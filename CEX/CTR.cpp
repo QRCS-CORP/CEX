@@ -365,7 +365,7 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 		// generate random at output offset
 		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr);
 		// xor with input at offsets
-		Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+		Utility::MemUtils::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
@@ -400,7 +400,7 @@ void CTR::ProcessSequential(const std::vector<byte> &Input, const size_t InOffse
 
 	if (ALNLEN != 0)
 	{
-		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNLEN);
+		Utility::MemUtils::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
 	}
 
 	// get the remaining bytes

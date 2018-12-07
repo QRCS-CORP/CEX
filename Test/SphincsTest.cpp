@@ -127,10 +127,10 @@ namespace Test
 			throw;
 		}
 
-		// null prng and kdf
+		// null prng
 		try
 		{
-			Sphincs sgn(Enumeration::SphincsParameters::SPXS128F256, nullptr, nullptr);
+			Sphincs sgn(Enumeration::SphincsParameters::SPXS128F256, nullptr);
 
 			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE3"));
 		}
@@ -324,6 +324,8 @@ namespace Test
 
 	void SphincsTest::Stress()
 	{
+		const size_t CYCLES = TEST_CYCLES == 1 ? 1 : TEST_CYCLES / 2;
+
 		SecureRandom gen;
 		Sphincs sgn1(SphincsParameters::SPXS128F256);
 		Sphincs sgn2(SphincsParameters::SPXS256F256);
@@ -332,7 +334,6 @@ namespace Test
 		std::vector<byte> sig(0);
 		size_t msglen;
 		bool status;
-		const size_t CYCLES = TEST_CYCLES == 1 ? 1 : TEST_CYCLES / 2;
 
 		for (size_t i = 0; i < CYCLES; ++i)
 		{

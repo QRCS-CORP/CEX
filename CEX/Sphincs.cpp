@@ -14,10 +14,6 @@ Sphincs::Sphincs(SphincsParameters Parameters, Prngs PrngType)
 	:
 	m_destroyEngine(true),
 	m_isInitialized(false),
-	m_kdfGenerator(Parameters != SphincsParameters::None ? 
-		new Kdf::SHAKE(Parameters == SphincsParameters::SPXS128F256 ? 
-			Enumeration::ShakeModes::SHAKE128 : Enumeration::ShakeModes::SHAKE256) : 
-		throw CryptoAsymmetricException("Sphincs:CTor", "The sphincs parameters can not be none!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException("Sphincs:CTor", "The prng type can not be none!")),
 	m_isSigner(false),
@@ -26,12 +22,10 @@ Sphincs::Sphincs(SphincsParameters Parameters, Prngs PrngType)
 {
 }
 
-Sphincs::Sphincs(SphincsParameters Parameters, IPrng* Rng, IKdf* Generator)
+Sphincs::Sphincs(SphincsParameters Parameters, IPrng* Rng)
 	:
 	m_destroyEngine(false),
 	m_isInitialized(false),
-	m_kdfGenerator(Generator != nullptr ? Generator :
-		throw CryptoAsymmetricException("Sphincs:CTor", "The kdf can not be null!")),
 	m_rndGenerator(Rng != nullptr ? Rng :
 		throw CryptoAsymmetricException("Sphincs:CTor", "The prng can not be null!")),
 	m_isSigner(false),
@@ -45,8 +39,8 @@ Sphincs::~Sphincs()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_isSigner = false;
 		m_isInitialized = false;
+		m_isSigner = false;
 		m_spxParameters = SphincsParameters::None;
 
 		// release keys
@@ -66,18 +60,16 @@ Sphincs::~Sphincs()
 			{
 				m_rndGenerator.reset(nullptr);
 			}
-			if (m_kdfGenerator != nullptr)
-			{
-				m_kdfGenerator.reset(nullptr);
-			}
+
 			m_destroyEngine = false;
 		}
 		else
 		{
+			// release the generator (received through ctor2) back to caller
 			if (m_rndGenerator != nullptr)
 			{
-				// release the generator (received through ctor2) back to caller
 				m_rndGenerator.release();
+				m_rndGenerator = nullptr;
 			}
 		}
 	}
@@ -129,8 +121,7 @@ IAsymmetricKeyPair* Sphincs::Generate()
 	std::vector<byte> pk(SPXF256::SPHINCS_PUBLICKEY_SIZE);
 	std::vector<byte> sk(SPXF256::SPHINCS_SECRETKEY_SIZE);
 
-	SPXF256::Generate(pk, sk, m_rndGenerator, m_kdfGenerator);
-
+	SPXF256::Generate(pk, sk, m_rndGenerator, m_spxParameters);
 	SphincsPublicKey* apk = new SphincsPublicKey(m_spxParameters, pk);
 	SphincsPrivateKey* ask = new SphincsPrivateKey(m_spxParameters, sk);
 
@@ -162,6 +153,8 @@ const void Sphincs::Initialize(IAsymmetricKey* Key)
 
 size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature)
 {
+	size_t sgnlen;
+
 	if (!m_isInitialized)
 	{
 		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme has not been initialized!");
@@ -175,15 +168,15 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 		throw CryptoAsymmetricException("Sphincs:Sign", "The message size must be non-zero!");
 	}
 
-	size_t sgnlen;
-
-	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->R(), m_rndGenerator, m_kdfGenerator);
+	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->R(), m_rndGenerator, m_spxParameters);
 
 	return sgnlen;
 }
 
 bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message)
 {
+	uint result;
+
 	if (!m_isInitialized)
 	{
 		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme has not been initialized!");
@@ -193,28 +186,9 @@ bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Mess
 		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme is not initialized for verification!");
 	}
 
-	uint result;
-
-	result = SPXF256::Verify(Message, Signature, m_publicKey->P(), m_kdfGenerator);
+	result = SPXF256::Verify(Message, Signature, m_publicKey->P(), m_spxParameters);
 
 	return (result == 1);
-}
-
-void Sphincs::Test()
-{
-	Sphincs sgn(SphincsParameters::SPXS128F256);
-	IAsymmetricKeyPair* kp = sgn.Generate();
-	std::vector<byte> msg1(32);
-	std::vector<byte> sig(0);
-	// generate the signature
-	sgn.Initialize(kp->PrivateKey());
-	sgn.Sign(msg1, sig);
-	sgn.Initialize(kp->PublicKey());
-	std::vector<byte> msg2(0);
-
-	// if authentication fails, this will throw
-	sgn.Verify(sig, msg2);
-
 }
 
 NAMESPACE_SPHINCSEND

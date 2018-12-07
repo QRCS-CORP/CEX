@@ -46,7 +46,7 @@ public:
 	{
 		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
 		{
-			Output[i] ^= static_cast<ulong>(IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
+			Output[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
 		}
 	}
 

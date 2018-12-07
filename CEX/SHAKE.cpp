@@ -9,6 +9,7 @@ NAMESPACE_KDF
 
 using Utility::ArrayUtils;
 using Utility::IntUtils;
+using Digest::Keccak;
 using Utility::MemUtils;
 
 const std::string SHAKE::CLASS_NAME("SHAKE");
@@ -20,7 +21,7 @@ SHAKE::SHAKE(ShakeModes ShakeModeType)
 	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_domainCode(SHAKE_DOMAIN),
 	m_hashSize((ShakeModeType == ShakeModes::SHAKE128) ? 16 : (ShakeModeType == ShakeModes::SHAKE256) ? 32 :
-	(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
+		(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_kdfState(),
@@ -37,6 +38,7 @@ SHAKE::~SHAKE()
 	{
 		m_isDestroyed = true;
 		m_blockSize = 0;
+		m_domainCode = 0x00;
 		m_hashSize = 0;
 		m_isInitialized = false;
 		m_shakeMode = ShakeModes::None;
@@ -229,7 +231,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == m_blockSize)
 			{
-				ArrayUtils::AbsorbBlock8to64(pad, 0, m_kdfState, m_blockSize);
+				Keccak::Absorb(pad, 0, m_blockSize, m_kdfState);
 				Permute(m_kdfState);
 				offset = 0;
 			}
@@ -247,7 +249,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == m_blockSize)
 			{
-				ArrayUtils::AbsorbBlock8to64(pad, 0, m_kdfState, m_blockSize);
+				Keccak::Absorb(pad, 0, m_blockSize, m_kdfState);
 				Permute(m_kdfState);
 				offset = 0;
 			}
@@ -270,13 +272,30 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 
 void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	while (Length != 0)
+	if (Length >= m_blockSize)
 	{
-		const size_t BLKLEN = IntUtils::Min(m_blockSize, Length);
-		MemUtils::Copy(m_kdfState, 0, Output, OutOffset, BLKLEN);
+		const size_t BLKCNT = Length / m_blockSize;
+
+		if (m_shakeMode != ShakeModes::SHAKE1024)
+		{
+			Keccak::SqueezeR24(m_kdfState, Output, OutOffset, BLKCNT, m_blockSize);
+			const size_t BLKOFF = BLKCNT * m_blockSize;
+			Length -= BLKOFF;
+			OutOffset += BLKOFF;
+		}
+		else
+		{
+			Keccak::SqueezeR48(m_kdfState, Output, OutOffset, BLKCNT, m_blockSize);
+			const size_t BLKOFF = BLKCNT * m_blockSize;
+			Length -= BLKOFF;
+			OutOffset += BLKOFF;
+		}
+	}
+
+	if (Length != 0)
+	{
 		Permute(m_kdfState);
-		Length -= BLKLEN;
-		OutOffset += BLKLEN;
+		MemUtils::Copy(m_kdfState, 0, Output, OutOffset, Length);
 	}
 }
 
@@ -291,7 +310,7 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 		// sequential loop through blocks
 		while (Length >= m_blockSize)
 		{
-			ArrayUtils::AbsorbBlock8to64(Input, InOffset, m_kdfState, m_blockSize);
+			Keccak::Absorb(Input, InOffset, m_blockSize, m_kdfState);
 			Permute(m_kdfState);
 			InOffset += m_blockSize;
 			Length -= m_blockSize;
@@ -308,9 +327,7 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 		MemUtils::Clear(msg, Length, m_blockSize - Length);
 		msg[m_blockSize - 1] |= 0x80;
-		ArrayUtils::AbsorbBlock8to64(msg, 0, m_kdfState, m_blockSize);
-
-		Permute(m_kdfState);
+		Keccak::Absorb(msg, 0, m_blockSize, m_kdfState);
 	}
 }
 
@@ -318,7 +335,7 @@ void SHAKE::LoadState()
 {
 	// initialize state arrays
 	Reset();
-	// define legal key sizes (just a recomendation, only min size is enforced)
+	// define legal key sizes (just a recommendation, only min size is enforced)
 	m_legalKeySizes.resize(3);
 	// minimum security is half the digest output size
 	m_legalKeySizes[0] = SymmetricKeySize((m_hashSize / 2), 0, 0);
@@ -332,12 +349,21 @@ void SHAKE::Permute(std::array<ulong, STATE_SIZE> &State)
 {
 	if (m_shakeMode != ShakeModes::SHAKE1024)
 	{
-		// rng uses the unrolled timing-neutral permutation
-		Digest::Keccak::PermuteR24P1600U(State);
+#if defined(CEX_DIGEST_COMPACT)
+		// memory conservative compact form
+		Keccak::PermuteR24P1600U(State);
+#else
+		// unrolled timing-neutral form
+		Keccak::PermuteR24P1600U(State);
+#endif
 	}
 	else
 	{
-		Digest::Keccak::PermuteR48P1600U(State);
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600U(State);
+#else
+		Keccak::PermuteR48P1600U(State);
+#endif
 	}
 }
 

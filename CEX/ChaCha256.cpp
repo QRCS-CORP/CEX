@@ -521,7 +521,7 @@ void ChaCha256::Process(const std::vector<byte> &Input, size_t InOffset, std::ve
 
 		if (ALNLEN != 0)
 		{
-			MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNLEN);
+			MemUtils::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
 		}
 
 		// get the remaining bytes
@@ -550,7 +550,7 @@ void ChaCha256::Process(const std::vector<byte> &Input, size_t InOffset, std::ve
 			// create random at offset position
 			this->Generate(thdCtr, Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// xor with input at offset
-			MemUtils::XorBlock(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+			MemUtils::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{

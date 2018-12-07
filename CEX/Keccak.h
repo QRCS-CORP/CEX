@@ -20,6 +20,8 @@
 #define CEX_KECCAK_H
 
 #include "CexDomain.h"
+#include "IntUtils.h"
+#include "MemUtils.h"
 
 #if defined(__AVX2__)
 #	include "ULong256.h"
@@ -29,6 +31,9 @@
 #endif
 
 NAMESPACE_DIGEST
+
+using Utility::IntUtils;
+using Utility::MemUtils;
 
 #if defined(__AVX2__)
 	using Numeric::ULong256;
@@ -76,10 +81,244 @@ class Keccak
 
 private:
 
-	static const std::vector<ulong> RC24;
-	static const std::vector<ulong> RC48;
+	static const std::array<ulong, 24> RC24;
+	static const std::array<ulong, 48> RC48;
 
 public:
+
+	const static size_t KECCAK_STATE_SIZE = 25;
+
+	/// <summary>
+	/// The Keccak absorb function; copy bytes from a byte array to the state array.
+	/// <para>Input length must be 64-bit aligned.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename Array>
+	static void Absorb(const Array &Input, size_t InOffset, size_t InLength, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	{
+		CexAssert(InLength % sizeof(ulong) == 0, "the input length is not 64-bit aligned");
+
+#if !defined(CEX_IS_LITTLE_ENDIAN)
+		MemUtils::XOR(Input, InOffset, State, 0, InLength);
+#else
+		for (size_t i = 0; i < InLength / sizeof(ulong); ++i)
+		{
+			State[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+		}
+#endif
+	}
+
+	/// <summary>
+	/// The Keccak 24-round extraction function; extract blocks of state to an output 8-bit array
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations uint64 state array</param>
+	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="Blocks">The number of blocks to extract</param>
+	/// <param name="Rate">The Keccak extraction rate</param>
+	template<typename Array>
+	static void SqueezeR24(std::array<ulong, KECCAK_STATE_SIZE> &State, Array &Output, size_t OutOffset, size_t Blocks, size_t Rate)
+	{
+		while (Blocks > 0)
+		{
+#if defined(CEX_DIGEST_COMPACT)
+			Digest::Keccak::PermuteR24P1600C(State);
+#else
+			Digest::Keccak::PermuteR24P1600U(State);
+#endif
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+			MemUtils::Copy(State, 0, Output, OutOffset, Rate);
+#else
+
+			for (size_t i = 0; i < (Rate >> 3); i++)
+			{
+				IntUtils::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
+			}
+#endif
+
+			OutOffset += Rate;
+			--Blocks;
+		}
+	}
+
+	/// <summary>
+	/// The Keccak 48-round extraction function; extract blocks of state to an output 8-bit array
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations uint64 state array</param>
+	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="Blocks">The number of blocks to extract</param>
+	/// <param name="Rate">The Keccak extraction rate</param>
+	template<typename Array>
+	static void SqueezeR48(std::array<ulong, KECCAK_STATE_SIZE> &State, Array &Output, size_t OutOffset, size_t Blocks, size_t Rate)
+	{
+		while (Blocks > 0)
+		{
+#if defined(CEX_DIGEST_COMPACT)
+			Digest::Keccak::PermuteR48P1600C(State);
+#else
+			Digest::Keccak::PermuteR48P1600U(State);
+#endif
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+			MemUtils::Copy(State, 0, Output, OutOffset, Rate);
+#else
+
+			for (size_t i = 0; i < (Rate >> 3); i++)
+			{
+				IntUtils::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
+			}
+#endif
+
+			OutOffset += Rate;
+			--Blocks;
+			}
+	}
+
+	/// <summary>
+	/// The Keccak XOF function using 24 rounds; process an input seed array and return a pseudo-random output array.
+	/// <para>A compact form of the SHAKE XOF function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of seed bytes to process</param>
+	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="OutLength">The number of output bytes to produce</param>
+	/// <param name="Rate">The block rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayA, typename ArrayB>
+	static void XOFR24(const ArrayA &Input, size_t InOffset, size_t InLength, ArrayB &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	{
+		std::array<byte, 200> msg = { 0 };
+		std::array<ulong, 25> state = { 0 };
+		size_t i;
+
+		while (InLength >= Rate)
+		{
+			Keccak::Absorb(Input, InOffset, Rate, state);
+#if defined(CEX_DIGEST_COMPACT)
+			Keccak::PermuteR24P1600C(state);
+#else
+			Keccak::PermuteR24P1600U(state);
+#endif
+			InLength -= Rate;
+			InOffset += Rate;
+		}
+
+		MemUtils::Copy(Input, InOffset, msg, 0, InLength);
+		msg[InLength] = 0x1F;
+		MemUtils::Clear(msg, InLength + 1, Rate - InLength + 1);
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemUtils::XOR(msg, 0, state, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			state[i] ^= IntUtils::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+
+		size_t blkcnt = OutLength / Rate;
+		Keccak::SqueezeR24(state, Output, OutOffset, blkcnt, Rate);
+		OutOffset += blkcnt * Rate;
+		OutLength -= blkcnt * Rate;
+
+		if (OutLength != 0)
+		{
+#if defined(CEX_DIGEST_COMPACT)
+			Digest::Keccak::PermuteR24P1600C(state);
+#else
+			Keccak::PermuteR24P1600U(state);
+#endif
+
+			const size_t FNLBLK = OutLength % sizeof(ulong) == 0 ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
+
+			for (i = 0; i < FNLBLK; i++)
+			{
+				IntUtils::Le64ToBytes(state[i], msg, (8 * i));
+			}
+
+			MemUtils::Copy(msg, 0, Output, OutOffset, OutLength);
+		}
+	}
+
+	/// <summary>
+	/// The Keccak XOF function using 48 rounds; process an input seed array and return a pseudo-random output array.
+	/// <para>A compact form of the SHAKE XOF function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of seed bytes to process</param>
+	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="OutLength">The number of output bytes to produce</param>
+	/// <param name="Rate">The block rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayA, typename ArrayB>
+	static void XOFR48(const ArrayA &Input, size_t InOffset, size_t InLength, ArrayB &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	{
+		std::array<byte, 200> msg = { 0 };
+		std::array<ulong, 25> state = { 0 };
+		size_t i;
+
+		while (InLength >= Rate)
+		{
+			Keccak::Absorb(Input, InOffset, Rate, state);
+#if defined(CEX_DIGEST_COMPACT)
+			Keccak::PermuteR48P1600C(state);
+#else
+			Keccak::PermuteR48P1600U(state);
+#endif
+			InLength -= Rate;
+			InOffset += Rate;
+		}
+
+		MemUtils::Copy(Input, InOffset, msg, 0, InLength);
+		msg[InLength] = 0x1F;
+		MemUtils::Clear(msg, InLength + 1, Rate - InLength + 1);
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemUtils::XOR(msg, 0, state, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			state[i] ^= IntUtils::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+
+		size_t blkcnt = OutLength / Rate;
+		Keccak::SqueezeR48(state, Output, OutOffset, blkcnt, Rate);
+		OutOffset += blkcnt * Rate;
+		OutLength -= blkcnt * Rate;
+
+		if (OutLength != 0)
+		{
+#if defined(CEX_DIGEST_COMPACT)
+			Digest::Keccak::PermuteR48P1600C(state);
+#else
+			Keccak::PermuteR48P1600U(state);
+#endif
+
+			const size_t FNLBLK = OutLength % sizeof(ulong) == 0 ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
+
+			for (i = 0; i < FNLBLK; i++)
+			{
+				IntUtils::Le64ToBytes(state[i], msg, (8 * i));
+			}
+
+			MemUtils::Copy(msg, 0, Output, OutOffset, OutLength);
+		}
+	}
 
 	/// <summary>
 	/// The compact form of the 24 round (standard) SHA3 permutation function.
@@ -88,7 +327,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR24P1600C(std::array<ulong, 25> &State);
+	static void PermuteR24P1600C(std::array<ulong, KECCAK_STATE_SIZE> &State);
 
 	/// <summary>
 	/// The unrolled form of the 24 round (standard) SHA3 permutation function.
@@ -97,7 +336,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR24P1600U(std::array<ulong, 25> &State);
+	static void PermuteR24P1600U(std::array<ulong, KECCAK_STATE_SIZE> &State);
 
 	/// <summary>
 	/// The compact form of the 48 round (extended) SHA3 permutation function.
@@ -106,7 +345,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR48P1600C(std::array<ulong, 25> &State);
+	static void PermuteR48P1600C(std::array<ulong, KECCAK_STATE_SIZE> &State);
 
 	/// <summary>
 	/// The unrolled form of the 48 round (extended) SHA3 permutation function.
@@ -115,7 +354,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR48P1600U(std::array<ulong, 25> &State);
+	static void PermuteR48P1600U(std::array<ulong, KECCAK_STATE_SIZE> &State);
 
 #if defined(__AVX2__)
 

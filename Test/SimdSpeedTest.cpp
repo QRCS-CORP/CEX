@@ -1352,7 +1352,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				MemUtils::XorBlock(buffer3, 0, buffer4, 0, buffer3.size());
+				MemUtils::XOR(buffer3, 0, buffer4, 0, buffer3.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;

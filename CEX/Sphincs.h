@@ -20,7 +20,6 @@
 #define CEX_SPHINCS_H
 
 #include "IAsymmetricSign.h"
-#include "IKdf.h"
 #include "SphincsKeyPair.h"
 #include "SphincsParameters.h"
 #include "SphincsPrivateKey.h"
@@ -28,7 +27,6 @@
 
 NAMESPACE_SPHINCS
 
-using Kdf::IKdf;
 using Key::Asymmetric::SphincsKeyPair;
 using Enumeration::SphincsParameters;
 using Key::Asymmetric::SphincsPrivateKey;
@@ -110,7 +108,6 @@ private:
 	bool m_destroyEngine;
 	bool m_isInitialized;
 	bool m_isSigner;
-	std::unique_ptr<IKdf> m_kdfGenerator;
 	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
 	std::unique_ptr<SphincsPrivateKey> m_privateKey;
 	std::unique_ptr<SphincsPublicKey> m_publicKey;
@@ -143,10 +140,9 @@ public:
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Rng">A pointer to the seed Prng function</param>
-	/// <param name="Generator">The internal kdf generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	Sphincs(SphincsParameters Parameters, IPrng* Rng, IKdf* Generator);
+	Sphincs(SphincsParameters Parameters, IPrng* Rng);
 
 	/// <summary>
 	/// Finalizer: destroys the containers objects
@@ -222,8 +218,6 @@ public:
 	/// 
 	/// <returns>Returns true if the signature matches</returns>
 	bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) override;
-
-	void Test();
 };
 
 NAMESPACE_SPHINCSEND

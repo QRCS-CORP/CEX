@@ -502,7 +502,7 @@ void ChaCha512::Process(const std::vector<byte> &Input, const size_t InOffset, s
 
 		if (ALNLEN != 0)
 		{
-			MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNLEN);
+			MemUtils::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
 		}
 
 		// get the remaining bytes
@@ -531,7 +531,7 @@ void ChaCha512::Process(const std::vector<byte> &Input, const size_t InOffset, s
 			// create random at offset position
 			this->Generate(Output, OutOffset + (i * CNKLEN), thdCtr, CNKLEN);
 			// xor with input at offset
-			MemUtils::XorBlock(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+			MemUtils::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{

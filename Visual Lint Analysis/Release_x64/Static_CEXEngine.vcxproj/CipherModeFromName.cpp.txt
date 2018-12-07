@@ -1,6 +1,0 @@
-
---- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherModeFromName.cpp (C++)
-
---- Global Wrap-up
-
- error 900: (Note -- Successful completion, 0 messages produced)

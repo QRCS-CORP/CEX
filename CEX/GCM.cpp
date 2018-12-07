@@ -371,7 +371,7 @@ bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 void GCM::CalculateMac()
 {
 	m_gcmHash->FinalizeBlock(m_checkSum, m_aadSize, m_msgSize);
-	Utility::MemUtils::XorBlock(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
+	Utility::MemUtils::XOR(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
 	Utility::MemUtils::COPY128(m_checkSum, 0, m_msgTag, 0);
 	Reset();
 

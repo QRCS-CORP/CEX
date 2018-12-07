@@ -81,7 +81,7 @@ class SHAKE final : public IKdf
 {
 private:
 
-	static const size_t BUFFER_SIZE = 168;
+	static const size_t BUFFER_SIZE = 200;
 	static const std::string CLASS_NAME;
 	static const byte CSHAKE_DOMAIN = 0x04;
 	static const size_t MIN_KEYLEN = 4;

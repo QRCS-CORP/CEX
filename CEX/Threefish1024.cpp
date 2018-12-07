@@ -474,7 +474,7 @@ void Threefish1024::Process(const std::vector<byte> &Input, const size_t InOffse
 
 		if (ALNLEN != 0)
 		{
-			MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNLEN);
+			MemUtils::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
 		}
 
 		// process the remaining bytes
@@ -503,7 +503,7 @@ void Threefish1024::Process(const std::vector<byte> &Input, const size_t InOffse
 			// create random at offset position
 			this->Generate(thdCtr, Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// xor with input at offset
-			MemUtils::XorBlock(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+			MemUtils::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{

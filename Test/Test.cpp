@@ -534,6 +534,7 @@ int main()
 			RunTest(new NTRUTest());
 			RunTest(new RingLWETest());
 			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
+			RunTest(new DilithiumTest());
 			RunTest(new SphincsTest());
 		}
 		else

@@ -2,10 +2,12 @@
 #include "IntUtils.h"
 #include "MemUtils.h"
 #include "SphincsUtils.h"
+#include "Keccak.h"
 
 NAMESPACE_SPHINCS
 
 using Utility::IntUtils;
+using Digest::Keccak;
 using Utility::MemUtils;
 
 void SPXF256::AddressToBytes(std::vector<byte> &Output, size_t Offset, const std::array<uint, 8> &Address)
@@ -54,7 +56,7 @@ void SPXF256::ChainLengths(std::vector<int> &Lengths, const std::vector<byte> &M
 	WotsChecksum(Lengths, SPX_WOTS_LEN1, Lengths);
 }
 
-void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std::vector<byte> &Leaf, uint LeafOffset, uint IdxOffset, const std::vector<byte> &AuthPath, size_t AuthOffset, uint TreeHeight, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::unique_ptr<IKdf> &Generator)
+void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std::vector<byte> &Leaf, uint LeafOffset, uint IdxOffset, const std::vector<byte> &AuthPath, size_t AuthOffset, uint TreeHeight, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, size_t Rate)
 {
 	// computes a Root node given a Leaf and an auth path.
 	// expects Addressess to be complete other than the tree_height and tree_index
@@ -90,12 +92,12 @@ void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std:
 		// pick the right or left neighbor, depending on parity of the node
 		if (LeafOffset & 1)
 		{
-			THash(buf1, SPX_N, buf1, 0, 2, PkSeed, Address, buf2, mask, Generator);
+			THash(buf1, SPX_N, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
 			MemUtils::Copy(AuthPath, AuthOffset, buf1, 0, SPX_N);
 		}
 		else
 		{
-			THash(buf1, 0, buf1, 0, 2, PkSeed, Address, buf2, mask, Generator);
+			THash(buf1, 0, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
 			MemUtils::Copy(AuthPath, AuthOffset, buf1, SPX_N, SPX_N);
 		}
 
@@ -107,10 +109,10 @@ void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std:
 	IdxOffset >>= 1;
 	SphincsUtils::SetTreeHeight(Address, TreeHeight);
 	SphincsUtils::SetTreeIndex(Address, LeafOffset + IdxOffset);
-	THash(Root, RootOffset, buf1, 0, 2, PkSeed, Address, buf2, mask, Generator);
+	THash(Root, RootOffset, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
 }
 
-void SPXF256::ForsGenLeaf(std::vector<byte> &Leaf, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, uint AddressIdx, const std::array<uint, 8> &TreeAddress, std::unique_ptr<IKdf> &Generator)
+void SPXF256::ForsGenLeaf(std::vector<byte> &Leaf, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, uint AddressIdx, const std::array<uint, 8> &TreeAddress, size_t Rate)
 {
 	std::array<uint, 8> leafaddress = { 0 };
 
@@ -118,16 +120,16 @@ void SPXF256::ForsGenLeaf(std::vector<byte> &Leaf, const std::vector<byte> &Secr
 	SphincsUtils::CopyKeypairAddress(TreeAddress, leafaddress);
 	SphincsUtils::SetType(leafaddress, SPX_ADDR_TYPE_FORSTREE);
 	SphincsUtils::SetTreeIndex(leafaddress, AddressIdx);
-	ForsGenSk(Leaf, 0, SecretSeed, leafaddress, Generator);
-	ForsSkToLeaf(Leaf, Leaf, 0, PublicSeed, leafaddress, Generator);
+	ForsGenSk(Leaf, 0, SecretSeed, leafaddress, Rate);
+	ForsSkToLeaf(Leaf, Leaf, 0, PublicSeed, leafaddress, Rate);
 }
 
-void SPXF256::ForsGenSk(std::vector<byte> &Secret, size_t SecretOffset, const std::vector<byte> &Seed, std::array<uint, 8> &Address, std::unique_ptr<IKdf> &Generator)
+void SPXF256::ForsGenSk(std::vector<byte> &Secret, size_t SecretOffset, const std::vector<byte> &Seed, std::array<uint, 8> &Address, size_t Rate)
 {
-	PrfAddress(Secret, SecretOffset, Seed, Address, Generator);
+	PrfAddress(Secret, SecretOffset, Seed, Address, Rate);
 }
 
-void SPXF256::ForsPkFromSig(std::vector<byte> &PublicKey, size_t PubKeyOffset, const std::vector<byte> &Signature, size_t SigOffset, const std::array<byte, SPX_FORS_MSG_BYTES> &Message, const std::vector<byte> &PublicSeed, const std::array<uint, 8> &ForsAddress, std::unique_ptr<IKdf> &Generator)
+void SPXF256::ForsPkFromSig(std::vector<byte> &PublicKey, size_t PubKeyOffset, const std::vector<byte> &Signature, size_t SigOffset, const std::array<byte, SPX_FORS_MSG_BYTES> &Message, const std::vector<byte> &PublicSeed, const std::array<uint, 8> &ForsAddress, size_t Rate)
 {
 	std::array<uint, 8> forstreeaddr = { 0 };
 	std::array<uint, 8> forspkaddr = { 0 };
@@ -152,20 +154,20 @@ void SPXF256::ForsPkFromSig(std::vector<byte> &PublicKey, size_t PubKeyOffset, c
 		SphincsUtils::SetTreeHeight(forstreeaddr, 0);
 		SphincsUtils::SetTreeIndex(forstreeaddr, indices[idx] + idxoffset);
 		// derive the leaf from the included secret key part
-		ForsSkToLeaf(leaf, Signature, idxsig, PublicSeed, forstreeaddr, Generator);
+		ForsSkToLeaf(leaf, Signature, idxsig, PublicSeed, forstreeaddr, Rate);
 		idxsig += SPX_N;
 		// derive the corresponding root node of this tree
-		ComputeRoot(roots, idx * SPX_N, leaf, indices[idx], idxoffset, Signature, idxsig, SPX_FORS_HEIGHT, PublicSeed, forstreeaddr, Generator);
+		ComputeRoot(roots, idx * SPX_N, leaf, indices[idx], idxoffset, Signature, idxsig, SPX_FORS_HEIGHT, PublicSeed, forstreeaddr, Rate);
 		idxsig += SPX_N * SPX_FORS_HEIGHT;
 	}
 
 	// hash horizontally across all tree roots to derive the public key
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + SPX_FORS_TREES * SPX_N);
 	std::vector<byte> mask(SPX_FORS_TREES * SPX_N);
-	THash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Generator);
+	THash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Rate);
 }
 
-void SPXF256::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vector<byte> &PublicKey, const std::array<byte, SPX_FORS_MSG_BYTES> &Message, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, const std::array<uint, 8> &ForsAddress, std::unique_ptr<IKdf> &Generator)
+void SPXF256::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vector<byte> &PublicKey, const std::array<byte, SPX_FORS_MSG_BYTES> &Message, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, const std::array<uint, 8> &ForsAddress, size_t Rate)
 {
 	std::array<uint, 8> forstreeaddr = { 0 };
 	std::array<uint, 8> forspkaddr = { 0 };
@@ -191,28 +193,28 @@ void SPXF256::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vect
 		SphincsUtils::SetTreeHeight(forstreeaddr, 0);
 		SphincsUtils::SetTreeIndex(forstreeaddr, indices[idx] + idxoffset);
 		// include the secret key part that produces the selected leaf node
-		ForsGenSk(Signature, idxsm, SecretSeed, forstreeaddr, Generator);
+		ForsGenSk(Signature, idxsm, SecretSeed, forstreeaddr, Rate);
 		idxsm += SPX_N;
 		// compute the authentication path for this leaf node
-		TreeHashF(roots, idx * SPX_N, Signature, idxsm, SecretSeed, PublicSeed, indices[idx], idxoffset, SPX_FORS_HEIGHT, forstreeaddr, stack, heights, Generator);
+		TreeHashF(roots, idx * SPX_N, Signature, idxsm, SecretSeed, PublicSeed, indices[idx], idxoffset, SPX_FORS_HEIGHT, forstreeaddr, stack, heights, Rate);
 		idxsm += SPX_N * SPX_FORS_HEIGHT;
 	}
 
 	// hash horizontally across all tree roots to derive the public key
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + (SPX_FORS_TREES * SPX_N));
 	std::vector<byte> mask(SPX_FORS_TREES * SPX_N);
-	THash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Generator);
+	THash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Rate);
 }
 
-void SPXF256::ForsSkToLeaf(std::vector<byte> &Leaf, const std::vector<byte> &SecretKey, size_t KeyOffset, const std::vector<byte> &PublicSeed, std::array<uint, 8> &LeafAddress, std::unique_ptr<IKdf> &Generator)
+void SPXF256::ForsSkToLeaf(std::vector<byte> &Leaf, const std::vector<byte> &SecretKey, size_t KeyOffset, const std::vector<byte> &PublicSeed, std::array<uint, 8> &LeafAddress, size_t Rate)
 {
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + 1 * SPX_N);
 	std::vector<byte> mask(SPX_N);
 
-	THash(Leaf, 0, SecretKey, KeyOffset, 1, PublicSeed, LeafAddress, buf, mask, Generator);
+	THash(Leaf, 0, SecretKey, KeyOffset, 1, PublicSeed, LeafAddress, buf, mask, Rate);
 }
 
-void SPXF256::GenChain(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, uint Start, uint Steps, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::unique_ptr<IKdf> &Generator)
+void SPXF256::GenChain(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, uint Start, uint Steps, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, size_t Rate)
 {
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + 1 * SPX_N);
 	std::vector<byte> mask(1 * SPX_N);
@@ -225,22 +227,22 @@ void SPXF256::GenChain(std::vector<byte> &Output, size_t OutOffset, const std::v
 	for (idx = Start; idx < (Start + Steps) && idx < SPX_WOTS_W; ++idx)
 	{
 		SphincsUtils::SetHashAddress(Address, idx);
-		THash(Output, OutOffset, Output, OutOffset, 1, PkSeed, Address, buf, mask, Generator);
+		THash(Output, OutOffset, Output, OutOffset, 1, PkSeed, Address, buf, mask, Rate);
 	}
 }
 
-void SPXF256::GenMessageRandom(const std::array<byte, SPX_N> &SkPrf, const std::vector<byte> &OptRnd, std::vector<byte> &Message, size_t MsgOffset, size_t MsgLength, std::unique_ptr<IKdf> &Generator)
+void SPXF256::GenMessageRandom(const std::array<byte, SPX_N> &SkPrf, const std::vector<byte> &OptRnd, std::vector<byte> &Message, size_t MsgOffset, size_t MsgLength, size_t Rate)
 {
 	MemUtils::Copy(SkPrf, 0, Message, MsgOffset - (2 * SPX_N), SPX_N);
 	MemUtils::Copy(OptRnd, 0, Message, MsgOffset - SPX_N, SPX_N);
 
 	std::vector<byte> k(MsgLength + (2 * SPX_N));
 	MemUtils::Copy(Message, MsgOffset - (2 * SPX_N), k, 0, k.size());
-	Generator->Initialize(k);
-	Generator->Generate(Message, 0, SPX_N);
+
+	XOF(k, 0, k.size(), Message, 0, SPX_N, Rate);
 }
 
-void SPXF256::HashMessage(std::array<byte, SPX_FORS_MSG_BYTES> &Digest, ulong &Tree, uint &LeafIndex, const std::vector<byte> &Rand, const std::vector<byte> &PublicKey, std::vector<byte> &Message, size_t MsgOffset, size_t MsgLength, std::unique_ptr<IKdf> &Generator)
+void SPXF256::HashMessage(std::array<byte, SPX_FORS_MSG_BYTES> &Digest, ulong &Tree, uint &LeafIndex, const std::vector<byte> &Rand, const std::vector<byte> &PublicKey, std::vector<byte> &Message, size_t MsgOffset, size_t MsgLength, size_t Rate)
 {
 	const int32_t SPX_TREE_BITS = (SPX_TREE_HEIGHT * (SPX_D - 1));
 	const int32_t SPX_TREE_BYTES = ((SPX_TREE_BITS + 7) / 8);
@@ -254,8 +256,8 @@ void SPXF256::HashMessage(std::array<byte, SPX_FORS_MSG_BYTES> &Digest, ulong &T
 
 	std::vector<byte> k(MsgLength + SPX_N + SPX_PK_BYTES);
 	MemUtils::Copy(Message, MsgOffset - SPX_N - SPX_PK_BYTES, k, 0, k.size());
-	Generator->Initialize(k);
-	Generator->Generate(buf, 0, SPX_DGST_BYTES);
+
+	XOF(k, 0, k.size(), buf, 0, SPX_DGST_BYTES, Rate);
 
 	MemUtils::Copy(buf, 0, Digest, 0, SPX_FORS_MSG_BYTES);
 	Tree = SphincsUtils::BytesToUll(buf, SPX_FORS_MSG_BYTES, SPX_TREE_BYTES);
@@ -284,7 +286,7 @@ void SPXF256::MessageToIndices(std::vector<uint> &Indices, const std::array<byte
 	}
 }
 
-void SPXF256::PrfAddress(std::vector<byte> &Output, size_t Offset, const std::vector<byte> &Key, const std::array<uint, 8> &Address, std::unique_ptr<IKdf> &Generator)
+void SPXF256::PrfAddress(std::vector<byte> &Output, size_t Offset, const std::vector<byte> &Key, const std::array<uint, 8> &Address, size_t Rate)
 {
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES);
 
@@ -293,11 +295,11 @@ void SPXF256::PrfAddress(std::vector<byte> &Output, size_t Offset, const std::ve
 
 	std::vector<byte> k(SPX_N + SPX_ADDR_BYTES);
 	MemUtils::Copy(buf, 0, k, 0, k.size());
-	Generator->Initialize(k);
-	Generator->Generate(Output, Offset, SPX_N);
+
+	XOF(k, 0, k.size(), Output, Offset, SPX_N, Rate);
 }
 
-void SPXF256::THash(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, const uint InputBlocks, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::vector<byte> &Buffer, std::vector<byte> &Mask, std::unique_ptr<IKdf> &Generator)
+void SPXF256::THash(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, const uint InputBlocks, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::vector<byte> &Buffer, std::vector<byte> &Mask, size_t Rate)
 {
 	size_t i;
 
@@ -308,8 +310,8 @@ void SPXF256::THash(std::vector<byte> &Output, size_t OutOffset, const std::vect
 
 	std::vector<byte> k(SPX_N + SPX_ADDR_BYTES);
 	MemUtils::Copy(Buffer, 0, k, 0, k.size());
-	Generator->Initialize(k);
-	Generator->Generate(Mask, 0, InputBlocks * SPX_N);
+
+	XOF(k, 0, k.size(), Mask, 0, InputBlocks * SPX_N, Rate);
 
 	for (i = 0; i < InputBlocks * SPX_N; ++i)
 	{
@@ -318,12 +320,12 @@ void SPXF256::THash(std::vector<byte> &Output, size_t OutOffset, const std::vect
 
 	k.resize(SPX_N + SPX_ADDR_BYTES + InputBlocks * SPX_N);
 	MemUtils::Copy(Buffer, 0, k, 0, k.size());
-	Generator->Initialize(k);
-	Generator->Generate(Output, OutOffset, SPX_N);
+
+	XOF(k, 0, k.size(), Output, OutOffset, SPX_N, Rate);
 }
 
 void SPXF256::TreeHashF(std::vector<byte> &Root, size_t RootOffset, std::vector<byte> &Authpath, size_t AuthOffset, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, uint LeafIndex,
-	uint IndexOffset, uint TreeHeight, std::array<uint, 8> &TreeAddress, std::vector<byte> &Stack, std::vector<uint> &Heights, std::unique_ptr<IKdf> &Generator)
+	uint IndexOffset, uint TreeHeight, std::array<uint, 8> &TreeAddress, std::vector<byte> &Stack, std::vector<uint> &Heights, size_t Rate)
 {
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + 2 * SPX_N);
 	std::vector<byte> leaf(SPX_N);
@@ -333,11 +335,11 @@ void SPXF256::TreeHashF(std::vector<byte> &Root, size_t RootOffset, std::vector<
 	size_t offset;
 
 	offset = 0;
-
+	// idx=1024, th=10
 	for (idx = 0; idx < static_cast<uint>(1 << TreeHeight); ++idx)
 	{
 		// add the next leaf node to the stack
-		ForsGenLeaf(leaf, SkSeed, PkSeed, idx + IndexOffset, TreeAddress, Generator);
+		ForsGenLeaf(leaf, SkSeed, PkSeed, idx + IndexOffset, TreeAddress, Rate);
 		MemUtils::Copy(leaf, 0, Stack, offset * SPX_N, SPX_N);
 		offset++;
 		Heights[offset - 1] = 0;
@@ -357,7 +359,7 @@ void SPXF256::TreeHashF(std::vector<byte> &Root, size_t RootOffset, std::vector<
 			SphincsUtils::SetTreeHeight(TreeAddress, Heights[offset - 1] + 1);
 			SphincsUtils::SetTreeIndex(TreeAddress, treeidx + (IndexOffset >> (Heights[offset - 1] + 1)));
 			// hash the top-most nodes from the stack together
-			THash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Generator);
+			THash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Rate);
 			--offset;
 			// note that the top-most node is now one layer higher
 			++Heights[offset - 1];
@@ -374,7 +376,7 @@ void SPXF256::TreeHashF(std::vector<byte> &Root, size_t RootOffset, std::vector<
 }
 
 void SPXF256::TreeHashW(std::vector<byte> &Root, std::vector<byte> &Authpath, size_t AuthOffset, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, uint LeafIndex,
-	uint IndexOffset, uint TreeHeight, std::array<uint, 8> &TreeAddress, std::vector<byte> &Stack, std::vector<uint> &Heights, std::unique_ptr<IKdf> &Generator)
+	uint IndexOffset, uint TreeHeight, std::array<uint, 8> &TreeAddress, std::vector<byte> &Stack, std::vector<uint> &Heights, size_t Rate)
 {
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + 2 * SPX_N);
 	std::vector<byte> mask(2 * SPX_N);
@@ -387,7 +389,7 @@ void SPXF256::TreeHashW(std::vector<byte> &Root, std::vector<byte> &Authpath, si
 	for (idx = 0; idx < (uint)(1 << TreeHeight); idx++)
 	{
 		// add the next leaf node to the stack
-		WotsGenLeaf(Stack, offset * static_cast<size_t>(SPX_N), SkSeed, PkSeed, idx + IndexOffset, TreeAddress, Generator);
+		WotsGenLeaf(Stack, offset * static_cast<size_t>(SPX_N), SkSeed, PkSeed, idx + IndexOffset, TreeAddress, Rate);
 		offset++;
 		Heights[offset - 1] = 0;
 
@@ -406,7 +408,7 @@ void SPXF256::TreeHashW(std::vector<byte> &Root, std::vector<byte> &Authpath, si
 			SphincsUtils::SetTreeHeight(TreeAddress, Heights[offset - 1] + 1);
 			SphincsUtils::SetTreeIndex(TreeAddress, treeidx + (IndexOffset >> (Heights[offset - 1] + 1)));
 			// hash the top-most nodes from the stack together
-			THash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Generator);
+			THash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Rate);
 			offset--;
 			// note that the top-most node is now one layer higher
 			Heights[offset - 1]++;
@@ -444,7 +446,7 @@ void SPXF256::WotsChecksum(std::vector<int> &CSumBaseW, size_t BaseOffset, const
 	BaseW(CSumBaseW, BaseOffset, SPX_WOTS_LEN2, csumbytes);
 }
 
-void SPXF256::WotsGenLeaf(std::vector<byte> &Leaf, size_t LeafOffset, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, uint AddressIndex, const std::array<uint, 8> &TreeAddress, std::unique_ptr<IKdf> &Generator)
+void SPXF256::WotsGenLeaf(std::vector<byte> &Leaf, size_t LeafOffset, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, uint AddressIndex, const std::array<uint, 8> &TreeAddress, size_t Rate)
 {
 	// computes the leaf at a given address. First generates the WOTS key pair, then computes leaf by hashing horizontally
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + SPX_WOTS_LEN * SPX_N);
@@ -458,32 +460,32 @@ void SPXF256::WotsGenLeaf(std::vector<byte> &Leaf, size_t LeafOffset, const std:
 	SphincsUtils::CopySubtreeAddress(TreeAddress, wotsaddr);
 	SphincsUtils::SetKeypairAddress(wotsaddr, AddressIndex);
 
-	WotsGenPk(pk, SkSeed, PkSeed, wotsaddr, Generator);
+	WotsGenPk(pk, SkSeed, PkSeed, wotsaddr, Rate);
 	SphincsUtils::CopyKeypairAddress(wotsaddr, wotspkaddr);
-	THash(Leaf, LeafOffset, pk, 0, SPX_WOTS_LEN, PkSeed, wotspkaddr, buf, mask, Generator);
+	THash(Leaf, LeafOffset, pk, 0, SPX_WOTS_LEN, PkSeed, wotspkaddr, buf, mask, Rate);
 }
 
-void SPXF256::WotsGenPk(std::vector<byte> &PublicKey, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::unique_ptr<IKdf> &Generator)
+void SPXF256::WotsGenPk(std::vector<byte> &PublicKey, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, size_t Rate)
 {
 	uint idx;
 
 	for (idx = 0; idx < SPX_WOTS_LEN; ++idx)
 	{
 		SphincsUtils::SetChainAddress(Address, idx);
-		WotsGenSk(PublicKey, idx * SPX_N, SkSeed, Address, Generator);
-		GenChain(PublicKey, idx * SPX_N, PublicKey, idx * SPX_N, 0, SPX_WOTS_W - 1, PkSeed, Address, Generator);
+		WotsGenSk(PublicKey, idx * SPX_N, SkSeed, Address, Rate);
+		GenChain(PublicKey, idx * SPX_N, PublicKey, idx * SPX_N, 0, SPX_WOTS_W - 1, PkSeed, Address, Rate);
 	}
 }
 
-void SPXF256::WotsGenSk(std::vector<byte> &Key, size_t Offset, const std::vector<byte> &KeySeed, std::array<uint, 8> &WotsAddress, std::unique_ptr<IKdf> &Generator)
+void SPXF256::WotsGenSk(std::vector<byte> &Key, size_t Offset, const std::vector<byte> &KeySeed, std::array<uint, 8> &WotsAddress, size_t Rate)
 {
 	// make sure that the hash address is actually zeroed
 	SphincsUtils::SetHashAddress(WotsAddress, 0);
 	// generate sk element
-	PrfAddress(Key, Offset, KeySeed, WotsAddress, Generator);
+	PrfAddress(Key, Offset, KeySeed, WotsAddress, Rate);
 }
 
-void SPXF256::WotsPkFromSig(std::vector<byte> &PublicKey, const std::vector<byte> &Signature, size_t SigOffset, const std::vector<byte> &Message, const std::vector<byte> &PrivateSeed, std::array<uint, 8> &Address, std::unique_ptr<IKdf> &Generator)
+void SPXF256::WotsPkFromSig(std::vector<byte> &PublicKey, const std::vector<byte> &Signature, size_t SigOffset, const std::vector<byte> &Message, const std::vector<byte> &PrivateSeed, std::array<uint, 8> &Address, size_t Rate)
 {
 	std::vector<int> lengths(SPX_WOTS_LEN);
 	uint idx;
@@ -493,11 +495,11 @@ void SPXF256::WotsPkFromSig(std::vector<byte> &PublicKey, const std::vector<byte
 	for (idx = 0; idx < SPX_WOTS_LEN; ++idx)
 	{
 		SphincsUtils::SetChainAddress(Address, idx);
-		GenChain(PublicKey, idx * SPX_N, Signature, SigOffset + (idx * SPX_N), lengths[idx], (SPX_WOTS_W - 1) - lengths[idx], PrivateSeed, Address, Generator);
+		GenChain(PublicKey, idx * SPX_N, Signature, SigOffset + (idx * SPX_N), lengths[idx], (SPX_WOTS_W - 1) - lengths[idx], PrivateSeed, Address, Rate);
 	}
 }
 
-void SPXF256::WotsSign(std::vector<byte> &Signature, size_t SigOffset, const std::vector<byte> &Message, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, std::array<uint, 8> &Address, std::unique_ptr<IKdf> &Generator)
+void SPXF256::WotsSign(std::vector<byte> &Signature, size_t SigOffset, const std::vector<byte> &Message, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, std::array<uint, 8> &Address, size_t Rate)
 {
 	std::vector<int> lengths(SPX_WOTS_LEN);
 	uint idx;
@@ -507,12 +509,21 @@ void SPXF256::WotsSign(std::vector<byte> &Signature, size_t SigOffset, const std
 	for (idx = 0; idx < SPX_WOTS_LEN; ++idx)
 	{
 		SphincsUtils::SetChainAddress(Address, idx);
-		WotsGenSk(Signature, SigOffset + (idx * SPX_N), SecretSeed, Address, Generator);
-		GenChain(Signature, SigOffset + (idx * SPX_N), Signature, SigOffset + (idx * SPX_N), 0, lengths[idx], PublicSeed, Address, Generator);
+		WotsGenSk(Signature, SigOffset + (idx * SPX_N), SecretSeed, Address, Rate);
+		GenChain(Signature, SigOffset + (idx * SPX_N), Signature, SigOffset + (idx * SPX_N), 0, lengths[idx], PublicSeed, Address, Rate);
 	}
 }
 
-void SPXF256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, std::unique_ptr<IKdf> &Generator)
+void SPXF256::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+{
+#if defined(CEX_SHAKE_STRONG)
+	Keccak::XOFR48(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#else
+	Keccak::XOFR24(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#endif
+}
+
+void SPXF256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, SphincsParameters Parameters)
 {
 	// we do not need the auth path in key generation, but it simplifies the
 	// code to have just one treehash routine that computes both root and path in one function
@@ -524,7 +535,9 @@ void SPXF256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateK
 	std::vector<byte> root(SPX_N);
 	std::vector<byte> pkseed(SPX_N);
 	std::vector<byte> skseed(SPX_N);
+	size_t rate;
 
+	rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
 	SphincsUtils::SetLayerAddress(toptreeaddr, SPX_D - 1);
 	SphincsUtils::SetType(toptreeaddr, SPX_ADDR_TYPE_HASHTREE);
 
@@ -534,7 +547,7 @@ void SPXF256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateK
 	Rng->Generate(skseed, 0, SPX_N);
 
 	// compute root node of the top-most subtree
-	TreeHashW(root, authpath, 0, skseed, pkseed, 0, 0, SPX_TREE_HEIGHT, toptreeaddr, stack, heights, Generator);
+	TreeHashW(root, authpath, 0, skseed, pkseed, 0, 0, SPX_TREE_HEIGHT, toptreeaddr, stack, heights, rate);
 
 	// copy root and seeds to private key
 	MemUtils::Copy(root, 0, PrivateKey, 3 * SPX_N, SPX_N);
@@ -544,7 +557,7 @@ void SPXF256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateK
 	MemUtils::Copy(PrivateKey, 2 * SPX_N, PublicKey, 0, 2 * SPX_N);
 }
 
-size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, std::unique_ptr<IKdf> &Generator)
+size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, SphincsParameters Parameters)
 {
 	// returns an array containing the signature followed by the message
 
@@ -562,13 +575,15 @@ size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 	uint idx;
 	uint idxleaf;
 	uint idxsm;
+	size_t rate;
 
+	rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
 	MemUtils::Copy(PrivateKey, 0, skseed, 0, SPX_N);
 	MemUtils::Copy(PrivateKey, SPX_N, skprf, 0, SPX_N);
 	MemUtils::Copy(PrivateKey, 2 * SPX_N, pk, 0, 2 * SPX_N);
 	SphincsUtils::SetType(wotsaddr, SPX_ADDR_TYPE_WOTS);
 	SphincsUtils::SetType(treeaddr, SPX_ADDR_TYPE_HASHTREE);
-	Signature.resize(Message.size() + SPXF256::SPHINCS_SIGNATURE_SIZE);
+	Signature.resize(Message.size() + SPHINCS_SIGNATURE_SIZE);
 
 	// already put the message in the right place, to make it easier to prepend
 	// things when computing the hash over the message
@@ -583,15 +598,16 @@ size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 	// getting a large number of traces when the signer uses the same nodes
 	Rng->Generate(optrand);
 	// compute the digest randomization value
-	GenMessageRandom(skprf, optrand, Signature, SPX_BYTES, Message.size(), Generator);
+	GenMessageRandom(skprf, optrand, Signature, SPX_BYTES, Message.size(), rate);
 	// derive the message digest and leaf index from R, PK and M
-	HashMessage(mhash, tree, idxleaf, Signature, pk, Signature, SPX_BYTES, Message.size(), Generator);
+	HashMessage(mhash, tree, idxleaf, Signature, pk, Signature, SPX_BYTES, Message.size(), rate);
 
 	idxsm = SPX_N;
 	SphincsUtils::SetTreeAddress(wotsaddr, tree);
 	SphincsUtils::SetKeypairAddress(wotsaddr, idxleaf);
 	// sign the message hash using FORS
-	ForsSign(Signature, idxsm, root, mhash, skseed, pk, wotsaddr, Generator);
+	ForsSign(Signature, idxsm, root, mhash, skseed, pk, wotsaddr, rate);
+	//fors_sign(Signature.data() + idxsm, root.data(), mhash.data(), skseed.data(), pk.data(), wotsaddr.data()); //.38
 	idxsm += SPX_FORS_BYTES;
 
 	for (idx = 0; idx < SPX_D; ++idx)
@@ -601,10 +617,11 @@ size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 		SphincsUtils::CopySubtreeAddress(treeaddr, wotsaddr);
 		SphincsUtils::SetKeypairAddress(wotsaddr, idxleaf);
 		// compute a WOTS signature
-		WotsSign(Signature, idxsm, root, skseed, pk, wotsaddr, Generator);
+		WotsSign(Signature, idxsm, root, skseed, pk, wotsaddr, rate);
 		idxsm += SPX_WOTS_BYTES;
 		// compute the authentication path for the used WOTS leaf
-		TreeHashW(root, Signature, idxsm, skseed, pk, idxleaf, 0, SPX_TREE_HEIGHT, treeaddr, stack, heights, Generator);
+		TreeHashW(root, Signature, idxsm, skseed, pk, idxleaf, 0, SPX_TREE_HEIGHT, treeaddr, stack, heights, rate);
+		//treehash(root.data(), Signature.data() + idxsm, skseed.data(), pk.data(), idxleaf, 0, SPX_TREE_HEIGHT, treeaddr.data(), stack.data(), heights.data(), wots_gen_leaf);
 		idxsm += SPX_TREE_HEIGHT * SPX_N;
 		// update the indices for the next layer
 		idxleaf = (tree & ((1 << SPX_TREE_HEIGHT) - 1));
@@ -614,7 +631,7 @@ size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 	return SPX_BYTES + Message.size();
 }
 
-uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, std::unique_ptr<IKdf> &Generator)
+uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, SphincsParameters Parameters)
 {
 	// verifies a given signature-message pair under a given public key
 
@@ -636,7 +653,9 @@ uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signat
 	size_t msglen;
 	uint idx;
 	uint idxleaf;
+	size_t rate;
 
+	rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
 	idxsig = 0;
 	MemUtils::Copy(PublicKey, SPX_N, pkroot, 0, SPX_N);
 	MemUtils::Copy(PublicKey, 0, pkseed, 0, SPX_N);
@@ -659,13 +678,13 @@ uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signat
 	MemUtils::Copy(Signature, 0, sig, 0, SPX_BYTES);
 	// derive the message digest and leaf index from R || PK || M
 	// the additional SPX_N is a result of the hash domain separator
-	HashMessage(mhash, tree, idxleaf, sig, PublicKey, tmsg, SPX_BYTES, msglen, Generator);
+	HashMessage(mhash, tree, idxleaf, sig, PublicKey, tmsg, SPX_BYTES, msglen, rate);
 	idxsig += SPX_N;
 
 	// layer correctly defaults to 0, so no need to set layer address
 	SphincsUtils::SetTreeAddress(wotsaddr, tree);
 	SphincsUtils::SetKeypairAddress(wotsaddr, idxleaf);
-	ForsPkFromSig(root, 0, Signature, idxsig, mhash, pkseed, wotsaddr, Generator);
+	ForsPkFromSig(root, 0, Signature, idxsig, mhash, pkseed, wotsaddr, rate);
 	idxsig += SPX_FORS_BYTES;
 
 	// for each subtree
@@ -677,12 +696,12 @@ uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signat
 		SphincsUtils::SetKeypairAddress(wotsaddr, idxleaf);
 		SphincsUtils::CopyKeypairAddress(wotsaddr, wotspkaddr);
 		// the WOTS public key is only correct if the signature was correct
-		WotsPkFromSig(wotspk, sig, idxsig, root, pkseed, wotsaddr, Generator);
+		WotsPkFromSig(wotspk, sig, idxsig, root, pkseed, wotsaddr, rate);
 		idxsig += SPX_WOTS_BYTES;
 		// compute the leaf node using the WOTS public key
-		THash(leaf, 0, wotspk, 0, SPX_WOTS_LEN, pkseed, wotspkaddr, buf, mask, Generator);
+		THash(leaf, 0, wotspk, 0, SPX_WOTS_LEN, pkseed, wotspkaddr, buf, mask, rate);
 		// compute the root node of this subtree
-		ComputeRoot(root, 0, leaf, idxleaf, 0, sig, idxsig, SPX_TREE_HEIGHT, pkseed, treeaddr, Generator);
+		ComputeRoot(root, 0, leaf, idxleaf, 0, sig, idxsig, SPX_TREE_HEIGHT, pkseed, treeaddr, rate);
 		idxsig += SPX_TREE_HEIGHT * SPX_N;
 		// update the indices for the next layer
 		idxleaf = (tree & ((1 << SPX_TREE_HEIGHT) - 1));

@@ -34,10 +34,10 @@ Dilithium::~Dilithium()
 {
 	if (!m_isDestroyed)
 	{
-		m_isDestroyed = true;
-		m_isSigner = false;
-		m_isInitialized = false;
 		m_dlmParameters = DilithiumParameters::None;
+		m_isDestroyed = true;
+		m_isInitialized = false;
+		m_isSigner = false;
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -56,6 +56,7 @@ Dilithium::~Dilithium()
 			{
 				m_rndGenerator.reset(nullptr);
 			}
+
 			m_destroyEngine = false;
 		}
 		else

@@ -298,11 +298,11 @@ void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y)
 
 	for (size_t i = 0; i < 2 * MEM_COST; i += 2)
 	{
-		Utility::MemUtils::XorBlock(State, i * 16, X, 0, X.size() * sizeof(uint));
+		Utility::MemUtils::XOR(State, i * 16, X, 0, X.size() * sizeof(uint));
 		SalsaCore(X);
 		Utility::MemUtils::Copy(X, 0, Y, i * 8, 16 * sizeof(uint));
 
-		Utility::MemUtils::XorBlock(State, i * 16 + 16, X, 0, X.size() * sizeof(uint));
+		Utility::MemUtils::XOR(State, i * 16 + 16, X, 0, X.size() * sizeof(uint));
 		SalsaCore(X);
 		Utility::MemUtils::Copy(X, 0, Y, i * 8 + MEM_COST * 16, 16 * sizeof(uint));
 	}
@@ -562,7 +562,7 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 	for (size_t i = 0; i < N; ++i)
 	{
 		uint j = X[bCount - 16] & NMASK;
-		Utility::MemUtils::XorBlock(V[j], 0, X, 0, X.size() * sizeof(uint));
+		Utility::MemUtils::XOR(V[j], 0, X, 0, X.size() * sizeof(uint));
 		BlockMix(X, Y);
 	}
 

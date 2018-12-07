@@ -73,7 +73,7 @@ void GHASH::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std:
 	while (Length != 0)
 	{
 		const size_t DIFFLEN = Utility::IntUtils::Min(Length, BLOCK_SIZE);
-		Utility::MemUtils::XorBlock(Input, InOffset, Output, 0, DIFFLEN);
+		Utility::MemUtils::XOR(Input, InOffset, Output, 0, DIFFLEN);
 		GcmMultiply(Output);
 		InOffset += DIFFLEN;
 		Length -= DIFFLEN;

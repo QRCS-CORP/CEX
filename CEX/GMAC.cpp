@@ -156,7 +156,7 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 
 	m_gmacHash->FinalizeBlock(m_msgCode, m_msgCounter, 0);
-	Utility::MemUtils::XorBlock(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
+	Utility::MemUtils::XOR(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
 	Utility::MemUtils::Copy(m_msgCode, 0, Output, OutOffset, BLOCK_SIZE);
 	Reset();
 

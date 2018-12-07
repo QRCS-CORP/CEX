@@ -156,11 +156,11 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	{
 		Cipher::Symmetric::Block::Padding::ISO7816 pad;
 		pad.AddPadding(m_msgBuffer, m_msgLength);
-		Utility::MemUtils::XorBlock(m_K2, 0, m_msgBuffer, 0, m_macSize);
+		Utility::MemUtils::XOR(m_K2, 0, m_msgBuffer, 0, m_macSize);
 	}
 	else
 	{
-		Utility::MemUtils::XorBlock(m_K1, 0, m_msgBuffer, 0, m_macSize);
+		Utility::MemUtils::XOR(m_K1, 0, m_msgBuffer, 0, m_macSize);
 	}
 
 	m_cipherMode->EncryptBlock(m_msgBuffer, 0, m_msgCode, 0);
