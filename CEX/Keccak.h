@@ -87,6 +87,10 @@ private:
 public:
 
 	const static size_t KECCAK_STATE_SIZE = 25;
+	const static size_t KECCAK_RATE128_SIZE = 168;
+	const static size_t KECCAK_RATE256_SIZE = 136;
+	const static size_t KECCAK_RATE512_SIZE = 72;
+	const static size_t KECCAK_RATE1024_SIZE = 72;
 
 	/// <summary>
 	/// The Keccak absorb function; copy bytes from a byte array to the state array.
@@ -195,7 +199,7 @@ public:
 	/// <param name="OutLength">The number of output bytes to produce</param>
 	/// <param name="Rate">The block rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	template<typename ArrayA, typename ArrayB>
-	static void XOFR24(const ArrayA &Input, size_t InOffset, size_t InLength, ArrayB &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	static void XOFR24P1600(const ArrayA &Input, size_t InOffset, size_t InLength, ArrayB &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 	{
 		std::array<byte, 200> msg = { 0 };
 		std::array<ulong, 25> state = { 0 };
@@ -264,7 +268,7 @@ public:
 	/// <param name="OutLength">The number of output bytes to produce</param>
 	/// <param name="Rate">The block rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	template<typename ArrayA, typename ArrayB>
-	static void XOFR48(const ArrayA &Input, size_t InOffset, size_t InLength, ArrayB &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	static void XOFR48P1600(const ArrayA &Input, size_t InOffset, size_t InLength, ArrayB &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 	{
 		std::array<byte, 200> msg = { 0 };
 		std::array<ulong, 25> state = { 0 };

@@ -18,11 +18,11 @@ Keccak512::Keccak512(bool Parallel)
 	:
 	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
 	m_isDestroyed(false),
-	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
+	m_msgBuffer(Parallel ? DEF_PRLDEGREE * Keccak::KECCAK_RATE512_SIZE : Keccak::KECCAK_RATE512_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_parallelProfile(Keccak::KECCAK_RATE512_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_treeDestroy(true),
-	m_treeParams(Parallel ? KeccakParams(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : KeccakParams(DIGEST_SIZE, 0, 0))
+	m_treeParams(Parallel ? KeccakParams(DIGEST_SIZE, static_cast<byte>(Keccak::KECCAK_RATE512_SIZE), DEF_PRLDEGREE) : KeccakParams(DIGEST_SIZE, 0, 0))
 {
 	// TODO: implement parallel alternate for single core cpu
 	if (Parallel && !m_parallelProfile.IsParallel())
@@ -42,9 +42,9 @@ Keccak512::Keccak512(KeccakParams &Params)
 	:
 	m_dgtState(1),
 	m_isDestroyed(false),
-	m_msgBuffer(BLOCK_SIZE),
+	m_msgBuffer(Keccak::KECCAK_RATE512_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
+	m_parallelProfile(Keccak::KECCAK_RATE512_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
 	m_treeDestroy(false),
 	m_treeParams(Params)
 {
@@ -60,7 +60,7 @@ Keccak512::Keccak512(KeccakParams &Params)
 	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
 	{
 		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
+		m_msgBuffer.resize(m_treeParams.FanOut() * Keccak::KECCAK_RATE512_SIZE);
 	}
 	else if (m_parallelProfile.IsParallel())
 	{
@@ -98,7 +98,7 @@ Keccak512::~Keccak512()
 
 size_t Keccak512::BlockSize() 
 { 
-	return BLOCK_SIZE; 
+	return Keccak::KECCAK_RATE512_SIZE; 
 }
 
 size_t Keccak512::DigestSize() 
@@ -170,8 +170,8 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 			while (m_msgLength != 0)
 			{
-				const size_t MSGRMD = (m_msgLength >= BLOCK_SIZE) ? BLOCK_SIZE : m_msgLength;
-				HashFinal(m_msgBuffer, blkCtr * BLOCK_SIZE, MSGRMD, m_dgtState[blkCtr]);
+				const size_t MSGRMD = (m_msgLength >= Keccak::KECCAK_RATE512_SIZE) ? Keccak::KECCAK_RATE512_SIZE : m_msgLength;
+				HashFinal(m_msgBuffer, blkCtr * Keccak::KECCAK_RATE512_SIZE, MSGRMD, m_dgtState[blkCtr]);
 				m_msgLength -= MSGRMD;
 				++blkCtr;
 			}
@@ -189,13 +189,13 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// compress full blocks
 		size_t blkOff = 0;
-		if (m_msgLength > BLOCK_SIZE)
+		if (m_msgLength > Keccak::KECCAK_RATE512_SIZE)
 		{
-			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
+			const size_t BLKRMD = m_msgLength - (m_msgLength % Keccak::KECCAK_RATE512_SIZE);
 
-			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
+			for (size_t i = 0; i < BLKRMD / Keccak::KECCAK_RATE512_SIZE; ++i)
 			{
-				Absorb(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, rootState);
+				Keccak::Absorb(m_msgBuffer, i * Keccak::KECCAK_RATE512_SIZE, Keccak::KECCAK_RATE512_SIZE, rootState.H);
 				Permute(rootState.H);
 			}
 
@@ -248,7 +248,7 @@ void Keccak512::Reset()
 		if (m_parallelProfile.IsParallel())
 		{
 			m_treeParams.NodeOffset() = static_cast<uint>(i);
-			Absorb(m_treeParams.ToBytes(), 0, BLOCK_SIZE, m_dgtState[i]);
+			Keccak::Absorb(m_treeParams.ToBytes(), 0, Keccak::KECCAK_RATE512_SIZE, m_dgtState[i].H);
 			Permute(m_dgtState[i].H);
 		}
 	}
@@ -280,7 +280,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				// empty the message buffer
 				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
-					Absorb(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, m_dgtState[i]);
+					Keccak::Absorb(m_msgBuffer, i * Keccak::KECCAK_RATE512_SIZE, Keccak::KECCAK_RATE512_SIZE, m_dgtState[i].H);
 					Permute(m_dgtState[i].H);
 				});
 
@@ -297,7 +297,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				// process large blocks
 				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
+					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK_RATE512_SIZE), m_dgtState[i], PRCLEN);
 				});
 
 				Length -= PRCLEN;
@@ -310,7 +310,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
+					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK_RATE512_SIZE), m_dgtState[i], PRMLEN);
 				});
 
 				Length -= PRMLEN;
@@ -319,15 +319,15 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		}
 		else
 		{
-			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
+			if (m_msgLength != 0 && (m_msgLength + Length >= Keccak::KECCAK_RATE512_SIZE))
 			{
-				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				const size_t RMDLEN = Keccak::KECCAK_RATE512_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
 					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
-				Absorb(m_msgBuffer, 0, BLOCK_SIZE, m_dgtState[0]);
+				Keccak::Absorb(m_msgBuffer, 0, Keccak::KECCAK_RATE512_SIZE, m_dgtState[0].H);
 				Permute(m_dgtState[0].H);
 				m_msgLength = 0;
 				InOffset += RMDLEN;
@@ -335,12 +335,12 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			}
 
 			// sequential loop through blocks
-			while (Length >= BLOCK_SIZE)
+			while (Length >= Keccak::KECCAK_RATE512_SIZE)
 			{
-				Absorb(Input, InOffset, BLOCK_SIZE, m_dgtState[0]);
+				Keccak::Absorb(Input, InOffset, Keccak::KECCAK_RATE512_SIZE, m_dgtState[0].H);
 				Permute(m_dgtState[0].H);
-				InOffset += BLOCK_SIZE;
-				Length -= BLOCK_SIZE;
+				InOffset += Keccak::KECCAK_RATE512_SIZE;
+				Length -= Keccak::KECCAK_RATE512_SIZE;
 			}
 		}
 
@@ -355,14 +355,6 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 //~~~Private Functions~~~//
 
-void Keccak512::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State)
-{
-	for (size_t i = 0; i < Length / sizeof(ulong); ++i)
-	{
-		State.H[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
-	}
-}
-
 void Keccak512::Permute(std::array<ulong, 25> &Hash)
 {
 #if defined(CEX_DIGEST_COMPACT)
@@ -375,8 +367,8 @@ void Keccak512::Permute(std::array<ulong, 25> &Hash)
 void Keccak512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State)
 {
 	Input[InOffset + Length] = DOMAIN_CODE;
-	Input[InOffset + BLOCK_SIZE - 1] |= 128;
-	Absorb(Input, InOffset, BLOCK_SIZE, State);
+	Input[InOffset + Keccak::KECCAK_RATE512_SIZE - 1] |= 128;
+	Keccak::Absorb(Input, InOffset, Keccak::KECCAK_RATE512_SIZE, State.H);
 	Permute(State.H);
 }
 
@@ -384,7 +376,7 @@ void Keccak512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Kec
 {
 	do
 	{
-		Absorb(Input, InOffset, BLOCK_SIZE, State);
+		Keccak::Absorb(Input, InOffset, Keccak::KECCAK_RATE512_SIZE, State.H);
 		Permute(State.H);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();

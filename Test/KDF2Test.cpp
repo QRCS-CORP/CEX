@@ -56,7 +56,7 @@ namespace Test
 			Kat(gen1, m_key[0], m_expected[0]);
 			OnProgress(std::string("KDF2Test: Passed KDF2 SHA2-256 known answer tests.."));
 
-			KDF2* gen2 = new KDF2(SHA2Digests::SHA256);
+			KDF2* gen2 = new KDF2(SHA2Digests::SHA512);
 			Kat(gen2, m_key[1], m_expected[1]);
 			OnProgress(std::string("KDF2Test: Passed KDF2 SHA2-512 known answer tests.."));
 
@@ -194,7 +194,7 @@ namespace Test
 		const std::vector<std::string> expected =
 		{
 			std::string("10A2403DB42A8743CB989DE86E668D168CBE6046E23FF26F741E87949A3BBA1311AC179F819A3D18412E9EB45668F2923C087C1299005F8D5FD42CA257BC93E8FEE0C5A0D2A8AA70185401FBBD99379EC76C663E9A29D0B70F3FE261A59CDC24875A60B4AACB1319FA11C3365A8B79A44669F26FBA933D012DB213D7E3B16349"),
-			std::string("211A46C25A7504326B07E6CA5EF7F8E099B1DE1BC714B34EBD7176AB210B26EA25993255FA267F496787D2A1026EFCEA204425E178BB79714979E1808D0855C8275049F5215968C0DD462A188200CFA1")
+			std::string("025B56E574E97FA3F7CEFF979963E3CDF2ED7D082FBC17B5DE5CB12E6CC9655AA807BCACF9C1653A64DFF1C51F0C6DA1970B7EBC0D097C149189433392C3AB5C98E98D6128E66ED62DE043F23A67FCB1")
 		};
 		HexConverter::Decode(expected, 2, m_expected);
 	}
@@ -202,15 +202,10 @@ namespace Test
 	void KDF2Test::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected)
 	{
 		std::vector<byte> otp(Expected.size());
-		KDF2 gen(SHA2Digests::SHA256);
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
 		Generator->Generate(otp, 0, otp.size());
-
-		/*std::string m = "";
-		HexConverter::ToString(otp, m);
-		std::cout << m << std::endl;*/
 
 		if (otp != Expected)
 		{

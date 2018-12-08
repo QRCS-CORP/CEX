@@ -1,10 +1,12 @@
 #include "MLWEQ7681N256.h"
 #include "MemUtils.h"
-#include "SHAKE.h"
+#include "Keccak.h"
 
 NAMESPACE_MODULELWE
 
-//~~~Constant Tables~~~//
+using Digest::Keccak;
+
+//~~~Constants~~~//
 
 const std::array<ushort, 256> MLWEQ7681N256::Zetas =
 {
@@ -227,16 +229,15 @@ void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 
 void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, MLWE_N>>> &A, const std::vector<byte> &Seed, bool Transposed)
 {
+	std::vector<byte> buf(Keccak::KECCAK_RATE128_SIZE * 4);
+	std::vector<byte> tmpK(Seed.size() + 2);
 	byte i;
 	byte j;
 	ushort val;
 	size_t ctr;
 	size_t pos;
 
-	std::vector<byte> tmpK(Seed.size() + 2);
 	Utility::MemUtils::Copy(Seed, 0, tmpK, 0, Seed.size());
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE128);
-	std::vector<byte> buf(gen.BlockSize() * 4);
 
 	for (i = 0; i < A.size(); i++)
 	{
@@ -256,8 +257,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 				tmpK[Seed.size()] = j;
 			}
 
-			gen.Initialize(tmpK);
-			gen.Generate(buf);
+			XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE128_SIZE);
 
 			while (ctr < MLWE_N)
 			{
@@ -273,7 +273,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 
 				if (pos > buf.size() - 2)
 				{
-					gen.Generate(buf, 0, gen.BlockSize());
+					XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE128_SIZE);
 					pos = 0;
 				}
 			}
@@ -303,9 +303,7 @@ void MLWEQ7681N256::PolyGetNoise(std::array<ushort, MLWE_N> &R, size_t Eta, cons
 	cust[6] = static_cast<byte>(Nonce & 0xFF);
 	cust[7] = static_cast<byte>(Nonce >> 8);
 
-	Kdf::SHAKE kdf;
-	kdf.Initialize(Seed, cust);
-	kdf.Generate(buf);
+	XOF(Seed, 0, Seed.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE256_SIZE);
 
 	Cbd(R, buf, Eta);
 }
@@ -858,6 +856,15 @@ void MLWEQ7681N256::UnpackPublicKey(std::vector<std::array<ushort, MLWE_N>> &Pk,
 void MLWEQ7681N256::UnpackSecretKey(std::vector<std::array<ushort, MLWE_N>> &Sk, const std::vector<byte> &PackedSk)
 {
 	PolyVecFrombytes(Sk, PackedSk);
+}
+
+void MLWEQ7681N256::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+{
+#if defined(CEX_SHAKE_STRONG)
+	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#else
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#endif
 }
 
 NAMESPACE_MODULELWEEND

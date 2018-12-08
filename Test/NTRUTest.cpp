@@ -47,6 +47,8 @@ namespace Test
 			OnProgress(std::string("NTRUTest: Passed message authentication test.."));
 			CipherText();
 			OnProgress(std::string("NTRUTest: Passed cipher-text integrity test.."));
+			Exception();
+			OnProgress(std::string("NTRUTest: Passed exception handling test.."));
 			PublicKey();
 			OnProgress(std::string("NTRUTest: Passed public key integrity test.."));
 			Serialization();
@@ -72,7 +74,7 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		// LPrime
+		// test param 1: NTRUS1LQ4591N761
 		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
@@ -89,16 +91,15 @@ namespace Test
 			throw TestException(std::string("NTRU"), std::string("L-Prime Message authentication integrity test failed! -NA1"));
 		}
 
-		delete kp1;
-
 		cpt.clear();
 		sec1.clear();
 		sec2.clear();
 		cpt.resize(0);
 		sec1.resize(64);
 		sec2.resize(64);
+		delete kp1;
 
-		// SPrime
+		// test param 2: NTRUS2SQ4591N761
 		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp2 = cpr2.Generate();
 
@@ -122,7 +123,7 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		// LPrime
+		// test param 1: NTRUS1LQ4591N761
 		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
@@ -139,16 +140,15 @@ namespace Test
 			throw TestException(std::string("NTRU"), std::string("L-Prime Cipher-text integrity test failed! -NC1"));
 		}
 
-		delete kp1;
-
 		cpt.clear();
 		sec1.clear();
 		sec2.clear();
 		cpt.resize(0);
 		sec1.resize(64);
 		sec2.resize(64);
+		delete kp1;
 
-		// SPrime
+		// test param 2: NTRUS2SQ4591N761
 		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp2 = cpr2.Generate();
 
@@ -225,7 +225,7 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		// LPrime
+		// test param 1: NTRUS1LQ4591N761
 		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
@@ -244,16 +244,15 @@ namespace Test
 			throw TestException(std::string("NTRU"), std::string("Public key integrity test failed! -NP1"));
 		}
 
-		delete kp1;
-
 		cpt.clear();
 		sec1.clear();
 		sec2.clear();
 		cpt.resize(0);
 		sec1.resize(64);
 		sec2.resize(64);
+		delete kp1;
 
-		// SPrime
+		// test param 2: NTRUS2SQ4591N761
 		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp2 = cpr2.Generate();
 
@@ -277,12 +276,14 @@ namespace Test
 
 	void NTRUTest::Serialization()
 	{
-		std::vector<byte> skey;
-		NTRU cpr(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
+		std::vector<byte> skey(0);
+
+		// test param 1: NTRUS1LQ4591N761
+		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr.Generate();
+			IAsymmetricKeyPair* kp = cpr1.Generate();
 			NTRUPrivateKey* priK1 = (NTRUPrivateKey*)kp->PrivateKey();
 			skey = priK1->ToBytes();
 			NTRUPrivateKey priK2(skey);
@@ -301,6 +302,34 @@ namespace Test
 				throw TestException(std::string("NTRU"), std::string("Public key serialization test has failed! -NR2"));
 			}
 		}
+
+		skey.clear();
+		skey.resize(0);
+
+		// test param 2: NTRUS2SQ4591N761
+		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
+
+		for (size_t i = 0; i < TEST_CYCLES; ++i)
+		{
+			IAsymmetricKeyPair* kp = cpr2.Generate();
+			NTRUPrivateKey* priK1 = (NTRUPrivateKey*)kp->PrivateKey();
+			skey = priK1->ToBytes();
+			NTRUPrivateKey priK2(skey);
+
+			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			{
+				throw TestException(std::string("NTRU"), std::string("Private key serialization test has failed! -NR3"));
+			}
+
+			NTRUPublicKey* pubK1 = (NTRUPublicKey*)kp->PublicKey();
+			skey = pubK1->ToBytes();
+			NTRUPublicKey pubK2(skey);
+
+			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
+			{
+				throw TestException(std::string("NTRU"), std::string("Public key serialization test has failed! -NR4"));
+			}
+		}
 	}
 
 	void NTRUTest::Stress()
@@ -310,7 +339,7 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		// LPrime
+		// test param 1: NTRUS1LQ4591N761
 		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
@@ -336,7 +365,14 @@ namespace Test
 			}
 		}
 
-		// SPrime
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+
+		// test param 2: NTRUS2SQ4591N761
 		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)

@@ -225,6 +225,8 @@ private:
 	static void UnpackPublicKey(std::vector<std::array<ushort, MLWE_N>> &Pk, std::vector<byte> &Seed, const std::vector<byte> &PackedPk);
 
 	static void UnpackSecretKey(std::vector<std::array<ushort, MLWE_N>> &Sk, const std::vector<byte> &PackedSk);
+
+	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 };
 
 NAMESPACE_MODULELWEEND

@@ -27,7 +27,7 @@ void SPXF256::BaseW(std::vector<int> &Output, size_t OutOffset, const size_t Out
 	// this only works when log_w is a divisor of 8
 	int32_t bits;
 	int32_t inoffset;
-	uint8_t total;
+	byte total;
 	size_t i;
 
 	bits = 0;
@@ -517,9 +517,9 @@ void SPXF256::WotsSign(std::vector<byte> &Signature, size_t SigOffset, const std
 void SPXF256::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
 #if defined(CEX_SHAKE_STRONG)
-	Keccak::XOFR48(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 #else
-	Keccak::XOFR24(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 #endif
 }
 

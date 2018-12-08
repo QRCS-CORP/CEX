@@ -1,8 +1,8 @@
 #include "RLWEQ12289N1024.h"
 #include "BCG.h"
 #include "GCM.h"
+#include "Keccak.h"
 #include "MemUtils.h"
-#include "SHAKE.h"
 
 #if defined(__AVX512__)
 #	include "UInt512.h"
@@ -16,6 +16,9 @@
 #endif
 
 NAMESPACE_RINGLWE
+
+using Digest::Keccak;
+using Utility::MemUtils;
 
 //~~~Constant Tables~~~//
 
@@ -482,8 +485,8 @@ byte RLWEQ12289N1024::HammimgWeight(byte A)
 {
 	// Compute the Hamming weight of a byte
 
-	uint8_t i;
-	uint8_t r;
+	byte i;
+	byte r;
 
 	r = 0;
 
@@ -685,23 +688,17 @@ void RLWEQ12289N1024::PolySample(std::array<ushort, RLWE_N> &R, const std::vecto
 	std::vector<byte> extseed(RLWE_SEED_SIZE + 2);
 	size_t i;
 	size_t j;
-	uint8_t a;
-	uint8_t b;
+	byte a;
+	byte b;
 
-	for (i = 0; i < RLWE_SEED_SIZE; ++i)
-	{
-		extseed[i] = Seed[i];
-	}
-
+	MemUtils::Copy(Seed, 0, extseed, 0, RLWE_SEED_SIZE);
 	extseed[RLWE_SEED_SIZE] = Nonce;
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
 
 	// Generate noise in blocks of 64 coefficients
 	for (i = 0; i < RLWE_N / 64; ++i)
 	{
-		extseed[RLWE_SEED_SIZE + 1] = static_cast<uint8_t>(i);
-		gen.Initialize(extseed);
-		gen.Generate(buf);
+		extseed[RLWE_SEED_SIZE + 1] = static_cast<byte>(i);
+		XOF(extseed, 0, extseed.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE256_SIZE);
 
 		for (j = 0; j < 64; j++)
 		{
@@ -771,36 +768,32 @@ void RLWEQ12289N1024::PolyTomessage(std::vector<byte> &Message, const std::array
 
 void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed)
 {
-	const size_t SHAKE128_RATE = 168;
-	std::vector<byte> buf(SHAKE128_RATE);
+	std::vector<byte> buf(Keccak::KECCAK_RATE128_SIZE);
 	std::vector<byte> extseed(RLWE_SEED_SIZE + 1);
 	size_t ctr;
 	size_t i;
 	size_t j;
 	ushort val;
 
-	for (i = 0; i < RLWE_SEED_SIZE; ++i)
-	{
-		extseed[i] = Seed[i];
-	}
-
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE128);
+	MemUtils::Copy(Seed, 0, extseed, 0, RLWE_SEED_SIZE);
 	ctr = 0;
+
 	// generate a in blocks of 64 coefficients
 	for (i = 0; i < RLWE_N / 64; ++i)
 	{
 		ctr = 0;
 		// domain-separate the 16 independent calls
-		extseed[RLWE_SEED_SIZE] = (uint8_t)i;
-		gen.Initialize(extseed);
+		extseed[RLWE_SEED_SIZE] = static_cast<byte>(i);
+
 		// very unlikely to run more than once
 		while (ctr < 64)
 		{
-			gen.Generate(buf);
+			XOF(extseed, 0, extseed.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE128_SIZE);
 
-			for (j = 0; j < SHAKE128_RATE && ctr < 64; j += 2)
+			for (j = 0; j < Keccak::KECCAK_RATE128_SIZE && ctr < 64; j += 2)
 			{
-				val = (buf[j] | ((ushort)buf[j + 1] << 8));
+				val = (buf[j] | (static_cast<ushort>(buf[j + 1]) << 8));
+
 				if (val < 5 * RLWE_Q)
 				{
 					A[(i * 64) + ctr] = val;
@@ -809,6 +802,15 @@ void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 			}
 		}
 	}
+}
+
+void RLWEQ12289N1024::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+{
+#if defined(CEX_SHAKE_STRONG)
+	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#else
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#endif
 }
 
 NAMESPACE_RINGLWEEND

@@ -9,6 +9,7 @@
 
 namespace Test
 {
+	using Enumeration::MLWEParameters;
 	using namespace Key::Asymmetric;
 	using namespace Cipher::Asymmetric::MLWE;
 
@@ -73,23 +74,66 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 
-		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		// test param 1: MLWES2Q7681N256
+		ModuleLWE cpr1(MLWEParameters::MLWES2Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
-		cpr.Initialize(kp->PublicKey());
-		cpr.Encapsulate(cpt, sec1);
+		cpr1.Initialize(kp1->PublicKey());
+		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
 		m_rngPtr->Generate(cpt, 0, 4);
 
-		cpr.Initialize(kp->PrivateKey());
+		cpr1.Initialize(kp1->PrivateKey());
 
-		if (cpr.Decapsulate(cpt, sec2))
+		if (cpr1.Decapsulate(cpt, sec2))
 		{
 			throw TestException(std::string("ModuleLWE"), std::string("Message authentication test failed! -MA1"));
 		}
 
-		delete kp;
+		delete kp1;
+
+		// test param 2: MLWES3Q7681N256
+		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+
+		cpt.resize(0);
+
+		cpr2.Initialize(kp2->PublicKey());
+		cpr2.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->Generate(cpt, 0, 4);
+
+		cpr2.Initialize(kp2->PrivateKey());
+
+		if (cpr2.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("ModuleLWE"), std::string("Message authentication test failed! -MA2"));
+		}
+
+		delete kp2;
+
+		// test param 3: MLWES4Q7681N256
+		ModuleLWE cpr3(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp3 = cpr3.Generate();
+
+		cpt.resize(0);
+
+		cpr3.Initialize(kp3->PublicKey());
+		cpr3.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->Generate(cpt, 0, 4);
+
+		cpr3.Initialize(kp3->PrivateKey());
+
+		if (cpr3.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("ModuleLWE"), std::string("Message authentication test failed! -MA3"));
+		}
+
+		delete kp3;
 	}
 
 	void ModuleLWETest::CipherText()
@@ -98,23 +142,66 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		// test param 1: MLWES2Q7681N256
+		ModuleLWE cpr1(MLWEParameters::MLWES2Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
-		cpr.Initialize(kp->PublicKey());
-		cpr.Encapsulate(cpt, sec1);
+		cpr1.Initialize(kp1->PublicKey());
+		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
 		m_rngPtr->Generate(cpt, 0, 4);
 
-		cpr.Initialize(kp->PrivateKey());
+		cpr1.Initialize(kp1->PrivateKey());
 
-		if (cpr.Decapsulate(cpt, sec2))
+		if (cpr1.Decapsulate(cpt, sec2))
 		{
 			throw TestException(std::string("ModuleLWE"), std::string("Cipher-text integrity test failed! -MC1"));
 		}
 
-		delete kp;
+		delete kp1;
+
+		// test param 2: MLWES3Q7681N256
+		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+
+		cpt.resize(0);
+
+		cpr2.Initialize(kp2->PublicKey());
+		cpr2.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->Generate(cpt, 0, 4);
+
+		cpr2.Initialize(kp2->PrivateKey());
+
+		if (cpr2.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("ModuleLWE"), std::string("Cipher-text integrity test failed! -MC2"));
+		}
+
+		delete kp2;
+
+		// test param 3: MLWES4Q7681N256
+		ModuleLWE cpr3(MLWEParameters::MLWES4Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp3 = cpr3.Generate();
+
+		cpt.resize(0);
+
+		cpr3.Initialize(kp3->PublicKey());
+		cpr3.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->Generate(cpt, 0, 4);
+
+		cpr3.Initialize(kp3->PrivateKey());
+
+		if (cpr3.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("ModuleLWE"), std::string("Cipher-text integrity test failed! -MC3"));
+		}
+
+		delete kp3;
 	}
 
 	void ModuleLWETest::Exception()
@@ -122,7 +209,7 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			ModuleLWE cpr(Enumeration::MLWEParameters::None, m_rngPtr);
+			ModuleLWE cpr(MLWEParameters::None, m_rngPtr);
 
 			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME1"));
 		}
@@ -136,7 +223,7 @@ namespace Test
 
 		try
 		{
-			ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, Enumeration::Prngs::None);
+			ModuleLWE cpr(MLWEParameters::MLWES3Q7681N256, Enumeration::Prngs::None);
 
 			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME2"));
 		}
@@ -151,7 +238,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			ModuleLWE cpra(Enumeration::MLWEParameters::MLWES3Q7681N256, Enumeration::Prngs::BCR);
+			ModuleLWE cpra(MLWEParameters::MLWES3Q7681N256, Enumeration::Prngs::BCR);
 			Cipher::Asymmetric::RLWE::RingLWE cprb;
 			// create an invalid key set
 			IAsymmetricKeyPair* kp = cprb.Generate();
@@ -174,36 +261,92 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		// test param 1: MLWES2Q7681N256
+		ModuleLWE cpr1(MLWEParameters::MLWES2Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = ((MLWEPublicKey*)kp->PublicKey())->P();
+		std::vector<byte> pk1 = ((MLWEPublicKey*)kp1->PublicKey())->P();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		MLWEPublicKey* pk2 = new MLWEPublicKey(Enumeration::MLWEParameters::MLWES3Q7681N256, pk1);
-		cpr.Initialize(pk2);
-		cpr.Encapsulate(cpt, sec1);
+		MLWEPublicKey* pk2 = new MLWEPublicKey(MLWEParameters::MLWES2Q7681N256, pk1);
+		cpr1.Initialize(pk2);
+		cpr1.Encapsulate(cpt, sec1);
 
-		cpr.Initialize(kp->PrivateKey());
+		cpr1.Initialize(kp1->PrivateKey());
 
-		if (cpr.Decapsulate(cpt, sec2))
+		if (cpr1.Decapsulate(cpt, sec2))
 		{
 			throw TestException(std::string("ModuleLWE"), std::string("Public-key integrity test failed! -MP1"));
 		}
 
-		delete kp;
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+		delete kp1;
+
+		// test param 2: MLWES3Q7681N256
+		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+
+		// alter public key
+		std::vector<byte> pk3 = ((MLWEPublicKey*)kp2->PublicKey())->P();
+		pk3[0] += 1;
+		pk3[1] += 1;
+		MLWEPublicKey* pk4 = new MLWEPublicKey(MLWEParameters::MLWES3Q7681N256, pk3);
+		cpr2.Initialize(pk4);
+		cpr2.Encapsulate(cpt, sec1);
+
+		cpr2.Initialize(kp2->PrivateKey());
+
+		if (cpr2.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("ModuleLWE"), std::string("Public-key integrity test failed! -MP2"));
+		}
+
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+		delete kp2;
+
+		// test param 3: MLWES4Q7681N256
+		ModuleLWE cpr3(MLWEParameters::MLWES4Q7681N256, m_rngPtr);
+		IAsymmetricKeyPair* kp3 = cpr3.Generate();
+
+		// alter public key
+		std::vector<byte> pk5 = ((MLWEPublicKey*)kp3->PublicKey())->P();
+		pk5[0] += 1;
+		pk5[1] += 1;
+		MLWEPublicKey* pk6 = new MLWEPublicKey(MLWEParameters::MLWES4Q7681N256, pk5);
+		cpr3.Initialize(pk6);
+		cpr3.Encapsulate(cpt, sec1);
+
+		cpr3.Initialize(kp3->PrivateKey());
+
+		if (cpr3.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("ModuleLWE"), std::string("Public-key integrity test failed! -MP3"));
+		}
+
+		delete kp3;
 	}
 
 	void ModuleLWETest::Serialization()
 	{
 		std::vector<byte> skey;
-		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES4Q7681N256, m_rngPtr);
+
+		// test param 1: MLWES2Q7681N256
+		ModuleLWE cpr1(MLWEParameters::MLWES2Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-
-			IAsymmetricKeyPair* kp = cpr.Generate();
+			IAsymmetricKeyPair* kp = cpr1.Generate();
 			MLWEPrivateKey* priK1 = (MLWEPrivateKey*)kp->PrivateKey();
 			skey = priK1->ToBytes();
 			MLWEPrivateKey priK2(skey);
@@ -222,6 +365,63 @@ namespace Test
 				throw TestException(std::string("ModuleLWE"), std::string("Public key serialization test has failed! -MR2"));
 			}
 		}
+
+		skey.clear();
+		skey.resize(0);
+
+		// test param 2: MLWES3Q7681N256
+		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
+
+		for (size_t i = 0; i < TEST_CYCLES; ++i)
+		{
+
+			IAsymmetricKeyPair* kp = cpr2.Generate();
+			MLWEPrivateKey* priK1 = (MLWEPrivateKey*)kp->PrivateKey();
+			skey = priK1->ToBytes();
+			MLWEPrivateKey priK2(skey);
+
+			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			{
+				throw TestException(std::string("ModuleLWE"), std::string("Private key serialization test has failed! -MR3"));
+			}
+
+			MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
+			skey = pubK1->ToBytes();
+			MLWEPublicKey pubK2(skey);
+
+			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
+			{
+				throw TestException(std::string("ModuleLWE"), std::string("Public key serialization test has failed! -MR4"));
+			}
+		}
+
+		skey.clear();
+		skey.resize(0);
+
+		// test param 3: MLWES4Q7681N256
+		ModuleLWE cpr3(MLWEParameters::MLWES4Q7681N256, m_rngPtr);
+
+		for (size_t i = 0; i < TEST_CYCLES; ++i)
+		{
+			IAsymmetricKeyPair* kp = cpr3.Generate();
+			MLWEPrivateKey* priK1 = (MLWEPrivateKey*)kp->PrivateKey();
+			skey = priK1->ToBytes();
+			MLWEPrivateKey priK2(skey);
+
+			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			{
+				throw TestException(std::string("ModuleLWE"), std::string("Private key serialization test has failed! -MR5"));
+			}
+
+			MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
+			skey = pubK1->ToBytes();
+			MLWEPublicKey pubK2(skey);
+
+			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
+			{
+				throw TestException(std::string("ModuleLWE"), std::string("Public key serialization test has failed! -MR6"));
+			}
+		}
 	}
 
 	void ModuleLWETest::Stress()
@@ -230,7 +430,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 
-		ModuleLWE cpr1(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
+		ModuleLWE cpr1(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
@@ -255,7 +455,14 @@ namespace Test
 			}
 		}
 
-		ModuleLWE cpr2(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+
+		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
@@ -280,7 +487,14 @@ namespace Test
 			}
 		}
 
-		ModuleLWE cpr3(Enumeration::MLWEParameters::MLWES4Q7681N256, m_rngPtr);
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+
+		ModuleLWE cpr3(MLWEParameters::MLWES4Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{

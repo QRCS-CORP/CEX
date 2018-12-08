@@ -74,16 +74,13 @@ namespace Test
 
 			MemoryStreamTest();
 			OnProgress(std::string("Passed MemoryStream self test.. "));
-			OnProgress(std::string(""));
 
 			SerializeStructTest();
 			OnProgress(std::string("Passed CipherDescription serialization test.."));
-			OnProgress(std::string(""));
 
 			OnProgress(std::string("***Testing Cipher Parameters***"));
 			ParametersTest();
 			OnProgress(std::string("Passed Cipher Parameters tests.."));
-			OnProgress(std::string(""));
 
 			Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
 			OnProgress(std::string("***Testing Padding Modes***"));
@@ -95,7 +92,6 @@ namespace Test
 			OnProgress(std::string("Passed CBC/TBC CipherStream test.."));
 			StreamModesTest(new CBC(eng), new ISO7816());
 			OnProgress(std::string("Passed CBC/ISO7816 CipherStream test.."));
-			OnProgress(std::string(""));
 
 			OnProgress(std::string("***Testing Cipher Modes***"));
 			StreamModesTest(new CTR(eng), new ISO7816());
@@ -104,7 +100,6 @@ namespace Test
 			OnProgress(std::string("Passed CFB CipherStream test.."));
 			StreamModesTest(new OFB(eng), new ISO7816());
 			OnProgress(std::string("Passed OFB CipherStream test.."));
-			OnProgress(std::string(""));
 			delete eng;
 
 			OnProgress(std::string("***Testing Cipher Description Initialization***"));
@@ -117,11 +112,8 @@ namespace Test
 				Enumeration::KeySizes::K256,				// key size
 				Enumeration::IVSizes::V128);				// cipher iv size
 
-
-
 			DescriptionTest(&cd);
 			OnProgress(std::string("Passed CipherDescription stream test.."));
-			OnProgress(std::string(""));
 			Cipher::Symmetric::Block::SHX* spx = new Cipher::Symmetric::Block::SHX();
 			StreamModesTest(new CBC(spx), new ISO7816());
 			delete spx;
@@ -141,7 +133,6 @@ namespace Test
 			Cipher::Symmetric::Block::SHX* shx = new Cipher::Symmetric::Block::SHX();
 			StreamModesTest(new CBC(shx), new ISO7816());
 			delete shx;
-			OnProgress(std::string(""));
 
 			return SUCCESS;
 		}

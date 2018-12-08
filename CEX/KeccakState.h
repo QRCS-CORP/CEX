@@ -31,7 +31,6 @@ NAMESPACE_DIGEST
 /// <summary>
 /// The Keccak state structure
 /// </summary> 
-
 struct KeccakState
 {
 	std::array<ulong, 25> H;

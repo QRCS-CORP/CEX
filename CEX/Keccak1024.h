@@ -76,7 +76,6 @@ class Keccak1024 final : public IDigest
 {
 private:
 
-	static const size_t BLOCK_SIZE = 72;
 	static const std::string CLASS_NAME;
 	static const size_t DEF_PRLDEGREE = 8;
 	static const size_t DIGEST_SIZE = 128;
@@ -235,7 +234,6 @@ public:
 
 private:
 
-	void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
 	void Permute(std::array<ulong, 25> &Hash);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length);
