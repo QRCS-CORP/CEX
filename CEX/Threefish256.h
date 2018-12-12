@@ -26,8 +26,13 @@
 #define CEX_THREEFISH256_H
 
 #include "IStreamCipher.h"
+#include "ShakeModes.h"
+#include "SymmetricSecureKey.h"
 
 NAMESPACE_STREAM
+
+using Enumeration::ShakeModes;
+using Key::Symmetric::SymmetricSecureKey;
 
 /// <summary>
 /// A parallelized and vectorized Threefish-256 72-round stream cipher [TSX256] implementation.
@@ -140,14 +145,14 @@ private:
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<Threefish512State> m_cipherState;
 	std::vector<byte> m_distributionCode;
+	ShakeModes m_generatorMode;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::vector<size_t> m_legalRounds;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ulong m_macCounter;
-	std::vector<byte> m_macKey;
+	std::unique_ptr<SymmetricSecureKey> m_macKey;
 	ParallelOptions m_parallelProfile;
 
 public:
@@ -170,8 +175,10 @@ public:
 	/// Use the Finalize function to derive the Mac code once processing of the message stream has completed.</para>
 	/// </summary>
 	/// 
-	/// <param name="Authenticator">The optional Message Authentication Code generator type</param>
-	explicit Threefish256(StreamAuthenticators Authenticator = StreamAuthenticators::None);
+	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid authentication method is chosen</exception>
+	explicit Threefish256(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -225,9 +232,9 @@ public:
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Read Only: Available transformation round assignments
+	/// Read Only: The stream ciphers class name
 	/// </summary>
-	const std::vector<size_t> &LegalRounds() override;
+	const std::string Name() override;
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
@@ -244,21 +251,19 @@ public:
 	ParallelOptions &ParallelProfile() override;
 
 	/// <summary>
-	/// Read Only: The stream ciphers class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Read Only: Number of rounds
-	/// </summary>
-	const size_t Rounds() override;
-
-	/// <summary>
 	/// Read Only: The legal tag length in bytes
 	/// </summary>
 	const size_t TagSize() override;
 
 	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// The stream ciphers authentication MAC generator type.
+	/// <para>Change the MAC generator (HMAC, KMAK -N), type used to authenticate the stream.</para>
+	/// </summary>
+	/// 
+	/// <param name="AuthenticatorType">The MAC generator type used to calculate the authentication code</param>
+	void Authenticator(StreamAuthenticators AuthenticatorType);
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output array.   

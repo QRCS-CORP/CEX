@@ -33,7 +33,7 @@ NAMESPACE_ROUTING
 /// 
 /// void ProgressTest()
 /// {
-/// 	CipherStream cs(Enumeration::SymmetricEngines::RDX,
+/// 	CipherStream cs(Enumeration::SymmetricCiphers::RDX,
 /// 		22,
 /// 		Enumeration::CipherModes::CBC,
 /// 		Enumeration::PaddingModes::PKCS7);

@@ -15,9 +15,9 @@ enum class CipherModes : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// Electronic CodeBook Mode (not secure, testing only)
+	/// Authenticated Counter Mode
 	/// </summary>
-	ECB = 1,
+	ACM = 1,
 	/// <summary>
 	/// Cipher Block Chaining Mode
 	/// </summary>
@@ -35,21 +35,25 @@ enum class CipherModes : byte
 	/// </summary>
 	EAX = 5,
 	/// <summary>
+	/// Electronic CodeBook Mode (not secure: should be used for testing or new constructions only)
+	/// </summary>
+	ECB = 6,
+	/// <summary>
 	/// Galois Counter AEAD Mode
 	/// </summary>
-	GCM = 6,
+	GCM = 7,
 	/// <summary>
 	/// Little Endian Integer Counter Mode
 	/// </summary>
-	ICM = 7,
+	ICM = 8,
 	/// <summary>
 	/// Offset CodeBook AEAD Mode
 	/// </summary>
-	OCB = 8,
+	OCB = 9,
 	/// <summary>
 	/// Output FeedBack Mode
 	/// </summary>
-	OFB = 9
+	OFB = 10
 };
 
 NAMESPACE_ENUMERATIONEND

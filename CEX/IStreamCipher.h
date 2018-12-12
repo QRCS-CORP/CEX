@@ -120,11 +120,6 @@ public:
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Read Only: Available transformation round assignments
-	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() = 0;
-
-	/// <summary>
 	/// Read Only: The stream ciphers class name
 	/// </summary>
 	virtual const std::string Name() = 0;
@@ -144,16 +139,19 @@ public:
 	virtual ParallelOptions &ParallelProfile() = 0;
 
 	/// <summary>
-	/// Read Only: Number of rounds
-	/// </summary>
-	virtual const size_t Rounds() = 0;
-
-	/// <summary>
 	/// Read Only: The legal tag length in bytes
 	/// </summary>
 	virtual const size_t TagSize() = 0;
 
 	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// Read/Write: The stream ciphers authentication MAC generator type.
+	/// <para>Set the MAC generator (HMAC, KMAK -N), type used to authenticate the stream.</para>
+	/// </summary>
+	/// 
+	/// <param name="AuthenticatorType">The MAC generator used to calculate the authentication code</param>
+	virtual void Authenticator(StreamAuthenticators AuthenticatorType) = 0;
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output array.   

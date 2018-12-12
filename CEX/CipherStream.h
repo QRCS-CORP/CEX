@@ -36,7 +36,7 @@
 #include "IPadding.h"
 #include "ParallelOptions.h"
 #include "SymmetricKeySize.h"
-#include "SymmetricEngines.h"
+#include "SymmetricCiphers.h"
 
 NAMESPACE_PROCESSING
 
@@ -52,7 +52,7 @@ using Cipher::Symmetric::Block::Padding::IPadding;
 using Key::Symmetric::ISymmetricKey;
 using Enumeration::PaddingModes;
 using Common::ParallelOptions;
-using Enumeration::SymmetricEngines;
+using Enumeration::SymmetricCiphers;
 using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>

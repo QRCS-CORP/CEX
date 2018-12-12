@@ -29,7 +29,11 @@ enum class StreamAuthenticators : byte
 	/// <summary>
 	/// The KMAC-512 message authentication code generator
 	/// </summary>
-	KMAC512 = 4
+	KMAC512 = 4, 
+	/// <summary>
+	/// The KMAC-1024 message authentication code generator (experimental)
+	/// </summary>
+	KMAC1024 = 5
 };
 
 NAMESPACE_ENUMERATIONEND

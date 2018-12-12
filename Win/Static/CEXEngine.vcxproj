@@ -193,6 +193,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\CEX\ACS.h" />
     <ClInclude Include="..\..\CEX\ACP.h" />
     <ClInclude Include="..\..\CEX\AeadModeFromName.h" />
     <ClInclude Include="..\..\CEX\AeadModes.h" />
@@ -406,7 +407,7 @@
     <ClInclude Include="..\..\CEX\StreamCiphers.h" />
     <ClInclude Include="..\..\CEX\StreamReader.h" />
     <ClInclude Include="..\..\CEX\StreamWriter.h" />
-    <ClInclude Include="..\..\CEX\SymmetricEngines.h" />
+    <ClInclude Include="..\..\CEX\SymmetricCiphers.h" />
     <ClInclude Include="..\..\CEX\TBC.h" />
     <ClInclude Include="..\..\CEX\UInt256.h" />
     <ClInclude Include="..\..\CEX\UInt512.h" />
@@ -417,6 +418,7 @@
     <ClInclude Include="..\..\CEX\ZeroPad.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\CEX\ACS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp" />
     <ClCompile Include="..\..\CEX\AHX.cpp" />

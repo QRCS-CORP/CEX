@@ -1,152 +1,148 @@
 // The GPL version 3 License (GPLv3)
+// 
 // Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
+// 
 // This program is free software : you can redistribute it and / or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
 // GNU General Public License for more details.
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
-// Principal Algorithms:
-// This cipher is based on the Threefish1024 stream cipher designed by Daniel J. Bernstein:
-// Threefish1024: <a href="http://www.ecrypt.eu.org/stream/salsa20pf.html"/>.
-// 
+//
 // Implementation Details:
-// Threefish1024: An implementation if the Threefish1024 implemented as a stream cipher
-// Written by John Underhill, September 11, 2018
+// An implementation of an Authenticated Counter Mode (ACS).
+// Written by John Underhill, December 9, 2018
 // Contact: develop@vtdev.com
 
-#ifndef CEX_THREEFISH1024_H
-#define CEX_THREEFISH1024_H
+#ifndef CEX_ACS_H
+#define CEX_ACS_H
 
 #include "IStreamCipher.h"
+#include "BlockCiphers.h"
+#include "BlockCipherExtensions.h"
+#include "CTR.h"
+#include "IBlockCipher.h"
+#include "IMac.h"
 #include "ShakeModes.h"
+#include "StreamAuthenticators.h"
 #include "SymmetricSecureKey.h"
 
 NAMESPACE_STREAM
 
+using Enumeration::BlockCiphers;
+using Enumeration::BlockCipherExtensions;
+using Cipher::Symmetric::Block::Mode::CTR;
+using Cipher::Symmetric::Block::Mode::IBlockCipher;
+using Mac::IMac;
 using Enumeration::ShakeModes;
+using Enumeration::StreamAuthenticators;
 using Key::Symmetric::SymmetricSecureKey;
 
 /// <summary>
-/// A parallelized and vectorized Threefish1024 120-round stream cipher [TSX1024] implementation.
-/// <para>Uses an optional authentication mode (HMAC(SHA2) or KMAC set through the constructor) to authenticate the stream.</para>
-/// </summary>
+/// An Encrypt and Authenticate AEAD Block Cipher Mode
+/// </summary> 
 /// 
 /// <example>
-/// <description>Encrypt an array:</description>
+/// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// SymmetricKey k(Key, Nonce);
-/// Threefish1024 cipher;
-/// // set to false to run in sequential mode
-/// cipher.IsParallel() = true;
-/// // calculated automatically based on cache size, but overridable
-/// cipher.ParallelBlockSize() = cipher.ProcessorCount() * 6400;
-/// cipher.Initialize(true, k);
-/// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
-/// </code>
-///
-/// <description>Encrypt and authenticate an array:</description>
-/// <code>
-/// SymmetricKey k(Key, Nonce);
-/// Threefish1024 cipher(StreamAuthenticators::HMACSHA256);
-/// // set to false to run in sequential mode
-/// cipher.IsParallel() = true;
+/// ACS cipher(BlockCiphers::Rijndael);
 /// // initialize for encryption
-/// cipher.Initialize(true, k);
-/// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
-/// // copy mac to end of ciphertext array
-/// cipher.Finalize(Output, OutOffset + Length, CodeLength);
+/// cipher.Initialize(true, SymmetricKey(Key, Nonce, [Info]));
+/// // encrypt one block
+/// size_t encLen = cipher.BlockSize();
+/// cipher.Transform(Input, 0, Output, 0, encLen);
+/// // append the mac code to the output
+/// cipher.Finalize(Output, encLen);
 /// </code>
+/// </example>
 ///
-/// <description>Decrypt and authenticate an array:</description>
+/// <example>
+/// <description>Decrypting a block of bytes:</description>
 /// <code>
-/// SymmetricKey k(Key, Nonce);
-/// Threefish1024 cipher(StreamAuthenticators::HMACSHA256);
-/// // set parallel to true to run in parallel mode
-/// cipher.IsParallel() = true;
+/// ACS cipher(BlockCiphers::Rijndael);
 /// // initialize for decryption
-/// cipher.Initialize(false, k);
-/// // decrypt the ciphertext
-/// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
-/// // copy mac to temp for comparison
-/// std::vector&lt;byte&gt; mac(cipher.TagSize(), 0);
-/// cipher.Finalize(mac, 0, mac.size());
-/// // constant time comparison of mac to embedded  code
-/// IntUtils::Compare(Input, InOffset + Length, mac, 0, mac.size());
+/// cipher.Initialize(false, SymmetricKey(Key, Nonce, [Associated Data]));
+/// // calculate offset; mac code should always be last block after ciphertext
+/// size_t decLen = Input.size() - cipher.BlockSize();
+/// // decrypt a block
+/// cipher.Transform(Input, 0, Output, 0, decLen);
+/// // generate the internal mac code and compare it
+/// if (!cipher.Verify(Input, decLen))
+///		throw;
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para></para>
+/// <para>
+/// The ACS Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode. \n
+/// ACS is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. \n
+/// It also has provable security, dependant on the block cipher used by the mode. \n
+/// ACS first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a CBC-based MAC function used for data authentication. \n
+/// When encryption is completed, the MAC code is generated and appended to the output stream using the Finalize(Output, Offset) call. \n
+/// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text. \n
+/// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process.</para>
+///
+/// <description><B>Description:</B></description>
+/// <para><EM>Legend:</EM> \n
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code \n
+/// <EM>Encryption</EM> \n
+/// For i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T. \n
+/// <EM>Decryption</EM> \n
+/// For i ...n (T = Mk(Ci), Pi = D(Ci)). PT = P||T.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The transformation function used by Threefish is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded. \n
-/// This is achieved by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads. \n 
-/// The key stream generated by encrypting the counter array(s), is used as a source of random, and XOR'd with the message input to produce the cipher text.</para>
+/// <para>The encryption and decryption functions of the ACS mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
+/// The ACS parallel mode also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
+/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions. \n
+/// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
+/// The cipher transform is parallelizable, however the authentication pass, (CMAC), is processed sequentially.</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description></description></item>
-/// <item><description>The Key size is 64 bytes (512 bits).</description></item>
-/// <item><description>This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to one of the HMAC or KMAC options.</description></item>
-/// <item><description>Use the Finalize(Output, Offset, Length) function to calculate the MAC code; that code can either be appended to the cipher-text on encryption, or used to compare to an existing code in the stream using the decryption mode.</description></item>
-/// <item><description>If authentication is enabled, the cipher-key and MAC seed are generated using SHAKE, this will change the cipher-text output.</description></item>
-/// <item><description>In authenticated mode, the cipher-key generated by SHAKE will be constant even with differing MAC generators; only two cipher-text outputs are possible, authenticated or non-authenticated.</description></item>
-/// <item><description>The nonce size is 16 bytes (128 bits), this value is optional but recommended.</description></item>
-/// <item><description>Block size is 64 bytes (512 bits) wide.</description></item>
-/// <item><description>The Info string is optional, but can be used to create a tweakable cipher; must be no more than 16 bytes in length.</description></item>
-/// <item><description>Authentication using HMAC or KMAC, can be invoked by setting the StreamAuthenticators parameter in the constructor.</description></item>
-/// <item><description>The authentication code can be generated and added to an encrypted stream using the Finalize(Output, Offset, Length) function.</description></item>
-/// <item><description>A MAC code can be verified by calling the boolean Verify(Input, Offset, Length) function.</description></item>
-/// <item><description>Permutation rounds are fixed at 96.</description></item>
-/// <item><description>Encryption can both be pipelined (AVX2 or AVX512), and multi-threaded with any even number of threads.</description></item>
-/// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
-/// <item><description>The transformation methods can not be called until the Initialize(SymmetricKey) function has been called.</description></item>
+/// <item><description>ACS is an AEAD authenticated mode, additional data such as packet header information can be added to the authentication process.</description></item>
+/// <item><description>Additional data can be added using the SetAssociatedData(Input, Offset, Length) call, and during Initialize, using the Info parameter of the SymmetricKey.</description></item>
+/// <item><description>Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output array in either encryption or decryption operation mode.</description></item>
+/// <item><description>The Verify(Input, Offset, Length) function can be used to compare the MAC code embedded with the cipher-text to the internal MAC code generated after a Decryption cycle.</description></item>
+/// <item><description>Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
 /// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
-/// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
-/// <item><description>ParallelBlockSize() is calculated automatically based on processor(s) cache size but can be user defined, but must be evenly divisible by ParallelMinimumSize().</description></item>
+/// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
 /// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
 /// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % .ParallelMinimumSize);</c></description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>The Skein Hash Function Family <a href="https://www.schneier.com/academic/paperfiles/skein1.3.pdf">Skein V1.1</a>.</description></item>
-/// <item><description>NIST Round 3 <a href="https://www.schneier.com/academic/paperfiles/skein-1.3-modifications.pdf">Tweak Description</a>.</description></item>
-/// <item><description>Skein <a href="https://www.schneier.com/academic/paperfiles/skein-proofs.pdf">Provable Security</a> Support for the Skein Hash Family.</description></item>
-/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition>.</description></item>
+/// <item><description>The <a href="http://web.cs.ucdavis.edu/~rogaway/papers/acs.pdf">ACS Mode</a> of Operation.</description></item>
+/// <item><description>RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorithms for Authenticated Encryption</a>.</description></item>
+/// <item><description>Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/chap7.pdf">Chapter 7: Block Ciphers</a>.</description></item>
 /// </list>
-/// 
 /// </remarks>
-class Threefish1024 final : public IStreamCipher
+class ACS final : public IStreamCipher
 {
 private:
 
-	static const size_t BLOCK_SIZE = 128;
+	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
-	static const size_t INFO_SIZE = 16;
-	static const size_t KEY_SIZE = 128;
-	static const size_t NONCE_SIZE = 2;
-	static const size_t ROUND_COUNT = 120;
 	static const std::vector<byte> CSHAKE_CUST;
-	static const size_t STATE_PRECACHED = 2048;
-	static const size_t STATE_SIZE = 128;
-	static const std::string OMEGA_INFO;
-
-	struct Threefish1024State;
+	static const size_t INFO_SIZE = 136;
+	static const size_t MAX_PRLALLOC = 100000000;
+	static const size_t MIN_TAGSIZE = 16;
+	static const std::string SIGMA_INFO;
+	static const byte UPDATE_PREFIX = 0x80;
 
 	StreamAuthenticators m_authenticatorType;
-	std::unique_ptr<Threefish1024State> m_cipherState;
+	std::unique_ptr<CTR> m_cipherMode;
+	BlockCiphers m_cipherType;
 	std::vector<byte> m_distributionCode;
-	ShakeModes m_generatorMode;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
@@ -155,6 +151,7 @@ private:
 	ulong m_macCounter;
 	std::unique_ptr<SymmetricSecureKey> m_macKey;
 	ParallelOptions m_parallelProfile;
+	ShakeModes m_generatorMode;
 
 public:
 
@@ -163,28 +160,29 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	Threefish1024(const Threefish1024&) = delete;
+	ACS(const ACS&) = delete;
 
 	/// <summary>
 	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	Threefish1024& operator=(const Threefish1024&) = delete;
+	ACS& operator=(const ACS&) = delete;
 
 	/// <summary>
-	/// Initialize the class.
-	/// <para>Setting the optional Mac parameter to any value other than None (the default), enables authentication for this cipher.
-	/// Use the Finalize function to derive the Mac code once processing of the message stream has completed.</para>
+	/// Initialize the Cipher Mode using a block cipher type name.
+	/// <para>The cipher instance is created and destroyed automatically.</para>
 	/// </summary>
-	/// 
-	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC1024</param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid authentication method is chosen</exception>
-	explicit Threefish1024(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC1024);
+	/// <param name="CipherType">The enumeration name of the underlying block cipher; the default is AHX</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF; the default is SHAKE256</param>
+	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid block cipher type is used</exception>
+	ACS(BlockCiphers CipherType = BlockCiphers::AHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::SHAKE256, StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	~Threefish1024() override;
+	~ACS() override;
 
 	//~~~Accessors~~~//
 
@@ -277,9 +275,9 @@ public:
 	/// <param name="Output">The output array that receives the authentication code</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">The number of MAC code bytes to write to the output array.
-	/// <para>Must be no greater than the MAC functions output size.</para></param>
+	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if the cipher was not initialized for authentication</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
 	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 	/// <summary>
@@ -290,7 +288,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParams">Cipher key structure, containing cipher key, and optional nonce pair and info arrays</param>
+	/// <param name="KeyParams">Cipher key structure, containing cipher key and nonce pair, and optional info array</param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
@@ -303,6 +301,11 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	void ParallelMaxDegree(size_t Degree) override;
+
+	/// <summary>
+	/// Reset the internal state
+	/// </summary>
+	void Reset();
 
 	/// <summary>
 	/// Add additional data to the authentication generator.  
@@ -332,7 +335,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	void TransformBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+	void TransformBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
@@ -344,15 +347,9 @@ public:
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">Number of bytes to process</param>
-	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
-private:
-
-	void Generate(std::array<ulong, 2> &Counter, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
-	void Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
-	void Reset();
 };
 
 NAMESPACE_STREAMEND
 #endif
-

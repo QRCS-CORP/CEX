@@ -83,6 +83,11 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 			macPtr = new Mac::KMAC(Enumeration::ShakeModes::SHAKE512);
 			break;
 		}
+		case Enumeration::StreamAuthenticators::KMAC1024:
+		{
+			macPtr = new Mac::KMAC(Enumeration::ShakeModes::SHAKE1024);
+			break;
+		}
 		default:
 		{
 			throw CryptoException("MacFromName:GetInstance", "The mac type is not recognized!");

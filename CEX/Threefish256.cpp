@@ -51,19 +51,19 @@ struct Threefish256::Threefish512State
 
 //~~~Constructor~~~//
 
-Threefish256::Threefish256(StreamAuthenticators Authenticator)
+Threefish256::Threefish256(StreamAuthenticators AuthenticatorType)
 	:
-	m_authenticatorType(Authenticator),
+	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new Threefish512State),
 	m_distributionCode(16),
+	m_generatorMode(ShakeModes::SHAKE256),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(ulong), INFO_SIZE) },
-	m_legalRounds(ROUND_COUNT),
 	m_macAuthenticator(m_authenticatorType == StreamAuthenticators::None ? nullptr :
-		Helper::MacFromName::GetInstance(Authenticator)),
+		Helper::MacFromName::GetInstance(AuthenticatorType)),
 	m_macCounter(0),
-	m_macKey(0),
+	m_macKey(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 }
@@ -72,8 +72,9 @@ Threefish256::~Threefish256()
 {
 	if (!m_isDestroyed)
 	{
-		m_isDestroyed = true;
 		m_authenticatorType = StreamAuthenticators::None;
+		m_isDestroyed = true;
+		m_generatorMode = ShakeModes::None;
 		m_isInitialized = false;
 		m_macCounter = 0;
 		m_parallelProfile.Reset();
@@ -83,10 +84,16 @@ Threefish256::~Threefish256()
 			m_cipherState->Reset();
 			m_cipherState.reset(nullptr);
 		}
+		if (m_macAuthenticator != nullptr)
+		{
+			m_macAuthenticator.reset(nullptr);
+		}
+		if (m_macKey != nullptr)
+		{
+			m_macKey.reset(nullptr);
+		}
 
 		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearVector(m_legalRounds);
-		IntUtils::ClearVector(m_macKey);
 	}
 }
 
@@ -127,11 +134,6 @@ const std::vector<SymmetricKeySize> &Threefish256::LegalKeySizes()
 	return m_legalKeySizes;
 }
 
-const std::vector<size_t> &Threefish256::LegalRounds()
-{
-	return m_legalRounds;
-}
-
 const std::string Threefish256::Name()
 {
 	switch (m_authenticatorType)
@@ -159,17 +161,27 @@ ParallelOptions &Threefish256::ParallelProfile()
 	return m_parallelProfile;
 }
 
-const size_t Threefish256::Rounds()
-{
-	return ROUND_COUNT;
-}
-
 const size_t Threefish256::TagSize()
 {
 	return m_macAuthenticator != nullptr ? m_macAuthenticator->MacSize() : 0;
 }
 
 //~~~Public Functions~~~//
+
+void Threefish256::Authenticator(StreamAuthenticators AuthenticatorType)
+{
+	if (m_macAuthenticator != nullptr)
+	{
+		m_macAuthenticator.reset(nullptr);
+	}
+
+	if (AuthenticatorType != StreamAuthenticators::None)
+	{
+		m_macAuthenticator.reset(Helper::MacFromName::GetInstance(AuthenticatorType));
+	}
+
+	m_authenticatorType = AuthenticatorType;
+}
 
 void Threefish256::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
@@ -193,13 +205,15 @@ void Threefish256::Finalize(std::vector<byte> &Output, const size_t OutOffset, c
 	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
 
 	// extract the new mac key
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(m_macKey, cst);
-	gen.Generate(m_macKey);
+	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+	Kdf::SHAKE gen(m_generatorMode);
+	gen.Initialize(m_macKey->Key(), cst);
+	gen.Generate(mk);
 
-	// re-initialize the authenticator
-	Key::Symmetric::SymmetricKey sk(m_macKey);
-	m_macAuthenticator->Initialize(sk);
+	// reset the generator with the new key
+	m_macKey.reset(nullptr);
+	m_macKey.reset(new SymmetricSecureKey(mk));
+	m_macAuthenticator->Initialize(*m_macKey.get());
 }
 
 void Threefish256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -230,7 +244,7 @@ void Threefish256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 
 	// reset the counter and mac
-	m_cipherState->Reset();
+	Reset();
 
 	// initialize state
 	if (KeyParams.Nonce().size() != 0)
@@ -253,7 +267,6 @@ void Threefish256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	// copy the tweak
 	MemUtils::Copy(m_cipherState->T, 0, m_distributionCode, 0, 16);
 
-
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
 		MemUtils::Copy(KeyParams.Key(), 0, m_cipherState->K, 0, KEY_SIZE);
@@ -269,7 +282,7 @@ void Threefish256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
 
 		// initialize cSHAKE
-		Kdf::SHAKE kdf(Enumeration::ShakeModes::SHAKE256);
+		Kdf::SHAKE kdf(m_generatorMode);
 		kdf.Initialize(KeyParams.Key(), cst);
 
 		// generate the new cipher key
@@ -279,11 +292,17 @@ void Threefish256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		// copy key to state
 		MemUtils::Copy(ck, 0, m_cipherState->K, 0, KEY_SIZE);
 
-		// generate the mac seed
-		m_macKey.resize(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-		kdf.Generate(m_macKey);
-		Key::Symmetric::SymmetricKey sk(m_macKey);
-		m_macAuthenticator->Initialize(sk);
+		// generate the mac key
+		std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+		kdf.Generate(mk);
+
+		if (m_macKey != nullptr)
+		{
+			m_macKey.reset(nullptr);
+		}
+
+		m_macKey.reset(new SymmetricSecureKey(mk));
+		m_macAuthenticator->Initialize(*m_macKey.get());
 	}
 
 	m_isEncryption = Encryption;
@@ -310,6 +329,31 @@ void Threefish256::ParallelMaxDegree(size_t Degree)
 
 void Threefish256::Reset()
 {
+	switch (m_authenticatorType)
+	{
+		case StreamAuthenticators::KMAC256:
+		case StreamAuthenticators::HMACSHA256:
+		{
+			m_generatorMode = ShakeModes::SHAKE256;
+			break;
+		}
+		case StreamAuthenticators::KMAC512:
+		case StreamAuthenticators::HMACSHA512:
+		{
+			m_generatorMode = ShakeModes::SHAKE512;
+			break;
+		}
+		case StreamAuthenticators::KMAC1024:
+		{
+			m_generatorMode = ShakeModes::SHAKE1024;
+			break;
+		}
+		default:
+		{
+			m_generatorMode = ShakeModes::None;
+		}
+	}
+
 	m_macCounter = 0;
 	m_isInitialized = false;
 	m_cipherState->Reset();

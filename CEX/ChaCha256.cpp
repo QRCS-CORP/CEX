@@ -47,20 +47,20 @@ struct ChaCha256::ChaCha256State
 
 //~~~Constructor~~~//
 
-ChaCha256::ChaCha256(StreamAuthenticators Authenticator)
+ChaCha256::ChaCha256(StreamAuthenticators AuthenticatorType)
 	:
-	m_authenticatorType(Authenticator),
+	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new ChaCha256State),
 	m_distributionCode(INFO_SIZE),
+	m_generatorMode(ShakeModes::SHAKE256),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(uint), INFO_SIZE) },
-	m_legalRounds(ROUND_COUNT),
 	m_macAuthenticator(m_authenticatorType == StreamAuthenticators::None ? nullptr :
-		Helper::MacFromName::GetInstance(Authenticator)),
+		Helper::MacFromName::GetInstance(AuthenticatorType)),
 	m_macCounter(0),
-	m_macKey(0),
+	m_macKey(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 }
@@ -69,6 +69,8 @@ ChaCha256::~ChaCha256()
 {
 	if (!m_isDestroyed)
 	{
+		m_authenticatorType = StreamAuthenticators::None;
+		m_generatorMode = ShakeModes::None;
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
@@ -80,15 +82,36 @@ ChaCha256::~ChaCha256()
 			m_cipherState->Reset();
 			m_cipherState.reset(nullptr);
 		}
+		if (m_macKey != nullptr)
+		{
+			m_macKey.reset(nullptr);
+		}
+		if (m_macAuthenticator != nullptr)
+		{
+			m_macAuthenticator.reset(nullptr);
+		}
 
 		IntUtils::ClearVector(m_distributionCode);
 		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearVector(m_legalRounds);
-		IntUtils::ClearVector(m_macKey);
 	}
 }
 
 //~~~Accessors~~~//
+
+void ChaCha256::Authenticator(StreamAuthenticators AuthenticatorType)
+{
+	if (m_macAuthenticator != nullptr)
+	{
+		m_macAuthenticator.reset(nullptr);
+	}
+
+	if (AuthenticatorType != StreamAuthenticators::None)
+	{
+		m_macAuthenticator.reset(Helper::MacFromName::GetInstance(AuthenticatorType));
+	}
+
+	m_authenticatorType = AuthenticatorType;
+}
 
 const size_t ChaCha256::BlockSize() 
 { 
@@ -125,11 +148,6 @@ const std::vector<SymmetricKeySize> &ChaCha256::LegalKeySizes()
 	return m_legalKeySizes; 
 }
 
-const std::vector<size_t> &ChaCha256::LegalRounds() 
-{ 
-	return m_legalRounds; 
-}
-
 const std::string ChaCha256::Name() 
 { 
 	return CLASS_NAME;
@@ -143,11 +161,6 @@ const size_t ChaCha256::ParallelBlockSize()
 ParallelOptions &ChaCha256::ParallelProfile() 
 {
 	return m_parallelProfile;
-}
-
-const size_t ChaCha256::Rounds() 
-{ 
-	return ROUND_COUNT;
 }
 
 const size_t ChaCha256::TagSize()
@@ -179,13 +192,15 @@ void ChaCha256::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
 
 	// extract the new mac key
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(m_macKey, cst);
-	gen.Generate(m_macKey);
+	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+	Kdf::SHAKE gen(m_generatorMode);
+	gen.Initialize(m_macKey->Key(), cst);
+	gen.Generate(mk);
 
-	// re-initialize the authenticator
-	Key::Symmetric::SymmetricKey sk(m_macKey);
-	m_macAuthenticator->Initialize(sk);
+	// reset the generator with the new key
+	m_macKey.reset(nullptr);
+	m_macKey.reset(new SymmetricSecureKey(mk));
+	m_macAuthenticator->Initialize(*m_macKey.get());
 }
 
 void ChaCha256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -241,7 +256,7 @@ void ChaCha256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
 
 		// initialize cSHAKE
-		Kdf::SHAKE kdf(Enumeration::ShakeModes::SHAKE256);
+		Kdf::SHAKE kdf(m_generatorMode);
 		kdf.Initialize(KeyParams.Key(), cst);
 
 		// generate the new cipher key
@@ -251,11 +266,17 @@ void ChaCha256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		// expand round keys
 		Expand(ck, KeyParams.Nonce());
 
-		// generate the mac seed
-		m_macKey.resize(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-		kdf.Generate(m_macKey);
-		Key::Symmetric::SymmetricKey sk(m_macKey);
-		m_macAuthenticator->Initialize(sk);
+		// generate the mac key
+		std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+		kdf.Generate(mk);
+
+		if (m_macKey != nullptr)
+		{
+			m_macKey.reset(nullptr);
+		}
+
+		m_macKey.reset(new SymmetricSecureKey(mk));
+		m_macAuthenticator->Initialize(*m_macKey.get());
 	}
 
 	m_isEncryption = Encryption;
@@ -282,6 +303,31 @@ void ChaCha256::ParallelMaxDegree(size_t Degree)
 
 void ChaCha256::Reset()
 {
+	switch (m_authenticatorType)
+	{
+		case StreamAuthenticators::KMAC256:
+		case StreamAuthenticators::HMACSHA256:
+		{
+			m_generatorMode = ShakeModes::SHAKE256;
+			break;
+		}
+		case StreamAuthenticators::HMACSHA512:
+		case StreamAuthenticators::KMAC512:
+		{
+			m_generatorMode = ShakeModes::SHAKE512;
+			break;
+		}
+		case StreamAuthenticators::KMAC1024:
+		{
+			m_generatorMode = ShakeModes::SHAKE1024;
+			break;
+		}
+		default:
+		{
+			m_generatorMode = ShakeModes::None;
+		}
+	}
+
 	m_macCounter = 0;
 	m_isInitialized = false;
 	m_cipherState->Reset();

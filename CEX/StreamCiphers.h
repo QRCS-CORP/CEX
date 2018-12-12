@@ -15,6 +15,26 @@ enum class StreamCiphers : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
+	/// The Authenticated Stream Cipher; using AHX-KMAC256
+	/// </summary>
+	ACS256A = 59,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using AHX-KMAC512
+	/// </summary>
+	ACS512A = 60,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using SHX-KMAC256
+	/// </summary>
+	ACS256S = 61,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using SHX-KMAC512
+	/// </summary>
+	ACS512S = 62,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using default parameters AHX-CSHAKE512-KMAC512
+	/// </summary>
+	ACS = 63,
+	/// <summary>
 	/// The ChaChaPoly20 stream cipher
 	/// </summary>
 	ChaCha256 = 64,
@@ -22,10 +42,6 @@ enum class StreamCiphers : byte
 	/// The ChaChaPoly80 stream cipher
 	/// </summary>
 	ChaCha512 = 65,
-	/// <summary>
-	/// A Salsa20 stream cipher
-	/// </summary>
-	Salsa20 = 99,
 	/// <summary>
 	/// The Threefish 256-bit stream cipher
 	/// </summary>

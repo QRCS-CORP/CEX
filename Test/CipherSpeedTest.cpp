@@ -274,35 +274,35 @@ namespace Test
 
 	void CipherSpeedTest::ChaCha256SpeedTest()
 	{
-		ChaCha256* cipher = new ChaCha256();
+		ChaCha256* cipher = new ChaCha256(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 32, 8, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::ChaCha512SpeedTest()
 	{
-		ChaCha512* cipher = new ChaCha512();
+		ChaCha512* cipher = new ChaCha512(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 64, 0, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish256SpeedTest()
 	{
-		Threefish256* cipher = new Threefish256();
+		Threefish256* cipher = new Threefish256(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 32, 0, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish512SpeedTest()
 	{
-		Threefish512* cipher = new Threefish512();
+		Threefish512* cipher = new Threefish512(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 64, 0, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish1024SpeedTest()
 	{
-		Threefish1024* cipher = new Threefish1024();
+		Threefish1024* cipher = new Threefish1024(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 128, 0, 10, m_progressEvent);
 		delete cipher;
 	}

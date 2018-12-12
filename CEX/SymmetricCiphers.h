@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Symmetric encryption ciphers enumeration names
 /// </summary>
-enum class SymmetricEngines : byte
+enum class SymmetricCiphers : byte
 {
 	/// <summary>
 	/// No symmetric cipher is specified
@@ -39,13 +39,45 @@ enum class SymmetricEngines : byte
 	/// </summary>
 	SHX = 34,
 	/// <summary>
-	/// An implementation of the ChaCha stream cipher
+	/// The Authenticated Stream Cipher; using AHX-KMAC256
+	/// </summary>
+	ACS256A = 59,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using AHX-KMAC512
+	/// </summary>
+	ACS512A = 60,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using SHX-KMAC256
+	/// </summary>
+	ACS256S = 61,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using SHX-KMAC512
+	/// </summary>
+	ACS512S = 62,
+	/// <summary>
+	/// The Authenticated Stream Cipher; using default parameters AHX-CSHAKE512-KMAC512
+	/// </summary>
+	ACS = 63,
+	/// <summary>
+	/// The ChaChaPoly20 stream cipher
 	/// </summary>
 	ChaCha256 = 64,
 	/// <summary>
-	/// An implementation of the Salsa stream cipher
+	/// The ChaChaPoly80 stream cipher
 	/// </summary>
-	Salsa = 65
+	ChaCha512 = 65,
+	/// <summary>
+	/// The Threefish 256-bit stream cipher
+	/// </summary>
+	Threefish256 = 66,
+	/// <summary>
+	/// The Threefish 512-bit stream cipher
+	/// </summary>
+	Threefish512 = 67,
+	/// <summary>
+	/// The Threefish 1024-bit stream cipher
+	/// </summary>
+	Threefish1024 = 68
 };
 
 NAMESPACE_ENUMERATIONEND

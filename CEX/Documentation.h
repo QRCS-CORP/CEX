@@ -359,7 +359,7 @@ NAMESPACE_ROOT
 		enum class SimdProfiles {};
 		enum class StreamCiphers {};
 		enum class StreamModes {};
-		enum class SymmetricEngines {};
+		enum class SymmetricCiphers {};
 	NAMESPACE_ENUMERATIONEND
 	/*! @} */
 
