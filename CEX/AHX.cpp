@@ -346,44 +346,6 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 	// setup expanded key
 	m_expKey.resize((blkWords * (m_rndCount + 1)) / sizeof(uint));
 
-	// Note: removed Nov 30, 2018
-	/*if (keyWords == 16)
-	{
-		m_expKey[0] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data()));
-		m_expKey[1] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 16));
-		m_expKey[2] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 32));
-		m_expKey[3] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 48));
-		m_expKey[4] = _mm_aeskeygenassist_si128(m_expKey[3], 0x01);
-		ExpandRotBlock(m_expKey, 4, 4);
-		ExpandSubBlock(m_expKey, 5, 4);
-		m_expKey[6] = _mm_aeskeygenassist_si128(m_expKey[5], 0x02);
-		ExpandRotBlock(m_expKey, 6, 4);
-		ExpandSubBlock(m_expKey, 7, 4);
-		m_expKey[8] = _mm_aeskeygenassist_si128(m_expKey[7], 0x04);
-		ExpandRotBlock(m_expKey, 8, 4);
-		ExpandSubBlock(m_expKey, 9, 4);
-		m_expKey[10] = _mm_aeskeygenassist_si128(m_expKey[9], 0x08);
-		ExpandRotBlock(m_expKey, 10, 4);
-		ExpandSubBlock(m_expKey, 11, 4);
-		m_expKey[12] = _mm_aeskeygenassist_si128(m_expKey[11], 0x10);
-		ExpandRotBlock(m_expKey, 12, 4);
-		ExpandSubBlock(m_expKey, 13, 4);
-		m_expKey[14] = _mm_aeskeygenassist_si128(m_expKey[13], 0x20);
-		ExpandRotBlock(m_expKey, 14, 4);
-		ExpandSubBlock(m_expKey, 15, 4);
-		m_expKey[16] = _mm_aeskeygenassist_si128(m_expKey[15], 0x40);
-		ExpandRotBlock(m_expKey, 16, 4);
-		ExpandSubBlock(m_expKey, 17, 4);
-		m_expKey[18] = _mm_aeskeygenassist_si128(m_expKey[17], 0x80);
-		ExpandRotBlock(m_expKey, 18, 4);
-		ExpandSubBlock(m_expKey, 19, 4);
-		m_expKey[20] = _mm_aeskeygenassist_si128(m_expKey[19], 0x1B);
-		ExpandRotBlock(m_expKey, 20, 4);
-		ExpandSubBlock(m_expKey, 21, 4);
-		m_expKey[22] = _mm_aeskeygenassist_si128(m_expKey[21], 0x36);
-		ExpandRotBlock(m_expKey, 22, 4);
-	}
-	else */
 	if (keyWords == 8)
 	{
 		m_expKey[0] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data()));
@@ -651,8 +613,6 @@ void AHX::LoadState()
 		m_legalKeySizes[0] = SymmetricKeySize(16, BLOCK_SIZE, 0);
 		m_legalKeySizes[1] = SymmetricKeySize(24, BLOCK_SIZE, 0);
 		m_legalKeySizes[2] = SymmetricKeySize(32, BLOCK_SIZE, 0);
-		// Note: removed Nov 30, 2018
-		// m_legalKeySizes[3] = SymmetricKeySize(64, BLOCK_SIZE, 0);
 	}
 	else
 	{

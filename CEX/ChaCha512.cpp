@@ -201,7 +201,6 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	gen.Generate(mk);
 
 	// reset the generator with the new key
-	m_macKey.reset(nullptr);
 	m_macKey.reset(new SymmetricSecureKey(mk));
 	m_macAuthenticator->Initialize(*m_macKey.get());
 }
@@ -318,7 +317,11 @@ void ChaCha512::Reset()
 		}
 	}
 
-	m_macCounter = 0;
+	if (m_macAuthenticator != nullptr)
+	{
+		m_macAuthenticator->Reset();
+	}
+
 	m_isInitialized = false;
 	m_cipherState->Reset();
 }
@@ -357,8 +360,27 @@ void ChaCha512::Transform(const std::vector<byte> &Input, const size_t InOffset,
 
 void ChaCha512::Expand(const std::vector<byte> &Key)
 {
+#if defined(CEX_IS_LITTLE_ENDIAN)
 	MemUtils::Copy(Key, 0, m_cipherState->S, 0, STATE_SIZE * sizeof(uint));
 	MemUtils::Copy(Key, STATE_SIZE * sizeof(uint), m_cipherState->C, 0, NONCE_SIZE * sizeof(uint));
+#else
+	m_cipherState->S[0] += IntUtils::LeBytesTo32(Key, 0);
+	m_cipherState->S[1] += IntUtils::LeBytesTo32(Key, 4);
+	m_cipherState->S[2] += IntUtils::LeBytesTo32(Key, 8);
+	m_cipherState->S[3] += IntUtils::LeBytesTo32(Key, 12);
+	m_cipherState->S[4] += IntUtils::LeBytesTo32(Key, 16);
+	m_cipherState->S[5] += IntUtils::LeBytesTo32(Key, 20);
+	m_cipherState->S[6] += IntUtils::LeBytesTo32(Key, 24);
+	m_cipherState->S[7] += IntUtils::LeBytesTo32(Key, 28);
+	m_cipherState->S[8] += IntUtils::LeBytesTo32(Key, 32);
+	m_cipherState->S[9] += IntUtils::LeBytesTo32(Key, 36);
+	m_cipherState->S[10] += IntUtils::LeBytesTo32(Key, 40);
+	m_cipherState->S[11] += IntUtils::LeBytesTo32(Key, 44);
+	m_cipherState->S[12] += IntUtils::LeBytesTo32(Key, 48);
+	m_cipherState->S[13] += IntUtils::LeBytesTo32(Key, 52);
+	m_cipherState->C[0] += IntUtils::LeBytesTo32(Key, 56);
+	m_cipherState->C[1] += IntUtils::LeBytesTo32(Key, 60);
+#endif
 
 	if (m_distributionCode.size() == INFO_SIZE)
 	{

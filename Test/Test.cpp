@@ -125,6 +125,7 @@
 #include "../Test/TestFiles.h"
 #include "../Test/TestUtils.h"
 #include "../Test/ACPTest.h"
+#include "../Test/ACSTest.h"
 #include "../Test/AeadTest.h"
 #include "../Test/AesAvsTest.h"
 #include "../Test/AsymmetricSpeedTest.h"
@@ -486,6 +487,7 @@ int main()
 			PrintHeader("TESTING CIPHER PADDING MODES");
 			RunTest(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
+			RunTest(new ACSTest());
 			RunTest(new ChaChaTest());
 			RunTest(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");

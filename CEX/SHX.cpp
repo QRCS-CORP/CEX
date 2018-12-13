@@ -728,7 +728,7 @@ void SHX::LoadState()
 		}
 		else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 		{
-			// hmac(sha2-512) mac size
+			// HKDF(HMAC(SHA2-512) mac size - 1 byte counter
 			m_distCodeMax = 64;
 		}
 		else

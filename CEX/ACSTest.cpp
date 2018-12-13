@@ -1,19 +1,9 @@
-#include "ThreefishTest.h"
+#include "ACSTest.h"
 #include "../CEX/IntUtils.h"
 #include "../CEX/MemUtils.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
-#include "../CEX/Threefish.h"
-#include "../CEX/Threefish256.h"
-#include "../CEX/Threefish512.h"
-#include "../CEX/Threefish1024.h"
-
-#if defined(__AVX2__)
-#	include "../CEX/ULong256.h"
-#endif
-#if defined(__AVX512__)
-#	include "../CEX/ULong512.h"
-#endif
+#include "../CEX/ACS.h"
 
 namespace Test
 {
@@ -21,13 +11,9 @@ namespace Test
 	using Utility::IntUtils;
 	using Utility::MemUtils;
 	using Prng::SecureRandom;
-	using Enumeration::StreamAuthenticators;
 	using Key::Symmetric::SymmetricKey;
 	using Key::Symmetric::SymmetricKeySize;
-	using Cipher::Symmetric::Stream::Threefish;
-	using Cipher::Symmetric::Stream::Threefish256;
-	using Cipher::Symmetric::Stream::Threefish512;
-	using Cipher::Symmetric::Stream::Threefish1024;
+	using Cipher::Symmetric::Stream::ACS;
 
 #if defined(__AVX2__)
 	using Numeric::ULong256;
@@ -37,13 +23,13 @@ namespace Test
 	using Numeric::ULong512;
 #endif
 
-	const std::string ThreefishTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the ThreeFish stream cipher.";
-	const std::string ThreefishTest::FAILURE = "ThreefishTest: Test Failure!";
-	const std::string ThreefishTest::SUCCESS = "SUCCESS! All Threefish tests have executed succesfully.";
+	const std::string ACSTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the ThreeFish stream cipher.";
+	const std::string ACSTest::FAILURE = "ACSTest: Test Failure!";
+	const std::string ACSTest::SUCCESS = "SUCCESS! All ACS tests have executed succesfully.";
 
 	//~~~Constructor~~~//
 
-	ThreefishTest::ThreefishTest()
+	ACSTest::ACSTest()
 		:
 		m_code(0),
 		m_expected(0),
@@ -56,7 +42,7 @@ namespace Test
 		Initialize();
 	}
 
-	ThreefishTest::~ThreefishTest()
+	ACSTest::~ACSTest()
 	{
 		IntUtils::ClearVector(m_code);
 		IntUtils::ClearVector(m_expected);
@@ -68,78 +54,75 @@ namespace Test
 
 	//~~~Accessors~~~//
 
-	const std::string ThreefishTest::Description()
+	const std::string ACSTest::Description()
 	{
 		return DESCRIPTION;
 	}
 
-	TestEventHandler &ThreefishTest::Progress()
+	TestEventHandler &ACSTest::Progress()
 	{
 		return m_progressEvent;
 	}
 
 	//~~~Public Functions~~~//
 
-	std::string ThreefishTest::Run()
+	std::string ACSTest::Run()
 	{
 		try
 		{
 			// threefish256 standard and authenticated variants
-			Threefish256* tsx256h256 = new Threefish256(StreamAuthenticators::HMACSHA256);
-			Threefish256* tsx256h512 = new Threefish256(StreamAuthenticators::HMACSHA512);
-			Threefish256* tsx256k256 = new Threefish256(StreamAuthenticators::KMAC256);
-			Threefish256* tsx256k512 = new Threefish256(StreamAuthenticators::KMAC512);
-			Threefish256* tsx256s = new Threefish256(StreamAuthenticators::None);
 
-			// stress test authentication and verification using random input and keys
+			ACS256* tsx256h256 = new ACS256(Enumeration::StreamAuthenticators::HMACSHA256);
+			ACS256* tsx256h512 = new ACS256(Enumeration::StreamAuthenticators::HMACSHA512);
+			ACS256* tsx256k256 = new ACS256(Enumeration::StreamAuthenticators::KMAC256);
+			ACS256* tsx256k512 = new ACS256(Enumeration::StreamAuthenticators::KMAC512);
+			ACS256* tsx256s = new ACS256(Enumeration::StreamAuthenticators::None);
+
 			Authentication(tsx256h256);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 MAC authentication tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 MAC authentication tests.."));
 
-			// compare parallel to sequential otput for equality
 			CompareP256();
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 permutation variants equivalence test.."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 permutation variants equivalence test.."));
 
-			// test all exception handlers for correct operation
 			Exception(tsx256s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 exception handling tests.."));
-			
-			// test 2 succesive finalization calls against mac output and expected ciphertext
+			OnProgress(std::string("ACSTest: Passed ACS-256 exception handling tests.."));
+
 			Finalization(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0], m_code[12]);
 			Finalization(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[1], m_code[13]);
 			Finalization(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2], m_code[14]);
 			Finalization(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[3], m_code[15]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer finalization tests."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 known answer finalization tests."));
 
-			// original known answer test vectors generated with this implementation
+			// check each variant for identical cipher-text output
 			Kat(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
 			Kat(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
 			Kat(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
 			Kat(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
+			// non-authenticated threefish256
 			Kat(tsx256s, m_message[0], m_key[0], m_nonce[0], m_expected[2]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer cipher tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 known answer cipher tests.."));
 
-			// run the monte carlo equivalency tests and compare encryption to a vector
+			// check each variant for identical cipher-text output
 			MonteCarlo(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
 			MonteCarlo(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_monte[1]);
 			MonteCarlo(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
 			MonteCarlo(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_monte[1]);
+			// non-authenticated threefish256
 			MonteCarlo(tsx256s, m_message[0], m_key[0], m_nonce[0], m_monte[2]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 monte carlo tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 monte carlo tests.."));
 
-			// compare parallel output with sequential for equality
 			Parallel(tsx256s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 parallel to sequential equivalence test.."));
 
-			// looping test of successful decryption with random keys and input
 			Stress(tsx256s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 stress tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 stress tests.."));
 
-			// verify ciphertext output, decryption, and mac code generation
+			// original mac vectors
 			Verification(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
 			Verification(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[1]);
 			Verification(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
 			Verification(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[3]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer authentication tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-256 known answer authentication tests.."));
 
 			delete tsx256h256;
 			delete tsx256h512;
@@ -148,52 +131,58 @@ namespace Test
 			delete tsx256s;
 
 			// threefish512 standard and authenticated variants
-			Threefish512* tsx512h256 = new Threefish512(StreamAuthenticators::HMACSHA256);
-			Threefish512* tsx512h512 = new Threefish512(StreamAuthenticators::HMACSHA512);
-			Threefish512* tsx512k256 = new Threefish512(StreamAuthenticators::KMAC256);
-			Threefish512* tsx512k512 = new Threefish512(StreamAuthenticators::KMAC512);
-			Threefish512* tsx512s = new Threefish512(StreamAuthenticators::None);
+
+			ACS512* tsx512h256 = new ACS512(Enumeration::StreamAuthenticators::HMACSHA256);
+			ACS512* tsx512h512 = new ACS512(Enumeration::StreamAuthenticators::HMACSHA512);
+			ACS512* tsx512k256 = new ACS512(Enumeration::StreamAuthenticators::KMAC256);
+			ACS512* tsx512k512 = new ACS512(Enumeration::StreamAuthenticators::KMAC512);
+			ACS512* tsx512s = new ACS512(Enumeration::StreamAuthenticators::None);
 
 			Authentication(tsx512h256);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 MAC authentication tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 MAC authentication tests.."));
 
 			CompareP512();
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 permutation variants equivalence test.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 permutation variants equivalence test.."));
 
 			Exception(tsx512s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 exception handling tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 exception handling tests.."));
 
+			// check each variant for identical cipher-text output
 			Kat(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
 			Kat(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[4]);
 			Kat(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
 			Kat(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[4]);
+			// non-authenticated threefish512
 			Kat(tsx512s, m_message[1], m_key[1], m_nonce[1], m_expected[5]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer cipher tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 known answer cipher tests.."));
 
 			Finalization(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[3], m_code[4], m_code[16]);
 			Finalization(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[4], m_code[5], m_code[17]);
 			Finalization(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[3], m_code[6], m_code[18]);
 			Finalization(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[4], m_code[7], m_code[19]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer finalization tests."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 known answer finalization tests."));
 
+			// check each variant for identical cipher-text output
 			MonteCarlo(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_monte[3]);
 			MonteCarlo(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_monte[4]);
 			MonteCarlo(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_monte[3]);
 			MonteCarlo(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_monte[4]);
+			// non-authenticated threefish512
 			MonteCarlo(tsx512s, m_message[1], m_key[1], m_nonce[1], m_monte[5]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 monte carlo tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 monte carlo tests.."));
 
 			Parallel(tsx512s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 parallel to sequential equivalence test.."));
 
 			Stress(tsx512s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 stress tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 stress tests.."));
 
+			// original mac vectors
 			Verification(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[3], m_code[4]);
 			Verification(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[4], m_code[5]);
 			Verification(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[3], m_code[6]);
 			Verification(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[4], m_code[7]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer authentication tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-512 known answer authentication tests.."));
 
 			delete tsx512h256;
 			delete tsx512h512;
@@ -202,57 +191,63 @@ namespace Test
 			delete tsx512s;
 
 			// threefish1024 standard and authenticated variants
-			Threefish1024* tsx1024h256 = new Threefish1024(StreamAuthenticators::HMACSHA256);
-			Threefish1024* tsx1024h512 = new Threefish1024(StreamAuthenticators::HMACSHA512);
-			Threefish1024* tsx1024k256 = new Threefish1024(StreamAuthenticators::KMAC256);
-			Threefish1024* tsx1024k512 = new Threefish1024(StreamAuthenticators::KMAC512);
-			Threefish1024* tsx1024k1024 = new Threefish1024(StreamAuthenticators::KMAC1024);
-			Threefish1024* tsx1024s = new Threefish1024(StreamAuthenticators::None);
+
+			ACS1024* tsx1024h256 = new ACS1024(Enumeration::StreamAuthenticators::HMACSHA256);
+			ACS1024* tsx1024h512 = new ACS1024(Enumeration::StreamAuthenticators::HMACSHA512);
+			ACS1024* tsx1024k256 = new ACS1024(Enumeration::StreamAuthenticators::KMAC256);
+			ACS1024* tsx1024k512 = new ACS1024(Enumeration::StreamAuthenticators::KMAC512);
+			ACS1024* tsx1024k1024 = new ACS1024(Enumeration::StreamAuthenticators::KMAC1024);
+			ACS1024* tsx1024s = new ACS1024(Enumeration::StreamAuthenticators::None);
 
 			Authentication(tsx1024h256);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 MAC authentication tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 MAC authentication tests.."));
 
 			CompareP1024();
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 permutation variants equivalence test.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 permutation variants equivalence test.."));
 
 			Exception(tsx1024s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 exception handling tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 exception handling tests.."));
 
 			Finalization(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[6], m_code[8], m_code[20]);
 			Finalization(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[7], m_code[9], m_code[21]);
 			Finalization(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[6], m_code[10], m_code[22]);
 			Finalization(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[7], m_code[11], m_code[23]);
 			Finalization(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[9], m_code[24], m_code[25]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer authentication tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 known answer authentication tests.."));
 
+			// check each variant for identical cipher-text output
 			Kat(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[6]);
 			Kat(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[7]);
 			Kat(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[6]);
 			Kat(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[7]);
 			Kat(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[9]);
+			// non-authenticated threefish1024
 			Kat(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_expected[8]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer cipher tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 known answer cipher tests.."));
 
+			// check each variant for identical cipher-text output
 			MonteCarlo(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_monte[6]);
 			MonteCarlo(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_monte[7]);
 			MonteCarlo(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_monte[6]);
 			MonteCarlo(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_monte[7]);
 			MonteCarlo(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_monte[9]);
+			// non-authenticated threefish1024
 			MonteCarlo(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_monte[8]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 monte carlo tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 monte carlo tests.."));
 
 			Parallel(tsx1024s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 parallel to sequential equivalence test.."));
 
 			Stress(tsx1024s);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 stress tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 stress tests.."));
 
+			// original mac vectors
 			Verification(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[6], m_code[8]);
 			Verification(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[7], m_code[9]);
 			Verification(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[6], m_code[10]);
 			Verification(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[7], m_code[11]);
 			Verification(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[9], m_code[24]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer authentication tests.."));
+			OnProgress(std::string("ACSTest: Passed ACS-1024 known answer authentication tests.."));
 
 			delete tsx1024h256;
 			delete tsx1024h512;
@@ -273,7 +268,7 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Authentication(IStreamCipher* Cipher)
+	void ACSTest::Authentication(IStreamCipher* Cipher)
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		const size_t TAGLEN = Cipher->TagSize();
@@ -318,7 +313,7 @@ namespace Test
 			// use constant time IntUtils::Compare to verify mac
 			if (!IntUtils::Compare(code, 0, cpt, MSGLEN, TAGLEN))
 			{
-				throw TestException(std::string("Authentication: MAC output is not equal! -TA1"));
+				throw TestException(std::string("Authentication: MAC output is not equal! -TA2"));
 			}
 
 			if (!IntUtils::Compare(inp, 0, otp, 0, MSGLEN))
@@ -328,7 +323,7 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::CompareP256()
+	void ACSTest::CompareP256()
 	{
 		std::array<ulong, 2> counter{ 128, 1 };
 		std::array<ulong, 4> key;
@@ -342,8 +337,8 @@ namespace Test
 		MemUtils::Clear(state1, 0, 4 * sizeof(ulong));
 		MemUtils::Clear(state2, 0, 4 * sizeof(ulong));
 
-		Threefish::PemuteP256C(key, counter, tweak, state1, 72);
-		Threefish::PemuteR72P256U(key, counter, tweak, state2);
+		ACS::PemuteP256C(key, counter, tweak, state1, 72);
+		ACS::PemuteR72P256U(key, counter, tweak, state2);
 
 		if (state1 != state2)
 		{
@@ -357,7 +352,7 @@ namespace Test
 
 		MemUtils::Clear(state3, 0, 16 * sizeof(ulong));
 
-		Threefish::PemuteP4x256H(key, counter8, tweak, state3, 72);
+		ACS::PemuteP4x256H(key, counter8, tweak, state3, 72);
 
 		for (size_t i = 0; i < 16; i += 4)
 		{
@@ -379,7 +374,7 @@ namespace Test
 
 		MemUtils::Clear(state4, 0, 32 * sizeof(ulong));
 
-		Threefish::PemuteP4x512H(key, counter16, tweak, state4, 72);
+		ACS::PemuteP4x512H(key, counter16, tweak, state4, 72);
 
 		for (size_t i = 0; i < 32; i += 8)
 		{
@@ -395,7 +390,7 @@ namespace Test
 #endif
 	}
 
-	void ThreefishTest::CompareP512()
+	void ACSTest::CompareP512()
 	{
 		std::array<ulong, 2> counter{ 128, 1 };
 		std::array<ulong, 8> key;
@@ -409,8 +404,8 @@ namespace Test
 		MemUtils::Clear(state1, 0, 8 * sizeof(ulong));
 		MemUtils::Clear(state2, 0, 8 * sizeof(ulong));
 
-		Threefish::PemuteP512C(key, counter, tweak, state1, 96);
-		Threefish::PemuteR96P512U(key, counter, tweak, state2);
+		ACS::PemuteP512C(key, counter, tweak, state1, 96);
+		ACS::PemuteR96P512U(key, counter, tweak, state2);
 
 		if (state1 != state2)
 		{
@@ -424,7 +419,7 @@ namespace Test
 
 		MemUtils::Clear(state3, 0, 32 * sizeof(ulong));
 
-		Threefish::PemuteP4x512H(key, counter8, tweak, state3, 96);
+		ACS::PemuteP4x512H(key, counter8, tweak, state3, 96);
 
 		for (size_t i = 0; i < 32; i += 8)
 		{
@@ -446,7 +441,7 @@ namespace Test
 
 		MemUtils::Clear(state4, 0, 64 * sizeof(ulong));
 
-		Threefish::PemuteP8x512H(key, counter16, tweak, state4, 96);
+		ACS::PemuteP8x512H(key, counter16, tweak, state4, 96);
 
 		for (size_t i = 0; i < 64; i += 16)
 		{
@@ -463,7 +458,7 @@ namespace Test
 
 	}
 
-	void ThreefishTest::CompareP1024()
+	void ACSTest::CompareP1024()
 	{
 		std::array<ulong, 2> counter{ 128, 1 };
 		std::array<ulong, 16> key;
@@ -477,8 +472,8 @@ namespace Test
 		MemUtils::Clear(state1, 0, 16 * sizeof(ulong));
 		MemUtils::Clear(state2, 0, 16 * sizeof(ulong));
 
-		Threefish::PemuteR120P1024U(key, counter, tweak, state2);
-		Threefish::PemuteP1024C(key, counter, tweak, state1, 120);
+		ACS::PemuteR120P1024U(key, counter, tweak, state2);
+		ACS::PemuteP1024C(key, counter, tweak, state1, 120);
 
 		if (state1 != state2)
 		{
@@ -486,13 +481,13 @@ namespace Test
 		}
 
 #if defined(__AVX2__)
-		
+
 		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
 		std::array<ulong, 64> state3;
 
 		MemUtils::Clear(state3, 0, 64 * sizeof(ulong));
 
-		Threefish::PemuteP4x1024H(key, counter8, tweak, state3, 120);
+		ACS::PemuteP4x1024H(key, counter8, tweak, state3, 120);
 
 		for (size_t i = 0; i < 64; i += 16)
 		{
@@ -514,7 +509,7 @@ namespace Test
 
 		MemUtils::Clear(state4, 0, 128 * sizeof(ulong));
 
-		Threefish::PemuteP8x1024H(key, counter16, tweak, state4, 120);
+		ACS::PemuteP8x1024H(key, counter16, tweak, state4, 120);
 
 		for (size_t i = 0; i < 128; ++i)
 		{
@@ -531,7 +526,7 @@ namespace Test
 
 	}
 
-	void ThreefishTest::Exception(IStreamCipher* Cipher)
+	void ACSTest::Exception(IStreamCipher* Cipher)
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
@@ -543,7 +538,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE1"));
+			throw TestException(std::string("ACS"), std::string("Exception: Exception handling failure! -TE1"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -561,7 +556,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE2"));
+			throw TestException(std::string("ACS"), std::string("Exception: Exception handling failure! -TE2"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -580,7 +575,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE3"));
+			throw TestException(std::string("ACS"), std::string("Exception: Exception handling failure! -TE3"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -598,7 +593,7 @@ namespace Test
 
 			Cipher->Finalize(code, 0, 16);
 
-			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE4"));
+			throw TestException(std::string("ACS"), std::string("Exception: Exception handling failure! -TE4"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -617,7 +612,7 @@ namespace Test
 			Cipher->Initialize(true, kp);
 			Cipher->ParallelMaxDegree(9999);
 
-			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE5"));
+			throw TestException(std::string("ACS"), std::string("Exception: Exception handling failure! -TE5"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -628,7 +623,7 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
+	void ACSTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
 	{
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
@@ -678,7 +673,7 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void ACSTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
@@ -705,7 +700,7 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void ACSTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
 		const size_t MSGLEN = Message.size();
 		std::vector<byte> msg = Message;
@@ -740,7 +735,7 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Parallel(IStreamCipher* Cipher)
+	void ACSTest::Parallel(IStreamCipher* Cipher)
 	{
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
@@ -802,7 +797,7 @@ namespace Test
 		Cipher->ParallelProfile().ParallelBlockSize() = prlSize;
 	}
 
-	void ThreefishTest::Stress(IStreamCipher* Cipher)
+	void ACSTest::Stress(IStreamCipher* Cipher)
 	{
 		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
 		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
@@ -845,7 +840,7 @@ namespace Test
 		}
 	}
 
-	void ThreefishTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
+	void ACSTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
 	{
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
@@ -883,7 +878,7 @@ namespace Test
 
 	//~~~Private Functions~~~//
 
-	void ThreefishTest::Initialize()
+	void ACSTest::Initialize()
 	{
 		/*lint -save -e417 */
 
@@ -984,7 +979,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void ThreefishTest::OnProgress(std::string Data)
+	void ACSTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

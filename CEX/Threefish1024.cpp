@@ -210,7 +210,6 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 	gen.Generate(mk);
 
 	// reset the generator with the new key
-	m_macKey.reset(nullptr);
 	m_macKey.reset(new SymmetricSecureKey(mk));
 	m_macAuthenticator->Initialize(*m_macKey.get());
 }
@@ -294,12 +293,6 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		// generate the mac key
 		std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 		kdf.Generate(mk);
-
-		if (m_macKey != nullptr)
-		{
-			m_macKey.reset(nullptr);
-		}
-
 		m_macKey.reset(new SymmetricSecureKey(mk));
 		m_macAuthenticator->Initialize(*m_macKey.get());
 	}
@@ -353,7 +346,6 @@ void Threefish1024::Reset()
 		}
 	}
 
-	m_macCounter = 0;
 	m_isInitialized = false;
 	m_cipherState->Reset();
 }

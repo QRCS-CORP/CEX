@@ -15,6 +15,7 @@
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
 #include "../CEX/OCB.h"
+#include "../CEX/ACS.h"
 #include "../CEX/ChaCha256.h"
 #include "../CEX/ChaCha512.h"
 #include "../CEX/Threefish256.h"
@@ -151,6 +152,10 @@ namespace Test
 			OnProgress(std::string("### Tests speeds of Salsa and ChaCha stream ciphers"));
 			OnProgress(std::string("### Uses default of 20 rounds, 256 bit key"));
 			OnProgress(std::string(""));
+
+			OnProgress(std::string("***ACS: Monte Carlo test (K=256; R=22)***"));
+			ACSSpeedTest();
+
 			OnProgress(std::string("***ChaCha256: Monte Carlo test (K=256; R=20)***"));
 			ChaCha256SpeedTest();
 #if defined(CEX_CHACHA512_STRONG)
@@ -271,6 +276,13 @@ namespace Test
 	}
 
 	//*** Stream Cipher Tests ***//
+
+	void CipherSpeedTest::ACSSpeedTest()
+	{
+		ACS* cipher = new ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::None);
+		ParallelStreamLoop(cipher, 32, 16, 10, m_progressEvent);
+		delete cipher;
+	}
 
 	void CipherSpeedTest::ChaCha256SpeedTest()
 	{

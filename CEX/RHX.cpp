@@ -343,48 +343,6 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	// setup expanded key
 	m_expKey.resize((BLOCK_SIZE / 4) * (m_rndCount + 1), 0);
 
-	// Note: removed Nov 30, 2018
-	/*if (keyWords == 16)
-	{
-		m_expKey[0] = Utility::IntUtils::BeBytesTo32(Key, 0);
-		m_expKey[1] = Utility::IntUtils::BeBytesTo32(Key, 4);
-		m_expKey[2] = Utility::IntUtils::BeBytesTo32(Key, 8);
-		m_expKey[3] = Utility::IntUtils::BeBytesTo32(Key, 12);
-		m_expKey[4] = Utility::IntUtils::BeBytesTo32(Key, 16);
-		m_expKey[5] = Utility::IntUtils::BeBytesTo32(Key, 20);
-		m_expKey[6] = Utility::IntUtils::BeBytesTo32(Key, 24);
-		m_expKey[7] = Utility::IntUtils::BeBytesTo32(Key, 28);
-		m_expKey[8] = Utility::IntUtils::BeBytesTo32(Key, 32);
-		m_expKey[9] = Utility::IntUtils::BeBytesTo32(Key, 36);
-		m_expKey[10] = Utility::IntUtils::BeBytesTo32(Key, 40);
-		m_expKey[11] = Utility::IntUtils::BeBytesTo32(Key, 44);
-		m_expKey[12] = Utility::IntUtils::BeBytesTo32(Key, 48);
-		m_expKey[13] = Utility::IntUtils::BeBytesTo32(Key, 52);
-		m_expKey[14] = Utility::IntUtils::BeBytesTo32(Key, 56);
-		m_expKey[15] = Utility::IntUtils::BeBytesTo32(Key, 60);
-
-		// k512 R: 16,24,32,40,48,56,64,72,80,88, S: 20,28,36,44,52,60,68,76,84
-		ExpandRotBlock(m_expKey, 16, 16, 1);
-		ExpandSubBlock(m_expKey, 20, 16);
-		ExpandRotBlock(m_expKey, 24, 16, 2);
-		ExpandSubBlock(m_expKey, 28, 16);
-		ExpandRotBlock(m_expKey, 32, 16, 3);
-		ExpandSubBlock(m_expKey, 36, 16);
-		ExpandRotBlock(m_expKey, 40, 16, 4);
-		ExpandSubBlock(m_expKey, 44, 16);
-		ExpandRotBlock(m_expKey, 48, 16, 5);
-		ExpandSubBlock(m_expKey, 52, 16);
-		ExpandRotBlock(m_expKey, 56, 16, 6);
-		ExpandSubBlock(m_expKey, 60, 16);
-		ExpandRotBlock(m_expKey, 64, 16, 7);
-		ExpandSubBlock(m_expKey, 68, 16);
-		ExpandRotBlock(m_expKey, 72, 16, 8);
-		ExpandSubBlock(m_expKey, 76, 16);
-		ExpandRotBlock(m_expKey, 80, 16, 9);
-		ExpandSubBlock(m_expKey, 84, 16);
-		ExpandRotBlock(m_expKey, 88, 16, 10);
-	}
-	else */
 	if (keyWords == 8)
 	{
 		m_expKey[0] = Utility::IntUtils::BeBytesTo32(Key, 0);
@@ -655,8 +613,6 @@ void RHX::LoadState()
 		m_legalKeySizes[0] = SymmetricKeySize(16, BLOCK_SIZE, 0);
 		m_legalKeySizes[1] = SymmetricKeySize(24, BLOCK_SIZE, 0);
 		m_legalKeySizes[2] = SymmetricKeySize(32, BLOCK_SIZE, 0);
-		// Note: removed Nov 30, 2018
-		// m_legalKeySizes[3] = SymmetricKeySize(64, BLOCK_SIZE, 0);
 	}
 	else
 	{

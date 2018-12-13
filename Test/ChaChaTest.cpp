@@ -23,6 +23,7 @@ namespace Test
 	using Utility::IntUtils;
 	using Utility::MemUtils;
 	using Prng::SecureRandom;
+	using Enumeration::StreamAuthenticators;
 	using Key::Symmetric::SymmetricKey;
 	using Key::Symmetric::SymmetricKeySize;
 
@@ -82,29 +83,32 @@ namespace Test
 		try
 		{
 			// Standard ChaChaPoly20 + authenticator
+			ChaCha256* csx256h256 = new ChaCha256(StreamAuthenticators::HMACSHA256);
+			ChaCha256* csx256h512 = new ChaCha256(StreamAuthenticators::HMACSHA512);
+			ChaCha256* csx256k256 = new ChaCha256(StreamAuthenticators::KMAC256);
+			ChaCha256* csx256k512 = new ChaCha256(StreamAuthenticators::KMAC512);
+			ChaCha256* csx256s = new ChaCha256(StreamAuthenticators::None);
 
-			ChaCha256* csx256h256 = new ChaCha256(Enumeration::StreamAuthenticators::HMACSHA256);
-			ChaCha256* csx256h512 = new ChaCha256(Enumeration::StreamAuthenticators::HMACSHA512);
-			ChaCha256* csx256k256 = new ChaCha256(Enumeration::StreamAuthenticators::KMAC256);
-			ChaCha256* csx256k512 = new ChaCha256(Enumeration::StreamAuthenticators::KMAC512);
-			ChaCha256* csx256s = new ChaCha256(Enumeration::StreamAuthenticators::None);
-
+			// stress test authentication and verification using random input and keys
 			Authentication(csx256h256);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 MAC authentication tests.."));
 
+			// compare parallel to sequential otput for equality
 			CompareP256();
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 permutation variants equivalence test.."));
 
+			// test all exception handlers for correct operation
 			Exception(csx256s);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 exception handling tests.."));
 
+			// test 2 succesive finalization calls against mac output and expected ciphertext
 			Finalization(csx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0], m_code[4]);
 			Finalization(csx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[1], m_code[5]);
 			Finalization(csx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2], m_code[6]);
 			Finalization(csx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[3], m_code[7]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer finalization tests."));
 
-			// check each variant for identical cipher-text output
+			// original known answer test vectors generated with this implementation
 			Kat(csx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
 			Kat(csx256h256, m_message[0], m_key[1], m_nonce[1], m_expected[2]);
 			Kat(csx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
@@ -127,22 +131,23 @@ namespace Test
 			Kat(csx256s, m_message[0], m_key[4], m_nonce[6], m_expected[17]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer cipher tests.."));
 			
-			// check each variant for identical cipher-text output
+			// run the monte carlo equivalency tests and compare encryption to a vector
 			MonteCarlo(csx256h256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
 			MonteCarlo(csx256h512, m_message[0], m_key[0], m_nonce[0], m_monte[1]);
 			MonteCarlo(csx256k256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
 			MonteCarlo(csx256k512, m_message[0], m_key[0], m_nonce[0], m_monte[1]);
-			// non-authenticated standard chachapoly20
 			MonteCarlo(csx256s, m_message[0], m_key[0], m_nonce[0], m_monte[2]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 monte carlo tests.."));
 
+			// compare parallel output with sequential for equality
 			Parallel(csx256s);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 parallel to sequential equivalence test.."));
 
+			// looping test of successful decryption with random keys and input
 			Stress(csx256s);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 stress tests.."));
 
-			// original mac vectors
+			// verify ciphertext output, decryption, and mac code generation
 			Verification(csx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
 			Verification(csx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[1]);
 			Verification(csx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
@@ -156,12 +161,11 @@ namespace Test
 			delete csx256s;
 
 			// ChaChaPoly80 is the default if CEX_CHACHA512_STRONG is defined in CexConfig, or ChaChaPoly40 as alternate
-
-			ChaCha512* csx512h256 = new ChaCha512(Enumeration::StreamAuthenticators::HMACSHA256);
-			ChaCha512* csx512h512 = new ChaCha512(Enumeration::StreamAuthenticators::HMACSHA512);
-			ChaCha512* csx512k256 = new ChaCha512(Enumeration::StreamAuthenticators::KMAC256);
-			ChaCha512* csx512k512 = new ChaCha512(Enumeration::StreamAuthenticators::KMAC512);
-			ChaCha512* csx512s = new ChaCha512(Enumeration::StreamAuthenticators::None);
+			ChaCha512* csx512h256 = new ChaCha512(StreamAuthenticators::HMACSHA256);
+			ChaCha512* csx512h512 = new ChaCha512(StreamAuthenticators::HMACSHA512);
+			ChaCha512* csx512k256 = new ChaCha512(StreamAuthenticators::KMAC256);
+			ChaCha512* csx512k512 = new ChaCha512(StreamAuthenticators::KMAC512);
+			ChaCha512* csx512s = new ChaCha512(StreamAuthenticators::None);
 
 			Authentication(csx512h256);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 MAC authentication tests.."));
@@ -178,7 +182,6 @@ namespace Test
 			Finalization(csx512k512, m_message[0], m_key[2], m_nonce[2], m_expected[9], m_code[11], m_code[15]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer finalization tests."));
 
-			// check each authenticated variant for identical cipher-text output
 			Kat(csx512h256, m_message[0], m_key[2], m_nonce[2], m_expected[8]);
 			Kat(csx512h256, m_message[0], m_key[3], m_nonce[3], m_expected[10]);
 			Kat(csx512h512, m_message[0], m_key[2], m_nonce[2], m_expected[9]);
@@ -187,17 +190,14 @@ namespace Test
 			Kat(csx512k256, m_message[0], m_key[3], m_nonce[3], m_expected[10]);
 			Kat(csx512k512, m_message[0], m_key[2], m_nonce[2], m_expected[9]);
 			Kat(csx512k512, m_message[0], m_key[3], m_nonce[3], m_expected[11]);
-			// non-authenticated extended chachapoly80/40
 			Kat(csx512s, m_message[0], m_key[2], m_nonce[2], m_expected[12]);
 			Kat(csx512s, m_message[0], m_key[3], m_nonce[3], m_expected[13]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer cipher tests.."));
 
-			// check each variant for identical cipher-text output
 			MonteCarlo(csx512h256, m_message[0], m_key[3], m_nonce[3], m_monte[3]);
 			MonteCarlo(csx512h512, m_message[0], m_key[3], m_nonce[3], m_monte[4]);
 			MonteCarlo(csx512k256, m_message[0], m_key[3], m_nonce[3], m_monte[3]);
 			MonteCarlo(csx512k512, m_message[0], m_key[3], m_nonce[3], m_monte[4]);
-			// non-authenticated standard chachapoly20
 			MonteCarlo(csx512s, m_message[0], m_key[3], m_nonce[3], m_monte[5]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 monte carlo tests.."));
 
@@ -206,8 +206,7 @@ namespace Test
 
 			Stress(csx512s);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 stress tests.."));
-
-			// original mac vectors
+			
 			Verification(csx512h256, m_message[0], m_key[2], m_nonce[2], m_expected[8], m_code[8]);
 			Verification(csx512h512, m_message[0], m_key[2], m_nonce[2], m_expected[9], m_code[9]);
 			Verification(csx512k256, m_message[0], m_key[2], m_nonce[2], m_expected[8], m_code[10]);

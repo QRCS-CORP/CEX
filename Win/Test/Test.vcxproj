@@ -294,6 +294,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Test\ACPTest.h" />
+    <ClInclude Include="..\..\Test\ACSTest.h" />
     <ClInclude Include="..\..\Test\AeadTest.h" />
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\CJPTest.h" />
@@ -357,6 +358,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\ACPTest.cpp" />
+    <ClCompile Include="..\..\Test\ACSTest.cpp" />
     <ClCompile Include="..\..\Test\AeadTest.cpp" />
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\CJPTest.cpp" />

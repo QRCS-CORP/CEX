@@ -13,7 +13,7 @@ using Key::Symmetric::SymmetricKey;
 
 const std::vector<byte> ACS::CSHAKE_CUST = { 0x43, 0x53, 0x58, 0x32, 0x35, 0x36 };
 const std::string ACS::CLASS_NAME("ACS");
-const std::string ACS::SIGMA_INFO("ACS version 1.0");
+const std::string ACS::OMEGA_INFO("ACS version 1.0");
 
 //~~~Constructor~~~//
 
@@ -143,9 +143,6 @@ void ACS::Authenticator(StreamAuthenticators AuthenticatorType)
 
 void ACS::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized");
-	CexAssert(Length >= MIN_TAGSIZE || Length <= BLOCK_SIZE, "The cipher mode has not been initialized");
-
 	if (!m_isInitialized)
 	{
 		throw CryptoSymmetricCipherException("ACS:Finalize", "The cipher has not been initialized!");
@@ -166,14 +163,13 @@ void ACS::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
 
 	// extract the new mac key
-	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	Kdf::SHAKE gen(m_generatorMode);
 	gen.Initialize(m_macKey->Key(), cst);
-	gen.Generate(mk);
+	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+	gen.Generate(mack);
+	m_macKey.reset(new SymmetricSecureKey(mack));
 
 	// reset the generator with the new key
-	m_macKey.reset(nullptr);
-	m_macKey.reset(new SymmetricSecureKey(mk));
 	m_macAuthenticator->Initialize(*m_macKey.get());
 }
 
@@ -196,49 +192,57 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		throw CryptoSymmetricCipherException("ACS:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
 	}
 
-	// reset the counter and mac
+	// reset for a new key
 	Reset();
-
-	// set the initial counter value
-	m_macCounter = 1;
 
 	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		MemUtils::Copy(KeyParams.Info(), 0, m_distributionCode, 0, (KeyParams.Info().size() > m_distributionCode.size()) ? m_distributionCode.size() : KeyParams.Info().size());
+		m_distributionCode.resize(KeyParams.Info().size());
+		MemUtils::Copy(KeyParams.Info(), 0, m_distributionCode, 0, m_distributionCode.size());
 	}
 	else
 	{
 		// standard
-		m_distributionCode.assign(SIGMA_INFO.begin(), SIGMA_INFO.end());
+		m_distributionCode.assign(OMEGA_INFO.begin(), OMEGA_INFO.end());
 	}
 
-	// create the cSHAKE customization string
-	std::vector<byte> cust(CSHAKE_CUST.size() + sizeof(ulong));
-	MemUtils::Copy(CSHAKE_CUST, 0, cust, 0, CSHAKE_CUST.size());
-	IntUtils::Le64ToBytes(m_macCounter, cust, CSHAKE_CUST.size());
-	// initialize cSHAKE with k,c
-	Kdf::SHAKE kdf(m_generatorMode);
-	kdf.Initialize(KeyParams.Key(), cust);
-
-	// generate the new cipher key and customization string k, c
-	std::vector<byte> ck(KeyParams.Key().size());
-	std::vector<byte> cd(KeyParams.Info().size());
-	kdf.Generate(ck);
-	kdf.Generate(cd);
-	Key::Symmetric::SymmetricKey kp(ck, KeyParams.Nonce(), cd);
-	m_cipherMode->Initialize(true, kp);
-
-	// generate the mac key
-	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-	kdf.Generate(mk);
-
-	if (m_macKey != nullptr)
+	if (m_authenticatorType == StreamAuthenticators::None)
 	{
-		m_macKey.reset(nullptr);
+		// key the cipher directly
+		Key::Symmetric::SymmetricKey kp(KeyParams.Key(), KeyParams.Nonce(), m_distributionCode);
+		m_cipherMode->Initialize(true, kp);
 	}
-	m_macKey.reset(new SymmetricSecureKey(mk));
-	m_macAuthenticator->Initialize(*m_macKey.get());
+	else
+	{
+		// set the initial counter value
+		m_macCounter = 1;
+
+		// create the cSHAKE customization string
+		std::vector<byte> cust(CSHAKE_CUST.size() + sizeof(ulong));
+		MemUtils::Copy(CSHAKE_CUST, 0, cust, 0, CSHAKE_CUST.size());
+		IntUtils::Le64ToBytes(m_macCounter, cust, CSHAKE_CUST.size());
+
+		// initialize cSHAKE with k,c
+		Kdf::SHAKE kdf(m_generatorMode);
+		kdf.Initialize(KeyParams.Key(), cust);
+
+		// generate the cipher key
+		std::vector<byte> cprk(KeyParams.Key().size());
+		kdf.Generate(cprk);
+
+		// initialize the cipher k=14,223 n=255,254 c=65,67
+		Key::Symmetric::SymmetricKey kp(cprk, KeyParams.Nonce(), m_distributionCode);
+		m_cipherMode->Initialize(true, kp);
+
+		// generate the mac key
+		std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+		kdf.Generate(mack);
+
+		// initailize the mac
+		m_macKey.reset(new SymmetricSecureKey(mack));
+		m_macAuthenticator->Initialize(*m_macKey.get());
+	}
 
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
@@ -281,8 +285,6 @@ void ACS::Reset()
 	}
 
 	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
-	m_macAuthenticator->Reset();
-	m_macCounter = 0;
 	m_isInitialized = false;
 }
 

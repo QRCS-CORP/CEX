@@ -136,7 +136,7 @@ private:
 	static const size_t INFO_SIZE = 136;
 	static const size_t MAX_PRLALLOC = 100000000;
 	static const size_t MIN_TAGSIZE = 16;
-	static const std::string SIGMA_INFO;
+	static const std::string OMEGA_INFO;
 	static const byte UPDATE_PREFIX = 0x80;
 
 	StreamAuthenticators m_authenticatorType;
