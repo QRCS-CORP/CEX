@@ -4,11 +4,15 @@
 #include "CexDomain.h"
 #include "AsymmetricEngines.h"
 #include "AsymmetricKeyTypes.h"
+#include "CryptoAsymmetricException.h"
+#include "MemoryStream.h"
 
 NAMESPACE_ASYMMETRICKEY
 
 using Enumeration::AsymmetricEngines;
 using Enumeration::AsymmetricKeyTypes;
+using Exception::CryptoAsymmetricException;
+using IO::MemoryStream;
 
 /// <summary>
 /// The Asymmetric key interface

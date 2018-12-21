@@ -128,229 +128,319 @@ public:
 	/// <summary>
 	/// Advanced Bit Manipulation
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool ABM();
 
 	/// <summary>
 	/// Intel Add-Carry Instruction Extensions
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool ADS();
 
 	/// <summary>
 	/// Returns true if the AES-NI feature set is detected
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool AESNI();
 
 	/// <summary>
 	/// Returns true if the Advanced Vector Extensions feature set is detected
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool AVX();
 
 	/// <summary>
 	/// Returns true if the Advanced Vector Extensions 2 feature set is detected
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool AVX2();
 
 	/// <summary>
 	/// AVX512 Foundation detected
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool AVX512F();
 
 	/// <summary>
 	/// Bit Manipulation Instruction Set 2
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool BMT2();
 
 	/// <summary>
 	/// The bus reference frequency (newer Intel only)
 	/// <para>A value of 0 is returned if the feature is not available on this cpu</para>
 	/// </summary>
+	///
+	/// <returns>Returns the bus frequency</returns>
 	const size_t BusRefFrequency();
 
 	/// <summary>
 	/// Intel CMUL available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool CMUL();
 
 	/// <summary>
 	/// AMD FMA 4 instructions available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool FMA4();
 
 	/// <summary>
 	/// The processor base frequency (newer Intel only)
 	/// <para>A value of 0 is returned if the feature is not available on this cpu</para>
 	/// </summary>
+	///
+	/// <returns>Returns the base frequency</returns>
 	const size_t FrequencyBase();
 
 	/// <summary>
 	/// The processor maximum frequency (newer Intel only)
 	/// <para>A value of 0 is returned if the feature is not available on this cpu</para>
 	/// </summary>
+	///
+	/// <returns>Returns the maximum frequency</returns>
 	const size_t FrequencyMax();
 
 	/// <summary>
 	/// Hardware supports hyper-threading
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool HyperThread();
 
 	/// <summary>
 	/// Cpu is x64 emulating an x86 architecture
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool IsX86Emulation();
 
 	/// <summary>
 	/// Cpu is x64
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool IsX64();
 
 	/// <summary>
 	/// The total L1 data/instruction cache size in bytes for each physical processor core, defaults to 32kib
 	/// </summary>
+	///
+	/// <returns>Returns the size of each L1 cache</returns>
 	const size_t L1CacheSize();
 
 	/// <summary>
 	/// The total L1 data/instruction cache line size in bytes for each physical processor core, defaults to 64 bytes
 	/// </summary>
+	///
+	/// <returns>Returns the L1 cache line size</returns>
 	const size_t L1CacheLineSize();
 
 	/// <summary>
 	/// The total L1 data/instruction cache size in bytes for all processor cores, defaults to 256kib
 	/// </summary>
+	///
+	/// <returns>Returns the total size of L1 cache memory</returns>
 	const size_t L1CacheTotal();
 
 	/// <summary>
 	/// The total L1 data cache size in bytes for all processor cores, defaults to 256kib
 	/// </summary>
+	///
+	/// <returns>Returns the total size of L1 data cache memory</returns>
 	const size_t L1DataCacheTotal();
 
 	/// <summary>
 	/// The total L2 cache size in bytes for each physical processor core, defaults to 128kib
 	/// </summary>
+	///
+	/// <returns>Returns the size of each L2 cache memory</returns>
 	const size_t L2CacheSize();
 
 	/// <summary>
 	/// The total L2 cache size in bytes for all processor cores, defaults to 256kib
 	/// </summary>
+	///
+	/// <returns>Returns the total size of L2 cache memory</returns>
 	const size_t L2CacheTotal();
 
 	/// <summary>
 	/// Returns the L2 cache associativity
 	/// </summary>
+	///
+	/// <returns>Returns the processors L2 associativity</returns>
 	const CacheAssociations L2Associative();
 
 	/// <summary>
 	/// The maximum number of logical processors per core
 	/// </summary>
+	///
+	/// <returns>Returns the number of logical processors per core</returns>
 	const size_t LogicalPerCore();
 
 	/// <summary>
 	/// Intel Memory Protection Extensions
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool MPX();
 
 	/// <summary>
 	/// The total number of physical processor cores
 	/// </summary>
+	///
+	/// <returns>Returns the number of phsical processor cores</returns>
 	const size_t PhysicalCores();
 
 	/// <summary>
 	/// Platform Quality of Service Enforcement
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool PQE();
 
 	/// <summary>
 	/// Platform Quality of Service Monitoring
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool PQM();
 
 	/// <summary>
 	/// Cpu supports prefetch
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool PREFETCH();
 
 	/// <summary>
 	/// Intel Digital Random Number Generator
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool RDRAND();
 
 	/// <summary>
 	/// Intel Digital Random Seed Generator
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool RDSEED();
 
 	/// <summary>
 	/// RDTSCP time-stamp instruction
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool RDTSCP();
 
 	/// <summary>
 	/// TSE Restricted Transactional Memory
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool RTM();
 
 	/// <summary>
 	/// The processor serial number (not supported on some processors)
 	/// </summary>
+	///
+	/// <returns>Returns the CPU serial number</returns>
 	const std::string &SerialNumber();
 
 	/// <summary>
 	/// SHA instructions available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SHA();
 
 	/// <summary>
 	/// Supervisor Mode Access Prevention
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SMAP();
 
 	/// <summary>
 	/// Returns true if SSE or greater is detected
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SSE();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 2.0 available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SSE2();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 3.0 available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SSE3();
 
 	/// <summary>
 	/// Supplemental SSE3 Merom New Instructions available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SSSE3();
 
 	/// <summary>
 	/// AMD SSE 4A instructions available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SSE4A();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 4.1 available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SSE41();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 4.2 available
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool SSE42();
 
 	/// <summary>
 	/// Returns the cpu vendors enumeration value
 	/// </summary>
+	///
+	/// <returns>Returns the CPU vendors string</returns>
 	CpuVendors Vendor();
 
 	/// <summary>
 	/// The total number of threads available using hyperthreading
 	/// </summary>
+	///
+	/// <returns>Returns the total number of virtual and physical cores</returns>
 	const size_t VirtualCores();
 
 	/// <summary>
 	/// Returns true if the AMD eXtended Operations feature set is detected
 	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
 	const bool XOP();
 
 private:

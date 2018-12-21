@@ -75,25 +75,13 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: Unit block size of internal cipher in bytes.
-	/// <para>Block size must be 16 or 32 bytes wide. 
-	/// Value set in class constructor.</para>
+	/// Read Only: Internal block size of internal cipher in bytes.
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Read Only: The salt value in the initialization parameters (Tau-Sigma).
-	/// <para>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default.
-	/// Changing this code will create a unique distribution of the cipher.
-	/// For best security, the code should be a random extenion of the key, with rounds increased to 40 or more.
-	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
-	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
-	/// </summary>
-	virtual const std::vector<byte> &DistributionCode() = 0;
-
-	/// <summary>
 	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary domain key.</para>
+	/// <para>The distribution code is set with the ISymmetricKey Info parameter; and can be used as a secondary domain key.</para>
 	/// </summary>
 	virtual const size_t DistributionCodeMax() = 0;
 
@@ -115,7 +103,7 @@ public:
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
@@ -134,7 +122,7 @@ public:
 	/// Read/Write: Parallel and SIMD capability flags and sizes 
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
-	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
+	/// Changes to these values must be made before the Initialize(bool, ISymmetricKey) function is called.</para>
 	/// </summary>
 	virtual ParallelOptions &ParallelProfile() = 0;
 
@@ -156,20 +144,23 @@ public:
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output array.   
 	/// <para>The output array must be of sufficient length to receive the MAC code.
-	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
+	/// This function finalizes the Encryption/Decryption cycle, all data in a stream segment must be processed before this function is called.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The output array that receives the authentication code</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">The number of MAC code bytes to write to the output array.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
+	/// <para>Must be no greater than the MAC functions output size if HMAC authentication is selected, that size is indicated by the TagSize property, 
+	/// (though KMAC ouput size is unbound, it should not exceed the Tag size).</para></param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if the cipher is not initialized, or output array is too small</exception>
 	virtual void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
 
 	/// <summary>
-	/// Initialize the cipher
+	/// Initialize the cipher with an ISymmetricKey key container.
+	/// <para>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream.
+	/// Authentication on a decrypted stream can be performed by manually by comparing output with the the Finalize(Output, Offset, Length) function.
+	/// If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</para>
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">Cipher key container. The LegalKeySizes property contains valid sizes</param>
@@ -179,24 +170,24 @@ public:
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
 	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
-	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
+	/// Thread count must be an even number, and not exceed the number of processor [virtual] cores.</para>
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
 	/// Add additional data to the authentication generator.  
-	/// <para>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input.</para>
+	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can be called before or after a stream segment has been processed.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to process</param>
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state has been processed</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if state has been processed</exception>
 	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
 
 	/// <summary>
@@ -219,7 +210,7 @@ public:
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
-	/// <para><see cref="Initialize(SymmetricKey)"/> must be called before this method can be used.</para>
+	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>

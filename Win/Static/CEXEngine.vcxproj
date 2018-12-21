@@ -200,6 +200,7 @@
     <ClInclude Include="..\..\CEX\AHX.h" />
     <ClInclude Include="..\..\CEX\ArrayUtils.h" />
     <ClInclude Include="..\..\CEX\AsymmetricEngines.h" />
+    <ClInclude Include="..\..\CEX\AsymmetricKey.h" />
     <ClInclude Include="..\..\CEX\AsymmetricKeyTypes.h" />
     <ClInclude Include="..\..\CEX\AsymmetricTransforms.h" />
     <ClInclude Include="..\..\CEX\Authenticators.h" />
@@ -259,6 +260,7 @@
     <ClInclude Include="..\..\CEX\ErrorCodes.h" />
     <ClInclude Include="..\..\CEX\Event.h" />
     <ClInclude Include="..\..\CEX\MacFromName.h" />
+    <ClInclude Include="..\..\CEX\MemoryPool.h" />
     <ClInclude Include="..\..\CEX\MPKCM12T62.h" />
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h" />
     <ClInclude Include="..\..\CEX\DilithiumKeyPair.h" />
@@ -423,6 +425,7 @@
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp" />
     <ClCompile Include="..\..\CEX\AHX.cpp" />
     <ClCompile Include="..\..\CEX\ArrayUtils.cpp" />
+    <ClCompile Include="..\..\CEX\AsymmetricKey.cpp" />
     <ClCompile Include="..\..\CEX\BitConverter.cpp" />
     <ClCompile Include="..\..\CEX\Blake2.cpp" />
     <ClCompile Include="..\..\CEX\Blake256.cpp" />
@@ -517,6 +520,7 @@
     <ClCompile Include="..\..\CEX\RLWEPublicKey.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N2048.cpp" />
     <ClCompile Include="..\..\CEX\SCRYPT.cpp" />
+    <ClCompile Include="..\..\CEX\SecureMemory.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
     <ClCompile Include="..\..\CEX\SHA2.cpp" />
     <ClCompile Include="..\..\CEX\SHA256.cpp" />

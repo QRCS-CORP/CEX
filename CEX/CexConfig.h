@@ -73,6 +73,10 @@
 #	endif
 #elif defined(__ANDROID__)
 #	define CEX_OS_ANDROID
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(_SYSTYPE_BSD)
+#	define CEX_OS_BSD
+#elif defined(__OpenBSD__)
+#	define CEX_OS_OPENBSD
 #elif defined(__APPLE__) || defined(__MACH__)
 #	include "TargetConditionals.h"
 #	define CEX_OS_APPLE
@@ -96,7 +100,22 @@
 #endif
 #if defined(__posix) || defined(_POSIX_VERSION)
 #	define CEX_OS_POSIX
+#	define <unistd.h>
 #endif
+
+#if defined(_WIN32)
+#	define CEX_HAS_VIRTUALLOCK
+#	define CEX_HAS_RTLSECUREMEMORY
+#endif
+
+#if defined(_POSIX_MEMLOCK_RANGE)
+#	define CEX_HAS_POSIXMLOCK
+#endif
+
+#define CEX_SECMEMALLOC_DEFAULT 4096
+#define CEX_SECMEMALLOC_MIN 16
+#define CEX_SECMEMALLOC_MAX 128
+#define CEX_SECMEMALLOC_MAXKB 512
 
 // cpu type (only intel/amd/arm are targeted for support)
 #if defined(CEX_COMPILER_MSC)
@@ -407,14 +426,6 @@ typedef unsigned char byte;
 #	define CEX_PRAGMA_WARNING _Pragma ("warning: the operation is not supported")
 #endif
 
-//////////////////////////////////////////////////
-//		*** User Configurable Section ***		//
-// Settings in this section can be modified		//
-//////////////////////////////////////////////////
-
-// enabling this value will set asserts to throw in both debug and release modes
-//#define CEX_THROW_ASSERTIONS
-
 /// <summary>
 /// The global assertion handler template
 /// </summary>
@@ -432,6 +443,14 @@ inline static void CexAssert(bool Condition, const T Message)
 	} 
 #endif
 }
+
+//////////////////////////////////////////////////
+//		*** User Configurable Section ***		//
+// Settings in this section can be modified		//
+//////////////////////////////////////////////////
+
+// enabling this value uses the volatile memset to erase array data
+#define CEX_VOLATILE_MEMSET
 
 // toggles ChaCha512 from 40 to 80 rounds of mixing
 #define CEX_CHACHA512_STRONG

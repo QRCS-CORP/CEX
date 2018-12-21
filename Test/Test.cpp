@@ -278,9 +278,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("*                                             *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7c (A7)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7d (A7)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      December 12, 2018                *");
+	ConsoleUtils::WriteLine("* Date:      December 20, 2018                *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -292,7 +292,7 @@ void CloseApp()
 	GetResponse();
 	exit(0);
 }
-
+ 
 void RunTest(ITest* Test)
 {
 	try
@@ -345,6 +345,10 @@ int main()
 	bool hasAvx2;
 	bool isx86emu;
 	bool is64;
+
+	RunTest(new ACSTest());
+	//RunTest(new ChaChaTest());
+	//RunTest(new ThreefishTest());
 
 	ConsoleUtils::SizeConsole();
 	PrintTitle();

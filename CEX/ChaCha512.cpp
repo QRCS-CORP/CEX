@@ -43,6 +43,7 @@ struct ChaCha512::ChaCha512State
 
 const std::string ChaCha512::CLASS_NAME("ChaCha512");
 const std::vector<byte> ChaCha512::CSHAKE_CUST = { 0x43, 0x53, 0x58, 0x35, 0x31, 0x32 };
+const std::vector<byte> ChaCha512::SIGMA_INFO = { 0x65, 0x78, 0x70, 0x61, 0x6E, 0x64, 0x20, 0x36, 0x34, 0x2D, 0x62, 0x79, 0x74, 0x65, 0x20, 0x6B };
 
 //~~~Constructor~~~//
 
@@ -50,12 +51,10 @@ ChaCha512::ChaCha512(StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new ChaCha512State),
-	m_distributionCode(0),
-	m_generatorMode(ShakeModes::SHAKE256),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, SALT_SIZE, INFO_SIZE) },
+	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, 0, INFO_SIZE) },
 	m_macAuthenticator(m_authenticatorType == StreamAuthenticators::None ? nullptr :
 		Helper::MacFromName::GetInstance(AuthenticatorType)),
 	m_macCounter(0),
@@ -69,7 +68,6 @@ ChaCha512::~ChaCha512()
 	if (!m_isDestroyed)
 	{
 		m_authenticatorType = StreamAuthenticators::None;
-		m_generatorMode = ShakeModes::None;
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
@@ -90,7 +88,6 @@ ChaCha512::~ChaCha512()
 			m_macAuthenticator.reset(nullptr);
 		}
 
-		IntUtils::ClearVector(m_distributionCode);
 		IntUtils::ClearVector(m_legalKeySizes);
 	}
 }
@@ -100,11 +97,6 @@ ChaCha512::~ChaCha512()
 const size_t ChaCha512::BlockSize()
 {
 	return BLOCK_SIZE;
-}
-
-const std::vector<byte> &ChaCha512::DistributionCode()
-{
-	return m_distributionCode;
 }
 
 const size_t ChaCha512::DistributionCodeMax()
@@ -134,11 +126,44 @@ const std::vector<SymmetricKeySize> &ChaCha512::LegalKeySizes()
 
 const std::string ChaCha512::Name()
 {
+	std::string tmp = CLASS_NAME;
+
 #if defined(CEX_CHACHA512_STRONG)
-	return CLASS_NAME + "P80";
+	tmp += "P80";
 #else
-	return CLASS_NAME + "P40";
+	tmp += "P40";
 #endif
+
+	switch (m_authenticatorType)
+	{
+		case StreamAuthenticators::HMACSHA256:
+		{
+			tmp += "-HMACSHA256";
+			break;
+		}
+		case StreamAuthenticators::HMACSHA512:
+		{
+			tmp += "-HMACSHA512";
+			break;
+		}
+		case StreamAuthenticators::KMAC256:
+		{
+			tmp += "-KMAC256";
+			break;
+		}
+		case StreamAuthenticators::KMAC512:
+		{
+			tmp += "-KMAC512";
+			break;
+		}
+		default:
+		{
+			tmp += "-KMAC1024";
+			break;
+		}
+	}
+
+	return tmp;
 }
 
 const size_t ChaCha512::ParallelBlockSize()
@@ -183,6 +208,10 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	{
 		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The cipher has not been configured for authentication!");
 	}
+	if (Length > m_macAuthenticator->MacSize())
+	{
+		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The MAC code specified is longer than the maximum length!");
+	}
 
 	// generate the mac code
 	std::vector<byte> code(m_macAuthenticator->MacSize());
@@ -196,7 +225,7 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 
 	// extract the new mac key
 	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-	Kdf::SHAKE gen(m_generatorMode);
+	Kdf::SHAKE gen(ShakeModes::SHAKE512);
 	gen.Initialize(m_macKey->Key(), cst);
 	gen.Generate(mk);
 
@@ -209,30 +238,37 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (KeyParams.Key().size() != KEY_SIZE)
 	{
-		throw CryptoSymmetricCipherException("ChaCha256:Initialize", "Key must be 32 bytes!");
+		throw CryptoSymmetricCipherException("ChaCha512:Initialize", "The key must be 64 bytes!");
 	}
-	if (KeyParams.Info().size() > INFO_SIZE)
+	if (KeyParams.Nonce().size() != 0)
 	{
-		throw CryptoSymmetricCipherException("ChaCha256:Initialize", "The distribution code must be no larger than DistributionCodeMax!");
+		throw CryptoSymmetricCipherException("ChaCha512:Initialize", "The nonce is not required with ChaCha512!");
 	}
-	if (KeyParams.Nonce().size() != 0 && KeyParams.Nonce().size() < SALT_SIZE)
+	if (KeyParams.Info().size() > 0 && KeyParams.Info().size() != INFO_SIZE)
 	{
-		throw CryptoSymmetricCipherException("ChaCha256:Initialize", "The nonce should be either zero or at least 16 bytes!");
+		throw CryptoSymmetricCipherException("ChaCha512:Initialize", "The distribution code must be no larger than DistributionCodeMax!");
 	}
 
 	// reset the counter and mac
 	Reset();
 
+	std::vector<byte> code(INFO_SIZE);
+
 	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		MemUtils::Copy(KeyParams.Info(), 0, m_distributionCode, 0, (KeyParams.Info().size() > m_distributionCode.size()) ? m_distributionCode.size() : KeyParams.Info().size());
+		MemUtils::Copy(KeyParams.Info(), 0, code, 0, KeyParams.Info().size());
+	}
+	else
+	{
+		// standard
+		MemUtils::Copy(SIGMA_INFO, 0, code, 0, SIGMA_INFO.size());
 	}
 
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
 		// add key and nonce to state
-		Expand(KeyParams.Key());
+		Expand(KeyParams.Key(), code);
 	}
 	else
 	{
@@ -245,25 +281,19 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
 
 		// initialize cSHAKE
-		Kdf::SHAKE kdf(m_generatorMode);
-		kdf.Initialize(KeyParams.Key(), cst);
+		Kdf::SHAKE gen(ShakeModes::SHAKE512);
+		gen.Initialize(KeyParams.Key(), cst);
 
 		// generate the new cipher key
 		std::vector<byte> ck(KEY_SIZE);
-		kdf.Generate(ck);
+		gen.Generate(ck);
 
 		// expand round keys
-		Expand(ck);
+		Expand(ck, code);
 
 		// generate the mac key
 		std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-		kdf.Generate(mk);
-
-		if (m_macKey != nullptr)
-		{
-			m_macKey.reset(nullptr);
-		}
-
+		gen.Generate(mk);
 		m_macKey.reset(new SymmetricSecureKey(mk));
 		m_macAuthenticator->Initialize(*m_macKey.get());
 	}
@@ -292,31 +322,6 @@ void ChaCha512::ParallelMaxDegree(size_t Degree)
 
 void ChaCha512::Reset()
 {
-	switch (m_authenticatorType)
-	{
-		case StreamAuthenticators::KMAC256:
-		case StreamAuthenticators::HMACSHA256:
-		{
-			m_generatorMode = ShakeModes::SHAKE256;
-			break;
-		}
-		case StreamAuthenticators::HMACSHA512:
-		case StreamAuthenticators::KMAC512:
-		{
-			m_generatorMode = ShakeModes::SHAKE512;
-			break;
-		}
-		case StreamAuthenticators::KMAC1024:
-		{
-			m_generatorMode = ShakeModes::SHAKE1024;
-			break;
-		}
-		default:
-		{
-			m_generatorMode = ShakeModes::SHAKE512;
-		}
-	}
-
 	if (m_macAuthenticator != nullptr)
 	{
 		m_macAuthenticator->Reset();
@@ -358,37 +363,34 @@ void ChaCha512::Transform(const std::vector<byte> &Input, const size_t InOffset,
 
 //~~~Private Functions~~~//
 
-void ChaCha512::Expand(const std::vector<byte> &Key)
+void ChaCha512::Expand(const std::vector<byte> &Key, const std::vector<byte> &Code)
 {
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	MemUtils::Copy(Key, 0, m_cipherState->S, 0, STATE_SIZE * sizeof(uint));
 	MemUtils::Copy(Key, STATE_SIZE * sizeof(uint), m_cipherState->C, 0, NONCE_SIZE * sizeof(uint));
 #else
-	m_cipherState->S[0] += IntUtils::LeBytesTo32(Key, 0);
-	m_cipherState->S[1] += IntUtils::LeBytesTo32(Key, 4);
-	m_cipherState->S[2] += IntUtils::LeBytesTo32(Key, 8);
-	m_cipherState->S[3] += IntUtils::LeBytesTo32(Key, 12);
-	m_cipherState->S[4] += IntUtils::LeBytesTo32(Key, 16);
-	m_cipherState->S[5] += IntUtils::LeBytesTo32(Key, 20);
-	m_cipherState->S[6] += IntUtils::LeBytesTo32(Key, 24);
-	m_cipherState->S[7] += IntUtils::LeBytesTo32(Key, 28);
-	m_cipherState->S[8] += IntUtils::LeBytesTo32(Key, 32);
-	m_cipherState->S[9] += IntUtils::LeBytesTo32(Key, 36);
-	m_cipherState->S[10] += IntUtils::LeBytesTo32(Key, 40);
-	m_cipherState->S[11] += IntUtils::LeBytesTo32(Key, 44);
-	m_cipherState->S[12] += IntUtils::LeBytesTo32(Key, 48);
-	m_cipherState->S[13] += IntUtils::LeBytesTo32(Key, 52);
-	m_cipherState->C[0] += IntUtils::LeBytesTo32(Key, 56);
-	m_cipherState->C[1] += IntUtils::LeBytesTo32(Key, 60);
+	m_cipherState->S[0] = IntUtils::LeBytesTo32(Key, 0);
+	m_cipherState->S[1] = IntUtils::LeBytesTo32(Key, 4);
+	m_cipherState->S[2] = IntUtils::LeBytesTo32(Key, 8);
+	m_cipherState->S[3] = IntUtils::LeBytesTo32(Key, 12);
+	m_cipherState->S[4] = IntUtils::LeBytesTo32(Key, 16);
+	m_cipherState->S[5] = IntUtils::LeBytesTo32(Key, 20);
+	m_cipherState->S[6] = IntUtils::LeBytesTo32(Key, 24);
+	m_cipherState->S[7] = IntUtils::LeBytesTo32(Key, 28);
+	m_cipherState->S[8] = IntUtils::LeBytesTo32(Key, 32);
+	m_cipherState->S[9] = IntUtils::LeBytesTo32(Key, 36);
+	m_cipherState->S[10] = IntUtils::LeBytesTo32(Key, 40);
+	m_cipherState->S[11] = IntUtils::LeBytesTo32(Key, 44);
+	m_cipherState->S[12] = IntUtils::LeBytesTo32(Key, 48);
+	m_cipherState->S[13] = IntUtils::LeBytesTo32(Key, 52);
+	m_cipherState->C[0] = IntUtils::LeBytesTo32(Key, 56);
+	m_cipherState->C[1] = IntUtils::LeBytesTo32(Key, 60);
 #endif
 
-	if (m_distributionCode.size() == INFO_SIZE)
-	{
-		m_cipherState->S[4] += IntUtils::LeBytesTo32(m_distributionCode, 0);
-		m_cipherState->S[5] += IntUtils::LeBytesTo32(m_distributionCode, 4);
-		m_cipherState->S[6] += IntUtils::LeBytesTo32(m_distributionCode, 8);
-		m_cipherState->S[7] += IntUtils::LeBytesTo32(m_distributionCode, 12);
-	}
+	m_cipherState->S[4] += IntUtils::LeBytesTo32(Code, 0);
+	m_cipherState->S[5] += IntUtils::LeBytesTo32(Code, 4);
+	m_cipherState->S[6] += IntUtils::LeBytesTo32(Code, 8);
+	m_cipherState->S[7] += IntUtils::LeBytesTo32(Code, 12);
 }
 
 void ChaCha512::Generate(std::vector<byte> &Output, const size_t OutOffset, std::array<uint, 2> &Counter, const size_t Length)

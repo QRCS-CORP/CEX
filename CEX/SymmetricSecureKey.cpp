@@ -2,12 +2,19 @@
 #include "ArrayUtils.h"
 #include "CTR.h"
 #include "SHA512.h"
+#include "Shake.h"
 #include "StreamWriter.h"
 #include "StreamReader.h"
 #include "SymmetricKey.h"
 #include "SysUtils.h"
+#include "Threefish512.h"
 
 NAMESPACE_SYMMETRICKEY
+
+using Utility::ArrayUtils;
+using Utility::IntUtils;
+using Utility::MemUtils;
+using Utility::SysUtils;
 
 //~~~Constructors~~~//
 
@@ -24,12 +31,12 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, ulong KeySa
 	}
 
 	m_keyState.resize(m_keySizes.KeySize());
-	Utility::MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
+	MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
 
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
+		IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
 	}
 
 	Transform();
@@ -48,13 +55,13 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	}
 
 	m_keyState.resize(m_keySizes.KeySize() + m_keySizes.NonceSize());
-	Utility::MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
-	Utility::MemUtils::Copy(Nonce, 0, m_keyState, m_keySizes.KeySize(), m_keySizes.NonceSize());
+	MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
+	MemUtils::Copy(Nonce, 0, m_keyState, m_keySizes.KeySize(), m_keySizes.NonceSize());
 
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
+		IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
 	}
 
 	Transform();
@@ -73,14 +80,14 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	}
 
 	m_keyState.resize(m_keySizes.KeySize() + m_keySizes.NonceSize() + m_keySizes.InfoSize());
-	Utility::MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
-	Utility::MemUtils::Copy(Nonce, 0, m_keyState, m_keySizes.KeySize(), m_keySizes.NonceSize());
-	Utility::MemUtils::Copy(Info, 0, m_keyState, m_keySizes.KeySize() + m_keySizes.NonceSize(), m_keySizes.InfoSize());
+	MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
+	MemUtils::Copy(Nonce, 0, m_keyState, m_keySizes.KeySize(), m_keySizes.NonceSize());
+	MemUtils::Copy(Info, 0, m_keyState, m_keySizes.KeySize() + m_keySizes.NonceSize(), m_keySizes.InfoSize());
 
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
+		IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
 	}
 
 	Transform();
@@ -128,11 +135,11 @@ void SymmetricSecureKey::Destroy()
 
 		if (m_keyState.size() > 0)
 		{
-			Utility::IntUtils::ClearVector(m_keyState);
+			IntUtils::ClearVector(m_keyState);
 		}
 		if (m_keySalt.size() > 0)
 		{
-			Utility::IntUtils::ClearVector(m_keySalt);
+			IntUtils::ClearVector(m_keySalt);
 		}
 	}
 }
@@ -205,7 +212,7 @@ std::vector<byte> SymmetricSecureKey::Extract(size_t Offset, size_t Length)
 {
 	Transform();
 	std::vector<byte> state(Length);
-	Utility::MemUtils::Copy(m_keyState, Offset, state, 0, Length);
+	MemUtils::Copy(m_keyState, Offset, state, 0, Length);
 	Transform();
 
 	return state;
@@ -214,15 +221,15 @@ std::vector<byte> SymmetricSecureKey::Extract(size_t Offset, size_t Length)
 std::vector<byte> SymmetricSecureKey::GetSystemKey()
 {
 	std::vector<byte> state(0);
-	Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
-	Utility::ArrayUtils::AppendString(Utility::SysUtils::OsName(), state);
-	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserId(), state);
-	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserName(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
+	ArrayUtils::AppendString(SysUtils::ComputerName(), state);
+	ArrayUtils::AppendString(SysUtils::OsName(), state);
+	ArrayUtils::AppendString(SysUtils::UserId(), state);
+	ArrayUtils::AppendString(SysUtils::UserName(), state);
+	ArrayUtils::Append(SysUtils::ProcessId(), state);
 
 	if (m_keySalt.size() != 0)
 	{
-		Utility::ArrayUtils::Append(m_keySalt, state);
+		ArrayUtils::Append(m_keySalt, state);
 	}
 
 	Digest::SHA512 dgt;
@@ -238,8 +245,8 @@ void SymmetricSecureKey::Transform()
 	std::vector<byte> key(32);
 	std::vector<byte> iv(16);
 
-	Utility::MemUtils::Copy(seed, 0, key, 0, key.size());
-	Utility::MemUtils::Copy(seed, key.size(), iv, 0, iv.size());
+	MemUtils::Copy(seed, 0, key, 0, key.size());
+	MemUtils::Copy(seed, key.size(), iv, 0, iv.size());
 	SymmetricKey kp(key, iv);
 
 	// AES256-CTR

@@ -20,6 +20,7 @@
 // Implementation Details:
 // An implementation of an Authenticated Counter Mode (ACS).
 // Written by John Underhill, December 9, 2018
+// Updated December 20, 2018
 // Contact: develop@vtdev.com
 
 #ifndef CEX_ACS_H
@@ -133,16 +134,16 @@ private:
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
 	static const std::vector<byte> CSHAKE_CUST;
-	static const size_t INFO_SIZE = 136;
+	static const size_t INFO_SIZE = 16;
 	static const size_t MAX_PRLALLOC = 100000000;
 	static const size_t MIN_TAGSIZE = 16;
-	static const std::string OMEGA_INFO;
+	static const std::vector<byte> OMEGA_INFO;
 	static const byte UPDATE_PREFIX = 0x80;
 
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<CTR> m_cipherMode;
 	BlockCiphers m_cipherType;
-	std::vector<byte> m_distributionCode;
+	ShakeModes m_expansionMode;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
@@ -151,7 +152,6 @@ private:
 	ulong m_macCounter;
 	std::unique_ptr<SymmetricSecureKey> m_macKey;
 	ParallelOptions m_parallelProfile;
-	ShakeModes m_generatorMode;
 
 public:
 
@@ -176,7 +176,7 @@ public:
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF; the default is SHAKE256</param>
 	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid block cipher type is used</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block cipher type is used</exception>
 	ACS(BlockCiphers CipherType = BlockCiphers::AHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::SHAKE256, StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
@@ -187,24 +187,14 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: Unit block size of internal cipher in bytes.
-	/// <para>Block size is 64 bytes wide.</para>
+	/// Read Only: Internal block size of internal cipher in bytes.
+	/// <para>Block size is 16 bytes wide.</para>
 	/// </summary>
 	const size_t BlockSize() override;
 
 	/// <summary>
-	/// Read Only: The salt value in the initialization parameters (Tau-Sigma).
-	/// <para>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default.
-	/// Changing this code will create a unique distribution of the cipher.
-	/// For best security, the code should be a random extenion of the key, with rounds increased to 40 or more.
-	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
-	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
-	/// </summary>
-	const std::vector<byte> &DistributionCode() override;
-
-	/// <summary>
 	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary domain key.</para>
+	/// <para>The distribution code is set with the ISymmetricKey Info parameter; and can be used as a secondary domain key.</para>
 	/// </summary>
 	const size_t DistributionCodeMax() override;
 
@@ -226,7 +216,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
@@ -245,7 +235,7 @@ public:
 	/// Read/Write: Parallel and SIMD capability flags and recommended sizes.
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
-	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
+	/// Changes to these values must be made before the Initialize(bool, ISymmetricKey) function is called.</para>
 	/// </summary>
 	ParallelOptions &ParallelProfile() override;
 
@@ -266,10 +256,8 @@ public:
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output array.   
-	/// <para>The Finalize call can be made incrementally at any byte interval during the transformation without having to re-initialize the cipher.
-	/// The output array must be of sufficient length to receive the MAC code.
-	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
+	/// <para>The output array must be of sufficient length to receive the MAC code.
+	/// This function finalizes the Encryption/Decryption cycle, all data in a stream segment must be processed before this function is called.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The output array that receives the authentication code</param>
@@ -277,18 +265,18 @@ public:
 	/// <param name="Length">The number of MAC code bytes to write to the output array.
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if the cipher is not initialized, or output array is too small</exception>
 	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 	/// <summary>
-	/// Initialize the cipher.
+	/// Initialize the cipher with an ISymmetricKey key container.
 	/// <para>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream.
-	/// Authentication on a decrypted stream can be performed using either the boolean Verify(Input, Offset, Length), or manually compared using the Finalize(Output, Offset, Length) function.
+	/// Authentication on a decrypted stream can be performed by manually by comparing output with the the Finalize(Output, Offset, Length) function.
 	/// If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</para>
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParams">Cipher key structure, containing cipher key and nonce pair, and optional info array</param>
+	/// <param name="KeyParams">Cipher key structure, containing cipher key, nonce and optional info array</param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
@@ -296,7 +284,7 @@ public:
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
 	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
-	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
+	/// Thread count must be an even number, and not exceed the number of processor [virtual] cores.</para>
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
@@ -309,7 +297,7 @@ public:
 
 	/// <summary>
 	/// Add additional data to the authentication generator.  
-	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can be called after the processing of a plaintext or ciphertext input.</para>
+	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can be called before or after a stream segment has been processed.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to process</param>
@@ -339,7 +327,7 @@ public:
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
-	/// <para><see cref="Initialize(SymmetricKey)"/> must be called before this method can be used.</para>
+	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>

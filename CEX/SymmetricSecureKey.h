@@ -13,8 +13,8 @@ NAMESPACE_SYMMETRICKEY
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Key arrays are encrypted when the class is instantiated with data, and decrypted when accessed through the data arrays getter property functions (Key, Nonce, and Info</description></item>
-/// <item><description>The key material access is limited to the initializing process, user, and computer; it is not transferrable across process or machine boundaries</description></item>
+/// <item><description>Key arrays are encrypted when the class is instantiated with data, and decrypted when accessed through the data arrays getter property functions (Key, Nonce, and Info)</description></item>
+/// <item><description>The key material access is limited to the initializing process, user, and computer; it is not transferrable across process, machine, or domain boundaries</description></item>
 /// <item><description>Accessing the property functions from another process, user, or computer, will change the encryption key and return invalid data</description></item>
 /// <item><description>Serializing a SymmetricSecureKey returns a decrypted SymmetricKey stream, deserializing a SymmetricKey stream returns an initialized SymmetricSecureKey</description></item>
 /// <item><description>An optional 64bit KeySalt can be added through the constructors, this adds the salt value to system and process specific state to derive the internal encryption key</description></item>

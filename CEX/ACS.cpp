@@ -11,9 +11,9 @@ using Utility::IntUtils;
 using Utility::MemUtils;
 using Key::Symmetric::SymmetricKey;
 
-const std::vector<byte> ACS::CSHAKE_CUST = { 0x43, 0x53, 0x58, 0x32, 0x35, 0x36 };
 const std::string ACS::CLASS_NAME("ACS");
-const std::string ACS::OMEGA_INFO("ACS version 1.0");
+const std::vector<byte> ACS::CSHAKE_CUST = { 0x43, 0x53, 0x58, 0x32, 0x35, 0x36 };
+const std::vector<byte> ACS::OMEGA_INFO = { 0x41, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62 };
 
 //~~~Constructor~~~//
 
@@ -23,8 +23,7 @@ ACS::ACS(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, Str
 	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType, CipherExtensionType) :
 		throw CryptoSymmetricCipherException("ACS:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
-	m_distributionCode(0),
-	m_generatorMode(ShakeModes::SHAKE256),
+	m_expansionMode(ShakeModes::SHAKE512),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -44,14 +43,13 @@ ACS::~ACS()
 	{
 		m_authenticatorType = StreamAuthenticators::None;
 		m_cipherType = BlockCiphers::None;
+		m_expansionMode = ShakeModes::None;
 		m_isDestroyed = true;
 		m_isEncryption = false;
-		m_generatorMode = ShakeModes::None;
 		m_isInitialized = false;
 		m_macCounter = 0;
 		m_parallelProfile.Reset();
 
-		IntUtils::ClearVector(m_distributionCode);
 		IntUtils::ClearVector(m_legalKeySizes);
 
 		if (m_cipherMode != nullptr)
@@ -74,11 +72,6 @@ ACS::~ACS()
 const size_t ACS::BlockSize()
 {
 	return BLOCK_SIZE;
-}
-
-const std::vector<byte> &ACS::DistributionCode()
-{
-	return m_distributionCode;
 }
 
 const size_t ACS::DistributionCodeMax()
@@ -108,7 +101,38 @@ const std::vector<SymmetricKeySize> &ACS::LegalKeySizes()
 
 const std::string ACS::Name()
 {
-	return CLASS_NAME + "-" + m_cipherMode->Engine()->Name();
+	std::string tmp = CLASS_NAME  + "-" + m_cipherMode->Engine()->Name();
+
+	switch (m_authenticatorType)
+	{
+		case StreamAuthenticators::HMACSHA256:
+		{
+			tmp += "-HMACSHA256";
+			break;
+		}
+		case StreamAuthenticators::HMACSHA512:
+		{
+			tmp += "-HMACSHA512";
+			break;
+		}
+		case StreamAuthenticators::KMAC256:
+		{
+			tmp += "-KMAC256";
+			break;
+		}
+		case StreamAuthenticators::KMAC512:
+		{
+			tmp += "-KMAC512";
+			break;
+		}
+		default:
+		{
+			tmp += "-KMAC1024";
+			break;
+		}
+	}
+
+	return tmp;
 }
 
 const size_t ACS::TagSize()
@@ -151,20 +175,24 @@ void ACS::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 	{
 		throw CryptoSymmetricCipherException("ACS:Finalize", "The cipher has not been configured for authentication!");
 	}
+	if (Length > m_macAuthenticator->MacSize())
+	{
+		throw CryptoSymmetricCipherException("ACS:Finalize", "The MAC code specified is longer than the maximum length!");
+	}
 
 	// generate the mac code
 	std::vector<byte> code(m_macAuthenticator->MacSize());
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
-	// customization string is CSX256+counter
-	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
-	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
-	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+	// customization string is cust+counter
+	std::vector<byte> cust(CSHAKE_CUST.size() + sizeof(ulong));
+	MemUtils::Copy(CSHAKE_CUST, 0, cust, 0, CSHAKE_CUST.size());
+	IntUtils::Le64ToBytes(m_macCounter, cust, CSHAKE_CUST.size());
 
 	// extract the new mac key
-	Kdf::SHAKE gen(m_generatorMode);
-	gen.Initialize(m_macKey->Key(), cst);
+	Kdf::SHAKE gen(m_expansionMode);
+	gen.Initialize(m_macKey->Key(), cust);
 	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	gen.Generate(mack);
 	m_macKey.reset(new SymmetricSecureKey(mack));
@@ -191,26 +219,31 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	{
 		throw CryptoSymmetricCipherException("ACS:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
 	}
+	if (KeyParams.Info().size() != 0 && KeyParams.Info().size() != INFO_SIZE)
+	{
+		throw CryptoSymmetricCipherException("ACS:Initialize", "The info parameter size is invalid, must be 16 bytes!");
+	}
 
 	// reset for a new key
 	Reset();
 
+	std::vector<byte> code(INFO_SIZE);
+
 	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		m_distributionCode.resize(KeyParams.Info().size());
-		MemUtils::Copy(KeyParams.Info(), 0, m_distributionCode, 0, m_distributionCode.size());
+		MemUtils::Copy(KeyParams.Info(), 0, code, 0, code.size());
 	}
 	else
 	{
 		// standard
-		m_distributionCode.assign(OMEGA_INFO.begin(), OMEGA_INFO.end());
+		MemUtils::Copy(OMEGA_INFO, 0, code, 0, code.size());
 	}
 
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
 		// key the cipher directly
-		Key::Symmetric::SymmetricKey kp(KeyParams.Key(), KeyParams.Nonce(), m_distributionCode);
+		Key::Symmetric::SymmetricKey kp(KeyParams.Key(), KeyParams.Nonce(), code);
 		m_cipherMode->Initialize(true, kp);
 	}
 	else
@@ -224,20 +257,21 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		IntUtils::Le64ToBytes(m_macCounter, cust, CSHAKE_CUST.size());
 
 		// initialize cSHAKE with k,c
-		Kdf::SHAKE kdf(m_generatorMode);
-		kdf.Initialize(KeyParams.Key(), cust);
+		m_expansionMode = (KeyParams.Key().size() == 64) ? ShakeModes::SHAKE512 : (KeyParams.Key().size() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
+		Kdf::SHAKE gen(m_expansionMode);
+		gen.Initialize(KeyParams.Key(), cust);
 
 		// generate the cipher key
 		std::vector<byte> cprk(KeyParams.Key().size());
-		kdf.Generate(cprk);
+		gen.Generate(cprk);
 
-		// initialize the cipher k=14,223 n=255,254 c=65,67
-		Key::Symmetric::SymmetricKey kp(cprk, KeyParams.Nonce(), m_distributionCode);
+		// initialize the cipher
+		Key::Symmetric::SymmetricKey kp(cprk, KeyParams.Nonce(), code);
 		m_cipherMode->Initialize(true, kp);
 
 		// generate the mac key
 		std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-		kdf.Generate(mack);
+		gen.Generate(mack);
 
 		// initailize the mac
 		m_macKey.reset(new SymmetricSecureKey(mack));
@@ -259,31 +293,6 @@ void ACS::ParallelMaxDegree(size_t Degree)
 
 void ACS::Reset()
 {
-	switch (m_authenticatorType)
-	{
-		case StreamAuthenticators::KMAC256:
-		case StreamAuthenticators::HMACSHA256:
-		{
-			m_generatorMode = ShakeModes::SHAKE256;
-			break;
-		}
-		case StreamAuthenticators::KMAC512:
-		case StreamAuthenticators::HMACSHA512:
-		{
-			m_generatorMode = ShakeModes::SHAKE512;
-			break;
-		}
-		case StreamAuthenticators::KMAC1024:
-		{
-			m_generatorMode = ShakeModes::SHAKE1024;
-			break;
-		}
-		default:
-		{
-			m_generatorMode = ShakeModes::None;
-		}
-	}
-
 	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 	m_isInitialized = false;
 }
@@ -325,6 +334,7 @@ void ACS::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		if (m_authenticatorType != StreamAuthenticators::None)
 		{
 			m_macAuthenticator->Update(Output, OutOffset, Length);
+			m_macCounter += Length;
 		}
 	}
 	else
@@ -332,12 +342,11 @@ void ACS::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		if (m_authenticatorType != StreamAuthenticators::None)
 		{
 			m_macAuthenticator->Update(Input, InOffset, Length);
+			m_macCounter += Length;
 		}
 
 		m_cipherMode->Transform(Input, InOffset, Output, OutOffset, Length);
 	}
-
-	m_macCounter += Length;
 }
 
 NAMESPACE_STREAMEND

@@ -1014,6 +1014,12 @@
     <ClInclude Include="..\..\CEX\SymmetricCiphers.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\MemoryPool.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsymmetricKey.h">
+      <Filter>Header Files\Key\Asymmetric</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1456,6 +1462,12 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\ACS.cpp">
       <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SecureMemory.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricKey.cpp">
+      <Filter>Source Files\Key\Asymmetric</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

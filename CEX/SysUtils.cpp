@@ -795,6 +795,14 @@ std::string SysUtils::Version()
 		return serInf;
 	}
 
+	HMODULE SysUtils::GetCurrentModule()
+	{
+		HMODULE hMod = NULL;
+		::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)GetCurrentModule, &hMod);
+
+		return hMod;
+	}
+
 	std::string SysUtils::OsVersion()
 	{
 		// note: application must have manifest in Win10, or will return Win8 or Server2012:
@@ -906,6 +914,42 @@ std::string SysUtils::Version()
 		}
 
 		return serInf;
+	}
+
+	bool SysUtils::ProtectPages(void* Pointer, size_t Length)
+	{
+		HANDLE hProcess = ::GetCurrentProcess();
+		MEMORY_BASIC_INFORMATION mbi;
+		BOOL ret;
+		ULONG paold;
+
+		if (ret = (VirtualQueryEx(hProcess, Pointer, &mbi, sizeof(mbi)) == sizeof(mbi)))
+		{
+			if (!(mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)))
+			{
+				ret = VirtualProtectEx(hProcess, Pointer, Length, PAGE_GUARD | mbi.Protect, &paold);
+			}
+		}
+
+		return static_cast<bool>(ret);
+	}
+
+	bool SysUtils::ReleaseProtectedPages(void* Pointer, size_t Length)
+	{
+		HANDLE hProcess = ::GetCurrentProcess();
+		MEMORY_BASIC_INFORMATION mbi;
+		BOOL ret;
+		ULONG paold;
+
+		if (ret = (VirtualQueryEx(hProcess, Pointer, &mbi, sizeof(mbi)) == sizeof(mbi)))
+		{
+			if ((mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)))
+			{
+				ret = VirtualProtectEx(hProcess, Pointer, Length, PAGE_EXECUTE_READWRITE, &paold);
+			}
+		}
+
+		return static_cast<bool>(ret);
 	}
 
 	std::vector<std::string> SysUtils::SystemIds()

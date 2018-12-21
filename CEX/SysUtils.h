@@ -232,6 +232,13 @@ public:
 	static MEMORYSTATUSEX MemoryStatus();
 
 	/// <summary>
+	/// Return the handle to the current module
+	/// </summary>
+	/// 
+	/// <returns>An HMODULE handle</returns>
+	static HMODULE GetCurrentModule();
+
+	/// <summary>
 	/// Return an array of module entry structures for all running processes
 	/// </summary>
 	/// 
@@ -252,6 +259,26 @@ public:
 	/// 
 	/// <returns>A vector of PROCESSENTRY32 structures</returns>
 	static std::vector<PROCESSENTRY32> ProcessEntries();
+
+	/// <summary>
+	/// Guard a region of protected memory
+	/// </summary>
+	///
+	/// <param name="Pointer">The pointer to the region of memory</param>
+	/// <param name="Length">The amount of memory to protect</param>
+	/// 
+	/// <returns>Returns true for a successful operation</returns>
+	static bool ProtectPages(void* Pointer, size_t Length);
+
+	/// <summary>
+	/// Release page guard on a memory region
+	/// </summary>
+	///
+	/// <param name="Pointer">The pointer to the region of memory</param>
+	/// <param name="Length">The amount of memory to protect</param>
+	/// 
+	/// <returns>Returns true for a successful operation</returns>
+	static bool ReleaseProtectedPages(void* Pointer, size_t Length);
 
 	/// <summary>
 	/// Return a partial array of pre-formatted system CLSID strings

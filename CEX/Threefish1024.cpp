@@ -21,7 +21,7 @@ using Utility::ParallelUtils;
 
 const std::string Threefish1024::CLASS_NAME("Threefish1024");
 const std::vector<byte> Threefish1024::CSHAKE_CUST = { 0x54, 0x53, 0x58, 0x31, 0x30, 0x32, 0x34 };
-const std::string Threefish1024::OMEGA_INFO("Threefish1024120");
+const std::vector<byte> Threefish1024::OMEGA_INFO = { 0x54, 0x68, 0x72, 0x65, 0x65, 0x66, 0x69, 0x73, 0x68, 0x31, 0x30, 0x32, 0x34, 0x31, 0x32, 0x30 };
 
 struct Threefish1024::Threefish1024State
 {
@@ -53,8 +53,6 @@ Threefish1024::Threefish1024(StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new Threefish1024State),
-	m_distributionCode(16),
-	m_generatorMode(ShakeModes::SHAKE256),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(ulong), INFO_SIZE) },
@@ -72,7 +70,6 @@ Threefish1024::~Threefish1024()
 	{
 		m_authenticatorType = StreamAuthenticators::None;
 		m_isDestroyed = true;
-		m_generatorMode = ShakeModes::None;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_macCounter = 0;
@@ -118,11 +115,6 @@ const size_t Threefish1024::BlockSize()
 	return BLOCK_SIZE;
 }
 
-const std::vector<byte> &Threefish1024::DistributionCode()
-{
-	return m_distributionCode;
-}
-
 const size_t Threefish1024::DistributionCodeMax()
 {
 	return INFO_SIZE;
@@ -152,16 +144,30 @@ const std::string Threefish1024::Name()
 {
 	switch (m_authenticatorType)
 	{
-	case StreamAuthenticators::HMACSHA256:
-		return CLASS_NAME + "-HMACSHA256";
-	case StreamAuthenticators::HMACSHA512:
-		return CLASS_NAME + "-HMACSHA512";
-	case StreamAuthenticators::KMAC256:
-		return CLASS_NAME + "-KMAC256";
-	case StreamAuthenticators::KMAC512:
-		return CLASS_NAME + "-KMAC512";
-	default:
-		return CLASS_NAME;
+		case StreamAuthenticators::HMACSHA256:
+		{
+			return CLASS_NAME + "-HMACSHA256";
+		}
+		case StreamAuthenticators::HMACSHA512:
+		{
+			return CLASS_NAME + "-HMACSHA512";
+		}
+		case StreamAuthenticators::KMAC256:
+		{
+			return CLASS_NAME + "-KMAC256";
+		}
+		case StreamAuthenticators::KMAC512:
+		{
+			return CLASS_NAME + "-KMAC512";
+		}
+		case StreamAuthenticators::KMAC1024:
+		{
+			return CLASS_NAME + "-KMAC1024";
+		}
+		default:
+		{
+			return CLASS_NAME;
+		}
 	}
 }
 
@@ -192,6 +198,10 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 	{
 		throw CryptoSymmetricCipherException("Threefish1024:Finalize", "The cipher has not been configured for authentication!");
 	}
+	if (Length > m_macAuthenticator->MacSize())
+	{
+		throw CryptoSymmetricCipherException("Threefish1024:Finalize", "The MAC code specified is longer than the maximum length!");
+	}
 
 	// generate the mac code
 	std::vector<byte> code(m_macAuthenticator->MacSize());
@@ -205,7 +215,7 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 
 	// extract the new mac key
 	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-	Kdf::SHAKE gen(m_generatorMode);
+	Kdf::SHAKE gen(ShakeModes::SHAKE1024);
 	gen.Initialize(m_macKey->Key(), cst);
 	gen.Generate(mk);
 
@@ -220,9 +230,9 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	{
 		throw CryptoSymmetricCipherException("Threefish1024:Initialize", "Key must be 64 bytes!");
 	}
-	if (KeyParams.Nonce().size() > 0 && KeyParams.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
+	if (KeyParams.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Initialize", "Nonce must be no more than 16 bytes!");
+		throw CryptoSymmetricCipherException("Threefish1024:Initialize", "Nonce must be 16 bytes!");
 	}
 	if (KeyParams.Info().size() > 0 && KeyParams.Info().size() > INFO_SIZE)
 	{
@@ -244,30 +254,41 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	// reset the counter and mac
 	Reset();
 
-	// initialize state
-	if (KeyParams.Nonce().size() != 0)
-	{
-		// non-default nonce
-		MemUtils::Copy(KeyParams.Nonce(), 0, m_cipherState->C, 0, KeyParams.Nonce().size());
-	}
+	// copy nonce
+	m_cipherState->C[0] = IntUtils::LeBytesTo64(KeyParams.Nonce(), 0);
+	m_cipherState->C[1] = IntUtils::LeBytesTo64(KeyParams.Nonce(), 8);
 
 	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		MemUtils::Copy(KeyParams.Info(), 0, m_cipherState->T, 0, KeyParams.Info().size());
+		m_cipherState->T[0] = IntUtils::LeBytesTo64(KeyParams.Info(), 0);
+		m_cipherState->T[1] = IntUtils::LeBytesTo64(KeyParams.Info(), 8);
 	}
 	else
 	{
 		// default tweak
-		MemUtils::Copy(OMEGA_INFO, 0, m_cipherState->T, 0, OMEGA_INFO.size());
+		m_cipherState->T[0] = IntUtils::LeBytesTo64(OMEGA_INFO, 0);
+		m_cipherState->T[1] = IntUtils::LeBytesTo64(OMEGA_INFO, 8);
 	}
-
-	// copy the counter
-	MemUtils::Copy(m_cipherState->T, 0, m_distributionCode, 0, 16);
 
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
-		MemUtils::Copy(KeyParams.Key(), 0, m_cipherState->K, 0, KEY_SIZE);
+		m_cipherState->K[0] = IntUtils::LeBytesTo64(KeyParams.Key(), 0);
+		m_cipherState->K[1] = IntUtils::LeBytesTo64(KeyParams.Key(), 8);
+		m_cipherState->K[2] = IntUtils::LeBytesTo64(KeyParams.Key(), 16);
+		m_cipherState->K[3] = IntUtils::LeBytesTo64(KeyParams.Key(), 24);
+		m_cipherState->K[4] = IntUtils::LeBytesTo64(KeyParams.Key(), 32);
+		m_cipherState->K[5] = IntUtils::LeBytesTo64(KeyParams.Key(), 40);
+		m_cipherState->K[6] = IntUtils::LeBytesTo64(KeyParams.Key(), 48);
+		m_cipherState->K[7] = IntUtils::LeBytesTo64(KeyParams.Key(), 56);
+		m_cipherState->K[8] = IntUtils::LeBytesTo64(KeyParams.Key(), 64);
+		m_cipherState->K[9] = IntUtils::LeBytesTo64(KeyParams.Key(), 72);
+		m_cipherState->K[10] = IntUtils::LeBytesTo64(KeyParams.Key(), 80);
+		m_cipherState->K[11] = IntUtils::LeBytesTo64(KeyParams.Key(), 88);
+		m_cipherState->K[12] = IntUtils::LeBytesTo64(KeyParams.Key(), 96);
+		m_cipherState->K[13] = IntUtils::LeBytesTo64(KeyParams.Key(), 104);
+		m_cipherState->K[14] = IntUtils::LeBytesTo64(KeyParams.Key(), 112);
+		m_cipherState->K[15] = IntUtils::LeBytesTo64(KeyParams.Key(), 120);
 	}
 	else
 	{
@@ -280,19 +301,34 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
 
 		// initialize cSHAKE
-		Kdf::SHAKE kdf(m_generatorMode);
-		kdf.Initialize(KeyParams.Key(), cst);
+		Kdf::SHAKE gen(ShakeModes::SHAKE1024);
+		gen.Initialize(KeyParams.Key(), cst);
 
 		// generate the new cipher key
 		std::vector<byte> ck(KEY_SIZE);
-		kdf.Generate(ck);
+		gen.Generate(ck);
 
 		// copy key to state
-		MemUtils::Copy(ck, 0, m_cipherState->K, 0, KEY_SIZE);
+		m_cipherState->K[0] = IntUtils::LeBytesTo64(ck, 0);
+		m_cipherState->K[1] = IntUtils::LeBytesTo64(ck, 8);
+		m_cipherState->K[2] = IntUtils::LeBytesTo64(ck, 16);
+		m_cipherState->K[3] = IntUtils::LeBytesTo64(ck, 24);
+		m_cipherState->K[4] = IntUtils::LeBytesTo64(ck, 32);
+		m_cipherState->K[5] = IntUtils::LeBytesTo64(ck, 40);
+		m_cipherState->K[6] = IntUtils::LeBytesTo64(ck, 48);
+		m_cipherState->K[7] = IntUtils::LeBytesTo64(ck, 56);
+		m_cipherState->K[8] = IntUtils::LeBytesTo64(ck, 64);
+		m_cipherState->K[9] = IntUtils::LeBytesTo64(ck, 72);
+		m_cipherState->K[10] = IntUtils::LeBytesTo64(ck, 80);
+		m_cipherState->K[11] = IntUtils::LeBytesTo64(ck, 88);
+		m_cipherState->K[12] = IntUtils::LeBytesTo64(ck, 96);
+		m_cipherState->K[13] = IntUtils::LeBytesTo64(ck, 104);
+		m_cipherState->K[14] = IntUtils::LeBytesTo64(ck, 112);
+		m_cipherState->K[15] = IntUtils::LeBytesTo64(ck, 120);
 
 		// generate the mac key
 		std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-		kdf.Generate(mk);
+		gen.Generate(mk);
 		m_macKey.reset(new SymmetricSecureKey(mk));
 		m_macAuthenticator->Initialize(*m_macKey.get());
 	}
@@ -321,31 +357,6 @@ void Threefish1024::ParallelMaxDegree(size_t Degree)
 
 void Threefish1024::Reset()
 {
-	switch (m_authenticatorType)
-	{
-		case StreamAuthenticators::KMAC256:
-		case StreamAuthenticators::HMACSHA256:
-		{
-			m_generatorMode = ShakeModes::SHAKE256;
-			break;
-		}
-		case StreamAuthenticators::KMAC512:
-		case StreamAuthenticators::HMACSHA512:
-		{
-			m_generatorMode = ShakeModes::SHAKE512;
-			break;
-		}
-		case StreamAuthenticators::KMAC1024:
-		{
-			m_generatorMode = ShakeModes::SHAKE1024;
-			break;
-		}
-		default:
-		{
-			m_generatorMode = ShakeModes::None;
-		}
-	}
-
 	m_isInitialized = false;
 	m_cipherState->Reset();
 }
