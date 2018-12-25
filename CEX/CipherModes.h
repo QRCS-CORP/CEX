@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Symmetric cipher mode enmumeration names
+/// Symmetric cipher mode enumeration names
 /// </summary>
 enum class CipherModes : byte
 {

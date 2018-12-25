@@ -21,6 +21,7 @@
 // An implementation of a Cipher based Message Authentication Code (CMAC).
 // Written by John Underhill, January 10, 2014
 // Updated December 20, 2016
+// Updated December 23, 2018
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CMAC_H
@@ -29,6 +30,7 @@
 #include "IMac.h"
 #include "BlockCiphers.h"
 #include "ICipherMode.h"
+#include "SymmetricSecureKey.h"
 
 NAMESPACE_MAC
 
@@ -36,6 +38,7 @@ using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Cipher::Symmetric::Block::IBlockCipher;
 using Cipher::Symmetric::Block::Mode::ICipherMode;
+using Key::Symmetric::SymmetricSecureKey;
 
 /// <summary>
 /// An implementation of a symmetric Cipher based Message Authentication Code generator
@@ -83,7 +86,7 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// <item><description>MAC return size is the underlying ciphers block-size; e.g. for AES, 16 bytes, and can be truncated by the caller.</description></item>
 /// <item><description>With the Initialize(Key) method, the key must be at least the ciphers block-size plus the minimum key size in length.</description></item>
 /// <item><description>The Initialize(Key, Salt), and Initialize(Key, Salt, Info) methods, use the Key parameter as the cipher key, and the Salt as the initialization vector.</description></item>
-/// <item><description>The Initialize(Key, Salt, Info) method assigns the Info array to an HX extended ciphers DistributionCode property; used by the secure key schedule.</description></item>
+/// <item><description>The Initialize(Key, Salt, Info) method assigns the Info array to an HX extended ciphers DistributionCode property; used by the secure key schedule to create an encryption domain.</description></item>
 /// <item><description>After a finalizer call (Finalize or Compute), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
 /// </list>
 /// 
@@ -104,13 +107,11 @@ private:
 	static const byte CT1B = 0x1b;
 
 	std::unique_ptr<ICipherMode> m_cipherMode;
-	std::vector<byte> m_cipherKey;
 	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::vector<byte> m_K1; 
-	std::vector<byte> m_K2;
+	std::unique_ptr<SymmetricSecureKey> m_keys;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	size_t m_macSize;
 	std::vector<byte> m_msgBuffer;
@@ -139,6 +140,7 @@ public:
 	/// <summary>
 	/// Initialize the class with the block cipher enumeration name
 	/// </summary>
+	///
 	/// <param name="CipherType">The block cipher enumeration name</param>
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// 

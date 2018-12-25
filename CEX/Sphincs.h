@@ -19,18 +19,16 @@
 #ifndef CEX_SPHINCS_H
 #define CEX_SPHINCS_H
 
+#include "AsymmetricKey.h"
+#include "AsymmetricKeyPair.h"
 #include "IAsymmetricSign.h"
-#include "SphincsKeyPair.h"
 #include "SphincsParameters.h"
-#include "SphincsPrivateKey.h"
-#include "SphincsPublicKey.h"
 
 NAMESPACE_SPHINCS
 
-using Key::Asymmetric::SphincsKeyPair;
+using Key::Asymmetric::AsymmetricKey;
+using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::SphincsParameters;
-using Key::Asymmetric::SphincsPrivateKey;
-using Key::Asymmetric::SphincsPublicKey;
 
 /// <summary>
 /// An implementation of the SPHINCS+ asymmetric signature scheme
@@ -108,9 +106,8 @@ private:
 	bool m_destroyEngine;
 	bool m_isInitialized;
 	bool m_isSigner;
-	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
-	std::unique_ptr<SphincsPrivateKey> m_privateKey;
-	std::unique_ptr<SphincsPublicKey> m_publicKey;
+	std::unique_ptr<AsymmetricKey> m_privateKey;
+	std::unique_ptr<AsymmetricKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
 	SphincsParameters m_spxParameters;
 
@@ -190,14 +187,14 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	IAsymmetricKeyPair* Generate() override;
+	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
 	/// Initialize the signature scheme for signing (private key) or verifying (public key)
 	/// </summary>
 	/// 
 	/// <param name="Key">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
-	const void Initialize(IAsymmetricKey* Key) override;
+	const void Initialize(AsymmetricKey* Key) override;
 
 	/// <summary>
 	/// Sign a message array and return the message and attached signature

@@ -149,6 +149,7 @@ private:
 
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<Threefish512State> m_cipherState;
+	bool m_isAuthenticated;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
@@ -156,6 +157,7 @@ private:
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ulong m_macCounter;
 	std::unique_ptr<SymmetricSecureKey> m_macKey;
+	std::vector<byte> m_macTag;
 	ParallelOptions m_parallelProfile;
 
 public:
@@ -209,6 +211,11 @@ public:
 	const StreamCiphers Enumeral() override;
 
 	/// <summary>
+	/// Read Only: Cipher has authentication enabled
+	/// </summary>
+	const bool IsAuthenticator() override;
+
+	/// <summary>
 	/// Read Only: Cipher is ready to transform data
 	/// </summary>
 	const bool IsInitialized() override;
@@ -245,6 +252,11 @@ public:
 	ParallelOptions &ParallelProfile() override;
 
 	/// <summary>
+	/// Read Only: The current MAC tag value
+	/// </summary>
+	const std::vector<byte> &Tag() override;
+
+	/// <summary>
 	/// Read Only: The legal tag length in bytes
 	/// </summary>
 	const size_t TagSize() override;
@@ -258,20 +270,6 @@ public:
 	/// 
 	/// <param name="AuthenticatorType">The MAC generator type used to calculate the authentication code</param>
 	void Authenticator(StreamAuthenticators AuthenticatorType) override;
-
-	/// <summary>
-	/// Calculate the MAC code (Tag) and copy it to the Output array.   
-	/// <para>The output array must be of sufficient length to receive the MAC code.
-	/// This function finalizes the Encryption/Decryption cycle, all data in a stream segment must be processed before this function is called.</para>
-	/// </summary>
-	/// 
-	/// <param name="Output">The output array that receives the authentication code</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	/// <param name="Length">The number of MAC code bytes to write to the output array.
-	/// <para>Must be no greater than the MAC functions output size.</para></param>
-	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if the cipher was not initialized for authentication</exception>
-	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 	/// <summary>
 	/// Initialize the cipher with an ISymmetricKey key container.
@@ -308,24 +306,6 @@ public:
 	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 	/// <summary>
-	/// Encrypt/Decrypt one block of bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	void TransformBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
-
-	/// <summary>
-	/// Encrypt/Decrypt one block of bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	void TransformBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
-
-	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
 	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
@@ -339,6 +319,7 @@ public:
 
 private:
 
+	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void Generate(std::array<ulong, 2> &Counter, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void Reset();

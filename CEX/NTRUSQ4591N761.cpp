@@ -135,286 +135,6 @@ void NTRUSQ4591N761::MinMax(int32_t &X, int32_t &Y)
 	Y = yi ^ c;
 }
 
-int16_t NTRUSQ4591N761::ModqFreeze(int32_t A)
-{
-	// input between -9000000 and 9000000 output between -2295 and 2295
-	A -= 4591 * ((228 * A) >> 20);
-	A -= 4591 * ((58470 * A + 134217728) >> 28);
-
-	return A;
-}
-
-int16_t NTRUSQ4591N761::ModqPlusProduct(int16_t A, int16_t B, int16_t C)
-{
-	int32_t a = A;
-	int32_t b = B;
-	int32_t c = C;
-
-	return ModqFreeze(a + b * c);
-}
-
-int16_t NTRUSQ4591N761::ModqSum(int16_t A, int16_t B)
-{
-	int32_t s = A + B;
-
-	return ModqFreeze(s);
-}
-
-void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
-{
-	uint c0;
-	uint c1;
-	uint c2;
-	uint c3;
-	uint f0;
-	uint f1;
-	uint f2;
-	size_t i;
-
-	for (i = 0; i < NTRU_P / 3; ++i)
-	{
-		c0 = C[COffset + (i * 4)];
-		c1 = C[COffset + (i * 4) + 1];
-		c2 = C[COffset + (i * 4) + 2];
-		c3 = C[COffset + (i * 4) + 3];
-
-		// f0 + f1*1536 + f2*1536^2
-		// = c0 + c1*256 + c2*256^2 + c3*256^3
-		// with each F between 0 and 1530
-		// f2 = (64/9)c3 + (1/36)c2 + (1/9216)c1 + (1/2359296)c0 - [0,0.99675]
-		// claim: 2^21 f2 < x < 2^21(f2+1)
-		// where x = 14913081*c3 + 58254*c2 + 228*(c1+2)
-		// proof: x - 2^21 f2 = 456 - (8/9)c0 + (4/9)c1 - (2/9)c2 + (1/9)c3 + 2^21 [0,0.99675]
-		// at least 456 - (8/9)255 - (2/9)255 > 0
-		// at most 456 + (4/9)255 + (1/9)255 + 2^21 0.99675 < 2^21
-		f2 = ((14913081 * c3) + (58254 * c2) + (228 * (c1 + 2))) >> 21;
-		c2 += c3 << 8;
-		c2 -= (f2 * 9) << 2;
-
-		// f0 + f1*1536
-		// = c0 + c1*256 + c2*256^2
-		// c2 <= 35 = floor((1530+1530*1536)/256^2)
-		// f1 = (128/3)c2 + (1/6)c1 + (1/1536)c0 - (1/1536)f0
-		// claim: 2^21 f1 < x < 2^21(f1+1)
-		// where x = 89478485*c2 + 349525*c1 + 1365*(c0+1)
-		// proof: x - 2^21 f1 = 1365 - (1/3)c2 - (1/3)c1 - (1/3)c0 + (4096/3)f0
-		// at least 1365 - (1/3)35 - (1/3)255 - (1/3)255 > 0
-		// at most 1365 + (4096/3)1530 < 2^21
-		f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
-		c1 += c2 << 8;
-		c1 -= (f1 * 3) << 1;
-		c0 += c1 << 8;
-		f0 = c0;
-
-		F[(i * 3)] = ModqFreeze(f0 * 3 + NTRU_Q - NTRU_QSHIFT);
-		F[(i * 3) + 1] = ModqFreeze(f1 * 3 + NTRU_Q - NTRU_QSHIFT);
-		F[(i * 3) + 2] = ModqFreeze(f2 * 3 + NTRU_Q - NTRU_QSHIFT);
-	}
-
-	c0 = C[COffset + (i * 4)];
-	c1 = C[COffset + (i * 4) + 1];
-	c2 = C[COffset + (i * 4) + 2];
-	f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
-
-	c1 += c2 << 8;
-	c1 -= (f1 * 3) << 1;
-	c0 += c1 << 8;
-	f0 = c0;
-
-	F[(i * 3)] = ModqFreeze(f0 * 3 + NTRU_Q - NTRU_QSHIFT);
-	F[(i * 3) + 1] = ModqFreeze(f1 * 3 + NTRU_Q - NTRU_QSHIFT);
-}
-
-void NTRUSQ4591N761::RqEncodeRounded(std::vector<byte> &C, size_t COffset, const std::array<int16_t, NTRU_P> &F)
-{
-	int32_t f0;
-	int32_t f1;
-	int32_t f2;
-	size_t i;
-
-	for (i = 0; i < NTRU_P / 3; ++i)
-	{
-		f0 = F[(i * 3)] + NTRU_QSHIFT;
-		f1 = F[(i * 3) + 1] + NTRU_QSHIFT;
-		f2 = F[(i * 3) + 2] + NTRU_QSHIFT;
-		f0 = (21846 * f0) >> 16;
-		f1 = (21846 * f1) >> 16;
-		f2 = (21846 * f2) >> 16;
-		// now want f0 + f1*1536 + f2*1536^2 as a 32-bit integer
-		f2 *= 3;
-		f1 += f2 << 9;
-		f1 *= 3;
-		f0 += f1 << 9;
-		C[COffset + (i * 4)] = f0;
-		f0 >>= 8;
-		C[COffset + (i * 4) + 1] = f0;
-		f0 >>= 8;
-		C[COffset + (i * 4) + 2] = f0;
-		f0 >>= 8;
-		C[COffset + (i * 4) + 3] = f0;
-	}
-
-	// XXX: using p mod 3 = 2
-	f0 = F[(i * 3)] + NTRU_QSHIFT;
-	f1 = F[(i * 3) + 1] + NTRU_QSHIFT;
-	f0 = (21846 * f0) >> 16;
-	f1 = (21846 * f1) >> 16;
-	f1 *= 3;
-	f0 += f1 << 9;
-	C[COffset + (i * 4)] = f0;
-	f0 >>= 8;
-	C[COffset + (i * 4) + 1] = f0;
-	f0 >>= 8;
-	C[COffset + (i * 4) + 2] = f0;
-}
-
-void NTRUSQ4591N761::RqMult(std::array<int16_t, NTRU_P> &H, const std::array<int16_t, NTRU_P> &F, const std::array<int8_t, NTRU_P> &G)
-{
-	std::array<int16_t, NTRU_P + NTRU_P - 1> fg;
-	size_t i;
-	size_t j;
-	int16_t result;
-
-	for (i = 0; i < NTRU_P; ++i)
-	{
-		result = 0;
-
-		for (j = 0; j <= i; ++j)
-		{
-			result = ModqPlusProduct(result, F[j], G[i - j]);
-		}
-
-		fg[i] = result;
-	}
-
-	for (i = NTRU_P; i < NTRU_P + NTRU_P - 1; ++i)
-	{
-		result = 0;
-
-		for (j = i - NTRU_P + 1; j < NTRU_P; ++j)
-		{
-			result = ModqPlusProduct(result, F[j], G[i - j]);
-		}
-
-		fg[i] = result;
-	}
-
-	for (i = NTRU_P + NTRU_P - 2; i >= NTRU_P; --i)
-	{
-		fg[i - NTRU_P] = ModqSum(fg[i - NTRU_P], fg[i]);
-		fg[i - NTRU_P + 1] = ModqSum(fg[i - NTRU_P + 1], fg[i]);
-	}
-
-	for (i = 0; i < NTRU_P; ++i)
-	{
-		H[i] = fg[i];
-	}
-}
-
-void NTRUSQ4591N761::RqRound3(std::array<int16_t, NTRU_P> &H, const std::array<int16_t, NTRU_P> &F)
-{
-	size_t i;
-
-	for (i = 0; i < NTRU_P; ++i)
-	{
-		H[i] = ((21846 * (F[i] + 2295) + 32768) >> 16) * 3 - 2295;
-	}
-}
-
-void NTRUSQ4591N761::SmallDecode(std::array<int8_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
-{
-	size_t i;
-	uint8_t c0;
-
-	for (i = 0; i < NTRU_P / 4; ++i)
-	{
-		c0 = C[COffset + i];
-		F[(i * 4)] = ((int8_t)(c0 & 3)) - 1;
-		c0 >>= 2;
-		F[(i * 4) + 1] = ((int8_t)(c0 & 3)) - 1;
-		c0 >>= 2;
-		F[(i * 4) + 2] = ((int8_t)(c0 & 3)) - 1;
-		c0 >>= 2;
-		F[(i * 4) + 3] = ((int8_t)(c0 & 3)) - 1;
-	}
-
-	c0 = C[COffset + i];
-	F[(i * 4)] = ((int8_t)(c0 & 3)) - 1;
-}
-
-void NTRUSQ4591N761::SmallEncode(std::vector<byte> &C, size_t COffset, const std::array<int8_t, NTRU_P> &F)
-{
-	// all coefficients in -1, 0, 1
-	size_t i;
-	uint8_t c0;
-
-	for (i = 0; i < NTRU_P / 4; ++i)
-	{
-		c0 = F[(i * 4)] + 1;
-		c0 += (F[(i * 4) + 1] + 1) << 2;
-		c0 += (F[(i * 4) + 2] + 1) << 4;
-		c0 += (F[(i * 4) + 3] + 1) << 6;
-		C[COffset + i] = c0;
-	}
-
-	c0 = F[i * 4] + 1;
-	C[COffset + i] = c0;
-}
-
-void NTRUSQ4591N761::Swap32(int32_t &X, int32_t &Y, int32_t Mask)
-{
-	int32_t t;
-	int32_t xi;
-	int32_t yi;
-
-	xi = X;
-	yi = Y;
-	t = Mask & (xi ^ yi);
-	xi ^= t;
-	yi ^= t;
-	X = xi;
-	Y = yi;
-}
-
-void NTRUSQ4591N761::Sort(std::array<int32_t, NTRU_P> &X)
-{
-	const int32_t TOP = 512;
-
-	int32_t i;
-	int32_t p;
-	int32_t q;
-	int32_t n;
-
-	n = NTRU_P;
-
-	for (p = TOP; p > 0; p >>= 1)
-	{
-		for (i = 0; i < n - p; ++i)
-		{
-			if (!(i & p))
-			{
-				MinMax(X[i], X[i + p]);
-			}
-		}
-
-		for (q = TOP; q > p; q >>= 1)
-		{
-			for (i = 0; i < n - q; ++i)
-			{
-				if (!(i & p))
-				{
-					MinMax(X[i + p], X[i + q]);
-				}
-			}
-		}
-	}
-}
-
-int32_t NTRUSQ4591N761::Mod3NonZeroMask(int8_t X)
-{
-	return -X * X;
-}
-
 int8_t NTRUSQ4591N761::Mod3Freeze(int32_t a)
 {
 	// input between -100000 and 100000
@@ -434,6 +154,11 @@ int8_t NTRUSQ4591N761::Mod3MinusProduct(int8_t A, int8_t B, int8_t C)
 	return Mod3Freeze(a - b * c);
 }
 
+int32_t NTRUSQ4591N761::Mod3NonZeroMask(int8_t X)
+{
+	return -X * X;
+}
+
 int8_t NTRUSQ4591N761::Mod3PlusProduct(int8_t A, int8_t B, int8_t C)
 {
 	int32_t a = A;
@@ -448,6 +173,16 @@ int8_t NTRUSQ4591N761::Mod3Product(int8_t A, int8_t B)
 	return A * B;
 }
 
+int8_t NTRUSQ4591N761::Mod3Quotient(int8_t Num, int8_t Den)
+{
+	return Mod3Product(Num, Mod3Reciprocal(Den)); // fix
+}
+
+int8_t NTRUSQ4591N761::Mod3Reciprocal(int8_t A1)
+{
+	return A1;
+}
+
 int8_t NTRUSQ4591N761::Mod3Sum(int8_t A, int8_t B)
 {
 	int32_t a = A;
@@ -456,14 +191,13 @@ int8_t NTRUSQ4591N761::Mod3Sum(int8_t A, int8_t B)
 	return Mod3Freeze(a + b);
 }
 
-int8_t NTRUSQ4591N761::Mod3Reciprocal(int8_t A1)
+int16_t NTRUSQ4591N761::ModqFreeze(int32_t A)
 {
-	return A1;
-}
+	// input between -9000000 and 9000000 output between -2295 and 2295
+	A -= 4591 * ((228 * A) >> 20);
+	A -= 4591 * ((58470 * A + 134217728) >> 28);
 
-int8_t NTRUSQ4591N761::Mod3Quotient(int8_t Num, int8_t Den)
-{
-	return Mod3Product(Num, Mod3Reciprocal(Den)); // fix
+	return A;
 }
 
 int16_t NTRUSQ4591N761::ModqMinusProduct(int16_t A, int16_t B, int16_t C)
@@ -473,6 +207,48 @@ int16_t NTRUSQ4591N761::ModqMinusProduct(int16_t A, int16_t B, int16_t C)
 	int32_t c = C;
 
 	return ModqFreeze(a - b * c);
+}
+
+void NTRUSQ4591N761::ModqMinusProductVector(std::vector<int16_t> &Z, const std::vector<int16_t> &X, const std::vector<int16_t> &Y, size_t Length, const int16_t C)
+{
+	size_t i;
+
+	for (i = 0; i < Length; ++i)
+	{
+		Z[i] = ModqMinusProduct(X[i], Y[i], C);
+	}
+}
+
+#if !defined(NTRU_SPRIME_SIMPLE)
+
+void NTRUSQ4591N761::ModqMinusProductVector(std::vector<int16_t> &Z, size_t ZOffset, const std::vector<int16_t> &X, size_t XOffset, const std::vector<int16_t> &Y, size_t YOffset, size_t Length, const int16_t C)
+{
+	size_t i;
+
+	for (i = 0; i < Length; ++i)
+	{
+		Z[ZOffset + i] = ModqMinusProduct(X[XOffset + i], Y[YOffset + i], C);
+	}
+}
+
+#endif
+
+void NTRUSQ4591N761::ModqProductVector(std::array<int16_t, NTRU_P> &Z, const std::vector<int16_t> &X, size_t XOffset, size_t Length, const int16_t C)
+{
+	size_t i;
+
+	for (i = 0; i < Length; ++i)
+	{
+		Z[i] = ModqProduct(X[XOffset + i], C);
+	}
+}
+
+int16_t NTRUSQ4591N761::ModqProduct(int16_t A, int16_t B)
+{
+	int32_t a = A;
+	int32_t b = B;
+
+	return ModqFreeze(a * b);
 }
 
 int NTRUSQ4591N761::ModqNonZeroMask(int16_t X)
@@ -487,19 +263,18 @@ int NTRUSQ4591N761::ModqNonZeroMask(int16_t X)
 	return r;
 }
 
-int16_t NTRUSQ4591N761::ModqProduct(int16_t A, int16_t B)
+int16_t NTRUSQ4591N761::ModqPlusProduct(int16_t A, int16_t B, int16_t C)
 {
 	int32_t a = A;
 	int32_t b = B;
+	int32_t c = C;
 
-	return ModqFreeze(a * b);
+	return ModqFreeze(a + b * c);
 }
 
-int16_t NTRUSQ4591N761::ModqSquare(int16_t A)
+int16_t NTRUSQ4591N761::ModqQuotient(int16_t Num, int16_t Den)
 {
-	int32_t a = A;
-
-	return ModqFreeze(a * a);
+	return ModqProduct(Num, ModqReciprocal(Den));
 }
 
 int16_t NTRUSQ4591N761::ModqReciprocal(int16_t A1)
@@ -525,9 +300,74 @@ int16_t NTRUSQ4591N761::ModqReciprocal(int16_t A1)
 	return a4589;
 }
 
-int16_t NTRUSQ4591N761::ModqQuotient(int16_t Num, int16_t Den)
+void NTRUSQ4591N761::ModqShiftVector(std::vector<int16_t> &Z, size_t ZOffset, size_t Length)
 {
-	return ModqProduct(Num, ModqReciprocal(Den));
+	int32_t i;
+
+	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
+	{
+		Z[ZOffset + i] = Z[ZOffset + i - 1];
+	}
+
+	Z[0] = 0;
+}
+
+int16_t NTRUSQ4591N761::ModqSquare(int16_t A)
+{
+	int32_t a = A;
+
+	return ModqFreeze(a * a);
+}
+
+int16_t NTRUSQ4591N761::ModqSum(int16_t A, int16_t B)
+{
+	int32_t s = A + B;
+
+	return ModqFreeze(s);
+}
+
+void NTRUSQ4591N761::Mod3ProductVector(std::array<int8_t, NTRU_P> &Z, const std::vector<int8_t> &X, size_t XOffset, const int8_t C, size_t Length)
+{
+	size_t i;
+
+	for (i = 0; i < Length; ++i)
+	{
+		Z[i] = Mod3Product(X[XOffset + i], C);
+	}
+}
+
+#if !defined(NTRU_SPRIME_SIMPLE)
+void NTRUSQ4591N761::Mod3MinusProductVector(std::vector<int8_t> &Z, size_t ZOffset, const std::vector<int8_t> &X, size_t XOffset, const std::vector<int8_t> &Y, size_t YOffset, const int8_t C, size_t Length)
+{
+	size_t i;
+
+	for (i = 0; i < Length; ++i)
+	{
+		Z[ZOffset + i] = Mod3MinusProduct(X[XOffset + i], Y[YOffset + i], C);
+	}
+}
+#endif
+
+void NTRUSQ4591N761::Mod3MinusProductVector(std::vector<int8_t> &Z, const std::vector<int8_t> &X, const std::vector<int8_t> &Y, const int8_t C, size_t Length)
+{
+	size_t i;
+
+	for (i = 0; i < Length; ++i)
+	{
+		Z[i] = Mod3MinusProduct(X[i], Y[i], C);
+	}
+}
+
+void NTRUSQ4591N761::Mod3ShiftVector(std::vector<int8_t> &Z, size_t ZOffset, size_t Length)
+{
+	int32_t i;
+
+	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
+	{
+		Z[ZOffset + i] = Z[ZOffset + i - 1];
+	}
+
+	Z[0] = 0;
 }
 
 void NTRUSQ4591N761::R3Mult(std::array<int8_t, NTRU_P> &H, const std::array<int8_t, NTRU_P> &F, const std::array<int8_t, NTRU_P> &G)
@@ -572,142 +412,97 @@ void NTRUSQ4591N761::R3Mult(std::array<int8_t, NTRU_P> &H, const std::array<int8
 	}
 }
 
-int NTRUSQ4591N761::SmallerMask(int32_t X, int32_t Y)
+int NTRUSQ4591N761::R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S)
 {
-	return (X - Y) >> 31;
-}
+	const size_t ITRCNT = (2 * NTRU_P) + 1;
 
-void NTRUSQ4591N761::SmallRandomWeightW(std::array<int8_t, NTRU_P> &F, std::unique_ptr<Prng::IPrng> &Rng)
-{
-	std::array<int32_t, NTRU_P> r;
+	std::vector<int8_t> f(NTRU_P + 1);
+	std::vector<int8_t> g(NTRU_P + 1);
+	std::vector<int8_t> u(2 * NTRU_P + 2);
+	std::vector<int8_t> v(2 * NTRU_P + 2);
 	size_t i;
+	size_t loop;
+	int32_t d;
+	int32_t e;
+	int32_t swapmask;
+	int8_t c;
+
+	f[0] = -1;
+	f[1] = -1;
+	f[NTRU_P] = 1;
 
 	for (i = 0; i < NTRU_P; ++i)
 	{
-		r[i] = static_cast<int32_t>(Rng->NextUInt32());
+		g[i] = S[i];
 	}
 
-	for (i = 0; i < NTRU_W; ++i)
+	g[NTRU_P] = 0;
+	v[0] = 1;
+	d = NTRU_P;
+	e = NTRU_P;
+	loop = 0;
+
+	while (loop < ITRCNT)
 	{
-		r[i] &= -2;
-	}
+		// e == -1 or d + e + loop <= 2*p
+		// f has degree p: i.e., f[p]!=0
+		// f[i]==0 for i < p-d
+		// g has degree <=p (so it fits in p+1 coefficients)
+		// g[i]==0 for i < p-e
+		// u has degree <=loop (so it fits in loop+1 coefficients)
+		// u[i]==0 for i < p-d
+		// if invertible: u[i]==0 for i < loop-p (so can look at just p+1 coefficients)
+		// v has degree <=loop (so it fits in loop+1 coefficients)
+		// v[i]==0 for i < p-e
+		// v[i]==0 for i < loop-p (so can look at just p+1 coefficients)
 
-	for (i = NTRU_W; i < NTRU_P; ++i)
-	{
-		r[i] = (r[i] & -3) | 1;
-	}
+		c = Mod3Quotient(g[NTRU_P], f[NTRU_P]);
+		Mod3MinusProductVector(g, g, f, c, NTRU_P + 1);
+		Mod3ShiftVector(g, 0, NTRU_P + 1);
 
-	Sort(r);
 
-	for (i = 0; i < NTRU_P; ++i)
-	{
-		F[i] = static_cast<int8_t>(r[i] & 3) - 1;
-	}
-}
-
-void NTRUSQ4591N761::SmallRandom(std::array<int8_t, NTRU_P> &G, std::unique_ptr<Prng::IPrng> &Rng)
-{
-	size_t i;
-
-	for (i = 0; i < NTRU_P; ++i)
-	{
-		uint r = Rng->NextUInt32();
-		G[i] = (int8_t)(((1073741823 & r) * 3) >> 30) - 1;
-	}
-}
-
-void NTRUSQ4591N761::VectorMod3Product(std::array<int8_t, NTRU_P> &Z, const std::vector<int8_t> &X, size_t XOffset, const int8_t C, size_t Length)
-{
-	size_t i;
-
-	for (i = 0; i < Length; ++i)
-	{
-		Z[i] = Mod3Product(X[XOffset + i], C);
-	}
-}
-
-#if !defined(NTRU_SPRIME_SIMPLE)
-void NTRUSQ4591N761::VectorMod3MinusProduct(std::vector<int8_t> &Z, size_t ZOffset, const std::vector<int8_t> &X, size_t XOffset, const std::vector<int8_t> &Y, size_t YOffset, const int8_t C, size_t Length)
-{
-	size_t i;
-
-	for (i = 0; i < Length; ++i)
-	{
-		Z[ZOffset + i] = Mod3MinusProduct(X[XOffset + i], Y[YOffset + i], C);
-	}
-}
+#if defined(NTRU_SPRIME_SIMPLE)
+		Mod3MinusProductVector(v, v, u, c, ITRCNT + 1);
+		Mod3ShiftVector(v, 0, ITRCNT + 1);
+#else
+		if (loop < NTRU_P)
+		{
+			Mod3MinusProductVector(v, v, u, c, loop + 1);
+			Mod3ShiftVector(v, 0, loop + 2);
+		}
+		else
+		{
+			Mod3MinusProductVector(v, loop - NTRU_P, v, loop - NTRU_P, u, loop - NTRU_P, c, NTRU_P + 1);
+			Mod3ShiftVector(v, loop - NTRU_P, NTRU_P + 2);
+		}
 #endif
 
-void NTRUSQ4591N761::VectorMod3MinusProduct(std::vector<int8_t> &Z, const std::vector<int8_t> &X, const std::vector<int8_t> &Y, const int8_t C, size_t Length)
-{
-	size_t i;
+		++loop;
+		e -= 1;
 
-	for (i = 0; i < Length; ++i)
-	{
-		Z[i] = Mod3MinusProduct(X[i], Y[i], C);
-	}
-}
+		swapmask = SmallerMask(e, d) & Mod3NonZeroMask(g[NTRU_P]);
+		Swap32(e, d, swapmask);
+		Swap(f, 0, g, 0, NTRU_P + 1, swapmask);
 
-void NTRUSQ4591N761::VectorMod3Shift(std::vector<int8_t> &Z, size_t ZOffset, size_t Length)
-{
-	int32_t i;
 
-	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
-	{
-		Z[ZOffset + i] = Z[ZOffset + i - 1];
-	}
-
-	Z[0] = 0;
-}
-
-void NTRUSQ4591N761::RqEncode(std::vector<byte> &C, const std::array<int16_t, NTRU_P> &F)
-{
-	int32_t f0;
-	int32_t f1;
-	int32_t f2;
-	int32_t f3;
-	int32_t f4;
-	size_t  i;
-
-	for (i = 0; i < NTRU_P / 5; ++i)
-	{
-		f0 = F[(i * 5)] + NTRU_QSHIFT;
-		f1 = F[(i * 5) + 1] + NTRU_QSHIFT;
-		f2 = F[(i * 5) + 2] + NTRU_QSHIFT;
-		f3 = F[(i * 5) + 3] + NTRU_QSHIFT;
-		f4 = F[(i * 5) + 4] + NTRU_QSHIFT;
-		// now want f0 + 6144*f1 + ... as a 64-bit integer
-		f1 *= 3;
-		f2 *= 9;
-		f3 *= 27;
-		f4 *= 81;
-		// now want f0 + f1<<11 + f2<<22 + f3<<33 + f4<<44
-		f0 += f1 << 11;
-		C[(i * 8)] = f0;
-		f0 >>= 8;
-		C[(i * 8) + 1] = f0;
-		f0 >>= 8;
-		f0 += f2 << 6;
-		C[(i * 8) + 2] = f0;
-		f0 >>= 8;
-		C[(i * 8) + 3] = f0;
-		f0 >>= 8;
-		f0 += f3 << 1;
-		C[(i * 8) + 4] = f0;
-		f0 >>= 8;
-		f0 += f4 << 4;
-		C[(i * 8) + 5] = f0;
-		f0 >>= 8;
-		C[(i * 8) + 6] = f0;
-		f0 >>= 8;
-		C[(i * 8) + 7] = f0;
+#if defined(NTRU_SPRIME_SIMPLE)
+		Swap(u, 0, v, 0, ITRCNT + 1, swapmask);
+#else
+		if (loop < NTRU_P)
+		{
+			Swap(u, 0, v, 0, loop + 1, swapmask);
+		}
+		else
+		{
+			Swap(u, loop - NTRU_P, v, loop - NTRU_P, NTRU_P + 1, swapmask);
+		}
+#endif
 	}
 
-	// using p mod 5 = 1
-	f0 = F[(i * 5)] + NTRU_QSHIFT;
-	C[(i * 8)] = f0;
-	f0 >>= 8;
-	C[(i * 8) + 1] = f0;
+	c = Mod3Reciprocal(f[NTRU_P]);
+	Mod3ProductVector(R, u, NTRU_P, c, NTRU_P);
+
+	return SmallerMask(0, d);
 }
 
 void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
@@ -906,143 +701,205 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 	F[(i * 5)] = ModqFreeze(c0 + NTRU_Q - NTRU_QSHIFT);
 }
 
-int NTRUSQ4591N761::R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S)
+void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
 {
-	const size_t ITRCNT = (2 * NTRU_P) + 1;
-
-	std::vector<int8_t> f(NTRU_P + 1);
-	std::vector<int8_t> g(NTRU_P + 1);
-	std::vector<int8_t> u(2 * NTRU_P + 2);
-	std::vector<int8_t> v(2 * NTRU_P + 2);
+	uint c0;
+	uint c1;
+	uint c2;
+	uint c3;
+	uint f0;
+	uint f1;
+	uint f2;
 	size_t i;
-	size_t loop;
-	int32_t d;
-	int32_t e;
-	int32_t swapmask;
-	int8_t c;
 
-	f[0] = -1;
-	f[1] = -1;
-	f[NTRU_P] = 1;
+	for (i = 0; i < NTRU_P / 3; ++i)
+	{
+		c0 = C[COffset + (i * 4)];
+		c1 = C[COffset + (i * 4) + 1];
+		c2 = C[COffset + (i * 4) + 2];
+		c3 = C[COffset + (i * 4) + 3];
+
+		// f0 + f1*1536 + f2*1536^2
+		// = c0 + c1*256 + c2*256^2 + c3*256^3
+		// with each F between 0 and 1530
+		// f2 = (64/9)c3 + (1/36)c2 + (1/9216)c1 + (1/2359296)c0 - [0,0.99675]
+		// claim: 2^21 f2 < x < 2^21(f2+1)
+		// where x = 14913081*c3 + 58254*c2 + 228*(c1+2)
+		// proof: x - 2^21 f2 = 456 - (8/9)c0 + (4/9)c1 - (2/9)c2 + (1/9)c3 + 2^21 [0,0.99675]
+		// at least 456 - (8/9)255 - (2/9)255 > 0
+		// at most 456 + (4/9)255 + (1/9)255 + 2^21 0.99675 < 2^21
+		f2 = ((14913081 * c3) + (58254 * c2) + (228 * (c1 + 2))) >> 21;
+		c2 += c3 << 8;
+		c2 -= (f2 * 9) << 2;
+
+		// f0 + f1*1536
+		// = c0 + c1*256 + c2*256^2
+		// c2 <= 35 = floor((1530+1530*1536)/256^2)
+		// f1 = (128/3)c2 + (1/6)c1 + (1/1536)c0 - (1/1536)f0
+		// claim: 2^21 f1 < x < 2^21(f1+1)
+		// where x = 89478485*c2 + 349525*c1 + 1365*(c0+1)
+		// proof: x - 2^21 f1 = 1365 - (1/3)c2 - (1/3)c1 - (1/3)c0 + (4096/3)f0
+		// at least 1365 - (1/3)35 - (1/3)255 - (1/3)255 > 0
+		// at most 1365 + (4096/3)1530 < 2^21
+		f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
+		c1 += c2 << 8;
+		c1 -= (f1 * 3) << 1;
+		c0 += c1 << 8;
+		f0 = c0;
+
+		F[(i * 3)] = ModqFreeze(f0 * 3 + NTRU_Q - NTRU_QSHIFT);
+		F[(i * 3) + 1] = ModqFreeze(f1 * 3 + NTRU_Q - NTRU_QSHIFT);
+		F[(i * 3) + 2] = ModqFreeze(f2 * 3 + NTRU_Q - NTRU_QSHIFT);
+	}
+
+	c0 = C[COffset + (i * 4)];
+	c1 = C[COffset + (i * 4) + 1];
+	c2 = C[COffset + (i * 4) + 2];
+	f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
+
+	c1 += c2 << 8;
+	c1 -= (f1 * 3) << 1;
+	c0 += c1 << 8;
+	f0 = c0;
+
+	F[(i * 3)] = ModqFreeze(f0 * 3 + NTRU_Q - NTRU_QSHIFT);
+	F[(i * 3) + 1] = ModqFreeze(f1 * 3 + NTRU_Q - NTRU_QSHIFT);
+}
+
+void NTRUSQ4591N761::RqEncode(std::vector<byte> &C, const std::array<int16_t, NTRU_P> &F)
+{
+	int32_t f0;
+	int32_t f1;
+	int32_t f2;
+	int32_t f3;
+	int32_t f4;
+	size_t  i;
+
+	for (i = 0; i < NTRU_P / 5; ++i)
+	{
+		f0 = F[(i * 5)] + NTRU_QSHIFT;
+		f1 = F[(i * 5) + 1] + NTRU_QSHIFT;
+		f2 = F[(i * 5) + 2] + NTRU_QSHIFT;
+		f3 = F[(i * 5) + 3] + NTRU_QSHIFT;
+		f4 = F[(i * 5) + 4] + NTRU_QSHIFT;
+		// now want f0 + 6144*f1 + ... as a 64-bit integer
+		f1 *= 3;
+		f2 *= 9;
+		f3 *= 27;
+		f4 *= 81;
+		// now want f0 + f1<<11 + f2<<22 + f3<<33 + f4<<44
+		f0 += f1 << 11;
+		C[(i * 8)] = f0;
+		f0 >>= 8;
+		C[(i * 8) + 1] = f0;
+		f0 >>= 8;
+		f0 += f2 << 6;
+		C[(i * 8) + 2] = f0;
+		f0 >>= 8;
+		C[(i * 8) + 3] = f0;
+		f0 >>= 8;
+		f0 += f3 << 1;
+		C[(i * 8) + 4] = f0;
+		f0 >>= 8;
+		f0 += f4 << 4;
+		C[(i * 8) + 5] = f0;
+		f0 >>= 8;
+		C[(i * 8) + 6] = f0;
+		f0 >>= 8;
+		C[(i * 8) + 7] = f0;
+	}
+
+	// using p mod 5 = 1
+	f0 = F[(i * 5)] + NTRU_QSHIFT;
+	C[(i * 8)] = f0;
+	f0 >>= 8;
+	C[(i * 8) + 1] = f0;
+}
+
+void NTRUSQ4591N761::RqEncodeRounded(std::vector<byte> &C, size_t COffset, const std::array<int16_t, NTRU_P> &F)
+{
+	int32_t f0;
+	int32_t f1;
+	int32_t f2;
+	size_t i;
+
+	for (i = 0; i < NTRU_P / 3; ++i)
+	{
+		f0 = F[(i * 3)] + NTRU_QSHIFT;
+		f1 = F[(i * 3) + 1] + NTRU_QSHIFT;
+		f2 = F[(i * 3) + 2] + NTRU_QSHIFT;
+		f0 = (21846 * f0) >> 16;
+		f1 = (21846 * f1) >> 16;
+		f2 = (21846 * f2) >> 16;
+		// now want f0 + f1*1536 + f2*1536^2 as a 32-bit integer
+		f2 *= 3;
+		f1 += f2 << 9;
+		f1 *= 3;
+		f0 += f1 << 9;
+		C[COffset + (i * 4)] = f0;
+		f0 >>= 8;
+		C[COffset + (i * 4) + 1] = f0;
+		f0 >>= 8;
+		C[COffset + (i * 4) + 2] = f0;
+		f0 >>= 8;
+		C[COffset + (i * 4) + 3] = f0;
+	}
+
+	// XXX: using p mod 3 = 2
+	f0 = F[(i * 3)] + NTRU_QSHIFT;
+	f1 = F[(i * 3) + 1] + NTRU_QSHIFT;
+	f0 = (21846 * f0) >> 16;
+	f1 = (21846 * f1) >> 16;
+	f1 *= 3;
+	f0 += f1 << 9;
+	C[COffset + (i * 4)] = f0;
+	f0 >>= 8;
+	C[COffset + (i * 4) + 1] = f0;
+	f0 >>= 8;
+	C[COffset + (i * 4) + 2] = f0;
+}
+
+void NTRUSQ4591N761::RqMult(std::array<int16_t, NTRU_P> &H, const std::array<int16_t, NTRU_P> &F, const std::array<int8_t, NTRU_P> &G)
+{
+	std::array<int16_t, NTRU_P + NTRU_P - 1> fg;
+	size_t i;
+	size_t j;
+	int16_t result;
 
 	for (i = 0; i < NTRU_P; ++i)
 	{
-		g[i] = S[i];
-	}
+		result = 0;
 
-	g[NTRU_P] = 0;
-	v[0] = 1;
-	d = NTRU_P;
-	e = NTRU_P;
-	loop = 0;
-
-	while (loop < ITRCNT)
-	{
-		// e == -1 or d + e + loop <= 2*p
-		// f has degree p: i.e., f[p]!=0
-		// f[i]==0 for i < p-d
-		// g has degree <=p (so it fits in p+1 coefficients)
-		// g[i]==0 for i < p-e
-		// u has degree <=loop (so it fits in loop+1 coefficients)
-		// u[i]==0 for i < p-d
-		// if invertible: u[i]==0 for i < loop-p (so can look at just p+1 coefficients)
-		// v has degree <=loop (so it fits in loop+1 coefficients)
-		// v[i]==0 for i < p-e
-		// v[i]==0 for i < loop-p (so can look at just p+1 coefficients)
-
-		c = Mod3Quotient(g[NTRU_P], f[NTRU_P]);
-		VectorMod3MinusProduct(g, g, f, c, NTRU_P + 1);
-		VectorMod3Shift(g, 0, NTRU_P + 1);
-
-
-#if defined(NTRU_SPRIME_SIMPLE)
-		VectorMod3MinusProduct(v, v, u, c, ITRCNT + 1);
-		VectorMod3Shift(v, 0, ITRCNT + 1);
-#else
-		if (loop < NTRU_P)
+		for (j = 0; j <= i; ++j)
 		{
-			VectorMod3MinusProduct(v, v, u, c, loop + 1);
-			VectorMod3Shift(v, 0, loop + 2);
+			result = ModqPlusProduct(result, F[j], G[i - j]);
 		}
-		else
+
+		fg[i] = result;
+	}
+
+	for (i = NTRU_P; i < NTRU_P + NTRU_P - 1; ++i)
+	{
+		result = 0;
+
+		for (j = i - NTRU_P + 1; j < NTRU_P; ++j)
 		{
-			VectorMod3MinusProduct(v, loop - NTRU_P, v, loop - NTRU_P, u, loop - NTRU_P, c, NTRU_P + 1);
-			VectorMod3Shift(v, loop - NTRU_P, NTRU_P + 2);
+			result = ModqPlusProduct(result, F[j], G[i - j]);
 		}
-#endif
 
-		++loop;
-		e -= 1;
-
-		swapmask = SmallerMask(e, d) & Mod3NonZeroMask(g[NTRU_P]);
-		Swap32(e, d, swapmask);
-		Swap(f, 0, g, 0, NTRU_P + 1, swapmask);
-
-
-#if defined(NTRU_SPRIME_SIMPLE)
-		Swap(u, 0, v, 0, ITRCNT + 1, swapmask);
-#else
-		if (loop < NTRU_P)
-		{
-			Swap(u, 0, v, 0, loop + 1, swapmask);
-		}
-		else
-		{
-			Swap(u, loop - NTRU_P, v, loop - NTRU_P, NTRU_P + 1, swapmask);
-		}
-#endif
+		fg[i] = result;
 	}
 
-	c = Mod3Reciprocal(f[NTRU_P]);
-	VectorMod3Product(R, u, NTRU_P, c, NTRU_P);
-
-	return SmallerMask(0, d);
-}
-
-void NTRUSQ4591N761::VectorModqProduct(std::array<int16_t, NTRU_P> &Z, const std::vector<int16_t> &X, size_t XOffset, size_t Length, const int16_t C)
-{
-	size_t i;
-
-	for (i = 0; i < Length; ++i)
+	for (i = NTRU_P + NTRU_P - 2; i >= NTRU_P; --i)
 	{
-		Z[i] = ModqProduct(X[XOffset + i], C);
+		fg[i - NTRU_P] = ModqSum(fg[i - NTRU_P], fg[i]);
+		fg[i - NTRU_P + 1] = ModqSum(fg[i - NTRU_P + 1], fg[i]);
 	}
-}
 
-void NTRUSQ4591N761::VectorModqMinusProduct(std::vector<int16_t> &Z, const std::vector<int16_t> &X, const std::vector<int16_t> &Y, size_t Length, const int16_t C)
-{
-	size_t i;
-
-	for (i = 0; i < Length; ++i)
+	for (i = 0; i < NTRU_P; ++i)
 	{
-		Z[i] = ModqMinusProduct(X[i], Y[i], C);
+		H[i] = fg[i];
 	}
-}
-
-#if !defined(NTRU_SPRIME_SIMPLE)
-
-void NTRUSQ4591N761::VectorModqMinusProduct(std::vector<int16_t> &Z, size_t ZOffset, const std::vector<int16_t> &X, size_t XOffset, const std::vector<int16_t> &Y, size_t YOffset, size_t Length, const int16_t C)
-{
-	size_t i;
-
-	for (i = 0; i < Length; ++i)
-	{
-		Z[ZOffset + i] = ModqMinusProduct(X[XOffset + i], Y[YOffset + i], C);
-	}
-}
-
-#endif
-
-void NTRUSQ4591N761::VectorModqShift(std::vector<int16_t> &Z, size_t ZOffset, size_t Length)
-{
-	int32_t i;
-
-	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
-	{
-		Z[ZOffset + i] = Z[ZOffset + i - 1];
-	}
-
-	Z[0] = 0;
 }
 
 int NTRUSQ4591N761::RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S)
@@ -1113,22 +970,22 @@ int NTRUSQ4591N761::RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<in
 		// v[i]==0 for i < loop-p (so can look at just p+1 coefficients)
 
 		c = ModqQuotient(g[NTRU_P], f[NTRU_P]);
-		VectorModqMinusProduct(g, g, f, NTRU_P + 1, c);
-		VectorModqShift(g, 0, NTRU_P + 1);
+		ModqMinusProductVector(g, g, f, NTRU_P + 1, c);
+		ModqShiftVector(g, 0, NTRU_P + 1);
 
 #ifdef NTRU_SPRIME_SIMPLE
-		VectorModqMinusProduct(v, v, u, ITRCNT + 1, c);
-		VectorModqShift(v, 0, ITRCNT + 1);
+		ModqMinusProductVector(v, v, u, ITRCNT + 1, c);
+		ModqShiftVector(v, 0, ITRCNT + 1);
 #else
 		if (loop < NTRU_P)
 		{
-			VectorModqMinusProduct(v, v, u, loop + 1, c);
-			VectorModqShift(v, 0, loop + 2);
+			ModqMinusProductVector(v, v, u, loop + 1, c);
+			ModqShiftVector(v, 0, loop + 2);
 		}
 		else
 		{
-			VectorModqMinusProduct(v, loop - NTRU_P, v, loop - NTRU_P, u, loop - NTRU_P, NTRU_P + 1, c);
-			VectorModqShift(v, loop - NTRU_P, NTRU_P + 2);
+			ModqMinusProductVector(v, loop - NTRU_P, v, loop - NTRU_P, u, loop - NTRU_P, NTRU_P + 1, c);
+			ModqShiftVector(v, loop - NTRU_P, NTRU_P + 2);
 		}
 #endif
 
@@ -1153,9 +1010,152 @@ int NTRUSQ4591N761::RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<in
 	}
 
 	c = ModqReciprocal(f[NTRU_P]);
-	VectorModqProduct(R, u, NTRU_P, NTRU_P, c);
+	ModqProductVector(R, u, NTRU_P, NTRU_P, c);
 
 	return SmallerMask(0, d);
+}
+
+void NTRUSQ4591N761::RqRound3(std::array<int16_t, NTRU_P> &H, const std::array<int16_t, NTRU_P> &F)
+{
+	size_t i;
+
+	for (i = 0; i < NTRU_P; ++i)
+	{
+		H[i] = ((21846 * (F[i] + 2295) + 32768) >> 16) * 3 - 2295;
+	}
+}
+
+void NTRUSQ4591N761::SmallDecode(std::array<int8_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
+{
+	size_t i;
+	uint8_t c0;
+
+	for (i = 0; i < NTRU_P / 4; ++i)
+	{
+		c0 = C[COffset + i];
+		F[(i * 4)] = ((int8_t)(c0 & 3)) - 1;
+		c0 >>= 2;
+		F[(i * 4) + 1] = ((int8_t)(c0 & 3)) - 1;
+		c0 >>= 2;
+		F[(i * 4) + 2] = ((int8_t)(c0 & 3)) - 1;
+		c0 >>= 2;
+		F[(i * 4) + 3] = ((int8_t)(c0 & 3)) - 1;
+	}
+
+	c0 = C[COffset + i];
+	F[(i * 4)] = ((int8_t)(c0 & 3)) - 1;
+}
+
+void NTRUSQ4591N761::SmallEncode(std::vector<byte> &C, size_t COffset, const std::array<int8_t, NTRU_P> &F)
+{
+	// all coefficients in -1, 0, 1
+	size_t i;
+	uint8_t c0;
+
+	for (i = 0; i < NTRU_P / 4; ++i)
+	{
+		c0 = F[(i * 4)] + 1;
+		c0 += (F[(i * 4) + 1] + 1) << 2;
+		c0 += (F[(i * 4) + 2] + 1) << 4;
+		c0 += (F[(i * 4) + 3] + 1) << 6;
+		C[COffset + i] = c0;
+	}
+
+	c0 = F[i * 4] + 1;
+	C[COffset + i] = c0;
+}
+
+int NTRUSQ4591N761::SmallerMask(int32_t X, int32_t Y)
+{
+	return (X - Y) >> 31;
+}
+
+void NTRUSQ4591N761::SmallRandom(std::array<int8_t, NTRU_P> &G, std::unique_ptr<Prng::IPrng> &Rng)
+{
+	size_t i;
+
+	for (i = 0; i < NTRU_P; ++i)
+	{
+		uint r = Rng->NextUInt32();
+		G[i] = (int8_t)(((1073741823 & r) * 3) >> 30) - 1;
+	}
+}
+
+void NTRUSQ4591N761::SmallRandomWeightW(std::array<int8_t, NTRU_P> &F, std::unique_ptr<Prng::IPrng> &Rng)
+{
+	std::array<int32_t, NTRU_P> r;
+	size_t i;
+
+	for (i = 0; i < NTRU_P; ++i)
+	{
+		r[i] = static_cast<int32_t>(Rng->NextUInt32());
+	}
+
+	for (i = 0; i < NTRU_W; ++i)
+	{
+		r[i] &= -2;
+	}
+
+	for (i = NTRU_W; i < NTRU_P; ++i)
+	{
+		r[i] = (r[i] & -3) | 1;
+	}
+
+	Sort(r);
+
+	for (i = 0; i < NTRU_P; ++i)
+	{
+		F[i] = static_cast<int8_t>(r[i] & 3) - 1;
+	}
+}
+
+void NTRUSQ4591N761::Sort(std::array<int32_t, NTRU_P> &X)
+{
+	const int32_t TOP = 512;
+
+	int32_t i;
+	int32_t p;
+	int32_t q;
+	int32_t n;
+
+	n = NTRU_P;
+
+	for (p = TOP; p > 0; p >>= 1)
+	{
+		for (i = 0; i < n - p; ++i)
+		{
+			if (!(i & p))
+			{
+				MinMax(X[i], X[i + p]);
+			}
+		}
+
+		for (q = TOP; q > p; q >>= 1)
+		{
+			for (i = 0; i < n - q; ++i)
+			{
+				if (!(i & p))
+				{
+					MinMax(X[i + p], X[i + q]);
+				}
+			}
+		}
+	}
+}
+
+void NTRUSQ4591N761::Swap32(int32_t &X, int32_t &Y, int32_t Mask)
+{
+	int32_t t;
+	int32_t xi;
+	int32_t yi;
+
+	xi = X;
+	yi = Y;
+	t = Mask & (xi ^ yi);
+	xi ^= t;
+	yi ^= t;
+	X = xi;
+	Y = yi;
 }
 
 int32_t NTRUSQ4591N761::Verify32(const std::vector<byte> &X, const std::vector<byte> &Y)

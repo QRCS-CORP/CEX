@@ -62,7 +62,7 @@ namespace Test
 	//~~~Public Functions~~~//
 
 	std::string ACSTest::Run()
-	{ 
+	{
 		try
 		{
 			// acs standard and authenticated variants
@@ -100,11 +100,6 @@ namespace Test
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
 			MonteCarlo(acs256s, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
-			MonteCarlo(acsc256h256, m_message[0], m_key[0], m_nonce[0], m_monte[1]);
-			MonteCarlo(acsc256k256, m_message[0], m_key[0], m_nonce[0], m_monte[2]);
-			MonteCarlo(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_monte[3]);
-			MonteCarlo(acsc512k512, m_message[0], m_key[1], m_nonce[0], m_monte[4]);
-			MonteCarlo(acsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_monte[5]);
 			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 monte carlo tests.."));
 
 			// compare parallel output with sequential for equality
@@ -152,7 +147,6 @@ namespace Test
 		std::vector<byte> inp;
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> nonce(ks.NonceSize());
-		std::vector<byte> code(TAGLEN);
 		std::vector<byte> otp;
 		SecureRandom rnd;
 		size_t i;
@@ -174,20 +168,16 @@ namespace Test
 			IntUtils::Fill(nonce, 0, nonce.size(), rnd);
 			SymmetricKey kp(key, nonce);
 
-			// encrypt plain-text
+			// encrypt plain-text, writes mac to output stream
 			Cipher->Initialize(true, kp);
 			Cipher->Transform(inp, 0, cpt, 0, MSGLEN);
-			// write mac to output stream
-			Cipher->Finalize(cpt, MSGLEN, TAGLEN);
 
 			// decrypt cipher-text
 			Cipher->Initialize(false, kp);
 			Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
-			// write mac to temp array
-			Cipher->Finalize(code, 0, TAGLEN);
 
 			// use constant time IntUtils::Compare to verify mac
-			if (!IntUtils::Compare(code, 0, cpt, MSGLEN, TAGLEN))
+			if (!IntUtils::Compare(Cipher->Tag(), 0, cpt, MSGLEN, TAGLEN))
 			{
 				throw TestException(std::string("Authentication: MAC output is not equal! -TA1"));
 			}
@@ -279,24 +269,6 @@ namespace Test
 			throw;
 		}
 
-		// test invalid finalizer call
-		try
-		{
-			// not initialized
-			std::vector<byte> code(16);
-
-			Cipher->Finalize(code, 0, 16);
-
-			throw TestException(std::string("ACS"), std::string("Exception: Exception handling failure! -TE5"));
-		}
-		catch (CryptoSymmetricCipherException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
 		// test invalid parallel options
 		try
 		{
@@ -319,48 +291,55 @@ namespace Test
 
 	void ACSTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
 	{
+		const size_t CPTLEN = Message.size() + Cipher->TagSize();
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
-		std::vector<byte> code1(TAGLEN);
-		std::vector<byte> code2(TAGLEN);
-		std::vector<byte> cpt((MSGLEN + TAGLEN) * 2);
+		std::vector<byte> cpt(CPTLEN * 2);
 		std::vector<byte> otp(MSGLEN * 2);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt msg 1
 		Cipher->Initialize(true, kp);
-		Cipher->Transform(Message, 0, cpt, 0, MSGLEN); //21,222
-		Cipher->Finalize(cpt, MSGLEN, TAGLEN);
+		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF1"));
+		}
 
 		// encrypt msg 2
 		Cipher->Transform(Message, 0, cpt, MSGLEN + TAGLEN, MSGLEN);
-		Cipher->Finalize(cpt, (MSGLEN * 2) + TAGLEN, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF2"));
+		}
 
 		// decrypt msg 1
 		Cipher->Initialize(false, kp);
 		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
-		Cipher->Finalize(code1, 0, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF3"));
+		}
 
 		// decrypt msg 2
 		Cipher->Transform(cpt, MSGLEN + TAGLEN, otp, MSGLEN, MSGLEN);
-		Cipher->Finalize(code2, 0, TAGLEN);
 
-		// use constant time IntUtils::Compare to verify mac
-		if (!IntUtils::Compare(code1, 0, MacCode1, 0, TAGLEN))
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
 		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -TF1"));
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF4"));
 		}
-		if (!IntUtils::Compare(code2, 0, MacCode2, 0, TAGLEN))
-		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -TF2"));
-		}
+
+		// use constant time IntUtils::Compare to verify
 		if (!IntUtils::Compare(otp, 0, Message, 0, MSGLEN) || !IntUtils::Compare(otp, MSGLEN, Message, 0, MSGLEN))
 		{
-			throw TestException(std::string("Finalization: Decrypted output does not match the input! -TF3"));
+			throw TestException(std::string("Finalization: Decrypted output does not match the input! -TF5"));
 		}
 		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
-			throw TestException(std::string("Finalization: Output does not match the known answer! -TF4"));
+			throw TestException(std::string("Finalization: Output does not match the known answer! -TF6"));
 		}
 	}
 
@@ -368,8 +347,9 @@ namespace Test
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
+		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> cpt(MSGLEN);
+		std::vector<byte> cpt(CPTLEN);
 		std::vector<byte> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
@@ -385,7 +365,7 @@ namespace Test
 		{
 			throw TestException(std::string("Kat: Decrypted output does not match the input! -TV1"));
 		}
-		if (cpt != Expected)
+		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
 			throw TestException(std::string("Kat: Output does not match the known answer! -TV2"));
 		}
@@ -539,7 +519,6 @@ namespace Test
 	{
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
-		std::vector<byte> code(TAGLEN);
 		std::vector<byte> cpt(MSGLEN + TAGLEN);
 		std::vector<byte> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
@@ -547,27 +526,30 @@ namespace Test
 		// encrypt
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
-		Cipher->Finalize(cpt, MSGLEN, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, Mac, 0, TAGLEN))
+		{
+			throw TestException(std::string("Verification: MAC output is not equal! -TV1"));
+		}
 
 		// decrypt
 		Cipher->Initialize(false, kp);
 		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
-		Cipher->Finalize(code, 0, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, Mac, 0, TAGLEN))
+		{
+			throw TestException(std::string("Verification: MAC output is not equal! -TV2"));
+		}
 
 		if (otp != Message)
 		{
-			throw TestException(std::string("Verification: Decrypted output does not match the input! -TV1"));
+			throw TestException(std::string("Verification: Decrypted output does not match the input! -TV3"));
 		}
 
 		// use constant time IntUtils::Compare to verify mac
 		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
-			throw TestException(std::string("Verification: Output does not match the known answer! -TV2"));
-		}
-
-		if (!IntUtils::Compare(code, 0, Mac, 0, TAGLEN))
-		{
-			throw TestException(std::string("Verification: MAC output is not equal! -TV3"));
+			throw TestException(std::string("Verification: Output does not match the known answer! -TV4"));
 		}
 	}
 
@@ -582,20 +564,20 @@ namespace Test
 		const std::vector<std::string> code =
 		{
 			// acsc256h256
-			std::string("27143AD8CD957339CF15AE359A33E343E1E83EA29079EC976D6986CFC5572B4A"),
-			std::string("BACDAAA6DF63B47DD66F109254EBDDD36A939B583D4B16988ABF6B4138F0AF6E"),
+			std::string("118CB0FE3004C20349C1E9BF79B71DA0F77044D434AD98DEC7D9202BF754CBAA"),
+			std::string("0546033604F51E456913B902126D91256889336B8146F5DEAB3828CA086BA3E0"),
 			// acsc256k256
-			std::string("7E199833C9BA567A1D4B071B4CC385AA8F33F4E459075D5B25486642925FFA32"),
-			std::string("2497EE63511C472F0D14B0B474BEA89A0D88051031B334EB8EF777A841742647"),
+			std::string("A9C0B36F82870B2BFB2E8301750C85DAADE55DA7557BFAE83527E4475D6EFB9B"),
+			std::string("914EC9F0AF97FA4D4BFEA074C4B2BCD242657D5C3CFBC25DC237BB1570F2CE90"),
 			// acsc512h512
-			std::string("3F4ECA6B6485CA0E164A7C856DAB8DD01C623C548A9AD993501E0C6F3CCB424FAB364264BD8D9AB53328964B8A44269E7D18982F99169C78B87FB4CD7C789D5B"),
-			std::string("E340D2E649D3545E98A793D9B253C3D2C3598036B72BDD4A3244BC348B4FD4B60F17F185C4E66C727DB1A27BFE598343FD5190BA942DB7A96B203F4DDB4D7F93"),
+			std::string("4F367311D6CAB3838334708EE4FDE29355AA5C96E4BCD9945B002BF90B79E758F88954A9764E44DFA50BBF2C26657AF6C38451C8255F5A7DDDE658797ECF8750"),
+			std::string("27B971FBD946BDFDBAFF57E4FCE3720E67C6F2DFBE2035A50AC58C87732ED321FDCC51873D41B57DA46DBCF04387B2072ABCA6AE8114656F6187B6E229F1B634"),
 			// acsc512k512
-			std::string("99A71F9C92FAB580B02C7EE1AC23AB9C5716902D03FB25BA52BC7745D74B95C7881139E3AEF3BDC0FC60843D2CAF55160071EEBAA72268205BF3C086B9DB7368"),
-			std::string("FEF85738A72D34A04B44544B4B05315E0D70D1E6559077A8AC4BF4DB7D8CC062237CD87C9189F18452A943E4A49528A4C0B57DB5271B4B540A8D46E4AB10C7CC"),
+			std::string("A35895727ECCC5B35D045FD8F48450DD1C233CF624C527C5D6CF3F5F9EA988FDE1E9288269D950B13D5CD1E60AEFF438CD95859C296A92422593CAE7438C2EB0"),
+			std::string("4542A29F95FA118EEB27028C7E1180C8432196CEFB708D9BFFD0676F33A868A7B1DD1B06CF49A7BCDF1B4D2DFC736A5B74C0AACE42C879B668111D4364691CE9"),
 			// acs1024k1024
-			std::string("CD9189A961A2FC4EE37772D8AB881357F7AF0EE2579E1B8426C3D89B43928747544B23FD68C87B96B778F3397AF03CF9E887799E19DA627FB76C24F433895B2D2114ED8370D4EABFF04FF50C631285BCCBFE708785D97EF97B82A6A8B6702063B94B52B3666F5FB45A00205F7401E10E3A07071BB9DD7ADE6B0A965A2BF082B1"),
-			std::string("B596D47B6FADA088B309F0469CBAD1A57B6F399C879B025D0E591B81C666FF3DC6D2D80E70119941AC7F4312E4054CBD3F68274164AFD0F1B71DC548352AF19513C1681D3058CC2276971C2FCE35B165FE5C89127A1BB084B519698572C0A2696CE1883556E63CD67FD18D91D7CCD48BC0B8901297C96941DB01185367A02C7C")
+			std::string("87FF77AFCA20EAF3DC7D99500E47FED1E237741CDF39B36AED5897D0EA9458892ABB638EEDB0047373C644C8D7EB039A500A14D4C47C3882764FEC104FCDFD61EBA892E2F9EFA78916602C4671ABC1EB3722BEDF55FD594FF3AB9672ECFCDBA76BEA96853CA257CE87A4B7B0355BFB012F734A700EA3E088BD6BA9ECAEDFEB1F"),
+			std::string("10AB4BEA094D41477807A471733C69B403DA2112B0155B5B9B0583A919E384BD2B69D67F689DAF4E879F4B446D7147DD5AAD4754C6EC34B0AF5E487542A87B1A1C1E1BE6233CBDE1CEDCD6A9B2EA170B56EFD9E058BC9FD773B55D1B74FF31D597AA7B89A7E79F14BE83D3F47C8B0A911C36CB20558575AAA2666FF57F93493A")
 		};
 		HexConverter::Decode(code, 10, m_code);
 

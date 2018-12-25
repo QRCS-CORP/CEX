@@ -24,19 +24,21 @@ const std::string ISO7816::Name()
 
 size_t ISO7816::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
-	if (Offset > Input.size())
-	{
-		throw CryptoPaddingException("ISO7816:AddPadding", "The padding offset value is longer than the array length!");
-	}
+	size_t padlen;
 
-	size_t padlen = (Input.size() - Offset);
-	Input[Offset] = MKCODE;
-	++Offset;
+	padlen = 0;
 
-	while (Offset < Input.size())
+	if (Offset != Input.size())
 	{
-		Input[Offset] = ZBCODE;
+		padlen = (Input.size() - Offset);
+		Input[Offset] = MKCODE;
 		++Offset;
+
+		while (Offset < Input.size())
+		{
+			Input[Offset] = ZBCODE;
+			++Offset;
+		}
 	}
 
 	return padlen;
@@ -44,7 +46,9 @@ size_t ISO7816::AddPadding(std::vector<byte> &Input, size_t Offset)
 
 size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input)
 {
-	size_t padlen = Input.size() - 1;
+	size_t padlen;
+
+	padlen = Input.size() - 1;
 
 	if (Input[padlen] == MKCODE)
 	{
@@ -58,8 +62,9 @@ size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input)
 	{
 		while (padlen > 0 && Input[padlen] == ZBCODE)
 		{
-			padlen--;
+			--padlen;
 		}
+
 		padlen = Input.size() - padlen;
 	}
 
@@ -68,7 +73,9 @@ size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input)
 
 size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	size_t padlen = Input.size() - (Offset + 1);
+	size_t padlen;
+
+	padlen = Input.size() - (Offset + 1);
 
 	if (Input[Offset + padlen] == MKCODE)
 	{
@@ -82,8 +89,9 @@ size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 	{
 		while (padlen > 0 && Input[Offset + padlen] == ZBCODE)
 		{
-			padlen--;
+			--padlen;
 		}
+
 		padlen = (Input.size() - Offset) - padlen;
 	}
 

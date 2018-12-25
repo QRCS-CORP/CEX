@@ -113,9 +113,7 @@ namespace Test
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer cipher tests.."));
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
-			MonteCarlo(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
-			MonteCarlo(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
-			MonteCarlo(tsx256s, m_message[0], m_key[0], m_nonce[0], m_monte[1]);
+			MonteCarlo(tsx256s, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 monte carlo tests.."));
 
 			// compare parallel output with sequential for equality
@@ -164,11 +162,7 @@ namespace Test
 			Finalization(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[5], m_code[15]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer finalization tests."));
 
-			MonteCarlo(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
-			MonteCarlo(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
-			MonteCarlo(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
-			MonteCarlo(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
-			MonteCarlo(tsx512s, m_message[1], m_key[1], m_nonce[1], m_monte[3]);
+			MonteCarlo(tsx512s, m_message[1], m_key[1], m_nonce[1], m_monte[1]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 monte carlo tests.."));
 
 			Parallel(tsx512s);
@@ -221,12 +215,7 @@ namespace Test
 			Kat(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_expected[5]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer cipher tests.."));
 
-			MonteCarlo(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
-			MonteCarlo(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
-			MonteCarlo(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
-			MonteCarlo(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
-			MonteCarlo(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
-			MonteCarlo(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_monte[5]);
+			MonteCarlo(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_monte[2]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 monte carlo tests.."));
 
 			Parallel(tsx1024s);
@@ -267,7 +256,6 @@ namespace Test
 		const size_t TAGLEN = Cipher->TagSize();
 		const size_t MINSMP = 64;
 		const size_t MAXSMP = 6400;
-		std::vector<byte> code(TAGLEN);
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
 		std::vector<byte> key(ks.KeySize());
@@ -296,17 +284,13 @@ namespace Test
 			// encrypt plain-text
 			Cipher->Initialize(true, kp);
 			Cipher->Transform(inp, 0, cpt, 0, MSGLEN);
-			// write mac to output stream
-			Cipher->Finalize(cpt, MSGLEN, TAGLEN);
 
 			// decrypt cipher-text
 			Cipher->Initialize(false, kp);
 			Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
-			// write mac to temp array
-			Cipher->Finalize(code, 0, TAGLEN);
 
 			// use constant time IntUtils::Compare to verify mac
-			if (!IntUtils::Compare(code, 0, cpt, MSGLEN, TAGLEN))
+			if (!IntUtils::Compare(Cipher->Tag(), 0, cpt, MSGLEN, TAGLEN))
 			{
 				throw TestException(std::string("Authentication: MAC output is not equal! -TA1"));
 			}
@@ -580,24 +564,6 @@ namespace Test
 			throw;
 		}
 
-		// test invalid finalizer call
-		try
-		{
-			// not initialized
-			std::vector<byte> code(16);
-
-			Cipher->Finalize(code, 0, 16);
-
-			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE4"));
-		}
-		catch (CryptoSymmetricCipherException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
 		// test invalid parallel options
 		try
 		{
@@ -621,57 +587,64 @@ namespace Test
 
 	void ThreefishTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
 	{
+		const size_t CPTLEN = Message.size() + Cipher->TagSize();
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
-		std::vector<byte> code1(TAGLEN);
-		std::vector<byte> code2(TAGLEN);
-		std::vector<byte> cpt((MSGLEN + TAGLEN) * 2);
+		std::vector<byte> cpt(CPTLEN * 2);
 		std::vector<byte> otp(MSGLEN * 2);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt msg 1
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
-		Cipher->Finalize(cpt, MSGLEN, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF1"));
+		}
 
 		// encrypt msg 2
 		Cipher->Transform(Message, 0, cpt, MSGLEN + TAGLEN, MSGLEN);
-		Cipher->Finalize(cpt, (MSGLEN * 2) + TAGLEN, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF2"));
+		}
 
 		// decrypt msg 1
 		Cipher->Initialize(false, kp);
 		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
-		Cipher->Finalize(code1, 0, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF3"));
+		}
 
 		// decrypt msg 2
 		Cipher->Transform(cpt, MSGLEN + TAGLEN, otp, MSGLEN, MSGLEN);
-		Cipher->Finalize(code2, 0, TAGLEN);
 
-		// use constant time IntUtils::Compare to verify mac
-		if (!IntUtils::Compare(code1, 0, MacCode1, 0, TAGLEN))
+		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
 		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -TF1"));
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF4"));
 		}
-		if (!IntUtils::Compare(code2, 0, MacCode2, 0, TAGLEN))
-		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -TF2"));
-		}
+
+		// use constant time IntUtils::Compare to verify
 		if (!IntUtils::Compare(otp, 0, Message, 0, MSGLEN) || !IntUtils::Compare(otp, MSGLEN, Message, 0, MSGLEN))
 		{
-			throw TestException(std::string("Finalization: Decrypted output does not match the input! -TF3"));
+			throw TestException(std::string("Finalization: Decrypted output does not match the input! -TF5"));
 		}
 		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
-			throw TestException(std::string("Finalization: Output does not match the known answer! -TF4"));
+			throw TestException(std::string("Finalization: Output does not match the known answer! -TF6"));
 		}
 	}
 
 	void ThreefishTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-
+		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
-		std::vector<byte> cpt(MSGLEN);
+		std::vector<byte> cpt(CPTLEN);
 		std::vector<byte> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
@@ -687,7 +660,7 @@ namespace Test
 		{
 			throw TestException(std::string("Kat: Decrypted output does not match the input! -TV1"));
 		}
-		if (cpt != Expected)
+		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
 			throw TestException(std::string("Kat: Output does not match the known answer! -TV2"));
 		}
@@ -695,9 +668,10 @@ namespace Test
 
 	void ThreefishTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
+		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
 		std::vector<byte> msg = Message;
-		std::vector<byte> enc(MSGLEN);
+		std::vector<byte> enc(CPTLEN);
 		std::vector<byte> dec(MSGLEN);
 		Key::Symmetric::SymmetricKey kp(Key, Nonce);
 
@@ -705,11 +679,11 @@ namespace Test
 
 		for (size_t i = 0; i != MONTE_CYCLES; i++)
 		{
-			Cipher->Transform(msg, 0, enc, 0, msg.size());
+			Cipher->Transform(msg, 0, enc, 0, MSGLEN);
 			msg = enc;
 		}
 
-		if (enc != Expected)
+		if (!IntUtils::Compare(enc, 0, Expected, 0, MSGLEN))
 		{
 			throw TestException(std::string("MonteCarlo: Encrypted output does not match the expected! -TM1"));
 		}
@@ -718,7 +692,7 @@ namespace Test
 
 		for (size_t i = 0; i != MONTE_CYCLES; i++)
 		{
-			Cipher->Transform(enc, 0, dec, 0, enc.size());
+			Cipher->Transform(enc, 0, dec, 0, MSGLEN);
 			enc = dec;
 		}
 
@@ -815,6 +789,8 @@ namespace Test
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
+			const size_t CPTLEN = Cipher->IsAuthenticator() ? MSGLEN + Cipher->TagSize() : MSGLEN;
+
 			cpt.resize(MSGLEN);
 			inp.resize(MSGLEN);
 			otp.resize(MSGLEN);
@@ -827,6 +803,7 @@ namespace Test
 			// encrypt
 			Cipher->Initialize(true, kp);
 			Cipher->Transform(inp, 0, cpt, 0, MSGLEN);
+
 			// decrypt
 			Cipher->Initialize(false, kp);
 			Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
@@ -840,35 +817,34 @@ namespace Test
 
 	void ThreefishTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
 	{
+		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
-		std::vector<byte> code(TAGLEN);
-		std::vector<byte> cpt(MSGLEN + TAGLEN);
+		std::vector<byte> cpt(CPTLEN);
 		std::vector<byte> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
-		Cipher->Finalize(cpt, MSGLEN, TAGLEN);
+
+		if (!IntUtils::Compare(Cipher->Tag(), 0, Mac, 0, TAGLEN))
+		{
+			throw TestException(std::string("Verification: MAC output is not equal! -TV1"));
+		}
 
 		// decrypt
 		Cipher->Initialize(false, kp);
 		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
-		Cipher->Finalize(code, 0, TAGLEN);
 
 		if (otp != Message)
 		{
-			throw TestException(std::string("Verification: Decrypted output does not match the input! -TV1"));
+			throw TestException(std::string("Verification: Decrypted output does not match the input! -TV2"));
 		}
 		// use constant time IntUtils::Compare to verify mac
 		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
-			throw TestException(std::string("Verification: Output does not match the known answer! -TV2"));
-		}
-		if (!IntUtils::Compare(code, 0, Mac, 0, TAGLEN))
-		{
-			throw TestException(std::string("Verification: MAC output is not equal! -TV3"));
+			throw TestException(std::string("Verification: Output does not match the known answer! -TV3"));
 		}
 	}
 
@@ -883,34 +859,34 @@ namespace Test
 		const std::vector<std::string> code =
 		{
 			// tsx256 - verification
-			std::string("509BF34198A8DCE342DF1ABF2644393EDEAB7C5A66FCC05C44DFBAD45C0C33F3"),																	// tsx256h256
-			std::string("D06026F800C9BD6AB49B0C2714D5CEC1A73EAAA22D0E862B58771F70FB5BDE3D"),																	// tsx256k256
+			std::string("1AFD9F5BEF707423DB916C8908DBA25E2708370B6F332E5AFAC3DC16A32F7861"),																	// tsx256h256
+			std::string("0A46398105EBFF2BFAF548681A1024BB5C7B703B883CEAB12D918FC0A9A0CAFF"),																	// tsx256k256
 			// tsx512 - verification
-			std::string("5CDB3447F0DEF7149DDADAF4F6CF9B41BE3A527728DCED03216DE8A2FD154052"),																	// tsx512h256
-			std::string("F23A482F6BE7AF228D18E8FFB574813E8E63C854F171D25B876EB02540741498EBE13799E61AC8DE432B702027EC3FB3D6B28BCC61E17464DE5FA0BE0B86E4D9"),	// tsx512h512
-			std::string("B7BD6DE81164A62AFD79E7CBA2FB546C53E57BF4D5D42D3CB692C3A17FDB25FC"),																	// tsx512k256
-			std::string("4B0063C921F4D313FFBCA8FED0DABDC935485B3C6DF8B99FCB19C5C5A1A09CEB12184146BE94EBDA84C4DF8F4F6F72E564CC518DBBB30B68AB52EFED72911FBF"),	// tsx512k512
+			std::string("FC61B304D834529D3C2BE936ABEFAD7AED694A3A7E66A70B11D3D8D45E583584"),																	// tsx512h256
+			std::string("C68AB209F6F15EF0FE38BE88965CA60DDA19F12ABD5F35DD0BCB3DFF03CA09BE8E0617B85A4BB96360EC0929F19E9154B63E0ED6F4577EA98CD3A5AD9BA007A1"),	// tsx512h512
+			std::string("B7FA9D491BCA6FEB0A93E9538F15FEB2F0178ED72C4E0B460CD528FA8C790445"),																	// tsx512k256
+			std::string("EB76CF7034A473BDA4172F476BBC6FDE6FFC3E00B43C27D376E672A1A0FD755ABF12AB5C3F07CD4A6335DDE25A18D6B1926891CF934C21B78781AA43961AD9C2"),	// tsx512k512
 			// tsx1024- verification
-			std::string("FD6667AECF310FE107E48A9922F8FE0DB4C67ABE6A1D386898DCB23FD322C9BD"),																	// tsx1024h256
-			std::string("CB0976CBE2063C1A9A406AB5605D1E05E7C93E341FCB9D6CB54AA101DD5B3BD1F112D88ACE0B5C9E030249ECFF73C6F6610EE9CA17BC041AB4416C0FB1288CDD"),	// tsx1024h512
-			std::string("CC83F9E82D61B2205BA1975BFBF34CDEE834B0CD6834443540FCD0BAE2AD1726"),																	// tsx1024k256
-			std::string("0517A96B115F371DCE9A39358AACB7385558A73C43C635E024DD4B7029639514258EE69C2B4FEDDACC59A855D73D2153A252CB7053299DFD93548FD285A97AF8"),	// tsx1024k512
+			std::string("188CC237376F2E08F20897A994AA4699BDD8C87C7243D5841A5ACFE6AE579C8D"),																	// tsx1024h256
+			std::string("C7EE49F4D4ED065A64D6CC9F2C0B69380AC419C22C40587613E17753330E6BBFCED453D7C4828B6B94504F64F080B951A1F0523FCC616D86350C11A37DDE9FDB"),	// tsx1024h512
+			std::string("4C3BF3CCFB5F0908C84425574EBC8D089FBA17B597DFA775BBCEC86EC6E7158D"),																	// tsx1024k256
+			std::string("8236CE03B5BE75760E326718E8497799125FF8E6C7CB260905549E8AAF5DF19B9CEB603BB77A6E83B490967110F99AE51A3279C64D24AD8E1C2C9496048FD832"),	// tsx1024k512
 			// tsx256 finalization tests: mac-2
-			std::string("655CC3F418B2FF64E1C0AED6FF1B9E6CB0ACCDB6C32ABD74A495D7CA649591BD"),																	// tsx256h256
-			std::string("FBC80E8766E5014992C0D727F19CA532DC4EAF9A3AAEB65582E67C1794E82330"),																	// tsx256k256
+			std::string("B00F559E63A2E37B2D83727384F916D801AA4754AA28F4BB11582D2558B08346"),																	// tsx256h256
+			std::string("6F7596227167EB7EFF2C14C6F47AC02B735F45CD15EF45DCF718D515A6DBD73E"),																	// tsx256k256
 			// tsx512 finalization tests: mac-2
-			std::string("A47C29D31BCA48AE506A87CE1B366E8A15CC33EE175CC7ACFECC68DD5E804EF3"),																	// tsx512h256
-			std::string("2DF95CB2D9359CD268907DD7EC21845E9300176FB90D0BB5EDA31C8F57B0E6065094368798AF8DFDF11C1AB21EB6DBEB8D0BB0859B92D3FDD9B33D8F5C68A016"),	// tsx512h512
-			std::string("B7395656981B7510DB8C676A54DD2C4E5C58B8394E8278A091C51090AD34D419"),																	// tsx512k256
-			std::string("A1C0BEF51B48000D29F73EDC7681B8F47835F6901B73C109EBFDA862C719A2557065D50D832EC094F482954E4534B331F05194C0FAFE4A83125B249F25AEAA47"),	// tsx512k512
+			std::string("DAA776E2D27B7D251CB50372A27F2097A338281DE096A4268D03D7392182C51A"),																	// tsx512h256
+			std::string("6EE299F478A48CE7886C9878ACBC21338842DED7E7BDED8EB83A41DA1D077CE60C97A9946F5A62E8D6DF3D5545DB0BD39D4C18E404004FFF229701ED0AF6FF08"),	// tsx512h512
+			std::string("52266B3C790AA703DFC9755A504235C352AD87E55FCAC3B2F892315C1A48FC02"),																	// tsx512k256
+			std::string("2654192DFB39D8AD72E64EC1601FAC5135CFCEDBF148C8A5AA7BB7D121EA70A53252B4173C6B6D3B7F3B7D624AA75F08D0318816489EB18BD7D5CEE3199A3D06"),	// tsx512k512
 			// tsx1024 finalization tests: mac-2
-			std::string("754D322FE78B891B03418F02BF787D36FABEC98F896339764445BF0BEA31E5DE"),																	// tsx1024h256
-			std::string("E4FC6CE59E10E954E0365402FA97D628A490FEC9C2EC221EE614155FDD64995E0096B62CB43A5C980D1DA550C94CF8EA15C8D8DD7F781C6C3E38C9EA508ED254"),	// tsx1024h512
-			std::string("D4D92BC5FB814D82FC0F3B7099933F7F91301DDC5E4142BDB048A0F2DCA5E2D9"),																	// tsx1024k256
-			std::string("BCCEFCFA1C40BAA808AD9ACF969CB6ED5791333B4006A740F85781BA6544FE613FAAB660404E45EC7C380B78B3FEEF60DCFE126FEA6F846E30BBFFBC4AD2D4BB"),	// tsx1024k512
+			std::string("F17C91D48FAD8134BB8DCBF08A28716EFF733B0FBF55C7DC3B965A06C507AA63"),																	// tsx1024h256
+			std::string("F65C3749ACA44B023A91A151520822E180BCB5F54762A0DF4FE4598F7F8AFE73A833231C6369751D3FA753EE60D11EF4AEB24F3FD80FD350B886E32546739C52"),	// tsx1024h512
+			std::string("5B2942CBFC1075302FA98CD375DC683CFA6E38F7E381CE67333D36BA634CC498"),																	// tsx1024k256
+			std::string("BEE4A1A926A9E7E54026F93064B856EB8C8DEEC8C3D28E65C49772E05EBF55D455D88707DF8CA3DBD687EFCE198E854FCB09988BD7CE921770CDBBAE6556E7D3"),	// tsx1024k512
 			// tsx1024k1024 finalization tests: mac-2
-			std::string("D0C49650DBEC26DA7439C20D792FB31033FC480FAC3D4F36D58A26566FCCAF13F0570B69A7205B741F451559A7A591ACF9A4F8F30C63C5C9638DDAC40D1CCAEEAB6F17A733135C272FDBFBB7D96291B0D1FE1B2E15056CDE22AD3236DF1ED6A63C28C1C21A9B70415ECF46EE8FF1D32ACA1CF027C02B9FB9FD64F1CDF9B1564C"),																	// tsx1024k1024
-			std::string("3ECAF7371E2623FA4E5A1E9DC96B725A1E45E00ED40FA5411F473AE71C7390E249B76C224EF30A154043A71F7937C519093279B9383DB452803C41A3FDB34EEAFCC9E8F29BD51EFD5B184738A331AAA0482B607E0FED45B905A0EAA5726663A7B5522C6A90637FF4F46F121383A01AF023A3DDA336665E0F54A06982D54EFFA0")		// tsx1024k1024
+			std::string("F891C78496EEDE1D2C3B769C2E92C90FFC0F66C33E3F7C9E31C5B721828C32F875CEF510D1A10F274388915F5955E595C7B70272EB8AD756F043A4876EA9EFD0588460AF7E6100C5CCE412F7541ED94093FD923E599D555C5DE5692390DED7928FD79DDBD8161D0E5562D73970DF556E4B416A12911269E8B224846D14C858E9"),																	// tsx1024k1024
+			std::string("623411655999BED2E8F13DF3645C3FDD33B60BC85A65F83046D185869FD97613BD7EE46047D707C93466F275FE15FB49F09A6EFD9DB43D7C71D7A549D0BC3ACDC9ADAA5401CCF6AE981F87103599B14CFB98802F3C63F767B912C0F670592F6EC11805E26A8B10C844140CFA1D0BBC7978F266FAFF3BEABCA31B3F749D261FFB")		// tsx1024k1024
 		};
 		HexConverter::Decode(code, 22, m_code);
 
@@ -943,14 +919,11 @@ namespace Test
 
 		const std::vector<std::string> monte =
 		{
-			std::string("2F962D1BBD97223A5A0379B1A4D7AF7C86227BFFED5362551433155A106207C1"),
 			std::string("963A9EAB3EBEFCAAF8BD27F68755D00DB8269C1EBADD4BD3BE75A36A39A31F9F"),
-			std::string("0C6C0ECA8EA33C62DDF79B8C547640EA25E157DC863C155690B3A5C461AB4102F62729B44FD04FD9EE829763EADAC944CC63BF69980FFC15669CA5D5C51C6830"),
 			std::string("39AB0176F64ED6A121D85C78DEF78D7A548118A89FC5E4C00508F3D5DED5DABC34D0544262FF32BBAD7F2BDF2963F10EE796FB7A1A70BE4BDC2546A95788849D"),
-			std::string("C836E5E5CD57CB3690F0485E97357BCD029A79C102A23C8B5140BF00E7DE296C3C3791E901A52B283005F1BBBBDB71B083AD8F60435DBDFCFB1DD9376762EA5849339CB2D10C7FFE6793418F2D289884B760277DBFAD70092957B671E5148CF52672A6C0B74737FC40FBFFA94AA44FC77C98E370D97A8CA3421DA8002AA7CA22"),
 			std::string("4FE91078F7C2BE5A8AA30D5F53C71C77A421D1A836EA0F08D6AA543415A792CDD9B05BD4A0725501B14E87BF1A13F57A5EFE4A50C8D69571401CA74659C06C0DCC8F7B905BFD5E67E7A8FFAF122DAEB6E209A6C0C57E6A45380EB24ACEF0D5E2A0E6A4580043AA1E5A172FD54CA80CFAA87B82ADBA96AD909034F44DACCC5474")
 		};
-		HexConverter::Decode(monte, 6, m_monte);
+		HexConverter::Decode(monte, 3, m_monte);
 
 		const std::vector<std::string> nonce =
 		{

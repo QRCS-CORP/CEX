@@ -20,18 +20,16 @@
 #define CEX_MODULELWE_H
 
 #include "CexDomain.h"
+#include "AsymmetricKey.h"
+#include "AsymmetricKeyPair.h"
 #include "IAsymmetricCipher.h"
-#include "MLWEKeyPair.h"
 #include "MLWEParameters.h"
-#include "MLWEPrivateKey.h"
-#include "MLWEPublicKey.h"
 
 NAMESPACE_MODULELWE
 
-using Key::Asymmetric::MLWEKeyPair;
+using Key::Asymmetric::AsymmetricKey;
+using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::MLWEParameters;
-using Key::Asymmetric::MLWEPrivateKey;
-using Key::Asymmetric::MLWEPublicKey;
 
 /// <summary>
 /// An implementation of the Module Learning With Errors asymmetric cipher (ModuleLWE)
@@ -102,10 +100,9 @@ private:
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
 	std::vector<byte> m_keyTag;
-	std::unique_ptr<MLWEPrivateKey> m_privateKey;
-	std::unique_ptr<MLWEPublicKey> m_publicKey;
+	std::unique_ptr<AsymmetricKey> m_privateKey;
+	std::unique_ptr<AsymmetricKey> m_publicKey;
 	MLWEParameters m_mlweParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
@@ -216,7 +213,7 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	IAsymmetricKeyPair* Generate() override;
+	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -225,7 +222,7 @@ public:
 	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(IAsymmetricKey* Key) override;
+	void Initialize(AsymmetricKey* Key) override;
 
 private:
 

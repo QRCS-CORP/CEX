@@ -1,4 +1,7 @@
 #include "Sphincs.h"
+#include "AsymmetricEngines.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
 #include "PrngFromName.h"
 #include "SecureRandom.h"
 #include "SHAKE.h"
@@ -6,6 +9,9 @@
 
 NAMESPACE_SPHINCS
 
+using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
 using Utility::MemUtils;
 
 const std::string Sphincs::CLASS_NAME = "SPHINCS+";
@@ -116,35 +122,39 @@ const size_t Sphincs::PublicKeySize()
 	return SPXF256::SPHINCS_PUBLICKEY_SIZE;
 }
 
-IAsymmetricKeyPair* Sphincs::Generate()
+AsymmetricKeyPair* Sphincs::Generate()
 {
 	std::vector<byte> pk(SPXF256::SPHINCS_PUBLICKEY_SIZE);
 	std::vector<byte> sk(SPXF256::SPHINCS_SECRETKEY_SIZE);
 
 	SPXF256::Generate(pk, sk, m_rndGenerator, m_spxParameters);
-	SphincsPublicKey* apk = new SphincsPublicKey(m_spxParameters, pk);
-	SphincsPrivateKey* ask = new SphincsPrivateKey(m_spxParameters, sk);
+	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_spxParameters), pk);
+	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_spxParameters), sk);
 
-	return new SphincsKeyPair(ask, apk);
+	return new AsymmetricKeyPair(ask, apk);
 }
 
-const void Sphincs::Initialize(IAsymmetricKey* Key)
+const void Sphincs::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::Sphincs)
 	{
 		throw CryptoAsymmetricException("Sphincs:Initialize", "The key base type is invalid!");
 	}
-
-	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyType() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyType() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
-		m_publicKey = std::unique_ptr<SphincsPublicKey>((SphincsPublicKey*)Key);
-		m_spxParameters = m_publicKey->Parameters();
+		throw CryptoAsymmetricException("Sphincs:Initialize", "The key type is invalid!");
+	}
+
+	if (Key->KeyType() == AsymmetricKeyTypes::SignaturePublicKey)
+	{
+		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_spxParameters = static_cast<SphincsParameters>(m_publicKey->Parameters());
 		m_isSigner = false;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<SphincsPrivateKey>((SphincsPrivateKey*)Key);
-		m_spxParameters = m_privateKey->Parameters();
+		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_spxParameters = static_cast<SphincsParameters>(m_privateKey->Parameters());
 		m_isSigner = true;
 	}
 
@@ -168,7 +178,7 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 		throw CryptoAsymmetricException("Sphincs:Sign", "The message size must be non-zero!");
 	}
 
-	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->R(), m_rndGenerator, m_spxParameters);
+	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->P(), m_rndGenerator, m_spxParameters);
 
 	return sgnlen;
 }

@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Symmetric block cipher enmumeration names
+/// Symmetric block cipher enumeration names
 /// <para>Note: HX ciphers are always ordinally higher in value than standard ciphers.</para>
 /// </summary>
 enum class BlockCiphers : byte

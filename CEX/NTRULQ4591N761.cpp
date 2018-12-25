@@ -364,7 +364,7 @@ void NTRULQ4591N761::SeededWeightW(std::array<int8_t, NTRU_P> &F, const std::vec
 	size_t i;
 
 	Utility::MemUtils::Copy(K, 0, tmpK, 0, NTRU_SEED_SIZE);
-	
+
 	Prng::CSR rng(tmpK);
 	rng.Generate(tmpR);
 	Utility::MemUtils::Copy(tmpR, 0, r, 0, tmpR.size());

@@ -24,28 +24,31 @@ const std::string TBC::Name()
 
 size_t TBC::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
-	if (Offset > Input.size())
-	{
-		throw CryptoPaddingException("TBC:AddPadding", "The padding offset value is longer than the array length!");
-	}
-
-	size_t offlen = (Offset > 0) ? Offset - 1 : 0;
-	size_t padlen = Input.size() - Offset;
+	size_t offlen;
+	size_t padlen;
 	byte code;
 
-	if ((Input[offlen] & 0x01) == 0)
-	{
-		code = MKCODE;
-	}
-	else
-	{
-		code = ZBCODE;
-	}
+	padlen = 0;
 
-	while (Offset < Input.size())
+	if (Offset != Input.size())
 	{
-		Input[Offset] = code;
-		++Offset;
+		offlen = (Offset > 0) ? Offset - 1 : 0;
+		padlen = Input.size() - Offset;
+
+		if ((Input[offlen] & 0x01) == 0)
+		{
+			code = MKCODE;
+		}
+		else
+		{
+			code = ZBCODE;
+		}
+
+		while (Offset < Input.size())
+		{
+			Input[Offset] = code;
+			++Offset;
+		}
 	}
 
 	return padlen;
@@ -53,8 +56,11 @@ size_t TBC::AddPadding(std::vector<byte> &Input, size_t Offset)
 
 size_t TBC::GetPaddingLength(const std::vector<byte> &Input)
 {
-	size_t padlen = Input.size();
-	byte code = Input[padlen - 1];
+	size_t padlen;
+	byte code;
+
+	padlen = Input.size();
+	code = Input[padlen - 1];
 
 	if (code != MKCODE && code != ZBCODE)
 	{
@@ -63,16 +69,19 @@ size_t TBC::GetPaddingLength(const std::vector<byte> &Input)
 
 	while (padlen != 0 && Input[padlen - 1] == code)
 	{
-		padlen--;
+		--padlen;
 	}
 
-	return Input.size() - padlen;
+	return static_cast<size_t>(Input.size() - padlen);
 }
 
 size_t TBC::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	size_t padlen = Input.size() - Offset;
-	byte code = Input[Input.size() - 1];
+	size_t padlen;
+	byte code;
+
+	padlen = Input.size() - Offset;
+	code = Input[Input.size() - 1];
 
 	if (code != MKCODE && code != ZBCODE)
 	{
@@ -84,7 +93,7 @@ size_t TBC::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 		padlen--;
 	}
 
-	return (Input.size() - Offset) - padlen;
+	return static_cast<size_t>((Input.size() - Offset) - padlen);
 }
 
 NAMESPACE_PADDINGEND

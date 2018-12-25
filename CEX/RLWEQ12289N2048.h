@@ -194,8 +194,6 @@ private:
 	static void PolyTomessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X);
 
 	static void PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed);
-
-	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 };
 
 NAMESPACE_RINGLWEEND

@@ -9,9 +9,8 @@ namespace Test
 	using Mac::IMac;
 
 	/// <summary>
-	/// HMAC implementation vector comparison tests.
-	/// <para>Using vectors from Rfc 4493:
-	/// <see href="http://tools.ietf.org/html/rfc4493"/></para>
+	/// CMAC implementation KAT vector comparison, exception handling, and stress tests.
+	/// <para>Using vectors from Rfc 4493: <see href="http://tools.ietf.org/html/rfc4493"/></para>
 	/// </summary>
 	class CMACTest final : public ITest
 	{

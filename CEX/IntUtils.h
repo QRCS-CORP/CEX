@@ -621,6 +621,7 @@ public:
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
+	///
 	/// <returns>A 16 bit integer in Big Endian format</returns>
 	template<typename Array>
 	inline static ushort BeBytesTo16(const Array &Input, size_t InOffset)
@@ -640,11 +641,29 @@ public:
 	}
 
 	/// <summary>
+	/// Convert a Big Endian 16 bit word to byte array
+	/// </summary>
+	/// 
+	/// <param name="Value">The 16 bit integer</param>
+	///
+	/// <returns>An array of bytes in Big Endian order</returns>
+	template<typename Array>
+	inline static Array Be16ToBytes(ushort Value)
+	{
+		Array otp(sizeof(ushort));
+
+		Be16ToBytes(Value, otp, 0);
+
+		return otp;
+	}
+
+	/// <summary>
 	/// Convert a byte array to a Big Endian 32 bit word
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
+	///
 	/// <returns>A 32 bit integer in Big Endian format</returns>
 	template<typename Array>
 	inline static uint BeBytesTo32(const Array &Input, size_t InOffset)
@@ -667,11 +686,29 @@ public:
 	}
 
 	/// <summary>
+	/// Convert a Big Endian 32 bit word to byte array
+	/// </summary>
+	/// 
+	/// <param name="Value">The 32 bit integer</param>
+	///
+	/// <returns>An array of bytes in Big Endian order</returns>
+	template<typename Array>
+	inline static Array Be32ToBytes(uint Value)
+	{
+		Array otp(sizeof(uint));
+
+		Be32ToBytes(Value, otp, 0);
+
+		return otp;
+	}
+
+	/// <summary>
 	/// Convert a byte array to a Big Endian 64 bit dword
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
+	///
 	/// <returns>A 64 bit integer in Big Endian format</returns>
 	template<typename Array>
 	inline static ulong BeBytesTo64(const Array &Input, size_t InOffset)
@@ -694,6 +731,23 @@ public:
 			(static_cast<ulong>(Input[InOffset + 6]) << 8) |
 			(static_cast<ulong>(Input[InOffset + 7]));
 #endif
+	}
+
+	/// <summary>
+	/// Convert a Big Endian 64 bit dword to byte array
+	/// </summary>
+	/// 
+	/// <param name="Value">The 64 bit integer</param>
+	///
+	/// <returns>An array of bytes in Big Endian order</returns>
+	template<typename Array>
+	inline static Array Be64ToBytes(ulong Value)
+	{
+		Array otp(sizeof(ulong));
+
+		Be64ToBytes(Value, otp, 0);
+
+		return otp;
 	}
 
 	/// <summary>
@@ -868,6 +922,23 @@ public:
 	}
 
 	/// <summary>
+	/// Convert a Little Endian 16 bit word to a byte array
+	/// </summary>
+	/// 
+	/// <param name="Value">The 16 bit integer</param>
+	///
+	/// <returns>An array of bytes in Little Endian order</returns>
+	template<typename Array>
+	inline static Array Le16ToBytes(ushort Value)
+	{
+		Array otp(sizeof(ushort));
+
+		Le16ToBytes(Value, otp, 0);
+
+		return otp;
+	}
+
+	/// <summary>
 	/// Convert a Little Endian 32 bit word to bytes
 	/// </summary>
 	/// 
@@ -888,6 +959,23 @@ public:
 		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
 		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
 #endif
+	}
+
+	/// <summary>
+	/// Convert a Little Endian 32 bit word to a byte array
+	/// </summary>
+	/// 
+	/// <param name="Value">The 32 bit integer</param>
+	///
+	/// <returns>An array of bytes in Little Endian order</returns>
+	template<typename Array>
+	inline static Array Le32ToBytes(uint Value)
+	{
+		Array otp(sizeof(uint));
+
+		Le32ToBytes(Value, otp, 0);
+
+		return otp;
 	}
 
 	/// <summary>
@@ -915,6 +1003,23 @@ public:
 		Output[OutOffset + 6] = static_cast<byte>(Value >> 48);
 		Output[OutOffset + 7] = static_cast<byte>(Value >> 56);
 #endif
+	}
+
+	/// <summary>
+	/// Convert a Little Endian 64 bit dword to byte array
+	/// </summary>
+	/// 
+	/// <param name="Value">The 64 bit integer</param>
+	///
+	/// <returns>An array of bytes in Little Endian order</returns>
+	template<typename Array>
+	inline static Array Le64ToBytes(ulong Value)
+	{
+		Array otp(sizeof(ulong));
+
+		Le64ToBytes(Value, otp, 0);
+
+		return otp;
 	}
 
 	/// <summary>
@@ -1034,6 +1139,7 @@ public:
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
+	///
 	/// <returns>A 16 bit integer in Little Endian format</returns>
 	template<typename Array>
 	inline static ushort LeBytesTo16(const Array &Input, size_t InOffset)
@@ -1059,6 +1165,7 @@ public:
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
+	///
 	/// <returns>A 32 bit word in Little Endian format</returns>
 	template<typename Array>
 	inline static uint LeBytesTo32(const Array &Input, size_t InOffset)
@@ -1086,6 +1193,7 @@ public:
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
+	///
 	/// <returns>A 64 bit word in Little Endian format</returns>
 	template<typename Array>
 	inline static ulong LeBytesTo64(const Array &Input, size_t InOffset)
@@ -1369,14 +1477,17 @@ public:
 	template <typename Array>
 	inline static bool Compare(const Array &A, size_t AOffset, const Array &B, size_t BOffset, size_t Length)
 	{
-		size_t delta = 0;
+		Array::value_type delta;
+		size_t i;
 
-		for (size_t i = 0; i < Length; ++i)
+		delta = 0;
+
+		for (i = 0; i < Length; ++i)
 		{
 			delta |= (A[AOffset + i] ^ B[BOffset + i]);
 		}
 
-		return (delta == 0);
+		return static_cast<bool>(delta == 0);
 	}
 
 	/// <summary>

@@ -1,4 +1,7 @@
 #include "McEliece.h"
+#include "AsymmetricEngines.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
 #include "MPKCM12T62.h"
 #include "GCM.h"
 #include "IntUtils.h"
@@ -7,6 +10,13 @@
 #include "SymmetricKey.h"
 
 NAMESPACE_MCELIECE
+
+using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
+using Enumeration::BlockCiphers;
+using Enumeration::ShakeModes;
+using Utility::IntUtils;
 
 const std::string McEliece::CLASS_NAME = "McEliece";
 
@@ -48,7 +58,7 @@ McEliece::~McEliece()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_mpkcParameters = MPKCParameters::None;
-		Utility::IntUtils::ClearVector(m_domainKey);
+		IntUtils::ClearVector(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -138,14 +148,14 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 
 		e.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
 
-		status = MPKCM12T62::Decrypt(e, m_privateKey->S(), CipherText);
+		status = MPKCM12T62::Decrypt(e, m_privateKey->P(), CipherText);
 	}
 
 	// copy hash of pk to coin 1
-	Utility::MemUtils::Copy(m_privateKey->S(), MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
+	Utility::MemUtils::Copy(m_privateKey->P(), MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
 
 	// hash ct to coin 2
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	Kdf::SHAKE gen(ShakeModes::SHAKE256);
 	gen.Initialize(CipherText, 0, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE);
 	gen.Generate(coins, MPKCM12T62::MPKC_COIN_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
 
@@ -156,7 +166,7 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 
 	// decrypt the secret
 	SharedSecret.resize(CipherText.size() - MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE);
-	Cipher::Symmetric::Block::Mode::GCM cpr(Enumeration::BlockCiphers::Rijndael);
+	Cipher::Symmetric::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
 	Key::Symmetric::SymmetricKey kp(key, iv);
 	cpr.Initialize(false, kp);
 	cpr.Transform(CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret, 0, SharedSecret.size());
@@ -185,7 +195,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	}
 
 	// hash pk to coin 1
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	Kdf::SHAKE gen(ShakeModes::SHAKE256);
 	gen.Initialize(m_publicKey->P());
 	gen.Generate(coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
 	// hash ct to coin 2
@@ -201,7 +211,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	m_rndGenerator->Generate(SharedSecret);
 
 	// encrypt the secret and add to ct
-	Cipher::Symmetric::Block::Mode::GCM cpr(Enumeration::BlockCiphers::Rijndael);
+	Cipher::Symmetric::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
 	Key::Symmetric::SymmetricKey kp(key, iv);
 	cpr.Initialize(true, kp);
 	cpr.Transform(SharedSecret, 0, CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret.size());
@@ -209,7 +219,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	cpr.Finalize(CipherText, CipherText.size() - MPKCM12T62::MPKC_TAG_SIZE, MPKCM12T62::MPKC_TAG_SIZE);
 }
 
-IAsymmetricKeyPair* McEliece::Generate()
+AsymmetricKeyPair* McEliece::Generate()
 {
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
@@ -225,34 +235,38 @@ IAsymmetricKeyPair* McEliece::Generate()
 		}
 
 		// add H(pk) to private key
-		Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+		Kdf::SHAKE gen(ShakeModes::SHAKE256);
 		gen.Initialize(pk);
 		gen.Generate(sk, MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
 	}
 
-	Key::Asymmetric::MPKCPublicKey* apk = new Key::Asymmetric::MPKCPublicKey(m_mpkcParameters, pk);
-	Key::Asymmetric::MPKCPrivateKey* ask = new Key::Asymmetric::MPKCPrivateKey(m_mpkcParameters, sk);
+	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mpkcParameters), pk);
+	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::McEliece, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_mpkcParameters), sk);
 
-	return new Key::Asymmetric::MPKCKeyPair(ask, apk);
+	return new AsymmetricKeyPair(ask, apk);
 }
 
-void McEliece::Initialize(IAsymmetricKey* Key)
+void McEliece::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::McEliece)
 	{
 		throw CryptoAsymmetricException("McEliece:Initialize", "The key is invalid!");
 	}
-
-	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
-		m_publicKey = std::unique_ptr<MPKCPublicKey>((MPKCPublicKey*)Key);
-		m_mpkcParameters = m_publicKey->Parameters();
+		throw CryptoAsymmetricException("McEliece:Initialize", "The key type is invalid!");
+	}
+
+	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)
+	{
+		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_mpkcParameters = static_cast<MPKCParameters>(m_publicKey->Parameters());
 		m_isEncryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<MPKCPrivateKey>((MPKCPrivateKey*)Key);
-		m_mpkcParameters = m_privateKey->Parameters();
+		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_mpkcParameters = static_cast<MPKCParameters>(m_privateKey->Parameters());
 		m_isEncryption = false;
 	}
 

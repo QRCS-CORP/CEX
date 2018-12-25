@@ -1,12 +1,23 @@
 #include "RingLWE.h"
+#include "AsymmetricEngines.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
+#include "IntUtils.h"
+#include "MemUtils.h"
+#include "PrngFromName.h"
 #include "RLWEQ12289N1024.h"
 #include "RLWEQ12289N2048.h"
-#include "IntUtils.h"
-#include "PrngFromName.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_RINGLWE
+
+using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
+using Enumeration::ShakeModes;
+using Utility::IntUtils;
+using Utility::MemUtils;
 
 const std::string RingLWE::CLASS_NAME = "RingLWE";
 
@@ -48,7 +59,7 @@ RingLWE::~RingLWE()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_rlweParameters = RLWEParameters::None;
-		Utility::IntUtils::ClearVector(m_domainKey);
+		IntUtils::ClearVector(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -152,24 +163,24 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 			pk.resize(RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);
 
 			// decrypt the key
-			RLWEQ12289N1024::Decrypt(sec, CipherText, m_privateKey->R());
+			RLWEQ12289N1024::Decrypt(sec, CipherText, m_privateKey->P());
 
 			// Use hash of pk stored in sk
-			Utility::MemUtils::Copy(m_privateKey->R(), RLWEQ12289N1024::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N1024::RLWE_SEED_SIZE), sec, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+			MemUtils::Copy(m_privateKey->P(), RLWEQ12289N1024::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N1024::RLWE_SEED_SIZE), sec, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			
 			// multitarget countermeasure for coins + contributory KEM
-			Utility::MemUtils::Copy(m_privateKey->R(), RLWEQ12289N1024::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N1024::RLWE_SEED_SIZE), sec, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
-			Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+			MemUtils::Copy(m_privateKey->P(), RLWEQ12289N1024::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N1024::RLWE_SEED_SIZE), sec, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+			Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 			shk256.Initialize(sec);
 			shk256.Generate(kcoins);
 			
 			// coins are in k+RLWE_SEED_SIZE
-			Utility::MemUtils::Copy(kcoins, RLWEQ12289N1024::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
-			Utility::MemUtils::Copy(m_privateKey->R(), RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE, pk, 0, RLWEQ12289N1024::RLWE_CPAPUBLICKEY_SIZE);
+			MemUtils::Copy(kcoins, RLWEQ12289N1024::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
+			MemUtils::Copy(m_privateKey->P(), RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE, pk, 0, RLWEQ12289N1024::RLWE_CPAPUBLICKEY_SIZE);
 			RLWEQ12289N1024::Encrypt(cmp, sec, pk, coin);
 			
 			// copy Targhi-Unruh hash into ct
-			Utility::MemUtils::Copy(kcoins, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE, cmp, RLWEQ12289N1024::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE, cmp, RLWEQ12289N1024::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			
 			// verify the code
 			result = Verify(CipherText, cmp, CipherText.size());
@@ -179,10 +190,10 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 			shk256.Generate(kcoins, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			
 			// overwrite pre-k with z on re-encryption failure
-			Utility::IntUtils::CMov(kcoins, 0, m_privateKey->R(), m_privateKey->R().size() - RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE, result);
+			IntUtils::CMov(kcoins, 0, m_privateKey->P(), m_privateKey->P().size() - RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE, result);
 			
 			// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
-			Utility::MemUtils::Copy(kcoins, 0, sec, 0, RLWEQ12289N1024::RLWE_SEED_SIZE * 2);
+			MemUtils::Copy(kcoins, 0, sec, 0, RLWEQ12289N1024::RLWE_SEED_SIZE * 2);
 			shk256.Initialize(sec, m_domainKey);
 			shk256.Generate(SharedSecret);
 			break;
@@ -201,29 +212,29 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 			pk.resize(RLWEQ12289N2048::RLWE_CCAPUBLICKEY_SIZE);
 
 			// decrypt the key
-			RLWEQ12289N2048::Decrypt(sec, CipherText, m_privateKey->R());
+			RLWEQ12289N2048::Decrypt(sec, CipherText, m_privateKey->P());
 			// Use hash of pk stored in sk
-			Utility::MemUtils::Copy(m_privateKey->R(), RLWEQ12289N2048::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N2048::RLWE_SEED_SIZE), sec, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
+			MemUtils::Copy(m_privateKey->P(), RLWEQ12289N2048::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N2048::RLWE_SEED_SIZE), sec, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// multitarget countermeasure for coins + contributory KEM
-			Utility::MemUtils::Copy(m_privateKey->R(), RLWEQ12289N2048::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N2048::RLWE_SEED_SIZE), sec, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
-			Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+			MemUtils::Copy(m_privateKey->P(), RLWEQ12289N2048::RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWEQ12289N2048::RLWE_SEED_SIZE), sec, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
+			Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 			shk256.Initialize(sec);
 			shk256.Generate(kcoins);
 			// coins are in k+RLWE_SEED_SIZE
-			Utility::MemUtils::Copy(kcoins, RLWEQ12289N2048::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
-			Utility::MemUtils::Copy(m_privateKey->R(), RLWEQ12289N2048::RLWE_CPAPRIVATEKEY_SIZE, pk, 0, RLWEQ12289N2048::RLWE_CPAPUBLICKEY_SIZE);
+			MemUtils::Copy(kcoins, RLWEQ12289N2048::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
+			MemUtils::Copy(m_privateKey->P(), RLWEQ12289N2048::RLWE_CPAPRIVATEKEY_SIZE, pk, 0, RLWEQ12289N2048::RLWE_CPAPUBLICKEY_SIZE);
 			RLWEQ12289N2048::Encrypt(cmp, sec, pk, coin);
 			// copy Targhi-Unruh hash into ct
-			Utility::MemUtils::Copy(kcoins, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE, cmp, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE, cmp, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// verify the code
 			result = Verify(CipherText, cmp, CipherText.size());
 			// overwrite coins in k with H(c)
 			shk256.Initialize(cmp, 0, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE);
 			shk256.Generate(kcoins, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// overwrite pre-k with z on re-encryption failure
-			Utility::IntUtils::CMov(kcoins, 0, m_privateKey->R(), m_privateKey->R().size() - RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE, result);
+			IntUtils::CMov(kcoins, 0, m_privateKey->P(), m_privateKey->P().size() - RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE, result);
 			// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
-			Utility::MemUtils::Copy(kcoins, 0, sec, 0, RLWEQ12289N2048::RLWE_SEED_SIZE * 2);
+			MemUtils::Copy(kcoins, 0, sec, 0, RLWEQ12289N2048::RLWE_SEED_SIZE * 2);
 			shk256.Initialize(sec, m_domainKey);
 			shk256.Generate(SharedSecret);
 			break;
@@ -256,8 +267,8 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 			CipherText.resize(RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE);
 			m_rndGenerator->Generate(sec, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			// don't release system RNG output
-			Utility::MemUtils::Copy(sec, 0, coin, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
-			Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+			MemUtils::Copy(sec, 0, coin, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
+			Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 			shk256.Initialize(coin);
 			shk256.Generate(sec, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			// multitarget countermeasure for coins + contributory KEM
@@ -267,17 +278,17 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 			shk256.Initialize(sec);
 			shk256.Generate(kcoins, 0, RLWEQ12289N1024::RLWE_SEED_SIZE * 3);
 			// coins are in k+KYBER_KEYBYTES
-			Utility::MemUtils::Copy(kcoins, RLWEQ12289N1024::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, RLWEQ12289N1024::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			RLWEQ12289N1024::Encrypt(CipherText, sec, m_publicKey->P(), coin);
 			// copy Targhi-Unruh hash into ct
-			Utility::MemUtils::Copy(kcoins, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE, CipherText, RLWEQ12289N1024::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE, CipherText, RLWEQ12289N1024::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			// copy cpa bytes of ct to cmp
-			Utility::MemUtils::Copy(CipherText, 0, cmp, 0, RLWEQ12289N1024::RLWE_CPACIPHERTEXT_SIZE);
+			MemUtils::Copy(CipherText, 0, cmp, 0, RLWEQ12289N1024::RLWE_CPACIPHERTEXT_SIZE);
 			// H(c) add the ct hash to k
 			shk256.Initialize(cmp);
 			shk256.Generate(kcoins, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			// hash concatenation of pre-k and H(c) to k
-			Utility::MemUtils::Copy(kcoins, 0, sec, 0, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, 0, sec, 0, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
 			shk256.Initialize(sec, m_domainKey);
 			shk256.Generate(SharedSecret);
 			break;
@@ -292,8 +303,8 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 			CipherText.resize(RLWEQ12289N2048::RLWE_CCACIPHERTEXT_SIZE);
 			m_rndGenerator->Generate(sec, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// don't release system RNG output
-			Utility::MemUtils::Copy(sec, 0, coin, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
-			Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+			MemUtils::Copy(sec, 0, coin, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
+			Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 			shk256.Initialize(coin);
 			shk256.Generate(sec, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// multitarget countermeasure for coins + contributory KEM
@@ -303,17 +314,17 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 			shk256.Initialize(sec);
 			shk256.Generate(kcoins, 0, RLWEQ12289N2048::RLWE_SEED_SIZE * 3);
 			// coins are in k+KYBER_KEYBYTES
-			Utility::MemUtils::Copy(kcoins, RLWEQ12289N2048::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, RLWEQ12289N2048::RLWE_SEED_SIZE, coin, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			RLWEQ12289N2048::Encrypt(CipherText, sec, m_publicKey->P(), coin);
 			// copy Targhi-Unruh hash into ct
-			Utility::MemUtils::Copy(kcoins, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE, CipherText, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE, CipherText, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// copy cpa bytes of ct to cmp
-			Utility::MemUtils::Copy(CipherText, 0, cmp, 0, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE);
+			MemUtils::Copy(CipherText, 0, cmp, 0, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE);
 			// H(c) add the ct hash to k
 			shk256.Initialize(cmp);
 			shk256.Generate(kcoins, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// hash concatenation of pre-k and H(c) to k
-			Utility::MemUtils::Copy(kcoins, 0, sec, 0, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE);
+			MemUtils::Copy(kcoins, 0, sec, 0, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE);
 			shk256.Initialize(sec, m_domainKey);
 			shk256.Generate(SharedSecret);
 			break;
@@ -321,7 +332,7 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 	}
 }
 
-IAsymmetricKeyPair* RingLWE::Generate()
+AsymmetricKeyPair* RingLWE::Generate()
 {
 	CexAssert(m_rlweParameters != RLWEParameters::None, "The parameter setting is invalid");
 
@@ -340,15 +351,15 @@ IAsymmetricKeyPair* RingLWE::Generate()
 			RLWEQ12289N1024::Generate(pk, sk, m_rndGenerator);
 
 			// generate H(pk)
-			Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+			Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 			shk256.Initialize(pk);
 			shk256.Generate(buff, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			// value z for pseudo-random output on reject
 			m_rndGenerator->Generate(buff, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 
 			// copy the puplic key + H(pk)
-			Utility::MemUtils::Copy(pk, 0, sk, RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE, RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);
-			Utility::MemUtils::Copy(buff, 0, sk, RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE + RLWEQ12289N1024::RLWE_CPAPUBLICKEY_SIZE, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
+			MemUtils::Copy(pk, 0, sk, RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE, RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);
+			MemUtils::Copy(buff, 0, sk, RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE + RLWEQ12289N1024::RLWE_CPAPUBLICKEY_SIZE, 2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
 			break;
 		}
 		case (RLWEParameters::RLWES2Q12289N2048):
@@ -360,42 +371,46 @@ IAsymmetricKeyPair* RingLWE::Generate()
 			RLWEQ12289N2048::Generate(pk, sk, m_rndGenerator);
 
 			// generate H(pk)
-			Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+			Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 			shk256.Initialize(pk);
 			shk256.Generate(buff, 0, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// value z for pseudo-random output on reject
 			m_rndGenerator->Generate(buff, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
 
 			// copy the puplic key + H(pk)
-			Utility::MemUtils::Copy(pk, 0, sk, RLWEQ12289N2048::RLWE_CPAPRIVATEKEY_SIZE, RLWEQ12289N2048::RLWE_CCAPUBLICKEY_SIZE);
-			Utility::MemUtils::Copy(buff, 0, sk, RLWEQ12289N2048::RLWE_CPAPRIVATEKEY_SIZE + RLWEQ12289N2048::RLWE_CPAPUBLICKEY_SIZE, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE);
+			MemUtils::Copy(pk, 0, sk, RLWEQ12289N2048::RLWE_CPAPRIVATEKEY_SIZE, RLWEQ12289N2048::RLWE_CCAPUBLICKEY_SIZE);
+			MemUtils::Copy(buff, 0, sk, RLWEQ12289N2048::RLWE_CPAPRIVATEKEY_SIZE + RLWEQ12289N2048::RLWE_CPAPUBLICKEY_SIZE, 2 * RLWEQ12289N2048::RLWE_SEED_SIZE);
 			break;
 		}
 	}
 
-	Key::Asymmetric::RLWEPublicKey* apk = new Key::Asymmetric::RLWEPublicKey(m_rlweParameters, pk);
-	Key::Asymmetric::RLWEPrivateKey* ask = new Key::Asymmetric::RLWEPrivateKey(m_rlweParameters, sk);
+	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_rlweParameters), pk);
+	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::RingLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_rlweParameters), sk);
 
-	return new Key::Asymmetric::RLWEKeyPair(ask, apk);
+	return new AsymmetricKeyPair(ask, apk);
 }
 
-void RingLWE::Initialize(IAsymmetricKey* Key)
+void RingLWE::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::RingLWE)
 	{
 		throw CryptoAsymmetricException("RingLWE:Initialize", "The key is invalid!");
 	}
-
-	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
-		m_publicKey = std::unique_ptr<RLWEPublicKey>((RLWEPublicKey*)Key);
-		m_rlweParameters = m_publicKey->Parameters();
+		throw CryptoAsymmetricException("RingLWE:Initialize", "The key type is invalid!");
+	}
+
+	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)
+	{
+		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_rlweParameters = static_cast<RLWEParameters>(m_publicKey->Parameters());
 		m_isEncryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<RLWEPrivateKey>((RLWEPrivateKey*)Key);
-		m_rlweParameters = m_privateKey->Parameters();
+		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_rlweParameters = static_cast<RLWEParameters>(m_privateKey->Parameters());
 		m_isEncryption = false;
 	}
 
@@ -404,7 +419,6 @@ void RingLWE::Initialize(IAsymmetricKey* Key)
 
 int32_t RingLWE::Verify(const std::vector<byte> &A, const std::vector<byte> &B, size_t Length)
 {
-	// TODO: bizzare non-const-time behavior if placed in IntUtils, why?
 	size_t i;
 	int32_t r;
 

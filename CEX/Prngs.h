@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Pseudo Random Generators enmumeration names
+/// Pseudo Random Generators enumeration names
 /// </summary>
 enum class Prngs : byte
 {

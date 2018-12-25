@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Block cipher padding mode enmumeration names
+/// Block cipher padding mode enumeration names
 /// </summary>
 enum class PaddingModes : byte
 {

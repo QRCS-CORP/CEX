@@ -1,13 +1,22 @@
 #include "NTRU.h"
+#include "AsymmetricEngines.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
 #include "BCR.h"
+#include "IntUtils.h"
 #include "NTRULQ4591N761.h"
 #include "NTRUSQ4591N761.h"
-#include "IntUtils.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_NTRU
+
+using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
+using Utility::IntUtils;
+using Enumeration::ShakeModes;
 
 const std::string NTRU::CLASS_NAME = "NTRU";
 
@@ -49,7 +58,7 @@ NTRU::~NTRU()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_ntruParameters = NTRUParameters::None;
-		Utility::IntUtils::ClearVector(m_domainKey);
+		IntUtils::ClearVector(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -140,17 +149,17 @@ bool NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &S
 		CexAssert(CipherText.size() >= NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		// process message from B and return shared secret
-		result = NTRUSQ4591N761::Decrypt(secret, CipherText, m_privateKey->R());
+		result = NTRUSQ4591N761::Decrypt(secret, CipherText, m_privateKey->P());
 	}
 	else if (m_ntruParameters == NTRUParameters::NTRUS1LQ4591N761)
 	{
 		CexAssert(CipherText.size() >= NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
-		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->R());
+		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->P());
 	}
 
 	// hash the message to create the shared secret
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	Kdf::SHAKE gen(ShakeModes::SHAKE256);
 	gen.Initialize(secret, m_domainKey);
 	gen.Generate(SharedSecret);
 
@@ -183,12 +192,12 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 		NTRULQ4591N761::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
 	}
 
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	Kdf::SHAKE gen(ShakeModes::SHAKE256);
 	gen.Initialize(secret, m_domainKey);
 	gen.Generate(SharedSecret);
 }
 
-IAsymmetricKeyPair* NTRU::Generate()
+AsymmetricKeyPair* NTRU::Generate()
 {
 	CexAssert(m_ntruParameters != NTRUParameters::None, "The parameter setting is invalid");
 
@@ -210,29 +219,33 @@ IAsymmetricKeyPair* NTRU::Generate()
 		NTRULQ4591N761::Generate(pk, sk, m_rndGenerator);
 	}
 
-	NTRUPublicKey* apk = new NTRUPublicKey(m_ntruParameters, pk);
-	NTRUPrivateKey* ask = new NTRUPrivateKey(m_ntruParameters, sk);
+	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::NTRU, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_ntruParameters), pk);
+	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::NTRU, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_ntruParameters), sk);
 
-	return new NTRUKeyPair(ask, apk);
+	return new AsymmetricKeyPair(ask, apk);
 }
 
-void NTRU::Initialize(IAsymmetricKey* Key)
+void NTRU::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::NTRU)
 	{
 		throw CryptoAsymmetricException("NTRU:Initialize", "The key base type is invalid!");
 	}
-
-	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
-		m_publicKey = std::unique_ptr<NTRUPublicKey>((NTRUPublicKey*)Key);
-		m_ntruParameters = m_publicKey->Parameters();
+		throw CryptoAsymmetricException("NTRU:Initialize", "The key type is invalid!");
+	}
+
+	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)
+	{
+		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_ntruParameters = static_cast<NTRUParameters>(m_publicKey->Parameters());
 		m_isEncryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<NTRUPrivateKey>((NTRUPrivateKey*)Key);
-		m_ntruParameters = m_privateKey->Parameters();
+		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_ntruParameters = static_cast<NTRUParameters>(m_privateKey->Parameters());
 		m_isEncryption = false;
 	}
 

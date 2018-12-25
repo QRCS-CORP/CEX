@@ -43,7 +43,7 @@ public:
 	/// <param name="KeySize">The key byte array length</param>
 	/// <param name="NonceSize">The nonce byte array length</param>
 	/// <param name="InfoSize">The info byte array length</param>
-	explicit SymmetricKeySize(const size_t KeySize, const size_t NonceSize, const size_t InfoSize);
+	SymmetricKeySize(size_t KeySize, size_t NonceSize, size_t InfoSize);
 
 	//~~~Accessors~~~//
 

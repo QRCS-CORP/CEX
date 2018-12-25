@@ -20,18 +20,18 @@
 #define CEX_NTRU_H
 
 #include "CexDomain.h"
+
 #include "IAsymmetricCipher.h"
-#include "NTRUKeyPair.h"
+#include "AsymmetricKey.h"
+#include "AsymmetricKeyPair.h"
 #include "NTRUParameters.h"
-#include "NTRUPrivateKey.h"
-#include "NTRUPublicKey.h"
 
 NAMESPACE_NTRU
 
-using Key::Asymmetric::NTRUKeyPair;
+using Key::Asymmetric::AsymmetricKeyPair;
+using Key::Asymmetric::AsymmetricKey;
 using Enumeration::NTRUParameters;
-using Key::Asymmetric::NTRUPrivateKey;
-using Key::Asymmetric::NTRUPublicKey;
+
 
 /// <summary>
 /// An implementation of the NTRU Prime asymmetric cipher (NTRU)
@@ -109,10 +109,9 @@ private:
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
 	std::vector<byte> m_keyTag;
-	std::unique_ptr<NTRUPrivateKey> m_privateKey;
-	std::unique_ptr<NTRUPublicKey> m_publicKey;
+	std::unique_ptr<AsymmetricKey> m_privateKey;
+	std::unique_ptr<AsymmetricKey> m_publicKey;
 	NTRUParameters m_ntruParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
@@ -219,7 +218,7 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	IAsymmetricKeyPair* Generate() override;
+	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -228,7 +227,7 @@ public:
 	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(IAsymmetricKey* Key) override;
+	void Initialize(AsymmetricKey* Key) override;
 };
 
 NAMESPACE_NTRUEND

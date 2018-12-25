@@ -1,9 +1,7 @@
 #include "DilithiumTest.h"
+#include "../CEX/AsymmetricKey.h"
+#include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/Dilithium.h"
-#include "../CEX/DilithiumKeyPair.h"
-#include "../CEX/DilithiumPrivateKey.h"
-#include "../CEX/DilithiumPublicKey.h"
-#include "../CEX/IAsymmetricKeyPair.h"
 #include "../CEX/IntUtils.h"
 #include "../CEX/ModuleLWE.h"
 #include "../CEX/SecureRandom.h"
@@ -72,15 +70,15 @@ namespace Test
 
 	void DilithiumTest::Authentication()
 	{
-		Dilithium sgn1;
-		Dilithium sgn2;
+		Dilithium sgn1(DilithiumParameters::DLMS2N256Q8380417);
+		Dilithium sgn2(DilithiumParameters::DLMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 		SecureRandom rnd;
 		bool ret;
 
-		IAsymmetricKeyPair* kp = sgn1.Generate();
+		AsymmetricKeyPair* kp = sgn1.Generate();
 		sgn1.Initialize(kp->PrivateKey());
 		sgn1.Sign(msg1, sig);
 		sgn2.Initialize(kp->PublicKey());
@@ -148,7 +146,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Dilithium sgn;
+			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 			sgn.Sign(msg, sig);
 
 			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE4"));
@@ -166,7 +164,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Dilithium sgn;
+			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 			sgn.Verify(sig, msg);
 
 			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE5"));
@@ -182,10 +180,10 @@ namespace Test
 		// test initialization with invalid key
 		try
 		{
-			Dilithium sgn;
+			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 			Cipher::Asymmetric::MLWE::ModuleLWE cprb;
 			// create an invalid key set
-			IAsymmetricKeyPair* kp = cprb.Generate();
+			AsymmetricKeyPair* kp = cprb.Generate();
 			sgn.Initialize(kp->PrivateKey());
 
 			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE6"));
@@ -203,8 +201,8 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Dilithium sgn;
-			IAsymmetricKeyPair* kp = sgn.Generate();
+			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+			AsymmetricKeyPair* kp = sgn.Generate();
 			sgn.Initialize(kp->PublicKey());
 			sgn.Sign(msg, sig);
 
@@ -222,17 +220,17 @@ namespace Test
 	void DilithiumTest::PrivateKey()
 	{
 		SecureRandom gen;
-		Dilithium sgn;
+		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 
-		IAsymmetricKeyPair* kp = sgn.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter private key
-		std::vector<byte> sk1 = ((DilithiumPrivateKey*)kp->PrivateKey())->R();
+		std::vector<byte> sk1 = kp->PrivateKey()->P();
 		gen.Generate(sk1, 0, 16);
-		DilithiumPrivateKey* sk2 = new DilithiumPrivateKey(DilithiumParameters::DLMS2N256Q8380417, sk1);
+		AsymmetricKey* sk2 = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417), sk1);
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -248,17 +246,17 @@ namespace Test
 	void DilithiumTest::PublicKey()
 	{
 		SecureRandom gen;
-		Dilithium sgn;
+		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 
-		IAsymmetricKeyPair* kp = sgn.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = ((DilithiumPublicKey*)kp->PublicKey())->P();
+		std::vector<byte> pk1 = kp->PublicKey()->P();
 		gen.Generate(pk1, 0, 16);
-		DilithiumPublicKey* pk2 = new DilithiumPublicKey(DilithiumParameters::DLMS2N256Q8380417, pk1);
+		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417), pk1);
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -273,24 +271,24 @@ namespace Test
 
 	void DilithiumTest::Serialization()
 	{
-		Dilithium sgn;
+		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 		std::vector<byte> skey;
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			IAsymmetricKeyPair* kp = sgn.Generate();
-			DilithiumPrivateKey* prik1 = (DilithiumPrivateKey*)kp->PrivateKey();
+			AsymmetricKeyPair* kp = sgn.Generate();
+			AsymmetricKey* prik1 = kp->PrivateKey();
 			skey = prik1->ToBytes();
-			DilithiumPrivateKey prik2(skey);
+			AsymmetricKey prik2(skey);
 
-			if (prik1->R() != prik2.R() || prik1->Parameters() != prik2.Parameters())
+			if (prik1->P() != prik2.P() || prik1->Parameters() != prik2.Parameters())
 			{
 				throw TestException(std::string("DilithiumTest: Private key serialization test has failed! -DR1"));
 			}
 
-			DilithiumPublicKey* pubk1 = (DilithiumPublicKey*)kp->PublicKey();
+			AsymmetricKey* pubk1 = kp->PublicKey();
 			skey = pubk1->ToBytes();
-			DilithiumPublicKey pubk2(skey);
+			AsymmetricKey pubk2(skey);
 
 			if (pubk1->P() != pubk2.P() || pubk1->Parameters() != pubk2.Parameters())
 			{
@@ -302,12 +300,12 @@ namespace Test
 	void DilithiumTest::Signature()
 	{
 		SecureRandom gen;
-		Dilithium sgn;
+		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 
-		IAsymmetricKeyPair* kp = sgn.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -340,7 +338,7 @@ namespace Test
 			msglen = gen.NextUInt32(128, 16);
 			msg1.resize(msglen);
 
-			IAsymmetricKeyPair* kp = sgn1.Generate();
+			AsymmetricKeyPair* kp = sgn1.Generate();
 
 			sgn1.Initialize(kp->PrivateKey());
 			sgn1.Sign(msg1, sig);
@@ -368,7 +366,7 @@ namespace Test
 			msglen = gen.NextUInt32(128, 16);
 			msg1.resize(msglen);
 
-			IAsymmetricKeyPair* kp = sgn2.Generate();
+			AsymmetricKeyPair* kp = sgn2.Generate();
 
 			sgn2.Initialize(kp->PrivateKey());
 			sgn2.Sign(msg1, sig);
@@ -396,7 +394,7 @@ namespace Test
 			msglen = gen.NextUInt32(128, 16);
 			msg1.resize(msglen);
 
-			IAsymmetricKeyPair* kp = sgn3.Generate();
+			AsymmetricKeyPair* kp = sgn3.Generate();
 
 			sgn3.Initialize(kp->PrivateKey());
 			sgn3.Sign(msg1, sig);

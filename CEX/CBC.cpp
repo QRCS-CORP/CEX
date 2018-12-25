@@ -183,9 +183,10 @@ void CBC::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void CBC::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoSymmetricCipherException("CBC:ParallelMaxDegree", "Degree setting is invalid!");
+	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }

@@ -1,18 +1,17 @@
 #include "SphincsTest.h"
-#include "../CEX/IAsymmetricKeyPair.h"
+#include "../CEX/AsymmetricKey.h"
+#include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/IntUtils.h"
 #include "../CEX/ModuleLWE.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/Sphincs.h"
-#include "../CEX/SphincsKeyPair.h"
-#include "../CEX/SphincsPrivateKey.h"
-#include "../CEX/SphincsPublicKey.h"
 
 namespace Test
 {
 	using namespace Key::Asymmetric;
 	using Cipher::Asymmetric::Sign::SPX::Sphincs;
 	using Prng::SecureRandom;
+	using Enumeration::SphincsParameters;
 
 	const std::string SphincsTest::DESCRIPTION = "SphincsTest key generation, signature generation, and verification tests..";
 	const std::string SphincsTest::FAILURE = "FAILURE! ";
@@ -71,15 +70,15 @@ namespace Test
 
 	void SphincsTest::Authentication()
 	{
-		Sphincs sgn1;
-		Sphincs sgn2;
+		Sphincs sgn1(SphincsParameters::SPXS128F256);
+		Sphincs sgn2(SphincsParameters::SPXS128F256);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 		SecureRandom rnd;
 		bool ret;
 
-		IAsymmetricKeyPair* kp = sgn1.Generate();
+		AsymmetricKeyPair* kp = sgn1.Generate();
 		sgn1.Initialize(kp->PrivateKey());
 		sgn1.Sign(msg1, sig);
 		sgn2.Initialize(kp->PublicKey());
@@ -147,7 +146,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Sphincs sgn;
+			Sphincs sgn(SphincsParameters::SPXS128F256);
 			sgn.Sign(msg, sig);
 
 			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE4"));
@@ -165,7 +164,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Sphincs sgn;
+			Sphincs sgn(SphincsParameters::SPXS128F256);
 			sgn.Verify(sig, msg);
 
 			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE5"));
@@ -181,10 +180,10 @@ namespace Test
 		// test initialization with invalid key
 		try
 		{
-			Sphincs sgn;
+			Sphincs sgn(SphincsParameters::SPXS128F256);
 			Cipher::Asymmetric::MLWE::ModuleLWE cprb;
 			// create an invalid key set
-			IAsymmetricKeyPair* kp = cprb.Generate();
+			AsymmetricKeyPair* kp = cprb.Generate();
 			sgn.Initialize(kp->PrivateKey());
 
 			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE6"));
@@ -202,8 +201,8 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Sphincs sgn;
-			IAsymmetricKeyPair* kp = sgn.Generate();
+			Sphincs sgn(SphincsParameters::SPXS128F256);
+			AsymmetricKeyPair* kp = sgn.Generate();
 			sgn.Initialize(kp->PublicKey());
 			sgn.Sign(msg, sig);
 
@@ -221,17 +220,17 @@ namespace Test
 	void SphincsTest::PrivateKey()
 	{
 		SecureRandom gen;
-		Sphincs sgn;
+		Sphincs sgn(SphincsParameters::SPXS256F256);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 
-		IAsymmetricKeyPair* kp = sgn.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter private key
-		std::vector<byte> sk1 = ((SphincsPrivateKey*)kp->PrivateKey())->R();
+		std::vector<byte> sk1 = kp->PrivateKey()->P();
 		gen.Generate(sk1, 0, 16);
-		SphincsPrivateKey* sk2 = new SphincsPrivateKey(SphincsParameters::SPXS256F256, sk1);
+		AsymmetricKey* sk2 = new AsymmetricKey(AsymmetricEngines::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(SphincsParameters::SPXS256F256), sk1);
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -247,17 +246,17 @@ namespace Test
 	void SphincsTest::PublicKey()
 	{
 		SecureRandom gen;
-		Sphincs sgn;
+		Sphincs sgn(SphincsParameters::SPXS256F256);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 
-		IAsymmetricKeyPair* kp = sgn.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = ((SphincsPublicKey*)kp->PublicKey())->P();
+		std::vector<byte> pk1 = (kp->PublicKey()->P());
 		gen.Generate(pk1, 0, 16);
-		SphincsPublicKey* pk2 = new SphincsPublicKey(SphincsParameters::SPXS256F256, pk1);
+		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(SphincsParameters::SPXS256F256), pk1);
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -272,24 +271,24 @@ namespace Test
 
 	void SphincsTest::Serialization()
 	{
-		Sphincs sgn;
+		Sphincs sgn(SphincsParameters::SPXS128F256);
 		std::vector<byte> skey;
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			IAsymmetricKeyPair* kp = sgn.Generate();
-			SphincsPrivateKey* prik1 = (SphincsPrivateKey*)kp->PrivateKey();
+			AsymmetricKeyPair* kp = sgn.Generate();
+			AsymmetricKey* prik1 = kp->PrivateKey();
 			skey = prik1->ToBytes();
-			SphincsPrivateKey prik2(skey);
+			AsymmetricKey prik2(skey);
 
-			if (prik1->R() != prik2.R() || prik1->Parameters() != prik2.Parameters())
+			if (prik1->P() != prik2.P() || prik1->Parameters() != prik2.Parameters())
 			{
 				throw TestException(std::string("SphincsTest: Private key serialization test has failed! -SR1"));
 			}
 
-			SphincsPublicKey* pubk1 = (SphincsPublicKey*)kp->PublicKey();
+			AsymmetricKey* pubk1 = kp->PublicKey();
 			skey = pubk1->ToBytes();
-			SphincsPublicKey pubk2(skey);
+			AsymmetricKey pubk2(skey);
 
 			if (pubk1->P() != pubk2.P() || pubk1->Parameters() != pubk2.Parameters())
 			{
@@ -301,12 +300,12 @@ namespace Test
 	void SphincsTest::Signature()
 	{
 		SecureRandom gen;
-		Sphincs sgn;
+		Sphincs sgn(SphincsParameters::SPXS128F256);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 
-		IAsymmetricKeyPair* kp = sgn.Generate();
+		AsymmetricKeyPair* kp = sgn.Generate();
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -340,7 +339,7 @@ namespace Test
 			msglen = gen.NextUInt32(128, 16);
 			msg1.resize(msglen);
 
-			IAsymmetricKeyPair* kp = sgn1.Generate();
+			AsymmetricKeyPair* kp = sgn1.Generate();
 
 			sgn1.Initialize(kp->PrivateKey());
 			sgn1.Sign(msg1, sig);
@@ -368,7 +367,7 @@ namespace Test
 			msglen = gen.NextUInt32(128, 16);
 			msg1.resize(msglen);
 
-			IAsymmetricKeyPair* kp = sgn2.Generate();
+			AsymmetricKeyPair* kp = sgn2.Generate();
 
 			sgn2.Initialize(kp->PrivateKey());
 			sgn2.Sign(msg1, sig);

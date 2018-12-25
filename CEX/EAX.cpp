@@ -253,6 +253,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 			throw CryptoSymmetricCipherException("EAX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
 		}
 
+		// TODO: change to secure key and review
 		m_cipherKey = KeyParams.Key();
 	}
 
@@ -269,6 +270,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		throw CryptoSymmetricCipherException("EAX:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
 	}
 
+	// 
 	m_isEncryption = Encryption;
 	m_eaxNonce = KeyParams.Nonce();
 	Key::Symmetric::SymmetricKey kp(m_cipherKey);
@@ -277,16 +279,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	UpdateTag(0, m_eaxNonce);
 	m_macGenerator->Finalize(m_eaxVector, 0);
 	m_macGenerator->Initialize(kp);
-
-	// hx extended ciphers
-	if (KeyParams.Info().size() != 0 && m_cipherMode->Engine()->CipherExtension() != BlockCipherExtensions::None)
-	{
-		m_cipherMode->Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector, KeyParams.Info()));
-	}
-	else
-	{
-		m_cipherMode->Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector));
-	}
+	m_cipherMode->Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector, KeyParams.Info()));
 
 	if (m_isFinalized)
 	{
@@ -299,17 +292,24 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void EAX::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoSymmetricCipherException("EAX:ParallelMaxDegree", "Degree setting is invalid!");
+	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
 void EAX::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(!m_aadLoaded, "The associated data has already been set");
+	if (!m_isInitialized)
+	{
+		throw CryptoSymmetricCipherException("EAX:SetAssociatedData", "The cipher mode has not been initialized!");
+	}
+	if (m_aadLoaded)
+	{
+		throw CryptoSymmetricCipherException("EAX:SetAssociatedData", "The associated data has already been set!");
+	}
 
 	UpdateTag(1, std::vector<byte>(0));
 	m_macGenerator->Update(Input, Offset, Length);

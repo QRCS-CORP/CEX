@@ -210,9 +210,9 @@ void HMAC::ParallelMaxDegree(size_t Degree)
 	{
 		m_dgtEngine->ParallelMaxDegree(Degree);
 	}
-	catch (std::exception&)
+	catch (std::exception &ex)
 	{
-		throw CryptoMacException("HMAC:ParallelMaxDegree", "The Degree value must be a non-zero even number less than the number of processor cores!");
+		throw CryptoMacException("HMAC:ParallelMaxDegree", "The Degree value must be a non-zero even number less than the number of processor cores!", std::string(ex.what()));
 	}
 }
 

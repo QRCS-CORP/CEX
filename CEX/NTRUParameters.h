@@ -17,11 +17,11 @@ enum class NTRUParameters : byte
 	/// <summary>
 	/// The S1 parameters; (High Security) The rounded product form L-Prime, modulus of 4591 with 761 coefficients
 	/// </summary>
-	NTRUS1LQ4591N761 = 2,
+	NTRUS1LQ4591N761 = 8,
 	/// <summary>
 	/// The S2 parameters; (High Security) The rounded quotient form S-Prime, modulus of 4591 with 761 coefficients
 	/// </summary>
-	NTRUS2SQ4591N761 = 3
+	NTRUS2SQ4591N761 = 9
 };
 
 NAMESPACE_ENUMERATIONEND

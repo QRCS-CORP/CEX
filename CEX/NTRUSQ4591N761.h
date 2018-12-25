@@ -83,6 +83,8 @@ public:
 	/// </summary>
 	static const int NTRU_W = 286;
 
+	//~~~Public Functions~~~//
+
 	/// <summary>
 	/// Decrypt a cipher-text
 	/// </summary>
@@ -110,8 +112,6 @@ public:
 	/// <param name="PrivateKey">The private asymmetric key</param>
 	/// <param name="Rng">The random provider</param>
 	static void Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
-
-	/* Common Functions */
 
 private:
 
@@ -144,17 +144,77 @@ private:
 
 	static void MinMax(int32_t &X, int32_t &Y);
 
+	static int8_t Mod3Freeze(int32_t a);
+
+	static int8_t Mod3MinusProduct(int8_t A, int8_t B, int8_t C);
+
+#if !defined(NTRU_SPRIME_SIMPLE)
+	static void Mod3MinusProductVector(std::vector<int8_t> &Z, size_t ZOffset, const std::vector<int8_t> &X, size_t XOffset, const std::vector<int8_t> &Y, size_t YOffset, const int8_t C, size_t Length);
+#endif
+
+	static void Mod3MinusProductVector(std::vector<int8_t> &Z, const std::vector<int8_t> &X, const std::vector<int8_t> &Y, const int8_t C, size_t Length);
+
+	static int32_t Mod3NonZeroMask(int8_t X);
+
+	static int8_t Mod3PlusProduct(int8_t A, int8_t B, int8_t C);
+
+	static int8_t Mod3Product(int8_t A, int8_t B);
+
+	static void Mod3ProductVector(std::array<int8_t, NTRU_P> &Z, const std::vector<int8_t> &X, size_t XOffset, const int8_t C, size_t Length);
+
+	static int8_t Mod3Quotient(int8_t Num, int8_t Den);
+
+	static int8_t Mod3Reciprocal(int8_t A1);
+
+	static void Mod3ShiftVector(std::vector<int8_t> &Z, size_t ZOffset, size_t Length);
+
+	static int8_t Mod3Sum(int8_t A, int8_t B);
+
 	static int16_t ModqFreeze(int32_t A);
+
+	static int16_t ModqMinusProduct(int16_t A, int16_t B, int16_t C);
+
+	static void ModqMinusProductVector(std::vector<int16_t> &Z, const std::vector<int16_t> &X, const std::vector<int16_t> &Y, size_t Length, const int16_t C);
+
+#if !defined(NTRU_SPRIME_SIMPLE)
+	static void ModqMinusProductVector(std::vector<int16_t> &Z, size_t ZOffset, const std::vector<int16_t> &X, size_t XOffset, const std::vector<int16_t> &Y, size_t YOffset, size_t Length, const int16_t C);
+#endif
+
+	static int ModqNonZeroMask(int16_t X);
 
 	static int16_t ModqPlusProduct(int16_t A, int16_t B, int16_t C);
 
+	static int16_t ModqProduct(int16_t A, int16_t B);
+
+	static void ModqProductVector(std::array<int16_t, NTRU_P> &Z, const std::vector<int16_t> &X, size_t XOffset, size_t Length, const int16_t C);
+
+	static int16_t ModqQuotient(int16_t Num, int16_t Den);
+
+	static int16_t ModqReciprocal(int16_t A1);
+
+	static void ModqShiftVector(std::vector<int16_t> &Z, size_t ZOffset, size_t Length);
+
+	static int16_t ModqSquare(int16_t A);
+
 	static int16_t ModqSum(int16_t A, int16_t B);
 
+	static void R3Mult(std::array<int8_t, NTRU_P> &H, const std::array<int8_t, NTRU_P> &F, const std::array<int8_t, NTRU_P> &G);
+
+	static int R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S);
+
+	static void RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset);
+
+	static void RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C);
+
 	static void RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset);
+
+	static void RqEncode(std::vector<byte> &C, const std::array<int16_t, NTRU_P> &F);
 
 	static void RqEncodeRounded(std::vector<byte> &C, size_t COffset, const std::array<int16_t, NTRU_P> &F);
 
 	static void RqMult(std::array<int16_t, NTRU_P> &H, const std::array<int16_t, NTRU_P> &F, const std::array<int8_t, NTRU_P> &G);
+
+	static int RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S);
 
 	static void RqRound3(std::array<int16_t, NTRU_P> &H, const std::array<int16_t, NTRU_P> &F);
 
@@ -162,75 +222,15 @@ private:
 
 	static void SmallEncode(std::vector<byte> &C, size_t COffset, const std::array<int8_t, NTRU_P> &F);
 
-	static void Swap32(int32_t &X, int32_t &Y, int32_t Mask);
-
-	static void Sort(std::array<int32_t, NTRU_P> &X);
-
-	static int32_t Mod3NonZeroMask(int8_t X);
-
-	static int8_t Mod3Freeze(int32_t a);
-
-	static int8_t Mod3MinusProduct(int8_t A, int8_t B, int8_t C);
-
-	static int8_t Mod3PlusProduct(int8_t A, int8_t B, int8_t C);
-
-	static int8_t Mod3Product(int8_t A, int8_t B);
-
-	static int8_t Mod3Sum(int8_t A, int8_t B);
-
-	static int8_t Mod3Reciprocal(int8_t A1);
-
-	static int8_t Mod3Quotient(int8_t Num, int8_t Den);
-
-	static int16_t ModqMinusProduct(int16_t A, int16_t B, int16_t C);
-
-	static int ModqNonZeroMask(int16_t X);
-
-	static int16_t ModqProduct(int16_t A, int16_t B);
-
-	static int16_t ModqSquare(int16_t A);
-
-	static int16_t ModqReciprocal(int16_t A1);
-
-	static int16_t ModqQuotient(int16_t Num, int16_t Den);
-
-	static void R3Mult(std::array<int8_t, NTRU_P> &H, const std::array<int8_t, NTRU_P> &F, const std::array<int8_t, NTRU_P> &G);
-
 	static int SmallerMask(int32_t X, int32_t Y);
-
-	static void SmallRandomWeightW(std::array<int8_t, NTRU_P> &F, std::unique_ptr<Prng::IPrng> &Rng);
 
 	static void SmallRandom(std::array<int8_t, NTRU_P> &G, std::unique_ptr<Prng::IPrng> &Rng);
 
-	static void VectorMod3Product(std::array<int8_t, NTRU_P> &Z, const std::vector<int8_t> &X, size_t XOffset, const int8_t C, size_t Length);
+	static void SmallRandomWeightW(std::array<int8_t, NTRU_P> &F, std::unique_ptr<Prng::IPrng> &Rng);
 
-#if !defined(NTRU_SPRIME_SIMPLE)
-	static void VectorMod3MinusProduct(std::vector<int8_t> &Z, size_t ZOffset, const std::vector<int8_t> &X, size_t XOffset, const std::vector<int8_t> &Y, size_t YOffset, const int8_t C, size_t Length);
-#endif
+	static void Sort(std::array<int32_t, NTRU_P> &X);
 
-	static void VectorMod3MinusProduct(std::vector<int8_t> &Z, const std::vector<int8_t> &X, const std::vector<int8_t> &Y, const int8_t C, size_t Length);
-
-	static void VectorMod3Shift(std::vector<int8_t> &Z, size_t ZOffset, size_t Length);
-
-	static void RqEncode(std::vector<byte> &C, const std::array<int16_t, NTRU_P> &F);
-
-	static void RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset);
-
-	static void RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C);
-
-	static int R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S);
-
-	static void VectorModqProduct(std::array<int16_t, NTRU_P> &Z, const std::vector<int16_t> &X, size_t XOffset, size_t Length, const int16_t C);
-
-	static void VectorModqMinusProduct(std::vector<int16_t> &Z, const std::vector<int16_t> &X, const std::vector<int16_t> &Y, size_t Length, const int16_t C);
-
-#if !defined(NTRU_SPRIME_SIMPLE)
-	static void VectorModqMinusProduct(std::vector<int16_t> &Z, size_t ZOffset, const std::vector<int16_t> &X, size_t XOffset, const std::vector<int16_t> &Y, size_t YOffset, size_t Length, const int16_t C);
-#endif
-
-	static void VectorModqShift(std::vector<int16_t> &Z, size_t ZOffset, size_t Length);
-
-	static int RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S);
+	static void Swap32(int32_t &X, int32_t &Y, int32_t Mask);
 
 	static int32_t Verify32(const std::vector<byte> &X, const std::vector<byte> &Y);
 };

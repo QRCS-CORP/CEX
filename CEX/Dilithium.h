@@ -19,20 +19,20 @@
 #ifndef CEX_DILITHIUM_H
 #define CEX_DILITHIUM_H
 
+#include "AsymmetricTransforms.h"
 #include "IAsymmetricSign.h"
 #include "IKdf.h"
-#include "DilithiumKeyPair.h"
+#include "AsymmetricKeyPair.h"
 #include "DilithiumParameters.h"
-#include "DilithiumPrivateKey.h"
-#include "DilithiumPublicKey.h"
+#include "AsymmetricKey.h"
+#include "AsymmetricKey.h"
 
 NAMESPACE_DILITHIUM
 
-using Kdf::IKdf;
-using Key::Asymmetric::DilithiumKeyPair;
+using Key::Asymmetric::AsymmetricKey;
+using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::DilithiumParameters;
-using Key::Asymmetric::DilithiumPrivateKey;
-using Key::Asymmetric::DilithiumPublicKey;
+using Kdf::IKdf;
 
 /// <summary>
 /// An implementation of the Dilithium asymmetric signature scheme
@@ -108,13 +108,12 @@ private:
 
 	bool m_isDestroyed;
 	bool m_destroyEngine;
+	DilithiumParameters m_dlmParameters;
 	bool m_isInitialized;
 	bool m_isSigner;
-	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
-	std::unique_ptr<DilithiumPrivateKey> m_privateKey;
-	std::unique_ptr<DilithiumPublicKey> m_publicKey;
+	std::unique_ptr<AsymmetricKey> m_privateKey;
+	std::unique_ptr<AsymmetricKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
-	DilithiumParameters m_dlmParameters;
 
 public:
 
@@ -191,14 +190,14 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	IAsymmetricKeyPair* Generate() override;
+	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
 	/// Initialize the signature scheme for signing (private key) or verifying (public key)
 	/// </summary>
 	/// 
 	/// <param name="Key">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
-	const void Initialize(IAsymmetricKey* Key) override;
+	const void Initialize(AsymmetricKey* Key) override;
 
 	/// <summary>
 	/// Sign a message array and return the message and attached signature

@@ -1,8 +1,15 @@
 #include "Dilithium.h"
+#include "AsymmetricEngines.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
 #include "DLMN256Q8380417.h"
 #include "PrngFromName.h"
 
 NAMESPACE_DILITHIUM
+
+using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
 
 const std::string Dilithium::CLASS_NAME = "Dilithium";
 
@@ -119,7 +126,7 @@ const size_t Dilithium::PublicKeySize()
 	return cparams.PublicKeySize;
 }
 
-IAsymmetricKeyPair* Dilithium::Generate()
+AsymmetricKeyPair* Dilithium::Generate()
 {
 	DLMN256Q8380417::DlmParams cparams = DLMN256Q8380417::GetParams(m_dlmParameters);
 	std::vector<byte> pk(cparams.PublicKeySize);
@@ -127,29 +134,33 @@ IAsymmetricKeyPair* Dilithium::Generate()
 
 	DLMN256Q8380417::Generate(pk, sk, m_rndGenerator, m_dlmParameters);
 
-	DilithiumPublicKey* apk = new DilithiumPublicKey(m_dlmParameters, pk);
-	DilithiumPrivateKey* ask = new DilithiumPrivateKey(m_dlmParameters, sk);
+	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_dlmParameters), pk);
+	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_dlmParameters), sk);
 
-	return new DilithiumKeyPair(ask, apk);
+	return new AsymmetricKeyPair(ask, apk);
 }
 
-const void Dilithium::Initialize(IAsymmetricKey* Key)
+const void Dilithium::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::Dilithium)
 	{
 		throw CryptoAsymmetricException("Dilithium:Initialize", "The key base type is invalid!");
 	}
-
-	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyType() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyType() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
-		m_publicKey = std::unique_ptr<DilithiumPublicKey>((DilithiumPublicKey*)Key);
-		m_dlmParameters = m_publicKey->Parameters();
+		throw CryptoAsymmetricException("Dilithium:Initialize", "The key type is invalid!");
+	}
+
+	if (Key->KeyType() == AsymmetricKeyTypes::SignaturePublicKey)
+	{
+		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_dlmParameters = static_cast<DilithiumParameters>(m_publicKey->Parameters());
 		m_isSigner = false;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<DilithiumPrivateKey>((DilithiumPrivateKey*)Key);
-		m_dlmParameters = m_privateKey->Parameters();
+		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_dlmParameters = static_cast<DilithiumParameters>(m_privateKey->Parameters());
 		m_isSigner = true;
 	}
 
@@ -178,7 +189,7 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 		Signature.resize(cparams.SignatureSize + Message.size());
 	}
 
-	DLMN256Q8380417::Sign(Signature, Message, m_privateKey->R(), m_rndGenerator, m_dlmParameters);
+	DLMN256Q8380417::Sign(Signature, Message, m_privateKey->P(), m_rndGenerator, m_dlmParameters);
 
 	return Signature.size();
 }

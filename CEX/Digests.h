@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Cryptographic hash functions enmumeration names
+/// Cryptographic hash functions enumeration names
 /// </summary>
 enum class Digests : byte
 {

@@ -20,20 +20,20 @@
 #define CEX_IASYMMETRICCIPHER_H
 
 #include "CexDomain.h"
+#include "AsymmetricKey.h"
+#include "AsymmetricKeyPair.h"
 #include "CryptoAsymmetricException.h"
 #include "CryptoAuthenticationFailure.h"
-#include "IAsymmetricKey.h"
-#include "IAsymmetricKeyPair.h"
 #include "IPrng.h"
 #include "Prngs.h"
 
 NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricEngines;
+using Key::Asymmetric::AsymmetricKey;
+using Key::Asymmetric::AsymmetricKeyPair;
 using Exception::CryptoAsymmetricException;
 using Exception::CryptoAuthenticationFailure;
-using Key::Asymmetric::IAsymmetricKey;
-using Key::Asymmetric::IAsymmetricKeyPair;
 using Prng::IPrng;
 using Enumeration::Prngs;
 
@@ -124,7 +124,7 @@ public:
 	/// <summary>
 	/// Generate a public/private key-pair
 	/// </summary>
-	virtual IAsymmetricKeyPair* Generate() = 0;
+	virtual AsymmetricKeyPair* Generate() = 0;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -133,7 +133,7 @@ public:
 	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	virtual void Initialize(IAsymmetricKey* Key) = 0;
+	virtual void Initialize(AsymmetricKey* Key) = 0;
 };
 
 NAMESPACE_ASYMMETRICEND

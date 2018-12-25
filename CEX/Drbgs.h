@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Pseudo Random Generator enmumeration names
+/// Pseudo Random Generator enumeration names
 /// </summary>
 enum class Drbgs : byte
 {

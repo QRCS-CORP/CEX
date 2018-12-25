@@ -1,10 +1,8 @@
 #include "NTRUTest.h"
+#include "../CEX/AsymmetricKey.h"
+#include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/CryptoAuthenticationFailure.h"
-#include "../CEX/IAsymmetricKeyPair.h"
 #include "../CEX/NTRU.h"
-#include "../CEX/NTRUKeyPair.h"
-#include "../CEX/NTRUPrivateKey.h"
-#include "../CEX/NTRUPublicKey.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/SecureRandom.h"
 
@@ -12,6 +10,7 @@ namespace Test
 {
 	using namespace Key::Asymmetric;
 	using namespace Cipher::Asymmetric::NTRU;
+	using Enumeration::NTRUParameters;
 
 	const std::string NTRUTest::DESCRIPTION = "NTRU key generation, encryption, and decryption tests..";
 	const std::string NTRUTest::FAILURE = "FAILURE! ";
@@ -75,8 +74,8 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// test param 1: NTRUS1LQ4591N761
-		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp1 = cpr1.Generate();
+		NTRU cpr1(NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
+		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, sec1);
@@ -100,8 +99,8 @@ namespace Test
 		delete kp1;
 
 		// test param 2: NTRUS2SQ4591N761
-		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+		NTRU cpr2(NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
+		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, sec1);
@@ -124,8 +123,8 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// test param 1: NTRUS1LQ4591N761
-		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp1 = cpr1.Generate();
+		NTRU cpr1(NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
+		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, sec1);
@@ -149,8 +148,8 @@ namespace Test
 		delete kp1;
 
 		// test param 2: NTRUS2SQ4591N761
-		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+		NTRU cpr2(NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
+		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, sec1);
@@ -173,7 +172,7 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			NTRU cpr(Enumeration::NTRUParameters::None, m_rngPtr);
+			NTRU cpr(NTRUParameters::None, m_rngPtr);
 
 			throw TestException(std::string("NTRU"), std::string("Exception handling failure! -NE1"));
 		}
@@ -187,7 +186,7 @@ namespace Test
 
 		try
 		{
-			NTRU cpr(Enumeration::NTRUParameters::None, Enumeration::Prngs::None);
+			NTRU cpr(NTRUParameters::None, Enumeration::Prngs::None);
 
 			throw TestException(std::string("NTRU"), std::string("Exception handling failure! -NE2"));
 		}
@@ -202,10 +201,10 @@ namespace Test
 		// test initialization
 		try
 		{
-			NTRU cpra(Enumeration::NTRUParameters::None, Enumeration::Prngs::BCR);
+			NTRU cpra(NTRUParameters::None, Enumeration::Prngs::BCR);
 			Cipher::Asymmetric::RLWE::RingLWE cprb;
 			// create an invalid key set
-			IAsymmetricKeyPair* kp = cprb.Generate();
+			AsymmetricKeyPair* kp = cprb.Generate();
 			cpra.Initialize(kp->PrivateKey());
 
 			throw TestException(std::string("NTRU"), std::string("Exception handling failure! -NE3"));
@@ -226,14 +225,14 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// test param 1: NTRUS1LQ4591N761
-		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp1 = cpr1.Generate();
+		NTRU cpr1(NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
+		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
-		std::vector<byte> p1 = ((NTRUPublicKey*)kp1->PublicKey())->P();
+		std::vector<byte> p1 = kp1->PublicKey()->P();
 		p1[0] += 1;
 		p1[1] += 1;
-		NTRUPublicKey* pk1 = new NTRUPublicKey(Enumeration::NTRUParameters::NTRUS1LQ4591N761, p1);
+		AsymmetricKey* pk1 = new AsymmetricKey(AsymmetricEngines::NTRU, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(NTRUParameters::NTRUS1LQ4591N761), p1);
 		cpr1.Initialize(pk1);
 		cpr1.Encapsulate(cpt, sec1);
 
@@ -253,14 +252,14 @@ namespace Test
 		delete kp1;
 
 		// test param 2: NTRUS2SQ4591N761
-		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+		NTRU cpr2(NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
+		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
-		std::vector<byte> p2 = ((NTRUPublicKey*)kp2->PublicKey())->P();
+		std::vector<byte> p2 = kp2->PublicKey()->P();
 		p2[0] += 1;
 		p2[1] += 1;
-		NTRUPublicKey* pk2 = new NTRUPublicKey(Enumeration::NTRUParameters::NTRUS2SQ4591N761, p2);
+		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::NTRU, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(NTRUParameters::NTRUS2SQ4591N761), p2);
 		cpr2.Initialize(pk2);
 		cpr2.Encapsulate(cpt, sec1);
 
@@ -279,23 +278,23 @@ namespace Test
 		std::vector<byte> skey(0);
 
 		// test param 1: NTRUS1LQ4591N761
-		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
+		NTRU cpr1(NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr1.Generate();
-			NTRUPrivateKey* priK1 = (NTRUPrivateKey*)kp->PrivateKey();
+			AsymmetricKeyPair* kp = cpr1.Generate();
+			AsymmetricKey* priK1 = kp->PrivateKey();
 			skey = priK1->ToBytes();
-			NTRUPrivateKey priK2(skey);
+			AsymmetricKey priK2(skey);
 
-			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 			{
 				throw TestException(std::string("NTRU"), std::string("Private key serialization test has failed! -NR1"));
 			}
 
-			NTRUPublicKey* pubK1 = (NTRUPublicKey*)kp->PublicKey();
+			AsymmetricKey* pubK1 = kp->PublicKey();
 			skey = pubK1->ToBytes();
-			NTRUPublicKey pubK2(skey);
+			AsymmetricKey pubK2(skey);
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
@@ -307,23 +306,23 @@ namespace Test
 		skey.resize(0);
 
 		// test param 2: NTRUS2SQ4591N761
-		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
+		NTRU cpr2(NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr2.Generate();
-			NTRUPrivateKey* priK1 = (NTRUPrivateKey*)kp->PrivateKey();
+			AsymmetricKeyPair* kp = cpr2.Generate();
+			AsymmetricKey* priK1 = kp->PrivateKey();
 			skey = priK1->ToBytes();
-			NTRUPrivateKey priK2(skey);
+			AsymmetricKey priK2(skey);
 
-			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 			{
 				throw TestException(std::string("NTRU"), std::string("Private key serialization test has failed! -NR3"));
 			}
 
-			NTRUPublicKey* pubK1 = (NTRUPublicKey*)kp->PublicKey();
+			AsymmetricKey* pubK1 = kp->PublicKey();
 			skey = pubK1->ToBytes();
-			NTRUPublicKey pubK2(skey);
+			AsymmetricKey pubK2(skey);
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
@@ -340,12 +339,12 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// test param 1: NTRUS1LQ4591N761
-		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
+		NTRU cpr1(NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
 			m_rngPtr->Generate(sec1);
-			IAsymmetricKeyPair* kp = cpr1.Generate();
+			AsymmetricKeyPair* kp = cpr1.Generate();
 
 			cpr1.Initialize(kp->PublicKey());
 			cpr1.Encapsulate(cpt, sec1);
@@ -373,12 +372,12 @@ namespace Test
 		sec2.resize(64);
 
 		// test param 2: NTRUS2SQ4591N761
-		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
+		NTRU cpr2(NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
 			m_rngPtr->Generate(sec1);
-			IAsymmetricKeyPair* kp = cpr2.Generate();
+			AsymmetricKeyPair* kp = cpr2.Generate();
 
 			cpr2.Initialize(kp->PublicKey());
 			cpr2.Encapsulate(cpt, sec1);

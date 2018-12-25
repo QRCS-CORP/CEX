@@ -20,18 +20,16 @@
 #define CEX_RINGLWE_H
 
 #include "CexDomain.h"
+#include "AsymmetricKey.h"
+#include "AsymmetricKeyPair.h"
 #include "IAsymmetricCipher.h"
-#include "RLWEKeyPair.h"
 #include "RLWEParameters.h"
-#include "RLWEPrivateKey.h"
-#include "RLWEPublicKey.h"
 
 NAMESPACE_RINGLWE
 
-using Key::Asymmetric::RLWEKeyPair;
+using Key::Asymmetric::AsymmetricKey;
+using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::RLWEParameters;
-using Key::Asymmetric::RLWEPrivateKey;
-using Key::Asymmetric::RLWEPublicKey;
 
 /// <summary>
 /// An implementation of the Ring Learning With Errors asymmetric cipher (RingLWE)
@@ -112,9 +110,8 @@ private:
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
-	std::unique_ptr<RLWEPrivateKey> m_privateKey;
-	std::unique_ptr<RLWEPublicKey> m_publicKey;
+	std::unique_ptr<AsymmetricKey> m_privateKey;
+	std::unique_ptr<AsymmetricKey> m_publicKey;
 	RLWEParameters m_rlweParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
@@ -221,7 +218,7 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	IAsymmetricKeyPair* Generate() override;
+	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -230,7 +227,7 @@ public:
 	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(IAsymmetricKey* Key) override;
+	void Initialize(AsymmetricKey* Key) override;
 
 private:
 

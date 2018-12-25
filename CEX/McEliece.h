@@ -20,18 +20,16 @@
 #define CEX_MCELIECE_H
 
 #include "CexDomain.h"
+#include "AsymmetricKey.h"
+#include "AsymmetricKeyPair.h"
 #include "IAsymmetricCipher.h"
-#include "MPKCKeyPair.h"
 #include "MPKCParameters.h"
-#include "MPKCPrivateKey.h"
-#include "MPKCPublicKey.h"
 
 NAMESPACE_MCELIECE
 
-using Key::Asymmetric::MPKCKeyPair;
+using Key::Asymmetric::AsymmetricKey;
+using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::MPKCParameters;
-using Key::Asymmetric::MPKCPrivateKey;
-using Key::Asymmetric::MPKCPublicKey;
 
 /// <summary>
 /// An implementation of the Niederreiter dual form of the McEliece public key crypto-system
@@ -111,8 +109,8 @@ private:
 	bool m_isEncryption;
 	bool m_isInitialized;
 	MPKCParameters m_mpkcParameters;
-	std::unique_ptr<MPKCPrivateKey> m_privateKey;
-	std::unique_ptr<MPKCPublicKey> m_publicKey;
+	std::unique_ptr<AsymmetricKey> m_privateKey;
+	std::unique_ptr<AsymmetricKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -218,7 +216,7 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	IAsymmetricKeyPair* Generate() override;
+	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -227,7 +225,7 @@ public:
 	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(IAsymmetricKey* Key) override;
+	void Initialize(AsymmetricKey* Key) override;
 };
 
 NAMESPACE_MCELIECEEND

@@ -24,20 +24,20 @@ const std::string PKCS7::Name()
 
 size_t PKCS7::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
-	if (Offset > Input.size())
+	byte code;
+
+	if (Offset != Input.size())
 	{
-		throw CryptoPaddingException("PKCS7:AddPadding", "The padding offset value is longer than the array length!");
+		code = static_cast<byte>(Input.size() - Offset);
+
+		while (Offset < Input.size())
+		{
+			Input[Offset] = code;
+			++Offset;
+		}
 	}
 
-	byte code = static_cast<byte>(Input.size() - Offset);
-
-	while (Offset < Input.size())
-	{
-		Input[Offset] = code;
-		++Offset;
-	}
-
-	return code;
+	return static_cast<size_t>(code);
 }
 
 size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input)
@@ -45,8 +45,11 @@ size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input)
 	// note: even with the check, if the last decrypted byte is equal to 1,
 	// pkcs will see this last data byte as indicating a single byte of padding and return 1.. (unavoidable)
 	// If an input does not need padding, mark the corresponding padding flag (in ex. CipherDescription) to None
-	size_t len = Input.size() - 1;
-	byte code = Input[len];
+	size_t len;
+	byte code;
+
+	len = Input.size() - 1;
+	code = Input[len];
 
 	if (static_cast<int>(code) > len)
 	{
@@ -70,8 +73,11 @@ size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input)
 
 size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	size_t len = Input.size() - (Offset + 1);
-	byte code = Input[Input.size() - 1];
+	size_t len;
+	byte code;
+
+	len = Input.size() - (Offset + 1);
+	code = Input[Input.size() - 1];
 
 	if (static_cast<int>(code) > len)
 	{

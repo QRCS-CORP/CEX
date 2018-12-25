@@ -61,11 +61,16 @@ namespace Test
 		try
 		{
 			EAX* cpr1 = new EAX(Enumeration::BlockCiphers::Rijndael);
-
-			for (size_t i = 0; i < EAX_TESTSIZE; ++i)
-			{
-				Kat(cpr1, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
-			}
+			Kat(cpr1, m_key[0], m_nonce[0], m_associatedText[0], m_plainText[0], m_cipherText[0], m_expectedCode[0]);
+			Kat(cpr1, m_key[1], m_nonce[1], m_associatedText[1], m_plainText[1], m_cipherText[1], m_expectedCode[1]);
+			Kat(cpr1, m_key[2], m_nonce[2], m_associatedText[2], m_plainText[2], m_cipherText[2], m_expectedCode[2]);
+			Kat(cpr1, m_key[3], m_nonce[3], m_associatedText[3], m_plainText[3], m_cipherText[3], m_expectedCode[3]);
+			Kat(cpr1, m_key[4], m_nonce[4], m_associatedText[4], m_plainText[4], m_cipherText[4], m_expectedCode[4]);
+			Kat(cpr1, m_key[5], m_nonce[5], m_associatedText[5], m_plainText[5], m_cipherText[5], m_expectedCode[5]);
+			Kat(cpr1, m_key[6], m_nonce[6], m_associatedText[6], m_plainText[6], m_cipherText[6], m_expectedCode[6]);
+			Kat(cpr1, m_key[7], m_nonce[7], m_associatedText[7], m_plainText[7], m_cipherText[7], m_expectedCode[7]);
+			Kat(cpr1, m_key[8], m_nonce[8], m_associatedText[8], m_plainText[8], m_cipherText[8], m_expectedCode[8]);
+			Kat(cpr1, m_key[9], m_nonce[9], m_associatedText[9], m_plainText[9], m_cipherText[9], m_expectedCode[9]);
 			OnProgress(std::string("AeadTest: Passed EAX known answer comparison tests.."));
 
 			Stress(cpr1);
@@ -80,11 +85,22 @@ namespace Test
 			delete cpr1;
 
 			OCB* cpr2 = new OCB(Enumeration::BlockCiphers::Rijndael);
-
-			for (size_t i = EAX_TESTSIZE; i < EAX_TESTSIZE + OCB_TESTSIZE; ++i)
-			{
-				Kat(cpr2, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
-			}
+			Kat(cpr2, m_key[10], m_nonce[10], m_associatedText[10], m_plainText[10], m_cipherText[10], m_expectedCode[10]);
+			Kat(cpr2, m_key[11], m_nonce[11], m_associatedText[11], m_plainText[11], m_cipherText[11], m_expectedCode[11]);
+			Kat(cpr2, m_key[12], m_nonce[12], m_associatedText[12], m_plainText[12], m_cipherText[12], m_expectedCode[12]);
+			Kat(cpr2, m_key[13], m_nonce[13], m_associatedText[13], m_plainText[13], m_cipherText[13], m_expectedCode[13]);
+			Kat(cpr2, m_key[14], m_nonce[14], m_associatedText[14], m_plainText[14], m_cipherText[14], m_expectedCode[14]);
+			Kat(cpr2, m_key[15], m_nonce[15], m_associatedText[15], m_plainText[15], m_cipherText[15], m_expectedCode[15]);
+			Kat(cpr2, m_key[16], m_nonce[16], m_associatedText[16], m_plainText[16], m_cipherText[16], m_expectedCode[16]);
+			Kat(cpr2, m_key[17], m_nonce[17], m_associatedText[17], m_plainText[17], m_cipherText[17], m_expectedCode[17]);
+			Kat(cpr2, m_key[18], m_nonce[18], m_associatedText[18], m_plainText[18], m_cipherText[18], m_expectedCode[18]);
+			Kat(cpr2, m_key[19], m_nonce[19], m_associatedText[19], m_plainText[19], m_cipherText[19], m_expectedCode[19]);
+			Kat(cpr2, m_key[20], m_nonce[20], m_associatedText[20], m_plainText[20], m_cipherText[20], m_expectedCode[20]);
+			Kat(cpr2, m_key[21], m_nonce[21], m_associatedText[21], m_plainText[21], m_cipherText[21], m_expectedCode[21]);
+			Kat(cpr2, m_key[22], m_nonce[22], m_associatedText[22], m_plainText[22], m_cipherText[22], m_expectedCode[22]);
+			Kat(cpr2, m_key[23], m_nonce[23], m_associatedText[23], m_plainText[23], m_cipherText[23], m_expectedCode[23]);
+			Kat(cpr2, m_key[24], m_nonce[24], m_associatedText[24], m_plainText[24], m_cipherText[24], m_expectedCode[24]);
+			Kat(cpr2, m_key[25], m_nonce[25], m_associatedText[25], m_plainText[25], m_cipherText[25], m_expectedCode[25]);
 			OnProgress(std::string("AeadTest: Passed OCB known answer comparison tests.."));
 
 			Stress(cpr2);
@@ -99,11 +115,24 @@ namespace Test
 			delete cpr2;
 
 			GCM* cpr3 = new GCM(Enumeration::BlockCiphers::Rijndael);
-
-			for (size_t i = EAX_TESTSIZE + OCB_TESTSIZE; i < EAX_TESTSIZE + OCB_TESTSIZE + GCM_TESTSIZE; ++i)
-			{
-				Kat(cpr3, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
-			}
+			Kat(cpr3, m_key[26], m_nonce[26], m_associatedText[26], m_plainText[26], m_cipherText[26], m_expectedCode[26]);
+			Kat(cpr3, m_key[27], m_nonce[27], m_associatedText[27], m_plainText[27], m_cipherText[27], m_expectedCode[27]);
+			Kat(cpr3, m_key[28], m_nonce[28], m_associatedText[28], m_plainText[28], m_cipherText[28], m_expectedCode[28]);
+			Kat(cpr3, m_key[29], m_nonce[29], m_associatedText[29], m_plainText[29], m_cipherText[29], m_expectedCode[29]);
+			Kat(cpr3, m_key[30], m_nonce[30], m_associatedText[30], m_plainText[30], m_cipherText[30], m_expectedCode[30]);
+			Kat(cpr3, m_key[31], m_nonce[31], m_associatedText[31], m_plainText[31], m_cipherText[31], m_expectedCode[31]);
+			Kat(cpr3, m_key[32], m_nonce[32], m_associatedText[32], m_plainText[32], m_cipherText[32], m_expectedCode[32]);
+			Kat(cpr3, m_key[33], m_nonce[33], m_associatedText[33], m_plainText[33], m_cipherText[33], m_expectedCode[33]);
+			Kat(cpr3, m_key[34], m_nonce[34], m_associatedText[34], m_plainText[34], m_cipherText[34], m_expectedCode[34]);
+			Kat(cpr3, m_key[35], m_nonce[35], m_associatedText[35], m_plainText[35], m_cipherText[35], m_expectedCode[35]);
+			Kat(cpr3, m_key[36], m_nonce[36], m_associatedText[36], m_plainText[36], m_cipherText[36], m_expectedCode[36]);
+			Kat(cpr3, m_key[37], m_nonce[37], m_associatedText[37], m_plainText[37], m_cipherText[37], m_expectedCode[37]);
+			Kat(cpr3, m_key[38], m_nonce[38], m_associatedText[38], m_plainText[38], m_cipherText[38], m_expectedCode[38]);
+			Kat(cpr3, m_key[39], m_nonce[39], m_associatedText[39], m_plainText[39], m_cipherText[39], m_expectedCode[39]);
+			Kat(cpr3, m_key[40], m_nonce[40], m_associatedText[40], m_plainText[40], m_cipherText[40], m_expectedCode[40]);
+			Kat(cpr3, m_key[41], m_nonce[41], m_associatedText[41], m_plainText[41], m_cipherText[41], m_expectedCode[41]);
+			Kat(cpr3, m_key[42], m_nonce[42], m_associatedText[42], m_plainText[42], m_cipherText[42], m_expectedCode[42]);
+			Kat(cpr3, m_key[43], m_nonce[43], m_associatedText[43], m_plainText[43], m_cipherText[43], m_expectedCode[43]);
 			OnProgress(std::string("AeadTest: Passed GCM known answer comparison tests.."));
 
 			Stress(cpr3);

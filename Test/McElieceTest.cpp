@@ -1,9 +1,7 @@
 #include "McElieceTest.h"
-#include "../CEX/IAsymmetricKeyPair.h"
+#include "../CEX/AsymmetricKey.h"
+#include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/McEliece.h"
-#include "../CEX/MPKCKeyPair.h"
-#include "../CEX/MPKCPrivateKey.h"
-#include "../CEX/MPKCPublicKey.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/RHX.h"
 
@@ -11,6 +9,7 @@ namespace Test
 {
 	using namespace Key::Asymmetric;
 	using namespace Cipher::Asymmetric::MPKC;
+	using Enumeration::MPKCParameters;
 
 	const std::string McElieceTest::DESCRIPTION = "McEliece key generation, encryption, and decryption tests.";
 	const std::string McElieceTest::FAILURE = "FAILURE! ";
@@ -73,8 +72,8 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 
-		McEliece cpr(Enumeration::MPKCParameters::MPKCS1M12T62, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		McEliece cpr(MPKCParameters::MPKCS1M12T62, m_rngPtr);
+		AsymmetricKeyPair* kp = cpr.Generate();
 
 		cpr.Initialize(kp->PublicKey());
 		cpr.Encapsulate(cpt, sec1);
@@ -98,8 +97,8 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		McEliece cpr(Enumeration::MPKCParameters::MPKCS1M12T62, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		McEliece cpr(MPKCParameters::MPKCS1M12T62, m_rngPtr);
+		AsymmetricKeyPair* kp = cpr.Generate();
 
 		cpr.Initialize(kp->PublicKey());
 		cpr.Encapsulate(cpt, sec1);
@@ -122,7 +121,7 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			McEliece cpr(Enumeration::MPKCParameters::None, m_rngPtr);
+			McEliece cpr(MPKCParameters::None, m_rngPtr);
 
 			throw TestException(std::string("McEliece"), std::string("Exception handling failure! -ME1"));
 		}
@@ -136,7 +135,7 @@ namespace Test
 
 		try
 		{
-			McEliece cpr(Enumeration::MPKCParameters::MPKCS1M12T62, Enumeration::Prngs::None);
+			McEliece cpr(MPKCParameters::MPKCS1M12T62, Enumeration::Prngs::None);
 
 			throw TestException(std::string("McEliece"), std::string("Exception handling failure! -ME2"));
 		}
@@ -151,10 +150,10 @@ namespace Test
 		// test initialization
 		try
 		{
-			McEliece cpra(Enumeration::MPKCParameters::MPKCS1M12T62, Enumeration::Prngs::BCR);
+			McEliece cpra(MPKCParameters::MPKCS1M12T62, Enumeration::Prngs::BCR);
 			Cipher::Asymmetric::RLWE::RingLWE cprb;
 			// create an invalid key set
-			IAsymmetricKeyPair* kp = cprb.Generate();
+			AsymmetricKeyPair* kp = cprb.Generate();
 			cpra.Initialize(kp->PrivateKey());
 
 			throw TestException(std::string("McEliece"), std::string("Exception handling failure! -ME3"));
@@ -174,15 +173,15 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		McEliece cpr(Enumeration::MPKCParameters::MPKCS1M12T62, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		McEliece cpr(MPKCParameters::MPKCS1M12T62, m_rngPtr);
+		AsymmetricKeyPair* kp = cpr.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = ((MPKCPublicKey*)kp->PublicKey())->P();
+		std::vector<byte> pk1 = kp->PublicKey()->P();
 		pk1[0] += 1;
 		pk1[1] += 1;
 
-		MPKCPublicKey* pk2 = new MPKCPublicKey(Enumeration::MPKCParameters::MPKCS1M12T62, pk1);
+		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MPKCParameters::MPKCS1M12T62), pk1);
 		cpr.Initialize(pk2);
 		cpr.Encapsulate(cpt, sec1);
 
@@ -201,20 +200,20 @@ namespace Test
 		std::vector<byte> pkey;
 		std::vector<byte> skey;
 
-		McEliece cpr(Enumeration::MPKCParameters::MPKCS1M12T62, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
-		MPKCPrivateKey* priK1 = (MPKCPrivateKey*)kp->PrivateKey();
+		McEliece cpr(MPKCParameters::MPKCS1M12T62, m_rngPtr);
+		AsymmetricKeyPair* kp = cpr.Generate();
+		AsymmetricKey* priK1 = kp->PrivateKey();
 		skey = priK1->ToBytes();
-		MPKCPrivateKey priK2(skey);
+		AsymmetricKey priK2(skey);
 
-		if (priK1->S() != priK2.S() || priK1->Parameters() != priK2.Parameters())
+		if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 		{
 			throw TestException(std::string("McEliece"), std::string("Private key serialization test has failed! -MR1"));
 		}
 
-		MPKCPublicKey* pubK1 = (MPKCPublicKey*)kp->PublicKey();
+		AsymmetricKey* pubK1 = kp->PublicKey();
 		pkey = pubK1->ToBytes();
-		MPKCPublicKey pubK2(pkey);
+		AsymmetricKey pubK2(pkey);
 
 		if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 		{
@@ -231,12 +230,12 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
-		McEliece cpr(Enumeration::MPKCParameters::MPKCS1M12T62, m_rngPtr);
+		McEliece cpr(MPKCParameters::MPKCS1M12T62, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 			m_rngPtr->Generate(sec1);
-			IAsymmetricKeyPair* kp = cpr.Generate();
+			AsymmetricKeyPair* kp = cpr.Generate();
 			cpr.Initialize(kp->PublicKey());
 			cpr.Encapsulate(cpt, sec1);
 

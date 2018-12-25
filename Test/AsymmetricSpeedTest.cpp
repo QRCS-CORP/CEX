@@ -1,32 +1,23 @@
 #include "AsymmetricSpeedTest.h"
+#include "../CEX/AsymmetricKey.h"
+#include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/BlockCipherFromName.h"
 #include "../CEX/DigestFromName.h"
 #include "../CEX/Dilithium.h"
-#include "../CEX/DilithiumKeyPair.h"
-#include "../CEX/IAsymmetricKeyPair.h"
 #include "../CEX/McEliece.h"
-#include "../CEX/MPKCKeyPair.h"
 #include "../CEX/ModuleLWE.h"
-#include "../CEX/MLWEKeyPair.h"
 #include "../CEX/NTRU.h"
-#include "../CEX/NTRUKeyPair.h"
 #include "../CEX/PrngFromName.h"
 #include "../CEX/RingLWE.h"
-#include "../CEX/RLWEKeyPair.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SHAKE.h"
 #include "../CEX/Sphincs.h"
-#include "../CEX/SphincsKeyPair.h"
 
 namespace Test
 {
+	using Key::Asymmetric::AsymmetricKey;
+	using Key::Asymmetric::AsymmetricKeyPair;
 	using Cipher::Asymmetric::Sign::DLM::Dilithium;
-	using Key::Asymmetric::DilithiumKeyPair;
-	using Key::Asymmetric::IAsymmetricKeyPair;
-	using Key::Asymmetric::MLWEKeyPair;
-	using Key::Asymmetric::MPKCKeyPair;
-	using Key::Asymmetric::NTRUKeyPair;
-	using Key::Asymmetric::RLWEKeyPair;
 	using Cipher::Asymmetric::MPKC::McEliece;
 	using Cipher::Asymmetric::MLWE::ModuleLWE;
 	using Cipher::Asymmetric::NTRU::NTRU;
@@ -35,7 +26,6 @@ namespace Test
 	using Cipher::Asymmetric::RLWE::RingLWE;
 	using Kdf::SHAKE;
 	using Cipher::Asymmetric::Sign::SPX::Sphincs;
-	using Key::Asymmetric::SphincsKeyPair;
 
 	const std::string AsymmetricSpeedTest::DESCRIPTION = "Asymmetric Cipher and Signature Scheme Speed Tests.";
 	const std::string AsymmetricSpeedTest::FAILURE = "FAILURE! ";
@@ -153,7 +143,7 @@ namespace Test
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			DilithiumKeyPair* kp = reinterpret_cast<DilithiumKeyPair*>(asySgn.Generate());
+			AsymmetricKeyPair* kp = asySgn.Generate();
 			delete kp;
 		}
 
@@ -173,7 +163,7 @@ namespace Test
 		std::vector<byte> msg(32);
 		std::vector<byte> sig(0);
 		Dilithium asySgn(Params, PrngType);
-		DilithiumKeyPair* kp = reinterpret_cast<DilithiumKeyPair*>(asySgn.Generate());
+		AsymmetricKeyPair* kp = asySgn.Generate();
 		asySgn.Initialize(kp->PrivateKey());
 
 		uint64_t start = TestUtils::GetTimeMs64();
@@ -200,7 +190,7 @@ namespace Test
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 		Dilithium asySgn(Params, PrngType);
-		DilithiumKeyPair* kp = reinterpret_cast<DilithiumKeyPair*>(asySgn.Generate());
+		AsymmetricKeyPair* kp = asySgn.Generate();
 		asySgn.Initialize(kp->PrivateKey());
 		asySgn.Sign(msg1, sig);
 		asySgn.Initialize(kp->PublicKey());
@@ -229,7 +219,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 		ModuleLWE asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -261,7 +251,7 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
 		ModuleLWE asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -293,7 +283,7 @@ namespace Test
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			MLWEKeyPair* kp = reinterpret_cast<MLWEKeyPair*>(asyCpr.Generate());
+			AsymmetricKeyPair* kp = asyCpr.Generate();
 			delete kp;
 		}
 
@@ -314,7 +304,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 		McEliece asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -346,7 +336,7 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
 		McEliece asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -378,7 +368,7 @@ namespace Test
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			MPKCKeyPair* kp = reinterpret_cast<MPKCKeyPair*>(asyCpr.Generate());
+			AsymmetricKeyPair* kp = asyCpr.Generate();
 			delete kp;
 		}
 
@@ -399,7 +389,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 		NTRU asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -431,7 +421,7 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
 		NTRU asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -463,7 +453,7 @@ namespace Test
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			NTRUKeyPair* kp = reinterpret_cast<NTRUKeyPair*>(asyCpr.Generate());
+			AsymmetricKeyPair* kp = asyCpr.Generate();
 			delete kp;
 		}
 
@@ -484,7 +474,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 		RingLWE asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -516,7 +506,7 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
 		RingLWE asyCpr(Params, PrngType);
-		IAsymmetricKeyPair* kp;
+		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(kp->PublicKey());
@@ -548,7 +538,7 @@ namespace Test
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			RLWEKeyPair* kp = reinterpret_cast<RLWEKeyPair*>(asyCpr.Generate());
+			AsymmetricKeyPair* kp = asyCpr.Generate();
 			delete kp;
 		}
 
@@ -571,7 +561,7 @@ namespace Test
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			SphincsKeyPair* kp = reinterpret_cast<SphincsKeyPair*>(asySgn.Generate());
+			AsymmetricKeyPair* kp = asySgn.Generate();
 			delete kp;
 		}
 
@@ -591,7 +581,7 @@ namespace Test
 		std::vector<byte> msg(32, 0x80);
 		std::vector<byte> sig(0);
 		Sphincs asySgn(Params, PrngType);
-		SphincsKeyPair* kp = reinterpret_cast<SphincsKeyPair*>(asySgn.Generate());
+		AsymmetricKeyPair* kp = asySgn.Generate();
 		asySgn.Initialize(kp->PrivateKey());
 
 		uint64_t start = TestUtils::GetTimeMs64();
@@ -622,7 +612,7 @@ namespace Test
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 		Sphincs asySgn(Params, PrngType);
-		SphincsKeyPair* kp = reinterpret_cast<SphincsKeyPair*>(asySgn.Generate());
+		AsymmetricKeyPair* kp = asySgn.Generate();
 		asySgn.Initialize(kp->PrivateKey());
 		asySgn.Sign(msg1, sig);
 		asySgn.Initialize(kp->PublicKey());

@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Message Authentication Code generator enmumeration names
+/// Message Authentication Code generator enumeration names
 /// </summary>
 enum class Macs : byte
 {

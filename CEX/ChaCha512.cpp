@@ -51,6 +51,7 @@ ChaCha512::ChaCha512(StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new ChaCha512State),
+	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -59,6 +60,7 @@ ChaCha512::ChaCha512(StreamAuthenticators AuthenticatorType)
 		Helper::MacFromName::GetInstance(AuthenticatorType)),
 	m_macCounter(0),
 	m_macKey(nullptr),
+	m_macTag(0),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 }
@@ -68,6 +70,7 @@ ChaCha512::~ChaCha512()
 	if (!m_isDestroyed)
 	{
 		m_authenticatorType = StreamAuthenticators::None;
+		m_isAuthenticated = false;
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
@@ -89,6 +92,7 @@ ChaCha512::~ChaCha512()
 		}
 
 		IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearVector(m_macTag);
 	}
 }
 
@@ -107,6 +111,11 @@ const size_t ChaCha512::DistributionCodeMax()
 const StreamCiphers ChaCha512::Enumeral()
 {
 	return StreamCiphers::ChaCha512;
+}
+
+const bool ChaCha512::IsAuthenticator()
+{
+	return m_isAuthenticated;
 }
 
 const bool ChaCha512::IsInitialized()
@@ -176,6 +185,11 @@ ParallelOptions &ChaCha512::ParallelProfile()
 	return m_parallelProfile;
 }
 
+const std::vector<byte> &ChaCha512::Tag()
+{
+	return m_macTag;
+}
+
 const size_t ChaCha512::TagSize()
 {
 	return m_macAuthenticator != nullptr ? m_macAuthenticator->MacSize() : 0;
@@ -196,42 +210,6 @@ void ChaCha512::Authenticator(StreamAuthenticators AuthenticatorType)
 	}
 
 	m_authenticatorType = AuthenticatorType;
-}
-
-void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
-{
-	if (!m_isInitialized)
-	{
-		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The cipher has not been initialized!");
-	}
-	if (m_macAuthenticator == nullptr)
-	{
-		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The cipher has not been configured for authentication!");
-	}
-	if (Length > m_macAuthenticator->MacSize())
-	{
-		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The MAC code specified is longer than the maximum length!");
-	}
-
-	// generate the mac code
-	std::vector<byte> code(m_macAuthenticator->MacSize());
-	m_macAuthenticator->Finalize(code, 0);
-	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
-
-	// customization string is CSX512+counter
-	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
-	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
-	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
-
-	// extract the new mac key
-	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-	Kdf::SHAKE gen(ShakeModes::SHAKE512);
-	gen.Initialize(m_macKey->Key(), cst);
-	gen.Generate(mk);
-
-	// reset the generator with the new key
-	m_macKey.reset(new SymmetricSecureKey(mk));
-	m_macAuthenticator->Initialize(*m_macKey.get());
 }
 
 void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -304,31 +282,12 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void ChaCha512::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException("ChaCha512:ParallelMaxDegree", "Parallel degree can not be zero!");
-	}
-	if (Degree % 2 != 0)
-	{
-		throw CryptoSymmetricCipherException("ChaCha512:ParallelMaxDegree", "Parallel degree must be an even number!");
-	}
-	if (Degree > m_parallelProfile.ProcessorCount())
-	{
-		throw CryptoSymmetricCipherException("ChaCha512:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+		throw CryptoSymmetricCipherException("ChaCha512:ParallelMaxDegree", "Degree setting is invalid!");
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
-}
-
-void ChaCha512::Reset()
-{
-	if (m_macAuthenticator != nullptr)
-	{
-		m_macAuthenticator->Reset();
-	}
-
-	m_isInitialized = false;
-	m_cipherState->Reset();
 }
 
 void ChaCha512::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
@@ -344,16 +303,6 @@ void ChaCha512::SetAssociatedData(const std::vector<byte> &Input, const size_t O
 
 	// update the authenticator
 	m_macAuthenticator->Update(Input, Offset, Length);
-}
-
-void ChaCha512::TransformBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	Process(Input, 0, Output, 0, BLOCK_SIZE);
-}
-
-void ChaCha512::TransformBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	Process(Input, InOffset, Output, OutOffset, BLOCK_SIZE);
 }
 
 void ChaCha512::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
@@ -391,6 +340,42 @@ void ChaCha512::Expand(const std::vector<byte> &Key, const std::vector<byte> &Co
 	m_cipherState->S[5] += IntUtils::LeBytesTo32(Code, 4);
 	m_cipherState->S[6] += IntUtils::LeBytesTo32(Code, 8);
 	m_cipherState->S[7] += IntUtils::LeBytesTo32(Code, 12);
+}
+
+void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+{
+	if (!m_isInitialized)
+	{
+		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The cipher has not been initialized!");
+	}
+	if (m_macAuthenticator == nullptr)
+	{
+		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The cipher has not been configured for authentication!");
+	}
+	if (Length > m_macAuthenticator->MacSize())
+	{
+		throw CryptoSymmetricCipherException("ChaCha512:Finalize", "The MAC code specified is longer than the maximum length!");
+	}
+
+	// generate the mac code
+	std::vector<byte> code(m_macAuthenticator->MacSize());
+	m_macAuthenticator->Finalize(code, 0);
+	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
+
+	// customization string is CSX512+counter
+	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
+	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
+	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+
+	// extract the new mac key
+	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+	Kdf::SHAKE gen(ShakeModes::SHAKE512);
+	gen.Initialize(m_macKey->Key(), cst);
+	gen.Generate(mk);
+
+	// reset the generator with the new key
+	m_macKey.reset(new SymmetricSecureKey(mk));
+	m_macAuthenticator->Initialize(*m_macKey.get());
 }
 
 void ChaCha512::Generate(std::vector<byte> &Output, const size_t OutOffset, std::array<uint, 2> &Counter, const size_t Length)
@@ -557,12 +542,6 @@ void ChaCha512::Process(const std::vector<byte> &Input, const size_t InOffset, s
 {
 	const size_t PRCLEN = (Length >= Input.size() - InOffset) && Length >= Output.size() - OutOffset ? IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) : Length;
 
-	if (m_authenticatorType != StreamAuthenticators::None && !m_isEncryption)
-	{
-		m_macAuthenticator->Update(Input, InOffset, Length);
-		m_macCounter += Length;
-	}
-
 	if (!m_parallelProfile.IsParallel() || PRCLEN < m_parallelProfile.ParallelMinimumSize())
 	{
 		// generate random
@@ -625,11 +604,45 @@ void ChaCha512::Process(const std::vector<byte> &Input, const size_t InOffset, s
 		}
 	}
 
-	if (m_authenticatorType != StreamAuthenticators::None && m_isEncryption)
+	if (m_isAuthenticated)
 	{
-		m_macAuthenticator->Update(Output, OutOffset, Length);
 		m_macCounter += Length;
+
+		if (m_isEncryption)
+		{
+			m_macAuthenticator->Update(Output, OutOffset, Length);
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(uint));
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(uint));
+
+			Finalize(m_macTag, 0, m_macTag.size());
+			MemUtils::Copy(m_macTag, 0, Output, OutOffset + Length, m_macTag.size());
+		}
+		else
+		{
+			m_macAuthenticator->Update(Input, InOffset, Length);
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(uint));
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(uint));
+
+			Finalize(m_macTag, 0, m_macTag.size());
+
+			if (!IntUtils::Compare(Input, InOffset + Length, m_macTag, 0, m_macTag.size()))
+			{
+				throw CryptoAuthenticationFailure("ChaCha512:Process", "The authentication tag does not match!");
+			}
+		}
 	}
+}
+
+void ChaCha512::Reset()
+{
+	if (m_macAuthenticator != nullptr)
+	{
+		m_macAuthenticator->Reset();
+		m_macTag.resize(m_macAuthenticator->MacSize());
+	}
+
+	m_isInitialized = false;
+	m_cipherState->Reset();
 }
 
 NAMESPACE_STREAMEND

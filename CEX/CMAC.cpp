@@ -6,6 +6,12 @@
 
 NAMESPACE_MAC
 
+using Utility::IntUtils;
+using Utility::MemUtils;
+using Cipher::Symmetric::Block::Mode::CBC;
+using Cipher::Symmetric::Block::Padding::ISO7816;
+using Key::Symmetric::SymmetricKey;
+
 const std::string CMAC::CLASS_NAME("CMAC");
 
 //~~~Constructor~~~//
@@ -14,13 +20,11 @@ CMAC::CMAC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
 	m_cipherMode(CipherType != BlockCiphers::None ? new Cipher::Symmetric::Block::Mode::CBC(CipherType, CipherExtensionType) :
 		throw CryptoMacException("CMAC:Finalize", "The cipher type can not be none!")),
-	m_cipherKey(0),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_K1(0),
-	m_K2(0),
+	m_keys(nullptr),
 	m_legalKeySizes(0),
 	m_macSize(m_cipherMode->BlockSize()),
 	m_msgBuffer(m_macSize),
@@ -34,13 +38,11 @@ CMAC::CMAC(IBlockCipher* Cipher)
 	:
 	m_cipherMode(Cipher != nullptr ? new Cipher::Symmetric::Block::Mode::CBC(Cipher) :
 		throw CryptoMacException("CMAC:Finalize", "The cipher can not be null!")),
-	m_cipherKey(0),
 	m_cipherType(Cipher->Enumeral()),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_K1(0),
-	m_K2(0),
+	m_keys(nullptr),
 	m_legalKeySizes(0),
 	m_macSize(m_cipherMode->BlockSize()),
 	m_msgBuffer(m_macSize),
@@ -60,12 +62,15 @@ CMAC::~CMAC()
 		m_macSize = 0;
 		m_msgLength = 0;
 
-		Utility::IntUtils::ClearVector(m_cipherKey);
-		Utility::IntUtils::ClearVector(m_K1);
-		Utility::IntUtils::ClearVector(m_K2);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_msgCode);
-		Utility::IntUtils::ClearVector(m_msgBuffer);
+		IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearVector(m_msgCode);
+		IntUtils::ClearVector(m_msgBuffer);
+
+		if (m_keys != nullptr)
+		{
+			m_keys->Destroy();
+			m_keys.reset(nullptr);
+		}
 
 		if (m_destroyEngine)
 		{
@@ -152,19 +157,21 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		throw CryptoMacException("CMAC:Compute", "The Output buffer is too short!");
 	}
 
+	ISO7816 pad;
+	pad.AddPadding(m_msgBuffer, m_msgLength);
+
 	if (m_msgLength != m_cipherMode->BlockSize())
 	{
-		Cipher::Symmetric::Block::Padding::ISO7816 pad;
-		pad.AddPadding(m_msgBuffer, m_msgLength);
-		Utility::MemUtils::XOR(m_K2, 0, m_msgBuffer, 0, m_macSize);
+		MemUtils::XOR(m_keys->Nonce(), 0, m_msgBuffer, 0, m_macSize);
 	}
 	else
 	{
-		Utility::MemUtils::XOR(m_K1, 0, m_msgBuffer, 0, m_macSize);
+		MemUtils::XOR(m_keys->Key(), 0, m_msgBuffer, 0, m_macSize);
 	}
 
 	m_cipherMode->EncryptBlock(m_msgBuffer, 0, m_msgCode, 0);
-	Utility::MemUtils::Copy(m_msgCode, 0, Output, OutOffset, m_macSize);
+	MemUtils::Copy(m_msgCode, 0, Output, OutOffset, m_macSize);
+
 	Reset();
 
 	return m_macSize;
@@ -177,49 +184,37 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 		throw CryptoMacException("CMAC:Initialize", "Key size is too small; must be minimum key size!");
 	}
 
+	std::vector<byte> k1;
+	std::vector<byte> k2;
+	std::vector<byte> lu(m_cipherMode->BlockSize());
+	std::vector<byte> tmpz(m_cipherMode->BlockSize());
+
 	if (m_isInitialized)
 	{
 		Reset();
 	}
 
-	m_cipherKey = KeyParams.Key();
+	// initialize the cipher
 	std::vector<byte> tmpIv(m_cipherMode->BlockSize());
-	Key::Symmetric::SymmetricKey kp(m_cipherKey, tmpIv);
+	SymmetricKey kp(KeyParams.Key(), tmpIv, KeyParams.Info());
 	m_cipherMode->Initialize(true, kp);
-
-	if (KeyParams.Info().size() != 0 &&
-		m_cipherType != BlockCiphers::Rijndael &&
-		m_cipherType != BlockCiphers::Serpent)
-	{
-		if (KeyParams.Info().size() <= m_cipherMode->Engine()->DistributionCodeMax())
-		{
-			m_cipherMode->Engine()->DistributionCode() = KeyParams.Info();
-		}
-		else
-		{
-			// info is too large; size to optimal max, ignore remainder
-			std::vector<byte> tmpInfo(m_cipherMode->Engine()->DistributionCodeMax());
-			Utility::MemUtils::Copy(KeyParams.Info(), 0, tmpInfo, 0, tmpInfo.size());
-			m_cipherMode->Engine()->DistributionCode() = tmpInfo;
-		}
-	}
-
-	std::vector<byte> lu(m_cipherMode->BlockSize());
-	std::vector<byte> tmpz(m_cipherMode->BlockSize());
+	// generate the mac keys
 	m_cipherMode->EncryptBlock(tmpz, 0, lu, 0);
-	m_K1 = GenerateSubkey(lu);
-	m_K2 = GenerateSubkey(m_K1);
+	k1 = GenerateSubkey(lu);
+	k2 = GenerateSubkey(k1);
+	// store them in a secure key
+	m_keys.reset(new SymmetricSecureKey(k1, k2));
+	// re-initialize the cipher
 	m_cipherMode->Initialize(true, kp);
-
 	m_isInitialized = true;
 }
 
 void CMAC::Reset()
 {
 	// reinitialize the cbc iv
-	Utility::MemUtils::Clear(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode.get())->IV(), 0, BLOCK_SIZE);
-	Utility::MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
-	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	MemUtils::Clear(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode.get())->IV(), 0, BLOCK_SIZE);
+	MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
+	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 }
 
@@ -259,14 +254,14 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 			m_msgLength = 0;
 		}
 
-		size_t diff = m_cipherMode->BlockSize() - m_msgLength;
-		if (Length > diff)
+		const size_t RMDLEN = m_cipherMode->BlockSize() - m_msgLength;
+		if (Length > RMDLEN)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, diff);
+			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			m_cipherMode->EncryptBlock(m_msgBuffer, 0, m_msgCode, 0);
 			m_msgLength = 0;
-			Length -= diff;
-			InOffset += diff;
+			Length -= RMDLEN;
+			InOffset += RMDLEN;
 
 			while (Length > m_cipherMode->BlockSize())
 			{
@@ -278,7 +273,7 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 		if (Length > 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -288,8 +283,10 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 {
-	int fbit = (Input[0] & 0xFF) >> 7;
 	std::vector<byte> tmpKey(Input.size());
+	int fbit;
+
+	fbit = static_cast<int>(Input[0] & 0xFF) >> 7;
 
 	for (size_t i = 0; i < Input.size() - 1; i++)
 	{
@@ -308,8 +305,10 @@ std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 
 void CMAC::Scope()
 {
-	m_legalKeySizes.resize(m_cipherMode->LegalKeySizes().size());
-	std::vector<SymmetricKeySize> keySizes = m_cipherMode->LegalKeySizes();
+	std::vector<SymmetricKeySize> keySizes;
+
+	keySizes = m_cipherMode->LegalKeySizes();
+	m_legalKeySizes.resize(keySizes.size());
 
 	// cbc iv is always zero-size with cmac
 	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)

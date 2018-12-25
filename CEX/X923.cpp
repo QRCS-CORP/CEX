@@ -26,30 +26,34 @@ const std::string X923::Name()
 
 size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
-	if (Offset > Input.size())
+	byte code;
+
+	code = 0;
+
+	if (Offset != Input.size())
 	{
-		throw CryptoPaddingException("X923:AddPadding", "The padding offset value is longer than the array length!");
+		const size_t INPLEN = (Input.size() - Offset) - 1;
+		code = static_cast<byte>(Input.size() - Offset);
+
+		if (INPLEN > 0)
+		{
+			std::vector<byte> data(INPLEN);
+			Provider::CSP rnd;
+			rnd.Generate(data);
+			Utility::MemUtils::Copy(data, 0, Input, Offset, INPLEN);
+		}
+
+		Input[Input.size() - 1] = code;
 	}
 
-	const size_t INPLEN = (Input.size() - Offset) - 1;
-	byte code = static_cast<byte>(Input.size() - Offset);
-
-	if (INPLEN > 0)
-	{
-		std::vector<byte> data(INPLEN);
-		Provider::CSP rnd;
-		rnd.Generate(data);
-		Utility::MemUtils::Copy(data, 0, Input, Offset, INPLEN);
-	}
-
-	Input[Input.size() - 1] = code;
-
-	return code;
+	return static_cast<size_t>(code);
 }
 
 size_t X923::GetPaddingLength(const std::vector<byte> &Input)
 {
-	size_t code = Input[Input.size() - 1] & 0xFF;
+	size_t code;
+
+	code = Input[Input.size() - 1] & 0xFF;
 
 	if (code > Input.size() - 1)
 	{
@@ -61,7 +65,9 @@ size_t X923::GetPaddingLength(const std::vector<byte> &Input)
 
 size_t X923::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	size_t code = Input[Input.size() - 1] & 0xFF;
+	size_t code;
+
+	code = Input[Input.size() - 1] & 0xFF;
 
 	if (code > Input.size() - 1)
 	{

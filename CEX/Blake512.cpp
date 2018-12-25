@@ -351,7 +351,7 @@ void Blake512::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException("Blake256::ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoDigestException("Blake512::ParallelMaxDegree", "Degree setting is invalid!");
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);

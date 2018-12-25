@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Asymmetric cipher enmumeration names
+/// Asymmetric cipher enumeration names
 /// </summary>
 enum class AsymmetricEngines : byte
 {

@@ -1,13 +1,24 @@
 #include "ModuleLWE.h"
+#include "AsymmetricEngines.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
 #include "BCR.h"
-#include "MLWEQ7681N256.h"
 #include "IntUtils.h"
 #include "MemUtils.h"
+#include "MLWEQ7681N256.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MODULELWE
+
+
+using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
+using Enumeration::ShakeModes;
+using Utility::IntUtils;
+using Utility::MemUtils;
 
 const std::string ModuleLWE::CLASS_NAME = "ModuleLWE";
 
@@ -49,7 +60,7 @@ ModuleLWE::~ModuleLWE()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_mlweParameters = MLWEParameters::None;
-		Utility::IntUtils::ClearVector(m_domainKey);
+		IntUtils::ClearVector(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -154,18 +165,18 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	int32_t result;
 
 	// decrypt the key
-	MLWEQ7681N256::Decrypt(sec, CipherText, m_privateKey->R());
+	MLWEQ7681N256::Decrypt(sec, CipherText, m_privateKey->P());
 
 	// multitarget countermeasure for coins + contributory KEM
-	Utility::MemUtils::Copy(m_privateKey->R(), PUBLEN + PRILEN, sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemUtils::Copy(m_privateKey->P(), PUBLEN + PRILEN, sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
-	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 	shk256.Initialize(sec);
 	shk256.Generate(kr);
 
 	// coins are in kr+MLWE_SEED_SIZE
-	Utility::MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
-	Utility::MemUtils::Copy(m_privateKey->R(), PRILEN, pk, 0, PUBLEN);
+	MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemUtils::Copy(m_privateKey->P(), PRILEN, pk, 0, PUBLEN);
 	MLWEQ7681N256::Encrypt(cmp, sec, pk, coin);
 
 	// verify the code
@@ -176,7 +187,7 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	shk256.Generate(kr, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// overwrite pre-k with z on re-encryption failure
-	Utility::IntUtils::CMov(kr, 0, m_privateKey->R(), m_privateKey->R().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
+	IntUtils::CMov(kr, 0, m_privateKey->P(), m_privateKey->P().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
 
 	// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 	shk256.Initialize(kr, m_domainKey);
@@ -202,8 +213,8 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 	m_rndGenerator->Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// don't release system RNG output
-	Utility::MemUtils::Copy(sec, 0, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
-	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	MemUtils::Copy(sec, 0, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 	shk256.Initialize(coin);
 	shk256.Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
@@ -215,7 +226,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	shk256.Generate(kr);
 
 	// coins are in kr+KYBER_KEYBYTES
-	Utility::MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	MLWEQ7681N256::Encrypt(CipherText, sec, m_publicKey->P(), coin);
 
 	// overwrite coins in kr with H(c)
@@ -227,7 +238,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	shk256.Generate(SharedSecret);
 }
 
-IAsymmetricKeyPair* ModuleLWE::Generate()
+AsymmetricKeyPair* ModuleLWE::Generate()
 {
 	const size_t K = (m_mlweParameters == MLWEParameters::MLWES3Q7681N256) ? 3 : (m_mlweParameters == MLWEParameters::MLWES4Q7681N256) ? 4 : 2;
 	const size_t PUBLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
@@ -241,49 +252,50 @@ IAsymmetricKeyPair* ModuleLWE::Generate()
 	MLWEQ7681N256::Generate(pk, sk, m_rndGenerator);
 
 	// add the hash of the public key to the secret key
-	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 	shk256.Initialize(pk);
 	shk256.Generate(buff, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// value z for pseudo-random output on reject
 	m_rndGenerator->Generate(buff, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// copy H(p) and random coin
-	Utility::MemUtils::Copy(buff, 0, sk, PUBLEN + PRILEN, 2 * MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemUtils::Copy(buff, 0, sk, PUBLEN + PRILEN, 2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
-	Key::Asymmetric::MLWEPublicKey* apk = new Key::Asymmetric::MLWEPublicKey(m_mlweParameters, pk);
-	Key::Asymmetric::MLWEPrivateKey* ask = new Key::Asymmetric::MLWEPrivateKey(m_mlweParameters, sk);
+	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mlweParameters), pk);
+	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_mlweParameters), sk);
 
-	return new Key::Asymmetric::MLWEKeyPair(ask, apk);
+	return new AsymmetricKeyPair(ask, apk);
 }
 
-void ModuleLWE::Initialize(IAsymmetricKey* Key)
+void ModuleLWE::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::ModuleLWE)
 	{
 		throw CryptoAsymmetricException("ModuleLWE:Initialize", "Encryption requires a valid public key!");
 	}
-
-	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
-		m_publicKey = std::unique_ptr<MLWEPublicKey>((MLWEPublicKey*)Key);
-		m_mlweParameters = m_publicKey->Parameters();
+		throw CryptoAsymmetricException("ModuleLWE:Initialize", "The key type is invalid!");
+	}
+
+	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)
+	{
+		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_mlweParameters = static_cast<MLWEParameters>(m_publicKey->Parameters());
 		m_isEncryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<MLWEPrivateKey>((MLWEPrivateKey*)Key);
-		m_mlweParameters = m_privateKey->Parameters();
+		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_mlweParameters = static_cast<MLWEParameters>(m_privateKey->Parameters());
 		m_isEncryption = false;
 	}
  
 	m_isInitialized = true;
 }
 
-//~~~Private Functions~~~//
-
 int32_t ModuleLWE::Verify(const std::vector<byte> &A, const std::vector<byte> &B, size_t Length)
 {
-	// TODO: bizzare non-const-time behavior if placed in IntUtils, why?
 	size_t i;
 	int32_t r;
 

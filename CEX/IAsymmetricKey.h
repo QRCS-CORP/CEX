@@ -11,6 +11,7 @@ NAMESPACE_ASYMMETRICKEY
 
 using Enumeration::AsymmetricEngines;
 using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
 using Exception::CryptoAsymmetricException;
 using IO::MemoryStream;
 
@@ -20,18 +21,6 @@ using IO::MemoryStream;
 class IAsymmetricKey
 {
 public:
-
-	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read Only: The keys parent cipher type-name AsymmetricKeyTypes
-	/// </summary>
-	virtual const AsymmetricEngines CipherType() = 0;
-
-	/// <summary>
-	/// Read Only: The keys type-name
-	/// </summary>
-	virtual const AsymmetricKeyTypes KeyType() = 0;
 
 	//~~~Constructor~~~//
 
@@ -58,6 +47,28 @@ public:
 	virtual ~IAsymmetricKey() noexcept 
 	{
 	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The keys cipher type name
+	/// </summary>
+	virtual const AsymmetricEngines CipherType() = 0;
+
+	/// <summary>
+	/// Read Only: The keys assigned type name
+	/// </summary>
+	virtual const AsymmetricKeyTypes KeyType() = 0;
+
+	/// <summary>
+	/// Read Only: The cipher parameters enumeration type name
+	/// </summary>
+	virtual const AsymmetricTransforms Parameters() = 0;
+
+	/// <summary>
+	/// Read Only: The asymmetric key polynomial
+	/// </summary>
+	virtual const std::vector<byte> &P() = 0;
 
 	//~~~Public Functions~~~//
 

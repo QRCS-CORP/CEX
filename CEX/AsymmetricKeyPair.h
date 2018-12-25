@@ -1,22 +1,22 @@
-#ifndef CEX_MPKCKEYPAIR_H
-#define CEX_MPKCKEYPAIR_H
+#ifndef CEX_ASYMMTERICKEYPAIR_H
+#define CEX_ASYMMTERICKEYPAIR_H
 
 #include "CexDomain.h"
-#include "IAsymmetricKeyPair.h"
-#include "MPKCPrivateKey.h"
-#include "MPKCPublicKey.h"
+#include "AsymmetricKey.h"
 
 NAMESPACE_ASYMMETRICKEY
 
+using Key::Asymmetric::AsymmetricKey;
+
 /// <summary>
-/// A McEliece public and private key container
+/// A RingLWE public and private key container
 /// </summary>
-class MPKCKeyPair final : public IAsymmetricKeyPair
+class AsymmetricKeyPair final
 {
 private:
 
-	MPKCPrivateKey* m_privateKey;
-	MPKCPublicKey* m_publicKey;
+	AsymmetricKey* m_privateKey;
+	AsymmetricKey* m_publicKey;
 	std::vector<byte> m_Tag;
 
 public:
@@ -26,17 +26,17 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	MPKCKeyPair(const MPKCKeyPair&) = delete;
+	AsymmetricKeyPair(const AsymmetricKeyPair&) = delete;
 
 	/// <summary>
-	/// Copy constructor: copy is restricted, this function has been deleted
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	MPKCKeyPair& operator=(const MPKCKeyPair&) = delete;
+	AsymmetricKeyPair& operator=(const AsymmetricKeyPair&) = delete;
 
 	/// <summary>
 	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
-	MPKCKeyPair() = delete;
+	AsymmetricKeyPair() = delete;
 
 	/// <summary>
 	/// Constructor: instantiate this class with the public/private keys
@@ -44,7 +44,7 @@ public:
 	/// 
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
-	MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey);
+	AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey);
 
 	/// <summary>
 	/// Constructor: instantiate this class with the public/private keys and an identification tag
@@ -53,31 +53,31 @@ public:
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
 	/// <param name="Tag">The identification tag</param>
-	MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey, std::vector<byte> &Tag);
+	AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey, std::vector<byte> &Tag);
 
 	/// <summary>
 	/// Destructor: finalize this class.
 	/// <para>Only the tag is destroyed in the finalizer. Call the Destroy() function on Public/Private key members,
 	/// or let them go out of scope to finalize them.</para>
 	/// </summary>
-	~MPKCKeyPair() override;
+	~AsymmetricKeyPair();
 
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// The Private Key
+	/// The secret private Key
 	/// </summary>
-	IAsymmetricKey* PrivateKey() override;
+	AsymmetricKey* PrivateKey();
 
 	/// <summary>
-	/// The Public key
+	/// The public key
 	/// </summary>
-	IAsymmetricKey* PublicKey() override;
+	AsymmetricKey* PublicKey();
 
 	/// <summary>
 	/// Read/Write: An optional identification tag
 	/// </summary>
-	std::vector<byte> &Tag() override;
+	std::vector<byte> &Tag();
 
 private:
 

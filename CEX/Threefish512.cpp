@@ -53,6 +53,7 @@ Threefish512::Threefish512(StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new Threefish512State),
+	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(ulong), INFO_SIZE) },
@@ -60,6 +61,7 @@ Threefish512::Threefish512(StreamAuthenticators AuthenticatorType)
 		Helper::MacFromName::GetInstance(AuthenticatorType)),
 	m_macCounter(0),
 	m_macKey(nullptr),
+	m_macTag(0),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 }
@@ -69,6 +71,7 @@ Threefish512::~Threefish512()
 	if (!m_isDestroyed)
 	{
 		m_authenticatorType = StreamAuthenticators::None;
+		m_isAuthenticated = false;
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
@@ -90,6 +93,7 @@ Threefish512::~Threefish512()
 		}
 
 		IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearVector(m_macTag);
 	}
 }
 
@@ -123,6 +127,11 @@ const size_t Threefish512::DistributionCodeMax()
 const StreamCiphers Threefish512::Enumeral()
 {
 	return StreamCiphers::Threefish512;
+}
+
+const bool Threefish512::IsAuthenticator()
+{
+	return m_isAuthenticated;
 }
 
 const bool Threefish512::IsInitialized()
@@ -181,48 +190,17 @@ ParallelOptions &Threefish512::ParallelProfile()
 	return m_parallelProfile;
 }
 
+const std::vector<byte> &Threefish512::Tag()
+{
+	return m_macTag;
+}
+
 const size_t Threefish512::TagSize()
 {
 	return m_macAuthenticator != nullptr ? m_macAuthenticator->MacSize() : 0;
 }
 
 //~~~Public Functions~~~//
-
-void Threefish512::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
-{
-	if (!m_isInitialized)
-	{
-		throw CryptoSymmetricCipherException("Threefish512:Finalize", "The cipher has not been initialized!");
-	}
-	if (m_macAuthenticator == nullptr)
-	{
-		throw CryptoSymmetricCipherException("Threefish512:Finalize", "The cipher has not been configured for authentication!");
-	}
-	if (Length > m_macAuthenticator->MacSize())
-	{
-		throw CryptoSymmetricCipherException("Threefish512:Finalize", "The MAC code specified is longer than the maximum length!");
-	}
-
-	// generate the mac code
-	std::vector<byte> code(m_macAuthenticator->MacSize());
-	m_macAuthenticator->Finalize(code, 0);
-	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
-
-	// customization string is TSX512+counter
-	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
-	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
-	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
-
-	// extract the new mac key
-	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-	Kdf::SHAKE gen(ShakeModes::SHAKE512);
-	gen.Initialize(m_macKey->Key(), cst);
-	gen.Generate(mk);
-
-	// reset the generator with the new key
-	m_macKey.reset(new SymmetricSecureKey(mk));
-	m_macAuthenticator->Initialize(*m_macKey.get());
-}
 
 void Threefish512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
@@ -323,26 +301,12 @@ void Threefish512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void Threefish512::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException("Threefish512:ParallelMaxDegree", "Parallel degree can not be zero!");
-	}
-	if (Degree % 2 != 0)
-	{
-		throw CryptoSymmetricCipherException("Threefish512:ParallelMaxDegree", "Parallel degree must be an even number!");
-	}
-	if (Degree > m_parallelProfile.ProcessorCount())
-	{
-		throw CryptoSymmetricCipherException("Threefish512:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+		throw CryptoSymmetricCipherException("Threefish512:ParallelMaxDegree", "Degree setting is invalid!");
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
-}
-
-void Threefish512::Reset()
-{
-	m_isInitialized = false;
-	m_cipherState->Reset();
 }
 
 void Threefish512::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
@@ -360,22 +324,48 @@ void Threefish512::SetAssociatedData(const std::vector<byte> &Input, const size_
 	m_macAuthenticator->Update(Input, Offset, Length);
 }
 
-void Threefish512::TransformBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	Process(Input, 0, Output, 0, BLOCK_SIZE);
-}
-
-void Threefish512::TransformBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	Process(Input, InOffset, Output, OutOffset, BLOCK_SIZE);
-}
-
 void Threefish512::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	Process(Input, InOffset, Output, OutOffset, Length);
 }
 
 //~~~Private Functions~~~//
+
+void Threefish512::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+{
+	if (!m_isInitialized)
+	{
+		throw CryptoSymmetricCipherException("Threefish512:Finalize", "The cipher has not been initialized!");
+	}
+	if (m_macAuthenticator == nullptr)
+	{
+		throw CryptoSymmetricCipherException("Threefish512:Finalize", "The cipher has not been configured for authentication!");
+	}
+	if (Length > m_macAuthenticator->MacSize())
+	{
+		throw CryptoSymmetricCipherException("Threefish512:Finalize", "The MAC code specified is longer than the maximum length!");
+	}
+
+	// generate the mac code
+	std::vector<byte> code(m_macAuthenticator->MacSize());
+	m_macAuthenticator->Finalize(code, 0);
+	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
+
+	// customization string is TSX512+counter
+	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
+	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
+	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+
+	// extract the new mac key
+	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+	Kdf::SHAKE gen(ShakeModes::SHAKE512);
+	gen.Initialize(m_macKey->Key(), cst);
+	gen.Generate(mk);
+
+	// reset the generator with the new key
+	m_macKey.reset(new SymmetricSecureKey(mk));
+	m_macAuthenticator->Initialize(*m_macKey.get());
+}
 
 void Threefish512::Generate(std::array<ulong, 2> &Counter, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
@@ -491,12 +481,6 @@ void Threefish512::Process(const std::vector<byte> &Input, const size_t InOffset
 {
 	const size_t PRCLEN = Length;
 
-	if (m_authenticatorType != StreamAuthenticators::None && !m_isEncryption)
-	{
-		m_macAuthenticator->Update(Input, InOffset, Length);
-		m_macCounter += Length;
-	}
-
 	if (!m_parallelProfile.IsParallel() || PRCLEN < m_parallelProfile.ParallelMinimumSize())
 	{
 		// generate random
@@ -559,11 +543,45 @@ void Threefish512::Process(const std::vector<byte> &Input, const size_t InOffset
 		}
 	}
 
-	if (m_authenticatorType != StreamAuthenticators::None && m_isEncryption)
+	if (m_isAuthenticated)
 	{
-		m_macAuthenticator->Update(Output, OutOffset, Length);
 		m_macCounter += Length;
+
+		if (m_isEncryption)
+		{
+			m_macAuthenticator->Update(Output, OutOffset, Length);
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(ulong));
+
+			Finalize(m_macTag, 0, m_macTag.size());
+			MemUtils::Copy(m_macTag, 0, Output, OutOffset + Length, m_macTag.size());
+		}
+		else
+		{
+			m_macAuthenticator->Update(Input, InOffset, Length);
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(ulong));
+
+			Finalize(m_macTag, 0, m_macTag.size());
+
+			if (!IntUtils::Compare(Input, InOffset + Length, m_macTag, 0, m_macTag.size()))
+			{
+				throw CryptoAuthenticationFailure("Threefish512:Process", "The authentication tag does not match!");
+			}
+		}
 	}
+}
+
+void Threefish512::Reset()
+{
+	if (m_macAuthenticator != nullptr)
+	{
+		m_macAuthenticator->Reset();
+		m_macTag.resize(m_macAuthenticator->MacSize());
+	}
+
+	m_isInitialized = false;
+	m_cipherState->Reset();
 }
 
 NAMESPACE_STREAMEND

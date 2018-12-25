@@ -22,8 +22,8 @@
 #include "CexDomain.h"
 #include "AsymmetricEngines.h"
 #include "CryptoAsymmetricException.h"
-#include "IAsymmetricKey.h"
-#include "IAsymmetricKeyPair.h"
+#include "AsymmetricKey.h"
+#include "AsymmetricKeyPair.h"
 #include "IPrng.h"
 #include "Prngs.h"
 
@@ -31,8 +31,8 @@ NAMESPACE_ASYMMETRICSIGN
 
 using Enumeration::AsymmetricEngines;
 using Exception::CryptoAsymmetricException;
-using Key::Asymmetric::IAsymmetricKey;
-using Key::Asymmetric::IAsymmetricKeyPair;
+using Key::Asymmetric::AsymmetricKey;
+using Key::Asymmetric::AsymmetricKeyPair;
 using Prng::IPrng;
 using Enumeration::Prngs;
 
@@ -110,14 +110,14 @@ public:
 	/// <returns>A public/private key pair</returns>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	virtual IAsymmetricKeyPair* Generate() = 0;
+	virtual AsymmetricKeyPair* Generate() = 0;
 
 	/// <summary>
 	/// Initialize the signature scheme for signing (private key) or verifying (public key)
 	/// </summary>
 	/// 
 	/// <param name="AsymmetricKey">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
-	virtual const void Initialize(IAsymmetricKey* AsymmetricKey) = 0;
+	virtual const void Initialize(AsymmetricKey* AsymmetricKey) = 0;
 
 	/// <summary>
 	/// Sign a message array and return the message and attached signature

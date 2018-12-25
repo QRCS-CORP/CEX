@@ -17,15 +17,15 @@ enum class SphincsParameters : byte
 	/// <summary>
 	/// The S1 parameters; (Medium Security) The Sphincs SHAKE128, F256 parameter set
 	/// </summary>
-	SPXS128F256 = 1,
+	SPXS128F256 = 12,
 	/// <summary>
 	/// The S2 parameters; (High Security) The Sphincs SHAKE256, F256 parameter set
 	/// </summary>
-	SPXS256F256 = 2,
+	SPXS256F256 = 13,
 	/// <summary>
 	/// The S3 parameters; (Highest Security) The experimental Sphincs SHAKE512, F256 parameter set
 	/// </summary>
-	SPXS512F256 = 3
+	SPXS512F256 = 14
 };
 
 NAMESPACE_ENUMERATIONEND

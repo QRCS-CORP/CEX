@@ -1,17 +1,15 @@
 #include "ModuleLWETest.h"
+#include "../CEX/AsymmetricKey.h"
+#include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/CryptoAuthenticationFailure.h"
-#include "../CEX/IAsymmetricKeyPair.h"
 #include "../CEX/ModuleLWE.h"
-#include "../CEX/MLWEKeyPair.h"
-#include "../CEX/MLWEPrivateKey.h"
-#include "../CEX/MLWEPublicKey.h"
 #include "../CEX/RingLWE.h"
 
 namespace Test
 {
-	using Enumeration::MLWEParameters;
 	using namespace Key::Asymmetric;
 	using namespace Cipher::Asymmetric::MLWE;
+	using Enumeration::MLWEParameters;
 
 	const std::string ModuleLWETest::DESCRIPTION = "ModuleLWE key generation, encryption, and decryption tests..";
 	const std::string ModuleLWETest::FAILURE = "FAILURE! ";
@@ -76,7 +74,7 @@ namespace Test
 
 		// test param 1: MLWES2Q7681N256
 		ModuleLWE cpr1(MLWEParameters::MLWES2Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp1 = cpr1.Generate();
+		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, sec1);
@@ -95,7 +93,7 @@ namespace Test
 
 		// test param 2: MLWES3Q7681N256
 		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpt.resize(0);
 
@@ -116,7 +114,7 @@ namespace Test
 
 		// test param 3: MLWES4Q7681N256
 		ModuleLWE cpr3(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp3 = cpr3.Generate();
+		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		cpt.resize(0);
 
@@ -144,7 +142,7 @@ namespace Test
 
 		// test param 1: MLWES2Q7681N256
 		ModuleLWE cpr1(MLWEParameters::MLWES2Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp1 = cpr1.Generate();
+		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, sec1);
@@ -163,7 +161,7 @@ namespace Test
 
 		// test param 2: MLWES3Q7681N256
 		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpt.resize(0);
 
@@ -184,7 +182,7 @@ namespace Test
 
 		// test param 3: MLWES4Q7681N256
 		ModuleLWE cpr3(MLWEParameters::MLWES4Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp3 = cpr3.Generate();
+		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		cpt.resize(0);
 
@@ -241,7 +239,7 @@ namespace Test
 			ModuleLWE cpra(MLWEParameters::MLWES3Q7681N256, Enumeration::Prngs::BCR);
 			Cipher::Asymmetric::RLWE::RingLWE cprb;
 			// create an invalid key set
-			IAsymmetricKeyPair* kp = cprb.Generate();
+			AsymmetricKeyPair* kp = cprb.Generate();
 			cpra.Initialize(kp->PrivateKey());
 
 			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME3"));
@@ -263,13 +261,13 @@ namespace Test
 
 		// test param 1: MLWES2Q7681N256
 		ModuleLWE cpr1(MLWEParameters::MLWES2Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp1 = cpr1.Generate();
+		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = ((MLWEPublicKey*)kp1->PublicKey())->P();
+		std::vector<byte> pk1 = kp1->PublicKey()->P();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		MLWEPublicKey* pk2 = new MLWEPublicKey(MLWEParameters::MLWES2Q7681N256, pk1);
+		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MLWEParameters::MLWES2Q7681N256), pk1);
 		cpr1.Initialize(pk2);
 		cpr1.Encapsulate(cpt, sec1);
 
@@ -290,13 +288,13 @@ namespace Test
 
 		// test param 2: MLWES3Q7681N256
 		ModuleLWE cpr2(MLWEParameters::MLWES3Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
-		std::vector<byte> pk3 = ((MLWEPublicKey*)kp2->PublicKey())->P();
+		std::vector<byte> pk3 = kp2->PublicKey()->P();
 		pk3[0] += 1;
 		pk3[1] += 1;
-		MLWEPublicKey* pk4 = new MLWEPublicKey(MLWEParameters::MLWES3Q7681N256, pk3);
+		AsymmetricKey* pk4 = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MLWEParameters::MLWES3Q7681N256), pk3);
 		cpr2.Initialize(pk4);
 		cpr2.Encapsulate(cpt, sec1);
 
@@ -317,13 +315,13 @@ namespace Test
 
 		// test param 3: MLWES4Q7681N256
 		ModuleLWE cpr3(MLWEParameters::MLWES4Q7681N256, m_rngPtr);
-		IAsymmetricKeyPair* kp3 = cpr3.Generate();
+		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		// alter public key
-		std::vector<byte> pk5 = ((MLWEPublicKey*)kp3->PublicKey())->P();
+		std::vector<byte> pk5 = kp3->PublicKey()->P();
 		pk5[0] += 1;
 		pk5[1] += 1;
-		MLWEPublicKey* pk6 = new MLWEPublicKey(MLWEParameters::MLWES4Q7681N256, pk5);
+		AsymmetricKey* pk6 = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MLWEParameters::MLWES4Q7681N256), pk5);
 		cpr3.Initialize(pk6);
 		cpr3.Encapsulate(cpt, sec1);
 
@@ -346,19 +344,19 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr1.Generate();
-			MLWEPrivateKey* priK1 = (MLWEPrivateKey*)kp->PrivateKey();
+			AsymmetricKeyPair* kp = cpr1.Generate();
+			AsymmetricKey* priK1 = kp->PrivateKey();
 			skey = priK1->ToBytes();
-			MLWEPrivateKey priK2(skey);
+			AsymmetricKey priK2(skey);
 
-			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 			{
 				throw TestException(std::string("ModuleLWE"), std::string("Private key serialization test has failed! -MR1"));
 			}
 
-			MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
+			AsymmetricKey* pubK1 = kp->PublicKey();
 			skey = pubK1->ToBytes();
-			MLWEPublicKey pubK2(skey);
+			AsymmetricKey pubK2(skey);
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
@@ -375,19 +373,19 @@ namespace Test
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 
-			IAsymmetricKeyPair* kp = cpr2.Generate();
-			MLWEPrivateKey* priK1 = (MLWEPrivateKey*)kp->PrivateKey();
+			AsymmetricKeyPair* kp = cpr2.Generate();
+			AsymmetricKey* priK1 = kp->PrivateKey();
 			skey = priK1->ToBytes();
-			MLWEPrivateKey priK2(skey);
+			AsymmetricKey priK2(skey);
 
-			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 			{
 				throw TestException(std::string("ModuleLWE"), std::string("Private key serialization test has failed! -MR3"));
 			}
 
-			MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
+			AsymmetricKey* pubK1 = kp->PublicKey();
 			skey = pubK1->ToBytes();
-			MLWEPublicKey pubK2(skey);
+			AsymmetricKey pubK2(skey);
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
@@ -403,19 +401,19 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr3.Generate();
-			MLWEPrivateKey* priK1 = (MLWEPrivateKey*)kp->PrivateKey();
+			AsymmetricKeyPair* kp = cpr3.Generate();
+			AsymmetricKey* priK1 = kp->PrivateKey();
 			skey = priK1->ToBytes();
-			MLWEPrivateKey priK2(skey);
+			AsymmetricKey priK2(skey);
 
-			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 			{
 				throw TestException(std::string("ModuleLWE"), std::string("Private key serialization test has failed! -MR5"));
 			}
 
-			MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
+			AsymmetricKey* pubK1 = kp->PublicKey();
 			skey = pubK1->ToBytes();
-			MLWEPublicKey pubK2(skey);
+			AsymmetricKey pubK2(skey);
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
@@ -435,7 +433,7 @@ namespace Test
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
 			m_rngPtr->Generate(sec1);
-			IAsymmetricKeyPair* kp = cpr1.Generate();
+			AsymmetricKeyPair* kp = cpr1.Generate();
 
 			cpr1.Initialize(kp->PublicKey());
 			cpr1.Encapsulate(cpt, sec1);
@@ -467,7 +465,7 @@ namespace Test
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
 			m_rngPtr->Generate(sec1);
-			IAsymmetricKeyPair* kp = cpr2.Generate();
+			AsymmetricKeyPair* kp = cpr2.Generate();
 
 			cpr2.Initialize(kp->PublicKey());
 			cpr2.Encapsulate(cpt, sec1);
@@ -499,7 +497,7 @@ namespace Test
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
 			m_rngPtr->Generate(sec1);
-			IAsymmetricKeyPair* kp = cpr3.Generate();
+			AsymmetricKeyPair* kp = cpr3.Generate();
 
 			cpr3.Initialize(kp->PublicKey());
 			cpr3.Encapsulate(cpt, sec1);

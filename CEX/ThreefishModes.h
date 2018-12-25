@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Threefish stream cipher operation-modes enmumeration names
+/// Threefish stream cipher operation-modes enumeration names
 /// </summary>
 enum class ThreefishModes : byte
 {

@@ -17,11 +17,11 @@ enum class MPKCParameters : byte
 	/// <summary>
 	/// The S1 parameters (Medium Security) A finite field of 12 and an error correction capability of 62
 	/// </summary>
-	MPKCS1M12T62 = 1
+	MPKCS1M12T62 = 7
 	/// <summary>
 	/// A finite field of ?? and an error correction capability of ??
 	/// </summary>
-	//G??T?? = 2
+	//G??T?? = 8
 };
 
 NAMESPACE_ENUMERATIONEND

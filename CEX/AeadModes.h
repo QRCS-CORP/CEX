@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Symmetric AEAD cipher mode enmumeration names
+/// Symmetric AEAD cipher mode enumeration names
 /// </summary>
 enum class AeadModes : byte
 {
