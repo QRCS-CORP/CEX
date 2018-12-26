@@ -25,7 +25,7 @@ const std::string Threefish256::CLASS_NAME("Threefish256");
 const std::vector<byte> Threefish256::CSHAKE_CUST = { 0x54, 0x53, 0x58, 0x32, 0x35, 0x36 };
 const std::vector<byte> Threefish256::OMEGA_INFO = { 0x54, 0x68, 0x72, 0x65, 0x65, 0x66, 0x69, 0x73, 0x68, 0x50, 0x32, 0x35, 0x36, 0x52, 0x37, 0x32 };
 
-struct Threefish256::Threefish512State
+struct Threefish256::Threefish256State
 {
 	// counter
 	std::array<ulong, 2> C;
@@ -34,7 +34,7 @@ struct Threefish256::Threefish512State
 	// tweak
 	std::array<ulong, 2> T;
 
-	Threefish512State()
+	Threefish256State()
 	{
 		Reset();
 	}
@@ -52,8 +52,9 @@ struct Threefish256::Threefish512State
 
 Threefish256::Threefish256(StreamAuthenticators AuthenticatorType)
 	:
-	m_authenticatorType(AuthenticatorType),
-	m_cipherState(new Threefish512State),
+	m_authenticatorType(AuthenticatorType != StreamAuthenticators::HMACSHA512 || AuthenticatorType != StreamAuthenticators::KMAC512 || AuthenticatorType != StreamAuthenticators::KMAC1024 ? AuthenticatorType :
+		throw CryptoSymmetricCipherException("Threefish256:CTor", "The authenticator must be a 256-bit MAC function!")),
+	m_cipherState(new Threefish256State),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
 	m_isInitialized(false),

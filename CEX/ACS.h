@@ -21,6 +21,7 @@
 // An implementation of an Authenticated Counter Mode (ACS).
 // Written by John Underhill, December 9, 2018
 // Updated December 20, 2018
+// Updated December 26, 2018
 // Contact: develop@vtdev.com
 
 #ifndef CEX_ACS_H
@@ -48,83 +49,99 @@ using Enumeration::StreamAuthenticators;
 using Key::Symmetric::SymmetricSecureKey;
 
 /// <summary>
-/// An Encrypt and Authenticate AEAD Block Cipher Mode
+/// An Encrypt and Authenticate AEAD Stream cipher implementation.
+/// <para>Uses an optional authentication mode; HMAC(SHA2) or KMAC set through the constructor to authenticate the stream.</para>
 /// </summary> 
 /// 
 /// <example>
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// ACS cipher(BlockCiphers::Rijndael);
-/// // initialize for encryption
-/// cipher.Initialize(true, SymmetricKey(Key, Nonce, [Info]));
-/// // encrypt one block
-/// size_t encLen = cipher.BlockSize();
-/// cipher.Transform(Input, 0, Output, 0, encLen);
-/// // append the mac code to the output
-/// cipher.Finalize(Output, encLen);
+/// SymmetricKey kp(Key, Nonce);
+/// ACS cipher(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256, StreamAuthenticators::KMAC256);
+/// // mac code is appended to the cipher-text stream in authentication mode
+/// cipher.Initialize(true, kp);
+/// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
 /// </code>
-/// </example>
 ///
-/// <example>
-/// <description>Decrypting a block of bytes:</description>
+/// <description>Encrypt and authenticate an array:</description>
 /// <code>
-/// ACS cipher(BlockCiphers::Rijndael);
+/// SymmetricKey kp(Key, Nonce);
+/// ACS cipher(StreamAuthenticators::HMACSHA256);
+/// // initialize for encryption
+/// cipher.Initialize(true, kp);
+/// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
+/// </code>
+///
+/// <description>Decrypt and authenticate an array:</description>
+/// <code>
+/// SymmetricKey kp(Key, Nonce);
+/// ACS cipher(StreamAuthenticators::HMACSHA256);
 /// // initialize for decryption
-/// cipher.Initialize(false, SymmetricKey(Key, Nonce, [Associated Data]));
-/// // calculate offset; mac code should always be last block after ciphertext
-/// size_t decLen = Input.size() - cipher.BlockSize();
-/// // decrypt a block
-/// cipher.Transform(Input, 0, Output, 0, decLen);
-/// // generate the internal mac code and compare it
-/// if (!cipher.Verify(Input, decLen))
-///		throw;
+/// cipher.Initialize(false, kp);
+/// // decrypt the ciphertext
+/// try
+/// {
+///		cipher.Transform(Input, InOffset, Output, OutOffset, Length);
+/// }
+/// catch (CryptoAuthenticationFailure)
+/// {
+///		// do something...
+/// }
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>
-/// The ACS Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode. \n
+/// The ACS Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated stream cipher. \n
 /// ACS is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. \n
 /// It also has provable security, dependant on the block cipher used by the mode. \n
-/// ACS first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a CBC-based MAC function used for data authentication. \n
-/// When encryption is completed, the MAC code is generated and appended to the output stream using the Finalize(Output, Offset) call. \n
+/// ACS first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a MAC function used for data authentication. \n
+/// When encryption is completed, the MAC code is generated and appended to the output stream automatically. \n
 /// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text. \n
-/// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process.</para>
-///
-/// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM> \n
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code \n
-/// <EM>Encryption</EM> \n
-/// For i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T. \n
-/// <EM>Decryption</EM> \n
-/// For i ...n (T = Mk(Ci), Pi = D(Ci)). PT = P||T.</para>
+/// During decryption, if the MAC codes do not match, a CryptoAuthenticationFailure exception error is thrown.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
 /// <para>The encryption and decryption functions of the ACS mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
-/// The ACS parallel mode also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
-/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions. \n
+/// The ACS stream cipher also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
+/// uses SIMD instructions to decrypt/encrypt blocks in parallel, depending on which framework is runtime available, 256 or 512-bit SIMD instructions. \n
 /// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
-/// The cipher transform is parallelizable, however the authentication pass, (CMAC), is processed sequentially.</para>
+/// The cipher transform is parallelizable, however the authentication pass, is processed sequentially.</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>ACS is an AEAD authenticated mode, additional data such as packet header information can be added to the authentication process.</description></item>
-/// <item><description>Additional data can be added using the SetAssociatedData(Input, Offset, Length) call, and during Initialize, using the Info parameter of the SymmetricKey.</description></item>
-/// <item><description>Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output array in either encryption or decryption operation mode.</description></item>
-/// <item><description>The Verify(Input, Offset, Length) function can be used to compare the MAC code embedded with the cipher-text to the internal MAC code generated after a Decryption cycle.</description></item>
-/// <item><description>Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
-/// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
-/// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
+/// <item><description>Supported key sizes are 32, 64, and 128 bytes (256, 512, and 1024 bits).</description></item>
+/// <item><description>The mandatory Nonce size is 16 bytes (128 bits).</description></item>
+/// <item><description>The ISymmetricKey info value can be used as a cipher tweak to create a unique ciphertext and MAC output.</description></item>
+/// <item><description>The ciphers Initialize function can use either a SymmetricKey container, or an encrypted SymmetricSecureKey.</description></item>
+/// <item><description>Block size is 16 bytes wide (128 bits).</description></item>
+/// <item><description>This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to one of the HMAC or KMAC options.</description></item>
+/// <item><description>In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception.</description></item>
+/// <item><description>If authentication is enabled, the cipher-key and MAC seed are generated using cSHAKE, this will change the cipher-text output.</description></item>
+/// <item><description>In authenticated mode, the cipher-key generated by cSHAKE will be constant even with differing MAC generators; only two cipher-text outputs are possible, authenticated or non-authenticated.</description></item>
+/// <item><description>The Info string is optional, but can be used to create a tweakable cipher; must be 16 bytes in length.</description></item>
+/// <item><description>Permutation rounds are fixed 22, 30, and 38, for 256, 512, and 1024-bit keys.</description></item>
+/// <item><description>Authentication using HMAC or KMAC, can be invoked by setting the StreamAuthenticators parameter in the constructor.</description></item>
+/// <item><description>The class functions are virtual, and can be accessed from an IStreamCipher instance.</description></item>
+/// <item><description>The transformation methods can not be called until the Initialize(ISymmetricKey) function has been called.</description></item>
+/// <item><description>Encryption can both be pipelined (AVX, AVX2, or AVX512), and multi-threaded with any even number of threads, the configuration can be modified using the ParallelProfile() accessor function.</description></item>
+/// <item><description>If the system supports Parallel processing, and ParallelProfile().IsParallel() is set to true; passing an input block of ParallelProfile().ParallelBlockSize() to the transform will be auto parallelized.</description></item>
+/// <item><description>The ParallelProfile().ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
+/// <item><description>ParallelProfile().ParallelBlockSize() is calculated automatically based on processor(s) cache size but can be user defined, but must be evenly divisible by ParallelProfile().ParallelMinimumSize().</description></item>
 /// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
 /// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % .ParallelMinimumSize);</c></description></item>
 /// </list>
-/// 
+///
 /// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>The <a href="http://web.cs.ucdavis.edu/~rogaway/papers/acs.pdf">ACS Mode</a> of Operation.</description></item>
 /// <item><description>RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorithms for Authenticated Encryption</a>.</description></item>
 /// <item><description>Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/chap7.pdf">Chapter 7: Block Ciphers</a>.</description></item>
+/// <item><description>Fips-202: The <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">SHA-3 Standard</a></description>.</item>
+/// <item><description>SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a></description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2104">2104</a>: HMAC: Keyed-Hashing for Message Authentication.</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198-1</a>: The Keyed-Hash Message Authentication Code (HMAC).</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">180-4</a>: Secure Hash Standard (SHS).</description></item>
 /// </list>
 /// </remarks>
 class ACS final : public IStreamCipher
@@ -217,7 +234,7 @@ public:
 
 	/// <summary>
 	/// Read Only: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available with this mode.
+	/// <para>Indicates whether parallel processing is available with this cipher.
 	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	const bool IsParallel() override;
@@ -269,12 +286,12 @@ public:
 	/// <summary>
 	/// Initialize the cipher with an ISymmetricKey key container.
 	/// <para>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream.
-	/// Authentication on a decrypted stream can be performed by manually by comparing output with the the Finalize(Output, Offset, Length) function.
-	/// If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</para>
+	/// Authentication on a decrypted stream is performed automatically; failure will throw a CryptoAuthenticationFailure exception.
+	/// If encryption and authentication are set to true, the MAC code is appended to the ciphertext array.</para>
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParams">Cipher key structure, containing cipher key, nonce and optional info array</param>
+	/// <param name="KeyParams">Cipher key structure, containing cipher key, nonce, and optional info array</param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
@@ -302,7 +319,9 @@ public:
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
-	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
+	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.
+	///	In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be long enough to accommodate this code.
+	/// In decryption mode, this code is checked before the stream is decrypted, if the authentication fails a CryptoAuthenticationFailure exception is thrown.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
@@ -310,6 +329,8 @@ public:
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">Number of bytes to process</param>
+	///
+	/// <exception cref="Exception::CryptoAuthenticationFailure">Thrown during decryption if the the ciphertext fails authentication</exception>
 	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 private:

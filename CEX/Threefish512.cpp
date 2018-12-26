@@ -51,7 +51,8 @@ struct Threefish512::Threefish512State
 
 Threefish512::Threefish512(StreamAuthenticators AuthenticatorType)
 	:
-	m_authenticatorType(AuthenticatorType),
+	m_authenticatorType(AuthenticatorType != StreamAuthenticators::KMAC1024 ? AuthenticatorType :
+		throw CryptoSymmetricCipherException("Threefish512:CTor", "The authenticator must be a 256 or 512-bit MAC function!")),
 	m_cipherState(new Threefish512State),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),

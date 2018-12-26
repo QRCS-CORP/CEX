@@ -49,7 +49,7 @@ struct ChaCha256::ChaCha256State
 
 ChaCha256::ChaCha256(StreamAuthenticators AuthenticatorType)
 	:
-	m_authenticatorType(AuthenticatorType != StreamAuthenticators::HMACSHA512 || AuthenticatorType != StreamAuthenticators::KMAC512 ? AuthenticatorType : 
+	m_authenticatorType(AuthenticatorType != StreamAuthenticators::HMACSHA512 || AuthenticatorType != StreamAuthenticators::KMAC512 || AuthenticatorType != StreamAuthenticators::KMAC1024 ? AuthenticatorType :
 		throw CryptoSymmetricCipherException("ChaCha256:CTor", "The authenticator must be a 256-bit MAC function!")),
 	m_cipherState(new ChaCha256State),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),

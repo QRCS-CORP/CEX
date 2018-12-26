@@ -20,7 +20,7 @@ The current version is <B>1.0.0.7e</B> (A7 version), which are the major, minor,
 
 \author    John Underhill
 \version   1.0.0.7e
-\date      December 20, 2018
+\date      December 26, 2018
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n

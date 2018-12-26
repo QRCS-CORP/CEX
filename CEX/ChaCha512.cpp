@@ -49,7 +49,8 @@ const std::vector<byte> ChaCha512::SIGMA_INFO = { 0x65, 0x78, 0x70, 0x61, 0x6E, 
 
 ChaCha512::ChaCha512(StreamAuthenticators AuthenticatorType)
 	:
-	m_authenticatorType(AuthenticatorType),
+	m_authenticatorType(AuthenticatorType != StreamAuthenticators::KMAC1024 ? AuthenticatorType : 
+		throw CryptoSymmetricCipherException("ChaCha512:CTor", "The authenticator must be a 256 or 512-bit MAC function!")),
 	m_cipherState(new ChaCha512State),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
