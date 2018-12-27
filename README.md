@@ -14,27 +14,27 @@ There are some new ideas, and new technologies, as I intend to push the envelope
 
 This library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs, TRNGs etc, preliminary work has been completed as of version v1.0. 
 That work is still evolving however, as improvements and additions to the symmetric cryptography will continue throughout the libraries lifetime.
-The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and this release contains the NTRU (NTRU Prime), RingLWE (New Hope), ModuleLWE (Kyber) and McEliece (Niederreiter) asymmetric ciphers.
+The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work is well under way, and this release contains the NTRU (NTRU Prime), RingLWE (New Hope), ModuleLWE (Kyber) and McEliece (Niederreiter) asymmetric ciphers, as well as the Dilithium and SPHINCS+ signature schemes.
 
-Though efforts have been made towards future compatibility with other platforms, this is currently a Windows-only library. 
+Though efforts have been made towards future compatibility with other platforms, this is currently a Windows-only library, but is currently scheduled for multi-platform compatibility (Android, Linux, iOS) by the spring of 2019.
 This has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, using the MSVC and Intel compiler tool-chains, and future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
 
-Only a limited number of CPUs have been tested so far; an AMD K9, and Intel i3, i5, and i7 processors; for the moment, newer Intel and AMD cpu's are all that is supported, (testing on a wider range of hardware profiles is ongoing, if you would like to help, contact me: john at vtdev.com). 
+Only a limited number of CPUs have been tested so far; an AMD K9, and Intel i3, i5, and i7 processors; for the moment, newer Intel and AMD cpu's are all that is supported, (testing on a wider range of hardware profiles is ongoing). 
 
-Works with or without intrinsics, set the test project and the library to a supported instruction set to test the intrinsics implementations.
-The SIMD support is set to AVX2 by default, (AVX implementations are also in place on a number of ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). The library also has experimental AVX512 support (untested), that can be enabled through the CexConfig file.
+Works with or without intrinsics, set the test project and the library to a supported instruction set to test the intrinsics enhanced implementations.
+The SIMD support is set to AVX2 by default, (AVX implementations are also in place on some ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). The library also has experimental AVX512 support (untested), that can be enabled through the CexConfig.h file.
 
 The Win folder contains a visual studio test project, which tests each cipher and protocol with it's official test vectors, and has a set of digest and symmetric cipher speed tests. Make sure the project properties SIMD and OpenMP support are enabled before running the project, and for speed tests, compile in release mode.
 If running the executable, the Win\Test\Vectors folder containing the cipher KAT files must be in the executables path.
 
-For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
+For more information on the current capabilities of the library, refer to the libraries help pages.
 
-This is still an early stage in the development of this library, so stay tuned, be patient.. (eta is the spring of 2019).
+Note: This is still an early stage in the development of this library, and much of the work is formative and evolving, so stay tuned, be patient.. (eta is the summer of 2019).
 
 ## Contents
 ### Asymmetric Ciphers
 * The NTRU asymmetric cipher (S-Prime and L-Prime)
-* The RingLWE asymmetric cipher (New Hope)
+* The RingLWE asymmetric cipher (New Hope -N1024/N2048)
 * The Niederreiter dual form of the McEliece cipher
 * The ModuleLWE asymmetric cipher (Kyber)
 
@@ -45,7 +45,7 @@ This is still an early stage in the development of this library, so stay tuned, 
 ### Block Ciphers
 Note: Each cipher can be deployed as either the standard form (AES, Serpent, Twofish), or the extended hybrid using cSHAKE or HKDF(SHA2) key expansion
 * The AES-NI Hash eXtended cipher (AHX)
-* The Rijndael Hash eXtended cipher (RHX)
+* The fallback Rijndael Hash eXtended cipher (RHX)
 * The Serpent Hash eXtended cipher (SHX)
 
 ### Block Cipher Modes
@@ -66,10 +66,10 @@ Note: Each cipher can be deployed as either the standard form (AES, Serpent, Two
 * The X.923 Padding Scheme
 
 ### Stream Ciphers 
-* Added a built-in authentication option to every stream cipher
-* ChaCha256-P20 stream cipher
-* ChaCha512-P80 stream cipher
-* Threefish 256/512/1024 stream ciphers
+Note: Integrated an optional built-in authentication generator (HMAC/KMAC) to each stream cipher
+* The Authenticate and Encrypt and AEAD stream cipher implementation (Authenticated Cipher Stream: ACS).
+* Threefish 256/512/1024 authenticated stream ciphers
+* ChaCha256-P20 and ChaCha512-P80 authenticated stream ciphers
 
 ### Message Digests
 Note: Every message digest implementation has both parallel and sequential modes of operation
@@ -112,14 +112,34 @@ Note: Every message digest implementation has both parallel and sequential modes
 * Intel RdRand/RdSeed Provider (RDP)
 
 ## Trajectory
-The current version is <B>1.0.0.6</B> (A6 version), which are the major, minor, patch, and release codes.
-The next planned release (1.0.0.7) will be in October 2018.
+The current version is <B>1.0.0.7</B> (A7 version), which are the major, minor, patch, and release codes.
+The next planned release (1.0.0.8) is planned for February 2019.
   
-### Current Release 1.0.0.6 (version A6):
+### New in Current Release 1.0.0.7 (version A7):
+* The Dilithium asymmetric signature scheme
+* The SPHINCS+ asymmetric signature scheme
 * The NTRU Prime asymmetric cipher
-* The cSHAKE KDF integrated as an HX symmetric cipher key expansion option
-* Update of all asymmetric ciphers to match NIST PQ entries
+* The cSHAKE XOF function added as an HX symmetric cipher key expansion option
+* Update of all base asymmetric ciphers and signature schemes to match NIST PQ entries
 * Message digests updated for performance and security
+* Integrated an optional built-in authentication generator (HMAC/KMAC) to each stream cipher
+* Added the Authenticate and Encrypt and AEAD stream cipher implementation (Authenticated Cipher Stream: ACS).
+* Threefish 256/512/1024 authenticated stream ciphers
+* ChaCha256-P20 and ChaCha512-P80 authenticated stream ciphers
+
+### Planned Release 1.0.0.8 (version A8):
+## ETA is February 14, 2019
+* Authenticated stream ciphers ACS,ThreeFish-256/512/1024, and ChaCha256/512
+* Update secure key mechanisms and integrate internally
+* Full security, documentation, and code review cycles
+* Begin optimization and review of asymmetric primitives
+* Create accompanying website and publish documentation
+
+### Planned Release 1.2.0.1
+* DLL API (.NET/Java)
+* Direct Trust Model DTM-KEX (external?)
+* Post-Quantum Secure DNS, PQ-SECDNS (external)
+* Shared Trust Model STM-KEX (external?)
 
 ### Planned Release 1.1.0.1
 * RingLWE
@@ -137,17 +157,17 @@ The next planned release (1.0.0.7) will be in October 2018.
 
 ## History
   
-### Version 1.0.0.7a, December 04, 2018
+### Version 1.0.0.7, December 04, 2018
 * The Dilithium asymmetric signature scheme
 * The SPHINCS+ asymmetric signature scheme
 * The NTRU Prime asymmetric cipher
-* The cSHAKE KDF integrated as an HX symmetric cipher key expansion option
-* Update of all asymmetric ciphers to match NIST PQ entries
+* The cSHAKE XOF function added as an HX symmetric cipher key expansion option
+* Update of all base asymmetric ciphers to match NIST PQ entries
 * Message digests updated for performance and security
-* Added a a built-in authentication option to every stream cipher
-* ChaCha256-P20 stream cipher
-* ChaCha512-P80 stream cipher
-* Threefish 256/512/1024 stream ciphers
+* Integrated an optional built-in authentication generator (HMAC/KMAC) to each stream cipher
+* Added the Authenticate and Encrypt and AEAD stream cipher implementation (Authenticated Cipher Stream: ACS).
+* Threefish 256/512/1024 authenticated stream ciphers
+* ChaCha256-P20 and ChaCha512-P80 authenticated stream ciphers
 
 ### Version 1.0.0.5, March 16, 2018
 * The library is now Misra C++ 2014 compliant
