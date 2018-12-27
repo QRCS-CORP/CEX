@@ -6,5 +6,5 @@ var searchData=
   ['skeinubitype',['SkeinUbiType',['../group___digest.html#ga0275357fcdd6da6fb73a7cb04b0d8f8e',1,'Documentation.h']]],
   ['streamciphers',['StreamCiphers',['../group___enumeration.html#ga62fe0a4066025a96f0d329627b1bf127',1,'Documentation.h']]],
   ['streammodes',['StreamModes',['../group___enumeration.html#ga573b39e87832257156460627bfbaa8bd',1,'Documentation.h']]],
-  ['symmetricengines',['SymmetricEngines',['../group___enumeration.html#gaa9520d8e4fd72264d0e7842c76b7f586',1,'Documentation.h']]]
+  ['symmetricciphers',['SymmetricCiphers',['../group___enumeration.html#ga83e5aeee49605814f7a50b7521a86bf8',1,'Documentation.h']]]
 ];

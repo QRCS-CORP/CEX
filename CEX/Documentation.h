@@ -268,11 +268,13 @@ NAMESPACE_ROOT
 		*  @brief Symmetric Stream Cipher Namespace
 		*/
 		NAMESPACE_STREAM
-			class IStreamCipher {};
+			class ACS {};
 			class ChaCha256 {};
 			class ChaCha512 {};
+			class IStreamCipher {};
 			class Threefish256 {};
 			class Threefish512 {};
+			class Threefish1024 {};
 		NAMESPACE_STREAMEND
 		/*! @} */
 

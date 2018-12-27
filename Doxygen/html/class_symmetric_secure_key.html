@@ -98,9 +98,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae16cb355134332b7a5c9cfea15ff2e7b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ae16cb355134332b7a5c9cfea15ff2e7b">SymmetricSecureKey</a> ()=delete</td></tr>
 <tr class="memdesc:ae16cb355134332b7a5c9cfea15ff2e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#ae16cb355134332b7a5c9cfea15ff2e7b">More...</a><br /></td></tr>
 <tr class="separator:ae16cb355134332b7a5c9cfea15ff2e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4121ba28e2e818f4ef5d8be9894663f9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a4121ba28e2e818f4ef5d8be9894663f9">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, ulong KeySalt=0)</td></tr>
-<tr class="memdesc:a4121ba28e2e818f4ef5d8be9894663f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key.  <a href="#a4121ba28e2e818f4ef5d8be9894663f9">More...</a><br /></td></tr>
-<tr class="separator:a4121ba28e2e818f4ef5d8be9894663f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a178946be21cdb3d59184716c2fcf2401"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a178946be21cdb3d59184716c2fcf2401">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, ulong KeySalt=0)</td></tr>
+<tr class="memdesc:a178946be21cdb3d59184716c2fcf2401"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key.  <a href="#a178946be21cdb3d59184716c2fcf2401">More...</a><br /></td></tr>
+<tr class="separator:a178946be21cdb3d59184716c2fcf2401"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae595ec8b9505920c9f626df0e671fab9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ae595ec8b9505920c9f626df0e671fab9">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, ulong KeySalt=0)</td></tr>
 <tr class="memdesc:ae595ec8b9505920c9f626df0e671fab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key, and nonce parameters.  <a href="#ae595ec8b9505920c9f626df0e671fab9">More...</a><br /></td></tr>
 <tr class="separator:ae595ec8b9505920c9f626df0e671fab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,9 +159,9 @@ Static Public Member Functions</h2></td></tr>
 <p>Contains encrypted keying material used for initialization of symmetric ciphers, Macs, Rngs, and Drbgs.</p>
 <p>Implementation Notes: </p><ul>
 <li>
-Key arrays are encrypted when the class is instantiated with data, and decrypted when accessed through the data arrays getter property functions (Key, Nonce, and Info </li>
+Key arrays are encrypted when the class is instantiated with data, and decrypted when accessed through the data arrays getter property functions (Key, Nonce, and Info) </li>
 <li>
-The key material access is limited to the initializing process, user, and computer; it is not transferrable across process or machine boundaries </li>
+The key material access is limited to the initializing process, user, and computer; it is not transferrable across process, machine, or domain boundaries </li>
 <li>
 Accessing the property functions from another process, user, or computer, will change the encryption key and return invalid data </li>
 <li>
@@ -227,8 +227,8 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 
 </div>
 </div>
-<a id="a4121ba28e2e818f4ef5d8be9894663f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4121ba28e2e818f4ef5d8be9894663f9">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[3/5]</span></h2>
+<a id="a178946be21cdb3d59184716c2fcf2401"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a178946be21cdb3d59184716c2fcf2401">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -237,7 +237,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_SYMMETRICKEY SymmetricSecureKey::SymmetricSecureKey </td>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Key</em>, </td>

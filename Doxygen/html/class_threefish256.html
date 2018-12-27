@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A parallelized and vectorized Threefish-256 72-round stream cipher [TSX256] implementation.  
+<p>A vectorized and optionally parallelized Threefish-256 72-round stream cipher [TSX256] implementation.  
  <a href="class_threefish256.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_threefish256_8h_source.html">Threefish256.h</a>&gt;</code></p>
@@ -94,24 +94,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0cf213e824cf52a69c8da615b788ada0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_threefish256.html">Threefish256</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a0cf213e824cf52a69c8da615b788ada0">operator=</a> (const <a class="el" href="class_threefish256.html">Threefish256</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a0cf213e824cf52a69c8da615b788ada0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a0cf213e824cf52a69c8da615b788ada0">More...</a><br /></td></tr>
 <tr class="separator:a0cf213e824cf52a69c8da615b788ada0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29a052c115301546d5b664e1ee4b1d8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a29a052c115301546d5b664e1ee4b1d8e">Threefish256</a> (StreamAuthenticators Authenticator=StreamAuthenticators::None)</td></tr>
-<tr class="memdesc:a29a052c115301546d5b664e1ee4b1d8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the class.  <a href="#a29a052c115301546d5b664e1ee4b1d8e">More...</a><br /></td></tr>
-<tr class="separator:a29a052c115301546d5b664e1ee4b1d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6298a438967dbfec2742bb03aaa2206c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a6298a438967dbfec2742bb03aaa2206c">Threefish256</a> (StreamAuthenticators AuthenticatorType=StreamAuthenticators::KMAC256)</td></tr>
+<tr class="memdesc:a6298a438967dbfec2742bb03aaa2206c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Threefish-256 cipher.  <a href="#a6298a438967dbfec2742bb03aaa2206c">More...</a><br /></td></tr>
+<tr class="separator:a6298a438967dbfec2742bb03aaa2206c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b01055d43c5883bb09ef7f1768b06fa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a5b01055d43c5883bb09ef7f1768b06fa">~Threefish256</a> () override</td></tr>
 <tr class="memdesc:a5b01055d43c5883bb09ef7f1768b06fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a5b01055d43c5883bb09ef7f1768b06fa">More...</a><br /></td></tr>
 <tr class="separator:a5b01055d43c5883bb09ef7f1768b06fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac228b939bda9b16941e84646883efa7f"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#ac228b939bda9b16941e84646883efa7f">BlockSize</a> () override</td></tr>
-<tr class="memdesc:ac228b939bda9b16941e84646883efa7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Unit block size of internal cipher in bytes.  <a href="#ac228b939bda9b16941e84646883efa7f">More...</a><br /></td></tr>
+<tr class="memdesc:ac228b939bda9b16941e84646883efa7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Internal block size of internal cipher in bytes.  <a href="#ac228b939bda9b16941e84646883efa7f">More...</a><br /></td></tr>
 <tr class="separator:ac228b939bda9b16941e84646883efa7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e33b4b2ae30ba4e17b71099f4bb88bf"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a2e33b4b2ae30ba4e17b71099f4bb88bf">DistributionCode</a> () override</td></tr>
-<tr class="memdesc:a2e33b4b2ae30ba4e17b71099f4bb88bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The salt value in the initialization parameters (Tau-Sigma).  <a href="#a2e33b4b2ae30ba4e17b71099f4bb88bf">More...</a><br /></td></tr>
-<tr class="separator:a2e33b4b2ae30ba4e17b71099f4bb88bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa87997e3aedb1811cb3d0a4cd98decb4"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#aa87997e3aedb1811cb3d0a4cd98decb4">DistributionCodeMax</a> () override</td></tr>
 <tr class="memdesc:aa87997e3aedb1811cb3d0a4cd98decb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum size of the distribution code in bytes.  <a href="#aa87997e3aedb1811cb3d0a4cd98decb4">More...</a><br /></td></tr>
 <tr class="separator:aa87997e3aedb1811cb3d0a4cd98decb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a529590450d154f1de9e64c5268f38e7d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga62fe0a4066025a96f0d329627b1bf127">StreamCiphers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a529590450d154f1de9e64c5268f38e7d">Enumeral</a> () override</td></tr>
 <tr class="memdesc:a529590450d154f1de9e64c5268f38e7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers type name  <a href="#a529590450d154f1de9e64c5268f38e7d">More...</a><br /></td></tr>
 <tr class="separator:a529590450d154f1de9e64c5268f38e7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9354e83f25403f746d632401c3b6369"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#aa9354e83f25403f746d632401c3b6369">IsAuthenticator</a> () override</td></tr>
+<tr class="memdesc:aa9354e83f25403f746d632401c3b6369"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Cipher has authentication enabled  <a href="#aa9354e83f25403f746d632401c3b6369">More...</a><br /></td></tr>
+<tr class="separator:aa9354e83f25403f746d632401c3b6369"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a903f88bf4d5b54208d1e7703e72e04f4"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a903f88bf4d5b54208d1e7703e72e04f4">IsInitialized</a> () override</td></tr>
 <tr class="memdesc:a903f88bf4d5b54208d1e7703e72e04f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Cipher is ready to transform data  <a href="#a903f88bf4d5b54208d1e7703e72e04f4">More...</a><br /></td></tr>
 <tr class="separator:a903f88bf4d5b54208d1e7703e72e04f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -119,32 +119,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a090770d2dfc74390a825e5e16e0ce05c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#a090770d2dfc74390a825e5e16e0ce05c">More...</a><br /></td></tr>
 <tr class="separator:a090770d2dfc74390a825e5e16e0ce05c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e17f5adc9ac75e695f52ca50799729f"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a1e17f5adc9ac75e695f52ca50799729f">LegalKeySizes</a> () override</td></tr>
-<tr class="memdesc:a1e17f5adc9ac75e695f52ca50799729f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of allowed cipher input key byte-sizes  <a href="#a1e17f5adc9ac75e695f52ca50799729f">More...</a><br /></td></tr>
+<tr class="memdesc:a1e17f5adc9ac75e695f52ca50799729f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes  <a href="#a1e17f5adc9ac75e695f52ca50799729f">More...</a><br /></td></tr>
 <tr class="separator:a1e17f5adc9ac75e695f52ca50799729f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8277363c0e40bf8eff97f46ecdc2c66a"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; size_t &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a8277363c0e40bf8eff97f46ecdc2c66a">LegalRounds</a> () override</td></tr>
-<tr class="memdesc:a8277363c0e40bf8eff97f46ecdc2c66a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Available transformation round assignments  <a href="#a8277363c0e40bf8eff97f46ecdc2c66a">More...</a><br /></td></tr>
-<tr class="separator:a8277363c0e40bf8eff97f46ecdc2c66a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a480162ca19d4e4e672d6b88af15fc83c"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a480162ca19d4e4e672d6b88af15fc83c">Name</a> () override</td></tr>
+<tr class="memdesc:a480162ca19d4e4e672d6b88af15fc83c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers class name  <a href="#a480162ca19d4e4e672d6b88af15fc83c">More...</a><br /></td></tr>
+<tr class="separator:a480162ca19d4e4e672d6b88af15fc83c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a882e785843ec2fd5260355827836111c"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a882e785843ec2fd5260355827836111c">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:a882e785843ec2fd5260355827836111c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#a882e785843ec2fd5260355827836111c">More...</a><br /></td></tr>
 <tr class="separator:a882e785843ec2fd5260355827836111c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa458a2138889c3ea8ad6f2781069a9bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_parallel_options.html">ParallelOptions</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#aa458a2138889c3ea8ad6f2781069a9bd">ParallelProfile</a> () override</td></tr>
 <tr class="memdesc:aa458a2138889c3ea8ad6f2781069a9bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Parallel and SIMD capability flags and recommended sizes.  <a href="#aa458a2138889c3ea8ad6f2781069a9bd">More...</a><br /></td></tr>
 <tr class="separator:aa458a2138889c3ea8ad6f2781069a9bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a480162ca19d4e4e672d6b88af15fc83c"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a480162ca19d4e4e672d6b88af15fc83c">Name</a> () override</td></tr>
-<tr class="memdesc:a480162ca19d4e4e672d6b88af15fc83c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers class name  <a href="#a480162ca19d4e4e672d6b88af15fc83c">More...</a><br /></td></tr>
-<tr class="separator:a480162ca19d4e4e672d6b88af15fc83c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15c2a4da8d9794be8ac625141561590e"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a15c2a4da8d9794be8ac625141561590e">Rounds</a> () override</td></tr>
-<tr class="memdesc:a15c2a4da8d9794be8ac625141561590e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Number of rounds  <a href="#a15c2a4da8d9794be8ac625141561590e">More...</a><br /></td></tr>
-<tr class="separator:a15c2a4da8d9794be8ac625141561590e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fc74f288c848b12e66a5d247393a70e"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a2fc74f288c848b12e66a5d247393a70e">Tag</a> () override</td></tr>
+<tr class="memdesc:a2fc74f288c848b12e66a5d247393a70e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The current MAC tag value  <a href="#a2fc74f288c848b12e66a5d247393a70e">More...</a><br /></td></tr>
+<tr class="separator:a2fc74f288c848b12e66a5d247393a70e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19fb3214716d5be4968404bd9eeac8f8"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a19fb3214716d5be4968404bd9eeac8f8">TagSize</a> () override</td></tr>
 <tr class="memdesc:a19fb3214716d5be4968404bd9eeac8f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The legal tag length in bytes  <a href="#a19fb3214716d5be4968404bd9eeac8f8">More...</a><br /></td></tr>
 <tr class="separator:a19fb3214716d5be4968404bd9eeac8f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a362e6e73a14fa38389c19dd1c50601f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a362e6e73a14fa38389c19dd1c50601f5">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length)</td></tr>
-<tr class="memdesc:a362e6e73a14fa38389c19dd1c50601f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output array. <br />
-  <a href="#a362e6e73a14fa38389c19dd1c50601f5">More...</a><br /></td></tr>
-<tr class="separator:a362e6e73a14fa38389c19dd1c50601f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57712b57d86ec869ee25f5cdceaa8664"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a57712b57d86ec869ee25f5cdceaa8664">Authenticator</a> (StreamAuthenticators AuthenticatorType) override</td></tr>
+<tr class="memdesc:a57712b57d86ec869ee25f5cdceaa8664"><td class="mdescLeft">&#160;</td><td class="mdescRight">The stream ciphers authentication MAC generator type.  <a href="#a57712b57d86ec869ee25f5cdceaa8664">More...</a><br /></td></tr>
+<tr class="separator:a57712b57d86ec869ee25f5cdceaa8664"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade877839bf148c17f577678828c22d01"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#ade877839bf148c17f577678828c22d01">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:ade877839bf148c17f577678828c22d01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher.  <a href="#ade877839bf148c17f577678828c22d01">More...</a><br /></td></tr>
+<tr class="memdesc:ade877839bf148c17f577678828c22d01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher with an ISymmetricKey key container.  <a href="#ade877839bf148c17f577678828c22d01">More...</a><br /></td></tr>
 <tr class="separator:ade877839bf148c17f577678828c22d01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af810333f22c302eaa72babcd8b101ee7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#af810333f22c302eaa72babcd8b101ee7">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:af810333f22c302eaa72babcd8b101ee7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#af810333f22c302eaa72babcd8b101ee7">More...</a><br /></td></tr>
@@ -153,12 +149,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:adfc7a3654fc1e776dcccfb671148d749"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the authentication generator. <br />
   <a href="#adfc7a3654fc1e776dcccfb671148d749">More...</a><br /></td></tr>
 <tr class="separator:adfc7a3654fc1e776dcccfb671148d749"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16917a80f2b35c3bb96c0f25a3f70763"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a16917a80f2b35c3bb96c0f25a3f70763">TransformBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a16917a80f2b35c3bb96c0f25a3f70763"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt/Decrypt one block of bytes  <a href="#a16917a80f2b35c3bb96c0f25a3f70763">More...</a><br /></td></tr>
-<tr class="separator:a16917a80f2b35c3bb96c0f25a3f70763"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adca16003091d782a0e82695881633e50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#adca16003091d782a0e82695881633e50">TransformBlock</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset) override</td></tr>
-<tr class="memdesc:adca16003091d782a0e82695881633e50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt/Decrypt one block of bytes  <a href="#adca16003091d782a0e82695881633e50">More...</a><br /></td></tr>
-<tr class="separator:adca16003091d782a0e82695881633e50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87274f0765e22d353de3253c1467a80b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish256.html#a87274f0765e22d353de3253c1467a80b">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length) override</td></tr>
 <tr class="memdesc:a87274f0765e22d353de3253c1467a80b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt/Decrypt an array of bytes with offset and length parameters.  <a href="#a87274f0765e22d353de3253c1467a80b">More...</a><br /></td></tr>
 <tr class="separator:a87274f0765e22d353de3253c1467a80b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,52 +167,56 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad0d33aab27fe8dabe9160a560bc19d5b inherit pub_methods_class_i_stream_cipher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A parallelized and vectorized Threefish-256 72-round stream cipher [TSX256] implementation. </p>
-<p>Uses an optional authentication mode (HMAC(SHA2) or KMAC set through the constructor) to authenticate the stream.</p>
-<p>Encrypt an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> k(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish256.html">Threefish256</a> cipher;</div><div class="line"><span class="comment">// set to false to run in sequential mode</span></div><div class="line">cipher.<a class="code" href="class_threefish256.html#a090770d2dfc74390a825e5e16e0ce05c">IsParallel</a>() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// calculated automatically based on cache size, but overridable</span></div><div class="line">cipher.<a class="code" href="class_threefish256.html#a882e785843ec2fd5260355827836111c">ParallelBlockSize</a>() = cipher.ProcessorCount() * 3200;</div><div class="line">cipher.<a class="code" href="class_threefish256.html#ade877839bf148c17f577678828c22d01">Initialize</a>(<span class="keyword">true</span>, k);</div><div class="line">cipher.<a class="code" href="class_threefish256.html#a87274f0765e22d353de3253c1467a80b">Transform</a>(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Encrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> k(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish256.html">Threefish256</a> cipher(StreamAuthenticators::HMACSHA256);</div><div class="line"><span class="comment">// set to false to run in sequential mode</span></div><div class="line">cipher.<a class="code" href="class_threefish256.html#a090770d2dfc74390a825e5e16e0ce05c">IsParallel</a>() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.<a class="code" href="class_threefish256.html#ade877839bf148c17f577678828c22d01">Initialize</a>(<span class="keyword">true</span>, k);</div><div class="line">cipher.<a class="code" href="class_threefish256.html#a87274f0765e22d353de3253c1467a80b">Transform</a>(Input, InOffset, Output, OutOffset, Length);</div><div class="line"><span class="comment">// copy mac to end of ciphertext array</span></div><div class="line">cipher.<a class="code" href="class_threefish256.html#a362e6e73a14fa38389c19dd1c50601f5">Finalize</a>(Output, OutOffset + Length, CodeLength);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> k(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish256.html">Threefish256</a> cipher(StreamAuthenticators::HMACSHA256);</div><div class="line"><span class="comment">// set parallel to true to run in parallel mode</span></div><div class="line">cipher.<a class="code" href="class_threefish256.html#a090770d2dfc74390a825e5e16e0ce05c">IsParallel</a>() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.<a class="code" href="class_threefish256.html#ade877839bf148c17f577678828c22d01">Initialize</a>(<span class="keyword">false</span>, k);</div><div class="line"><span class="comment">// decrypt the ciphertext</span></div><div class="line"><span class="comment">// copy mac to temp for comparison</span></div><div class="line">std::vector&lt;byte&gt; mac(cipher.<a class="code" href="class_threefish256.html#a19fb3214716d5be4968404bd9eeac8f8">TagSize</a>(), 0);</div><div class="line">cipher.<a class="code" href="class_threefish256.html#a362e6e73a14fa38389c19dd1c50601f5">Finalize</a>(mac, 0, mac.size());</div><div class="line"><span class="comment">// constant time comparison of mac to embedded  code</span></div><div class="line"><a class="code" href="class_int_utils.html#acdd597db68ebafaf1ff7692a83a5ae5b">IntUtils::Compare</a>(Input, InOffset + Length, mac, 0, mac.size());</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<div class="textblock"><p>A vectorized and optionally parallelized Threefish-256 72-round stream cipher [TSX256] implementation. </p>
+<p>Uses an optional authentication mode; HMAC(SHA2) or KMAC set through the constructor to authenticate the stream.</p>
+<p>Encrypt an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish256.html">Threefish256</a> cipher(StreamAuthenticators::HMACSHA256);</div><div class="line"><span class="comment">// mac code is appended to the cipher-text stream in authentication mode</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Encrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish256.html">Threefish256</a> cipher(StreamAuthenticators::HMACSHA256);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish256.html">Threefish256</a> cipher(StreamAuthenticators::HMACSHA256);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"><span class="comment">// decrypt the ciphertext</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="struct_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>This cipher is a vectorized and optionally parallelized implementation of the Threefish256 cipher, used by the Skein family of hash functions. <br />
+It is capable of processing data using AVX2 or AVX512 SIMD instructions, and can also optionally employ multi-threaded parallelism. <br />
+An optional authentication component has also been added, and the cipher output can be authenticated using either an SHA2 hash based HMAC, or the Keccak based KMAC message authentication code generators.</p>
 <p><b>Multi-Threading:</b> </p>
 <p>The transformation function used by Threefish is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded. <br />
 This is achieved by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads. <br />
  The key stream generated by encrypting the counter array(s), is used as a source of random, and XOR'd with the message input to produce the cipher text.</p>
+<p><b>Authentication:</b> </p>
+<p>When operating in authenticated mode; in an encryption cycle the MAC code is automatically appended to the output cipher-text. <br />
+During a decryption cycle, the code is checked against the new code generated by the MAC generator, and a failure will throw a CryptoAuthenticationFailure exception. <br />
+It is recommended that the decryption function is wrapped in a try/catch block, so that CryptoAuthenticationFailure can be handled by the calling function. <br />
+The supported MAC generator options for Threefish256 are HMAC(SHA2-256), and the Keccak based KMAC-256.</p>
 <p>Implementation Notes: </p><ul>
 <li>
 </li>
 <li>
 The Key size is 32 bytes (256 bits). </li>
 <li>
+The mandatory nonce size is 16 bytes (128 bits). </li>
+<li>
+The Info string is optional, but can be used to create a tweakable cipher; it must be 16 bytes in length. </li>
+<li>
+Block size is 32 bytes wide (256 bits). </li>
+<li>
+Permutation rounds are fixed at 72. </li>
+<li>
 This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to one of the HMAC or KMAC options. </li>
 <li>
-Use the Finalize(Output, Offset, Length) function to calculate the MAC code; that code can either be appended to the cipher-text on encryption, or used to compare to an existing code in the stream using the decryption mode. </li>
+In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception. </li>
 <li>
-In authenticated mode, the cipher-key generated by SHAKE will be constant even with differing MAC generators; only two cipher-text outputs are possible, authenticated or non-authenticated. </li>
+In authenticated mode, the cipher-key generated by cSHAKE will be constant even with differing MAC generators; only two cipher-text outputs are possible, authenticated or non-authenticated. </li>
 <li>
-If authentication is enabled, the cipher-key and MAC seed are generated using SHAKE, this will change the cipher-text output. </li>
-<li>
-The nonce size is 16 bytes (128 bits), this value is optional but recommended. </li>
-<li>
-Block size is 32 bytes (256 bits) wide. </li>
-<li>
-The Info string is optional, but can be used to create a tweakable cipher; must be no more than 16 bytes in length. </li>
+If authentication is enabled, the cipher-key and MAC seed are generated using cSHAKE, this will change the cipher-text output. </li>
 <li>
 Authentication using HMAC or KMAC, can be invoked by setting the StreamAuthenticators parameter in the constructor. </li>
 <li>
-The authentication code can be generated and added to an encrypted stream using the Finalize(Output, Offset, Length) function. </li>
-<li>
-A MAC code can be verified by calling the boolean Verify(Input, Offset, Length) function. </li>
-<li>
-Permutation rounds are fixed at 96. </li>
-<li>
 Encryption can both be pipelined (AVX2 or AVX512), and multi-threaded with any even number of threads. </li>
 <li>
-The Transform functions are virtual, and can be accessed from an ICipherMode instance. </li>
+The class functions are virtual, and can be accessed from an IStreamCipher instance. </li>
 <li>
-The transformation methods can not be called until the Initialize(SymmetricKey) function has been called. </li>
+The transformation functions can not be called until the Initialize(ISymmetricKey) function has been called. </li>
 <li>
-If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized. </li>
+If the system supports Parallel processing, and ParallelProfile().IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized. </li>
 <li>
-The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system. </li>
+The ParallelProfile().ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system. </li>
 <li>
-ParallelBlockSize() is calculated automatically based on processor(s) cache size but can be user defined, but must be evenly divisible by ParallelMinimumSize(). </li>
+ParallelProfile().ParallelBlockSize() is calculated automatically based on processor(s) cache size but can be user defined, but must be evenly divisible by ParallelProfile().ParallelMinimumSize(). </li>
 <li>
 The ParallelBlockSize() can be changed through the ParallelProfile() property </li>
 <li>
@@ -237,6 +231,12 @@ NIST Round 3 <a href="https://www.schneier.com/academic/paperfiles/skein-1.3-mod
 Skein <a href="https://www.schneier.com/academic/paperfiles/skein-proofs.pdf">Provable Security</a> Support for the Skein Hash Family. </li>
 <li>
 NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition&gt;. </li>
+<li>
+FIPS 202: <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">Permutation Based Hash</a> and Extendable Output Functions </li>
+<li>
+NIST <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SP800-185</a> SHA-3 Derived Functions. </li>
+<li>
+Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </ol>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a6c804cf13b20a2494d4aa7094a885269"></a>
@@ -267,8 +267,8 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 
 </div>
 </div>
-<a id="a29a052c115301546d5b664e1ee4b1d8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a29a052c115301546d5b664e1ee4b1d8e">&#9670;&nbsp;</a></span>Threefish256() <span class="overload">[2/2]</span></h2>
+<a id="a6298a438967dbfec2742bb03aaa2206c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6298a438967dbfec2742bb03aaa2206c">&#9670;&nbsp;</a></span>Threefish256() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -280,7 +280,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
           <td class="memname">Threefish256::Threefish256 </td>
           <td>(</td>
           <td class="paramtype">StreamAuthenticators&#160;</td>
-          <td class="paramname"><em>Authenticator</em> = <code>StreamAuthenticators::None</code></td><td>)</td>
+          <td class="paramname"><em>AuthenticatorType</em> = <code>StreamAuthenticators::KMAC256</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -291,11 +291,17 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the class. </p>
-<p>Setting the optional Mac parameter to any value other than None (the default), enables authentication for this cipher. Use the Finalize function to derive the Mac code once processing of the message stream has completed.</p>
+<p>Initialize the Threefish-256 cipher. </p>
+<p>Setting the optional AuthenticatorType parameter to any value other than None, enables authentication for this cipher. Use the Finalize function to derive the Mac code once processing of the message stream has completed. The default authenticator parameter in Threefish-256 is KMAC256; valid options are, None, HMACSHA256, and KMAC256.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Authenticator</td><td>The optional Message Authentication Code generator type</td></tr>
+    <tr><td class="paramname">AuthenticatorType</td><td>The authentication engine, the default is KMAC256</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if an invalid authentication method is chosen</td></tr>
   </table>
   </dd>
 </dl>
@@ -330,6 +336,43 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a57712b57d86ec869ee25f5cdceaa8664"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57712b57d86ec869ee25f5cdceaa8664">&#9670;&nbsp;</a></span>Authenticator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Threefish256::Authenticator </td>
+          <td>(</td>
+          <td class="paramtype">StreamAuthenticators&#160;</td>
+          <td class="paramname"><em>AuthenticatorType</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The stream ciphers authentication MAC generator type. </p>
+<p>Change the MAC generator (HMAC, KMAK -N), type used to authenticate the stream.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">AuthenticatorType</td><td>The MAC generator type used to calculate the authentication code</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_stream_cipher.html#ac9281aba075583407f8dcd8e59208aa5">IStreamCipher</a>.</p>
+
+</div>
+</div>
 <a id="ac228b939bda9b16941e84646883efa7f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac228b939bda9b16941e84646883efa7f">&#9670;&nbsp;</a></span>BlockSize()</h2>
 
@@ -353,40 +396,10 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Unit block size of internal cipher in bytes. </p>
-<p>Block size is 64 bytes wide.</p>
+<p>Read Only: Internal block size of internal cipher in bytes. </p>
+<p>Block size is 32 bytes wide.</p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#ab43c314979a5ba8f9bcdd2a2918668c5">IStreamCipher</a>.</p>
-
-</div>
-</div>
-<a id="a2e33b4b2ae30ba4e17b71099f4bb88bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2e33b4b2ae30ba4e17b71099f4bb88bf">&#9670;&nbsp;</a></span>DistributionCode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt; byte &gt; &amp; Threefish256::DistributionCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The salt value in the initialization parameters (Tau-Sigma). </p>
-<p>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default. Changing this code will create a unique distribution of the cipher. For best security, the code should be a random extenion of the key, with rounds increased to 40 or more. Code must be non-zero, 16 bytes in length, and sufficiently asymmetric. If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</p>
-
-<p>Implements <a class="el" href="class_i_stream_cipher.html#a5d9e7d7e1d7da10b42ad8845bca2c411">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -414,7 +427,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </div><div class="memdoc">
 
 <p>Read Only: The maximum size of the distribution code in bytes. </p>
-<p>The distribution code can be used as a secondary domain key.</p>
+<p>The distribution code is set with the ISymmetricKey Info parameter; and can be used as a secondary domain key.</p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#ab19df3b39349ed54f076d2eb7bf59792">IStreamCipher</a>.</p>
 
@@ -446,69 +459,6 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 <p>Read Only: The stream ciphers type name </p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a9a99aa0832cd3263de8c6d09de0f39de">IStreamCipher</a>.</p>
-
-</div>
-</div>
-<a id="a362e6e73a14fa38389c19dd1c50601f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a362e6e73a14fa38389c19dd1c50601f5">&#9670;&nbsp;</a></span>Finalize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Threefish256::Finalize </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Calculate the MAC code (Tag) and copy it to the Output array. <br />
- </p>
-<p>The Finalize call can be made incrementally at any byte interval during the transformation without having to re-initialize the cipher. The output array must be of sufficient length to receive the MAC code. This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>The output array that receives the authentication code</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of MAC code bytes to write to the output array. </td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Must be no greater than the MAC functions output size.</p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if the cipher was not initialized for authentication</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_stream_cipher.html#abe1a006ddbf156e7abbc583eec18185f">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -546,12 +496,12 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the cipher. </p>
-<p>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream. Authentication on a decrypted stream can be performed using either the boolean Verify(Input, Offset, Length), or manually compared using the Finalize(Output, Offset, Length) function. If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</p>
+<p>Initialize the cipher with an ISymmetricKey key container. </p>
+<p>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream. Authentication on a decrypted stream is performed automatically; failure will throw a CryptoAuthenticationFailure exception. If encryption and authentication are set to true, the MAC code is appended to the ciphertext array.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Encryption</td><td>Using Encryption or Decryption mode</td></tr>
-    <tr><td class="paramname">KeyParams</td><td>Cipher key structure, containing cipher key, and optional nonce pair and info arrays</td></tr>
+    <tr><td class="paramname">KeyParams</td><td>Cipher key structure, containing cipher key, nonce, and optional info array</td></tr>
   </table>
   </dd>
 </dl>
@@ -563,6 +513,35 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </dl>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#af8a12c0e2af8b9c60d3278306c95d620">IStreamCipher</a>.</p>
+
+</div>
+</div>
+<a id="aa9354e83f25403f746d632401c3b6369"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9354e83f25403f746d632401c3b6369">&#9670;&nbsp;</a></span>IsAuthenticator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const bool Threefish256::IsAuthenticator </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Cipher has authentication enabled </p>
+
+<p>Implements <a class="el" href="class_i_stream_cipher.html#afe81de6080616f45138d3df0be2d71a2">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -619,7 +598,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </div><div class="memdoc">
 
 <p>Read Only: Processor parallelization availability. </p>
-<p>Indicates whether parallel processing is available with this mode. If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</p>
+<p>Indicates whether parallel processing is available with this cipher. If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a79947c59521fb1f7440cc3a6cb57c766">IStreamCipher</a>.</p>
 
@@ -648,38 +627,9 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Array of allowed cipher input key byte-sizes </p>
+<p>Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes </p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a50c9524e55e3a37bf648baf2c3933d0e">IStreamCipher</a>.</p>
-
-</div>
-</div>
-<a id="a8277363c0e40bf8eff97f46ecdc2c66a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8277363c0e40bf8eff97f46ecdc2c66a">&#9670;&nbsp;</a></span>LegalRounds()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt; size_t &gt; &amp; Threefish256::LegalRounds </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: Available transformation round assignments </p>
-
-<p>Implements <a class="el" href="class_i_stream_cipher.html#a3a74e4dcf486c0aee2ce485b3fa96bc3">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -795,7 +745,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </div><div class="memdoc">
 
 <p>Set the maximum number of threads allocated when using multi-threaded processing. </p>
-<p>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. Thread count must be an even number, and not exceed the number of processor cores.</p>
+<p>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. Thread count must be an even number, and not exceed the number of processor [virtual] cores.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
@@ -831,38 +781,9 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </div><div class="memdoc">
 
 <p>Read/Write: Parallel and SIMD capability flags and recommended sizes. </p>
-<p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(SymmetricKey) function is called.</p>
+<p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(bool, ISymmetricKey) function is called.</p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#abd0fdb581ea82a4146ed2cc2b671c675">IStreamCipher</a>.</p>
-
-</div>
-</div>
-<a id="a15c2a4da8d9794be8ac625141561590e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15c2a4da8d9794be8ac625141561590e">&#9670;&nbsp;</a></span>Rounds()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t Threefish256::Rounds </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: Number of rounds </p>
-
-<p>Implements <a class="el" href="class_i_stream_cipher.html#a8905883f55fd49c6c3909994b3b7ba43">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -908,7 +829,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 
 <p>Add additional data to the authentication generator. <br />
  </p>
-<p>Must be called after Initialize(bool, ISymmetricKey), and can be called after the processing of a plaintext or ciphertext input.</p>
+<p>Must be called after Initialize(bool, ISymmetricKey), and can be called before or after a stream segment has been processed.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Input</td><td>The input array of bytes to process</td></tr>
@@ -925,6 +846,35 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </dl>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#aac6f69ec029ba6b6c13a3271d05cec80">IStreamCipher</a>.</p>
+
+</div>
+</div>
+<a id="a2fc74f288c848b12e66a5d247393a70e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fc74f288c848b12e66a5d247393a70e">&#9670;&nbsp;</a></span>Tag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; byte &gt; &amp; Threefish256::Tag </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The current MAC tag value </p>
+
+<p>Implements <a class="el" href="class_i_stream_cipher.html#adcc52d5a6b907468fa7f9b272d027a79">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -1010,7 +960,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </div><div class="memdoc">
 
 <p>Encrypt/Decrypt an array of bytes with offset and length parameters. </p>
-<p>Initialize(SymmetricKey) must be called before this method can be used.</p>
+<p>Initialize(bool, ISymmetricKey) must be called before this method can be used. In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be long enough to accommodate this code. In decryption mode, this code is checked before the stream is decrypted, if the authentication fails a CryptoAuthenticationFailure exception is thrown.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Input</td><td>The input array of bytes to transform</td></tr>
@@ -1021,116 +971,14 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoAuthenticationFailure</td><td>Thrown during decryption if the the ciphertext fails authentication</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#aec123c7f27b0c09142523018fe206b38">IStreamCipher</a>.</p>
-
-</div>
-</div>
-<a id="a16917a80f2b35c3bb96c0f25a3f70763"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a16917a80f2b35c3bb96c0f25a3f70763">&#9670;&nbsp;</a></span>TransformBlock() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Threefish256::TransformBlock </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Encrypt/Decrypt one block of bytes </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to transform</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of transformed bytes</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_stream_cipher.html#af0a9b3968c24470a81bcc666ec0f5677">IStreamCipher</a>.</p>
-
-</div>
-</div>
-<a id="adca16003091d782a0e82695881633e50"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adca16003091d782a0e82695881633e50">&#9670;&nbsp;</a></span>TransformBlock() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Threefish256::TransformBlock </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const size_t&#160;</td>
-          <td class="paramname"><em>InOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Encrypt/Decrypt one block of bytes </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to transform</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of transformed bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_stream_cipher.html#a0c1d6eff1ad7808040c7ff4327f1e8d8">IStreamCipher</a>.</p>
 
 </div>
 </div>

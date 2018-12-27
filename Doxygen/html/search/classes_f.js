@@ -1,6 +1,7 @@
 var searchData=
 [
   ['scrypt',['SCRYPT',['../class_s_c_r_y_p_t.html',1,'']]],
+  ['securememory',['SecureMemory',['../class_secure_memory.html',1,'']]],
   ['securerandom',['SecureRandom',['../class_secure_random.html',1,'']]],
   ['securestream',['SecureStream',['../class_secure_stream.html',1,'']]],
   ['sha2',['SHA2',['../struct_s_h_a2.html',1,'']]],
@@ -16,9 +17,6 @@ var searchData=
   ['skeinparams',['SkeinParams',['../class_skein_params.html',1,'']]],
   ['skeinubitweak',['SkeinUbiTweak',['../class_skein_ubi_tweak.html',1,'']]],
   ['sphincs',['Sphincs',['../class_sphincs.html',1,'']]],
-  ['sphincskeypair',['SphincsKeyPair',['../class_sphincs_key_pair.html',1,'']]],
-  ['sphincsprivatekey',['SphincsPrivateKey',['../class_sphincs_private_key.html',1,'']]],
-  ['sphincspublickey',['SphincsPublicKey',['../class_sphincs_public_key.html',1,'']]],
   ['sphincsutils',['SphincsUtils',['../class_sphincs_utils.html',1,'']]],
   ['spxf256',['SPXF256',['../class_s_p_x_f256.html',1,'']]],
   ['streamcipherfromname',['StreamCipherFromName',['../class_stream_cipher_from_name.html',1,'']]],

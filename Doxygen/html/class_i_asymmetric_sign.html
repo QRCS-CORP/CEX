@@ -119,12 +119,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a95d9971467e4cef79b51f960c4c64575"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a95d9971467e4cef79b51f960c4c64575">PublicKeySize</a> ()=0</td></tr>
 <tr class="memdesc:a95d9971467e4cef79b51f960c4c64575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key size in bytes  <a href="#a95d9971467e4cef79b51f960c4c64575">More...</a><br /></td></tr>
 <tr class="separator:a95d9971467e4cef79b51f960c4c64575"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a84ecabcdeed5f7bc611f9c69e5b07b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a5a84ecabcdeed5f7bc611f9c69e5b07b">Generate</a> ()=0</td></tr>
-<tr class="memdesc:a5a84ecabcdeed5f7bc611f9c69e5b07b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#a5a84ecabcdeed5f7bc611f9c69e5b07b">More...</a><br /></td></tr>
-<tr class="separator:a5a84ecabcdeed5f7bc611f9c69e5b07b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19b890923492323d38717bc459698756"><td class="memItemLeft" align="right" valign="top">virtual const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a19b890923492323d38717bc459698756">Initialize</a> (<a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *AsymmetricKey)=0</td></tr>
-<tr class="memdesc:a19b890923492323d38717bc459698756"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the signature scheme for signing (private key) or verifying (public key)  <a href="#a19b890923492323d38717bc459698756">More...</a><br /></td></tr>
-<tr class="separator:a19b890923492323d38717bc459698756"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab51a5eb81adf56edf13cf4f6413114d9"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_asymmetric_key_pair.html">AsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#ab51a5eb81adf56edf13cf4f6413114d9">Generate</a> ()=0</td></tr>
+<tr class="memdesc:ab51a5eb81adf56edf13cf4f6413114d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#ab51a5eb81adf56edf13cf4f6413114d9">More...</a><br /></td></tr>
+<tr class="separator:ab51a5eb81adf56edf13cf4f6413114d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b35faed78f989e5f9899d6ecd3241f5"><td class="memItemLeft" align="right" valign="top">virtual const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a4b35faed78f989e5f9899d6ecd3241f5">Initialize</a> (<a class="el" href="class_asymmetric_key.html">AsymmetricKey</a> *<a class="el" href="class_asymmetric_key.html">AsymmetricKey</a>)=0</td></tr>
+<tr class="memdesc:a4b35faed78f989e5f9899d6ecd3241f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the signature scheme for signing (private key) or verifying (public key)  <a href="#a4b35faed78f989e5f9899d6ecd3241f5">More...</a><br /></td></tr>
+<tr class="separator:a4b35faed78f989e5f9899d6ecd3241f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c6d71ed448c63a5d48d486969ca92ca"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a1c6d71ed448c63a5d48d486969ca92ca">Sign</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>, std::vector&lt; byte &gt; &amp;Signature)=0</td></tr>
 <tr class="memdesc:a1c6d71ed448c63a5d48d486969ca92ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign a message array and return the message and attached signature  <a href="#a1c6d71ed448c63a5d48d486969ca92ca">More...</a><br /></td></tr>
 <tr class="separator:a1c6d71ed448c63a5d48d486969ca92ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,12 +243,12 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The signature schemes type-name </p>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#a00933b00989256cbb6fbaa33360885cc">Sphincs</a>, and <a class="el" href="class_dilithium.html#a504fe2e7bc6443a0ab7932b33720277a">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#a504fe2e7bc6443a0ab7932b33720277a">Dilithium</a>, and <a class="el" href="class_sphincs.html#a00933b00989256cbb6fbaa33360885cc">Sphincs</a>.</p>
 
 </div>
 </div>
-<a id="a5a84ecabcdeed5f7bc611f9c69e5b07b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a84ecabcdeed5f7bc611f9c69e5b07b">&#9670;&nbsp;</a></span>Generate()</h2>
+<a id="ab51a5eb81adf56edf13cf4f6413114d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab51a5eb81adf56edf13cf4f6413114d9">&#9670;&nbsp;</a></span>Generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -257,7 +257,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* IAsymmetricSign::Generate </td>
+          <td class="memname">virtual <a class="el" href="class_asymmetric_key_pair.html">AsymmetricKeyPair</a>* IAsymmetricSign::Generate </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -279,12 +279,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#abaaa0fe20de4ca0429f293e5e8fc025c">Sphincs</a>, and <a class="el" href="class_dilithium.html#a9678cdb8e448a01cd43d026d646f7ceb">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#aee7a6792d2c7aec164cc92304b03409f">Dilithium</a>, and <a class="el" href="class_sphincs.html#ad09e3b91330fdea9190b0a65660cbf3c">Sphincs</a>.</p>
 
 </div>
 </div>
-<a id="a19b890923492323d38717bc459698756"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a19b890923492323d38717bc459698756">&#9670;&nbsp;</a></span>Initialize()</h2>
+<a id="a4b35faed78f989e5f9899d6ecd3241f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b35faed78f989e5f9899d6ecd3241f5">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -295,7 +295,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual const void IAsymmetricSign::Initialize </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="class_asymmetric_key.html">AsymmetricKey</a> *&#160;</td>
           <td class="paramname"><em>AsymmetricKey</em></td><td>)</td>
           <td></td>
         </tr>
@@ -310,12 +310,12 @@ Public Member Functions</h2></td></tr>
 <p>Initialize the signature scheme for signing (private key) or verifying (public key) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">AsymmetricKey</td><td>The <a class="el" href="group___asymmetric_key.html" title="Asymmetric Key containers and generator. ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
+    <tr><td class="paramname">AsymmetricKey</td><td>The <a class="el" href="class_asymmetric_key.html" title="An Asymmetric cipher key container ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#ab81d11344f348905b88a8a896bff3fe0">Sphincs</a>, and <a class="el" href="class_dilithium.html#a69364ad4248ade5306e7869f9a828f5f">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#ac2af8aa68030cebfb9df5704b2cf4d5d">Dilithium</a>, and <a class="el" href="class_sphincs.html#a8fe512af37d407c7e4ea35bb9ae8b427">Sphincs</a>.</p>
 
 </div>
 </div>
@@ -344,7 +344,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The signature scheme has been initialized with a key </p>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#a588146e86b94ac4199e4ef9f8e2314c0">Sphincs</a>, and <a class="el" href="class_dilithium.html#a4e9457aab532fb5f640306d77e5945f6">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#a4e9457aab532fb5f640306d77e5945f6">Dilithium</a>, and <a class="el" href="class_sphincs.html#a588146e86b94ac4199e4ef9f8e2314c0">Sphincs</a>.</p>
 
 </div>
 </div>
@@ -373,7 +373,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: This class is initialized for Signing with the Private key </p>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#aa0eb4574df842bb3c6d389ea8a1bba76">Sphincs</a>, and <a class="el" href="class_dilithium.html#a53998ac127553733580db685517c80f9">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#a53998ac127553733580db685517c80f9">Dilithium</a>, and <a class="el" href="class_sphincs.html#aa0eb4574df842bb3c6d389ea8a1bba76">Sphincs</a>.</p>
 
 </div>
 </div>
@@ -402,7 +402,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The signature scheme name </p>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#a61ea39256ea247709d7d72e8fbeb9dcb">Sphincs</a>, and <a class="el" href="class_dilithium.html#a3a75022e2d83b41747c07aa6fa4d6fec">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#a3a75022e2d83b41747c07aa6fa4d6fec">Dilithium</a>, and <a class="el" href="class_sphincs.html#a61ea39256ea247709d7d72e8fbeb9dcb">Sphincs</a>.</p>
 
 </div>
 </div>
@@ -459,7 +459,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The expected Private key size in bytes </p>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#a08985c961919894c9b69b4388c707a7a">Sphincs</a>, and <a class="el" href="class_dilithium.html#a9e374ef7058b87bd76989fd093cb0f2a">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#a9e374ef7058b87bd76989fd093cb0f2a">Dilithium</a>, and <a class="el" href="class_sphincs.html#a08985c961919894c9b69b4388c707a7a">Sphincs</a>.</p>
 
 </div>
 </div>
@@ -488,7 +488,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The expected Public key size in bytes </p>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#a384523c49d175414091494c466abc087">Sphincs</a>, and <a class="el" href="class_dilithium.html#aa625f481f6b09af524694fdb839c9f13">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#aa625f481f6b09af524694fdb839c9f13">Dilithium</a>, and <a class="el" href="class_sphincs.html#a384523c49d175414091494c466abc087">Sphincs</a>.</p>
 
 </div>
 </div>
@@ -536,7 +536,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns the size of the signed message</dd></dl>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#aaa9ddb2a6c9fed9485791bd7008bc129">Sphincs</a>, and <a class="el" href="class_dilithium.html#a866323ff7d78fc3cf258a51e897e3ba1">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#a866323ff7d78fc3cf258a51e897e3ba1">Dilithium</a>, and <a class="el" href="class_sphincs.html#aaa9ddb2a6c9fed9485791bd7008bc129">Sphincs</a>.</p>
 
 </div>
 </div>
@@ -584,7 +584,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns true if the signature matches</dd></dl>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#a75123662e6c7df9f74d8ddfd12437d34">Sphincs</a>, and <a class="el" href="class_dilithium.html#a18b11c85551cae8a6cb7e3b7863c1d7b">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_dilithium.html#a18b11c85551cae8a6cb7e3b7863c1d7b">Dilithium</a>, and <a class="el" href="class_sphincs.html#a75123662e6c7df9f74d8ddfd12437d34">Sphincs</a>.</p>
 
 </div>
 </div>

@@ -192,7 +192,7 @@ With the Initialize(Key) method, the key must be at least the ciphers block-size
 <li>
 The Initialize(Key, Salt), and Initialize(Key, Salt, Info) methods, use the Key parameter as the cipher key, and the Salt as the initialization vector. </li>
 <li>
-The Initialize(Key, Salt, Info) method assigns the Info array to an HX extended ciphers DistributionCode property; used by the secure key schedule. </li>
+The Initialize(Key, Salt, Info) method assigns the Info array to an HX extended ciphers DistributionCode property; used by the secure key schedule to create an encryption domain. </li>
 <li>
 After a finalizer call (Finalize or Compute), the Mac functions state is reset and must be re-initialized with a new key. </li>
 </ul>
