@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_poly1305-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Poly1305 Class Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
+<div class="title">Poly1305 Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___mac.html">Mac</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -152,7 +152,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Poly1305 Message Authentication Code generator </p>
-<p>Example generating a MAC code from an Input array </p><div class="fragment"><div class="line"><span class="comment">// the default constructor uses the sequential processing mode (no cipher assist, just Poly1305)</span></div><div class="line"><a class="code" href="class_poly1305.html">Poly1305</a> mac(Enumeration::BlockCiphers::Rijndael);</div><div class="line"></div><div class="line"><span class="comment">// Note: if key is not pre-conditioned for Poly1305-AES, it will be clamped automatically in Initialize(&amp;ISymmetricKey)</span></div><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>);</div><div class="line">mac.<a class="code" href="class_h_m_a_c.html#a134fce299837da79ed312be1d9d81d07">Initialize</a>(kp);</div><div class="line">mac.<a class="code" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">Update</a>(Input, 0, Input.size());</div><div class="line">mac.<a class="code" href="class_h_m_a_c.html#afed75e57ce7bd44b5e19e19071eab845">Finalize</a>(Output, Offset);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>Example generating a MAC code from an Input array </p><div class="fragment"><div class="line"><span class="comment">// the default constructor uses the sequential processing mode (no cipher assist, just Poly1305)</span></div><div class="line"><a class="code" href="class_poly1305.html">Poly1305</a> mac(Enumeration::BlockCiphers::Rijndael);</div><div class="line"></div><div class="line"><span class="comment">// Note: if key is not pre-conditioned for Poly1305-AES, it will be clamped automatically in Initialize(&amp;ISymmetricKey)</span></div><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>);</div><div class="line">mac.<a class="code" href="class_h_m_a_c.html#a134fce299837da79ed312be1d9d81d07">Initialize</a>(kp);</div><div class="line">mac.<a class="code" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">Update</a>(Input, 0, Input.size());</div><div class="line">mac.<a class="code" href="class_h_m_a_c.html#afed75e57ce7bd44b5e19e19071eab845">Finalize</a>(Output, Offset);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>Poly1305 and the cipher assisted variant Poly1305-AES are Message Authentication Code generators that return a 16-byte authentication code for a message of any length. Both variants use a a 32-byte secret key, with the Poly1305-AES mode also requiring a 16-byte nonce (unique message number). <br />
 This MAC generator can be used in tandem with a symmetric cipher, to generate an authentication code along with each encrypted message segment.</p>
 <p>Implementation Notes: </p><ul>
@@ -723,6 +723,7 @@ Twofish: <a href="https://www.schneier.com/paper-twofish-paper.pdf">Specificatio
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
+<li>C:/Users/John/Documents/GitHub/CEX/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
 <li>C:/Users/John/Documents/GitHub/CEX/CEX/<a class="el" href="_poly1305_8h_source.html">Poly1305.h</a></li>
 <li>C:/Users/John/Documents/GitHub/CEX/CEX/Poly1305.cpp</li>
 </ul>

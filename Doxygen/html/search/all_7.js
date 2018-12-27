@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['half',['Half',['../group___enumeration.html#gga0723717e3a79eed5c042d2059894ba5eac48615a1bc4197056d522af276aa5a85',1,'Documentation.h']]],
   ['hasprefetch',['HasPrefetch',['../class_parallel_options.html#afca50e00e32b9e5f850c966ca41bd01e',1,'ParallelOptions']]],
   ['hasrdtsc',['HasRdtsc',['../class_sys_utils.html#ac670506fd547970624317ac67e342d5e',1,'SysUtils']]],
   ['hassha2',['HasSHA2',['../class_parallel_options.html#a94efd9913e51fb7444f3f474ed27994d',1,'ParallelOptions']]],
@@ -13,5 +14,7 @@ var searchData=
   ['hkdf256',['HKDF256',['../group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda4484af85c975af92f5887ba9be983e59',1,'HKDF256():&#160;Documentation.h'],['../group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da4484af85c975af92f5887ba9be983e59',1,'HKDF256():&#160;Documentation.h']]],
   ['hkdf512',['HKDF512',['../group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda2e4a5e5ad9cdce79dbe7a0aa64cecad4',1,'HKDF512():&#160;Documentation.h'],['../group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da2e4a5e5ad9cdce79dbe7a0aa64cecad4',1,'HKDF512():&#160;Documentation.h']]],
   ['hmac',['HMAC',['../class_h_m_a_c.html',1,'HMAC'],['../class_h_m_a_c.html#a9f4e42f005d99c8b61e9451ac9368f59',1,'HMAC::HMAC(const HMAC &amp;)=delete'],['../class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530',1,'HMAC::HMAC()=delete'],['../class_h_m_a_c.html#aaab7675637bcbca1a6180ab39dcaa137',1,'HMAC::HMAC(SHA2Digests DigestType, bool Parallel=false)'],['../class_h_m_a_c.html#a4a9ca4c3f837eecc6c9304220e32e9bb',1,'HMAC::HMAC(IDigest *Digest)'],['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ad90d710b6a4618188f5dc2a19a8cdcf9',1,'HMAC():&#160;Documentation.h']]],
+  ['hmacsha256',['HMACSHA256',['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55',1,'Documentation.h']]],
+  ['hmacsha512',['HMACSHA512',['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a0ff37e2df6d3d9e355c3039bb6358c1b',1,'Documentation.h']]],
   ['hyperthread',['HyperThread',['../class_cpu_detect.html#a323052c39ee2dda4ce51219053f28e93',1,'CpuDetect']]]
 ];

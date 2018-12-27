@@ -289,7 +289,6 @@ NAMESPACE_ROOT
 	*  @{
 	*/
 	NAMESPACE_COMMON
-		class CipherDescription {};
 		class CpuDetect {};
 		class ParallelOptions {};
 	NAMESPACE_COMMONEND
@@ -301,23 +300,27 @@ NAMESPACE_ROOT
 	*  @{
 	*/
 	NAMESPACE_DIGEST
+		class Blake2 {};
 		class Blake512 {};
 		class Blake256 {};
 		class Blake2Params {};
 		class IDigest {};
+		class Keccak {};
 		class Keccak256 {};
 		class Keccak512 {};
 		class Keccak1024 {};
 		class KeccakParams {};
+		class KeccakState {};
+		class SHA2 {};
 		class SHA256 {};
 		class SHA512 {};
 		class SHA2Params {};
+		class Skein {};
 		class Skein256 {};
 		class Skein512 {};
 		class Skein1024 {};
 		class SkeinParams {};
 		class SkeinUbiTweak {};
-		enum class SkeinUbiType {};
 	NAMESPACE_DIGESTEND
 	/*! @} */
 
@@ -340,28 +343,42 @@ NAMESPACE_ROOT
 	*  @brief Cryptographic Enumerations
 	*/
 	NAMESPACE_ENUMERATION
+		enum class AeadModes {};
 		enum class AsymmetricEngines {};
-		enum class BlockCipherExtensions {};
+		enum class AsymmetricKeyTypes {};
+		enum class AsymmetricTransforms {};
+		enum class Authenticators {};
 		enum class BlockCiphers {};
+		enum class BlockCipherExtensions {};
 		enum class BlockSizes {};
 		enum class CipherModes {};
+		enum class CpuCores {};
 		enum class Digests {};
+		enum class DilithiumParameters {};
 		enum class Drbgs {};
 		enum class IVSizes {};
 		enum class Kdfs {};
 		enum class KeySizes {};
 		enum class Macs {};
+		enum class MLWEParameters {};
 		enum class MPKCParameters {};
+		enum class NTRUParameters {};
 		enum class PaddingModes {};
 		enum class Prngs {};
 		enum class Providers {};
 		enum class RLWEParameters {};
 		enum class RoundCounts {};
+		enum class SHA2Digests {};
 		enum class ShakeModes {};
+		enum class SimdIntegers {};
 		enum class SimdProfiles {};
+		enum class SkeinUbiType {};
+		enum class SphincsParameters {};
+		enum class StreamAuthenticators {};
 		enum class StreamCiphers {};
 		enum class StreamModes {};
 		enum class SymmetricCiphers {};
+		enum class ThreefishModes {};
 	NAMESPACE_ENUMERATIONEND
 	/*! @} */
 
@@ -372,6 +389,7 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_EXCEPTION
 		class CryptoAsymmetricException {};
+		class CryptoAuthenticationFailure {};
 		class CryptoCipherModeException {};
 		class CryptoDigestException {};
 		class CryptoException {};
@@ -391,6 +409,7 @@ NAMESPACE_ROOT
 	*  @brief Cryptographic Helper Classes
 	*/
 	NAMESPACE_HELPER
+		class AeadModeFromName {};
 		class BlockCipherFromName {};
 		class CipherFromDescription {};
 		class CipherModeFromName {};
@@ -401,6 +420,7 @@ NAMESPACE_ROOT
 		class PaddingFromName {};
 		class PrngFromName {};
 		class ProviderFromName {};
+		class SecureStream {};
 		class StreamCipherFromName {};
 	NAMESPACE_HELPEREND
 	/*! @} */
@@ -449,14 +469,10 @@ NAMESPACE_ROOT
 		*  @brief Asymmetric Key containers and generator
 		*/
 		NAMESPACE_ASYMMETRICKEY
+			class AsymmetricKey {};
+			class AsymmetricKeyPair {};
 			class IAsymmetricKey {};
 			class IAsymmetricKeyPair {};
-			class MPKCKeyPair {};
-			class MPKCPrivateKey {};
-			class MPKCPublicKey {};
-			class RLWEKeyPair {};
-			class RLWEPrivateKey {};
-			class RLWEPublicKey {};
 		NAMESPACE_ASYMMETRICKEYEND
 		/*! @} */
 
@@ -487,6 +503,8 @@ NAMESPACE_ROOT
 		class GMAC {};
 		class HMAC {};
 		class IMac {};
+		class KMAC {};
+		class Poly1305 {};
 	NAMESPACE_MACEND
 	/*! @} */
 
@@ -499,10 +517,13 @@ NAMESPACE_ROOT
 	*  @brief SIMD and Big Integer Namespace
 	*/
 	NAMESPACE_NUMERIC
+		class Donna128 {};
 		class UInt128 {};
 		class UInt256 {};
-		class ULong256 {};
 		class UInt512 {};
+		class ULong256 {};
+		class ULong512 {};
+		class UShort128 {};
 	NAMESPACE_NUMERICEND
 	/*! @} */
 
@@ -570,6 +591,7 @@ NAMESPACE_ROOT
 		class MemUtils {};
 		class ParallelUtils {};
 		class SysUtils {};
+		class TimeStamp {};
 	NAMESPACE_UTILITYEND
 	/*! @} */
 

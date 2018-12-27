@@ -25,6 +25,6 @@ var searchData=
   ['rhx',['RHX',['../group___enumeration.html#ggaa7f8226ec43fe26b57b18e6821c90ffda4641fa9c43756b35b616ec7d3456d995',1,'RHX():&#160;Documentation.h'],['../group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4641fa9c43756b35b616ec7d3456d995',1,'RHX():&#160;Documentation.h']]],
   ['rijndael',['Rijndael',['../group___enumeration.html#ggaa7f8226ec43fe26b57b18e6821c90ffdaf92201fd9c879328a6b24fa434b845f2',1,'Rijndael():&#160;Documentation.h'],['../group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8af92201fd9c879328a6b24fa434b845f2',1,'Rijndael():&#160;Documentation.h']]],
   ['ringlwe',['RingLWE',['../group___enumeration.html#gga29d0f9dca8992bfdc1e8f55c6b4c13f1aeec43cb050676d2a993b2ce9cbb0c436',1,'Documentation.h']]],
-  ['rlwes1q12289n1024',['RLWES1Q12289N1024',['../group___enumeration.html#gga54a04adf3e9a92c6b1cbbc65858339a5aedd91a1815a976fe9a97dbf9ae10b94e',1,'Documentation.h']]],
-  ['rlwes2q12289n2048',['RLWES2Q12289N2048',['../group___enumeration.html#gga54a04adf3e9a92c6b1cbbc65858339a5af250195052635c336ab0f1a98abfc569',1,'Documentation.h']]]
+  ['rlwes1q12289n1024',['RLWES1Q12289N1024',['../group___enumeration.html#gga25da89a987f4d7e835bc03bb8599a693aedd91a1815a976fe9a97dbf9ae10b94e',1,'RLWES1Q12289N1024():&#160;Documentation.h'],['../group___enumeration.html#gga54a04adf3e9a92c6b1cbbc65858339a5aedd91a1815a976fe9a97dbf9ae10b94e',1,'RLWES1Q12289N1024():&#160;Documentation.h']]],
+  ['rlwes2q12289n2048',['RLWES2Q12289N2048',['../group___enumeration.html#gga25da89a987f4d7e835bc03bb8599a693af250195052635c336ab0f1a98abfc569',1,'RLWES2Q12289N2048():&#160;Documentation.h'],['../group___enumeration.html#gga54a04adf3e9a92c6b1cbbc65858339a5af250195052635c336ab0f1a98abfc569',1,'RLWES2Q12289N2048():&#160;Documentation.h']]]
 ];

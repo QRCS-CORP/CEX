@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['rdengines',['RdEngines',['../class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9',1,'RDP']]],
-  ['rlweparameters',['RLWEParameters',['../group___enumeration.html#ga54a04adf3e9a92c6b1cbbc65858339a5',1,'Documentation.h']]],
-  ['roundcounts',['RoundCounts',['../group___enumeration.html#gad57696fdbcdac43c18f9ba4dada98447',1,'Documentation.h']]]
+  ['paddingmodes',['PaddingModes',['../group___enumeration.html#ga2da315b4e41c3a75fd478a5d60c4d685',1,'Documentation.h']]],
+  ['prngs',['Prngs',['../group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7',1,'Documentation.h']]],
+  ['providers',['Providers',['../group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0',1,'Documentation.h']]]
 ];
