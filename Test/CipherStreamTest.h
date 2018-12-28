@@ -8,6 +8,9 @@
 
 namespace Test
 {
+	using Cipher::Symmetric::Block::Mode::ICipherMode;
+	using Cipher::Symmetric::Block::Padding::IPadding;
+
 	/// <summary>
 	/// Tests the CipherStream Processer
 	/// </summary>
@@ -61,9 +64,6 @@ namespace Test
 	private:
 
 		size_t AllocateRandom(std::vector<byte> &Data, size_t Size = 0, size_t NonAlign = 0);
-		void BlockCTR(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-		void BlockDecrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-		void BlockEncrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void CbcModeTest();
 		void CfbModeTest();
 		void CtrModeTest();
@@ -75,7 +75,7 @@ namespace Test
 		void ParametersTest();
 		void OfbModeTest();
 		void SerializeStructTest();
-		void StreamModesTest(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding);
+		void StreamModesTest(ICipherMode* Cipher, IPadding* Padding);
 	};
 }
 

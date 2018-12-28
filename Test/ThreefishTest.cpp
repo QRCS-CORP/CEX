@@ -103,13 +103,13 @@ namespace Test
 			
 			// test 2 succesive finalization calls against mac output and expected ciphertext
 			Finalization(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0], m_code[10]);
-			Finalization(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1], m_code[11]);
+			Finalization(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[1], m_code[11]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer finalization tests."));
 
 			// original known answer test vectors generated with this implementation
 			Kat(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(tsx256s, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
+			Kat(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
+			Kat(tsx256s, m_message[0], m_key[0], m_nonce[0], m_expected[2]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer cipher tests.."));
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
@@ -126,7 +126,7 @@ namespace Test
 
 			// verify ciphertext output, decryption, and mac code generation
 			Verification(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
-			Verification(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1]);
+			Verification(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[1]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer authentication tests.."));
 
 			delete tsx256h256;
@@ -149,18 +149,18 @@ namespace Test
 			Exception(tsx512s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 exception handling tests.."));
 
-			Kat(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
-			Kat(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
-			Kat(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
-			Kat(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
-			Kat(tsx512s, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer cipher tests.."));
-
-			Finalization(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[2], m_code[12]);
-			Finalization(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[3], m_code[13]);
-			Finalization(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[4], m_code[14]);
-			Finalization(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[5], m_code[15]);
+			Finalization(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[3], m_code[2], m_code[12]);
+			Finalization(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[4], m_code[3], m_code[13]);
+			Finalization(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[5], m_code[4], m_code[14]);
+			Finalization(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[6], m_code[5], m_code[15]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer finalization tests."));
+
+			Kat(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
+			Kat(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[4]);
+			Kat(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[5]);
+			Kat(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[6]);
+			Kat(tsx512s, m_message[1], m_key[1], m_nonce[1], m_expected[7]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer cipher tests.."));
 
 			MonteCarlo(tsx512s, m_message[1], m_key[1], m_nonce[1], m_monte[1]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 monte carlo tests.."));
@@ -171,10 +171,10 @@ namespace Test
 			Stress(tsx512s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 stress tests.."));
 
-			Verification(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[2]);
-			Verification(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[3]);
-			Verification(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[4]);
-			Verification(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[5]);
+			Verification(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[3], m_code[2]);
+			Verification(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[4], m_code[3]);
+			Verification(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[5], m_code[4]);
+			Verification(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[6], m_code[5]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer authentication tests.."));
 
 			delete tsx512h256;
@@ -200,19 +200,19 @@ namespace Test
 			Exception(tsx1024s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 exception handling tests.."));
 
-			Finalization(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[6], m_code[16]);
-			Finalization(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[7], m_code[17]);
-			Finalization(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8], m_code[18]);
-			Finalization(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9], m_code[19]);
-			Finalization(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[20], m_code[21]);
+			Finalization(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[8], m_code[6], m_code[16]);
+			Finalization(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[9], m_code[7], m_code[17]);
+			Finalization(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[10], m_code[8], m_code[18]);
+			Finalization(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[11], m_code[9], m_code[19]);
+			Finalization(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[12], m_code[20], m_code[21]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer authentication tests.."));
 
-			Kat(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_expected[5]);
+			Kat(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[8]);
+			Kat(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[9]);
+			Kat(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[10]);
+			Kat(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[11]);
+			Kat(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[12]);
+			Kat(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_expected[13]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer cipher tests.."));
 
 			MonteCarlo(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_monte[2]);
@@ -224,11 +224,11 @@ namespace Test
 			Stress(tsx1024s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 stress tests.."));
 
-			Verification(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[6]);
-			Verification(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[7]);
-			Verification(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8]);
-			Verification(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9]);
-			Verification(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[20]);
+			Verification(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[8], m_code[6]);
+			Verification(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[9], m_code[7]);
+			Verification(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[10], m_code[8]);
+			Verification(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[11], m_code[9]);
+			Verification(tsx1024k1024, m_message[2], m_key[2], m_nonce[2], m_expected[12], m_code[20]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer authentication tests.."));
 
 			delete tsx1024h256;
@@ -859,47 +859,55 @@ namespace Test
 		const std::vector<std::string> code =
 		{
 			// tsx256 - verification
-			std::string("1AFD9F5BEF707423DB916C8908DBA25E2708370B6F332E5AFAC3DC16A32F7861"),																	// tsx256h256
-			std::string("0A46398105EBFF2BFAF548681A1024BB5C7B703B883CEAB12D918FC0A9A0CAFF"),																	// tsx256k256
+			std::string("60C417AC4EE5F43382ACEBE4453C3F119CFAD78EA1E2CCA3517D3BBEF1859B09"),																	// tsx256h256
+			std::string("49EE5D3C88A42CDF054FCA6E93BA16BA00AAE4734147C7F5441A9FC2054344E1"),																	// tsx256k256
 			// tsx512 - verification
-			std::string("FC61B304D834529D3C2BE936ABEFAD7AED694A3A7E66A70B11D3D8D45E583584"),																	// tsx512h256
-			std::string("C68AB209F6F15EF0FE38BE88965CA60DDA19F12ABD5F35DD0BCB3DFF03CA09BE8E0617B85A4BB96360EC0929F19E9154B63E0ED6F4577EA98CD3A5AD9BA007A1"),	// tsx512h512
-			std::string("B7FA9D491BCA6FEB0A93E9538F15FEB2F0178ED72C4E0B460CD528FA8C790445"),																	// tsx512k256
-			std::string("EB76CF7034A473BDA4172F476BBC6FDE6FFC3E00B43C27D376E672A1A0FD755ABF12AB5C3F07CD4A6335DDE25A18D6B1926891CF934C21B78781AA43961AD9C2"),	// tsx512k512
+			std::string("C19FDC2F9160C77ED7078886E4884461A5AA6EDB131311B8BAFA4071C2E6B5CA"),																	// tsx512h256
+			std::string("EB4D53A06D6F474CDEFB54E71BD53F4FA50A6A33D93EA4F76ADA74EC2588EE2D8C0E98B62176F5FF72259640F506F2787ACF6E4A0D0AAA095BFA51571533BE1B"),	// tsx512h512
+			std::string("1FFD4B4EED720F5489DF0F2EDE377F5DE3312DFE03F8A8A36A7957ED678C4D46"),																	// tsx512k256
+			std::string("786586E4C05DAFF30810C0DB6EA268F06BF8C7A20D43138C8E3A2753CDF5677B8588A66AA08AB6239830EFF64C589F6EEAC814D2CEEEB43449700A1E30AE2950"),	// tsx512k512
 			// tsx1024- verification
-			std::string("188CC237376F2E08F20897A994AA4699BDD8C87C7243D5841A5ACFE6AE579C8D"),																	// tsx1024h256
-			std::string("C7EE49F4D4ED065A64D6CC9F2C0B69380AC419C22C40587613E17753330E6BBFCED453D7C4828B6B94504F64F080B951A1F0523FCC616D86350C11A37DDE9FDB"),	// tsx1024h512
-			std::string("4C3BF3CCFB5F0908C84425574EBC8D089FBA17B597DFA775BBCEC86EC6E7158D"),																	// tsx1024k256
-			std::string("8236CE03B5BE75760E326718E8497799125FF8E6C7CB260905549E8AAF5DF19B9CEB603BB77A6E83B490967110F99AE51A3279C64D24AD8E1C2C9496048FD832"),	// tsx1024k512
+			std::string("8AEB70D8BF1A83DA1F8936CF7A1E9098F44D220FD6682B66D732E4EBF07E02D0"),																	// tsx1024h256
+			std::string("5E394834A36C9DB632D5C572FE4319A0E6CA25DFC369717B77ADF3A2A2EF86063DC6EB8B8B5D4D46003533426F5395AF05A061224453229A2A3BB5F7382C77F1"),	// tsx1024h512
+			std::string("67E23840956DFA021BC89CFF6D5774E8BC52F7E8BC87F83D9DF5C2BE89D96DA2"),																	// tsx1024k256
+			std::string("640A0452CECB50F06D4867280D61030460ACB5713DA96E9A4EDF8858489CC6EF5D6A04B0FFA6FD70DD5CBBADB038AE8F19D22D5F026645F54E263506DDC4023C"),	// tsx1024k512
 			// tsx256 finalization tests: mac-2
-			std::string("B00F559E63A2E37B2D83727384F916D801AA4754AA28F4BB11582D2558B08346"),																	// tsx256h256
-			std::string("6F7596227167EB7EFF2C14C6F47AC02B735F45CD15EF45DCF718D515A6DBD73E"),																	// tsx256k256
+			std::string("8591E3435A33BEB456452FB788580A8B77B128FEF8F668DD8311E3A48C9B1FBF"),																	// tsx256h256
+			std::string("C9E940254B4794766C7F19A6B12C7A7677B5D37C84FCCD300B6AC98E7571A304"),																	// tsx256k256
 			// tsx512 finalization tests: mac-2
-			std::string("DAA776E2D27B7D251CB50372A27F2097A338281DE096A4268D03D7392182C51A"),																	// tsx512h256
-			std::string("6EE299F478A48CE7886C9878ACBC21338842DED7E7BDED8EB83A41DA1D077CE60C97A9946F5A62E8D6DF3D5545DB0BD39D4C18E404004FFF229701ED0AF6FF08"),	// tsx512h512
-			std::string("52266B3C790AA703DFC9755A504235C352AD87E55FCAC3B2F892315C1A48FC02"),																	// tsx512k256
-			std::string("2654192DFB39D8AD72E64EC1601FAC5135CFCEDBF148C8A5AA7BB7D121EA70A53252B4173C6B6D3B7F3B7D624AA75F08D0318816489EB18BD7D5CEE3199A3D06"),	// tsx512k512
+			std::string("03D7B2CEACB7D2274206A11C12FA8A126519745FF3784B351235E8F156D77C0F"),																	// tsx512h256
+			std::string("E7C6DCCDE38CC0B9480A49E52BBE52460CA5905C4ECBD1649DE48676756EDFC2C0ACC96609089EECFA5DE9F1ACCB29F6A020A11524091A4D5A2D48C0B8CCD760"),	// tsx512h512
+			std::string("5AB6A2591B936E908FC59A2833CB19D2744E061659DEC05293DA651048EFEDE3"),																	// tsx512k256
+			std::string("B7170DB2D7FEB5FB24C95E4BC0816FA750DED08E66A802F6B33101C38CBA78C0317B967411838D65217E2BECCE1BE5C760A95EAC9CFEAC21E9E669DD2BE85892"),	// tsx512k512
 			// tsx1024 finalization tests: mac-2
-			std::string("F17C91D48FAD8134BB8DCBF08A28716EFF733B0FBF55C7DC3B965A06C507AA63"),																	// tsx1024h256
-			std::string("F65C3749ACA44B023A91A151520822E180BCB5F54762A0DF4FE4598F7F8AFE73A833231C6369751D3FA753EE60D11EF4AEB24F3FD80FD350B886E32546739C52"),	// tsx1024h512
-			std::string("5B2942CBFC1075302FA98CD375DC683CFA6E38F7E381CE67333D36BA634CC498"),																	// tsx1024k256
-			std::string("BEE4A1A926A9E7E54026F93064B856EB8C8DEEC8C3D28E65C49772E05EBF55D455D88707DF8CA3DBD687EFCE198E854FCB09988BD7CE921770CDBBAE6556E7D3"),	// tsx1024k512
+			std::string("1A5D0F20CB31E7E087B14FF9B742142D741192BFFA2D56CBAAE747AB2D4F5979"),																	// tsx1024h256
+			std::string("AB67B5A2787B925BBABB39DC3570D529EADAC572C5D98E7C9001B8756C704EBDC7EFC751015E1E732C6C62EE7F679B0A2BD43680869B05D5A356F11648CB7BB9"),	// tsx1024h512
+			std::string("BE1EC2CCC3B75A5B50E5B2D89A9B3A856346B470DB4215D9FB7CF3143B8824F4"),																	// tsx1024k256
+			std::string("F4285FC54F012244631A9AA3C64BDDA234227CF5B592E17DCA0D70F1D7AC05CD9B7CCB35F71DDF90473DA25B07567078F08559D6A9D91E5CF72E98DCB045B242"),	// tsx1024k512
 			// tsx1024k1024 finalization tests: mac-2
-			std::string("F891C78496EEDE1D2C3B769C2E92C90FFC0F66C33E3F7C9E31C5B721828C32F875CEF510D1A10F274388915F5955E595C7B70272EB8AD756F043A4876EA9EFD0588460AF7E6100C5CCE412F7541ED94093FD923E599D555C5DE5692390DED7928FD79DDBD8161D0E5562D73970DF556E4B416A12911269E8B224846D14C858E9"),																	// tsx1024k1024
-			std::string("623411655999BED2E8F13DF3645C3FDD33B60BC85A65F83046D185869FD97613BD7EE46047D707C93466F275FE15FB49F09A6EFD9DB43D7C71D7A549D0BC3ACDC9ADAA5401CCF6AE981F87103599B14CFB98802F3C63F767B912C0F670592F6EC11805E26A8B10C844140CFA1D0BBC7978F266FAFF3BEABCA31B3F749D261FFB")		// tsx1024k1024
+			std::string("102274AF7633951F752FDAC4A496EC86C490F9D16DE4B7C41E44140434D1FDC5916DE3B8C0CCBD618740379AA9796DA4EB5F4708C8A4052449ACAEA44DF4C3669446F8CE3008C31E20A8535E438F81BA06305BE4970EB36813BC7CC36C1DF610360EF6FC00EE091EE903A821EC09F90F2316D27049253CBA9F87EE0DA77BE583"),																	// tsx1024k1024
+			std::string("88E543D605F865AF30E4A17848A131BFF571003E817D0270B34F7D58C9FF2C93D2E8ED19E770A5D2CAAA827704697743FA57F69A1DBE8C0498BC889D2B1EE4262FDC9BC03BBC209B8BD92F92DA622AA01AA5CFAF326964CECC2BE6EB93AC52D668DAAEC235FAAF8A5F05A28026E4B4BA09DAAE1087B4BC68AB8C47A8187F17F4")		// tsx1024k1024
 		};
 		HexConverter::Decode(code, 22, m_code);
 
 		const std::vector<std::string> expected =
 		{
-			std::string("22051C2C7115F2E1343D848ABA02C749C474E7EFB0CE6AA72F2573A3089EF780"),
+			std::string("4ED77F3F983C6F35C9A5ADEFD7447004EBBE098FB488EBEB6B80514667444D0E"),
+			std::string("366CE9D507F31F5272AE5DA4EA483DB0CBC10329425CB43AD259294FCA3A0BCE"),
 			std::string("70EA75CE071C24670A8AB583ED7ADDB64AE83D669BCA9E5E42F5ED70F691166A"),
-			std::string("85D1B134B67A1DE07439DEF590208088F60210BE24E510669964ECE5A8C09F175F709679E19789742F339EF6E49A7E3EEED658F0FC8043537E7E5105E5EE20AF"),
+			std::string("DE1C8FF89D760ABD368FCF972B0ABF753E210C99B3E170EDB5DDF01F437BDAC7E4BFE0594BA3257E88E1C8DD1044D6C6A3606FAB6CF939E0CA9DDCFD7C2F8BAD"),
+			std::string("102C4AA042C38CB138ADA0FAE4B8D1C53A5260BFDFE46990D82700A09FFFA2F173865E820D34EE13CB36CE4139DAF4B0B7362F9E8DD7E13254D90CE75749655A"),
+			std::string("BE3AB71F968A420165EEBD2E0E8CCF50916C809D26009B9781124DEC59FE67288198DD5247489F449A4F1B94513809899A63F537CF71EBA43A1DB6C57245E378"),
+			std::string("4F433077556E7DB5A8708CDA9849AB3619E5BABD430319191C33557B6956C0D12EE84AB5C2BBF55128DA23F685C9914AE677C4EAF72B505073AF7E5390E0324E"),
 			std::string("0F43C172A46F8EAC0E961938B2E56BC128B982CBA28DDE70C88C2DA3EF37BA3DBB457F420390EE146735169E573620C6B0415160284749DDFC72A3D13904557E"),
-			std::string("9E2E81ACB541F45E239D14D4BEDC29FBE03F6554086EF684BFF81587D063037B8B8BBAAADB2930F636EBE55716FDC4EE55232C94463A928F5F2885FF595E80EC6183E9F02A9B822BF8418FB64FCE35553D4BB3D0027DA947F3BFBEBB27B620D15B2DE678AAB759C7CA540515E726EBC711BCDBF6E1C5CEE8B4B145FFCD560522"),
+			std::string("0CB8DF1ABA7BA22DA7ABDBD2C368A04D532F50389BC47BEFAEFD3A4464036A8BC2D10D2F3EEDDDA9AD869F3947964342704C8D01CC9117028D2B99DAFB973D355908B5616E0335CE5788EB0237C3FB99A32622E5069467E98978E772E97AF0DAC26622F1FFE7FB250B0D10602659F683393494BDE555F3D340B6256623174808"),
+			std::string("561632B2C28CEC073E0CE98E701405D996FEF747D1B87004377D9440A0CAD6BA034527BB5F93ECB8FED21848E21BBA3D880F5488675E86FB0AA58F11E5B29FB42845202889C1D9D928ACF70A6C34D60D0BB92CA3746F00DD017F387E7EA1F295339B271A163434E27A53553EB75BC077A18A7B7E4B14866C3FF50439C61A37B4"),
+			std::string("AB3305096376897E6A8921A759964B07DCE61C8B9DC22EC0EB33D09EA7392CC40BB28960023BBA88288FC2772067839B6D893B1408AB80747C3E318610A0183C477802705996E0DFD4F5120192F5983AC8C1BCA73DC7E023240EBEF83DD544CEEEF7FF7638AB8B3F8EE449FAA51C875A5B162FA84998DA7B9A2E82870E569B1C"),
+			std::string("F05D3655A6B260FA489F20D13F795CD9C3157594594A3A09565EB2529A091733EE483E704ABBBBDA85EC9808397F7B0DFBF6A332227595FE1C51A9E1C8F9D2C7CA80C775BF2900369E90DBAC0F4A91CCEB720D8A7B4D27806BC8D4A5D6E6D7F63431645F6EEAC4BF633D76099FD0C53F8AF8E36DC0F8BF68C3FF46F958E453B7"),
+			std::string("24977F741863E8472C47AD0F782F9772AF938882EC69269C93F741509B68032EA820545E3BB32363285E2ED8C3F3F9B6D86F3FF524011F547D9EC873AAC336FD9B5E46A536B643579F2EB5543D99EB35FF7C18BE4B984EAB8D7E5CB2FD438A39501A1AF0ABA868B915B39A5F77DD56813A5B9ACF31545B0E9ACFF1A226C82BD6"),
 			std::string("B3F7134A5977D657479377A1224CA0ACF29C79B4AF0C8A23B269850F6DAEEDB37F8EFCD7F0B65BA7B4F5264E255B459E96AC4D1DD13D7957B6581DB116C7F5848BCD73FA5B588D28B0EE942F8E5F01C85E4E85B743B7CB0EC885B77533D733ABD811B6AB5D2AA25DFADA55138EEB5E3FF150BE937F1AB241DC374DB1F1BA6D09")
 		};
-		HexConverter::Decode(expected, 6, m_expected);
+		HexConverter::Decode(expected, 14, m_expected);
 
 		const std::vector<std::string> key =
 		{

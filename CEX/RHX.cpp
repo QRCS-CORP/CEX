@@ -127,19 +127,19 @@ const std::string RHX::Name()
 
 	if (m_cprExtension == BlockCipherExtensions::SHAKE256)
 	{
-		txtName = CIPHER_NAME + std::string("-SHAKE-256");
+		txtName = CIPHER_NAME + std::string("+SHAKE-256");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
 	{
-		txtName = CLASS_NAME + std::string("-SHAKE512-");
+		txtName = CLASS_NAME + std::string("+SHAKE-512");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF256)
 	{
-		txtName = CLASS_NAME + std::string("-HKDF-SHA2-256");
+		txtName = CLASS_NAME + std::string("+HKDF-SHA256");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 	{
-		txtName = CLASS_NAME + std::string("-HKDF-SHA2-512");
+		txtName = CLASS_NAME + std::string("+HKDF-SHA512");
 	}
 	else
 	{

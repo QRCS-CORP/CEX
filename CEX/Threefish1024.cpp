@@ -20,7 +20,6 @@ using Utility::MemUtils;
 using Utility::ParallelUtils;
 
 const std::string Threefish1024::CLASS_NAME("Threefish1024");
-const std::vector<byte> Threefish1024::CSHAKE_CUST = { 0x54, 0x53, 0x58, 0x31, 0x30, 0x32, 0x34 };
 const std::vector<byte> Threefish1024::OMEGA_INFO = { 0x54, 0x68, 0x72, 0x65, 0x65, 0x66, 0x69, 0x73, 0x68, 0x31, 0x30, 0x32, 0x34, 0x31, 0x32, 0x30 };
 
 struct Threefish1024::Threefish1024State
@@ -53,6 +52,7 @@ Threefish1024::Threefish1024(StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new Threefish1024State),
+	m_cShakeCustom(0),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
 	m_isInitialized(false),
@@ -92,6 +92,7 @@ Threefish1024::~Threefish1024()
 			m_macKey.reset(nullptr);
 		}
 
+		IntUtils::ClearVector(m_cShakeCustom);
 		IntUtils::ClearVector(m_legalKeySizes);
 		IntUtils::ClearVector(m_macTag);
 	}
@@ -155,23 +156,23 @@ const std::string Threefish1024::Name()
 	{
 		case StreamAuthenticators::HMACSHA256:
 		{
-			return CLASS_NAME + "-HMACSHA256";
+			return CLASS_NAME + "+HMAC-SHA256";
 		}
 		case StreamAuthenticators::HMACSHA512:
 		{
-			return CLASS_NAME + "-HMACSHA512";
+			return CLASS_NAME + "+HMAC-SHA512";
 		}
 		case StreamAuthenticators::KMAC256:
 		{
-			return CLASS_NAME + "-KMAC256";
+			return CLASS_NAME + "+KMAC-256";
 		}
 		case StreamAuthenticators::KMAC512:
 		{
-			return CLASS_NAME + "-KMAC512";
+			return CLASS_NAME + "+KMAC-512";
 		}
 		case StreamAuthenticators::KMAC1024:
 		{
-			return CLASS_NAME + "-KMAC1024";
+			return CLASS_NAME + "+KMAC-1024";
 		}
 		default:
 		{
@@ -274,13 +275,14 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_macCounter = 1;
 
 		// create the cSHAKE customization string
-		std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
-		MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
-		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+		m_cShakeCustom.resize(sizeof(ulong) + Name().size());
+		// add mac counter and algorithm name to customization string
+		IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+		MemUtils::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE1024);
-		gen.Initialize(KeyParams.Key(), cst);
+		gen.Initialize(KeyParams.Key(), m_cShakeCustom);
 
 		// generate the new cipher key
 		std::vector<byte> ck(KEY_SIZE);
@@ -367,15 +369,13 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
-	// customization string is TSX1024+counter
-	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
-	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
-	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+	// customization string is: mac counter + algorithm name
+	IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
 
 	// extract the new mac key
 	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	Kdf::SHAKE gen(ShakeModes::SHAKE1024);
-	gen.Initialize(m_macKey->Key(), cst);
+	gen.Initialize(m_macKey->Key(), m_cShakeCustom);
 	gen.Generate(mk);
 
 	// reset the generator with the new key

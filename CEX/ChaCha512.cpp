@@ -42,7 +42,6 @@ struct ChaCha512::ChaCha512State
 };
 
 const std::string ChaCha512::CLASS_NAME("ChaCha512");
-const std::vector<byte> ChaCha512::CSHAKE_CUST = { 0x43, 0x53, 0x58, 0x35, 0x31, 0x32 };
 const std::vector<byte> ChaCha512::SIGMA_INFO = { 0x65, 0x78, 0x70, 0x61, 0x6E, 0x64, 0x20, 0x36, 0x34, 0x2D, 0x62, 0x79, 0x74, 0x65, 0x20, 0x6B };
 
 //~~~Constructor~~~//
@@ -52,6 +51,7 @@ ChaCha512::ChaCha512(StreamAuthenticators AuthenticatorType)
 	m_authenticatorType(AuthenticatorType != StreamAuthenticators::KMAC1024 ? AuthenticatorType : 
 		throw CryptoSymmetricCipherException("ChaCha512:CTor", "The authenticator must be a 256 or 512-bit MAC function!")),
 	m_cipherState(new ChaCha512State),
+	m_cShakeCustom(0),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -92,6 +92,7 @@ ChaCha512::~ChaCha512()
 			m_macAuthenticator.reset(nullptr);
 		}
 
+		IntUtils::ClearVector(m_cShakeCustom);
 		IntUtils::ClearVector(m_legalKeySizes);
 		IntUtils::ClearVector(m_macTag);
 	}
@@ -148,27 +149,27 @@ const std::string ChaCha512::Name()
 	{
 		case StreamAuthenticators::HMACSHA256:
 		{
-			tmp += "-HMACSHA256";
+			tmp += "+HMAC-SHA256";
 			break;
 		}
 		case StreamAuthenticators::HMACSHA512:
 		{
-			tmp += "-HMACSHA512";
+			tmp += "+HMAC-SHA512";
 			break;
 		}
 		case StreamAuthenticators::KMAC256:
 		{
-			tmp += "-KMAC256";
+			tmp += "+KMAC-256";
 			break;
 		}
 		case StreamAuthenticators::KMAC512:
 		{
-			tmp += "-KMAC512";
+			tmp += "+KMAC-512";
 			break;
 		}
 		default:
 		{
-			tmp += "-KMAC1024";
+			tmp += "+KMAC-1024";
 			break;
 		}
 	}
@@ -255,13 +256,14 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_macCounter = 1;
 
 		// create the cSHAKE customization string
-		std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
-		MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
-		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+		m_cShakeCustom.resize(sizeof(ulong) + Name().size());
+		// add mac counter and algorithm name to customization string
+		IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+		MemUtils::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE512);
-		gen.Initialize(KeyParams.Key(), cst);
+		gen.Initialize(KeyParams.Key(), m_cShakeCustom);
 
 		// generate the new cipher key
 		std::vector<byte> ck(KEY_SIZE);
@@ -363,15 +365,13 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
-	// customization string is CSX512+counter
-	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
-	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
-	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+	// customization string is: mac counter + algorithm name
+	IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
 
 	// extract the new mac key
 	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	Kdf::SHAKE gen(ShakeModes::SHAKE512);
-	gen.Initialize(m_macKey->Key(), cst);
+	gen.Initialize(m_macKey->Key(), m_cShakeCustom);
 	gen.Generate(mk);
 
 	// reset the generator with the new key

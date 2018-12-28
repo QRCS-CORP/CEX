@@ -301,21 +301,21 @@ namespace Test
 	void CipherSpeedTest::Threefish256SpeedTest()
 	{
 		Threefish256* cipher = new Threefish256(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 32, 0, 10, m_progressEvent);
+		ParallelStreamLoop(cipher, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish512SpeedTest()
 	{
 		Threefish512* cipher = new Threefish512(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 64, 0, 10, m_progressEvent);
+		ParallelStreamLoop(cipher, 64, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish1024SpeedTest()
 	{
 		Threefish1024* cipher = new Threefish1024(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 128, 0, 10, m_progressEvent);
+		ParallelStreamLoop(cipher, 128, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 

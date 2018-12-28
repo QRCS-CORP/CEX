@@ -42,7 +42,7 @@ namespace Test
 	{
 		try
 		{
-			/*Authentication();
+			Authentication();
 			OnProgress(std::string("RingLWETest: Passed message authentication test.."));
 			CipherText();
 			OnProgress(std::string("RingLWETest: Passed cipher-text integrity test.."));
@@ -51,7 +51,7 @@ namespace Test
 			PublicKey();
 			OnProgress(std::string("RingLWETest: Passed public key integrity test.."));
 			Serialization();
-			OnProgress(std::string("RingLWETest: Passed key serialization tests.."));*/
+			OnProgress(std::string("RingLWETest: Passed key serialization tests.."));
 			Stress();
 			OnProgress(std::string("RingLWETest: Passed encryption and decryption stress tests.."));
 

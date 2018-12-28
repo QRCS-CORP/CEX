@@ -19,6 +19,18 @@
 
 namespace Test
 {
+	using namespace Enumeration;
+	using namespace Cipher::Symmetric::Block::Mode;
+	using namespace Cipher::Symmetric::Block::Padding;
+
+	using Processing::CipherDescription;
+	using Processing::CipherStream;
+	using IO::MemoryStream;
+	using Cipher::Symmetric::Block::RHX;
+	using Prng::SecureRandom;
+	using Cipher::Symmetric::Block::SHX;
+	using Key::Symmetric::SymmetricKey; 
+
 	const std::string CipherStreamTest::DESCRIPTION = "CipherStream Processer Tests.";
 	const std::string CipherStreamTest::FAILURE = "FAILURE: ";
 	const std::string CipherStreamTest::SUCCESS = "SUCCESS! CipherStream tests have executed succesfully.";
@@ -52,10 +64,6 @@ namespace Test
 
 	std::string CipherStreamTest::Run()
 	{
-		using namespace Cipher::Symmetric::Block::Mode;
-		using namespace Cipher::Symmetric::Block::Padding;
-		using namespace Enumeration;
-
 		try
 		{
 			Initialize();
@@ -82,7 +90,7 @@ namespace Test
 			ParametersTest();
 			OnProgress(std::string("Passed Cipher Parameters tests.."));
 
-			Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
+			RHX* eng = new RHX();
 			OnProgress(std::string("***Testing Padding Modes***"));
 			StreamModesTest(new CBC(eng), new X923());
 			OnProgress(std::string("Passed CBC/X923 CipherStream test.."));
@@ -103,18 +111,18 @@ namespace Test
 			delete eng;
 
 			OnProgress(std::string("***Testing Cipher Description Initialization***"));
-			//Processing::CipherDescription cd2(BlockCiphers::Rijndael,)
-			Processing::CipherDescription cd(
-				Enumeration::BlockCiphers::Rijndael,		// cipher engine
-				Enumeration::BlockCipherExtensions::None,	// cipher extension
-				Enumeration::CipherModes::CTR,				// cipher mode
-				Enumeration::PaddingModes::None,			// padding mode
-				Enumeration::KeySizes::K256,				// key size
-				Enumeration::IVSizes::V128);				// cipher iv size
+			//CipherDescription cd2(BlockCiphers::Rijndael,)
+			CipherDescription cd(
+				BlockCiphers::Rijndael,		// cipher engine
+				BlockCipherExtensions::None,	// cipher extension
+				CipherModes::CTR,				// cipher mode
+				PaddingModes::None,			// padding mode
+				KeySizes::K256,				// key size
+				IVSizes::V128);				// cipher iv size
 
 			DescriptionTest(&cd);
 			OnProgress(std::string("Passed CipherDescription stream test.."));
-			Cipher::Symmetric::Block::SHX* spx = new Cipher::Symmetric::Block::SHX();
+			SHX* spx = new SHX();
 			StreamModesTest(new CBC(spx), new ISO7816());
 			delete spx;
 			OnProgress(std::string("Passed SHX CipherStream test.."));
@@ -126,11 +134,11 @@ namespace Test
 			}
 
 			// test extended ciphers
-			Cipher::Symmetric::Block::RHX* rhx = new Cipher::Symmetric::Block::RHX();
+			RHX* rhx = new RHX();
 			StreamModesTest(new CBC(rhx), new ISO7816());
 			delete rhx;
 			OnProgress(std::string("Passed RHX extended CipherStream test.."));
-			Cipher::Symmetric::Block::SHX* shx = new Cipher::Symmetric::Block::SHX();
+			SHX* shx = new SHX();
 			StreamModesTest(new CBC(shx), new ISO7816());
 			delete shx;
 
@@ -158,8 +166,8 @@ namespace Test
 		std::vector<byte> data(1025, 3);
 
 		// initialize the cipher and key container
-		Processing::CipherStream cs(Enumeration::BlockCiphers::Rijndael, Enumeration::BlockCipherExtensions::None, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ISO7816);
-		Key::Symmetric::SymmetricKey kp(key, iv);
+		CipherStream cs(BlockCiphers::Rijndael, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ISO7816);
+		SymmetricKey kp(key, iv);
 
 		// encrypt the file in-place
 		FileStream fIn1(INPFILE, FileStream::FileAccess::Read);
@@ -191,43 +199,47 @@ namespace Test
 		cs.Initialize(false, kp);
 		cs.Write(&fIn4, &fOut4);
 		fIn4.Close();
-		fOut4.Close();/**/
+		fOut4.Close();
 	}
 
 	void CipherStreamTest::CbcModeTest()
 	{
 		AllocateRandom(m_iv, 16);
 		AllocateRandom(m_key, 32);
-
-		Key::Symmetric::SymmetricKey kp(m_key, m_iv);
-		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-		Cipher::Symmetric::Block::Mode::CBC cipher(eng);
-		Cipher::Symmetric::Block::Mode::CBC cipher2(eng);
-		Cipher::Symmetric::Block::Padding::ISO7816* padding = new Cipher::Symmetric::Block::Padding::ISO7816();
-		cipher.ParallelProfile().IsParallel() = false;
-		Processing::CipherStream cs(&cipher2, padding);
-		Prng::SecureRandom rng;
+		
+		SymmetricKey kp(m_key, m_iv);
+		RHX* eng = new RHX();
+		CBC cipher1(eng);
+		CBC cipher2(eng);
+		PKCS7* padding = new PKCS7();
+		cipher1.ParallelProfile().IsParallel() = false;
+		CipherStream cs(&cipher2, padding);
+		SecureRandom rng;
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
-			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize()));
+			smpSze -= (smpSze % 16);
+			size_t prlBlock = smpSze - (smpSze % cipher1.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
+			m_cmpText.clear();
+			m_decText.clear();
+			m_encText.clear();
 			m_cmpText.resize(smpSze);
 			m_decText.resize(smpSze);
 			m_encText.resize(smpSze);
 
-			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher1.ParallelProfile().ParallelBlockSize() = prlBlock;
 			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
-			IO::MemoryStream mIn(m_plnText);
-			IO::MemoryStream mOut;
-			IO::MemoryStream mRes;
+			MemoryStream mIn(m_plnText);
+			MemoryStream mOut;
+			MemoryStream mRes;
 
 			// *** Compare encryption output *** //
 
 			// local processor
-			cipher.Initialize(true, kp);
-			BlockEncrypt(&cipher, padding, m_plnText, 0, m_encText, 0);
+			cipher1.Initialize(true, kp);
+			cipher1.Transform(m_plnText, 0, m_encText, 0, m_plnText.size());
 
 			// streamcipher linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -237,7 +249,7 @@ namespace Test
 
 			if (mOut.ToArray() != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CM1"));
 			}
 
 			// byte array interface
@@ -246,18 +258,18 @@ namespace Test
 
 			if (m_cmpText != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CM2"));
 			}
 
 			// ***compare decryption output *** //
 
 			// local processor
-			cipher.Initialize(false, kp);
-			BlockDecrypt(&cipher, padding, m_encText, 0, m_decText, 0);
+			cipher1.Initialize(false, kp);
+			cipher1.Transform(m_encText, 0, m_decText, 0, m_plnText.size());
 
 			if (m_plnText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CM3"));
 			}
 
 			// decrypt linear mode
@@ -268,7 +280,7 @@ namespace Test
 
 			if (mRes.ToArray() != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CM4"));
 			}
 
 			// byte array interface
@@ -277,7 +289,7 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CM5"));
 			}
 
 			// decrypt parallel mode
@@ -290,7 +302,7 @@ namespace Test
 
 			if (mRes.ToArray() != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CM6"));
 			}
 
 			m_cmpText.resize(m_encText.size());
@@ -300,7 +312,7 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CM7"));
 			}
 
 			m_cmpText.resize(m_encText.size());
@@ -311,7 +323,7 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CM8"));
 			}
 		}
 
@@ -323,35 +335,39 @@ namespace Test
 	{
 		AllocateRandom(m_iv, 16);
 		AllocateRandom(m_key, 32);
-		Key::Symmetric::SymmetricKey kp(m_key, m_iv);
-		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-		Cipher::Symmetric::Block::Mode::CFB cipher(eng);
-		Cipher::Symmetric::Block::Mode::CFB cipher2(eng);
-		Cipher::Symmetric::Block::Padding::ISO7816* padding = new Cipher::Symmetric::Block::Padding::ISO7816();
-		cipher.ParallelProfile().IsParallel() = false;
-		Processing::CipherStream cs(&cipher2, padding);
-		Prng::SecureRandom rng;
+		SymmetricKey kp(m_key, m_iv);
+		RHX* eng = new RHX();
+		CFB cipher1(eng);
+		CFB cipher2(eng);
+		PKCS7* padding = new PKCS7();
+		cipher1.ParallelProfile().IsParallel() = false;
+		CipherStream cs(&cipher2, padding);
+		SecureRandom rng;
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
-			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize()));
+			smpSze -= (smpSze % 16);
+			size_t prlBlock = smpSze - (smpSze % cipher1.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
+			m_cmpText.clear();
+			m_decText.clear();
+			m_encText.clear();
 			m_cmpText.resize(smpSze);
 			m_decText.resize(smpSze);
 			m_encText.resize(smpSze);
 
-			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher1.ParallelProfile().ParallelBlockSize() = prlBlock;
 			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
-			IO::MemoryStream mIn(m_plnText);
-			IO::MemoryStream mOut;
-			IO::MemoryStream mRes;
+			MemoryStream mIn(m_plnText);
+			MemoryStream mOut;
+			MemoryStream mRes;
 
 			// *** Compare encryption output *** //
 
 			// local processor
-			cipher.Initialize(true, kp);
-			BlockEncrypt(&cipher, padding, m_plnText, 0, m_encText, 0);
+			cipher1.Initialize(true, kp);
+			cipher1.Transform(m_plnText, 0, m_encText, 0, m_plnText.size());
 
 			// streamcipher linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -361,7 +377,7 @@ namespace Test
 
 			if (mOut.ToArray() != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CF1"));
 			}
 
 			// byte array interface
@@ -370,18 +386,18 @@ namespace Test
 
 			if (m_cmpText != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CF2"));
 			}
 
 			// ***compare decryption output *** //
 
 			// local processor
-			cipher.Initialize(false, kp);
-			BlockDecrypt(&cipher, padding, m_encText, 0, m_decText, 0);
+			cipher1.Initialize(false, kp);
+			cipher1.Transform(m_encText, 0, m_decText, 0, m_encText.size());
 
 			if (m_plnText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal -CF3"));
 			}
 
 			// decrypt linear mode
@@ -392,7 +408,7 @@ namespace Test
 
 			if (mRes.ToArray() != m_plnText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CF4"));
 			}
 
 			// byte array interface
@@ -401,7 +417,7 @@ namespace Test
 
 			if (m_cmpText != m_plnText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CF5"));
 			}
 
 			// decrypt parallel mode
@@ -414,7 +430,7 @@ namespace Test
 
 			if (mRes.ToArray() != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CF6"));
 			}
 
 			m_cmpText.resize(m_encText.size());
@@ -424,7 +440,7 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CF7"));
 			}
 
 			m_cmpText.resize(m_encText.size());
@@ -435,7 +451,7 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CF8"));
 			}
 		}
 
@@ -450,33 +466,36 @@ namespace Test
 
 		Key::Symmetric::SymmetricKey kp(m_key, m_iv);
 		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-		Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-		Cipher::Symmetric::Block::Mode::CTR cipher2(eng);
-		Processing::CipherStream cs(&cipher2);
-		cipher.ParallelProfile().IsParallel() = false;
-		Prng::SecureRandom rng;
+		CTR cipher1(eng);
+		CTR cipher2(eng);
+		CipherStream cs(&cipher2);
+		cipher1.ParallelProfile().IsParallel() = false;
+		SecureRandom rng;
 
 		// ctr test
 		for (size_t i = 0; i < 10; i++)
 		{
-			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
-			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize()));
+			size_t prlBlock = smpSze - (smpSze % cipher1.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
-			m_encText.resize(smpSze);
+			m_cmpText.clear();
+			m_decText.clear();
+			m_encText.clear();
 			m_cmpText.resize(smpSze);
 			m_decText.resize(smpSze);
+			m_encText.resize(smpSze);
 
-			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher1.ParallelProfile().ParallelBlockSize() = prlBlock;
 			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
-			IO::MemoryStream mIn(m_plnText);
-			IO::MemoryStream mOut;
-			IO::MemoryStream mRes;
+			MemoryStream mIn(m_plnText);
+			MemoryStream mOut;
+			MemoryStream mRes;
 
 			// *** Compare encryption output *** //
 
 			// local processor
-			cipher.Initialize(true, kp);
-			BlockCTR(&cipher, m_plnText, 0, m_encText, 0);
+			cipher1.Initialize(true, kp);
+			cipher1.Transform(m_plnText, 0, m_encText, 0, m_plnText.size());
 
 			// streamcipher linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -486,7 +505,7 @@ namespace Test
 
 			if (mOut.ToArray() != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CT1"));
 			}
 
 			// byte array interface
@@ -495,7 +514,7 @@ namespace Test
 
 			if (m_cmpText != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CT2"));
 			}
 
 			mIn.Seek(0, IO::SeekOrigin::Begin);
@@ -508,7 +527,7 @@ namespace Test
 
 			if (mOut.ToArray() != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CT3"));
 			}
 
 			// byte array interface
@@ -517,18 +536,18 @@ namespace Test
 
 			if (m_cmpText != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CT4"));
 			}
 
 			// ***compare decryption output *** //
 
 			// local processor
-			cipher.Initialize(false, kp);
-			BlockCTR(&cipher, m_encText, 0, m_decText, 0);
+			cipher1.Initialize(false, kp);
+			cipher1.Transform(m_encText, 0, m_decText, 0, m_encText.size());
 
 			if (m_plnText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CT5"));
 			}
 
 			// decrypt linear mode
@@ -539,7 +558,7 @@ namespace Test
 
 			if (mRes.ToArray() != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CT6"));
 			}
 
 			// byte array interface
@@ -548,7 +567,7 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CT7"));
 			}
 
 			// decrypt parallel mode
@@ -561,7 +580,7 @@ namespace Test
 
 			if (mRes.ToArray() != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CT8"));
 			}
 
 			// byte array interface
@@ -570,25 +589,25 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CT9"));
 			}
 		}
 
 		delete eng;
 	}
 
-	void CipherStreamTest::DescriptionTest(Processing::CipherDescription* Description)
+	void CipherStreamTest::DescriptionTest(CipherDescription* Description)
 	{
 		AllocateRandom(m_iv, 16);
 		AllocateRandom(m_key, 32);
 		AllocateRandom(m_plnText);
 
-		Key::Symmetric::SymmetricKey kp(m_key, m_iv);
-		IO::MemoryStream mIn(m_plnText);
-		IO::MemoryStream mOut;
-		IO::MemoryStream mRes;
+		SymmetricKey kp(m_key, m_iv);
+		MemoryStream mIn(m_plnText);
+		MemoryStream mOut;
+		MemoryStream mRes;
 
-		Processing::CipherStream cs(Description);
+		CipherStream cs(Description);
 		cs.Initialize(true, kp);
 		cs.Write(&mIn, &mOut);
 
@@ -599,7 +618,7 @@ namespace Test
 
 		if (mRes.ToArray() != m_plnText)
 		{
-			throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+			throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CD1"));
 		}
 	}
 
@@ -614,7 +633,7 @@ namespace Test
 
 	void CipherStreamTest::MemoryStreamTest()
 	{
-		IO::MemoryStream ms;
+		MemoryStream ms;
 		ms.WriteByte((byte)10);
 		ms.WriteByte((byte)11);
 		ms.WriteByte((byte)12);
@@ -656,18 +675,18 @@ namespace Test
 		AllocateRandom(m_iv, 16);
 		AllocateRandom(m_key, 32);
 		AllocateRandom(m_plnText, 1);
-		Prng::SecureRandom rng;
-		Key::Symmetric::SymmetricKey kp(m_key, m_iv);
+		SecureRandom rng;
+		SymmetricKey kp(m_key, m_iv);
 		m_cmpText.resize(1);
 		m_decText.resize(1);
 		m_encText.resize(1);
 
-		Cipher::Symmetric::Block::RHX* engine = new Cipher::Symmetric::Block::RHX();
+		RHX* engine = new RHX();
 
 		// 1 byte with byte arrays
 		{
-			Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-			Processing::CipherStream cs(cipher);
+			CTR* cipher = new CTR(engine);
+			CipherStream cs(cipher);
 
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_encText, 0);
@@ -677,29 +696,29 @@ namespace Test
 
 			if (m_decText != m_plnText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CP1"));
 			}
 
 			delete cipher;
 		}
 		// 1 byte with stream
 		{
-			Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-			Processing::CipherStream cs(cipher);
+			CTR* cipher = new CTR(engine);
+			CipherStream cs(cipher);
 			cs.Initialize(true, kp);
 			AllocateRandom(m_plnText, 1);
-			IO::MemoryStream mIn(m_plnText);
-			IO::MemoryStream mOut;
+			MemoryStream mIn(m_plnText);
+			MemoryStream mOut;
 			cs.Write(&mIn, &mOut);
 
 			cs.Initialize(false, kp);
-			IO::MemoryStream mRes;
+			MemoryStream mRes;
 			mOut.Seek(0, IO::SeekOrigin::Begin);
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_plnText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CP2"));
 			}
 
 			delete cipher;
@@ -707,8 +726,8 @@ namespace Test
 
 		// partial block with byte arrays
 		{
-			Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-			Processing::CipherStream cs(cipher);
+			CTR* cipher = new CTR(engine);
+			CipherStream cs(cipher);
 			AllocateRandom(m_plnText, 15);
 			m_decText.resize(15);
 			m_encText.resize(15);
@@ -721,32 +740,32 @@ namespace Test
 
 			if (m_decText != m_plnText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CP3"));
 			}
 
 			delete cipher;
 		}
 		// partial block with stream
 		{
-			Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-			Processing::CipherStream cs(cipher);
+			CTR* cipher = new CTR(engine);
+			CipherStream cs(cipher);
 			AllocateRandom(m_plnText, 15);
 			m_decText.resize(15);
 			m_encText.resize(15);
 
 			cs.Initialize(true, kp);
-			IO::MemoryStream mIn(m_plnText);
-			IO::MemoryStream mOut;
+			MemoryStream mIn(m_plnText);
+			MemoryStream mOut;
 			cs.Write(&mIn, &mOut);
 
 			cs.Initialize(false, kp);
-			IO::MemoryStream mRes;
+			MemoryStream mRes;
 			mOut.Seek(0, IO::SeekOrigin::Begin);
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_plnText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CP4"));
 			}
 
 			delete cipher;
@@ -756,14 +775,16 @@ namespace Test
 		{
 			for (size_t i = 0; i < 10; i++)
 			{
-				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
+				CTR* cipher = new CTR(engine);
 				uint smpSze = rng.NextUInt32(static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize()));
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
+				m_decText.clear();
+				m_encText.clear();
 				m_decText.resize(smpSze);
 				m_encText.resize(smpSze);
 
-				Processing::CipherStream cs(cipher);
+				CipherStream cs(cipher);
 				cs.ParallelProfile().ParallelBlockSize() = prlBlock;
 				cs.Initialize(true, kp);
 				cs.Write(m_plnText, 0, m_encText, 0);
@@ -773,7 +794,7 @@ namespace Test
 
 				if (m_decText != m_plnText)
 				{
-					throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+					throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CP5"));
 				}
 
 				delete cipher;
@@ -783,28 +804,30 @@ namespace Test
 		{
 			for (size_t i = 0; i < 10; i++)
 			{
-				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
+				CTR* cipher = new CTR(engine);
 				uint smpSze = rng.NextUInt32(static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize()));
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
+				m_decText.clear();
+				m_encText.clear();
 				m_decText.resize(smpSze);
 				m_encText.resize(smpSze);
 
-				Processing::CipherStream cs(cipher);
+				CipherStream cs(cipher);
 				cs.ParallelProfile().ParallelBlockSize() = prlBlock;
 				cs.Initialize(true, kp);
-				IO::MemoryStream mIn(m_plnText);
-				IO::MemoryStream mOut;
+				MemoryStream mIn(m_plnText);
+				MemoryStream mOut;
 				cs.Write(&mIn, &mOut);
 
 				cs.Initialize(false, kp);
-				IO::MemoryStream mRes;
+				MemoryStream mRes;
 				mOut.Seek(0, IO::SeekOrigin::Begin);
 				cs.Write(&mOut, &mRes);
 
 				if (mRes.ToArray() != m_plnText)
 				{
-					throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+					throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CP6"));
 				}
 
 				delete cipher;
@@ -819,35 +842,39 @@ namespace Test
 		AllocateRandom(m_iv, 16);
 		AllocateRandom(m_key, 32);
 
-		Key::Symmetric::SymmetricKey kp(m_key, m_iv);
-		Cipher::Symmetric::Block::RHX* engine = new Cipher::Symmetric::Block::RHX();
-		Cipher::Symmetric::Block::Mode::OFB cipher(engine);
-		Cipher::Symmetric::Block::Mode::OFB cipher2(engine);
-		Cipher::Symmetric::Block::Padding::ISO7816* padding = new Cipher::Symmetric::Block::Padding::ISO7816();
-		cipher.ParallelProfile().IsParallel() = false;
-		Processing::CipherStream cs(&cipher2, padding);
-		Prng::SecureRandom rng;
+		SymmetricKey kp(m_key, m_iv);
+		RHX* engine = new RHX();
+		OFB cipher1(engine);
+		OFB cipher2(engine);
+		PKCS7* padding = new PKCS7();
+		cipher1.ParallelProfile().IsParallel() = false;
+		CipherStream cs(&cipher2, padding);
+		SecureRandom rng;
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
-			size_t prlBlock = (size_t)smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher1.ParallelProfile().ParallelMinimumSize()));
+			smpSze -= (smpSze % 16);
+			size_t prlBlock = (size_t)smpSze - (smpSze % cipher1.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
+			m_cmpText.clear();
+			m_decText.clear();
+			m_encText.clear();
 			m_cmpText.resize(smpSze);
 			m_decText.resize(smpSze);
 			m_encText.resize(smpSze);
 
-			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher1.ParallelProfile().ParallelBlockSize() = prlBlock;
 			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
-			IO::MemoryStream mIn(m_plnText);
-			IO::MemoryStream mOut;
-			IO::MemoryStream mRes;
+			MemoryStream mIn(m_plnText);
+			MemoryStream mOut;
+			MemoryStream mRes;
 
 			// *** Compare encryption output *** //
 
 			// local processor
-			cipher.Initialize(true, kp);
-			BlockEncrypt(&cipher, padding, m_plnText, 0, m_encText, 0);
+			cipher1.Initialize(true, kp);
+			cipher1.Transform(m_plnText, 0, m_encText, 0, m_plnText.size());
 
 			// streamcipher linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -857,7 +884,7 @@ namespace Test
 
 			if (mOut.ToArray() != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CO1"));
 			}
 
 			// byte array interface
@@ -866,18 +893,18 @@ namespace Test
 
 			if (m_cmpText != m_encText)
 			{
-				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CO2"));
 			}
 
 			// ***compare decryption output *** //
 
 			// local processor
-			cipher.Initialize(false, kp);
-			BlockDecrypt(&cipher, padding, m_encText, 0, m_decText, 0);
+			cipher1.Initialize(false, kp);
+			cipher1.Transform(m_encText, 0, m_decText, 0, m_encText.size());
 
 			if (m_plnText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CO3"));
 			}
 
 			// decrypt linear mode
@@ -888,7 +915,7 @@ namespace Test
 
 			if (mRes.ToArray() != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CO4"));
 			}
 
 			m_cmpText.resize(m_encText.size());
@@ -898,7 +925,7 @@ namespace Test
 
 			if (m_cmpText != m_decText)
 			{
-				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal!"));
+				throw TestException(std::string("CipherStreamTest: Decrypted arrays are not equal! -CO5"));
 			}
 		}
 
@@ -910,16 +937,16 @@ namespace Test
 	{
 		using namespace Enumeration;
 
-		Processing::CipherDescription cd(
-			Enumeration::BlockCiphers::Rijndael,		// cipher engine
-			Enumeration::BlockCipherExtensions::None,	// cipher extension
-			Enumeration::CipherModes::CTR,				// cipher mode
-			Enumeration::PaddingModes::None,			// padding mode
-			Enumeration::KeySizes::K256,				// key size
-			Enumeration::IVSizes::V128);				// cipher iv size
+		CipherDescription cd(
+			BlockCiphers::Rijndael,		// cipher engine
+			BlockCipherExtensions::None,// cipher extension
+			CipherModes::CTR,			// cipher mode
+			PaddingModes::None,			// padding mode
+			KeySizes::K256,				// key size
+			IVSizes::V128);				// cipher iv size
 
-		CEX::IO::MemoryStream* ms = cd.ToStream();
-		Processing::CipherDescription cy(*ms);
+		MemoryStream* ms = cd.ToStream();
+		CipherDescription cy(*ms);
 		delete ms;
 
 		if (!cy.Equals(cd))
@@ -928,9 +955,9 @@ namespace Test
 		}
 	}
 
-	void CipherStreamTest::StreamModesTest(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding)
+	void CipherStreamTest::StreamModesTest(ICipherMode* Cipher, IPadding* Padding)
 	{
-		Key::Symmetric::SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
+		SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
 		if (keySize.KeySize() > 32)
 		{
 			AllocateRandom(m_key, 192);
@@ -944,10 +971,10 @@ namespace Test
 		// we are testing padding modes, make sure input size is random, but -not- block aligned..
 		AllocateRandom(m_plnText, 0, Cipher->BlockSize());
 
-		Key::Symmetric::SymmetricKey kp(m_key, m_iv);
-		IO::MemoryStream mIn(m_plnText);
-		IO::MemoryStream mOut;
-		IO::MemoryStream mRes;
+		SymmetricKey kp(m_key, m_iv);
+		MemoryStream mIn(m_plnText);
+		MemoryStream mOut;
+		MemoryStream mRes;
 
 		Processing::CipherStream cs(Cipher, Padding);
 		cs.Initialize(true, kp);
@@ -959,7 +986,7 @@ namespace Test
 
 		if (mRes.ToArray() != m_plnText)
 		{
-			throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal!"));
+			throw TestException(std::string("CipherStreamTest: Encrypted arrays are not equal! -CS1"));
 		}
 
 		delete Cipher;
@@ -970,7 +997,7 @@ namespace Test
 
 	size_t CipherStreamTest::AllocateRandom(std::vector<byte> &Data, size_t Size, size_t NonAlign)
 	{
-		Prng::SecureRandom rng(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
+		SecureRandom rng(Prngs::BCR, Providers::CSP);
 
 		if (Size != 0)
 		{
@@ -992,76 +1019,6 @@ namespace Test
 
 		rng.Generate(Data);
 		return (int)Data.size();
-	}
-
-	void CipherStreamTest::BlockCTR(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-	{
-		const size_t INPLEN = Input.size() - InOffset;
-		Cipher->Transform(Input, InOffset, Output, OutOffset, INPLEN);
-	}
-
-	void CipherStreamTest::BlockDecrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-	{
-		const size_t BLKLEN = Cipher->BlockSize();
-		const size_t INPLEN = Input.size() - InOffset;
-		const size_t ALNLEN = (INPLEN < BLKLEN) ? 0 : ((INPLEN / BLKLEN) * BLKLEN) - BLKLEN;
-
-		if (INPLEN > BLKLEN)
-		{
-			Cipher->ParallelProfile().IsParallel() = false;
-			Cipher->Transform(Input, InOffset, Output, OutOffset, ALNLEN);
-			InOffset += ALNLEN;
-			OutOffset += ALNLEN;
-		}
-
-		// last block
-		std::vector<byte> inpBuffer(BLKLEN);
-		std::memcpy(&inpBuffer[0], &Input[InOffset], BLKLEN);
-		std::vector<byte> outBuffer(BLKLEN);
-		Cipher->DecryptBlock(inpBuffer, 0, outBuffer, 0);
-		const size_t PADLEN = Padding->GetPaddingLength(outBuffer, 0);
-		const size_t FNLLEN = (PADLEN == 0) ? BLKLEN : BLKLEN - PADLEN;
-		std::memcpy(&Output[OutOffset], &outBuffer[0], FNLLEN);
-		OutOffset += FNLLEN;
-
-		if (Output.size() != OutOffset)
-		{
-			Output.resize(OutOffset);
-		}
-	}
-
-	void CipherStreamTest::BlockEncrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-	{
-		const size_t BLKLEN = Cipher->BlockSize();
-		const size_t INPLEN = Input.size() - InOffset;
-		const size_t ALNLEN = (INPLEN < BLKLEN) ? 0 : INPLEN - (INPLEN % BLKLEN);
-
-		if (INPLEN > BLKLEN)
-		{
-			Cipher->ParallelProfile().IsParallel() = false;
-			Cipher->Transform(Input, InOffset, Output, OutOffset, ALNLEN);
-			InOffset += ALNLEN;
-			OutOffset += ALNLEN;
-		}
-
-		// partial
-		if (ALNLEN != INPLEN)
-		{
-			size_t FNLLEN = INPLEN - ALNLEN;
-			std::vector<byte> inpBuffer(BLKLEN);
-			std::memcpy(&inpBuffer[0], &Input[InOffset], FNLLEN);
-			if (FNLLEN != BLKLEN)
-			{
-				Padding->AddPadding(inpBuffer, FNLLEN);
-			}
-			std::vector<byte> outBuffer(BLKLEN);
-			Cipher->EncryptBlock(inpBuffer, 0, outBuffer, 0);
-			if (Output.size() != OutOffset + BLKLEN)
-			{
-				Output.resize(OutOffset + BLKLEN);
-			}
-			std::memcpy(&Output[OutOffset], &outBuffer[0], BLKLEN);
-		}
 	}
 
 	void CipherStreamTest::OnProgress(std::string Data)

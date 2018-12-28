@@ -1,108 +1,48 @@
-// HISTORY
-//
-// ### CEX 1.0.0.6 ###
-// Current Release 1.0.0.6 (version A6)
-// The SPHINCS+ asymmetric signature scheme
-// The NTRU Prime asymmetric cipher
-// Authenticated Threefish-256/512/1024 stream ciphers
-// Authenticated ChaCha-256/512 stream ciphers
-// The cSHAKE option (RSX) integrated into RHX/AHX
-// Asymmetric ciphers updated to the NIST PQ Round 1 versions
-//
-// ### CEX 1.0.0.5 ###
-// Current Release 1.0.0.5 (version A5)
-// The ModuleLWE asymmetric cipher
-// The SHAKE Key Derivation Function
-// Addition of asymmetric cipher Encapsulate / Decapsulate api
-// The library is now Misra C++ 2014 compliant
-//
-// ### CEX 1.0.0.4 ###
-// 1.0.0.4, Full Release
-// The full version will be Misra and SEI-CERT compliant, (eta. is mid December 2017)
-// Added McEliece public key crypto system	-done
-// Added Keccak1024 message digest	-done
-// Added Poly1305 Mac and ChaCha/Poly1305 AEAD mode -(mode scheduled for 1.0.0.5)
-// Reworked public classes/interfaces for POD data types in preparation for DLL interface -ongoing..
-// Complete preformance optimization cycle; strategic memory allocation (stack or heap), and review class/function variables -ongoing..
-// Complete security compliance cycle; all code reviewed and updated to MISRA/SEI-CERT security recommendations -ongoing..
-//
-// Release 1.0.0.3, June 30, 2017
-// Added asymmetric cipher interfaces and framework
-// Added RingLWE asymmetric cipher
-// Added the Auto Collection seed Provider (ACP)
-// Addition of the HCR prng
-// Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators
-// Overhaul of SecureRandom and prng classes
-//
-// Release 1.0.0.2, April 23, 2017
-// Added and integrated a vectorized MemUtils class
-// Added experimental AVX512 support
-// Added UInt512 class
-// Added MemUtils and SIMD tests
-// Templated Chacha and Salsa
-// Rewrites of Twofish and Serpent
-// Headers are now documentation only (no inline accessors)
-// Added override hint to virtual functions in headers
-// Many small format changes and a couple of bug fixes
-//
-// Release 1.0.1.1, April 08, 2017
-// Fixed a bug in CpuDetect (misreporting SIMD capabilities of some cpu's)
-// Added preprocessor definitions for intrinsics throughout both projects
-// Cleaned up the test project
-// Changes to code required by Intel tool-chain
-// Tested on Intel i3, i5, i7, and an AMD K9
-// Tested on debug and release versions of ARM/x86/x64
-// Tested on MSVC 2015 and 2017 ide
-// Now supports arch:AVX2 (recommended), arch:AVX (minimum), or no intrinsics support, arch:IA32
-// Many misc. internal todo's and rewrites completed
-//
-// Release 1.0.0.1
-// Skein Tree			-done
-// Rewrite SHA2			-done
-// Rewrite Blake2		-done
-// Keccak Tree			-done
-// Scrypt				-done
-// Code review			-done
-// Help review			-done
-//
-// Release 0.14.2.1
-// EAX/GCM/OCB			-done
-// GMAC					-done
-// Code review			-done
-//
-// Release 0.13
-// HX kdf change		-done
-// DCG/BCG/HCG Drbg		-done
-// RDP/ECP/CJP provider -done
-// Secure Key/mem		-done
-// CipherStream rewrite	-done
-// KeyGenerator rewrite	-dome	
 
 // TRAJECTORY
 //
-// ### SCHEDULE FOR 1.0.0.7 RELEASE ###
-// ## ETA is December 25, 2018 ##
-// 
-// Add SPHINCS+ signature scheme
-// Add Dilithium signature scheme
+// ##SCHEDULE FOR 1.0.0.8 RELEASE ###
+// ##ETA is February 14, 2019 ##
 //
+// Authenticated stream ciphers ACS,ThreeFish-256/512/1024, and ChaCha256/512	- done
+// Update secure key mechanisms and integrate internally						- started
+// Full security, documentation, and code review cycles							- started
+// Begin optimization and review of asymmetric primitives						- 
+// Create accompanying website and publish documentation						- 
+//
+// New in Current Release 1.0.0.7 (version A7):
+// The Dilithium asymmetric signature scheme
+// The SPHINCS + asymmetric signature scheme
+// The NTRU Prime asymmetric cipher
+// The cSHAKE XOF function added as an HX symmetric cipher key expansion option
+// Update of all base asymmetric ciphers and signature schemes to match NIST PQ entries
+// Message digests updated for performance and security
+// Integrated an optional built - in authentication generator(HMAC / KMAC) to each stream cipher
+// Added the Authenticate and Encrypt and AEAD stream cipher implementation(Authenticated Cipher Stream : ACS).
+// Threefish 256/512/1024 authenticated stream ciphers
+// ChaCha256 - P20 and ChaCha512 - P80 authenticated stream ciphers
 //
 // ### Planned Release 1.1.0.1 ###
 //
-// AVX512 integration		-started
-// RingLWE					-added
-// McEliece					-added
-// ModuleLWE				-added
-// NTRU						-added
-// SPHINCS+					-added
-// Dilithium				-
+// RingLWE							-added
+// McEliece							-added
+// ModuleLWE						-added
+// NTRU								-added
+// SPHINCS+							-added
+// Dilithium						-added
+// Optimization						-started
+// AVX512 integration				-started
+// Compiler compatibility			-started
+// Android/iOS/Linux compatibility	-started
+// DLL API (.NET/Java)				-not started
 //
 // ### Planned Release 1.2.0.1 ###
-// STM - KEX
-// Android / iOS / Linux compatibility
-// DLL API
 //
-// ## Style Rules ##
+// Direct Trust Model DTM-KEX (external?)
+// Post-Quantum Secure DNS, PQ-SECDNS (external)
+// Shared Trust Model STM-KEX (external?)
+//
+// ### Style Rules ###
 // 
 // namespace: Single capaitalized word, ex. Network::
 // class name: Pascal case description, maximum of two words, ex. SymmetricKey()
@@ -276,12 +216,12 @@ void PrintRandom(size_t Lines)
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("***********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++   *");
-	ConsoleUtils::WriteLine("*                                             *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7e (A7)                   *");
-	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      December 26, 2018                *");
-	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
+	ConsoleUtils::WriteLine("// * CEX++ Version 1.0.0.7: CEX Library in C++   *");
+	ConsoleUtils::WriteLine("// *                                             *");
+	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7e (A7)                   *");
+	ConsoleUtils::WriteLine("// * License:   GPLv3                            *");
+	ConsoleUtils::WriteLine("// * Date:      December 26, 2018                *");
+	ConsoleUtils::WriteLine("// * Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
 }
@@ -309,7 +249,7 @@ void RunTest(ITest* Test)
 	catch (TestException &ex)
 	{
 		ConsoleUtils::WriteLine("");
-		ConsoleUtils::WriteLine("*** ERROR CONDITION ***");
+		ConsoleUtils::WriteLine("**// * ERROR CONDITION ***");
 
 
 		if (ex.Origin().size() != 0)
@@ -491,7 +431,7 @@ int main()
 			RunTest(new ChaChaTest());
 			RunTest(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
-			RunTest(new CipherStreamTest());
+			// RunTest(new CipherStreamTest());
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");

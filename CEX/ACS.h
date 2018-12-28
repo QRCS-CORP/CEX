@@ -49,7 +49,7 @@ using Enumeration::StreamAuthenticators;
 using Key::Symmetric::SymmetricSecureKey;
 
 /// <summary>
-/// An Encrypt and Authenticate AEAD Stream cipher implementation.
+/// An Encrypt and Authenticate AEAD stream cipher implementation (Authenticated Cipher Stream).
 /// <para>Uses an optional authentication mode; HMAC(SHA2) or KMAC set through the constructor to authenticate the stream.</para>
 /// </summary> 
 /// 
@@ -150,7 +150,6 @@ private:
 
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
-	static const std::vector<byte> CSHAKE_CUST;
 	static const size_t INFO_SIZE = 16;
 	static const size_t MAX_PRLALLOC = 100000000;
 	static const size_t MIN_TAGSIZE = 16;
@@ -160,6 +159,7 @@ private:
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<CTR> m_cipherMode;
 	BlockCiphers m_cipherType;
+	std::vector<byte> m_cShakeCustom;
 	ShakeModes m_expansionMode;
 	bool m_isAuthenticated;
 	bool m_isDestroyed;

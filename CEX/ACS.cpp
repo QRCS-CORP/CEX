@@ -12,7 +12,6 @@ using Utility::MemUtils;
 using Key::Symmetric::SymmetricKey;
 
 const std::string ACS::CLASS_NAME("ACS");
-const std::vector<byte> ACS::CSHAKE_CUST = { 0x43, 0x53, 0x58, 0x32, 0x35, 0x36 };
 const std::vector<byte> ACS::OMEGA_INFO = { 0x41, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62 };
 
 //~~~Constructor~~~//
@@ -23,6 +22,7 @@ ACS::ACS(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, Str
 	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType, CipherExtensionType) :
 		throw CryptoSymmetricCipherException("ACS:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
+	m_cShakeCustom(0),
 	m_expansionMode(ShakeModes::SHAKE512),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
@@ -66,6 +66,7 @@ ACS::~ACS()
 			m_macAuthenticator.reset(nullptr);
 		}
 
+		IntUtils::ClearVector(m_cShakeCustom);
 		IntUtils::ClearVector(m_legalKeySizes);
 		IntUtils::ClearVector(m_macTag);
 	}
@@ -116,27 +117,27 @@ const std::string ACS::Name()
 	{
 		case StreamAuthenticators::HMACSHA256:
 		{
-			tmp += "-HMACSHA256";
+			tmp += "+HMAC-SHA256";
 			break;
 		}
 		case StreamAuthenticators::HMACSHA512:
 		{
-			tmp += "-HMACSHA512";
+			tmp += "+HMAC-SHA512";
 			break;
 		}
 		case StreamAuthenticators::KMAC256:
 		{
-			tmp += "-KMAC256";
+			tmp += "+KMAC-256";
 			break;
 		}
 		case StreamAuthenticators::KMAC512:
 		{
-			tmp += "-KMAC512";
+			tmp += "+KMAC-512";
 			break;
 		}
 		default:
 		{
-			tmp += "-KMAC1024";
+			tmp += "+KMAC-1024";
 			break;
 		}
 	}
@@ -232,14 +233,15 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_macCounter = 1;
 
 		// create the cSHAKE customization string
-		std::vector<byte> cust(CSHAKE_CUST.size() + sizeof(ulong));
-		MemUtils::Copy(CSHAKE_CUST, 0, cust, 0, CSHAKE_CUST.size());
-		IntUtils::Le64ToBytes(m_macCounter, cust, CSHAKE_CUST.size());
+		m_cShakeCustom.resize(sizeof(ulong) + Name().size());
+		// add mac counter and algorithm name to customization string
+		IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+		MemUtils::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE with k,c
 		m_expansionMode = (KeyParams.Key().size() == 64) ? ShakeModes::SHAKE512 : (KeyParams.Key().size() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
 		Kdf::SHAKE gen(m_expansionMode);
-		gen.Initialize(KeyParams.Key(), cust);
+		gen.Initialize(KeyParams.Key(), m_cShakeCustom);
 
 		// generate the cipher key
 		std::vector<byte> cprk(KeyParams.Key().size());
@@ -343,14 +345,12 @@ void ACS::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
-	// customization string is cust+counter
-	std::vector<byte> cust(CSHAKE_CUST.size() + sizeof(ulong));
-	MemUtils::Copy(CSHAKE_CUST, 0, cust, 0, CSHAKE_CUST.size());
-	IntUtils::Le64ToBytes(m_macCounter, cust, CSHAKE_CUST.size());
+	// customization string is: mac counter + algorithm name
+	IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
 
 	// extract the new mac key
 	Kdf::SHAKE gen(m_expansionMode);
-	gen.Initialize(m_macKey->Key(), cust);
+	gen.Initialize(m_macKey->Key(), m_cShakeCustom);
 	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	gen.Generate(mack);
 	m_macKey.reset(new SymmetricSecureKey(mack));

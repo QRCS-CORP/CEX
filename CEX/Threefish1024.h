@@ -136,7 +136,6 @@ class Threefish1024 final : public IStreamCipher
 private:
 
 	static const size_t BLOCK_SIZE = 128;
-	static const std::vector<byte> CSHAKE_CUST;
 	static const std::string CLASS_NAME;
 	static const size_t INFO_SIZE = 16;
 	static const size_t KEY_SIZE = 128;
@@ -150,6 +149,7 @@ private:
 
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<Threefish1024State> m_cipherState;
+	std::vector<byte> m_cShakeCustom;
 	bool m_isAuthenticated;
 	bool m_isDestroyed;
 	bool m_isEncryption;
