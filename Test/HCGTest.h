@@ -15,11 +15,13 @@ namespace Test
 	class HCGTest final : public ITest
 	{
 	private:
+
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 65536;
 		static const size_t MINM_ALLOC = 1024;
+		static const size_t SAMPLE_SIZE = 1024000;
 		static const size_t TEST_CYCLES = 10;
 
 		std::vector<std::vector<byte>> m_expected;
@@ -54,8 +56,10 @@ namespace Test
 		std::string Run() override;
 
 		/// <summary>
-		///  Test drbg output using chisquare, mean value, and ordered runs tests
+		///  Test DRBG output using chisquare, mean value, and ordered runs tests
 		/// </summary>
+		/// 
+		/// <param name="Rng">The DRBG instance</param>
 		void Evaluate(IDrbg* Rng);
 
 		/// <summary>
@@ -64,10 +68,10 @@ namespace Test
 		void Exception();
 
 		/// <summary>
-		/// Compare known answer test vectors to drbg output
+		/// Compare known answer test vectors to DRBG output
 		/// </summary>
 		/// 
-		/// <param name="Rng">The drbg instance</param>
+		/// <param name="Rng">The DRBG instance</param>
 		/// <param name="Key">The input key</param>
 		/// <param name="Expected">The expected output</param>
 		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected);
@@ -80,7 +84,7 @@ namespace Test
 	private:
 
 		void Initialize();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 		bool OrderedRuns(const std::vector<byte> &Input);
 	};
 }

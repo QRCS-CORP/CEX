@@ -1,5 +1,5 @@
 #include "MLWEQ7681N256.h"
-#include "MemUtils.h"
+#include "MemoryTools.h"
 #include "Keccak.h"
 
 NAMESPACE_MODULELWE
@@ -237,7 +237,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 	size_t ctr;
 	size_t pos;
 
-	Utility::MemUtils::Copy(Seed, 0, tmpK, 0, Seed.size());
+	Utility::MemoryTools::Copy(Seed, 0, tmpK, 0, Seed.size());
 
 	for (i = 0; i < A.size(); i++)
 	{

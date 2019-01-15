@@ -2,8 +2,8 @@
 #define CEX_STREAMWRITER_H
 
 #include "MemoryStream.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 
 NAMESPACE_IO
 
@@ -102,7 +102,7 @@ public:
 			m_streamState.resize(m_streamPosition + INPLEN);
 		}
 
-		Utility::IntUtils::LeToBlock(Input, 0, m_streamState, m_streamPosition, INPLEN);
+		Utility::IntegerTools::LeToBlock(Input, 0, m_streamState, m_streamPosition, INPLEN);
 		m_streamPosition += INPLEN;
 	}
 
@@ -124,10 +124,10 @@ public:
 
 		if (sizeof(Array::value_type) > 1)
 		{
-			Utility::IntUtils::LeToBlock(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
+			Utility::IntegerTools::LeToBlock(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
 		}
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
+			Utility::MemoryTools::Copy(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
 		}
 
 
@@ -152,22 +152,22 @@ public:
 		{
 			case 8:
 			{
-				Utility::IntUtils::Le64ToBytes(Value, m_streamState, m_streamPosition);
+				Utility::IntegerTools::Le64ToBytes(Value, m_streamState, m_streamPosition);
 				break;
 			}
 			case 4:
 			{
-				Utility::IntUtils::Le32ToBytes(Value, m_streamState, m_streamPosition);
+				Utility::IntegerTools::Le32ToBytes(Value, m_streamState, m_streamPosition);
 				break;
 			}
 			case 2:
 			{
-				Utility::IntUtils::Le16ToBytes(Value, m_streamState, m_streamPosition);
+				Utility::IntegerTools::Le16ToBytes(Value, m_streamState, m_streamPosition);
 				break;
 			}
 			default:
 			{
-				Utility::MemUtils::CopyFromValue(Value, m_streamState, m_streamPosition, 1);
+				Utility::MemoryTools::CopyFromValue(Value, m_streamState, m_streamPosition, 1);
 			}
 		}
 

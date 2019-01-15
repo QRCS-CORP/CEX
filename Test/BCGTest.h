@@ -10,14 +10,14 @@ namespace Test
 
 	/// <summary>
 	/// Tests the Block Cipher Counter mode Generator (BCG) implementation using exception handling, parameter checks, stress and KAT tests.
-	/// <para>Compares drbg output with CTR mode encrypting all zeroes input.</para>
+	/// <para>Compares DRBG output with CTR mode encrypting all zeroes input.</para>
 	/// </summary>
 	class BCGTest final : public ITest
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t SAMPLE_SIZE = 1024000;
@@ -56,8 +56,10 @@ namespace Test
 		std::string Run() override;
 
 		/// <summary>
-		///  Test drbg output using chisquare, mean value, and ordered runs tests
+		///  Test DRBG output using chisquare, mean value, and ordered runs tests
 		/// </summary>
+		/// 
+		/// <param name="Rng">The DRBG instance</param>
 		void Evaluate(IDrbg* Rng);
 
 		/// <summary>
@@ -66,10 +68,10 @@ namespace Test
 		void Exception();
 
 		/// <summary>
-		/// Compare known answer test vectors to drbg output
+		/// Compare known answer test vectors to DRBG output
 		/// </summary>
 		/// 
-		/// <param name="Rng">The drbg instance</param>
+		/// <param name="Rng">The DRBG instance</param>
 		/// <param name="Key">The input key</param>
 		/// <param name="Nonce">The input nonce</param>
 		/// <param name="Expected">The expected output</param>
@@ -83,7 +85,7 @@ namespace Test
 	private:
 
 		void Initialize();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

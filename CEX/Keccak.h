@@ -20,8 +20,8 @@
 #define CEX_KECCAK_H
 
 #include "CexDomain.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 
 #if defined(__AVX2__)
 #	include "ULong256.h"
@@ -32,8 +32,8 @@
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 #if defined(__AVX2__)
 	using Numeric::ULong256;
@@ -107,11 +107,11 @@ public:
 		CexAssert(InLength % sizeof(ulong) == 0, "the input length is not 64-bit aligned");
 
 #if !defined(CEX_IS_LITTLE_ENDIAN)
-		MemUtils::XOR(Input, InOffset, State, 0, InLength);
+		MemoryTools::XOR(Input, InOffset, State, 0, InLength);
 #else
 		for (size_t i = 0; i < InLength / sizeof(ulong); ++i)
 		{
-			State[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+			State[i] ^= IntegerTools::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
 		}
 #endif
 	}
@@ -137,12 +137,12 @@ public:
 #endif
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-			MemUtils::Copy(State, 0, Output, OutOffset, Rate);
+			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
 #else
 
 			for (size_t i = 0; i < (Rate >> 3); i++)
 			{
-				IntUtils::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
+				IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
 			}
 #endif
 
@@ -172,12 +172,12 @@ public:
 #endif
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-			MemUtils::Copy(State, 0, Output, OutOffset, Rate);
+			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
 #else
 
 			for (size_t i = 0; i < (Rate >> 3); i++)
 			{
-				IntUtils::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
+				IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
 			}
 #endif
 
@@ -217,17 +217,17 @@ public:
 			InOffset += Rate;
 		}
 
-		MemUtils::Copy(Input, InOffset, msg, 0, InLength);
+		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
 		msg[InLength] = 0x1F;
-		MemUtils::Clear(msg, InLength + 1, Rate - InLength + 1);
+		MemoryTools::Clear(msg, InLength + 1, Rate - InLength + 1);
 		msg[Rate - 1] |= 128;
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		MemUtils::XOR(msg, 0, state, 0, Rate);
+		MemoryTools::XOR(msg, 0, state, 0, Rate);
 #else
 		for (i = 0; i < (Rate >> 3); ++i)
 		{
-			state[i] ^= IntUtils::LeBytesTo64(msg, (8 * i));
+			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
 		}
 #endif
 
@@ -248,10 +248,10 @@ public:
 
 			for (i = 0; i < FNLBLK; i++)
 			{
-				IntUtils::Le64ToBytes(state[i], msg, (8 * i));
+				IntegerTools::Le64ToBytes(state[i], msg, (8 * i));
 			}
 
-			MemUtils::Copy(msg, 0, Output, OutOffset, OutLength);
+			MemoryTools::Copy(msg, 0, Output, OutOffset, OutLength);
 		}
 	}
 
@@ -286,17 +286,17 @@ public:
 			InOffset += Rate;
 		}
 
-		MemUtils::Copy(Input, InOffset, msg, 0, InLength);
+		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
 		msg[InLength] = 0x1F;
-		MemUtils::Clear(msg, InLength + 1, Rate - InLength + 1);
+		MemoryTools::Clear(msg, InLength + 1, Rate - InLength + 1);
 		msg[Rate - 1] |= 128;
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		MemUtils::XOR(msg, 0, state, 0, Rate);
+		MemoryTools::XOR(msg, 0, state, 0, Rate);
 #else
 		for (i = 0; i < (Rate >> 3); ++i)
 		{
-			state[i] ^= IntUtils::LeBytesTo64(msg, (8 * i));
+			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
 		}
 #endif
 
@@ -317,10 +317,10 @@ public:
 
 			for (i = 0; i < FNLBLK; i++)
 			{
-				IntUtils::Le64ToBytes(state[i], msg, (8 * i));
+				IntegerTools::Le64ToBytes(state[i], msg, (8 * i));
 			}
 
-			MemUtils::Copy(msg, 0, Output, OutOffset, OutLength);
+			MemoryTools::Copy(msg, 0, Output, OutOffset, OutLength);
 		}
 	}
 

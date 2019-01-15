@@ -1,9 +1,11 @@
 #include "SymmetricKey.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
-NAMESPACE_SYMMETRICKEY
+NAMESPACE_CIPHER
+
+using Enumeration::ErrorCodes;
 
 //~~~Constructors~~~//
 
@@ -17,7 +19,7 @@ SymmetricKey::SymmetricKey(const std::vector<byte> &Key)
 {
 	if (Key.size() == 0)
 	{
-		throw CryptoProcessingException("SymmetricKey:Ctor", "The key can not be zero sized!");
+		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam);
 	}
 }
 
@@ -31,7 +33,7 @@ SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte>
 {
 	if (Key.size() == 0 && Nonce.size() == 0)
 	{
-		throw CryptoProcessingException("SymmetricKey:Ctor", "The key and nonce can not both be be zero sized!");
+		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key and nonce can not both be be zero sized!"), ErrorCodes::InvalidParam);
 	}
 }
 
@@ -45,7 +47,7 @@ SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte>
 {
 	if (Key.size() == 0 && Nonce.size() == 0 && Info.size() == 0)
 	{
-		throw CryptoProcessingException("SymmetricKey:Ctor", "The key, nonce, and info can not all be be zero sized!");
+		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key, nonce, and info can not all be be zero sized!"), ErrorCodes::InvalidParam);
 	}
 }
 
@@ -91,15 +93,15 @@ void SymmetricKey::Destroy()
 
 		if (m_key.size() > 0)
 		{
-			Utility::IntUtils::ClearVector(m_key);
+			Utility::IntegerTools::Clear(m_key);
 		}
 		if (m_nonce.size() > 0)
 		{
-			Utility::IntUtils::ClearVector(m_nonce);
+			Utility::IntegerTools::Clear(m_nonce);
 		}
 		if (m_info.size() > 0)
 		{
-			Utility::IntUtils::ClearVector(m_info);
+			Utility::IntegerTools::Clear(m_info);
 		}
 	}
 }
@@ -166,4 +168,4 @@ MemoryStream* SymmetricKey::Serialize(SymmetricKey &KeyObj)
 	return strm;
 }
 
-NAMESPACE_SYMMETRICKEYEND
+NAMESPACE_CIPHEREND

@@ -1,9 +1,6 @@
 #include "NTRU.h"
-#include "AsymmetricEngines.h"
-#include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
 #include "BCR.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "NTRULQ4591N761.h"
 #include "NTRUSQ4591N761.h"
 #include "PrngFromName.h"
@@ -12,10 +9,8 @@
 
 NAMESPACE_NTRU
 
-using Enumeration::AsymmetricEngines;
-using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
-using Utility::IntUtils;
+using Enumeration::ErrorCodes;
+using Utility::IntegerTools;
 using Enumeration::ShakeModes;
 
 const std::string NTRU::CLASS_NAME = "NTRU";
@@ -30,9 +25,9 @@ NTRU::NTRU(NTRUParameters Parameters, Prngs PrngType)
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_ntruParameters(Parameters != NTRUParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(NTRUParameters::NTRUS2SQ4591N761) ? Parameters :
-		throw CryptoAsymmetricException("NTRU:CTor", "The parameter set is invalid!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The NTRU parameter set is invalid!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
-		throw CryptoAsymmetricException("NTRU:CTor", "The prng type can not be none!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -44,9 +39,9 @@ NTRU::NTRU(NTRUParameters Parameters, IPrng* Prng)
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_ntruParameters(Parameters != NTRUParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(NTRUParameters::NTRUS2SQ4591N761) ? Parameters :
-		throw CryptoAsymmetricException("NTRU:CTor", "The parameter set is invalid!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The NTRU parameter set is invalid!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(Prng != nullptr ? Prng :
-		throw CryptoAsymmetricException("NTRU:CTor", "The prng can not be null!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -58,7 +53,7 @@ NTRU::~NTRU()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_ntruParameters = NTRUParameters::None;
-		IntUtils::ClearVector(m_domainKey);
+		IntegerTools::Clear(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -114,15 +109,15 @@ const bool NTRU::IsInitialized()
 
 const std::string NTRU::Name()
 {
-	std::string ret = CLASS_NAME + "-";
+	std::string ret = CLASS_NAME;
 
 	if (m_ntruParameters == NTRUParameters::NTRUS2SQ4591N761)
 	{
-		ret += "NTRUS2SQ4591N761";
+		ret += "-NTRUS2SQ4591N761";
 	}
 	else if (m_ntruParameters == NTRUParameters::NTRUS1LQ4591N761)
 	{
-		ret += "NTRUS1LQ4591N761";
+		ret += "-NTRUS1LQ4591N761";
 	}
 
 	return ret;
@@ -229,11 +224,11 @@ void NTRU::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::NTRU)
 	{
-		throw CryptoAsymmetricException("NTRU:Initialize", "The key base type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
-		throw CryptoAsymmetricException("NTRU:Initialize", "The key type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 
 	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)

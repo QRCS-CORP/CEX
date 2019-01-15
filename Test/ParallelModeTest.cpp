@@ -7,19 +7,19 @@
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
 #include "../CEX/OCB.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using namespace Cipher::Symmetric::Block::Mode;
-	using Utility::IntUtils;
+	using namespace Cipher::Block::Mode;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
-	using Key::Symmetric::SymmetricKey;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
 
+	const std::string ParallelModeTest::CLASSNAME = "ParallelModeTest";
 	const std::string ParallelModeTest::DESCRIPTION = "Stress test compares output from parallel and linear modes for equality.";
-	const std::string ParallelModeTest::FAILURE = "FAILURE! ";
 	const std::string ParallelModeTest::SUCCESS = "SUCCESS! Parallel stress tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -91,11 +91,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + ex.Origin(), ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -103,7 +103,7 @@ namespace Test
 	{
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[1];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[1];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;
 		std::vector<byte> inp;
@@ -145,8 +145,8 @@ namespace Test
 				cpt2.resize(inpLen);
 			}
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, inpLen, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, inpLen, rnd);
 			SymmetricKey k(key, iv);
 
 			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
@@ -163,7 +163,7 @@ namespace Test
 
 			if (cpt1 != cpt2)
 			{
-				throw TestException(std::string("Stress: Cipher output is not equal! -TP1"));
+				throw TestException(std::string("Stress"), Cipher->Name(), std::string("Cipher output is not equal! -TP1"));
 			}
 
 			if (Encryption)
@@ -175,7 +175,7 @@ namespace Test
 
 				if (otp != inp)
 				{
-					throw TestException(std::string("Stress: Cipher output is not equal! -TP2"));
+					throw TestException(std::string("Stress"), Cipher->Name(), std::string("Cipher output is not equal! -TP2"));
 				}
 			}
 		}
@@ -183,7 +183,7 @@ namespace Test
 
 	//~~~Private Functions~~~//
 
-	void ParallelModeTest::OnProgress(std::string Data)
+	void ParallelModeTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

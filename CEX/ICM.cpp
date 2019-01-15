@@ -1,7 +1,7 @@
 #include "ICM.h"
 #include "BlockCipherFromName.h"
-#include "IntUtils.h"
-#include "ParallelUtils.h"
+#include "IntegerTools.h"
+#include "ParallelTools.h"
 
 NAMESPACE_MODE
 
@@ -12,7 +12,7 @@ const std::string ICM::CLASS_NAME("ICM");
 ICM::ICM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
 	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
-		throw CryptoCipherModeException("ICM:CTor", "The Cipher type can not be none!")),
+		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_ctrVector(2),
 	m_destroyEngine(true),
@@ -27,7 +27,7 @@ ICM::ICM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 ICM::ICM(IBlockCipher* Cipher)
 	:
 	m_blockCipher(Cipher != nullptr ? Cipher : 
-		throw CryptoCipherModeException("ICM:CTor", "The Cipher can not be null!")),
+		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_cipherType(m_blockCipher->Enumeral()),
 	m_ctrVector(2),
 	m_destroyEngine(false),
@@ -50,7 +50,7 @@ ICM::~ICM()
 		m_isLoaded = false;
 		m_parallelProfile.Reset();
 
-		Utility::IntUtils::ClearVector(m_ctrVector);
+		Utility::IntegerTools::Clear(m_ctrVector);
 
 		if (m_destroyEngine)
 		{
@@ -154,24 +154,28 @@ void ICM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{
-		throw CryptoSymmetricCipherException("ICM:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() members in length.");
+		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}
 	if (KeyParams.Nonce().size() != BLOCK_SIZE)
 	{
-		throw CryptoSymmetricCipherException("ICM:Initialize", "Invalid nonce size! Nonce must be one of the LegalKeySizes() members in length.");
+		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid nonce size; nonce must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidSize);
 	}
-	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+
+	if (m_parallelProfile.IsParallel())
 	{
-		throw CryptoSymmetricCipherException("ICM:Initialize", "The parallel block size is out of bounds!");
-	}
-	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
-	{
-		throw CryptoSymmetricCipherException("ICM:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+		if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+		{
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size is out of bounds!"), ErrorCodes::InvalidSize);
+		}
+		if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
+		{
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidSize);
+		}
 	}
 
 	Scope();
 	m_blockCipher->Initialize(true, KeyParams);
-	Utility::MemUtils::COPY128(KeyParams.Nonce(), 0, m_ctrVector, 0);
+	Utility::MemoryTools::COPY128(KeyParams.Nonce(), 0, m_ctrVector, 0);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }
@@ -180,7 +184,7 @@ void ICM::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException("ICM:ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -189,7 +193,7 @@ void ICM::ParallelMaxDegree(size_t Degree)
 void ICM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length!");
+	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length!");
 
 	const size_t PRLBLK = m_parallelProfile.ParallelBlockSize();
 
@@ -220,19 +224,19 @@ void ICM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void ICM::Convert(const std::vector<ulong> &Input, std::vector<byte> &Output, size_t OutOffset)
 {
-	Utility::MemUtils::COPY128(Input, 0, Output, OutOffset);
+	Utility::MemoryTools::COPY128(Input, 0, Output, OutOffset);
 }
 
 void ICM::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
 	std::vector<byte> tmpCtr(BLOCK_SIZE);
 	Convert(m_ctrVector, tmpCtr, 0);
 	m_blockCipher->EncryptBlock(tmpCtr, 0, Output, OutOffset);
-	Utility::IntUtils::LeIncrementW(m_ctrVector);
-	Utility::MemUtils::XOR128(Input, InOffset, Output, OutOffset);
+	Utility::IntegerTools::LeIncrementW(m_ctrVector);
+	Utility::MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
 }
 
 void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<ulong> &Counter)
@@ -250,37 +254,37 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		while (blkCtr != PBKALN)
 		{
 			Convert(Counter, ctrBlk, 0);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 16);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 32);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 48);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 64);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 80);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 96);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 112);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 128);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 144);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 160);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 176);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 192);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 208);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 224);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 240);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			m_blockCipher->Transform2048(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX512BLK;
 		}
@@ -296,21 +300,21 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		while (blkCtr != PBKALN)
 		{
 			Convert(Counter, ctrBlk, 0);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 16);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 32);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 48);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 64);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 80);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 96);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 112);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			m_blockCipher->Transform1024(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX2BLK;
 		}
@@ -326,13 +330,13 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		while (blkCtr != PBKALN)
 		{
 			Convert(Counter, ctrBlk, 0);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 16);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 32);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			Convert(Counter, ctrBlk, 48);
-			Utility::IntUtils::LeIncrementW(Counter);
+			Utility::IntegerTools::LeIncrementW(Counter);
 			m_blockCipher->Transform512(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVXBLK;
 		}
@@ -346,7 +350,7 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	{
 		Convert(Counter, tmpCtr, 0);
 		m_blockCipher->EncryptBlock(tmpCtr, 0, Output, OutOffset + blkCtr);
-		Utility::IntUtils::LeIncrementW(Counter);
+		Utility::IntegerTools::LeIncrementW(Counter);
 		blkCtr += BLOCK_SIZE;
 	}
 
@@ -356,8 +360,8 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		Convert(Counter, tmpCtr, 0);
 		m_blockCipher->EncryptBlock(tmpCtr, 0, tmp, 0);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
-		Utility::MemUtils::Copy(tmp, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
-		Utility::IntUtils::LeIncrementW(Counter);
+		Utility::MemoryTools::Copy(tmp, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
+		Utility::IntegerTools::LeIncrementW(Counter);
 	}
 }
 
@@ -368,26 +372,26 @@ void ICM::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 	std::vector<ulong> tmpCtr(m_ctrVector.size());
 
-	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTRLEN](size_t i)
+	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
 		std::vector<ulong> thdCtr(2, 0);
 		// offset counter by chunk size / block size  
-		Utility::IntUtils::LeIncreaseW(m_ctrVector, thdCtr, CTRLEN * i);
+		Utility::IntegerTools::LeIncreaseW(m_ctrVector, thdCtr, CTRLEN * i);
 		// generate random at output array offset
 		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr);
 		// xor with input at offsets
-		Utility::MemUtils::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+		Utility::MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 		{
-			Utility::MemUtils::COPY128(thdCtr, 0, tmpCtr, 0);
+			Utility::MemoryTools::COPY128(thdCtr, 0, tmpCtr, 0);
 		}
 	});
 
 	// copy last counter to class variable
-	Utility::MemUtils::COPY128(tmpCtr, 0, m_ctrVector, 0);
+	Utility::MemoryTools::COPY128(tmpCtr, 0, m_ctrVector, 0);
 
 	// last block processing
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
@@ -412,7 +416,7 @@ void ICM::ProcessSequential(const std::vector<byte> &Input, const size_t InOffse
 
 	if (ALNLEN != 0)
 	{
-		Utility::MemUtils::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
+		Utility::MemoryTools::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
 	}
 
 	// get the remaining bytes

@@ -1,20 +1,20 @@
 #include "AeadTest.h"
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/OCB.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::IBlockCipher;
-	using Cipher::Symmetric::Block::Mode::EAX;
-	using Cipher::Symmetric::Block::Mode::GCM;
-	using Cipher::Symmetric::Block::Mode::OCB;
-	using Utility::IntUtils;
+	using Cipher::Block::IBlockCipher;
+	using Cipher::Block::Mode::EAX;
+	using Cipher::Block::Mode::GCM;
+	using Cipher::Block::Mode::OCB;
+	using Utility::IntegerTools;
 
+	const std::string AeadTest::CLASSNAME = "AeadTest";
 	const std::string AeadTest::DESCRIPTION = "Authenticate Encrypt and Associated Data (AEAD) Cipher Mode Tests.";
-	const std::string AeadTest::FAILURE = "FAILURE! ";
 	const std::string AeadTest::SUCCESS = "SUCCESS! AEAD tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -34,12 +34,12 @@ namespace Test
 
 	AeadTest::~AeadTest()
 	{
-		IntUtils::ClearVector(m_associatedText);
-		IntUtils::ClearVector(m_cipherText);
-		IntUtils::ClearVector(m_expectedCode);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_nonce);
-		IntUtils::ClearVector(m_plainText);
+		IntegerTools::Clear(m_associatedText);
+		IntegerTools::Clear(m_cipherText);
+		IntegerTools::Clear(m_expectedCode);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_nonce);
+		IntegerTools::Clear(m_plainText);
 	}
 
 	//~~~Accessors~~~//
@@ -150,18 +150,18 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error!")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void AeadTest::Kat(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
 		std::vector<byte> &CipherText, std::vector<byte> &MacCode)
 	{
-		Key::Symmetric::SymmetricKey kp(Key, Nonce);
+		Cipher::SymmetricKey kp(Key, Nonce);
 		Cipher->Initialize(true, kp);
 
 		if (AssociatedText.size() != 0)
@@ -176,7 +176,7 @@ namespace Test
 
 		if (CipherText != enc)
 		{
-			throw TestException(std::string("AeadTest: Encrypted output is not equal! -AK1"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AK1"));
 		}
 
 		// decryption
@@ -196,7 +196,7 @@ namespace Test
 		// Finalizer can be skipped if Verify called
 		if (!Cipher->Verify(enc, dlen, 16))
 		{
-			throw TestException(std::string("AeadTest: Tags do not match! -AK2"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("AeadTest: Tags do not match! -AK2"));
 		}
 
 		std::vector<byte> dec(dlen);
@@ -206,11 +206,11 @@ namespace Test
 		}
 		if (PlainText != dec)
 		{
-			throw TestException(std::string("AeadTest: Decrypted output is not equal! -AK3"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AK3"));
 		}
 		if (MacCode != mac || MacCode != Cipher->Tag())
 		{
-			throw TestException(std::string("AeadTest: Tags do not match! -AK4"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("AeadTest: Tags do not match! -AK4"));
 		}
 	}
 
@@ -223,7 +223,7 @@ namespace Test
 		std::vector<byte> enc1(80);
 
 		// get base value
-		Key::Symmetric::SymmetricKey kp1(key, nonce);
+		Cipher::SymmetricKey kp1(key, nonce);
 		Cipher->Initialize(true, kp1);
 		// test persisted ad
 		Cipher->PreserveAD() = true;
@@ -235,7 +235,7 @@ namespace Test
 		std::vector<byte> enc2(80);
 		// decrement counter by 10
 		nonce[nonce.size() - 1] -= 10;
-		Key::Symmetric::SymmetricKey kp2(key, nonce);
+		Cipher::SymmetricKey kp2(key, nonce);
 		// set to auto increment, with nonce auto-incremented post finalize, last run should equal first output
 		Cipher->AutoIncrement() = true;
 		Cipher->Initialize(true, kp2);
@@ -251,7 +251,7 @@ namespace Test
 		// this output should be different because of nonce -1
 		if (enc1 == enc2)
 		{
-			throw TestException(std::string("AeadTest: Output does not match! -AI1"));
+			throw TestException(std::string("Incremental"), Cipher->Name(), std::string("AeadTest: Output does not match! -AI1"));
 		}
 
 		// get the code after incrementing nonce one last time
@@ -260,7 +260,7 @@ namespace Test
 
 		if (enc1 != enc2)
 		{
-			throw TestException(std::string("AeadTest: Output does not match! -AI2"));
+			throw TestException(std::string("Incremental"), Cipher->Name(), std::string("AeadTest: Output does not match! -AI2"));
 		}
 	}
 
@@ -272,7 +272,7 @@ namespace Test
 		std::vector<byte> enc1;
 		std::vector<byte> enc2;
 		std::vector<byte> key(32);
-		std::vector<Key::Symmetric::SymmetricKeySize> keySizes = Cipher->LegalKeySizes();
+		std::vector<Cipher::SymmetricKeySize> keySizes = Cipher->LegalKeySizes();
 		std::vector<byte> nonce(keySizes[0].NonceSize());
 		std::vector<byte> assoc(16);
 		Prng::SecureRandom rng;
@@ -288,7 +288,7 @@ namespace Test
 			rng.Generate(nonce);
 			rng.Generate(key);
 			rng.Generate(assoc);
-			Key::Symmetric::SymmetricKey kp(key, nonce);
+			Cipher::SymmetricKey kp(key, nonce);
 
 			// parallel encryption mode
 			enc1.resize(dlen + Cipher->MaxTagSize());
@@ -310,7 +310,7 @@ namespace Test
 
 			if (enc1 != enc2)
 			{
-				throw TestException(std::string("AeadTest: Encrypted output is not equal! -AP1"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AP1"));
 			}
 
 			// parallel decryption mode
@@ -332,22 +332,22 @@ namespace Test
 
 			if (dec1 != dec2)
 			{
-				throw TestException(std::string("AeadTest: Decrypted output is not equal! -AP2"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AP2"));
 			}
 			if (dec1 != data)
 			{
-				throw TestException(std::string("AeadTest: Decrypted output is not equal! -AP3"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AP3"));
 			}
 			if (!Cipher->Verify(enc1, dlen, Cipher->MaxTagSize()))
 			{
-				throw TestException(std::string("AeadTest: Tags do not match! -AP4"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("AeadTest: Tags do not match! -AP4"));
 			}
 		}
 	}
 
 	void AeadTest::Stress(IAeadMode* Cipher)
 	{
-		Key::Symmetric::SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
 		std::vector<byte> data;
 		std::vector<byte> dec;
 		std::vector<byte> enc;
@@ -368,7 +368,7 @@ namespace Test
 			rng.Generate(nonce);
 			rng.Generate(key);
 			rng.Generate(assoc);
-			Key::Symmetric::SymmetricKey kp(key, nonce);
+			Cipher::SymmetricKey kp(key, nonce);
 
 			enc.resize(dlen + Cipher->MaxTagSize());
 			Cipher->Initialize(true, kp);
@@ -383,7 +383,7 @@ namespace Test
 
 			if (!Cipher->Verify(enc, dlen, Cipher->MaxTagSize()))
 			{
-				throw TestException(std::string("AeadTest: Tags do not match! -AS1"));
+				throw TestException(std::string("Stress"), Cipher->Name(), std::string("AeadTest: Tags do not match! -AS1"));
 			}
 		}
 	}
@@ -707,7 +707,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void AeadTest::OnProgress(std::string Data)
+	void AeadTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

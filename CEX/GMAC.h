@@ -34,7 +34,7 @@ NAMESPACE_MAC
 
 using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
-using Cipher::Symmetric::Block::IBlockCipher;
+using Cipher::Block::IBlockCipher;
 
 /// <summary>
 /// An implementation of a Galois/Counter Message Authentication Code generator
@@ -180,10 +180,10 @@ public:
 	/// <summary>
 	/// Read Only: Size of returned mac in bytes
 	/// </summary>
-	const size_t MacSize() override;
+	const size_t TagSize() override;
 
 	/// <summary>
-	/// Read Only: Mac generators class name
+	/// Read Only: Mac generators implementation name
 	/// </summary>
 	const std::string Name() override;
 

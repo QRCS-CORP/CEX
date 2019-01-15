@@ -18,19 +18,19 @@ enum class ShakeModes : byte
 	/// <summary>
 	/// The SHAKE128 XOF function
 	/// </summary>
-	SHAKE128 = 8,
+	SHAKE128 = 9,
 	/// <summary>
 	/// The SHAKE256 XOF function
 	/// </summary>
-	SHAKE256 = 9,
+	SHAKE256 = 10,
 	/// <summary>
 	/// The SHAKE512 XOF function
 	/// </summary>
-	SHAKE512 = 10,
+	SHAKE512 = 11,
 	/// <summary>
 	/// The SHAKE1024 XOF function
 	/// </summary>
-	SHAKE1024 = 11
+	SHAKE1024 = 12
 };
 
 NAMESPACE_ENUMERATIONEND

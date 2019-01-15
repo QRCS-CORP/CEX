@@ -3,19 +3,19 @@
 #	include "../CEX/AHX.h"
 #endif
 #include "../CEX/CTR.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::Mode::CTR;
-	using Utility::IntUtils;
+	using Cipher::Block::Mode::CTR;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
-	using namespace Cipher::Symmetric::Block;
+	using namespace Cipher::Block;
 
+	const std::string RijndaelTest::CLASSNAME = "RijndaelTest";
 	const std::string RijndaelTest::DESCRIPTION = "NIST AES specification FIPS 197 Known Answer Tests.";
-	const std::string RijndaelTest::FAILURE = "FAILURE! ";
 	const std::string RijndaelTest::SUCCESS = "SUCCESS! AES tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -33,9 +33,9 @@ namespace Test
 
 	RijndaelTest::~RijndaelTest()
 	{
-		IntUtils::ClearVector(m_cipherText);
-		IntUtils::ClearVector(m_keys);
-		IntUtils::ClearVector(m_plainText);
+		IntegerTools::Clear(m_cipherText);
+		IntegerTools::Clear(m_keys);
+		IntegerTools::Clear(m_plainText);
 		m_testAesNi = false;
 	}
 
@@ -216,11 +216,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -230,13 +230,13 @@ namespace Test
 		try
 		{
 			RHX cpr;
-			Key::Symmetric::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize() + 1);
 			SymmetricKey kp(k);
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Rijndael"), std::string("Exception: Exception handling failure! -RE1"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE1"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -251,7 +251,7 @@ namespace Test
 		{
 			RHX cpr(BlockCipherExtensions::Custom);
 
-			throw TestException(std::string("Rijndael"), std::string("Exception: Exception handling failure! -RE2"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE2"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -266,7 +266,7 @@ namespace Test
 		{
 			RHX cpr(nullptr);
 
-			throw TestException(std::string("Rijndael"), std::string("Exception: Exception handling failure! -RE3"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE3"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -282,14 +282,14 @@ namespace Test
 		const size_t MSGLEN = Message.size();
 		std::vector<byte> enc(MSGLEN);
 		std::vector<byte> dec(MSGLEN);
-		Key::Symmetric::SymmetricKey kp(Key);
+		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, enc, 0);
 
 		if (enc != Expected)
 		{
-			throw TestException(std::string("RijndaelTest: AES: Encrypted arrays are not equal!"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("Encrypted arrays are not equal!"));
 		}
 
 		Cipher->Initialize(false, kp);
@@ -297,7 +297,7 @@ namespace Test
 
 		if (dec != Message)
 		{
-			throw TestException(std::string("RijndaelTest: AES: Decrypted arrays are not equal!"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("Decrypted arrays are not equal!"));
 		}
 	}
 
@@ -307,7 +307,7 @@ namespace Test
 		std::vector<byte> msg = Message;
 		std::vector<byte> enc(MSGLEN);
 		std::vector<byte> dec(MSGLEN);
-		Key::Symmetric::SymmetricKey kp(Key);
+		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
 
@@ -319,7 +319,7 @@ namespace Test
 
 		if (enc != Expected)
 		{
-			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal! -RM1"));
+			throw TestException(std::string("MonteCarlo"), Cipher->Name(), std::string("Arrays are not equal! -RM1"));
 		}
 
 		Cipher->Initialize(false, kp);
@@ -332,7 +332,7 @@ namespace Test
 
 		if (dec != Message)
 		{
-			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal! -RM2"));
+			throw TestException(std::string("MonteCarlo"), Cipher->Name(), std::string("Arrays are not equal! -RM2"));
 		}
 	}
 
@@ -340,7 +340,7 @@ namespace Test
 	{
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;
 		std::vector<byte> inp;
@@ -363,8 +363,8 @@ namespace Test
 			inp.resize(INPLEN);
 			otp.resize(INPLEN);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, INPLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, INPLEN, rnd);
 			SymmetricKey kp(key, iv);
 
 			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
@@ -381,7 +381,7 @@ namespace Test
 
 			if (cpt1 != cpt2)
 			{
-				throw TestException(std::string("Parallel: Cipher output is not equal! -TP1"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -TP1"));
 			}
 
 			// decrypt sequential ciphertext with parallel
@@ -391,7 +391,7 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException(std::string("Parallel: Cipher output is not equal! -TP2"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -TP2"));
 			}
 		}
 
@@ -404,7 +404,7 @@ namespace Test
 		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
 		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
@@ -425,8 +425,8 @@ namespace Test
 			inp.resize(INPLEN);
 			otp.resize(INPLEN);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, INPLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, INPLEN, rnd);
 			SymmetricKey kp(key, iv);
 
 			// encrypt
@@ -438,7 +438,7 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
+				throw TestException(std::string("Stress"), Cipher->Name(), std::string("Transformation output is not equal! -TS1"));
 			}
 		}
 	}
@@ -556,7 +556,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void RijndaelTest::OnProgress(std::string Data)
+	void RijndaelTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

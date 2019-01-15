@@ -2,7 +2,7 @@
 #define CEXTEST_SIMDWRAPPERTEST_H
 
 #include "ITest.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
 #if defined(__AVX512__)
@@ -22,8 +22,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
@@ -63,7 +63,7 @@ namespace Test
 
 			for (size_t i = 0; i < ret.size(); ++i)
 			{
-				ret[i] = Utility::IntUtils::LeBytesTo32(Input, i * sizeof(uint));
+				ret[i] = Utility::IntegerTools::LeBytesTo32(Input, i * sizeof(uint));
 			}
 
 			return ret;
@@ -118,7 +118,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException(std::string("SimdMathCheck: addition test failed!"));
+					throw TestException(std::string("SimdMathCheck"), std::string("Add"), std::string("Addition test failed! -SS1"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -133,7 +133,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException(std::string("SimdMathCheck: multiplication test failed!"));
+					throw TestException(std::string("SimdMathCheck"), std::string("Multiply"), std::string("Multiplication test failed! -SS2"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -148,7 +148,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException(std::string("SimdMathCheck: subtraction test failed!"));
+					throw TestException(std::string("SimdMathCheck"), std::string("Subtract"), std::string("Subtraction test failed! -SS3"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -163,7 +163,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException(std::string("SimdMathCheck: division test failed!"));
+					throw TestException(std::string("SimdMathCheck"), std::string("Divide"), std::string("Division test failed! -SS4"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -178,12 +178,12 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException(std::string("SimdMathCheck: modulus test failed!"));
+					throw TestException(std::string("SimdMathCheck"), std::string("Modulus"), std::string("Modulus test failed! -SS5"));
 				}
 			}
 		}
 
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

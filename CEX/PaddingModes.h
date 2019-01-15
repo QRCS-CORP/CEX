@@ -15,21 +15,25 @@ enum class PaddingModes : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
+	/// ESP Padding Mode
+	/// </summary>
+	ESP = 1,
+	/// <summary>
 	/// ISO7816 Padding Mode
 	/// </summary>
-	ISO7816 = 1,
+	ISO7816 = 2,
 	/// <summary>
 	/// PKCS7 Padding Mode
 	/// </summary>
-	PKCS7 = 2,
-	/// <summary>
-	/// Trailing Bit Complement Padding Mode
-	/// </summary>
-	TBC = 3,
+	PKCS7 = 3,
 	/// <summary>
 	/// X923 Padding Mode
 	/// </summary>
-	X923 = 4
+	X923 = 4,
+	/// <summary>
+	/// Zero and One Padding Mode
+	/// </summary>
+	ZeroOne = 5
 };
 
 NAMESPACE_ENUMERATIONEND

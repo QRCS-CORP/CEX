@@ -1,51 +1,61 @@
 #include "PaddingFromName.h"
-#include "ISO7816.h"
+#include "CryptoPaddingException.h"
+#include "ESP.h"
 #include "PKCS7.h"
-#include "TBC.h"
 #include "X923.h"
+#include "ZeroOne.h"
 
 NAMESPACE_HELPER
 
+using Exception::CryptoPaddingException;
+using Enumeration::ErrorCodes;
+
 IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
 {
-	IPadding* padPtr = nullptr;
+	using namespace Cipher::Block::Padding;
+
+	IPadding* pptr = nullptr;
 
 	try
 	{
 		switch (PaddingType)
 		{
-			case PaddingModes::ISO7816:
+			case PaddingModes::ESP:
 			{
-				padPtr = new Cipher::Symmetric::Block::Padding::ISO7816();
+				pptr = new ESP();
 				break;
 			}
 			case PaddingModes::PKCS7:
 			{
-				padPtr = new Cipher::Symmetric::Block::Padding::PKCS7();
-				break;
-			}
-			case PaddingModes::TBC:
-			{
-				padPtr = new Cipher::Symmetric::Block::Padding::TBC();
+				pptr = new PKCS7();
 				break;
 			}
 			case PaddingModes::X923:
 			{
-				padPtr = new Cipher::Symmetric::Block::Padding::X923();
+				pptr = new X923();
+				break;
+			}
+			case PaddingModes::ZeroOne:
+			{
+				pptr = new ZeroOne();
 				break;
 			}
 			default:
 			{
-				throw CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
+				throw CryptoException(std::string("PaddingFromName"), std::string("GetInstance"), std::string("The padding mode type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoPaddingException &ex)
+	{
+		throw CryptoException(std::string("PaddingFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("PaddingFromName:GetInstance", "The padding mode is unavailable!", std::string(ex.what()));
+		throw CryptoException(std::string("PaddingFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return padPtr;
+	return pptr;
 }
 
 NAMESPACE_HELPEREND

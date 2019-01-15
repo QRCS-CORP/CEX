@@ -25,8 +25,11 @@
 #define CEX_KECCAKPARAMS_H
 
 #include "CexDomain.h"
+#include "CryptoDigestException.h"
 
 NAMESPACE_DIGEST
+
+using Exception::CryptoDigestException;
 
 /// <summary>
 /// The parallel Keccak configuration parameters structure
@@ -35,6 +38,7 @@ struct KeccakParams
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t HDR_SIZE = 24;
 
 	// offset | size | type

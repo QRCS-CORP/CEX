@@ -10,9 +10,10 @@
 NAMESPACE_MAC
 
 using Exception::CryptoMacException;
-using Key::Symmetric::ISymmetricKey;
+using Enumeration::ErrorCodes;
+using Cipher::ISymmetricKey;
 using Enumeration::Macs;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// Message Authentication Code (MAC) Interface
@@ -71,7 +72,7 @@ public:
 	/// <summary>
 	/// Read Only: Size of returned mac in bytes
 	/// </summary>
-	virtual const size_t MacSize() = 0;
+	virtual const size_t TagSize() = 0;
 
 	/// <summary>
 	/// Read Only: Mac generators class name

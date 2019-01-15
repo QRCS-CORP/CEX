@@ -1,15 +1,15 @@
 #include "Blake512.h"
 #include "Blake2.h"
 #include "CpuDetect.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
-#include "ParallelUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
+#include "ParallelTools.h"
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-using Utility::MemUtils;
-using Utility::ParallelUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
+using Utility::ParallelTools;
 
 struct Blake512::Blake2bState
 {
@@ -23,9 +23,9 @@ struct Blake512::Blake2bState
 
 	void Reset()
 	{
-		MemUtils::Clear(F, 0, F.size() * sizeof(ulong));
-		MemUtils::Clear(H, 0, H.size() * sizeof(ulong));
-		MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
+		MemoryTools::Clear(F, 0, F.size() * sizeof(ulong));
+		MemoryTools::Clear(H, 0, H.size() * sizeof(ulong));
+		MemoryTools::Clear(T, 0, T.size() * sizeof(ulong));
 	}
 };
 
@@ -46,7 +46,7 @@ Blake512::Blake512(bool Parallel)
 	// TODO: implement parallel alternate for single core cpu
 	if (Parallel && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException("Blake512::Ctor", "Cpu does not support parallel processing!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
 	}
 
 	m_parallelProfile.IsParallel() = m_parallelProfile.IsParallel() ? Parallel : false;
@@ -72,7 +72,7 @@ Blake512::Blake512(BlakeParams &Params)
 {
 	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException("Blake512::Ctor", "Cpu does not support parallel processing!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
 	}
 
 	m_parallelProfile.IsParallel() = m_parallelProfile.IsParallel() ? m_treeParams.FanOut() > 1 : false;
@@ -81,11 +81,11 @@ Blake512::Blake512(BlakeParams &Params)
 	{
 		if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
 		{
-			throw CryptoDigestException("BlakeBP512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
+			throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The LeafLength parameter is invalid! Must be evenly divisible by digest block size!"), ErrorCodes::InvalidParam);
 		}
 		if (Params.FanOut() < 2 || Params.FanOut() % 2 != 0)
 		{
-			throw CryptoDigestException("BlakeBP512:Ctor", "The FanOut parameter is invalid! Must be an even number greater than 1.");
+			throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The FanOut parameter is invalid! Must be an even number greater than 1!"), ErrorCodes::InvalidParam);
 		}
 	}
 	else
@@ -104,7 +104,7 @@ Blake512::~Blake512()
 		m_isDestroyed = true;
 		m_msgLength = 0;
 
-		IntUtils::ClearVector(m_msgBuffer);
+		IntegerTools::Clear(m_msgBuffer);
 		m_parallelProfile.Reset();
 
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -144,18 +144,18 @@ const bool Blake512::IsParallel()
 
 const std::string Blake512::Name()
 {
-	std::string txtName = "";
+	std::string name;
 
 	if (m_parallelProfile.IsParallel())
 	{
-		txtName = CLASS_NAME + "-P" + IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+		name = CLASS_NAME + "-P" + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 	else
 	{
-		txtName = CLASS_NAME;
+		name = CLASS_NAME;
 	}
 
-	return txtName;
+	return name;
 }
 
 const size_t Blake512::ParallelBlockSize() 
@@ -185,7 +185,7 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// padding
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		std::vector<byte> padLen(m_treeParams.FanOut(), BLOCK_SIZE);
@@ -204,7 +204,7 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			{
 				// process partial block set
 				Permute(m_msgBuffer, (i * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
-				MemUtils::Copy(m_msgBuffer, m_parallelProfile.ParallelMinimumSize() + (i * BLOCK_SIZE), m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE);
+				MemoryTools::Copy(m_msgBuffer, m_parallelProfile.ParallelMinimumSize() + (i * BLOCK_SIZE), m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE);
 				m_msgLength -= BLOCK_SIZE;
 			}
 
@@ -231,18 +231,18 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			{
 				blkLen = m_msgLength % BLOCK_SIZE;
 				m_msgLength += BLOCK_SIZE - blkLen;
-				MemUtils::Clear(m_msgBuffer, (i * BLOCK_SIZE) + blkLen, BLOCK_SIZE - blkLen);
+				MemoryTools::Clear(m_msgBuffer, (i * BLOCK_SIZE) + blkLen, BLOCK_SIZE - blkLen);
 			}
 			else if (m_msgLength < BLOCK_SIZE)
 			{
 				blkLen = m_msgLength;
-				MemUtils::Clear(m_msgBuffer, (i * BLOCK_SIZE) + blkLen, BLOCK_SIZE - blkLen);
+				MemoryTools::Clear(m_msgBuffer, (i * BLOCK_SIZE) + blkLen, BLOCK_SIZE - blkLen);
 			}
 
 			Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], blkLen);
 			m_msgLength -= BLOCK_SIZE;
 
-			IntUtils::LeULL512ToBlock(m_dgtState[i].H, 0, hashCodes, i * DIGEST_SIZE);
+			IntegerTools::LeULL512ToBlock(m_dgtState[i].H, 0, hashCodes, i * DIGEST_SIZE);
 		}
 
 		// set up the root node
@@ -272,19 +272,19 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// last compression
 		Permute(m_msgBuffer, m_msgLength - BLOCK_SIZE, m_dgtState[0], BLOCK_SIZE);
 		// output the code
-		IntUtils::LeULL512ToBlock(m_dgtState[0].H, 0, Output, 0);
+		IntegerTools::LeULL512ToBlock(m_dgtState[0].H, 0, Output, 0);
 	}
 	else
 	{
 		size_t padLen = m_msgBuffer.size() - m_msgLength;
 		if (padLen > 0)
 		{
-			MemUtils::Clear(m_msgBuffer, m_msgLength, padLen);
+			MemoryTools::Clear(m_msgBuffer, m_msgLength, padLen);
 		}
 
 		m_dgtState[0].F[0] = 0xFFFFFFFFFFFFFFFFULL;
 		Permute(m_msgBuffer, 0, m_dgtState[0], m_msgLength);
-		IntUtils::LeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
+		IntegerTools::LeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}
 
 	Reset();
@@ -292,11 +292,11 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	return DIGEST_SIZE;
 }
 
-void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
+void Blake512::Initialize(Cipher::ISymmetricKey &MacKey)
 {
 	if (MacKey.Key().size() < 32 || MacKey.Key().size() > 64)
 	{
-		throw Exception::CryptoDigestException("Blake512::Initialize", "Mac Key has invalid length!");
+		throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Mac Key has invalid length!"), ErrorCodes::InvalidKey);
 	}
 
 	std::vector<ulong> config(CHAIN_SIZE);
@@ -305,26 +305,26 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 	{
 		if (MacKey.Nonce().size() != 16)
 		{
-			throw Exception::CryptoDigestException("Blake512::Initialize", "Salt has invalid length!");
+			throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Salt has invalid length!"), ErrorCodes::InvalidSize);
 		}
 
-		config[4] = IntUtils::LeBytesTo64(MacKey.Nonce(), 0);
-		config[5] = IntUtils::LeBytesTo64(MacKey.Nonce(), 8);
+		config[4] = IntegerTools::LeBytesTo64(MacKey.Nonce(), 0);
+		config[5] = IntegerTools::LeBytesTo64(MacKey.Nonce(), 8);
 	}
 
 	if (MacKey.Info().size() != 0)
 	{
 		if (MacKey.Info().size() != 16)
 		{
-			throw Exception::CryptoDigestException("Blake512::Initialize", "Info has invalid length!");
+			throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Info has invalid length"), ErrorCodes::InvalidSize);
 		}
 
-		config[6] = IntUtils::LeBytesTo64(MacKey.Info(), 0);
-		config[7] = IntUtils::LeBytesTo64(MacKey.Info(), 8);
+		config[6] = IntegerTools::LeBytesTo64(MacKey.Info(), 0);
+		config[7] = IntegerTools::LeBytesTo64(MacKey.Info(), 8);
 	}
 
 	std::vector<byte> mkey(BLOCK_SIZE, 0);
-	MemUtils::Copy(MacKey.Key(), 0, mkey, 0, IntUtils::Min(MacKey.Key().size(), mkey.size()));
+	MemoryTools::Copy(MacKey.Key(), 0, mkey, 0, IntegerTools::Min(MacKey.Key().size(), mkey.size()));
 	m_treeParams.KeyLength() = static_cast<byte>(MacKey.Key().size());
 
 	if (m_parallelProfile.IsParallel())
@@ -332,7 +332,7 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 		// initialize the leaf nodes and add the key 
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
-			MemUtils::Copy(mkey, 0, m_msgBuffer, i * BLOCK_SIZE, mkey.size());
+			MemoryTools::Copy(mkey, 0, m_msgBuffer, i * BLOCK_SIZE, mkey.size());
 			m_treeParams.NodeOffset() = static_cast<byte>(i);
 			LoadState(m_dgtState[i], m_treeParams, config);
 		}
@@ -341,7 +341,7 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 	}
 	else
 	{
-		MemUtils::Copy(mkey, 0, m_msgBuffer, 0, mkey.size());
+		MemoryTools::Copy(mkey, 0, m_msgBuffer, 0, mkey.size());
 		m_msgLength = BLOCK_SIZE;
 		LoadState(m_dgtState[0], m_treeParams, config);
 	}
@@ -351,7 +351,7 @@ void Blake512::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException("Blake512::ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -395,7 +395,7 @@ void Blake512::Reset()
 		LoadState(m_dgtState[0], m_treeParams, config);
 	}
 
-	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 }
 
@@ -421,7 +421,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				m_msgLength = 0;
@@ -430,7 +430,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				ttlLen -= m_msgBuffer.size();
 
 				// empty the message buffer
-				ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
+				ParallelTools::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
 				{
 					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
 				});
@@ -446,7 +446,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 					}
 
 					// process large blocks
-					ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset, prcLen](size_t i)
+					ParallelTools::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset, prcLen](size_t i)
 					{
 						ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], prcLen);
 					});
@@ -464,7 +464,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				Length -= RMDLEN;
@@ -472,7 +472,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				m_msgLength = m_msgBuffer.size();
 
 				// process first half of buffer
-				ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
+				ParallelTools::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
 				{
 					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
 				});
@@ -480,7 +480,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				// left rotate the buffer
 				m_msgLength -= m_parallelProfile.ParallelMinimumSize();
 				const size_t FNLLEN = m_msgBuffer.size() / 2;
-				MemUtils::Copy(m_msgBuffer, FNLLEN, m_msgBuffer, 0, FNLLEN);
+				MemoryTools::Copy(m_msgBuffer, FNLLEN, m_msgBuffer, 0, FNLLEN);
 			}
 		}
 		else
@@ -490,7 +490,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				Permute(m_msgBuffer, 0, m_dgtState[0], BLOCK_SIZE);
@@ -511,7 +511,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -521,17 +521,17 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 void Blake512::LoadState(Blake2bState &State, BlakeParams &Params, std::vector<ulong> &Config)
 {
-	MemUtils::Clear(State.T, 0, COUNTER_SIZE * sizeof(ulong));
-	MemUtils::Clear(State.F, 0, FLAG_SIZE * sizeof(ulong));
-	MemUtils::Copy(Blake2::IV512, 0, State.H, 0, CHAIN_SIZE * sizeof(ulong));
+	MemoryTools::Clear(State.T, 0, COUNTER_SIZE * sizeof(ulong));
+	MemoryTools::Clear(State.F, 0, FLAG_SIZE * sizeof(ulong));
+	MemoryTools::Copy(Blake2::IV512, 0, State.H, 0, CHAIN_SIZE * sizeof(ulong));
 
 	Params.GetConfig<ulong>(Config);
-	MemUtils::XOR512(Config, 0, State.H, 0);
+	MemoryTools::XOR512(Config, 0, State.H, 0);
 }
 
 void Blake512::Permute(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, size_t Length)
 {
-	IntUtils::LeIncreaseW(State.T, State.T, Length);
+	IntegerTools::LeIncreaseW(State.T, State.T, Length);
 
 	std::array<ulong, 8> iv{
 		Blake2::IV512[0],

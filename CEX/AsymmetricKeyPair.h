@@ -4,9 +4,7 @@
 #include "CexDomain.h"
 #include "AsymmetricKey.h"
 
-NAMESPACE_ASYMMETRICKEY
-
-using Key::Asymmetric::AsymmetricKey;
+NAMESPACE_ASYMMETRIC
 
 /// <summary>
 /// A RingLWE public and private key container
@@ -84,6 +82,6 @@ private:
 	void Destroy();
 };
 
-NAMESPACE_ASYMMETRICKEYEND
+NAMESPACE_ASYMMETRICEND
 #endif
 

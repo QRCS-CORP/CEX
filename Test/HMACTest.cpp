@@ -1,6 +1,6 @@
 #include "HMACTest.h"
 #include "../CEX/HMAC.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 
@@ -8,14 +8,14 @@ namespace Test
 {
 	using Exception::CryptoMacException;
 	using Mac::HMAC;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 	using Enumeration::SHA2Digests;
-	using Key::Symmetric::SymmetricKey;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
 
+	const std::string HMACTest::CLASSNAME = "HMACTest";
 	const std::string HMACTest::DESCRIPTION = "RFC 4321 test vectors for HMAC SHA256, and SHA512.";
-	const std::string HMACTest::FAILURE = "FAILURE! ";
 	const std::string HMACTest::SUCCESS = "SUCCESS! All HMAC tests have executed succesfully.";
 
 	HMACTest::HMACTest()
@@ -30,9 +30,9 @@ namespace Test
 
 	HMACTest::~HMACTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_message);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_message);
 	}
 
 	const std::string HMACTest::Description()
@@ -87,11 +87,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -101,9 +101,9 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			HMAC mac(SHA2Digests::None);
+			HMAC gen(SHA2Digests::None);
 
-			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE1"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -117,9 +117,9 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			HMAC mac(nullptr);
+			HMAC gen(nullptr);
 
-			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE2"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -132,13 +132,13 @@ namespace Test
 		// test initialization
 		try
 		{
-			HMAC mac(SHA2Digests::SHA256);
+			HMAC gen(SHA2Digests::SHA256);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
-			mac.Initialize(kp);
+			gen.Initialize(kp);
 
-			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE3"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -151,12 +151,12 @@ namespace Test
 		// test finalize state -1
 		try
 		{
-			HMAC mac(SHA2Digests::SHA256);
-			std::vector<byte> code(mac.MacSize());
+			HMAC gen(SHA2Digests::SHA256);
+			std::vector<byte> code(gen.TagSize());
 			// generator was not initialized
-			mac.Finalize(code, 0);
+			gen.Finalize(code, 0);
 
-			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE4"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -219,7 +219,7 @@ namespace Test
 
 	void HMACTest::Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
-		std::vector<byte> code(Generator->MacSize());
+		std::vector<byte> code(Generator->TagSize());
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
@@ -229,11 +229,11 @@ namespace Test
 
 		if (Expected != code)
 		{
-			throw TestException(std::string("HMAC"), std::string("KAT: Expected values don't match! -HK1"));
+			throw TestException(std::string("Kat"), Generator->Name(), std::string("Expected values don't match! -HK1"));
 		}
 	}
 
-	void HMACTest::OnProgress(std::string Data)
+	void HMACTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -243,8 +243,8 @@ namespace Test
 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
-		std::vector<byte> otp1(Generator->MacSize());
-		std::vector<byte> otp2(Generator->MacSize());
+		std::vector<byte> otp1(Generator->TagSize());
+		std::vector<byte> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -254,8 +254,8 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 			SymmetricKey kp(key);
 
 			// generate the mac
@@ -267,7 +267,7 @@ namespace Test
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("HMAC"), std::string("Reset: Returns a different array after reset! -HP1"));
+				throw TestException(std::string("Params"), Generator->Name(), std::string("Returns a different array after reset! -HP1"));
 			}
 		}
 	}
@@ -276,7 +276,7 @@ namespace Test
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
 		std::vector<byte> msg;
-		std::vector<byte> otp(Generator->MacSize());
+		std::vector<byte> otp(Generator->TagSize());
 		std::vector<byte> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
@@ -289,8 +289,8 @@ namespace Test
 			{
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
-				IntUtils::Fill(key, 0, key.size(), rnd);
-				IntUtils::Fill(msg, 0, msg.size(), rnd);
+				IntegerTools::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(msg, 0, msg.size(), rnd);
 				SymmetricKey kp(key);
 
 				// generate with the kdf
@@ -298,9 +298,9 @@ namespace Test
 				Generator->Compute(msg, otp);
 				Generator->Reset();
 			}
-			catch (...)
+			catch (std::exception const&)
 			{
-				throw TestException(std::string("HMAC"), std::string("Stress: The generator has thrown an exception! -HS1"));
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("The generator has thrown an exception! -HS1"));
 			}
 		}
 	}

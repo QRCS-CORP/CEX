@@ -1,20 +1,20 @@
 #include "SphincsTest.h"
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/ModuleLWE.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/Sphincs.h"
 
 namespace Test
 {
-	using namespace Key::Asymmetric;
-	using Cipher::Asymmetric::Sign::SPX::Sphincs;
+	using namespace Asymmetric;
+	using Asymmetric::Sign::SPX::Sphincs;
 	using Prng::SecureRandom;
 	using Enumeration::SphincsParameters;
 
+	const std::string SphincsTest::CLASSNAME = "SphincsTest";
 	const std::string SphincsTest::DESCRIPTION = "SphincsTest key generation, signature generation, and verification tests..";
-	const std::string SphincsTest::FAILURE = "FAILURE! ";
 	const std::string SphincsTest::SUCCESS = "SUCCESS! SphincsTest tests have executed succesfully.";
 
 	SphincsTest::SphincsTest()
@@ -39,8 +39,11 @@ namespace Test
 
 	std::string SphincsTest::Run()
 	{
+		std::string fname;
+
 		try
 		{
+			fname = "Authentication";
 			Authentication();
 			OnProgress(std::string("SphincsTest: Passed message authentication test.."));
 			Exception();
@@ -60,11 +63,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : Unknown Error"));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -86,11 +89,11 @@ namespace Test
 
 		if (msg1 != msg2)
 		{
-			throw TestException(std::string("SphincsTest: Message authentication test failed! -SA1"));
+			throw TestException(std::string("Authentication"), sgn1.Name(), std::string("Message authentication test failed! -SA1"));
 		}
 		if (ret != true)
 		{
-			throw TestException(std::string("SphincsTest: Message authentication test failed! -SA1"));
+			throw TestException(std::string("Authentication"), sgn1.Name(), std::string("Message authentication test failed! -SA1"));
 		}
 	}
 
@@ -101,7 +104,7 @@ namespace Test
 		{
 			Sphincs sgn(Enumeration::SphincsParameters::None);
 
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE1"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE1"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -116,7 +119,7 @@ namespace Test
 		{
 			Sphincs sgn(Enumeration::SphincsParameters::SPXS128F256, Enumeration::Prngs::None);
 
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE2"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE2"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -131,7 +134,7 @@ namespace Test
 		{
 			Sphincs sgn(Enumeration::SphincsParameters::SPXS128F256, nullptr);
 
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE3"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE3"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -149,7 +152,7 @@ namespace Test
 			Sphincs sgn(SphincsParameters::SPXS128F256);
 			sgn.Sign(msg, sig);
 
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE4"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE4"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -167,7 +170,7 @@ namespace Test
 			Sphincs sgn(SphincsParameters::SPXS128F256);
 			sgn.Verify(sig, msg);
 
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE5"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE5"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -181,12 +184,12 @@ namespace Test
 		try
 		{
 			Sphincs sgn(SphincsParameters::SPXS128F256);
-			Cipher::Asymmetric::MLWE::ModuleLWE cprb;
+			Asymmetric::Encrypt::MLWE::ModuleLWE cprb;
 			// create an invalid key set
 			AsymmetricKeyPair* kp = cprb.Generate();
 			sgn.Initialize(kp->PrivateKey());
 
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE6"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE6"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -206,7 +209,7 @@ namespace Test
 			sgn.Initialize(kp->PublicKey());
 			sgn.Sign(msg, sig);
 
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE7"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE7"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -239,7 +242,7 @@ namespace Test
 
 		if (sgn.Verify(sig, msg2))
 		{
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Private-key integrity test failed! -SS1"));
+			throw TestException(std::string("PrivateKey"), sgn.Name(), std::string("Private key integrity test failed! -SS1"));
 		}
 	}
 
@@ -265,7 +268,7 @@ namespace Test
 
 		if (sgn.Verify(sig, msg2))
 		{
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Public-key integrity test failed! -SP1"));
+			throw TestException(std::string("PublicKey"), sgn.Name(), std::string("Public key integrity test failed! -SP1"));
 		}
 	}
 
@@ -283,7 +286,7 @@ namespace Test
 
 			if (prik1->P() != prik2.P() || prik1->Parameters() != prik2.Parameters())
 			{
-				throw TestException(std::string("SphincsTest: Private key serialization test has failed! -SR1"));
+				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Private key serialization test has failed! -SR1"));
 			}
 
 			AsymmetricKey* pubk1 = kp->PublicKey();
@@ -292,7 +295,7 @@ namespace Test
 
 			if (pubk1->P() != pubk2.P() || pubk1->Parameters() != pubk2.Parameters())
 			{
-				throw TestException(std::string("SphincsTest: Public key serialization test has failed! -SR2"));
+				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Public key serialization test has failed! -SR2"));
 			}
 		}
 	}
@@ -317,7 +320,7 @@ namespace Test
 
 		if (sgn.Verify(sig, msg2))
 		{
-			throw TestException(std::string("SPHINCS+"), std::string("Exception: Public-key integrity test failed! -SS1"));
+			throw TestException(std::string("Signature"), sgn.Name(), std::string("Signature test failed! -SS1"));
 		}
 	}
 
@@ -349,11 +352,11 @@ namespace Test
 
 			if (!status)
 			{
-				throw TestException(std::string("SPHINCS+"), std::string("Stress test authentication has failed! -SR1"));
+				throw TestException(std::string("Stress"), sgn1.Name(), std::string("Stress test authentication has failed! -SR1"));
 			}
 			if (msg1 != msg2)
 			{
-				throw TestException(std::string("SPHINCS+"), std::string("Stress test authentication has failed! -SR2"));
+				throw TestException(std::string("Stress"), sgn1.Name(), std::string("Stress test authentication has failed! -SR2"));
 			}
 
 			sig.clear();
@@ -377,11 +380,11 @@ namespace Test
 
 			if (!status)
 			{
-				throw TestException(std::string("SPHINCS+"), std::string("Stress test authentication has failed! -SR3"));
+				throw TestException(std::string("Stress"), sgn2.Name(), std::string("Stress test authentication has failed! -SR3"));
 			}
 			if (msg1 != msg2)
 			{
-				throw TestException(std::string("SPHINCS+"), std::string("Stress test authentication has failed! -SR4"));
+				throw TestException(std::string("Stress"), sgn2.Name(), std::string("Stress test authentication has failed! -SR4"));
 			}
 
 			sig.clear();
@@ -391,7 +394,7 @@ namespace Test
 		}
 	}
 
-	void SphincsTest::OnProgress(std::string Data)
+	void SphincsTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

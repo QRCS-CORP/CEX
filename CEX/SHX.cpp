@@ -1,6 +1,6 @@
 #include "SHX.h"
 #include "Serpent.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "KdfFromName.h"
 
 #if defined(__AVX512__)
@@ -27,7 +27,7 @@ SHX::SHX(BlockCipherExtensions CipherExtension)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
-		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("SHX:CTor", "The Kdf can not be null!") :
+		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -45,7 +45,7 @@ SHX::SHX(Kdf::IKdf* Kdf)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf :
-		throw CryptoSymmetricCipherException("SHX:CTor", "The Kdf can not be null!")),
+		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::InvalidParam)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -64,9 +64,9 @@ SHX::~SHX()
 		m_isInitialized = false;
 		m_rndCount = 0;
 
-		Utility::IntUtils::ClearVector(m_expKey);
-		Utility::IntUtils::ClearVector(m_distCode);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntegerTools::Clear(m_expKey);
+		Utility::IntegerTools::Clear(m_distCode);
+		Utility::IntegerTools::Clear(m_legalKeySizes);
 
 		if (m_destroyEngine)
 		{
@@ -135,11 +135,11 @@ const std::string SHX::Name()
 
 	if (m_cprExtension == BlockCipherExtensions::SHAKE256)
 	{
-		txtName = CIPHER_NAME + std::string("+SHAKE-256");
+		txtName = CIPHER_NAME + std::string("-SHAKE256");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
 	{
-		txtName = CLASS_NAME + std::string("+SHAKE-512");
+		txtName = CLASS_NAME + std::string("-SHAKE512");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF256)
 	{
@@ -147,7 +147,7 @@ const std::string SHX::Name()
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 	{
-		txtName = CLASS_NAME + std::string("+HKDF-SHA512");
+		txtName = CLASS_NAME + std::string("-HKDF-SHA512");
 	}
 	else
 	{
@@ -193,11 +193,11 @@ void SHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
 	{
-		throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
 	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_distCodeMax)
 	{
-		throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid info size; info parameter must be no longer than DistributionCodeMax size."), ErrorCodes::InvalidSize);
 	}
 
 	if (KeyParams.Info().size() > 0)
@@ -307,7 +307,7 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 	// copy bytes to working key
 	for (size_t i = 0; i < m_expKey.size(); ++i)
 	{
-		m_expKey[i] = Utility::IntUtils::LeBytesTo32(rawKey, i * sizeof(uint));
+		m_expKey[i] = Utility::IntegerTools::LeBytesTo32(rawKey, i * sizeof(uint));
 	}
 }
 
@@ -325,7 +325,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 	// step 1: reverse copy key to temp array
 	for (offset = Key.size(); offset > 0; offset -= 4)
 	{
-		Wp[index] = Utility::IntUtils::BeBytesTo32(Key, offset - 4);
+		Wp[index] = Utility::IntegerTools::BeBytesTo32(Key, offset - 4);
 		++index;
 	}
 
@@ -344,16 +344,16 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// step 2: rotate k into w(k) ints
 		for (size_t i = 8; i < 16; i++)
 		{
-			Wp[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
+			Wp[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
 		}
 
 		// copy to expanded key
-		Utility::MemUtils::Copy(Wp, 8, Wk, 0, 8 * sizeof(uint));
+		Utility::MemoryTools::Copy(Wp, 8, Wk, 0, 8 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 8; i < keySize; i++)
 		{
-			Wk[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+			Wk[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 		}
 	}
 	else
@@ -363,16 +363,16 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// Wp := (Wp-16 ^ Wp-13 ^ Wp-11 ^ Wp-10 ^ Wp-8 ^ Wp-5 ^ Wp-3 ^ Wp-1 ^ PHI ^ i) <<< 11
 		for (size_t i = 16; i < 32; i++)
 		{
-			Wp[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
+			Wp[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
 		}
 
 		// copy to expanded key
-		Utility::MemUtils::Copy(Wp, 16, Wk, 0, 16 * sizeof(uint));
+		Utility::MemoryTools::Copy(Wp, 16, Wk, 0, 16 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 16; i < keySize; i++)
 		{
-			Wk[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+			Wk[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 		}
 	}
 
@@ -403,10 +403,10 @@ void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	size_t keyCtr = m_expKey.size();
 
 	// input round
-	uint R3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12);
-	uint R2 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8);
-	uint R1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4);
-	uint R0 = Utility::IntUtils::LeBytesTo32(Input, InOffset);
+	uint R3 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 12);
+	uint R2 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 8);
+	uint R1 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 4);
+	uint R0 = Utility::IntegerTools::LeBytesTo32(Input, InOffset);
 
 	R3 ^= m_expKey[keyCtr - 1];
 	R2 ^= m_expKey[keyCtr - 2];
@@ -483,10 +483,10 @@ void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	while (keyCtr != RNDCNT);
 
 	// last round
-	Utility::IntUtils::Le32ToBytes(R3 ^ m_expKey[keyCtr - 1], Output, OutOffset + 12);
-	Utility::IntUtils::Le32ToBytes(R2 ^ m_expKey[keyCtr - 2], Output, OutOffset + 8);
-	Utility::IntUtils::Le32ToBytes(R1 ^ m_expKey[keyCtr - 3], Output, OutOffset + 4);
-	Utility::IntUtils::Le32ToBytes(R0 ^ m_expKey[keyCtr - 4], Output, OutOffset);
+	Utility::IntegerTools::Le32ToBytes(R3 ^ m_expKey[keyCtr - 1], Output, OutOffset + 12);
+	Utility::IntegerTools::Le32ToBytes(R2 ^ m_expKey[keyCtr - 2], Output, OutOffset + 8);
+	Utility::IntegerTools::Le32ToBytes(R1 ^ m_expKey[keyCtr - 3], Output, OutOffset + 4);
+	Utility::IntegerTools::Le32ToBytes(R0 ^ m_expKey[keyCtr - 4], Output, OutOffset);
 }
 
 void SHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -558,10 +558,10 @@ void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	size_t keyCtr = 0;
 
 	// input round
-	uint R0 = Utility::IntUtils::LeBytesTo32(Input, InOffset);
-	uint R1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4);
-	uint R2 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8);
-	uint R3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12);
+	uint R0 = Utility::IntegerTools::LeBytesTo32(Input, InOffset);
+	uint R1 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 4);
+	uint R2 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 8);
+	uint R3 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 12);
 
 	// process 8 round blocks
 	do
@@ -631,10 +631,10 @@ void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	while (keyCtr != RNDCNT);
 
 	// last round
-	Utility::IntUtils::Le32ToBytes(m_expKey[keyCtr] ^ R0, Output, OutOffset);
-	Utility::IntUtils::Le32ToBytes(m_expKey[keyCtr + 1] ^ R1, Output, OutOffset + 4);
-	Utility::IntUtils::Le32ToBytes(m_expKey[keyCtr + 2] ^ R2, Output, OutOffset + 8);
-	Utility::IntUtils::Le32ToBytes(m_expKey[keyCtr + 3] ^ R3, Output, OutOffset + 12);
+	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr] ^ R0, Output, OutOffset);
+	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr + 1] ^ R1, Output, OutOffset + 4);
+	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr + 2] ^ R2, Output, OutOffset + 8);
+	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr + 3] ^ R3, Output, OutOffset + 12);
 }
 
 void SHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)

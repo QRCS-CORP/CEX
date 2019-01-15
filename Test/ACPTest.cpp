@@ -1,18 +1,18 @@
 #include "ACPTest.h"
 #include "RandomUtils.h"
 #include "../CEX/ACP.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
 	using Provider::ACP;
 	using Exception::CryptoRandomException;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 
+	const std::string ACPTest::CLASSNAME = "ACPTest";
 	const std::string ACPTest::DESCRIPTION = "ACP stress and random evaluation tests.";
-	const std::string ACPTest::FAILURE = "FAILURE! ";
 	const std::string ACPTest::SUCCESS = "SUCCESS! All ACP tests have executed succesfully.";
 
 	ACPTest::ACPTest()
@@ -42,6 +42,11 @@ namespace Test
 			Exception();
 			OnProgress(std::string("ACPTest: Passed ACP exception handling tests.."));
 
+			ACP* gen = new ACP;
+			Evaluate(gen);
+			OnProgress(std::string("ACPTest: Passed ACP random evaluation.."));
+			delete gen;
+
 			Stress();
 			OnProgress(std::string("ACPTest: Passed ACP stress tests.."));
 
@@ -49,70 +54,25 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void ACPTest::Evaluate(IProvider* Rng)
 	{
-		std::vector<byte> otp(SAMPLE_SIZE);
-		double x;
-		std::string status;
-
-		Rng->Generate(otp);
-
-		// mean value test
-		x = TestUtils::MeanValue(otp);
-
-		status = (Rng->Name() + std::string(": Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
-
-		if (x < 122.5 || x > 132.5)
+		try
 		{
-			status += std::string("(FAIL)");
+			std::vector<byte> smp(SAMPLE_SIZE);
+			Rng->Generate(smp, 0, smp.size());
+			RandomUtils::Evaluate(Rng->Name(), smp);
 		}
-		else if (x < 125.0 || x > 130.0)
+		catch (TestException const &ex)
 		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-
-		OnProgress(std::string(status));
-
-		// ChiSquare
-		x = TestUtils::ChiSquare(otp) * 100;
-		status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
-
-		if (x < 1.0 || x > 99.0)
-		{
-			status += std::string("(FAIL)");
-		}
-		else if (x < 5.0 || x > 95.0)
-		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-		OnProgress(std::string(status));
-
-		// ordered runs
-		if (TestUtils::OrderedRuns(otp))
-		{
-			throw TestException(std::string("ACP"), std::string("Exception: Ordered runs test failure! -AE1"));
-		}
-
-		// succesive zeroes
-		if (TestUtils::SuccesiveZeros(otp))
-		{
-			throw TestException(std::string("ACP"), std::string("Exception: Succesive zeroes test failure! -AE2"));
+			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-AE1"));
 		}
 	}
 
@@ -126,7 +86,7 @@ namespace Test
 			// generator was not initialized
 			gen.Generate(rnd, 0, rnd.size() + 1);
 
-			throw TestException(std::string("ACP"), std::string("Exception: Exception handling failure! -AE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -AE3"));
 		}
 		catch (CryptoRandomException const &)
 		{
@@ -137,7 +97,7 @@ namespace Test
 		}
 	}
 
-	void ACPTest::OnProgress(std::string Data)
+	void ACPTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -161,9 +121,9 @@ namespace Test
 				gen.Generate(msg);
 				gen.Reset();
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("ACP"), std::string("Stress: The generator has thrown an exception! -AS1"));
+				throw TestException(std::string("Stress"), gen.Name(), std::string("The generator has thrown an exception! -AS1"));
 			}
 		}
 	}

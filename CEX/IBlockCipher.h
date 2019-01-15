@@ -23,6 +23,7 @@
 #include "BlockCipherExtensions.h"
 #include "BlockCiphers.h"
 #include "CryptoSymmetricCipherException.h"
+#include "ErrorCodes.h"
 #include "IKdf.h"
 #include "ISymmetricKey.h"
 #include "SymmetricKeySize.h"
@@ -32,9 +33,10 @@ NAMESPACE_BLOCK
 using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Exception::CryptoSymmetricCipherException;
+using Enumeration::ErrorCodes;
 using Kdf::IKdf;
-using Key::Symmetric::ISymmetricKey;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::ISymmetricKey;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// The Block Cipher Interface class

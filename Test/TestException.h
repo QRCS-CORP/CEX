@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_TESTEXCEPTION_H
-#define _CEXENGINE_TESTEXCEPTION_H
+#ifndef CEXENGINE_TESTEXCEPTION_H
+#define CEXENGINE_TESTEXCEPTION_H
 
 #include <exception>
 #include <iostream>
@@ -13,8 +13,11 @@ namespace Test
 	struct TestException : std::exception
 	{
 	private:
-		std::string m_origin;
+
+		std::string m_function;
+		std::string m_location;
 		std::string m_message;
+		std::string m_origin;
 
 	public:
 
@@ -22,10 +25,14 @@ namespace Test
 		/// Exception constructor
 		/// </summary>
 		///
-		/// <param name="Message">A custom message or error data</param>
-		explicit TestException(const std::string &Message)
+		/// <param name="Function">The name of the function throwing the exception</param>
+		/// <param name="Origin">The primitive origin of the exception</param>
+		/// <param name="Message">The custom message or error data</param>
+		TestException(const std::string &Function, const std::string &Origin, const std::string &Message)
 			:
-			m_origin(""),
+			m_function(Function),
+			m_location(""),
+			m_origin(Origin),
 			m_message(Message)
 		{
 		}
@@ -34,34 +41,47 @@ namespace Test
 		/// Exception constructor
 		/// </summary>
 		///
-		/// <param name="Origin">The origin of the exception</param>
-		/// <param name="Message">A custom message or error data</param>
-		TestException(const std::string &Origin, const std::string &Message)
+		/// <param name="Location">The class location of the exception</param>
+		/// <param name="Function">The name of the function throwing the exception</param>
+		/// <param name="Origin">The primitive origin of the exception</param>
+		/// <param name="Message">The custom message or error data</param>
+		TestException(const std::string &Location, const std::string &Function, const std::string &Origin, const std::string &Message)
 			:
+			m_function(Function),
+			m_location(Location),
 			m_origin(Origin),
 			m_message(Message)
 		{
 		}
 
 		/// <summary>
-		/// The origin of the exception in the format Class:Method
+		/// The name of the function throwing the exception
+		/// </summary>
+		const std::string &Function() const
+		{
+			return m_function;
+		}
+
+		/// <summary>
+		/// The class location of the exception
+		/// </summary>
+		const std::string &Location() const
+		{
+			return m_location;
+		}
+
+		/// <summary>
+		/// The primitive origin of the exception
 		/// </summary>
 		const std::string &Origin() const
 		{
 			return m_origin;
 		}
 
-		std::string &Origin()
-		{
-			return m_origin;
-		}
-
+		/// <summary>
+		/// The custom message or error data
+		/// </summary>
 		const std::string &Message() const
-		{
-			return m_message;
-		}
-
-		std::string &Message()
 		{
 			return m_message;
 		}

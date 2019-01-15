@@ -2,8 +2,11 @@
 #define CEX_SYMMETRICKEYSIZE_H
 
 #include "CexDomain.h"
+#include "CryptoProcessingException.h"
 
-NAMESPACE_SYMMETRICKEY
+NAMESPACE_CIPHER
+
+using Exception::CryptoProcessingException;
 
 /// <summary>
 /// Contains key and vector sizes
@@ -125,5 +128,5 @@ public:
 	std::vector<byte> ToBytes();
 };
 
-NAMESPACE_SYMMETRICKEYEND
+NAMESPACE_CIPHEREND
 #endif

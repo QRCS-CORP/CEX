@@ -42,7 +42,7 @@ NAMESPACE_ROUTING
 /// 	cs.ProgressPercent += &evt.Completed;
 /// 	std::vector&lt;byte&gt; key(32);
 /// 	std::vector&lt;byte&gt; iv(16);
-/// 	cs.Initialize(true, Key::Symmetric::SymmetricKey(key, iv));
+/// 	cs.Initialize(true, Cipher::SymmetricKey(key, iv));
 /// 	std::vector&lt;byte&gt; data(32000);
 /// 	std::vector&lt;byte&gt; vret(32000);
 /// 	cs.Write(data, 0, vret, 0);

@@ -26,8 +26,6 @@
 
 NAMESPACE_SPHINCS
 
-using Key::Asymmetric::AsymmetricKey;
-using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::SphincsParameters;
 
 /// <summary>

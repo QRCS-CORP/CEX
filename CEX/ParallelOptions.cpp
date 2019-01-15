@@ -1,8 +1,11 @@
 #include "ParallelOptions.h"
 #include "CpuDetect.h"
-#include "CryptoProcessingException.h"
 
-NAMESPACE_COMMON
+NAMESPACE_ROOT
+
+using Enumeration::ErrorCodes;
+
+const std::string ParallelOptions::CLASS_NAME("ParallelOptions");
 
 //~~~Constructor~~~//
 
@@ -10,7 +13,7 @@ ParallelOptions::ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t Res
 	:
 	m_autoInit(true),
 	m_blockSize(BlockSize != 0 && BlockSize % 2 == 0 ? BlockSize :
-		throw Exception::CryptoProcessingException("ParallelOptions:Ctor", "The BlockSize must be a positive even number!")),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The BlockSize must be a positive even number!"), ErrorCodes::InvalidParam)),
 	m_hasPrefetch(false),
 	m_hasSHA2(false),
 	m_hasSimd128(false),
@@ -40,7 +43,7 @@ ParallelOptions::ParallelOptions(size_t BlockSize, bool Parallel, size_t Paralle
 	:
 	m_autoInit(false),
 	m_blockSize(BlockSize != 0 && BlockSize % 2 == 0 ? BlockSize :
-		throw Exception::CryptoProcessingException("ParallelOptions:Ctor", "The BlockSize must be a positive even number!")),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The BlockSize must be a positive even number!"), ErrorCodes::InvalidParam)),
 	m_defaultParams(),
 	m_hasPrefetch(false),
 	m_hasSHA2(false),
@@ -274,7 +277,7 @@ void ParallelOptions::SetMaxDegree(size_t MaxDegree)
 {
 	if (MaxDegree == 0)
 	{
-		throw Exception::CryptoProcessingException("ParallelOptions:Ctor", "The MaxDegree must be a positive even number!");
+		throw CryptoProcessingException(CLASS_NAME, std::string("SetMaxDegree"), std::string("The MaxDegree must be a positive even number!"), ErrorCodes::InvalidParam);
 	}
 
 	m_overrideMaxDegree = true;
@@ -286,7 +289,7 @@ void ParallelOptions::SetMaxDegree(size_t MaxDegree)
 
 void ParallelOptions::Detect()
 {
-	Common::CpuDetect detect;
+	CpuDetect detect;
 
 	m_hasPrefetch = detect.PREFETCH();
 	m_hasSHA2 = detect.SHA();
@@ -319,4 +322,4 @@ void ParallelOptions::StoreDefaults()
 	m_defaultParams.ParallelBlockSize = m_parallelBlockSize;
 }
 
-NAMESPACE_COMMONEND
+NAMESPACE_ROOTEND

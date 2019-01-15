@@ -1,19 +1,24 @@
 #include "CipherStream.h"
 #include "BlockCipherFromName.h"
 #include "CipherModeFromName.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "PaddingFromName.h"
 #include "StreamCipherFromName.h"
 
 NAMESPACE_PROCESSING
+
+using Exception::CryptoCipherModeException;
+using Exception::ErrorCodes;
+
+const std::string CipherStream::CLASS_NAME("CipherStream");
 
 //~~~Constructor~~~//
 
 CipherStream::CipherStream(CipherDescription* Description)
 	:
 	m_cipherEngine(Description->CipherModeType() != CipherModes::None && Description->CipherType() != BlockCiphers::None ? GetCipherMode(Description->CipherType(), Description->CipherExtensionType(), Description->CipherModeType()) :
-		throw CryptoProcessingException("CipherStream:CTor", "The cipher type or mode is invalid!")),
-	m_cipherPadding(Description->CipherModeType() == CipherModes::CBC || Description->CipherModeType() == CipherModes::CFB || Description->CipherModeType() == CipherModes::OCB ? GetPaddingMode(Description->PaddingType()) : nullptr),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
+	m_cipherPadding(Description->CipherModeType() == CipherModes::CBC || Description->CipherModeType() == CipherModes::CFB || Description->CipherModeType() == CipherModes::OFB ? GetPaddingMode(Description->PaddingType()) : nullptr),
 	m_destroyEngine(true),
 	m_isBufferedIO(false),
 	m_isCounterMode(Description->CipherModeType() == CipherModes::CTR || Description->CipherModeType() == CipherModes::ICM),
@@ -29,8 +34,8 @@ CipherStream::CipherStream(CipherDescription* Description)
 CipherStream::CipherStream(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType, PaddingModes PaddingType)
 	:
 	m_cipherEngine(CipherModeType != CipherModes::None && CipherType != BlockCiphers::None ? GetCipherMode(CipherType, CipherExtensionType, CipherModeType) :
-		throw CryptoProcessingException("CipherStream:CTor", "The cipher type or mode is invalid!")),
-	m_cipherPadding(CipherModeType == CipherModes::CBC || CipherModeType == CipherModes::CFB || CipherModeType == CipherModes::OCB ? GetPaddingMode(PaddingType) : nullptr),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
+	m_cipherPadding(CipherModeType == CipherModes::CBC || CipherModeType == CipherModes::CFB || CipherModeType == CipherModes::OFB ? GetPaddingMode(PaddingType) : nullptr),
 	m_destroyEngine(true),
 	m_isBufferedIO(false),
 	m_isCounterMode(CipherModeType == CipherModes::CTR || CipherModeType == CipherModes::ICM),
@@ -46,7 +51,7 @@ CipherStream::CipherStream(BlockCiphers CipherType, BlockCipherExtensions Cipher
 CipherStream::CipherStream(ICipherMode* Cipher, IPadding* Padding)
 	:
 	m_cipherEngine(Cipher != nullptr ? Cipher :
-		throw CryptoProcessingException("CipherStream:CTor", "The Cipher can not be null!")),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_cipherPadding(Padding),
 	m_destroyEngine(false),
 	m_isBufferedIO(false),
@@ -69,7 +74,7 @@ CipherStream::~CipherStream()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_isParallel = false;
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntegerTools::Clear(m_legalKeySizes);
 
 		if (m_destroyEngine)
 		{
@@ -110,6 +115,11 @@ const std::vector<SymmetricKeySize> CipherStream::LegalKeySizes()
 	return m_legalKeySizes; 
 }
 
+const std::string CipherStream::Name()
+{
+	return m_cipherEngine->Name();
+}
+
 size_t CipherStream::ParallelBlockSize() 
 { 
 	return m_cipherEngine->ParallelBlockSize();
@@ -126,7 +136,7 @@ void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{
-		throw CryptoProcessingException("CipherStream:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+		throw CryptoProcessingException(CLASS_NAME, std::string("Initialize"), std::string("The cipher key length is invalid!"), ErrorCodes::InvalidKey);
 	}
 
 	try
@@ -137,9 +147,9 @@ void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_isEncryption = Encryption;
 		m_isInitialized = true;
 	}
-	catch(std::exception& ex)
+	catch(CryptoCipherModeException &ex)
 	{
-		throw CryptoProcessingException("CipherStream:Initialize", "The key could not be loaded, check the key and iv sizes!", std::string(ex.what()));
+		throw CryptoProcessingException(CLASS_NAME, std::string("Initialize"), ex.Message(), ex.ErrorCode());
 	}
 }
 
@@ -147,7 +157,7 @@ void CipherStream::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_cipherEngine->ParallelProfile().ProcessorCount())
 	{
-		throw CryptoProcessingException("CipherStream::ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoProcessingException(CLASS_NAME, std::string("ParallelMaxDegree"), std::string("Degree setting is invalid"), ErrorCodes::InvalidParam);
 	}
 
 	m_cipherEngine->ParallelProfile().SetMaxDegree(Degree);
@@ -226,20 +236,20 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
 			std::vector<byte> inpBuffer(BLKLEN);
-			Utility::MemUtils::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
+			Utility::MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
 			std::vector<byte> outBuffer(BLKLEN);
 			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, FNLLEN);
-			Utility::MemUtils::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
+			Utility::MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
 			prcLen += FNLLEN;
 		}
 		else if (m_isEncryption)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
 			std::vector<byte> inpBuffer(BLKLEN);
-			Utility::MemUtils::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
+			Utility::MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
 			if (FNLLEN != BLKLEN)
 			{
-				m_cipherPadding->AddPadding(inpBuffer, FNLLEN);
+				m_cipherPadding->AddPadding(inpBuffer, FNLLEN, inpBuffer.size());
 			}
 			prcLen += BLKLEN;
 
@@ -254,9 +264,8 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 		{
 			std::vector<byte> outBuffer(BLKLEN);
 			m_cipherEngine->DecryptBlock(Input, InOffset, outBuffer, 0);
-			const size_t PADLEN = m_cipherPadding->GetPaddingLength(outBuffer, 0);
-			const size_t FNLLEN = (PADLEN == 0) ? BLKLEN : BLKLEN - PADLEN;
-			Utility::MemUtils::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
+			const size_t FNLLEN = m_cipherPadding->GetBlockLength(outBuffer);
+			Utility::MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
 			prcLen += FNLLEN;
 
 			if (Output.size() != prcLen)
@@ -323,8 +332,8 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 		if (m_isCounterMode)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			Utility::MemUtils::Clear(outBuffer, 0, outBuffer.size());
-			Utility::MemUtils::Clear(inpBuffer, 0, inpBuffer.size());
+			Utility::MemoryTools::Clear(outBuffer, 0, outBuffer.size());
+			Utility::MemoryTools::Clear(inpBuffer, 0, inpBuffer.size());
 			prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
 			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, prcRead);
 			OutStream->Write(outBuffer, 0, prcRead);
@@ -335,7 +344,7 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 			prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
 			if (FNLLEN != BLKLEN)
 			{
-				m_cipherPadding->AddPadding(inpBuffer, prcRead);
+				m_cipherPadding->AddPadding(inpBuffer, prcRead, inpBuffer.size());
 			}
 			m_cipherEngine->EncryptBlock(inpBuffer, 0, outBuffer, 0);
 			OutStream->Write(outBuffer, 0, BLKLEN);
@@ -344,8 +353,7 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 		{
 			InStream->Read(inpBuffer, 0, BLKLEN);
 			m_cipherEngine->DecryptBlock(inpBuffer, 0, outBuffer, 0);
-			const size_t PADLEN = m_cipherPadding->GetPaddingLength(outBuffer, 0);
-			const size_t FNLLEN = (PADLEN == 0) ? BLKLEN : BLKLEN - PADLEN;
+			const size_t FNLLEN = m_cipherPadding->GetBlockLength(outBuffer);
 			OutStream->Write(outBuffer, 0, FNLLEN);
 		}
 	}
@@ -384,26 +392,12 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 
 ICipherMode* CipherStream::GetCipherMode(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType)
 {
-	try
-	{
-		return Helper::CipherModeFromName::GetInstance(CipherType, CipherExtensionType, CipherModeType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoProcessingException("CipherStream:GetCipherMode", "The cipher mode could not be instantiated!", std::string(ex.what()));
-	}
+	return Helper::CipherModeFromName::GetInstance(CipherType, CipherExtensionType, CipherModeType);
 }
 
 IPadding* CipherStream::GetPaddingMode(PaddingModes PaddingType)
 {
-	try
-	{
-		return Helper::PaddingFromName::GetInstance(PaddingType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoProcessingException("CipherStream:GetPaddingMode", "The padding could not be instantiated!", std::string(ex.what()));
-	}
+	return Helper::PaddingFromName::GetInstance(PaddingType);
 }
 
 void CipherStream::Scope()

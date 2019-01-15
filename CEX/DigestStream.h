@@ -39,7 +39,6 @@ using Enumeration::Digests;
 using Routing::Event;
 using IO::IByteStream;
 using Digest::IDigest;
-using Common::ParallelOptions;
 
 /// <summary>
 /// Digest stream helper class.
@@ -67,6 +66,8 @@ using Common::ParallelOptions;
 class DigestStream
 {
 private:
+
+	static const std::string CLASS_NAME;
 
 	std::unique_ptr<IDigest> m_digestEngine;
 	bool m_destroyEngine;

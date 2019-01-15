@@ -7,6 +7,10 @@
 
 namespace Test
 {
+	const std::string DigestStreamTest::CLASSNAME = "DigestStreamTest";
+	const std::string DigestStreamTest::DESCRIPTION = "DigestStream output test; compares output from SHA 256/512 digests and DigestStream.";
+	const std::string DigestStreamTest::SUCCESS = "SUCCESS! All DigestStream tests have executed succesfully.";
+
 	const std::string DigestStreamTest::Description()
 	{
 		return DESCRIPTION;
@@ -21,36 +25,36 @@ namespace Test
 	{
 		try
 		{
-			CompareOutput(Enumeration::Digests::SHA256);
+			Evaluate(Enumeration::Digests::SHA256);
 			OnProgress(std::string("Passed DigestStream SHA256 comparison tests.."));
 
-			CompareOutput(Enumeration::Digests::SHA512);
+			Evaluate(Enumeration::Digests::SHA512);
 			OnProgress(std::string("Passed DigestStream SHA512 comparison tests.."));
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void DigestStreamTest::CompareOutput(Enumeration::Digests Engine)
+	void DigestStreamTest::Evaluate(Enumeration::Digests Engine)
 	{
 		Prng::SecureRandom rnd;
 		std::vector<byte> data(rnd.NextUInt32(1000, 100));
 		rnd.Generate(data);
 
 		// digest instance for baseline
-		Digest::IDigest* eng = Helper::DigestFromName::GetInstance(Engine);
-		size_t dgtSze = eng->DigestSize();
+		Digest::IDigest* gen = Helper::DigestFromName::GetInstance(Engine);
+		size_t dgtSze = gen->DigestSize();
 		std::vector<byte> hash1(dgtSze);
-		eng->Compute(data, hash1);
-		delete eng;
+		gen->Compute(data, hash1);
+		delete gen;
 
 		// test stream method
 		std::vector<byte> hash2(dgtSze);
@@ -60,7 +64,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
+			throw TestException(std::string("Evaluate"), gen->Name(), std::string("DigestStreamTest: Expected hash is not equal! -DE1"));
 		}
 
 		// test byte access method
@@ -68,11 +72,11 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
+			throw TestException(std::string("Evaluate"), gen->Name(), std::string("DigestStreamTest: Expected hash is not equal! -DE2"));
 		}
 	}
 
-	void DigestStreamTest::OnProgress(std::string Data)
+	void DigestStreamTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

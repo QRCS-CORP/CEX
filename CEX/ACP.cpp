@@ -1,5 +1,5 @@
 #include "ACP.h"
-#include "ArrayUtils.h"
+#include "ArrayTools.h"
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
 #include "CJP.h"
@@ -7,9 +7,12 @@
 #include "RDP.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
-#include "SysUtils.h"
+#include "SystemTools.h"
 
 NAMESPACE_PROVIDER
+
+using Utility::ArrayTools;
+using Enumeration::ErrorCodes;
 
 const std::string ACP::CLASS_NAME("ACP");
 
@@ -20,8 +23,17 @@ ACP::ACP()
 	m_kdfGenerator(new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE512)),
 	m_hasRdrand(false),
 	m_hasTsc(false),
+#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
 	m_isAvailable(true)
+#else
+	m_isAvailable(false)
+#endif
 {
+	if (!m_isAvailable)
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("The provider is not supported on this system!"), ErrorCodes::NotFound);
+	}
+
 	Scope();
 	Reset();
 }
@@ -66,11 +78,7 @@ void ACP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException("ACP:Generate", "The output buffer is too small!");
-	}
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("ACP:Generate", "Random provider is not available!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
 	m_kdfGenerator->Generate(Output, Offset, Length);
@@ -87,7 +95,7 @@ std::vector<byte> ACP::Generate(size_t Length)
 ushort ACP::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	Utility::MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -95,7 +103,7 @@ ushort ACP::NextUInt16()
 uint ACP::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	Utility::MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -103,7 +111,7 @@ uint ACP::NextUInt32()
 ulong ACP::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	Utility::MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }
@@ -119,7 +127,7 @@ void ACP::Reset()
 	}
 	catch (std::exception &ex)
 	{
-		throw CryptoRandomException("ACP:Reset", "Entropy collection has failed!", std::string(ex.what()));
+		throw CryptoRandomException(Name(), std::string("Reset"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 }
 
@@ -131,18 +139,18 @@ void ACP::Collect()
 
 	std::vector<byte> state(0);
 	std::vector<byte> buffer(KBLOCK);
-	ulong ts = Utility::SysUtils::TimeStamp(m_hasTsc);
+	ulong ts = Utility::SystemTools::TimeStamp(m_hasTsc);
 	// add the first timestamp
-	Utility::ArrayUtils::Append(ts, state);
+	ArrayTools::Append(ts, state);
 
 	// add system state
-	Utility::ArrayUtils::Append(MemoryInfo(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
-	Utility::ArrayUtils::Append(ProcessInfo(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
-	Utility::ArrayUtils::Append(SystemInfo(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
-	Utility::ArrayUtils::Append(TimeInfo(), state);
+	ArrayTools::Append(MemoryInfo(), state);
+	ArrayTools::Append(Utility::SystemTools::TimeStamp(m_hasTsc) - ts, state);
+	ArrayTools::Append(ProcessInfo(), state);
+	ArrayTools::Append(Utility::SystemTools::TimeStamp(m_hasTsc) - ts, state);
+	ArrayTools::Append(SystemInfo(), state);
+	ArrayTools::Append(Utility::SystemTools::TimeStamp(m_hasTsc) - ts, state);
+	ArrayTools::Append(TimeInfo(), state);
 	// filter zeroes
 	Filter(state);
 
@@ -151,8 +159,8 @@ void ACP::Collect()
 	{
 		RDP rpv;
 		rpv.Generate(buffer);
-		Utility::ArrayUtils::Append(buffer, state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
+		ArrayTools::Append(buffer, state);
+		ArrayTools::Append(Utility::SystemTools::TimeStamp(m_hasTsc) - ts, state);
 	}
 
 #if defined(CEX_ACP_JITTER)
@@ -161,8 +169,8 @@ void ACP::Collect()
 	{
 		CJP jpv;
 		jpv.Generate(buffer);
-		Utility::ArrayUtils::Append(buffer, state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
+		ArrayTools::Append(buffer, state);
+		ArrayTools::Append(Utility::SystemTools::TimeStamp(m_hasTsc) - ts, state);
 	}
 #endif
 
@@ -177,7 +185,7 @@ void ACP::Collect()
 	CSP cvd;
 	buffer.resize(padLen);
 	cvd.Generate(buffer);
-	Utility::ArrayUtils::Append(buffer, state);
+	ArrayTools::Append(buffer, state);
 
 	// initialize cSHAKE-512
 	std::vector<byte> cust(72);
@@ -192,7 +200,7 @@ void ACP::Filter(std::vector<byte> &State)
 		return;
 	}
 
-	Utility::ArrayUtils::Remove(static_cast<byte>(0), State);
+	ArrayTools::Remove(static_cast<byte>(0), State);
 }
 
 std::vector<byte> ACP::MemoryInfo()
@@ -202,20 +210,20 @@ std::vector<byte> ACP::MemoryInfo()
 #if defined(CEX_OS_WINDOWS)
 	try
 	{
-		MEMORYSTATUSEX info = Utility::SysUtils::MemoryStatus();
+		MEMORYSTATUSEX info = Utility::SystemTools::MemoryStatus();
 
-		Utility::ArrayUtils::Append(info.dwMemoryLoad, state);
-		Utility::ArrayUtils::Append(info.ullAvailExtendedVirtual, state);
-		Utility::ArrayUtils::Append(info.ullAvailPageFile, state);
-		Utility::ArrayUtils::Append(info.ullAvailPhys, state);
-		Utility::ArrayUtils::Append(info.ullAvailVirtual, state);
-		Utility::ArrayUtils::Append(info.ullTotalPageFile, state);
-		Utility::ArrayUtils::Append(info.ullTotalPhys, state);
-		Utility::ArrayUtils::Append(info.ullTotalVirtual, state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryPhysicalTotal(), state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryPhysicalUsed(), state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualTotal(), state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualUsed(), state);
+		ArrayTools::Append(info.dwMemoryLoad, state);
+		ArrayTools::Append(info.ullAvailExtendedVirtual, state);
+		ArrayTools::Append(info.ullAvailPageFile, state);
+		ArrayTools::Append(info.ullAvailPhys, state);
+		ArrayTools::Append(info.ullAvailVirtual, state);
+		ArrayTools::Append(info.ullTotalPageFile, state);
+		ArrayTools::Append(info.ullTotalPhys, state);
+		ArrayTools::Append(info.ullTotalVirtual, state);
+		ArrayTools::Append(Utility::SystemTools::MemoryPhysicalTotal(), state);
+		ArrayTools::Append(Utility::SystemTools::MemoryPhysicalUsed(), state);
+		ArrayTools::Append(Utility::SystemTools::MemoryVirtualTotal(), state);
+		ArrayTools::Append(Utility::SystemTools::MemoryVirtualUsed(), state);
 	}
 	catch (std::exception&)
 	{
@@ -224,10 +232,10 @@ std::vector<byte> ACP::MemoryInfo()
 
 #elif defined(CEX_OS_POSIX)
 
-	Utility::ArrayUtils::Append(Utility::SysUtils::MemoryPhysicalTotal(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::MemoryPhysicalUsed(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualTotal(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualUsed(), state);
+	ArrayTools::Append(Utility::SystemTools::MemoryPhysicalTotal(), state);
+	ArrayTools::Append(Utility::SystemTools::MemoryPhysicalUsed(), state);
+	ArrayTools::Append(Utility::SystemTools::MemoryVirtualTotal(), state);
+	ArrayTools::Append(Utility::SystemTools::MemoryVirtualUsed(), state);
 
 #endif
 
@@ -241,14 +249,14 @@ std::vector<byte> ACP::ProcessInfo()
 #if defined(CEX_OS_WINDOWS)
 	try
 	{
-		std::vector<PROCESSENTRY32W> info = Utility::SysUtils::ProcessEntries();
+		std::vector<PROCESSENTRY32W> info = Utility::SystemTools::ProcessEntries();
 
 		for (size_t i = 0; i < info.size(); ++i)
 		{
-			Utility::ArrayUtils::Append(info[i].pcPriClassBase, state);
-			Utility::ArrayUtils::Append(info[i].szExeFile, state);
-			Utility::ArrayUtils::Append(info[i].th32ParentProcessID, state);
-			Utility::ArrayUtils::Append(info[i].th32ProcessID, state);
+			ArrayTools::Append(info[i].pcPriClassBase, state);
+			ArrayTools::Append(info[i].szExeFile, state);
+			ArrayTools::Append(info[i].th32ParentProcessID, state);
+			ArrayTools::Append(info[i].th32ProcessID, state);
 		}
 	}
 	catch (std::exception&)
@@ -257,19 +265,19 @@ std::vector<byte> ACP::ProcessInfo()
 
 	try
 	{
-		std::vector<MODULEENTRY32W> info = Utility::SysUtils::ModuleEntries();
+		std::vector<MODULEENTRY32W> info = Utility::SystemTools::ModuleEntries();
 
 		for (size_t i = 0; i < info.size(); ++i)
 		{
-			Utility::ArrayUtils::Append(info[i].GlblcntUsage, state);
-			Utility::ArrayUtils::Append(info[i].hModule, state);
-			Utility::ArrayUtils::Append(info[i].modBaseAddr, state);
-			Utility::ArrayUtils::Append(info[i].modBaseSize, state);
-			Utility::ArrayUtils::Append(info[i].ProccntUsage, state);
-			Utility::ArrayUtils::Append(info[i].szExePath, state);
-			Utility::ArrayUtils::Append(info[i].szModule, state);
-			Utility::ArrayUtils::Append(info[i].th32ModuleID, state);
-			Utility::ArrayUtils::Append(info[i].th32ProcessID, state);
+			ArrayTools::Append(info[i].GlblcntUsage, state);
+			ArrayTools::Append(info[i].hModule, state);
+			ArrayTools::Append(info[i].modBaseAddr, state);
+			ArrayTools::Append(info[i].modBaseSize, state);
+			ArrayTools::Append(info[i].ProccntUsage, state);
+			ArrayTools::Append(info[i].szExePath, state);
+			ArrayTools::Append(info[i].szModule, state);
+			ArrayTools::Append(info[i].th32ModuleID, state);
+			ArrayTools::Append(info[i].th32ProcessID, state);
 		}
 	}
 	catch (std::exception&)
@@ -278,20 +286,20 @@ std::vector<byte> ACP::ProcessInfo()
 
 	try
 	{
-		std::vector<HEAPENTRY32> info = Utility::SysUtils::HeapList();
+		std::vector<HEAPENTRY32> info = Utility::SystemTools::HeapList();
 
 		if (info.size() != 0)
 		{
-			Utility::ArrayUtils::Append(info[0].th32HeapID, state);
-			Utility::ArrayUtils::Append(info[0].th32ProcessID, state);
-			Utility::ArrayUtils::Append(info[0].hHandle, state);
+			ArrayTools::Append(info[0].th32HeapID, state);
+			ArrayTools::Append(info[0].th32ProcessID, state);
+			ArrayTools::Append(info[0].hHandle, state);
 
 			for (size_t i = 0; i < info.size(); ++i)
 			{
-				Utility::ArrayUtils::Append(info[i].dwAddress, state);
-				Utility::ArrayUtils::Append(info[i].dwBlockSize, state);
-				Utility::ArrayUtils::Append(info[i].dwFlags, state);
-				Utility::ArrayUtils::Append(info[i].dwLockCount, state);
+				ArrayTools::Append(info[i].dwAddress, state);
+				ArrayTools::Append(info[i].dwBlockSize, state);
+				ArrayTools::Append(info[i].dwFlags, state);
+				ArrayTools::Append(info[i].dwLockCount, state);
 			}
 		}
 	}
@@ -303,7 +311,7 @@ std::vector<byte> ACP::ProcessInfo()
 
 	try
 	{
-		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessEntries(), state);
+		ArrayTools::Append(Utility::SystemTools::ProcessEntries(), state);
 	}
 	catch (std::exception&)
 	{
@@ -316,7 +324,7 @@ std::vector<byte> ACP::ProcessInfo()
 
 void ACP::Scope()
 {
-	Common::CpuDetect detect;
+	CpuDetect detect;
 	m_hasRdrand = detect.RDRAND();
 	m_hasTsc = detect.RDTSCP();
 }
@@ -327,27 +335,27 @@ std::vector<byte> ACP::SystemInfo()
 
 #if defined(CEX_OS_WINDOWS)
 
-	POINT pnt = Utility::SysUtils::CursorPosition();
-	Utility::ArrayUtils::Append(pnt.x, state);
-	Utility::ArrayUtils::Append(pnt.y, state);
-	Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::CurrentThreadId(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::OsVersion(), state);
+	POINT pnt = Utility::SystemTools::CursorPosition();
+	ArrayTools::Append(pnt.x, state);
+	ArrayTools::Append(pnt.y, state);
+	ArrayTools::AppendString(Utility::SystemTools::ComputerName(), state);
+	ArrayTools::Append(Utility::SystemTools::ProcessId(), state);
+	ArrayTools::Append(Utility::SystemTools::CurrentThreadId(), state);
+	ArrayTools::Append(Utility::SystemTools::OsVersion(), state);
 
 	try
 	{
-		SYSTEM_INFO info = Utility::SysUtils::SystemInfo();
+		SYSTEM_INFO info = Utility::SystemTools::SystemInfo();
 
-		Utility::ArrayUtils::Append(info.dwActiveProcessorMask, state);
-		Utility::ArrayUtils::Append(info.dwAllocationGranularity, state);
-		Utility::ArrayUtils::Append(info.dwNumberOfProcessors, state);
-		Utility::ArrayUtils::Append(info.dwPageSize, state);
-		Utility::ArrayUtils::Append(info.dwProcessorType, state);
-		Utility::ArrayUtils::Append(info.lpMaximumApplicationAddress, state);
-		Utility::ArrayUtils::Append(info.lpMinimumApplicationAddress, state);
-		Utility::ArrayUtils::Append(info.wProcessorLevel, state);
-		Utility::ArrayUtils::Append(info.wProcessorRevision, state);
+		ArrayTools::Append(info.dwActiveProcessorMask, state);
+		ArrayTools::Append(info.dwAllocationGranularity, state);
+		ArrayTools::Append(info.dwNumberOfProcessors, state);
+		ArrayTools::Append(info.dwPageSize, state);
+		ArrayTools::Append(info.dwProcessorType, state);
+		ArrayTools::Append(info.lpMaximumApplicationAddress, state);
+		ArrayTools::Append(info.lpMinimumApplicationAddress, state);
+		ArrayTools::Append(info.wProcessorLevel, state);
+		ArrayTools::Append(info.wProcessorRevision, state);
 	}
 	catch (std::exception&)
 	{
@@ -357,9 +365,9 @@ std::vector<byte> ACP::SystemInfo()
 
 	try
 	{
-		Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
-		Utility::ArrayUtils::Append(Utility::SysUtils::SystemInfo(), state);
+		ArrayTools::AppendString(Utility::SystemTools::ComputerName(), state);
+		ArrayTools::Append(Utility::SystemTools::ProcessId(), state);
+		ArrayTools::Append(Utility::SystemTools::SystemInfo(), state);
 	}
 	catch (std::exception&)
 	{
@@ -374,9 +382,9 @@ std::vector<byte> ACP::TimeInfo()
 {
 	std::vector<byte> state(0);
 
-	Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::TimeCurrentNS(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::TimeSinceBoot(), state);
+	ArrayTools::Append(Utility::SystemTools::TimeStamp(m_hasTsc), state);
+	ArrayTools::Append(Utility::SystemTools::TimeCurrentNS(), state);
+	ArrayTools::Append(Utility::SystemTools::TimeSinceBoot(), state);
 
 	return state;
 }

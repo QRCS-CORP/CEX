@@ -24,6 +24,8 @@
 
 NAMESPACE_DIGEST
 
+using Exception::CryptoDigestException;
+
 /// <summary>
 /// Specifies the Skein Ubi type
 /// </summary>
@@ -183,7 +185,7 @@ public:
 	{
 		if (Value > 63)
 		{
-			throw Exception::CryptoDigestException("Skein:TreeLevel", "Tree level must be between 0 and 63, inclusive.");
+			throw CryptoDigestException("Skein:TreeLevel", "Tree level must be between 0 and 63, inclusive.");
 		}
 
 		Tweak[1] &= ~(static_cast<ulong>(0x3f) << 48);

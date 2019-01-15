@@ -13,10 +13,11 @@ NAMESPACE_DRBG
 
 using Exception::CryptoGeneratorException;
 using Enumeration::Drbgs;
+using Enumeration::ErrorCodes;
 using Provider::IProvider;
-using Key::Symmetric::ISymmetricKey;
+using Cipher::ISymmetricKey;
 using Enumeration::Providers;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// Deterministic Random Byte Generator (DRBG) interface class

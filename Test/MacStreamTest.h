@@ -13,8 +13,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
@@ -37,6 +37,26 @@ namespace Test
 		const std::string Description() override;
 
 		/// <summary>
+		/// Test initialization using a CMAC description
+		/// </summary>
+		void DescriptionCMAC();
+
+		/// <summary>
+		/// Test initialization using a HMAC description
+		/// </summary>
+		void DescriptionHMAC();
+
+		/// <summary>
+		/// Evaluate correct operation using a CMAC description
+		/// </summary>
+		void EvaluateCMAC();
+
+		/// <summary>
+		/// Evaluate correct operation using a HMAC description
+		/// </summary>
+		void EvaluateHMAC();
+
+		/// <summary>
 		/// Progress return event callback
 		/// </summary>
 		TestEventHandler &Progress() override;
@@ -48,11 +68,7 @@ namespace Test
 
 	private:
 
-		void CompareCmac();
-		void CompareHmac();
-		void CmacDescriptionTest();
-		void HmacDescriptionTest();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

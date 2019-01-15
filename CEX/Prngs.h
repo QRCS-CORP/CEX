@@ -15,21 +15,41 @@ enum class Prngs : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator
+	/// A Symmetric Cipher Counter mode random number generator using AES
 	/// </summary>
 	BCR = 1,
 	/// <summary>
-	/// A cSHAKE based random number generator
+	/// A Symmetric Cipher Counter mode random number generator using AHX/RHX and cSHAKE-256
 	/// </summary>
-	CSR = 2,
+	BCRAHXS256 = 2,
 	/// <summary>
-	/// An HMAC based random number generator
+	/// A Symmetric Cipher Counter mode random number generator using AHX/RHX and cSHAKE-512
 	/// </summary>
-	HCR = 3,
+	BCRAHXS512 = 3,
+	/// <summary>
+	/// A SHAKE based random number generator using cSHAKE-256
+	/// </summary>
+	CSR = 4,
+	/// <summary>
+	/// A SHAKE based random number generator using cSHAKE-512
+	/// </summary>
+	CSRC512 = 5,
+	/// <summary>
+	/// A SHAKE based random number generator using cSHAKE-1024
+	/// </summary>
+	CSRC1024 = 6,
+	/// <summary>
+	/// An HMAC based random number generator using SHA256
+	/// </summary>
+	HCR = 7,
+	/// <summary>
+	/// An HMAC based random number generator using SHA512
+	/// </summary>
+	HCRS512 = 8,
 	/// <summary>
 	/// An implementation of a passphrase based PKCS#5 random number generator
 	/// </summary>
-	PBR = 4
+	PBR = 9
 };
 
 NAMESPACE_ENUMERATIONEND

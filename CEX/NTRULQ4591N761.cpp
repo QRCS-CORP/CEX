@@ -1,5 +1,5 @@
 #include "NTRULQ4591N761.h"
-#include "MemUtils.h"
+#include "MemoryTools.h"
 
 NAMESPACE_NTRU
 
@@ -76,11 +76,11 @@ void NTRULQ4591N761::Generate(std::vector<byte> &PublicKey, std::vector<byte> &P
 	RqMult(A, G, a);
 	RqRound3(A, A);
 
-	Utility::MemUtils::Copy(k1, 0, PublicKey, 0, NTRU_SEED_SIZE);
+	Utility::MemoryTools::Copy(k1, 0, PublicKey, 0, NTRU_SEED_SIZE);
 	RqEncodeRounded(PublicKey, A);
 
 	SmallEncode(PrivateKey, a);
-	Utility::MemUtils::Copy(PublicKey, 0, PrivateKey, NTRU_SMALLENCODE_SIZE, NTRU_PUBLICKEY_SIZE);
+	Utility::MemoryTools::Copy(PublicKey, 0, PrivateKey, NTRU_SMALLENCODE_SIZE, NTRU_PUBLICKEY_SIZE);
 }
 
 //~~~Internal Functions~~~//
@@ -120,8 +120,8 @@ void NTRULQ4591N761::Hide(std::vector<byte> &CipherText, std::vector<byte> &Secr
 		C[i] = x;
 	}
 
-	Utility::MemUtils::Copy(k34, 0, CipherText, 0, NTRU_SEED_SIZE);
-	Utility::MemUtils::Copy(k34, NTRU_SEED_SIZE, Secret, 0, NTRU_SEED_SIZE);
+	Utility::MemoryTools::Copy(k34, 0, CipherText, 0, NTRU_SEED_SIZE);
+	Utility::MemoryTools::Copy(k34, NTRU_SEED_SIZE, Secret, 0, NTRU_SEED_SIZE);
 	RqEncodeRounded(CipherText, B);
 
 	const size_t CTOFT = NTRU_RQENCODEROUNDED_SIZE + NTRU_SEED_SIZE;
@@ -289,13 +289,13 @@ void NTRULQ4591N761::RqFromSeed(std::array<int16_t, NTRU_P> &H, const std::vecto
 	std::vector<byte> n(16, 0);
 	size_t i;
 
-	Utility::MemUtils::Copy(Key, KeyOffset, tmpK, 0, NTRU_SEED_SIZE);
+	Utility::MemoryTools::Copy(Key, KeyOffset, tmpK, 0, NTRU_SEED_SIZE);
 
 	Drbg::BCG gen(Enumeration::BlockCiphers::AHX);
 	gen.Initialize(tmpK, n);
 	gen.Generate(btbuf, 0, btbuf.size());
 
-	Utility::MemUtils::Copy(btbuf, 0, buf, 0, btbuf.size());
+	Utility::MemoryTools::Copy(btbuf, 0, buf, 0, btbuf.size());
 
 	for (i = 0; i < NTRU_P; ++i)
 	{
@@ -363,11 +363,11 @@ void NTRULQ4591N761::SeededWeightW(std::array<int8_t, NTRU_P> &F, const std::vec
 	std::vector<byte> tmpR(NTRU_P * sizeof(int32_t));
 	size_t i;
 
-	Utility::MemUtils::Copy(K, 0, tmpK, 0, NTRU_SEED_SIZE);
+	Utility::MemoryTools::Copy(K, 0, tmpK, 0, NTRU_SEED_SIZE);
 
 	Prng::CSR rng(tmpK);
 	rng.Generate(tmpR);
-	Utility::MemUtils::Copy(tmpR, 0, r, 0, tmpR.size());
+	Utility::MemoryTools::Copy(tmpR, 0, r, 0, tmpR.size());
 
 	for (i = 0; i < NTRU_P; ++i)
 	{

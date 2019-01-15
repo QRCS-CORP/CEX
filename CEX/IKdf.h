@@ -9,10 +9,11 @@
 
 NAMESPACE_KDF
 
+using Enumeration::ErrorCodes;
 using Enumeration::Kdfs;
-using Key::Symmetric::ISymmetricKey;
+using Cipher::ISymmetricKey;
 using Exception::CryptoKdfException;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// Key Derivation Function (KDF) interface class

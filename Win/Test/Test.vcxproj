@@ -365,6 +365,7 @@
     <ClCompile Include="..\..\Test\CSPTest.cpp" />
     <ClCompile Include="..\..\Test\DilithiumTest.cpp" />
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
+    <ClCompile Include="..\..\Test\RandomUtils.cpp" />
     <ClCompile Include="..\..\Test\RDPTest.cpp" />
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
     <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp" />

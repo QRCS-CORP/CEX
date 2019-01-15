@@ -1,6 +1,6 @@
 #include "CipherSpeedTest.h"
 #include "../CEX/CpuDetect.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #if defined(__AVX__)
 #	include "../CEX/AHX.h"
 #endif
@@ -25,12 +25,12 @@
 
 namespace Test
 {
-	using namespace Cipher::Symmetric::Block;
-	using namespace Cipher::Symmetric::Stream;
-	using Utility::IntUtils;
+	using namespace Cipher::Block;
+	using namespace Cipher::Stream;
+	using Utility::IntegerTools;
 
+	const std::string CipherSpeedTest::CLASSNAME = "CipherSpeedTest";
 	const std::string CipherSpeedTest::DESCRIPTION = "Cipher Speed Tests.";
-	const std::string CipherSpeedTest::FAILURE = "FAILURE! ";
 	const std::string CipherSpeedTest::MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
 
 	CipherSpeedTest::CipherSpeedTest()
@@ -176,11 +176,7 @@ namespace Test
 		}
 		catch (std::exception const &ex)
 		{
-			return FAILURE + " : " + ex.what();
-		}
-		catch (...)
-		{
-			return FAILURE + " : Unknown Error";
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -333,18 +329,18 @@ namespace Test
 	{
 		try
 		{
-			Common::CpuDetect detect;
+			CpuDetect detect;
 			m_hasAESNI = detect.AESNI();
 			m_hasAVX = detect.AVX();
 		}
-		catch (...)
+		catch (const std::exception)
 		{
 			m_hasAESNI = false;
 			m_hasAVX = false;
 		}
 	}
 
-	void CipherSpeedTest::OnProgress(std::string Data)
+	void CipherSpeedTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

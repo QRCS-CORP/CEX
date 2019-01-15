@@ -27,8 +27,6 @@
 
 NAMESPACE_MCELIECE
 
-using Key::Asymmetric::AsymmetricKey;
-using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::MPKCParameters;
 
 /// <summary>

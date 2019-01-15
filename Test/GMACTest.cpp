@@ -1,6 +1,6 @@
 #include "GMACTest.h"
 #include "../CEX/GMAC.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 
@@ -9,13 +9,13 @@ namespace Test
 	using Enumeration::BlockCiphers;
 	using Exception::CryptoMacException;
 	using Mac::GMAC;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
-	using Key::Symmetric::SymmetricKey;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
 
+	const std::string GMACTest::CLASSNAME = "GMACTest";
 	const std::string GMACTest::DESCRIPTION = "GMAC MAC Generator Tests.";
-	const std::string GMACTest::FAILURE = "FAILURE! ";
 	const std::string GMACTest::SUCCESS = "SUCCESS! GMAC tests have executed succesfully.";
 
 	GMACTest::GMACTest()
@@ -31,10 +31,10 @@ namespace Test
 
 	GMACTest::~GMACTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_message);
-		IntUtils::ClearVector(m_nonce);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_message);
+		IntegerTools::Clear(m_nonce);
 	}
 
 	const std::string GMACTest::Description()
@@ -81,11 +81,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -95,9 +95,9 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			GMAC mac(BlockCiphers::None);
+			GMAC gen(BlockCiphers::None);
 
-			throw TestException(std::string("GMAC"), std::string("Exception: Exception handling failure! -GE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -GE1"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -110,9 +110,9 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			GMAC mac(nullptr);
+			GMAC gen(nullptr);
 
-			throw TestException(std::string("GMAC"), std::string("Exception: Exception handling failure! -GE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -GE2"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -125,13 +125,13 @@ namespace Test
 		// test initialization
 		try
 		{
-			GMAC mac(BlockCiphers::Rijndael);
+			GMAC gen(BlockCiphers::Rijndael);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
-			mac.Initialize(kp);
+			gen.Initialize(kp);
 
-			throw TestException(std::string("GMAC"), std::string("Exception: Exception handling failure! -GE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -GE3"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -144,12 +144,12 @@ namespace Test
 		// test finalize state -1
 		try
 		{
-			GMAC mac(BlockCiphers::Rijndael);
+			GMAC gen(BlockCiphers::Rijndael);
 			std::vector<byte> code(16);
 			// generator was not initialized
-			mac.Finalize(code, 0);
+			gen.Finalize(code, 0);
 
-			throw TestException(std::string("GMAC"), std::string("Exception: Exception handling failure! -GE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -GE4"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -231,7 +231,7 @@ namespace Test
 	{
 		GMAC gen(BlockCiphers::Rijndael);
 		SymmetricKey kp(Key, Nonce);
-		std::vector<byte> code(gen.MacSize());
+		std::vector<byte> code(gen.TagSize());
 
 		gen.Initialize(kp);
 		gen.Update(Message, 0, Message.size());
@@ -240,11 +240,11 @@ namespace Test
 
 		if (Expected != code)
 		{
-			throw TestException(std::string("GMAC"), std::string("KAT: Expected values don't match! -KK1"));
+			throw TestException(std::string("Kat"), gen.Name(), std::string("Expected values don't match! -KK1"));
 		}
 	}
 
-	void GMACTest::OnProgress(std::string Data)
+	void GMACTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -255,8 +255,8 @@ namespace Test
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
 		std::vector<byte> nonce(ks.NonceSize());
-		std::vector<byte> otp1(Generator->MacSize());
-		std::vector<byte> otp2(Generator->MacSize());
+		std::vector<byte> otp1(Generator->TagSize());
+		std::vector<byte> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -266,9 +266,9 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(msg, 0, msg.size(), rnd); 
-			IntUtils::Fill(nonce, 0, nonce.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd); 
+			IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
 			SymmetricKey kp(key, nonce);
 
 			// generate the mac
@@ -280,7 +280,7 @@ namespace Test
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("GMAC"), std::string("Reset: Returns a different array after reset! -GP1"));
+				throw TestException(std::string("Params"), Generator->Name(), std::string("Returns a different array after reset! -GP1"));
 			}
 		}
 	}
@@ -290,7 +290,7 @@ namespace Test
 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
 		std::vector<byte> msg;
 		std::vector<byte> nonce(ks.NonceSize());
-		std::vector<byte> otp(Generator->MacSize());
+		std::vector<byte> otp(Generator->TagSize());
 		std::vector<byte> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
@@ -303,9 +303,9 @@ namespace Test
 			{
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
-				IntUtils::Fill(key, 0, key.size(), rnd);
-				IntUtils::Fill(msg, 0, msg.size(), rnd);
-				IntUtils::Fill(nonce, 0, nonce.size(), rnd);
+				IntegerTools::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(msg, 0, msg.size(), rnd);
+				IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
 				SymmetricKey kp(key, nonce);
 
 				// generate with the kdf
@@ -313,9 +313,9 @@ namespace Test
 				Generator->Compute(msg, otp);
 				Generator->Reset();
 			}
-			catch (...)
+			catch (std::exception const&)
 			{
-				throw TestException(std::string("GMAC"), std::string("Stress: The generator has thrown an exception! -GS1"));
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("The generator has thrown an exception! -GS1"));
 			}
 		}
 	}

@@ -1,14 +1,14 @@
 #include "Keccak512.h"
 #include "Keccak.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
-#include "ParallelUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
+#include "ParallelTools.h"
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-using Utility::MemUtils;
-using Utility::ParallelUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
+using Utility::ParallelTools;
 
 const std::string Keccak512::CLASS_NAME("Keccak512");
 
@@ -27,7 +27,7 @@ Keccak512::Keccak512(bool Parallel)
 	// TODO: implement parallel alternate for single core cpu
 	if (Parallel && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException("Keccak512::Ctor", "Cpu does not support parallel processing!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
 	}
 
 	if (m_parallelProfile.IsParallel())
@@ -50,11 +50,11 @@ Keccak512::Keccak512(KeccakParams &Params)
 {
 	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException("Keccak512::Ctor", "Cpu does not support parallel processing!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
 	}
 	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
 	{
-		throw CryptoDigestException("Keccak512::Ctor", "The tree parameters are invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The tree parameters are invalid!"), ErrorCodes::InvalidParam);
 	}
 
 	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
@@ -89,8 +89,8 @@ Keccak512::~Keccak512()
 			m_dgtState[i].Reset();
 		}
 
-		IntUtils::ClearVector(m_dgtState);
-		IntUtils::ClearVector(m_msgBuffer);
+		IntegerTools::Clear(m_dgtState);
+		IntegerTools::Clear(m_msgBuffer);
 	}
 }
 
@@ -118,18 +118,18 @@ const bool Keccak512::IsParallel()
 
 const std::string Keccak512::Name() 
 { 
-	std::string txtName = "";
+	std::string name;
 
 	if (m_parallelProfile.IsParallel())
 	{
-		txtName = CLASS_NAME + "-P" + IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+		name = CLASS_NAME + "-P" + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 	else
 	{
-		txtName = CLASS_NAME;
+		name = CLASS_NAME;
 	}
 
-	return txtName;
+	return name;
 }
 
 const size_t Keccak512::ParallelBlockSize() 
@@ -160,7 +160,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		// process buffer
@@ -183,7 +183,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntUtils::LeULL512ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * DIGEST_SIZE);
+			IntegerTools::LeULL512ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * DIGEST_SIZE);
 			m_msgLength += DIGEST_SIZE;
 		}
 
@@ -205,18 +205,18 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// finalize and store
 		HashFinal(m_msgBuffer, blkOff, m_msgLength, rootState);
-		IntUtils::LeULL512ToBlock(rootState.H, 0, Output, OutOffset);
+		IntegerTools::LeULL512ToBlock(rootState.H, 0, Output, OutOffset);
 	}
 	else
 	{
 
 		if (m_msgLength != m_msgBuffer.size())
 		{
-			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
-		IntUtils::LeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
+		IntegerTools::LeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}
 
 	Reset();
@@ -228,7 +228,7 @@ void Keccak512::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException("Keccak512::ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -238,7 +238,7 @@ void Keccak512::ParallelMaxDegree(size_t Degree)
 
 void Keccak512::Reset()
 {
-	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -274,11 +274,11 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				// empty the message buffer
-				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
 					Keccak::Absorb(m_msgBuffer, i * Keccak::KECCAK_RATE512_SIZE, Keccak::KECCAK_RATE512_SIZE, m_dgtState[i].H);
 					Permute(m_dgtState[i].H);
@@ -295,7 +295,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
 
 				// process large blocks
-				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK_RATE512_SIZE), m_dgtState[i], PRCLEN);
 				});
@@ -308,7 +308,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			{
 				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
 
-				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK_RATE512_SIZE), m_dgtState[i], PRMLEN);
 				});
@@ -324,7 +324,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				const size_t RMDLEN = Keccak::KECCAK_RATE512_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				Keccak::Absorb(m_msgBuffer, 0, Keccak::KECCAK_RATE512_SIZE, m_dgtState[0].H);
@@ -347,7 +347,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}

@@ -5,9 +5,11 @@
 
 namespace Test
 {
-	class RandomUtils
+	class RandomUtils final
 	{
 	public:
+
+		static void Evaluate(const std::string &Name, std::vector<byte> &Sample);
 
 		template<class T>
 		static std::string ChiSquare(T* Rng, size_t SampleSize = 1024000)

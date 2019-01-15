@@ -1,10 +1,10 @@
 #include "Blake2.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 //~~~Constants~~~//
 
@@ -88,7 +88,7 @@ void Blake2::PermuteR10P512C(const std::vector<byte> &Input, size_t InOffset, st
 		IV[7] };
 	size_t i;
 
-	IntUtils::LeBytesToUL512(Input, InOffset, M, 0);
+	IntegerTools::LeBytesToUL512(Input, InOffset, M, 0);
 
 	for (i = 0; i < 10; ++i)
 	{
@@ -210,22 +210,22 @@ void Blake2::PermuteR10P512C(const std::vector<byte> &Input, size_t InOffset, st
 
 void Blake2::PermuteR10P512U(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
 {
-	uint M0 = IntUtils::LeBytesTo32(Input, InOffset);
-	uint M1 = IntUtils::LeBytesTo32(Input, InOffset + 4);
-	uint M2 = IntUtils::LeBytesTo32(Input, InOffset + 8);
-	uint M3 = IntUtils::LeBytesTo32(Input, InOffset + 12);
-	uint M4 = IntUtils::LeBytesTo32(Input, InOffset + 16);
-	uint M5 = IntUtils::LeBytesTo32(Input, InOffset + 20);
-	uint M6 = IntUtils::LeBytesTo32(Input, InOffset + 24);
-	uint M7 = IntUtils::LeBytesTo32(Input, InOffset + 28);
-	uint M8 = IntUtils::LeBytesTo32(Input, InOffset + 32);
-	uint M9 = IntUtils::LeBytesTo32(Input, InOffset + 36);
-	uint M10 = IntUtils::LeBytesTo32(Input, InOffset + 40);
-	uint M11 = IntUtils::LeBytesTo32(Input, InOffset + 44);
-	uint M12 = IntUtils::LeBytesTo32(Input, InOffset + 48);
-	uint M13 = IntUtils::LeBytesTo32(Input, InOffset + 52);
-	uint M14 = IntUtils::LeBytesTo32(Input, InOffset + 56);
-	uint M15 = IntUtils::LeBytesTo32(Input, InOffset + 60);
+	uint M0 = IntegerTools::LeBytesTo32(Input, InOffset);
+	uint M1 = IntegerTools::LeBytesTo32(Input, InOffset + 4);
+	uint M2 = IntegerTools::LeBytesTo32(Input, InOffset + 8);
+	uint M3 = IntegerTools::LeBytesTo32(Input, InOffset + 12);
+	uint M4 = IntegerTools::LeBytesTo32(Input, InOffset + 16);
+	uint M5 = IntegerTools::LeBytesTo32(Input, InOffset + 20);
+	uint M6 = IntegerTools::LeBytesTo32(Input, InOffset + 24);
+	uint M7 = IntegerTools::LeBytesTo32(Input, InOffset + 28);
+	uint M8 = IntegerTools::LeBytesTo32(Input, InOffset + 32);
+	uint M9 = IntegerTools::LeBytesTo32(Input, InOffset + 36);
+	uint M10 = IntegerTools::LeBytesTo32(Input, InOffset + 40);
+	uint M11 = IntegerTools::LeBytesTo32(Input, InOffset + 44);
+	uint M12 = IntegerTools::LeBytesTo32(Input, InOffset + 48);
+	uint M13 = IntegerTools::LeBytesTo32(Input, InOffset + 52);
+	uint M14 = IntegerTools::LeBytesTo32(Input, InOffset + 56);
+	uint M15 = IntegerTools::LeBytesTo32(Input, InOffset + 60);
 	uint R0 = State[0];
 	uint R1 = State[1];
 	uint R2 = State[2];
@@ -1884,19 +1884,19 @@ void Blake2::PermuteR10P8x512H(const std::vector<byte> &Input, size_t InOffset, 
 	size_t i;
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-	MemUtils::Copy(Input, InOffset, M, 0, M.size() * sizeof(UInt256));
+	MemoryTools::Copy(Input, InOffset, M, 0, M.size() * sizeof(UInt256));
 #else
 	for (i = 0; i < 16; ++i)
 	{
 		M[i].Load(
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4)),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 64),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 128),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 196),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 256),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 320),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 384),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 448));
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4)),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 64),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 128),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 196),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 256),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 320),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 384),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 448));
 	}
 #endif
 
@@ -2045,27 +2045,27 @@ void Blake2::PermuteR10P16x512H(const std::vector<byte> &Input, size_t InOffset,
 	size_t i;
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-	MemUtils::Copy(Input, InOffset, M, 0, M.size() * sizeof(UInt512));
+	MemoryTools::Copy(Input, InOffset, M, 0, M.size() * sizeof(UInt512));
 #else
 	for (i = 0; i < 16; ++i)
 	{
 		M[i].Load(
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4)),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 64),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 128),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 196),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 256),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 320),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 384),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 448),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 512),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 576),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 640),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 704),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 768),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 832),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 896),
-			IntUtils::LeBytesTo32(Input, InOffset + (i * 4) + 960));
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4)),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 64),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 128),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 196),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 256),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 320),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 384),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 448),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 512),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 576),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 640),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 704),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 768),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 832),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 896),
+			IntegerTools::LeBytesTo32(Input, InOffset + (i * 4) + 960));
 	}
 #endif
 
@@ -2211,7 +2211,7 @@ void Blake2::PermuteR12P1024C(const std::vector<byte> &Input, size_t InOffset, s
 		IV[7] };
 	size_t i;
 
-	IntUtils::LeBytesToULL1024(Input, InOffset, M, 0);
+	IntegerTools::LeBytesToULL1024(Input, InOffset, M, 0);
 
 	for (i = 0; i < 12; ++i)
 	{
@@ -2333,22 +2333,22 @@ void Blake2::PermuteR12P1024C(const std::vector<byte> &Input, size_t InOffset, s
 
 void Blake2::PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
 {
-	ulong M0 = IntUtils::LeBytesTo64(Input, InOffset);
-	ulong M1 = IntUtils::LeBytesTo64(Input, InOffset + 8);
-	ulong M2 = IntUtils::LeBytesTo64(Input, InOffset + 16);
-	ulong M3 = IntUtils::LeBytesTo64(Input, InOffset + 24);
-	ulong M4 = IntUtils::LeBytesTo64(Input, InOffset + 32);
-	ulong M5 = IntUtils::LeBytesTo64(Input, InOffset + 40);
-	ulong M6 = IntUtils::LeBytesTo64(Input, InOffset + 48);
-	ulong M7 = IntUtils::LeBytesTo64(Input, InOffset + 56);
-	ulong M8 = IntUtils::LeBytesTo64(Input, InOffset + 64);
-	ulong M9 = IntUtils::LeBytesTo64(Input, InOffset + 72);
-	ulong M10 = IntUtils::LeBytesTo64(Input, InOffset + 80);
-	ulong M11 = IntUtils::LeBytesTo64(Input, InOffset + 88);
-	ulong M12 = IntUtils::LeBytesTo64(Input, InOffset + 96);
-	ulong M13 = IntUtils::LeBytesTo64(Input, InOffset + 104);
-	ulong M14 = IntUtils::LeBytesTo64(Input, InOffset + 112);
-	ulong M15 = IntUtils::LeBytesTo64(Input, InOffset + 120);
+	ulong M0 = IntegerTools::LeBytesTo64(Input, InOffset);
+	ulong M1 = IntegerTools::LeBytesTo64(Input, InOffset + 8);
+	ulong M2 = IntegerTools::LeBytesTo64(Input, InOffset + 16);
+	ulong M3 = IntegerTools::LeBytesTo64(Input, InOffset + 24);
+	ulong M4 = IntegerTools::LeBytesTo64(Input, InOffset + 32);
+	ulong M5 = IntegerTools::LeBytesTo64(Input, InOffset + 40);
+	ulong M6 = IntegerTools::LeBytesTo64(Input, InOffset + 48);
+	ulong M7 = IntegerTools::LeBytesTo64(Input, InOffset + 56);
+	ulong M8 = IntegerTools::LeBytesTo64(Input, InOffset + 64);
+	ulong M9 = IntegerTools::LeBytesTo64(Input, InOffset + 72);
+	ulong M10 = IntegerTools::LeBytesTo64(Input, InOffset + 80);
+	ulong M11 = IntegerTools::LeBytesTo64(Input, InOffset + 88);
+	ulong M12 = IntegerTools::LeBytesTo64(Input, InOffset + 96);
+	ulong M13 = IntegerTools::LeBytesTo64(Input, InOffset + 104);
+	ulong M14 = IntegerTools::LeBytesTo64(Input, InOffset + 112);
+	ulong M15 = IntegerTools::LeBytesTo64(Input, InOffset + 120);
 	ulong R0 = State[0];
 	ulong R1 = State[1];
 	ulong R2 = State[2];
@@ -4485,15 +4485,15 @@ void Blake2::PermuteR12P4x1024H(const std::vector<byte> &Input, size_t InOffset,
 	size_t i;
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-	MemUtils::Copy(Input, InOffset, M, 0, M.size() * sizeof(ULong256));
+	MemoryTools::Copy(Input, InOffset, M, 0, M.size() * sizeof(ULong256));
 #else
 	for (i = 0; i < 16; ++i)
 	{
 		M[i].Load(
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8)),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 128),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 256),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 384));
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8)),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 128),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 256),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 384));
 	}
 #endif
 
@@ -4642,19 +4642,19 @@ void Blake2::PermuteR12P8x1024H(const std::vector<byte> &Input, size_t InOffset,
 	size_t i;
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-	MemUtils::Copy(Input, InOffset, M, 0, M.size() * sizeof(ULong512));
+	MemoryTools::Copy(Input, InOffset, M, 0, M.size() * sizeof(ULong512));
 #else
 	for (i = 0; i < 16; ++i)
 	{
 		M[i].Load(
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8)),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 128),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 256),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 384),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 512),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 640),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 768),
-			IntUtils::LeBytesTo64(Input, InOffset + (i * 8) + 896));
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8)),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 128),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 256),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 384),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 512),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 640),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 768),
+			IntegerTools::LeBytesTo64(Input, InOffset + (i * 8) + 896));
 	}
 #endif
 

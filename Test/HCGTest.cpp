@@ -1,8 +1,9 @@
 #include "HCGTest.h"
+#include "RandomUtils.h"
 #include "../CEX/CSP.h"
 #include "../CEX/Digests.h"
 #include "../CEX/HCG.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SymmetricKey.h"
@@ -11,11 +12,11 @@ namespace Test
 {
 	using namespace Drbg;
 	using Enumeration::Digests;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 
+	const std::string HCGTest::CLASSNAME = "HCGTest";
 	const std::string HCGTest::DESCRIPTION = "HCG implementations vector comparison tests.";
-	const std::string HCGTest::FAILURE = "FAILURE! ";
 	const std::string HCGTest::SUCCESS = "SUCCESS! All HCG tests have executed succesfully.";
 
 	HCGTest::HCGTest()
@@ -29,8 +30,8 @@ namespace Test
 
 	HCGTest::~HCGTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
 	}
 
 	const std::string HCGTest::Description()
@@ -53,29 +54,29 @@ namespace Test
 			Stress();
 			OnProgress(std::string("HCGTest: Passedstress tests.."));
 
-			HCG* drbg1 = new HCG(SHA2Digests::SHA256, Providers::None);
-			Kat(drbg1, m_key[0], m_expected[0]);
-			HCG* drbg2 = new HCG(SHA2Digests::SHA512, Providers::None);
-			Kat(drbg2, m_key[1], m_expected[1]);
+			HCG* genh256 = new HCG(SHA2Digests::SHA256, Providers::None);
+			Kat(genh256, m_key[0], m_expected[0]);
+			HCG* genh512 = new HCG(SHA2Digests::SHA512, Providers::None);
+			Kat(genh512, m_key[1], m_expected[1]);
 			OnProgress(std::string("HCGTest: Passed HMAC Generator known answer tests.."));
 
 			OnProgress(std::string(""));
 			OnProgress(std::string("HCGTest: Evaluate random qualities using ChiSquare, Mean, and Ordered Runs for each generator variant"));
-			Evaluate(drbg1);
-			Evaluate(drbg2);
-			delete drbg1;
-			delete drbg2;
+			Evaluate(genh256);
+			Evaluate(genh512);
+			delete genh256;
+			delete genh512;
 			OnProgress(std::string("HCGTest: Passed HMAC Generator random evaluation tests.."));
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -85,9 +86,9 @@ namespace Test
 		try
 		{
 			// invalid digest choice
-			HCG drbg(SHA2Digests::None);
+			HCG gen(SHA2Digests::None);
 
-			throw TestException(std::string("HCG"), std::string("Exception: Exception handling failure! -HE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE1"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -101,9 +102,9 @@ namespace Test
 		try
 		{
 			// invalid null digest instance
-			HCG drbg(nullptr);
+			HCG gen(nullptr);
 
-			throw TestException(std::string("HCG"), std::string("Exception: Exception handling failure! -HE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE2"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -116,12 +117,12 @@ namespace Test
 		// test initialization
 		try
 		{
-			HCG drbg(SHA2Digests::SHA256, Providers::CSP);
+			HCG gen(SHA2Digests::SHA256, Providers::CSP);
 			// invalid key size
 			std::vector<byte> k(1);
-			drbg.Initialize(k);
+			gen.Initialize(k);
 
-			throw TestException(std::string("HCG"), std::string("Exception: Exception handling failure! -HE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE3"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -134,12 +135,12 @@ namespace Test
 		// test invalid generator state -1
 		try
 		{
-			HCG drbg(SHA2Digests::SHA256, Providers::CSP);
+			HCG gen(SHA2Digests::SHA256, Providers::CSP);
 			std::vector<byte> m(16);
 			// cipher was not initialized
-			drbg.Generate(m);
+			gen.Generate(m);
 
-			throw TestException(std::string("HCG"), std::string("Exception: Exception handling failure! -HE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE4"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -152,15 +153,15 @@ namespace Test
 		// test invalid generator state -2
 		try
 		{
-			HCG drbg(SHA2Digests::SHA256, Providers::CSP);
-			SymmetricKeySize ks = drbg.LegalKeySizes()[0];
+			HCG gen(SHA2Digests::SHA256, Providers::CSP);
+			SymmetricKeySize ks = gen.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize());
-			drbg.Initialize(k);
+			gen.Initialize(k);
 			std::vector<byte> m(16);
 			// array is too small
-			drbg.Generate(m, 0, m.size() + 1);
+			gen.Generate(m, 0, m.size() + 1);
 
-			throw TestException(std::string("HCG"), std::string("Exception: Exception handling failure! -HE5"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE5"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -173,15 +174,15 @@ namespace Test
 		// test invalid generator request
 		try
 		{
-			HCG drbg(SHA2Digests::SHA256, Providers::CSP);
-			SymmetricKeySize ks = drbg.LegalKeySizes()[0];
+			HCG gen(SHA2Digests::SHA256, Providers::CSP);
+			SymmetricKeySize ks = gen.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize());
-			drbg.Initialize(k);
+			gen.Initialize(k);
 			// more than the max request size -64kb
-			std::vector<byte> m(drbg.MaxRequestSize() + 1);
-			drbg.Generate(m, 0, m.size());
+			std::vector<byte> m(gen.MaxRequestSize() + 1);
+			gen.Generate(m, 0, m.size());
 
-			throw TestException(std::string("HCG"), std::string("Exception: Exception handling failure! -HE6"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE6"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -194,76 +195,23 @@ namespace Test
 
 	void HCGTest::Evaluate(IDrbg* Rng)
 	{
-		const size_t OTPLEN = MAXM_ALLOC * 10;
-
-		std::vector<byte> otp(OTPLEN);
-		Key::Symmetric::SymmetricKeySize ks = Rng->LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
-		SecureRandom rnd;
-		std::string status;
-		double x;
 		size_t i;
 
-		IntUtils::Fill(key, 0, key.size(), rnd);
-		IntUtils::Fill(iv, 0, iv.size(), rnd);
-		SymmetricKey kp(key, iv);
-
-		Rng->Initialize(kp);
-
-		for (i = 0; i < OTPLEN; i += MAXM_ALLOC)
+		try
 		{
-			Rng->Generate(otp, i, MAXM_ALLOC);
+			const size_t SEGCNT = SAMPLE_SIZE / Rng->MaxRequestSize();
+			std::vector<byte> smp(SEGCNT * Rng->MaxRequestSize());
+
+			for (i = 0; i < SEGCNT; ++i)
+			{
+				Rng->Generate(smp, i * Rng->MaxRequestSize(), Rng->MaxRequestSize());
+			}
+
+			RandomUtils::Evaluate(Rng->Name(), smp);
 		}
-
-		// mean value test
-		x = TestUtils::MeanValue(otp);
-
-		status = (Rng->Name() + std::string(": Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
-
-		if (x < 122.5 || x > 132.5)
+		catch (TestException const &ex)
 		{
-			status += std::string("(FAIL)");
-		}
-		else if (x < 125.0 || x > 130.0)
-		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-
-		OnProgress(std::string(status));
-
-		// ChiSquare
-		x = TestUtils::ChiSquare(otp) * 100;
-		status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
-
-		if (x < 1.0 || x > 99.0)
-		{
-			status += std::string("(FAIL)");
-		}
-		else if (x < 5.0 || x > 95.0)
-		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-		OnProgress(std::string(status));
-
-		// ordered runs
-		if (TestUtils::OrderedRuns(otp))
-		{
-			throw TestException(std::string("HCG"), std::string("Exception: Ordered runs test failure! -HE1"));
-		}
-
-		// succesive zeroes
-		if (TestUtils::SuccesiveZeros(otp))
-		{
-			throw TestException(std::string("HCG"), std::string("Exception: Succesive zeroes test failure! -HE2"));
+			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-HE1"));
 		}
 	}
 
@@ -299,19 +247,19 @@ namespace Test
 
 		if (exp != Expected)
 		{
-			throw TestException(std::string("Kat: Output does not match the known answer! -HK1"));
+			throw TestException(std::string("Kat"), Rng->Name(), std::string("Output does not match the known answer! -HK1"));
 		}
 	}
 
-	void HCGTest::OnProgress(std::string Data)
+	void HCGTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
 
 	void HCGTest::Stress()
 	{
-		HCG drbg;
-		Key::Symmetric::SymmetricKeySize ks = drbg.LegalKeySizes()[1];
+		HCG gen;
+		Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 		std::vector<byte> otp;
 		std::vector<byte> key(ks.KeySize());
 		SecureRandom rnd;
@@ -325,15 +273,15 @@ namespace Test
 			{
 				const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				otp.resize(OTPLEN);
-				IntUtils::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(key, 0, key.size(), rnd);
 
-				// generate with the drbg
-				drbg.Initialize(key);
-				drbg.Generate(otp, 0, OTPLEN);
+				// generate with the gen
+				gen.Initialize(key);
+				gen.Generate(otp, 0, OTPLEN);
 			}
-			catch (...)
+			catch (std::exception const&)
 			{
-				throw TestException(std::string("Stress: The generator has thrown an exception! -HS1"));
+				throw TestException(std::string("Stress"), gen.Name(), std::string("The generator has thrown an exception! -HS1"));
 			}
 		}
 	}

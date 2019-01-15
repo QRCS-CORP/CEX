@@ -2,8 +2,8 @@
 #include "../CEX/ChaCha.h"
 #include "../CEX/ChaCha256.h"
 #include "../CEX/ChaCha512.h"
-#include "../CEX/IntUtils.h"
-#include "../CEX/MemUtils.h"
+#include "../CEX/IntegerTools.h"
+#include "../CEX/MemoryTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 
@@ -16,16 +16,16 @@
 
 namespace Test
 {
-	using Cipher::Symmetric::Stream::ChaCha;
-	using Cipher::Symmetric::Stream::ChaCha256;
-	using Cipher::Symmetric::Stream::ChaCha512;
+	using Cipher::Stream::ChaCha;
+	using Cipher::Stream::ChaCha256;
+	using Cipher::Stream::ChaCha512;
 	using Exception::CryptoSymmetricCipherException;
-	using Utility::IntUtils;
-	using Utility::MemUtils;
+	using Utility::IntegerTools;
+	using Utility::MemoryTools;
 	using Prng::SecureRandom;
 	using Enumeration::StreamAuthenticators;
-	using Key::Symmetric::SymmetricKey;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
 
 #if defined(__AVX2__)
 	using Numeric::ULong256;
@@ -35,8 +35,8 @@ namespace Test
 	using Numeric::ULong512;
 #endif
 
+	const std::string ChaChaTest::CLASSNAME = "ChaChaTest";
 	const std::string ChaChaTest::DESCRIPTION = "Tests the 256 and 512 bit versions of the ChaCha stream cipher.";
-	const std::string ChaChaTest::FAILURE = "ChaChaTest: Test Failure!";
 	const std::string ChaChaTest::SUCCESS = "SUCCESS! All ChaCha tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -56,12 +56,12 @@ namespace Test
 
 	ChaChaTest::~ChaChaTest()
 	{
-		IntUtils::ClearVector(m_code);
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_message);
-		IntUtils::ClearVector(m_monte);
-		IntUtils::ClearVector(m_nonce);
+		IntegerTools::Clear(m_code);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_message);
+		IntegerTools::Clear(m_monte);
+		IntegerTools::Clear(m_nonce);
 	}
 
 	//~~~Accessors~~~//
@@ -202,17 +202,17 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + ex.Origin(), ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void ChaChaTest::Authentication(IStreamCipher* Cipher)
 	{
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		const size_t TAGLEN = Cipher->TagSize();
 		const size_t MINSMP = 64;
 		const size_t MAXSMP = 6400;
@@ -236,11 +236,11 @@ namespace Test
 			inp.resize(MSGLEN);
 			otp.resize(MSGLEN);
 
-			IntUtils::Fill(inp, 0, MSGLEN, rnd);
-			IntUtils::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, MSGLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
 			if (nonce.size() > 0)
 			{
-				IntUtils::Fill(nonce, 0, nonce.size(), rnd);
+				IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
 			}
 			SymmetricKey kp(key, nonce);
 
@@ -252,15 +252,15 @@ namespace Test
 			Cipher->Initialize(false, kp);
 			Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
 
-			// use constant time IntUtils::Compare to verify mac
-			if (!IntUtils::Compare(Cipher->Tag(), 0, cpt, MSGLEN, TAGLEN))
+			// use constant time IntegerTools::Compare to verify mac
+			if (!IntegerTools::Compare(Cipher->Tag(), 0, cpt, MSGLEN, TAGLEN))
 			{
-				throw TestException(std::string("Authentication: MAC output is not equal! -CA1"));
+				throw TestException(std::string("Authentication"), Cipher->Name(), std::string("MAC output is not equal! -CA1"));
 			}
 
-			if (!IntUtils::Compare(inp, 0, otp, 0, MSGLEN))
+			if (!IntegerTools::Compare(inp, 0, otp, 0, MSGLEN))
 			{
-				throw TestException(std::string("Authentication: MAC output is not equal! -CA2"));
+				throw TestException(std::string("Authentication"), Cipher->Name(), std::string("MAC output is not equal! -CA2"));
 			}
 		}
 	}
@@ -273,14 +273,14 @@ namespace Test
 		std::vector<byte> output2(64);
 		std::array<uint, 14> state;
 
-		MemUtils::Clear(state, 0, state.size() * sizeof(uint));
+		MemoryTools::Clear(state, 0, state.size() * sizeof(uint));
 
 		ChaCha::PermuteP512C(output1, 0, counter, state, ROUNDS);
 		ChaCha::PermuteR20P512U(output2, 0, counter, state);
 
 		if (output1 != output2)
 		{
-			throw TestException(std::string("Permutation256: Permutation output is not equal! -CP1"));
+			throw TestException(std::string("CompareP256"), std::string("PermuteP512"), std::string("Permutation output is not equal! -CP1"));
 		}
 
 #if defined(__AVX__)
@@ -296,7 +296,7 @@ namespace Test
 			{
 				if (output3[i + j] != output1[j])
 				{
-					throw TestException(std::string("Permutation256: Permutation output is not equal! -CP2"));
+					throw TestException(std::string("CompareP256"), std::string("PermuteP4x512H"), std::string("Permutation output is not equal! -CP2"));
 				}
 			}
 		}
@@ -316,7 +316,7 @@ namespace Test
 			{
 				if (output4[i + j] != output1[j])
 				{
-					throw TestException(std::string("Permutation256: Permutation output is not equal! -CP3"));
+					throw TestException(std::string("CompareP256"), std::string("PermuteP8x512H"), std::string("Permutation output is not equal! -CP3"));
 				}
 			}
 		}
@@ -336,7 +336,7 @@ namespace Test
 			{
 				if (output5[i + j] != output1[j])
 				{
-					throw TestException(std::string("Permutation256: Permutation output is not equal! -CP4"));
+					throw TestException(std::string("CompareP256"), std::string("PermuteP16x512H"), std::string("Permutation output is not equal! -CP4"));
 				}
 			}
 		}
@@ -355,7 +355,7 @@ namespace Test
 		std::vector<byte> output1(64);
 		std::array<uint, 14> state;
 
-		MemUtils::Clear(state, 0, state.size() * sizeof(uint));
+		MemoryTools::Clear(state, 0, state.size() * sizeof(uint));
 
 		ChaCha::PermuteP512C(output1, 0, counter, state, ROUNDS);
 
@@ -372,7 +372,7 @@ namespace Test
 			{
 				if (output2[i + j] != output1[j])
 				{
-					throw TestException(std::string("Permutation512: Permutation output is not equal! -CP1"));
+					throw TestException(std::string("CompareP512"), std::string("PermuteP4x512H"), std::string("Permutation output is not equal! -CP1"));
 				}
 			}
 		}
@@ -392,7 +392,7 @@ namespace Test
 			{
 				if (output3[i + j] != output1[j])
 				{
-					throw TestException(std::string("Permutation512: Permutation output is not equal! -CP2"));
+					throw TestException(std::string("CompareP512"), std::string("PermuteP8x512H"), std::string("Permutation output is not equal! -CP2"));
 				}
 			}
 		}
@@ -412,7 +412,7 @@ namespace Test
 			{
 				if (output4[i + j] != output1[j])
 				{
-					throw TestException(std::string("Permutation512: Permutation output is not equal! -CP3"));
+					throw TestException(std::string("CompareP512"), std::string("PermuteP16x512H"), std::string("Permutation output is not equal! -CP3"));
 				}
 			}
 		}
@@ -422,7 +422,7 @@ namespace Test
 
 	void ChaChaTest::Exception(IStreamCipher* Cipher)
 	{
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
 		// test initialization key input sizes
 		try
@@ -432,7 +432,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -CE1"));
+			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE1"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -450,7 +450,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -CE2"));
+			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE2"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -469,7 +469,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -CE3"));
+			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE3"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -489,7 +489,7 @@ namespace Test
 			Cipher->Initialize(true, kp);
 			Cipher->ParallelMaxDegree(9999);
 
-			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -CE6"));
+			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE6"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -513,50 +513,50 @@ namespace Test
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
 
-		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
+		if (!IntegerTools::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
 		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -CF1"));
+			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("MAC output is not equal! -CF1"));
 		}
 
 		// encrypt msg 2
 		Cipher->Transform(Message, 0, cpt, MSGLEN + TAGLEN, MSGLEN);
 
-		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
+		if (!IntegerTools::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
 		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -CF2"));
+			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("MAC output is not equal! -CF2"));
 		}
 
 		// decrypt msg 1
 		Cipher->Initialize(false, kp);
 		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
 
-		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
+		if (!IntegerTools::Compare(Cipher->Tag(), 0, MacCode1, 0, TAGLEN))
 		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -CF3"));
+			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("MAC output is not equal! -CF3"));
 		}
 
 		// decrypt msg 2
 		Cipher->Transform(cpt, MSGLEN + TAGLEN, otp, MSGLEN, MSGLEN);
 
-		if (!IntUtils::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
+		if (!IntegerTools::Compare(Cipher->Tag(), 0, MacCode2, 0, TAGLEN))
 		{
-			throw TestException(std::string("Finalization: MAC output is not equal! -CF4"));
+			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("MAC output is not equal! -CF4"));
 		}
 
-		// use constant time IntUtils::Compare to verify
-		if (!IntUtils::Compare(otp, 0, Message, 0, MSGLEN) || !IntUtils::Compare(otp, MSGLEN, Message, 0, MSGLEN))
+		// use constant time IntegerTools::Compare to verify
+		if (!IntegerTools::Compare(otp, 0, Message, 0, MSGLEN) || !IntegerTools::Compare(otp, MSGLEN, Message, 0, MSGLEN))
 		{
-			throw TestException(std::string("Finalization: Decrypted output does not match the input! -CF5"));
+			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("Decrypted output does not match the input! -CF5"));
 		}
-		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
+		if (!IntegerTools::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
-			throw TestException(std::string("Finalization: Output does not match the known answer! -CF6"));
+			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("Output does not match the known answer! -CF6"));
 		}
 	}
 
 	void ChaChaTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		const size_t CPTLEN = Cipher->IsAuthenticator() ? Message.size() + Cipher->TagSize() : Message.size();
 		const size_t MSGLEN = Message.size();
 		std::vector<byte> cpt(CPTLEN);
@@ -573,11 +573,11 @@ namespace Test
 
 		if (otp != Message)
 		{
-			throw TestException(std::string("Kat: Decrypted output does not match the input! -CK1"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("Decrypted output does not match the input! -CK1"));
 		}
-		if (!IntUtils::Compare(cpt, 0, Expected, 0, Expected.size()))
+		if (!IntegerTools::Compare(cpt, 0, Expected, 0, Expected.size()))
 		{
-			throw TestException(std::string("Kat: Output does not match the known answer! -CK2"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("Output does not match the known answer! -CK2"));
 		}
 	}
 
@@ -587,7 +587,7 @@ namespace Test
 		std::vector<byte> msg = Message;
 		std::vector<byte> enc(MSGLEN);
 		std::vector<byte> dec(MSGLEN);
-		Key::Symmetric::SymmetricKey kp(Key, Nonce);
+		Cipher::SymmetricKey kp(Key, Nonce);
 
 		Cipher->Initialize(true, kp);
 
@@ -599,7 +599,7 @@ namespace Test
 
 		if (enc != Expected)
 		{
-			throw TestException(std::string("MonteCarlo: Encrypted output does not match the expected! -CM1"));
+			throw TestException(std::string("MonteCarlo"), Cipher->Name(), std::string("Encrypted output does not match the expected! -CM1"));
 		}
 
 		Cipher->Initialize(false, kp);
@@ -612,7 +612,7 @@ namespace Test
 
 		if (dec != Message)
 		{
-			throw TestException(std::string("MonteCarlo: Decrypted output does not match the input! -CM2"));
+			throw TestException(std::string("MonteCarlo"), Cipher->Name(), std::string("Decrypted output does not match the input! -CM2"));
 		}
 	}
 
@@ -620,7 +620,7 @@ namespace Test
 	{
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;
 		std::vector<byte> inp;	
@@ -643,8 +643,8 @@ namespace Test
 			inp.resize(MSGLEN);
 			otp.resize(MSGLEN);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, MSGLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, MSGLEN, rnd);
 			SymmetricKey kp(key, nonce);
 
 			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
@@ -661,7 +661,7 @@ namespace Test
 
 			if (cpt1 != cpt2)
 			{
-				throw TestException(std::string("Parallel: Cipher output is not equal! -CP1"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -CP1"));
 			}
 
 			// decrypt sequential ciphertext with parallel
@@ -671,7 +671,7 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException(std::string("Parallel: Cipher output is not equal! -CP2"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -CP2"));
 			}
 		}
 
@@ -684,7 +684,7 @@ namespace Test
 		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
 		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
@@ -705,8 +705,8 @@ namespace Test
 			inp.resize(MSGLEN);
 			otp.resize(MSGLEN);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, MSGLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, MSGLEN, rnd);
 			SymmetricKey kp(key, nonce);
 
 			// encrypt
@@ -718,7 +718,7 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException(std::string("Stress: Transformation output is not equal! -CS1"));
+				throw TestException(std::string("Stress"), Cipher->Name(), std::string("Transformation output is not equal! -CS1"));
 			}
 		}
 	}
@@ -735,26 +735,26 @@ namespace Test
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
 
-		if (!IntUtils::Compare(Cipher->Tag(), 0, Mac, 0, TAGLEN))
+		if (!IntegerTools::Compare(Cipher->Tag(), 0, Mac, 0, TAGLEN))
 		{
-			throw TestException(std::string("Verification: MAC output is not equal! -CV1"));
+			throw TestException(std::string("Verification"), Cipher->Name(), std::string("MAC output is not equal! -CV1"));
 		}
 
 		// decrypt
 		Cipher->Initialize(false, kp);
 		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
 
-		if (!IntUtils::Compare(Cipher->Tag(), 0, Mac, 0, TAGLEN))
+		if (!IntegerTools::Compare(Cipher->Tag(), 0, Mac, 0, TAGLEN))
 		{
-			throw TestException(std::string("Verification: MAC output is not equal! -CV2"));
+			throw TestException(std::string("Verification"), Cipher->Name(), std::string("MAC output is not equal! -CV2"));
 		}
 		if (otp != Message)
 		{
-			throw TestException(std::string("Verification: Decrypted output does not match the input! -CV3"));
+			throw TestException(std::string("Verification"), Cipher->Name(), std::string("Decrypted output does not match the input! -CV3"));
 		}
-		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
+		if (!IntegerTools::Compare(cpt, 0, Expected, 0, MSGLEN))
 		{
-			throw TestException(std::string("Verification: Output does not match the known answer! -CV4"));
+			throw TestException(std::string("Verification"), Cipher->Name(), std::string("Output does not match the known answer! -CV4"));
 		}
 	}
 
@@ -765,77 +765,77 @@ namespace Test
 		/*lint -save -e417 */
 		const std::vector<std::string> code =
 		{
-			std::string("A39594A79F0FDEEE7DA96C6BF14740F359DF24E423F40C07C3A05D1B5E8FB224"),																	// csx256h256
-			std::string("383D5FFC7E44C1F4BD2FD5F606727C9FF3E9A8B780D63BF234A43D5C088AC171"),																	// csx256k256
+			std::string("6638E9C07B0B56AAFAF06543269FBA9DAFE8F20E557FB538306620A5AAE93A5A"),																	// csx256h256
+			std::string("361CD8CA01D0EF26C7F91DBD0E229E6442095521D079594B3348C9C42ECF2F29"),																	// csx256k256
 
 			// csx256 finalization tests: mac-2
-			std::string("ABFA51E6C41EF64217027BFC086D9127D7F4BA76F70629F6D88F0D9CE3205D10"),																	// csx256h256
-			std::string("39C267EA6C4D734D85253E289294114878D478E96C3075ACD27F3A63FF335992"),																	// csx256k256
+			std::string("DE329466ED4A3199E52483EBB76CA0F751F040DA796AFB465AEC56F1CAE124A6"),																	// csx256h256
+			std::string("A146D46C66D50DDC5D50407D2297257938882C3AB41980640CA3EA6239FC9229"),																	// csx256k256
 
 #if defined(CEX_CHACHA512_STRONG)
 			// csx512 - verification
-			std::string("0B084632CC4CA012ED52AA6E3D7D9CB4F541DDE8825D879DB7EA56D9659096FB"),																	// csx512h256
-			std::string("7FCEBCFA1A3D3E398B49B551CC8ED8C9901F6A37F08EAEDB92FFA74C772D3EAA53B5A901C6DA292A203E82510E42A9DFDA78730AC905283133EDC53DF99A05F5"),	// csx512h512
-			std::string("C3A6F4C77B699731F52A671E815CA3A81AB4D693FBD266F0A485260D28F962FF"),																	// csx512k256
-			std::string("A064F63E44BF50830756C91BFBDE48DAB308D61EBB7EBF19CBE2983803DCCC1D9736734040EF165064FA71D2EEBD6048DE45B2EBDE760A87CA29BA6293E0A277"),	// csx512k512
+			std::string("372B81A0D05393C96A886698765006D43D87633B0791A56890FC0F5DA1D1EE40"),																	// csx512h256
+			std::string("EE971CEEE8746BD884683A888D1F5CB7FBC7AC20C99108A3D6C83257F621A60163FE11EF9D6F19CDB9CBBFB01634EF05E1664F445F75E86B9B0BF513E7DA244A"),	// csx512h512
+			std::string("AFDB16252B31F74FFF0258D42CB8BDAFBC8C484F0F2E25DA8FCFE9042515C697"),																	// csx512k256
+			std::string("DE7C0B8AD77AF1D6755D9E4C9BF2337A44D9F36EDE5DEF3CD5D0D761B2A9AB2EF1BA2960387E48704C6DE9B7CBE2FB8B0F14F896EDE0A7D8D7B73620D82E9332"),	// csx512k512
 
 			// csx512p80 finalization tests: mac-2
-			std::string("84A73FAE2FF71DC088D1AC4C503F718A5E2A9F024960D634F9923EE5B1B95AF1"),																	// csx512h256
-			std::string("5F37ED1A7B8FA0039C3E490244CB8755B3938150F4F0BF676EE5DBAC487379DDCE8E95C0E23B5FE240B8A3DA1CA25E847FE2FB51C7559E107F0ED0CB4A494C3E"),	// csx512h512
-			std::string("4AE5964D83E104032379350AE48049AF28E37061D09CA1B4B6C55892A2CA4DB7"),																	// csx512k256
-			std::string("FBB055FB1F8D1057F75C0228B4665C4ADCB47130F014FE12520655CE9EF4059F3D02E2A14058E764CBFF37E60BE28A30044DA772A2C0DDED31EB42A9046174B6")		// csx512k512
+			std::string("03EA3F4E7A557CAA67A2A1B09BF132DC20C11EC628031A4DC669C180B8E8E164"),																	// csx512h256
+			std::string("95A593D639F7A7225D4FF55056C92D5197C1896A65EC74EA93E915FA99E3A0F84BDB9768E047A9ED9C1BC0FEFED06692303332C4617D9374D34AC9B57052ABBC"),	// csx512h512
+			std::string("64607C44DAAC6CD0B688B6D45469395810AB8AC55C331789A8BE37290F653825"),																	// csx512k256
+			std::string("596B3A53F001704585D2DD8C8286A203ED95DC3049BE901ADB48300C091F886D18A21C04CBEE3D6ADB20774A93320E4D436BE1CED1DB3527AA3090443F1B1BB9")		// csx512k512
 #else
 			// csx512p40 - verification
-			std::string("A9953EBED15DC72D782176FA7E3E9FF608C3DF05C5807B9B2F4FDD4C7900C680"),																	// csx512h256
-			std::string("6ACF42408DA6BC2B1196415A83E48EC98A7CEFC702B0D3DB6A150CBD2297E4743A9B5C56DC731155BA0C5292F41E27C2E0D6598D078F828A512E328A64560AF0"),	// csx512h512
-			std::string("8B16832B4B43AAFEF9727E4CF8E933960DA911A9280509E629BEA25A2BEF4DF3"),																	// csx512k256
-			std::string("C2BE5A317D0BEF63FDD2BD0092CB29A61A7EDCCF16BB067FE744CFD62C84E4DC0D6ADB1CC5451168BF4CBB6D14ABDFE750248B2B08910BF92D706E7C0893ED03"),	// csx512k512
+			std::string("134C58038A7C32AA80DF20B794D48D92924108BA08FE5A7C987B09850B4F57F6"),																	// csx512h256
+			std::string("5B060B3FAD2B6F8F490E8AF2DA05F912FB6A5C8DFD3E0F9FEBAE61C30914246E30361D67A4EA096C9AB8541356908269EF0C7ABC0D6EEA6649E5640350A08234"),	// csx512h512
+			std::string("498140165A1B3092D9C0B2CE0B38DF47C7B6E35D766B8561705AE3E4C955F93A"),																	// csx512k256
+			std::string("65F923B6B7A28E98EB5E1EFF6EDDB469E24B9E055B951C54ACFC63EB4F23F1A90835180D141206E0BFE82A01B18D8508FC4381BCE99E9B2D418D276DCF743B93"),	// csx512k512
 
 			// csx512p40 finalization tests: mac-2
-			std::string("89F1D8424628EE9FF228297F8120714CF71BF9A8B97DC4A2BB56C555C8F56AF2"),																	// csx512h256
-			std::string("E76D6004F90D007F3D9B0F1AAFFF562E8094D17F10BE50881CD37794FB6140C9D1306C354983867F98E4D2D3800392B68DE6E65D4ACA56C2C60A79F0A36C2DCF"),	// csx512h512
-			std::string("C4E2F7D4941F4B99FE766BD1C0BCE2C1993DF43F1ECD02185A22E9AC5C4BC44F"),																	// csx512k256
-			std::string("A6EDF24EF07E018AEC04B78A89A0E8F35170FC3A25FAA691C56E42B5DDEED187426E2A0E599C8592036B832C578A0D569F56E8807A02D7067A89940E578C1334")		// csx512k512
+			std::string("8A5F004FA20FABF0367197004F3414D66847041F2826A0C41A837C25DC77C8A1"),																	// csx512h256
+			std::string("D02E1037378CF8F6E224CB9073F42BD053EC3A83B50C9961ED6B3A6C7EC0324A2E6C5A504A36606687C0548EA96AF5298AD94C4E334B129203E3995E5178A6A0"),	// csx512h512
+			std::string("D4A27BAE1DAC56CCDB64AEE0E6C31A212E59FCE684B1F8D8BFEE229DE387FCF3"),																	// csx512k256
+			std::string("6A0FC1780DFFBE44536010CA0E3C696C15391188F127A12F4CB05C3BAFC9B83389B65E453C3EF26BDE7552C74F602FA78167F0D11E151545D70CB99EDC88C47F")		// csx512k512
 #endif
 		};
 		HexConverter::Decode(code, 12, m_code);
 
 		const std::vector<std::string> expected =
 		{
-			std::string("A991D2C9CA9FF63EB8310AA3D6EC77DC552D5BE4F5D340BF779AAAD48B3527A576BE0923E84C6495FFAA3BE6735C08B6FF8DDFD542673A50F98F44678989F041"),	// csx256h256
-			std::string("9F788EB117A002E7C188565A5947E4F9DF909A5891231086A4EA33708CD4D089BDDC88A0D26D3D92BD34DA19142D1B1B3DAACF9556CA2F03B049CC62DD309DF8"),	// csx256h256
-			std::string("A4E59655CDC3A6597E9B6013E263A52F665761D200013F6EFFBAEA1BCAEB444BAEB7FBB176F5C3E52466F26BDA11A62E27B74187092A246F22CE52D2B123F234"),	// csx256k256
-			std::string("159DF936E9BD7E64BBBF23F70AD66F1ED734CF4C9016DBEBF001C2AC3E9E1C7D619D4128F35B084A553C938A7BD0D44822AE582FD8909EBA5DFEE685219C807D"),	// csx256k256
-			std::string("E318D2D2A8DB6C70B71DCAAA5A9E0E655D85210AB1923E4F93C7C7EA824CBC9FF3CAAD9BA0022F3A39E60B70E5FDE09E0AF64DEAFBB93A63CE80A92E670CCE72"),	// csx256k256
-			std::string("FD39998A115F0B8C1E7833944F9F3E857EE531D74FA5CC5FC8BEC44BCF6E2F5B4E6E1B87DD7F49A02190261B9672462897D4BBD426EDD309BD9BCEBDD53256AC"),	// csx256k256
-			std::string("155CE519DA409555FD8E74C1C82195CF25152361D6E6D67DBA0BFA6B6CF445224641B050B746C6EAA0A91AEAC79274875488F2F9FA6726B6ED8648C830D4DBE6"),	// csx256k256
-			std::string("C08D8F0C44FF4D0CDDF1DCF3A4683710E7EB44B5E276C5DC86A8D7CBA2839A6B876D2B423092C16ABB9B3AC95C36A677F69246EE3D082631B26C048B3E7395F5"),	// csx256k256
+			std::string("AFA6F8F9B527053F0E7F242E49947EC5791D121C37D0C295762B8804F53A5DAA2BE48F976055177C825F2E1CC1AA80D9B45E77A252F905A30C3B3D64C800A83C"),	// csx256h256
+			std::string("B01A0425D63C8C7F27FD956D7528DFF316AA00D818DADD6CEE9073802AB5047FCE93FF18CABD09BE6EA6A9EDCEB031923DEA24185BD358B9E3CAF9C23381B408"),	// csx256h256
+			std::string("B318E77F38D67A6B4E82D47297C5E5D4AB7537AFBACBA384423A90C55FF2481C22D3FFD15A8FD2879636DD81650D6B0B5A88F0F91040C333E55EFE36528B34AF"),	// csx256k256
+			std::string("3F2C7538E080631DFB67DA75E70FF7929B1073C2D2D968107C190A4077F7EF171BED1D853938C680F046D79A8E3DC2E3BAEEB0BA51E98DCB848DEF864E575A44"),	// csx256k256
+			std::string("F77DAF38A1D5054D24C0F1DFD0989CA00B47393A36BFDD731521353730DE0F60B7684121CF480B9F3F11232DE28277050C98C26FD61CD7F48F093DA2A92DF037"),	// csx256k256
+			std::string("9DD37AB5D781BA65C91BC4B4C1AF826197BEC0B8EBAF308B2BDB7E85411EFE06313721238B67D3CF1CDC279AF0D39757E6F5EB0C7D4338E92F0DBFFDCEFE57EF"),	// csx256k256
+			std::string("EBA022DC33D77E1213522571D14201C3657797BADC093568C913B36A60A7CD1F4D566FC4E8D5AA8D49C19CE51222ECD9E5849EDB1A99E4C47ED13C84360616C3"),	// csx256k256
+			std::string("D6D56F1B78D046F351C5474B9A271356240637AA3A47E771FAE0CB244652BE6E87577A2FDBBEF9AADB794E348A5F7DA064137A4F92BACA4DF867581C5B54900A"),	// csx256k256
 			// IETF chacha-poly1305 for TLS, test vectors
 			std::string("76B8E0ADA0F13D90405D6AE55386BD28BDD219B8A08DED1AA836EFCC8B770DC7DA41597C5157488D7724E03FB8D84A376A43B8F41518A11CC387B669B2EE6586"),	// csx256s: IETF test vector 1
 			std::string("4540F05A9F1FB296D7736E7B208E3C96EB4FE1834688D2604F450952ED432D41BBE2A0B6EA7566D2A5D1E7E20D42AF2C53D792B1C43FEA817E9AD275AE546963"),	// csx256s: IETF test vector 2
-			std::string("DE9CBA7BF3D69EF5E786DC63973F653A0B49E015ADBFF7134FCB7DF137821031E85A050278A7084527214F73EFC7FA5B5277062EB7A0433E445F41E3"),			// csx256s: IETF test vector 3
+			std::string("DE9CBA7BF3D69EF5E786DC63973F653A0B49E015ADBFF7134FCB7DF137821031E85A050278A7084527214F73EFC7FA5B5277062EB7A0433E445F41E31AFAB757"),	// csx256s: IETF test vector 3
 			std::string("EF3FDFD6C61578FBF5CF35BD3DD33B8009631634D21E42AC33960BD138E50D32111E4CAF237EE53CA8AD6426194A88545DDC497A0B466E7D6BBDB0041B2F586B"),	// csx256s: IETF test vector 4
 
 #if defined(CEX_CHACHA512_STRONG)
-			std::string("58BC2802EB5BDA70DDAE99D1DEABA98839FEF74107CC75F1D680CCD24BFCAB5FD93936550BB5698B677F9B3CEEB67129762F9595B6B427C45392BBB063CD79E6"),
-			std::string("95D54389142122FC405E87C486A485E6122FA10C87CDA7D2BBA97A27252C04C331578D2D2723870E087544D3DC6CACE393E2DE99FDB117AF8C82138090BBCB99"),
-			std::string("3C0FDA2F5D1BE03A878A7D6D50FFF171183308DFBA747F904E2EBC7927551411C204CB09FF12E440AC64BB298BB2A70FA63FA7FEC7E7A48948D0E218FF8E3EE6"),
-			std::string("70D28AFEA4B117B00156E1A1C632E8D20E9B7E687A0C1654561657BD33A0CB4C48390B727430D4186C54C33084B16E42A3D090229904387D1517839C500975E9"),
-			std::string("AC11DD37517A9A26C30FF6F22E2ECBA26D7A0C70D0F24FF234DBF527678BE30039F320F2710EE0A246BD6C8198722FE0E0773F35D69939845004A4DF4DDCCB47"),
-			std::string("B13A9C5FF9069CE17737619028B5D8657E15593132DA4512CA3BA52B9E0C5392E26BEF8A9D6824C716A061EAA79F4466F9987A08EC79B295084C98558DAB972E"),
-			std::string("2D643464118359BD43B4C4CA5EA297CA466769516920757AF81E0C753E6CA631261D6ADA2ACFF225D6686EB01A58D4591F527D5C97A98B6FE68CB479ED342700"),
-			std::string("BE155498EED65C1F05B22F2EE22926B26AE963DA24D6F6DEB4D6117DE32818E5B4EDCBC2D4E3325E6F7A930A19F2C8668378D46E0FBB89E6EB0CB2755A38A0BF"),
+			std::string("34615F7934D518A5AFB2B72A794424B0C583E8C7A88F33AE63E3B167972730922E284365FDA9D92889D5DAEAE94A0490A747D2DBF0C536F0FD205D3A81981509"),
+			std::string("FA812E839B6234590E89E8B7FDD3982EE41E59807C567C670AF1E1166E516984815FA314D0A7819701814AC2F800E8427CA03A482C9983E18FED2EAC15996487"),
+			std::string("CBDCFCDE1070CE61FD55512A6682E3ED50DCBF9E85AD0A0E00B279BBB3C13BE924A1DF04A39B73689F1DB48C04789DBBDF36A8C23E71B615690CB38CCCFE97BA"),
+			std::string("F35502B5B1809920BFC46CFA13ED560D4F546DD324EF26F4DDD92F97CC79B0141650A0FAFDA3902DD8BE5C903404C04A683CEFE5D10133D25ACF2A52CF99DA09"),
+			std::string("ED1AD1E5DB57E25EA593B616187C5A70E8CF6743DC0C32323B9938159E73058A2F86859B15A1F342B0304B222A88B7133B07405BC1BD5F29A5469D5A76E5B93A"),
+			std::string("8E1C2C27B78F84815E860087E2B6822DA52D443F046BFB658F1EE5AC862B3C12180A210C60D5E277C2D31AB3757FD8C161E9A82A1B9E8886ED04F2956CE7D252"),
+			std::string("A3F9827B3589780409D750050995D7E7E3F40F72534F7E4537544F530088CE84EB6EE59033FFCE2942040D4881EE6E1DB992625A8762629A1B76DF66ABA53E72"),
+			std::string("8DE302EB7762FB38F1EE9FD08C69EC6F9AA25321F83DE484E4253697DF0F06F97C391CFF4B1BC78420A60A0F58F8ACA37875F57CB23D64A980D2F0C1A55621F1"),
 			std::string("23A5B37570F6E3585EFB4614460616A926243B865CFD6C2C1CBFC33CC4C8B8F3C8F67FD56A9589C2C144D5F02029C9DEE003A7A6A7185AE697D242FD531F0D69"),
 			std::string("DCBA51986EED0FDA2E15F9AD021B26CE17567A3EBE9F43FE8B5BD460527EDA8D77BB80C5B8BE29850A21428A7D390DF9631C5C126EFCED7E14441E8CD2A9AFF1")
 #else
-			std::string("420BCCB5E9CD77DE8929055E0B8CCBB9865D945E227411FCFCA191C5F9B64AED6CEC37AF00EE1B583935F1368C6A77C97F522C91430EA9E42E9EADCA8017F822"),
-			std::string("17488B8E8D6A69818BB55508CA6E407E2302311969A643FAE8034D85F615367A677C90F8668AAA8819212A18F3536BCA4B0DE92F85F45BEAC385FC5BB62A75D6"),
-			std::string("CA9ADF46D39490719E62676434064B3638E12D06480383E05462FD2A585AAE6B74A383362F0FD45170F56379F512561C0CF5D2E295BE52C350387CA589107109"),
-			std::string("9994ADE320633AEF5924A467D17EDF25C68EB75859684E8430AEE62D396374F9C3BD25190BD9101715351B99B177C3EF9983D91073D8ECCAE31492F5C2645B43"),
-			std::string("2E9EF32216F823C1200CFDA58B7D411B4B5EC7464679B1864CCE1E4330E40649DAC0706B5B959DE8505F945D4B1EED996C778BA0991D8F4D817DB55BAD2A23D4"),
-			std::string("6D1BAA2981D6F2650D3819EF01D38F2F8A80B8A14D20A1947A4917B992629969B1E625D40538E8D96885DBC7B7B78D49982511DB112279051790BE28C6F7FAF5"),
-			std::string("521C582B6FF692430FE2561EBB9DBFC9A99BECAA6366B2BD4F800D4B38250C08E87C2C176676B1430CE5A75EEEB0844A84762B84119FF53B16F989B1217381E9"),
-			std::string("D448C80D3F80E8B9E2C301586AA214DA54B29A5C4D17DA5FF5AEF54914C6C535954F4E4568AFA4076C45D34C6BE2693DE5603639EE88520E2B46366DF88EFED9"),
+			std::string("21AA224964A24744C1D171CAD96C36EB3074E96363DAA5496C138CC52B4AAFA1C5442D1564416F56373C6CBFA9418002B0733A1C1EEC4EF2E8943BD5F54A711D"),
+			std::string("4BF93EC53EE2143A833FD6C968DC1445C331A94514ABA8B68F416BEA93731F64C2B2D2E5F1662F7A80DCFBD4202EEAB930BF13CB166E2691EC0F7D9787220CBE"),
+			std::string("54E1F1E72B4F411E0ECC77F30520178D856AE586D5077203A44868FE708AA2A0DFE76DBA4FB6AC1882D25AE49EA7742D831CE78AEE655211EEC818C9DD83A6E2"),
+			std::string("919BAF4DD22123BD9F73E4EDED468DBA514DC280484190FAEE55CEC5B4D49375B6D7C3245EED40BFFB3C934AD2764CEC72D24026B230B5A4C1BE390A17A1041F"),
+			std::string("26F3E196D0D59A0921F64E46CE527D0ACF0457EFBDD7A308911F8C7EF6A97007E4FEE91612914F6278CBD9D1AF9CB67A5E421669F35FCFC6BC41DFFE07AFD355"),
+			std::string("615FFE620E2E798D06F219D8EC6F1B491206339F01D49D4FDB8102E40C70FA9708E5285108C13869885614ECCA779A8A40A4A2835A186A7146E97B9503705EC6"),
+			std::string("279D8CF7C53ACBA3ADC2EC6316221F284E8D25A271F74F83FE006D47E8E6B383C1532811C73909B91AA840E5364AD94992FD8236C3FEDFE28113D33A227C60E6"),
+			std::string("E02A1CB67FAE1D8989B103A3F010CE1E6BCF0772555BCBFB9C06B0C687A6417B82BC8068EBEB1E275407BCF5140568A2F4BCC983142E57C1E40135B730D8FCA3"),
 			std::string("5ADBA319A0A42546444C3121E94D3AFA40B5E63CEC9C667109DEF0E17009399E74C994AB07D7631344CBF266754DDE31C265082A9B630E97DE287023AAED8A21"),
 			std::string("C67BE57127D42320B584074F0964C75C643768B94E01C2D61A9F4071F71604D5F4A8A90A867FC47FA90592DEF26D36C72DC5CE7561B9AF564DCC217A19045175")
 #endif
@@ -898,7 +898,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void ChaChaTest::OnProgress(std::string Data)
+	void ChaChaTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

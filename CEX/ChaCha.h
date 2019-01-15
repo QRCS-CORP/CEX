@@ -47,10 +47,10 @@ private:
 		for (i = 0; i < 16; ++i)
 		{
 			State[i].Store(tmp, 0);
-			IntUtils::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
-			IntUtils::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
-			IntUtils::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
-			IntUtils::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
+			IntegerTools::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
+			IntegerTools::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
+			IntegerTools::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
+			IntegerTools::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
 		}
 	}
 
@@ -63,14 +63,14 @@ private:
 		for (i = 0; i < 16; ++i)
 		{
 			State[i].Store(tmp, 0);
-			IntUtils::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
-			IntUtils::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
-			IntUtils::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
-			IntUtils::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
-			IntUtils::Le32ToBytes(tmp[4], Output, OutOffset + (i * 4) + 256);
-			IntUtils::Le32ToBytes(tmp[5], Output, OutOffset + (i * 4) + 320);
-			IntUtils::Le32ToBytes(tmp[6], Output, OutOffset + (i * 4) + 384);
-			IntUtils::Le32ToBytes(tmp[7], Output, OutOffset + (i * 4) + 448);
+			IntegerTools::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
+			IntegerTools::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
+			IntegerTools::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
+			IntegerTools::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
+			IntegerTools::Le32ToBytes(tmp[4], Output, OutOffset + (i * 4) + 256);
+			IntegerTools::Le32ToBytes(tmp[5], Output, OutOffset + (i * 4) + 320);
+			IntegerTools::Le32ToBytes(tmp[6], Output, OutOffset + (i * 4) + 384);
+			IntegerTools::Le32ToBytes(tmp[7], Output, OutOffset + (i * 4) + 448);
 		}
 	}
 
@@ -83,22 +83,22 @@ private:
 		for (i = 0; i < 16; ++i)
 		{
 			State[i].Store(tmp, 0);
-			IntUtils::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
-			IntUtils::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
-			IntUtils::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
-			IntUtils::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
-			IntUtils::Le32ToBytes(tmp[4], Output, OutOffset + (i * 4) + 256);
-			IntUtils::Le32ToBytes(tmp[5], Output, OutOffset + (i * 4) + 320);
-			IntUtils::Le32ToBytes(tmp[6], Output, OutOffset + (i * 4) + 384);
-			IntUtils::Le32ToBytes(tmp[7], Output, OutOffset + (i * 4) + 448);
-			IntUtils::Le32ToBytes(tmp[8], Output, OutOffset + (i * 4) + 512);
-			IntUtils::Le32ToBytes(tmp[9], Output, OutOffset + (i * 4) + 576);
-			IntUtils::Le32ToBytes(tmp[10], Output, OutOffset + (i * 4) + 640);
-			IntUtils::Le32ToBytes(tmp[11], Output, OutOffset + (i * 4) + 704);
-			IntUtils::Le32ToBytes(tmp[12], Output, OutOffset + (i * 4) + 768);
-			IntUtils::Le32ToBytes(tmp[13], Output, OutOffset + (i * 4) + 832);
-			IntUtils::Le32ToBytes(tmp[14], Output, OutOffset + (i * 4) + 896);
-			IntUtils::Le32ToBytes(tmp[15], Output, OutOffset + (i * 4) + 960);
+			IntegerTools::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
+			IntegerTools::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
+			IntegerTools::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
+			IntegerTools::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
+			IntegerTools::Le32ToBytes(tmp[4], Output, OutOffset + (i * 4) + 256);
+			IntegerTools::Le32ToBytes(tmp[5], Output, OutOffset + (i * 4) + 320);
+			IntegerTools::Le32ToBytes(tmp[6], Output, OutOffset + (i * 4) + 384);
+			IntegerTools::Le32ToBytes(tmp[7], Output, OutOffset + (i * 4) + 448);
+			IntegerTools::Le32ToBytes(tmp[8], Output, OutOffset + (i * 4) + 512);
+			IntegerTools::Le32ToBytes(tmp[9], Output, OutOffset + (i * 4) + 576);
+			IntegerTools::Le32ToBytes(tmp[10], Output, OutOffset + (i * 4) + 640);
+			IntegerTools::Le32ToBytes(tmp[11], Output, OutOffset + (i * 4) + 704);
+			IntegerTools::Le32ToBytes(tmp[12], Output, OutOffset + (i * 4) + 768);
+			IntegerTools::Le32ToBytes(tmp[13], Output, OutOffset + (i * 4) + 832);
+			IntegerTools::Le32ToBytes(tmp[14], Output, OutOffset + (i * 4) + 896);
+			IntegerTools::Le32ToBytes(tmp[15], Output, OutOffset + (i * 4) + 960);
 		}
 	}
 

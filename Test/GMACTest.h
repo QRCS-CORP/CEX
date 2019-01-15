@@ -16,8 +16,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 64 * 255;
 		static const size_t MINM_ALLOC = 1024;
@@ -88,7 +88,7 @@ namespace Test
 	private:
 
 		void Initialize();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

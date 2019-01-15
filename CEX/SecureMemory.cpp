@@ -1,12 +1,14 @@
 #include "SecureMemory.h"
 
-NAMESPACE_COMMON
+NAMESPACE_ROOT
 
-size_t SecureMemory::Allocate(void* Pointer, size_t Length)
+void* SecureMemory::Allocate(size_t Length)
 {
 	const size_t PGESZE = PageSize();
+	void* ptr;
 
-	// avoid unnecessary page length boundary errors, and return correct size
+	ptr = nullptr;
+
 	if (Length % PGESZE != 0)
 	{
 		Length = (Length + PGESZE - (Length % PGESZE));
@@ -22,58 +24,48 @@ size_t SecureMemory::Allocate(void* Pointer, size_t Length)
 #		define MAP_ANONYMOUS MAP_ANON
 #	endif
 
-	void* Pointer = ::mmap(nullptr, Length, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED | MAP_NOCORE, -1, 0);
+	ptr = ::mmap(nullptr, Length, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_SHARED | MAP_NOCORE, -1, 0);
 
-	if (Pointer == MAP_FAILED)
+	if (ptr == MAP_FAILED)
 	{
-		Pointer = nullptr;
-		return 0;
+		ptr = nullptr;
 	}
 
+	if (ptr != nullptr)
+	{
 #	if defined(MADV_DONTDUMP)
-		::madvise(Pointer, Length, MADV_DONTDUMP);
+		::madvise(ptr, Length, MADV_DONTDUMP);
 #	endif
 
 #	if defined(CEX_HAS_POSIXMLOCK)
-	if (::mlock(Pointer, Length) != 0)
-	{
-		::munmap(Pointer, Length);
-
-		// failed to lock
-		Pointer = nullptr;
-		return 0;
-	}
+		if (::mlock(ptr, Length) != 0)
+		{
+			::munmap(ptr, Length);
+			::memset(ptr, 0, Length);
+			// failed to lock
+			ptr = nullptr;
+		}
 #	endif
-
-	::memset(Pointer, 0, Length);
+	}
 
 #elif defined(CEX_HAS_VIRTUALLOCK)
 
-	LPVOID ptr = ::VirtualAlloc(nullptr, Length, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	(LPVOID)ptr = ::VirtualAlloc(nullptr, Length, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-	if (!ptr)
+	if (ptr != nullptr)
 	{
-		Pointer = nullptr;
-		return 0;
+		if (::VirtualLock(ptr, Length) == 0)
+		{
+			::VirtualFree(ptr, 0, MEM_RELEASE);
+			::memset(ptr, 0, Length);
+			// failed to lock
+			ptr = nullptr;
+		}
 	}
-
-	if (::VirtualLock(Pointer, Length) == 0)
-	{
-		::VirtualFree(Pointer, 0, MEM_RELEASE);
-
-		// failed to lock
-		Pointer = nullptr;
-		return 0;
-	}
-
-#else
-	// not implemented
-	Pointer = nullptr;
-	return 0;
 
 #endif
 
-	return Length;
+	return ptr;
 }
 
 void SecureMemory::Erase(void* Pointer, size_t Length)
@@ -93,11 +85,11 @@ void SecureMemory::Erase(void* Pointer, size_t Length)
 
 #else
 
-	volatile uint8_t* p = reinterpret_cast<volatile uint8_t*>(Pointer);
+	volatile byte* ptr = reinterpret_cast<volatile byte*>(Pointer);
 
 	for (size_t i = 0; i != Length; ++i)
 	{
-		Pointer[i] = 0;
+		ptr[i] = 0;
 	}
 
 #endif
@@ -105,32 +97,31 @@ void SecureMemory::Erase(void* Pointer, size_t Length)
 
 void SecureMemory::Free(void* Pointer, size_t Length)
 {
-	if (Pointer == nullptr || Length == 0)
+	if (Pointer != nullptr || Length != 0)
 	{
-		return;
-	}
-
+		
 #if defined(CEX_OS_POSIX)
 
-	Erase(Pointer, Length);
+		Erase(Pointer, Length);
 
 #	if defined(CEX_HAS_POSIXMLOCK)
 		::munlock(Pointer, Length);
 #	endif
 
-	::munmap(Pointer, Length);
+		::munmap(Pointer, Length);
 
 #elif defined(CEX_HAS_VIRTUALLOCK)
 
-	Erase(Pointer, Length);
-	::VirtualUnlock(Pointer, Length);
-	::VirtualFree(Pointer, 0, MEM_RELEASE);
+		Erase(Pointer, Length);
+		::VirtualUnlock(Pointer, Length);
+		::VirtualFree(Pointer, 0, MEM_RELEASE);
 
 #else
 
-	throw CryptoException("SecureMemory::Free", "Invalid pointer to locked pages.");
+		throw CryptoException(std::string("SecureMemory"), std::string("Free"), std::string("Secure memory not supported on this system!"), Enumeration::ErrorCodes::NoAccess);
 
 #endif
+	}
 }
 
 size_t SecureMemory::Limit()
@@ -175,69 +166,60 @@ size_t SecureMemory::Limit()
 
 #	endif
 
-#elif defined(CEX_HAS_VIRTUALLOCK)
+#elif defined(CEX_OS_WINDOWS)
 
 	size_t lockable;
 	size_t overhead;
 	SIZE_T wmax;
 	SIZE_T wmin;
 
+	lockable = CEX_SECMEMALLOC_MAXKB * 1024ULL;
 	wmax = 0;
 	wmin = 0;
 
-	if (!::GetProcessWorkingSetSize(::GetCurrentProcess(), &wmin, &wmax))
+	if (::GetProcessWorkingSetSize(::GetCurrentProcess(), &wmin, &wmax))
 	{
-		return 0;
-	}
+		overhead = PageSize() * 11ULL;
 
-	overhead = PageSize() * 11ULL;
-
-	if (wmin > overhead)
-	{
-		lockable = wmin - overhead;
-
-		if (lockable < (CEX_SECMEMALLOC_MAXKB * 1024ULL))
+		if (wmin > overhead)
 		{
-			return lockable;
-		}
-		else
-		{
-			return CEX_SECMEMALLOC_MAXKB * 1024ULL;
+			lockable = wmin - overhead;
 		}
 	}
 
 #endif
 
-	return 0;
+	return lockable;
 }
 
 size_t SecureMemory::PageSize()
 {
+	long pagelen;
+
+	pagelen = 4096;
+
 #if defined(CEX_OS_POSIX)
 
-	long p = ::sysconf(_SC_PAGESIZE);
+	pagelen = ::sysconf(_SC_PAGESIZE);
 
-	if (p > 1)
+	if (pagelen < 1)
 	{
-		return static_cast<size_t>(p);
-	}
-	else
-	{
-		return CEX_SECMEMALLOC_DEFAULT;
+		pagelen = CEX_SECMEMALLOC_DEFAULT;
 	}
 
-#elif defined(CEX_HAS_VIRTUALLOCK)
+	return static_cast<size_t>(pagelen);
+
+#elif defined(CEX_OS_WINDOWS)
 
 	SYSTEM_INFO sysinfo;
 	::GetSystemInfo(&sysinfo);
-	return sysinfo.dwPageSize;
+	pagelen = static_cast<size_t>(sysinfo.dwPageSize);
 
-#else
-
-	// default value
-	return 4096;
+	return static_cast<size_t>(pagelen);
 
 #endif
+
+	return static_cast<size_t>(pagelen);
 }
 
-NAMESPACE_COMMONEND
+NAMESPACE_ROOTEND

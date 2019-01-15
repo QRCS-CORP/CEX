@@ -3,20 +3,23 @@
 
 #include "CexDomain.h"
 #include "ErrorCodes.h"
+#include "ExceptionTypes.h"
 
 NAMESPACE_EXCEPTION
 
 using Enumeration::ErrorCodes;
+using Enumeration::ExceptionTypes;
 
 /// <summary>
-/// Generalized cryptographic error container
+/// Base cryptographic exception container.
+/// <para>All of the CEX library errors can be caught using this base class.</para>
 /// </summary>
-struct CryptoException : std::exception
+class CryptoException : public std::exception
 {
 private:
 
-	std::string m_details;
 	ErrorCodes m_error;
+	std::string m_location;  // Location, Origin, Message, ErrorCode == Class, Function, Message, ErrorCode
 	std::string m_message;
 	std::string m_origin;
 
@@ -35,39 +38,6 @@ public:
 	CryptoException() = delete;
 
 	/// <summary>
-	/// Constructor: instantiate this class with a message
-	/// </summary>
-	///
-	/// <param name="Message">A custom message or error data</param>
-	explicit CryptoException(const std::string &Message);
-
-	/// <summary>
-	/// Constructor: instantiate this class with an origin and message
-	/// </summary>
-	///
-	/// <param name="Origin">The origin of the exception</param>
-	/// <param name="Message">A custom message or error data</param>
-	CryptoException(const std::string &Origin, const std::string &Message);
-
-	/// <summary>
-	/// Constructor: instantiate this class with an origin and message
-	/// </summary>
-	///
-	/// <param name="Origin">The origin of the exception</param>
-	/// <param name="Message">A custom message or error data</param>
-	/// <param name="ErrorCode">The error code enumeral</param>
-	CryptoException(const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode);
-
-	/// <summary>
-	/// Constructor: instantiate this class with an origin, message and inner exception
-	/// </summary>
-	///
-	/// <param name="Origin">The origin of the exception</param>
-	/// <param name="Message">A custom message or error data</param>
-	/// <param name="Detail">The inner exception string</param>
-	CryptoException(const std::string &Origin, const std::string &Message, const std::string &Detail);
-
-	/// <summary>
 	/// Constructor: instantiate this class with an origin, message and inner exception
 	/// </summary>
 	///
@@ -75,7 +45,7 @@ public:
 	/// <param name="Message">A custom message or error data</param>
 	/// <param name="Detail">The inner exception string</param>
 	/// <param name="ErrorCode">The error code enumeral</param>
-	CryptoException(const std::string &Origin, const std::string &Message, const std::string &Detail, ErrorCodes ErrorCode);
+	CryptoException(const std::string &Location, const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -85,24 +55,29 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: The inner exception string
+	/// Read: The exception eror code
 	/// </summary>
-	std::string &Details();
+	const ErrorCodes ErrorCode();
 
 	/// <summary>
-	/// Read/Write: The exception eror code
+	/// Read Only: The exceptions type name
 	/// </summary>
-	ErrorCodes &ErrorCode();
+	const ExceptionTypes Enumeral();
 
 	/// <summary>
-	/// Read/Write: The message associated with the error
+	/// Read: The class location string
 	/// </summary>
-	std::string &Message();
+	const std::string Location();
 
 	/// <summary>
-	/// Read/Write: The origin of the exception in the format Class
+	/// Read: The message associated with the error
 	/// </summary>
-	std::string &Origin();
+	const std::string Message();
+
+	/// <summary>
+	/// Read: The origin of the exception in the format Class
+	/// </summary>
+	const std::string Origin();
 };
 
 NAMESPACE_EXCEPTIONEND

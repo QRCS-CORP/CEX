@@ -10,7 +10,7 @@ NAMESPACE_DIGEST
 
 using Exception::CryptoDigestException;
 using Enumeration::Digests;
-using Common::ParallelOptions;
+using Enumeration::ErrorCodes;
 
 /// <summary>
 /// Hash Digest Interface

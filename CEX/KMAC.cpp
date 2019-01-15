@@ -1,14 +1,14 @@
 #include "KMAC.h"
-#include "ArrayUtils.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
+#include "ArrayTools.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 #include "Keccak.h"
 
 NAMESPACE_MAC
 
-using Utility::ArrayUtils;
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Utility::ArrayTools;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 const std::string KMAC::CLASS_NAME("KMAC");
 
@@ -25,7 +25,7 @@ KMAC::KMAC(ShakeModes ShakeModeType)
 		(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
 	m_msgLength(0),
 	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
-		throw CryptoMacException("KMAC:Ctor", "The SHAKE mode type can not ne none!"))
+		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type can not ne none!"), ErrorCodes::IllegalOperation))
 {
 	Scope();
 }
@@ -41,9 +41,9 @@ KMAC::~KMAC()
 		m_msgLength = 0;
 		m_shakeMode = ShakeModes::None;
 
-		IntUtils::ClearVector(m_distCode);
-		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearArray(m_msgBuffer);
+		IntegerTools::Clear(m_distCode);
+		IntegerTools::Clear(m_legalKeySizes);
+		IntegerTools::Clear(m_msgBuffer);
 	}
 }
 
@@ -66,12 +66,26 @@ const size_t KMAC::DistributionCodeMax()
 
 const Macs KMAC::Enumeral()
 {
-	return Macs::KMAC;
-}
+	Macs mname;
 
-const size_t KMAC::MacSize()
-{
-	return m_macSize;
+	if (m_shakeMode == ShakeModes::SHAKE1024)
+	{ 
+		mname = Macs::KMAC1024;
+	}
+	else if (m_shakeMode == ShakeModes::SHAKE512)
+	{
+		mname = Macs::KMAC512;
+	}
+	else if (m_shakeMode == ShakeModes::SHAKE256)
+	{
+		mname = Macs::KMAC256;
+	}
+	else
+	{
+		mname = Macs::KMAC128;
+	}
+
+	return mname;
 }
 
 const bool KMAC::IsInitialized()
@@ -86,12 +100,17 @@ std::vector<SymmetricKeySize> KMAC::LegalKeySizes() const
 
 const std::string KMAC::Name()
 {
-	return  CLASS_NAME + "-" + IntUtils::ToString(m_macSize);
+	return  CLASS_NAME + "-" + IntegerTools::ToString(m_macSize * 8);
 }
 
 const ShakeModes KMAC::ShakeMode()
 {
 	return m_shakeMode;
+}
+
+const size_t KMAC::TagSize()
+{
+	return m_macSize;
 }
 
 //~~~Public Functions~~~//
@@ -100,7 +119,11 @@ void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("KMAC:Compute", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+	}
+	if (Output.size() < TagSize())
+	{
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	Update(Input, 0, Input.size());
@@ -111,11 +134,11 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("KMAC:Finalize", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
-	if ((Output.size() - OutOffset) < MacSize())
+	if ((Output.size() - OutOffset) < TagSize())
 	{
-		throw CryptoMacException("KMAC:Finalize", "The Output buffer is too short!");
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	std::vector<byte> buf(sizeof(size_t) + 1);
@@ -125,11 +148,11 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 	if (m_msgLength != m_msgBuffer.size())
 	{
-		MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 	}
 
 	outLen = Output.size() - OutOffset;
-	outBits = ArrayUtils::RightEncode(buf, 0, outLen * 8);
+	outBits = ArrayTools::RightEncode(buf, 0, outLen * 8);
 
 	for (i = 0; i < outBits; i++)
 	{
@@ -140,7 +163,7 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	m_msgBuffer[m_msgLength] = DOMAIN_CODE;
 	m_msgBuffer[m_blockSize - 1] |= 128;
 
-	ArrayUtils::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
+	ArrayTools::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
 	Squeeze(m_kdfState, Output, OutOffset, static_cast<size_t>(outLen));
 
 	return outLen;
@@ -150,11 +173,11 @@ void KMAC::Initialize(ISymmetricKey &KeyParams)
 {
 	if (KeyParams.Key().size() < MIN_KEYSIZE)
 	{
-		throw CryptoMacException("KMAC:Initialize", "Key size is too small; should be a minimum of digest output size!");
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Key size is invalid; must be a legal key size!"), ErrorCodes::InvalidKey);
 	}
 	if (KeyParams.Info().size() > m_blockSize)
 	{
-		throw CryptoMacException("KMAC:Initialize", "The customization string must be less than or equal to the blocksize!");
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Info size is invalid; must be a legal info size!"), ErrorCodes::InvalidKey);
 	}
 
 	size_t keyLen = KeyParams.Key().size();
@@ -177,8 +200,8 @@ void KMAC::Initialize(ISymmetricKey &KeyParams)
 
 void KMAC::Reset()
 {
-	MemUtils::Clear(m_kdfState, 0, STATE_SIZE * sizeof(ulong));
-	MemUtils::Clear(m_msgBuffer, 0, BUFFER_SIZE);
+	MemoryTools::Clear(m_kdfState, 0, STATE_SIZE * sizeof(ulong));
+	MemoryTools::Clear(m_msgBuffer, 0, BUFFER_SIZE);
 	m_msgLength = 0;
 	m_isInitialized = false;
 }
@@ -193,11 +216,11 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("KMAC:Update", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException("KMAC:Update", "The Input buffer is too short!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
@@ -207,10 +230,10 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 			const size_t RMDLEN = m_blockSize - m_msgLength;
 			if (RMDLEN != 0)
 			{
-				MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			}
 
-			ArrayUtils::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
+			ArrayTools::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
 			Permute(m_kdfState);
 			m_msgLength = 0;
 			InOffset += RMDLEN;
@@ -220,7 +243,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 		// sequential loop through blocks
 		while (Length >= m_blockSize)
 		{
-			ArrayUtils::AbsorbBlock8to64(Input, InOffset, m_kdfState, m_blockSize);
+			ArrayTools::AbsorbBlock8to64(Input, InOffset, m_kdfState, m_blockSize);
 			Permute(m_kdfState);
 			InOffset += m_blockSize;
 			Length -= m_blockSize;
@@ -229,7 +252,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -246,9 +269,9 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 	size_t i;
 	ulong offset;
 
-	MemUtils::Clear(pad, 0, pad.size());
-	offset = ArrayUtils::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
-	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Name.size() * 8));
+	MemoryTools::Clear(pad, 0, pad.size());
+	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
+	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Name.size() * 8));
 
 	if (Name.size() != 0)
 	{
@@ -258,7 +281,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+					m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 				}
 
 				Permute(m_kdfState);
@@ -270,7 +293,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 		}
 	}
 
-	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
+	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
 
 	if (Customization.size() != 0)
 	{
@@ -280,7 +303,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+					m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 				}
 
 				Permute(m_kdfState);
@@ -292,12 +315,12 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 		}
 	}
 
-	MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
+	MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
 	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+		m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 	}
 
 	Permute(m_kdfState);
@@ -311,9 +334,9 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 	size_t i;
 	ulong offset;
 
-	MemUtils::Clear(pad, 0, pad.size());
-	offset = ArrayUtils::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
-	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Key.size() * 8));
+	MemoryTools::Clear(pad, 0, pad.size());
+	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
+	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Key.size() * 8));
 
 	if (Key.size() != 0)
 	{
@@ -323,7 +346,7 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+					m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 				}
 
 				Permute(m_kdfState);
@@ -335,12 +358,12 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 		}
 	}
 
-	MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
+	MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
 	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+		m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 	}
 
 	Permute(m_kdfState);
@@ -362,11 +385,13 @@ void KMAC::Scope()
 {
 	Reset();
 
-	m_legalKeySizes.resize(2);
-	// minimum seed size
-	m_legalKeySizes[0] = SymmetricKeySize(m_macSize, 0, 0);
-	// recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, 0, 0);
+	m_legalKeySizes.resize(3);
+	// minimum security is half the digest output size
+	m_legalKeySizes[0] = SymmetricKeySize((m_macSize / 2), 0, 0);
+	// best perf/sec mix, the digest output size
+	m_legalKeySizes[1] = SymmetricKeySize(m_macSize, 0, 0);
+	// max recommended key input; is two times the digest output size
+	m_legalKeySizes[2] = SymmetricKeySize(m_macSize * 2, 0, 0);
 }
 
 void KMAC::Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -379,7 +404,7 @@ void KMAC::Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size
 
 		for (i = 0; i < m_blockSize / 8; ++i)
 		{
-			IntUtils::Le64ToBytes(State[i], Output, OutOffset + (i * 8));
+			IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (i * 8));
 		}
 
 		OutOffset += m_blockSize;
@@ -392,14 +417,14 @@ void KMAC::Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size
 
 		for (i = 0; i < Length / 8; ++i)
 		{
-			IntUtils::Le64ToBytes(State[i], Output, OutOffset + (i * 8));
+			IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (i * 8));
 		}
 
 		Length -= i * 8;
 
 		if (Length > 0)
 		{
-			MemUtils::CopyFromValue(State[i], Output, OutOffset + (i * 8), Length);
+			MemoryTools::CopyFromValue(State[i], Output, OutOffset + (i * 8), Length);
 		}
 	}
 }

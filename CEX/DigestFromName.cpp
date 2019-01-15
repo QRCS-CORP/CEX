@@ -1,6 +1,7 @@
 #include "DigestFromName.h"
 #include "Blake512.h"
 #include "Blake256.h"
+#include "CryptoDigestException.h"
 #include "Keccak256.h"
 #include "Keccak512.h"
 #include "Keccak1024.h"
@@ -12,9 +13,16 @@
 
 NAMESPACE_HELPER
 
+using Exception::CryptoDigestException;
+using Enumeration::ErrorCodes;
+
 IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 {
-	IDigest* dgtPtr = nullptr;
+	using namespace Digest;
+
+	IDigest* dptr;
+
+	dptr = nullptr;
 
 	try
 	{
@@ -22,121 +30,129 @@ IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 		{
 			case Digests::Blake256:
 			{
-				dgtPtr = new Digest::Blake256(Parallel);
+				dptr = new Blake256(Parallel);
 				break;
 			}
 			case Digests::Blake512:
 			{
-				dgtPtr = new Digest::Blake512(Parallel);
+				dptr = new Blake512(Parallel);
 				break;
 			}
 			case Digests::Keccak256:
 			{
-				dgtPtr = new Digest::Keccak256(Parallel);
+				dptr = new Keccak256(Parallel);
 				break;
 			}
 			case Digests::Keccak512:
 			{
-				dgtPtr = new Digest::Keccak512(Parallel);
+				dptr = new Keccak512(Parallel);
 				break;
 			}
 			case Digests::Keccak1024:
 			{
-				dgtPtr = new Digest::Keccak1024(Parallel);
+				dptr = new Keccak1024(Parallel);
 				break;
 			}
 			case Digests::SHA256:
 			{
-				dgtPtr = new Digest::SHA256(Parallel);
+				dptr = new SHA256(Parallel);
 				break;
 			}
 			case Digests::SHA512:
 			{
-				dgtPtr = new Digest::SHA512(Parallel);
+				dptr = new SHA512(Parallel);
 				break;
 			}
 			case Digests::Skein256:
 			{
-				dgtPtr = new Digest::Skein256(Parallel);
+				dptr = new Skein256(Parallel);
 				break;
 			}
 			case Digests::Skein512:
 			{
-				dgtPtr = new Digest::Skein512(Parallel);
+				dptr = new Skein512(Parallel);
 				break;
 			}
 			case Digests::Skein1024:
 			{
-				dgtPtr = new Digest::Skein1024(Parallel);
+				dptr = new Skein1024(Parallel);
 				break;
 			}
 			default:
 			{
-				throw CryptoException("DigestFromName:GetInstance", "The digest is not recognized!");
+				throw CryptoException(std::string("DigestFromName"), std::string("GetInstance"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoDigestException &ex)
+	{
+		throw CryptoException("DigestFromName:GetInstance", "The digest is unavailable!", ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("DigestFromName:GetInstance", "The digest is unavailable!", std::string(ex.what()));
+		throw CryptoException("DigestFromName:GetInstance", "The digest has thrown an exception!", std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return dgtPtr;
+	return dptr;
 }
 
 size_t DigestFromName::GetBlockSize(Digests DigestType)
 {
-	size_t blkSize = 0;
+	size_t blen;
+
+	blen = 0;
 
 	switch (DigestType)
 	{
 		case Digests::Skein256:
 		{
-			blkSize = 32;
+			blen = 32;
 			break;
 		}
 		case Digests::Blake256:
 		case Digests::SHA256:
 		case Digests::Skein512:
 		{
-			blkSize = 64;
+			blen = 64;
 			break;
 		}
 		case Digests::Blake512:
 		case Digests::SHA512:
 		case Digests::Skein1024:
 		{
-			blkSize = 128;
+			blen = 128;
 			break;
 		}
 		case Digests::Keccak256:
 		{
-			blkSize = 136;
+			blen = 136;
 			break;
 		}
 		case Digests::Keccak512:
 		case Digests::Keccak1024:
 		{
-			blkSize = 72;
+			blen = 72;
 			break;
 		}
 		case Digests::None:
 		{
-			blkSize = 0;
+			blen = 0;
 			break;
 		}
 		default:
 		{
-			throw CryptoException("DigestFromName:GetBlockSize", "The digest type is not supported!");
+			throw CryptoException(std::string("DigestFromName"), std::string("GetBlockSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
 
-	return blkSize;
+	return blen;
 }
 
 size_t DigestFromName::GetDigestSize(Digests DigestType)
 {
-	size_t dgtSize = 0;
+	size_t dlen;
+
+	dlen = 0;
 
 	switch (DigestType)
 	{
@@ -145,7 +161,7 @@ size_t DigestFromName::GetDigestSize(Digests DigestType)
 		case Digests::SHA256:
 		case Digests::Skein256:
 		{
-			dgtSize = 32;
+			dlen = 32;
 			break;
 		}
 		case Digests::Blake512:
@@ -153,32 +169,34 @@ size_t DigestFromName::GetDigestSize(Digests DigestType)
 		case Digests::SHA512:
 		case Digests::Skein512:
 		{
-			dgtSize = 64;
+			dlen = 64;
 			break;
 		}
 		case Digests::Keccak1024:
 		case Digests::Skein1024:
 		{
-			dgtSize = 128;
+			dlen = 128;
 			break;
 		}
 		case Digests::None:
 		{
-			dgtSize = 0;
+			dlen = 0;
 			break;
 		}
 		default:
 		{
-			throw CryptoException("DigestFromName:GetDigestSize", "The digest type is not supported!");
+			throw CryptoException(std::string("DigestFromName"), std::string("GetDigestSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
 
-	return dgtSize;
+	return dlen;
 }
 
 size_t DigestFromName::GetPaddingSize(Digests DigestType)
 {
-	size_t padSize = 0;
+	size_t plen;
+
+	plen = 0;
 
 	switch (DigestType)
 	{
@@ -191,31 +209,31 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 		case Digests::Skein512:
 		case Digests::Skein1024:
 		{
-			padSize = 0;
+			plen = 0;
 			break;
 		}
 		case Digests::SHA256:
 		{
-			padSize = 9;
+			plen = 9;
 			break;
 		}
 		case Digests::SHA512:
 		{
-			padSize = 17;
+			plen = 17;
 			break;
 		}
 		case Digests::None:
 		{
-			padSize = 0;
+			plen = 0;
 			break;
 		}
 		default:
 		{
-			throw CryptoException("DigestFromName:GetPaddingSize", "The digest type is not supported!");
+			throw CryptoException(std::string("DigestFromName"), std::string("GetPaddingSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
 
-	return padSize;
+	return plen;
 }
 
 NAMESPACE_HELPEREND

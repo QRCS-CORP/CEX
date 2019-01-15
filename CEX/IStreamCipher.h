@@ -25,7 +25,7 @@
 #include "IMac.h"
 #include "ISymmetricKey.h"
 #include "ParallelOptions.h"
-#include "ParallelUtils.h"
+#include "ParallelTools.h"
 #include "StreamAuthenticators.h"
 #include "StreamCiphers.h"
 #include "SymmetricKeySize.h"
@@ -34,12 +34,12 @@ NAMESPACE_STREAM
 
 using Exception::CryptoAuthenticationFailure;
 using Exception::CryptoSymmetricCipherException;
+using Enumeration::ErrorCodes;
 using Mac::IMac;
-using Key::Symmetric::ISymmetricKey;
-using Common::ParallelOptions;
+using Cipher::ISymmetricKey;
 using Enumeration::StreamAuthenticators;
 using Enumeration::StreamCiphers;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// Stream Cipher virtual interface class
@@ -115,7 +115,7 @@ public:
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Read Only: The stream ciphers class name
+	/// Read Only: The stream ciphers implementation name
 	/// </summary>
 	virtual const std::string Name() = 0;
 

@@ -10,7 +10,7 @@
 #	endif
 #endif
 
-NAMESPACE_COMMON
+NAMESPACE_ROOT
 
 //~~~ Constructor~~~//
 
@@ -618,4 +618,4 @@ std::string CpuDetect::VendorString(std::array<uint, 4> &CpuInfo)
 	return std::string(vendId.data());
 }
 
-NAMESPACE_COMMONEND
+NAMESPACE_ROOTEND

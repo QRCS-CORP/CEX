@@ -2,8 +2,8 @@
 
 namespace Test
 {
+	const std::string SimdWrapperTest::CLASSNAME = "SymmetricKeyGeneratorTest";
 	const std::string SimdWrapperTest::DESCRIPTION = "Simd wrapper test; tests the output of SIMD wrapper functions.";
-	const std::string SimdWrapperTest::FAILURE = "FAILURE! ";
 	const std::string SimdWrapperTest::SUCCESS = "SUCCESS! All Simd wrapper tests have executed succesfully.";
 
 	SimdWrapperTest::SimdWrapperTest()
@@ -43,17 +43,17 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (TestException &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void SimdWrapperTest::OnProgress(std::string Data)
+	void SimdWrapperTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

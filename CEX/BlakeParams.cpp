@@ -1,8 +1,11 @@
 #include "BlakeParams.h"
-#include "CryptoDigestException.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_DIGEST
+
+using Enumeration::ErrorCodes;
+
+const std::string BlakeParams::CLASS_NAME("BlakeParams");
 
 BlakeParams::BlakeParams() :
 	m_dstCode(0),
@@ -33,11 +36,11 @@ BlakeParams::BlakeParams(byte OutputSize, byte TreeDepth, byte Fanout, byte Leaf
 {
 	if (OutputSize != 32 && OutputSize != 64)
 	{
-		throw Exception::CryptoDigestException("BlakeParams:Ctor", "The output size is invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The output size is invalid!"), ErrorCodes::IllegalOperation);
 	}
 	if (Fanout > 1 && InnerLength == 0 || Fanout == 1 && InnerLength != 0)
 	{
-		throw Exception::CryptoDigestException("BlakeParams:Ctor", "The fanout and leaf sizes are invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The fanout and leaf sizes are invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_dstCode.resize(DistributionCodeMax());
@@ -56,18 +59,16 @@ BlakeParams::BlakeParams(const std::vector<byte> &TreeArray)
 	m_outputSize(0),
 	m_reserved(0)
 {
-	CexAssert(TreeArray.size() == 32 || TreeArray.size() == 64, "The output size is invalid!");
-
 	if (TreeArray.size() != 32 && TreeArray.size() != 64)
 	{
-		throw Exception::CryptoDigestException("BlakeParams:Ctor", "The TreeArray buffer size is invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The TreeArray buffer size is invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	std::memcpy(&m_outputSize, &TreeArray[0], 1);
 	std::memcpy(&m_keyLen, &TreeArray[1], 1);
 	std::memcpy(&m_fanOut, &TreeArray[2], 1);
 	std::memcpy(&m_maxDepth, &TreeArray[3], 1);
-	m_leafSize = Utility::IntUtils::LeBytesTo32(TreeArray, 4);
+	m_leafSize = Utility::IntegerTools::LeBytesTo32(TreeArray, 4);
 	std::memcpy(&m_nodeOffset, &TreeArray[8], 1);
 	std::memcpy(&m_nodeDepth, &TreeArray[9], 1);
 	std::memcpy(&m_innerLen, &TreeArray[10], 1);
@@ -215,7 +216,7 @@ std::vector<byte> BlakeParams::ToBytes()
 	std::memcpy(&trs[1], &m_keyLen, 1);
 	std::memcpy(&trs[2], &m_fanOut, 1);
 	std::memcpy(&trs[3], &m_maxDepth, 1);
-	Utility::IntUtils::Le32ToBytes(m_leafSize, trs, 4);
+	Utility::IntegerTools::Le32ToBytes(m_leafSize, trs, 4);
 	std::memcpy(&trs[8], &m_nodeOffset, 1);
 	std::memcpy(&trs[9], &m_nodeDepth, 1);
 	std::memcpy(&trs[10], &m_innerLen, 1);

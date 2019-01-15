@@ -1,5 +1,5 @@
 #include "Poly1305Test.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/Poly1305.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
@@ -7,14 +7,14 @@
 namespace Test
 {
 	using Mac::CryptoMacException;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Mac::Poly1305;
 	using Prng::SecureRandom;
-	using Key::Symmetric::SymmetricKey;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
 
+	const std::string Poly1305Test::CLASSNAME = "Poly1305Test";
 	const std::string Poly1305Test::DESCRIPTION = "Poly1305 MAC Generator Tests.";
-	const std::string Poly1305Test::FAILURE = "FAILURE! ";
 	const std::string Poly1305Test::SUCCESS = "SUCCESS! Poly1305 tests have executed succesfully.";
 
 	Poly1305Test::Poly1305Test()
@@ -29,9 +29,9 @@ namespace Test
 
 	Poly1305Test::~Poly1305Test()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_message);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_message);
 	}
 
 	const std::string Poly1305Test::Description()
@@ -86,18 +86,18 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void Poly1305Test::Exception()
 	{
 		Poly1305 gen;
-		Key::Symmetric::SymmetricKeySize ks = gen.LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[0];
 
 		// test initialization key input-size
 		try
@@ -107,7 +107,7 @@ namespace Test
 
 			gen.Initialize(k);
 
-			throw TestException(std::string("Poly1305"), std::string("Exception: Exception handling failure! -PE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -PE1"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -125,7 +125,7 @@ namespace Test
 
 			gen.Compute(msg, code);
 
-			throw TestException(std::string("Poly1305"), std::string("Exception: Exception handling failure! -PE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -PE2"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -143,7 +143,7 @@ namespace Test
 
 			gen.Finalize(code, 0);
 
-			throw TestException(std::string("Poly1305"), std::string("Exception: Exception handling failure! -PE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -PE3"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -156,7 +156,7 @@ namespace Test
 		// output size check -1
 		try
 		{
-			std::vector<byte> code(gen.MacSize() - 1);
+			std::vector<byte> code(gen.TagSize() - 1);
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> msg(1);
 			SymmetricKey kp(key);
@@ -164,7 +164,7 @@ namespace Test
 			gen.Initialize(kp);
 			gen.Compute(msg, code);
 
-			throw TestException(std::string("Poly1305"), std::string("Exception: Exception handling failure! -PE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -PE4"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -177,7 +177,7 @@ namespace Test
 		// output size check -2
 		try
 		{
-			std::vector<byte> code(gen.MacSize() - 1);
+			std::vector<byte> code(gen.TagSize() - 1);
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> msg(1);
 			SymmetricKey kp(key);
@@ -186,7 +186,7 @@ namespace Test
 			gen.Update(msg, 0, 1);
 			gen.Finalize(code, 0);
 
-			throw TestException(std::string("Poly1305"), std::string("Exception: Exception handling failure! -PE5"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -PE5"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -299,7 +299,7 @@ namespace Test
 
 	void Poly1305Test::Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
-		std::vector<byte> code(Generator->MacSize());
+		std::vector<byte> code(Generator->TagSize());
 		SymmetricKey kp(Key);
 
 		Generator->Initialize(kp);
@@ -308,11 +308,11 @@ namespace Test
 
 		if (code != Expected)
 		{
-			throw TestException(std::string("Poly1305"), std::string("Poly1305Compare: Output do not match the vector! -PK1"));
+			throw TestException(std::string("Kat"), Generator->Name(), std::string("Output do not match the vector! -PK1"));
 		}
 	}
 
-	void Poly1305Test::OnProgress(std::string Data)
+	void Poly1305Test::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -322,8 +322,8 @@ namespace Test
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
-		std::vector<byte> otp1(Generator->MacSize());
-		std::vector<byte> otp2(Generator->MacSize());
+		std::vector<byte> otp1(Generator->TagSize());
+		std::vector<byte> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -333,8 +333,8 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 			SymmetricKey kp(key);
 
 			// generate the mac
@@ -346,7 +346,7 @@ namespace Test
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("Poly1305"), std::string("Reset: Returns a different array after reset! -PP1"));
+				throw TestException(std::string("Params"), Generator->Name(), std::string("Returns a different array after reset! -PP1"));
 			}
 		}
 	}
@@ -356,8 +356,8 @@ namespace Test
 		const uint MINMSG = 1;
 		const uint MAXMSG = 16384;
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
-		std::vector<byte> code1(Generator->MacSize());
-		std::vector<byte> code2(Generator->MacSize());
+		std::vector<byte> code1(Generator->TagSize());
+		std::vector<byte> code2(Generator->TagSize());
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
 		SecureRandom rnd;
@@ -370,8 +370,8 @@ namespace Test
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXMSG, MINMSG));
 			msg.resize(INPLEN);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 			SymmetricKey kp(key);
 
 			// compute
@@ -384,7 +384,7 @@ namespace Test
 
 			if (code1 != code2)
 			{
-				throw TestException(std::string("Poly1305"), std::string("Stress: MAC output is not equal! -PS1"));
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("MAC output is not equal! -PS1"));
 			}
 		}
 	}

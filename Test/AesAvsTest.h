@@ -6,7 +6,7 @@
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::IBlockCipher;
+	using Cipher::Block::IBlockCipher;
 
     /// <summary>
     /// Tests the Rijndael implementation using the NIST AESAVS vectors.
@@ -16,8 +16,8 @@ namespace Test
     {
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
@@ -56,8 +56,8 @@ namespace Test
         
     private:
 
-		void Compare(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
-		void OnProgress(std::string Data);
+		void Kat(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
+		void OnProgress(const std::string &Data);
     };
 }
 

@@ -29,8 +29,6 @@
 
 NAMESPACE_DILITHIUM
 
-using Key::Asymmetric::AsymmetricKey;
-using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::DilithiumParameters;
 using Kdf::IKdf;
 

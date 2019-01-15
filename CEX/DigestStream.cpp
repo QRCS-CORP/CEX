@@ -2,12 +2,16 @@
 
 NAMESPACE_PROCESSING
 
+using Exception::ErrorCodes;
+
+const std::string DigestStream::CLASS_NAME("MacStream");
+
 //~~~Constructor~~~//
 
 DigestStream::DigestStream(Digests DigestType, bool Parallel)
 	:
 	m_digestEngine(DigestType != Digests::None ? DigestFromName::GetInstance(DigestType, Parallel) :
-		throw CryptoProcessingException("DigestStream:CTor", "The Digest type can not be none!")),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isParallel(Parallel),
@@ -18,7 +22,7 @@ DigestStream::DigestStream(Digests DigestType, bool Parallel)
 DigestStream::DigestStream(IDigest* Digest)
 	:
 	m_digestEngine(Digest != nullptr ? Digest :
-		throw CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!")),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest can not be null!"), ErrorCodes::IllegalOperation)),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isParallel(m_digestEngine->IsParallel()),

@@ -5,7 +5,9 @@
 
 NAMESPACE_PRNG
 
-// TODO: needs review and uniform-distribution testing
+using Utility::MemoryTools;
+
+const std::string SecureRandom::CLASS_NAME("SecureRandom");
 
 //~~~Constructor~~~//
 
@@ -16,11 +18,11 @@ SecureRandom::SecureRandom(Prngs RngType, Providers ProviderType, Digests Digest
 	m_digestType((DigestType == Digests::None && RngType != Prngs::BCR) ? Digests::SHA256 : DigestType),
 	m_isDestroyed(false),
 	m_providerType(ProviderType != Providers::None ? ProviderType : 
-		throw CryptoRandomException("SecureRandom:CTor", "The provider type can not be none!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_rndBuffer(m_bufferSize),
 	m_rngGeneratorType(RngType != Prngs::None ? RngType :
-		throw CryptoRandomException("SecureRandom:CTor", "The engine type can not be none!")),
-	m_rngEngine(Helper::PrngFromName::GetInstance(m_rngGeneratorType, m_providerType, m_digestType))
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Provider type can not be none!"), ErrorCodes::IllegalOperation)),
+	m_rngEngine(Helper::PrngFromName::GetInstance(m_rngGeneratorType, m_providerType))
 {
 	Reset();
 }
@@ -36,13 +38,20 @@ SecureRandom::~SecureRandom()
 		m_providerType = Providers::None;
 		m_rngGeneratorType = Prngs::None;
 
-		Utility::IntUtils::ClearVector(m_rndBuffer);
+		Utility::IntegerTools::Clear(m_rndBuffer);
 
 		if (m_rngEngine != nullptr)
 		{
 			m_rngEngine.reset(nullptr);
 		}
 	}
+}
+
+//~~~Accessors~~~//
+
+const std::string SecureRandom::Name()
+{
+	return m_rngEngine->Name();
 }
 
 //~~~Public Functions~~~//
@@ -54,7 +63,7 @@ void SecureRandom::Fill(std::vector<ushort> &Output, size_t Offset, size_t Eleme
 	const size_t BUFLEN = Elements * sizeof(ushort);
 	std::vector<byte> buf(BUFLEN);
 	Generate(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+	MemoryTools::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
@@ -64,7 +73,7 @@ void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Element
 	const size_t BUFLEN = Elements * sizeof(uint);
 	std::vector<byte> buf(BUFLEN);
 	Generate(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+	MemoryTools::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 void SecureRandom::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
@@ -74,7 +83,7 @@ void SecureRandom::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elemen
 	const size_t BUFLEN = Elements * sizeof(ulong);
 	std::vector<byte> buf(BUFLEN);
 	Generate(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+	MemoryTools::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 std::vector<byte> SecureRandom::Generate(size_t Length)
@@ -90,7 +99,7 @@ void SecureRandom::Generate(std::vector<byte> &Output, size_t Offset, size_t Len
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	std::vector<byte> rnd = Generate(Length);
-	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
+	MemoryTools::Copy(rnd, 0, Output, Offset, Length);
 }
 
 void SecureRandom::Generate(std::vector<byte> &Output)
@@ -103,7 +112,7 @@ void SecureRandom::Generate(std::vector<byte> &Output)
 		// copy remaining bytes
 		if (bufSize != 0)
 		{
-			Utility::MemUtils::Copy(m_rndBuffer, m_bufferIndex, Output, 0, bufSize);
+			MemoryTools::Copy(m_rndBuffer, m_bufferIndex, Output, 0, bufSize);
 		}
 
 		size_t rmd = Output.size() - bufSize;
@@ -115,13 +124,13 @@ void SecureRandom::Generate(std::vector<byte> &Output)
 
 			if (rmd > m_rndBuffer.size())
 			{
-				Utility::MemUtils::Copy(m_rndBuffer, 0, Output, bufSize, m_rndBuffer.size());
+				MemoryTools::Copy(m_rndBuffer, 0, Output, bufSize, m_rndBuffer.size());
 				bufSize += m_rndBuffer.size();
 				rmd -= m_rndBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy(m_rndBuffer, 0, Output, bufSize, rmd);
+				MemoryTools::Copy(m_rndBuffer, 0, Output, bufSize, rmd);
 				m_bufferIndex = rmd;
 				rmd = 0;
 			}
@@ -129,7 +138,7 @@ void SecureRandom::Generate(std::vector<byte> &Output)
 	}
 	else
 	{
-		Utility::MemUtils::Copy(m_rndBuffer, m_bufferIndex, Output, 0, Output.size());
+		MemoryTools::Copy(m_rndBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -153,7 +162,7 @@ double SecureRandom::NextDouble()
 short SecureRandom::NextInt16()
 {
 	short x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(short)), 0, x, sizeof(short));
+	MemoryTools::CopyToValue(Generate(sizeof(short)), 0, x, sizeof(short));
 
 	return x;
 }
@@ -162,7 +171,7 @@ short SecureRandom::NextInt16(short Maximum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt16", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt16"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 
 	const short SMPMAX = static_cast<short>(std::numeric_limits<short>::max() - (std::numeric_limits<short>::max() % Maximum));
@@ -183,11 +192,11 @@ short SecureRandom::NextInt16(short Maximum, short Minimum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt16", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt16"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 	if (Maximum < Minimum)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt16", "Maximum can not be less than Minimum!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt16"), std::string("Maximum can not be less than Minimum!"), ErrorCodes::IllegalOperation);
 	}
 
 	const short SMPTHR = (Maximum - Minimum + 1);
@@ -208,7 +217,7 @@ short SecureRandom::NextInt16(short Maximum, short Minimum)
 ushort SecureRandom::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -217,7 +226,7 @@ ushort SecureRandom::NextUInt16(ushort Maximum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt16", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt16"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 
 	const ushort SMPMAX = static_cast<ushort>(std::numeric_limits<ushort>::max() - (std::numeric_limits<ushort>::max() % Maximum));
@@ -238,11 +247,11 @@ ushort SecureRandom::NextUInt16(ushort Maximum, ushort Minimum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt16", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt16"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 	if (Maximum < Minimum)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt16", "Maximum can not be less than Minimum!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt16"), std::string("Maximum can not be less than Minimum!"), ErrorCodes::IllegalOperation);
 	}
 
 	const ushort SMPTHR = (Maximum - Minimum + 1);
@@ -263,7 +272,7 @@ ushort SecureRandom::NextUInt16(ushort Maximum, ushort Minimum)
 int SecureRandom::NextInt32()
 {
 	int x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(int)), 0, x, sizeof(int));
+	MemoryTools::CopyToValue(Generate(sizeof(int)), 0, x, sizeof(int));
 
 	return x;
 }
@@ -272,7 +281,7 @@ int SecureRandom::NextInt32(int Maximum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt32", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt32"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 
 	const int SMPMAX = static_cast<int>(std::numeric_limits<int>::max() - (std::numeric_limits<int>::max() % Maximum));
@@ -293,11 +302,11 @@ int SecureRandom::NextInt32(int Maximum, int Minimum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt32", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt32"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 	if (Maximum < Minimum)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt32", "Maximum can not be less than Minimum!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt32"), std::string("Maximum can not be less than Minimum!"), ErrorCodes::IllegalOperation);
 	}
 
 	const int SMPTHR = (Maximum - Minimum + 1);
@@ -318,7 +327,7 @@ int SecureRandom::NextInt32(int Maximum, int Minimum)
 uint SecureRandom::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -327,7 +336,7 @@ uint SecureRandom::NextUInt32(uint Maximum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt32", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt32"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 
 	const uint SMPMAX = static_cast<uint>(std::numeric_limits<uint>::max() - (std::numeric_limits<uint>::max() % Maximum));
@@ -348,11 +357,11 @@ uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt32", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt32"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 	if (Maximum < Minimum)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt32", "Maximum can not be less than Minimum!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt32"), std::string("Maximum can not be less than Minimum!"), ErrorCodes::IllegalOperation);
 	}
 
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
@@ -375,7 +384,7 @@ uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 long SecureRandom::NextInt64()
 {
 	long x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(long)), 0, x, sizeof(long));
+	MemoryTools::CopyToValue(Generate(sizeof(long)), 0, x, sizeof(long));
 
 	return x;
 }
@@ -384,7 +393,7 @@ long SecureRandom::NextInt64(long Maximum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt64", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt64"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 
 	const long SMPMAX = static_cast<long>(std::numeric_limits<long>::max() - (std::numeric_limits<long>::max() % Maximum));
@@ -405,11 +414,11 @@ long SecureRandom::NextInt64(long Maximum, long Minimum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt64", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt64"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 	if (Maximum < Minimum)
 	{
-		throw CryptoRandomException("SecureRandom:NextInt64", "Maximum can not be less than Minimum!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextInt64"), std::string("Maximum can not be less than Minimum!"), ErrorCodes::IllegalOperation);
 	}
 
 	const long SMPTHR = (Maximum - Minimum + 1);
@@ -430,7 +439,7 @@ long SecureRandom::NextInt64(long Maximum, long Minimum)
 ulong SecureRandom::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }
@@ -439,7 +448,7 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt64", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt64"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 
 	const ulong SMPMAX = static_cast<ulong>(std::numeric_limits<ulong>::max() - (std::numeric_limits<ulong>::max() % Maximum));
@@ -460,11 +469,11 @@ ulong SecureRandom::NextUInt64(ulong Maximum, ulong Minimum)
 {
 	if (Maximum < 1)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt64", "Maximum can not be zero!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt64"), std::string("Maximum can not be zero!"), ErrorCodes::IllegalOperation);
 	}
 	if (Maximum < Minimum)
 	{
-		throw CryptoRandomException("SecureRandom:NextUInt64", "Maximum can not be less than Minimum!");
+		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt64"), std::string("Maximum can not be less than Minimum!"), ErrorCodes::IllegalOperation);
 	}
 
 	const ulong SMPTHR = (Maximum - Minimum + 1);

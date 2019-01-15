@@ -40,7 +40,7 @@
 
 NAMESPACE_DIGEST
 
-using Key::Symmetric::ISymmetricKey;
+using Cipher::ISymmetricKey;
 
 /// <summary>
 /// An implementation of the Blake2B and Blake2BP digests with a 512 bit digest output size

@@ -293,6 +293,16 @@ namespace Test
 		}
 	}
 
+	void TestUtils::Print(const std::string &Data)
+	{
+		std::cout << Data << std::endl;
+	}
+
+	void TestUtils::PrintHex(byte* Data, size_t Size)
+	{
+		std::cout << ToHex(Data, Size);
+	}
+
 	std::string TestUtils::RandomReadableString(size_t Length)
 	{
 		std::vector<byte> fill(1);
@@ -322,7 +332,7 @@ namespace Test
 
 		if (!ifs || !ifs.is_open())
 		{
-			throw TestException(std::string("Could not open the KAT file!"));
+			throw TestException(std::string("RandomReadableString"), FilePath, std::string("Could not open the KAT file!"));
 		}
 		else
 		{
@@ -340,7 +350,7 @@ namespace Test
 			}
 			else
 			{
-				throw TestException(std::string("The KAT file is empty!"));
+				throw TestException(std::string("RandomReadableString"), FilePath, std::string("The KAT file is empty!"));
 			}
 		}
 

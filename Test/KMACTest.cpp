@@ -1,6 +1,6 @@
 #include "KMACTest.h"
 #include "../CEX/KMAC.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 
@@ -8,14 +8,14 @@ namespace Test
 {
 	using Exception::CryptoMacException;
 	using Mac::KMAC;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 	using Enumeration::ShakeModes;
-	using Key::Symmetric::SymmetricKey;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
 
+	const std::string KMACTest::CLASSNAME = "KMACTest";
 	const std::string KMACTest::DESCRIPTION = "SP800-185 Test Vectors for KMAC-128 and KMAC-256.";
-	const std::string KMACTest::FAILURE = "FAILURE! ";
 	const std::string KMACTest::SUCCESS = "SUCCESS! All KMAC tests have executed succesfully.";
 
 	KMACTest::KMACTest()
@@ -31,10 +31,10 @@ namespace Test
 
 	KMACTest::~KMACTest()
 	{
-		IntUtils::ClearVector(m_custom);
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_message);
+		IntegerTools::Clear(m_custom);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_message);
 	}
 
 	const std::string KMACTest::Description()
@@ -99,11 +99,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -113,9 +113,9 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			KMAC mac(ShakeModes::None);
+			KMAC gen(ShakeModes::None);
 
-			throw TestException(std::string("KMAC"), std::string("Exception: Exception handling failure! -KE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -KE1"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -128,13 +128,13 @@ namespace Test
 		// test initialization
 		try
 		{
-			KMAC mac(ShakeModes::SHAKE128);
+			KMAC gen(ShakeModes::SHAKE128);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
-			mac.Initialize(kp);
+			gen.Initialize(kp);
 
-			throw TestException(std::string("KMAC"), std::string("Exception: Exception handling failure! -KE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -KE3"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -147,12 +147,12 @@ namespace Test
 		// test finalize state
 		try
 		{
-			KMAC mac(ShakeModes::SHAKE128);
-			std::vector<byte> code(mac.MacSize());
+			KMAC gen(ShakeModes::SHAKE128);
+			std::vector<byte> code(gen.TagSize());
 			// generator was not initialized
-			mac.Finalize(code, 0);
+			gen.Finalize(code, 0);
 
-			throw TestException(std::string("KMAC"), std::string("Exception: Exception handling failure! -KE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -KE4"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -226,11 +226,11 @@ namespace Test
 
 		if (Expected != code)
 		{
-			throw TestException(std::string("KMAC"), std::string("KAT: Expected values don't match! -KK1"));
+			throw TestException(std::string("Kat"), Generator->Name(), std::string("Expected values don't match! -KK1"));
 		}
 	}
 
-	void KMACTest::OnProgress(std::string Data)
+	void KMACTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -240,8 +240,8 @@ namespace Test
 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
-		std::vector<byte> otp1(Generator->MacSize());
-		std::vector<byte> otp2(Generator->MacSize());
+		std::vector<byte> otp1(Generator->TagSize());
+		std::vector<byte> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -251,8 +251,8 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 			SymmetricKey kp(key);
 
 			// generate the mac
@@ -264,7 +264,7 @@ namespace Test
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("KMAC"), std::string("Reset: Returns a different array after reset! -KP1"));
+				throw TestException(std::string("Params"), Generator->Name(), std::string("Returns a different array after reset! -KP1"));
 			}
 		}
 	}
@@ -274,7 +274,7 @@ namespace Test
 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
-		std::vector<byte> otp(Generator->MacSize());
+		std::vector<byte> otp(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -286,8 +286,8 @@ namespace Test
 			{
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
-				IntUtils::Fill(key, 0, key.size(), rnd);
-				IntUtils::Fill(msg, 0, msg.size(), rnd);
+				IntegerTools::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(msg, 0, msg.size(), rnd);
 				SymmetricKey kp(key);
 
 				// generate with the kdf
@@ -295,9 +295,9 @@ namespace Test
 				Generator->Compute(msg, otp);
 				Generator->Reset();
 			}
-			catch (...)
+			catch (std::exception const&)
 			{
-				throw TestException(std::string("KMAC"), std::string("Stress: The generator has thrown an exception! -KS1"));
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("The generator has thrown an exception! -KS1"));
 			}
 		}
 	}

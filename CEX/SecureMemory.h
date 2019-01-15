@@ -20,12 +20,12 @@
 #	include <windows.h>
 #endif
 
-NAMESPACE_COMMON
+NAMESPACE_ROOT
 
 using Exception::CryptoException;
 
 /// <summary>
-/// 
+/// A secure raw memory utilities class
 /// </summary>
 class SecureMemory
 {
@@ -40,7 +40,7 @@ public:
 	/// <param name="Length">The number of bytes in the allocatation request</param>
 	/// 
 	/// <returns>The number of bytes allocated, zero for allocation failure</returns>
-	static size_t Allocate(void* Pointer, size_t Length);
+	static void* Allocate(size_t Length);
 
 	/// <summary>
 	/// Securely erase an array of data
@@ -73,5 +73,5 @@ public:
 	static size_t PageSize();
 };
 
-NAMESPACE_COMMONEND
+NAMESPACE_ROOTEND
 #endif

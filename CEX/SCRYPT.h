@@ -35,7 +35,6 @@ NAMESPACE_KDF
 
 using Enumeration::Digests;
 using Digest::IDigest;
-using Common::ParallelOptions;
 using Enumeration::SHA2Digests;
 
 /// <summary>

@@ -4,7 +4,7 @@
 #include "CexConfig.h"
 #include "DilithiumParameters.h"
 #include "IPrng.h"
-#include "MemUtils.h"
+#include "MemoryTools.h"
 #include "SecureRandom.h"
 #include "SHAKE.h"
 
@@ -12,8 +12,8 @@ NAMESPACE_DILITHIUM
 
 using Enumeration::DilithiumParameters;
 using Kdf::SHAKE;
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 /// <summary>
 /// The Dilithium support class
@@ -144,7 +144,7 @@ private:
 
 		~PolyVec()
 		{
-			IntUtils::ClearVector(vec);
+			IntegerTools::Clear(vec);
 		}
 
 		const size_t size()

@@ -35,7 +35,6 @@ NAMESPACE_MAC
 
 using Enumeration::Digests;
 using Digest::IDigest;
-using Common::ParallelOptions;
 using Enumeration::SHA2Digests;
 
 /// <summary>
@@ -185,10 +184,10 @@ public:
 	/// <summary>
 	/// Read Only: Size of returned mac in bytes
 	/// </summary>
-	const size_t MacSize() override;
+	const size_t TagSize() override;
 
 	/// <summary>
-	/// Read Only: Mac generators class name
+	/// Read Only: Mac generators implementation name
 	/// </summary>
 	const std::string Name() override;
 

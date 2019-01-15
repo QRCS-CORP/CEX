@@ -40,9 +40,8 @@ NAMESPACE_DRBG
 
 using Enumeration::BlockCiphers;
 using Enumeration::BlockCipherExtensions;
-using Cipher::Symmetric::Block::IBlockCipher;
+using Cipher::Block::IBlockCipher;
 using Kdf::IKdf;
-using Common::ParallelOptions;
 
 /// <summary>
 /// An implementation of a Block cipher Counter mode Generator DRBG

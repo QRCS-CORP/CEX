@@ -1,7 +1,7 @@
 #include "SHA2Test.h"
 #include "../CEX/CpuDetect.h"
-#include "../CEX/IntUtils.h"
-#include "../CEX/MemUtils.h"
+#include "../CEX/IntegerTools.h"
+#include "../CEX/MemoryTools.h"
 #include "../CEX/SHA2.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SHA512.h"
@@ -19,8 +19,8 @@
 namespace Test
 {
 	using Exception::CryptoDigestException;
-	using Utility::IntUtils;
-	using Utility::MemUtils;
+	using Utility::IntegerTools;
+	using Utility::MemoryTools;
 	using Prng::SecureRandom;
 #if defined(__AVX2__)
 	using Numeric::UInt256;
@@ -32,8 +32,8 @@ namespace Test
 #endif
 	using namespace Digest;
 
+	const std::string SHA2Test::CLASSNAME = "SHA2Test";
 	const std::string SHA2Test::DESCRIPTION = "Tests SHA-2 256/512 with NIST KAT vectors.";
-	const std::string SHA2Test::FAILURE = "FAILURE! ";
 	const std::string SHA2Test::SUCCESS = "SUCCESS! All SHA-2 tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -50,8 +50,8 @@ namespace Test
 
 	SHA2Test::~SHA2Test()
 	{
-		IntUtils::ClearVector(m_exp256);
-		IntUtils::ClearVector(m_exp512);
+		IntegerTools::Clear(m_exp256);
+		IntegerTools::Clear(m_exp512);
 		(m_message);
 	}
 
@@ -73,7 +73,7 @@ namespace Test
 	{
 		try
 		{
-			Common::CpuDetect detect;
+			CpuDetect detect;
 
 			Exception();
 			OnProgress(std::string("SHA2Test: Passed SHA2-256/512 exception handling tests.."));
@@ -131,11 +131,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -148,7 +148,7 @@ namespace Test
 			SHA2Params params(32, 32, 99);
 			SHA256 dgt(params);
 
-			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE1"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE1"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -165,7 +165,7 @@ namespace Test
 			SHA2Params params(64, 64, 99);
 			SHA512 dgt(params);
 
-			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE2"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE2"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -182,7 +182,7 @@ namespace Test
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
-			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE3"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE3"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -199,7 +199,7 @@ namespace Test
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
-			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE4"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE4"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -219,7 +219,7 @@ namespace Test
 
 		if (Expected != code)
 		{
-			throw TestException(std::string("SHA2: Expected hash is not equal!"));
+			throw TestException(std::string("Kat"), Digest->Name(), std::string("Expected hash is not equal!"));
 		}
 
 		code.clear();
@@ -228,7 +228,7 @@ namespace Test
 
 		if (Expected != code)
 		{
-			throw TestException(std::string("SHA2: Expected hash is not equal!"));
+			throw TestException(std::string("Kat"), Digest->Name(), std::string("Expected hash is not equal!"));
 		}
 	}
 
@@ -249,7 +249,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
 			msg.resize(INPLEN);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 
 			try
 			{
@@ -270,9 +270,9 @@ namespace Test
 				Digest->ParallelMaxDegree(PRLDGR);
 				Digest->ParallelProfile().ParallelBlockSize() = PRLLEN;
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Parallel: Parallel integrity test has failed! -BP1"));
+				throw TestException(std::string("Parallel"), Digest->Name(), std::string("Parallel integrity test has failed! -BP1"));
 			}
 		}
 	}
@@ -283,15 +283,15 @@ namespace Test
 		std::array<uint, 8> state1;
 		std::array<uint, 8> state2;
 
-		MemUtils::Clear(state1, 0, 8 * sizeof(uint));
-		MemUtils::Clear(state2, 0, 8 * sizeof(uint));
+		MemoryTools::Clear(state1, 0, 8 * sizeof(uint));
+		MemoryTools::Clear(state2, 0, 8 * sizeof(uint));
 
 		SHA2::PermuteR64P512C(input, 0, state1);
 		SHA2::PermuteR64P512U(input, 0, state2);
 
 		if (state1 != state2)
 		{
-			throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
+			throw TestException(std::string("PermutationR64"), std::string("PermuteR64P512"), std::string("Permutation output is not equal!"));
 		}
 
 #if defined(__AVX2__)
@@ -302,13 +302,13 @@ namespace Test
 		SHA2::PermuteR64P8x512H(input256, 0, state256);
 
 		std::vector<uint> state256ul(32);
-		MemUtils::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
+		MemoryTools::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
 			if (state256ul[i] != state1[i / 8])
 			{
-				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
+				throw TestException(std::string("PermutationR64"), std::string("PermuteR64P8x512H"), std::string("Permutation output is not equal!"));
 			}
 		}
 
@@ -322,13 +322,13 @@ namespace Test
 		SHA2::PermuteR64P16x512H(input512, 0, state512);
 
 		std::vector<uint> state512ul(64);
-		MemUtils::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
+		MemoryTools::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
 			if (state512ul[i] != state1[i / 16])
 			{
-				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
+				throw TestException(std::string("PermutationR64"), std::string("PermuteR64P16x512H"), std::string("Permutation output is not equal!"));
 			}
 		}
 
@@ -349,7 +349,7 @@ namespace Test
 
 		if (state1 != state2)
 		{
-			throw TestException(std::string("Sha2 Permutation: Permutation output is not equal! -SP1"));
+			throw TestException(std::string("PermutationR80"), std::string("PermuteR80P1024"), std::string("Permutation output is not equal! -SP1"));
 		}
 
 #if defined(__AVX2__)
@@ -360,13 +360,13 @@ namespace Test
 		SHA2::PermuteR80P4x1024H(input256, 0, state256);
 
 		std::vector<ulong> state256ull(32);
-		MemUtils::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
+		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
 			if (state256ull[i] != state1[i / 4])
 			{
-				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal! -SP2"));
+				throw TestException(std::string("PermutationR80"), std::string("PermuteR80P4x1024H"), std::string("Permutation output is not equal! -SP2"));
 			}
 		}
 
@@ -380,13 +380,13 @@ namespace Test
 		SHA2::PermuteR80P8x1024H(input512, 0, state512);
 
 		std::vector<ulong> state512ull(64);
-		MemUtils::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
+		MemoryTools::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
 			if (state512ull[i] != state1[i / 8])
 			{
-				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal! -SP3"));
+				throw TestException(std::string("PermutationR80"), std::string("PermuteR80P8x1024H"), std::string("Permutation output is not equal! -SP3"));
 			}
 		}
 
@@ -410,7 +410,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
 			msg.resize(INPLEN);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 
 			try
 			{
@@ -420,14 +420,14 @@ namespace Test
 				Digest->Update(msg, 0, msg.size());
 				Digest->Finalize(code2, 0);
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Stress: The digest has thrown an exception! -SS1"));
+				throw TestException(std::string("Stress"), Digest->Name(), std::string("The digest has thrown an exception! -SS1"));
 			}
 
 			if (code1 != code2)
 			{
-				throw TestException(std::string("Stress: Hash output is not equal! -SS2"));
+				throw TestException(std::string("Stress"), Digest->Name(), std::string("Hash output is not equal! -SS2"));
 			}
 		}
 	}
@@ -443,7 +443,7 @@ namespace Test
 
 		if (!tree1.Equals(tree2))
 		{
-			throw std::string(std::string("SHA2Test: Tree parameters test failed! -ST1"));
+			throw TestException(std::string("TreeParams"), std::string("SHA2Params"), std::string("Tree parameters test failed! -ST1"));
 		}
 
 		std::vector<byte> code2(20, 7);
@@ -453,7 +453,7 @@ namespace Test
 
 		if (!tree3.Equals(tree4))
 		{
-			throw std::string("SHA2Test: Tree parameters test failed! -ST2");
+			throw TestException(std::string("TreeParams"), std::string("SHA2Params"), "Tree parameters test failed! -ST2");
 		}
 	}
 
@@ -491,7 +491,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void SHA2Test::OnProgress(std::string Data)
+	void SHA2Test::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

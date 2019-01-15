@@ -12,8 +12,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
@@ -54,7 +54,7 @@ namespace Test
 		void CSPGenerateFile(std::string FilePath, size_t FileSize);
 		void ECPGenerateFile(std::string FilePath, size_t FileSize);
 		void RDPGenerateFile(std::string FilePath, size_t FileSize);
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

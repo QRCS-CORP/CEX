@@ -2,27 +2,23 @@
 #include "BlockCiphers.h"
 #include "BCR.h"
 #include "CpuDetect.h"
+#include "CryptoRandomException.h"
+#include "CSR.h"
 #include "HCR.h"
 #include "SHA2Digests.h"
 
 NAMESPACE_HELPER
 
-IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType, Digests DigestType)
-{
-	if (PrngType == Prngs::None)
-	{
-		CryptoException("PrngFromName:GetPrng", "Prng type can not be none!");
-	}
-	if (ProviderType == Providers::None)
-	{
-		CryptoException("PrngFromName:GetPrng", "Prng type can not be none!");
-	}
-	if (PrngType != Prngs::BCR && DigestType == Digests::None)
-	{
-		CryptoException("PrngFromName:GetPrng", "Digest type can not be none when using Digest or HMAC based rng!");
-	}
+using Exception::CryptoRandomException;
+using Enumeration::ErrorCodes;
 
-	IPrng* rngPtr = nullptr;
+IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType)
+{
+	using namespace Prng;
+
+	IPrng* rptr;
+
+	rptr = nullptr;
 
 	try
 	{
@@ -30,37 +26,60 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType, Digests
 		{
 			case Prngs::BCR:
 			{
-#if defined(__AVX__)
-				Common::CpuDetect detect;
-				if (detect.AESNI())
-				{
-					rngPtr = new Prng::BCR(Enumeration::BlockCiphers::AHX, ProviderType);
-				}
-				else
-#endif
-				{
-					rngPtr = new Prng::BCR(Enumeration::BlockCiphers::RHX, ProviderType);
-				}
-
+				rptr = new BCR(Enumeration::BlockCiphers::AHX, ProviderType);
+				break;
+			}
+			case Prngs::BCRAHXS256:
+			{
+				rptr = new BCR(Enumeration::BlockCiphers::AHXS256, ProviderType);
+				break;
+			}
+			case Prngs::BCRAHXS512:
+			{
+				rptr = new BCR(Enumeration::BlockCiphers::AHXS512, ProviderType);
+				break;
+			}
+			case Prngs::CSR:
+			{
+				rptr = new CSR(ShakeModes::SHAKE256, ProviderType);
+				break;
+			}
+			case Prngs::CSRC512:
+			{
+				rptr = new CSR(ShakeModes::SHAKE512, ProviderType);
+				break;
+			}
+			case Prngs::CSRC1024:
+			{
+				rptr = new CSR(ShakeModes::SHAKE1024, ProviderType);
 				break;
 			}
 			case Prngs::HCR:
 			{
-				rngPtr = new Prng::HCR(static_cast<Enumeration::SHA2Digests>(DigestType), ProviderType);
+				rptr = new HCR(Enumeration::SHA2Digests::SHA256, ProviderType);
+				break;
+			}
+			case Prngs::HCRS512:
+			{
+				rptr = new HCR(Enumeration::SHA2Digests::SHA512, ProviderType);
 				break;
 			}
 			default:
 			{
-				throw CryptoException("PrngFromName:GetPrng", "The specified prng type is unrecognized!");
+				throw CryptoException(std::string("PrngFromName"), std::string("GetInstance"), std::string("The prng type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoRandomException &ex)
+	{
+		throw CryptoException(std::string("PrngFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("PrngFromName:GetInstance", "The prng is unavailable!", std::string(ex.what()));
+		throw CryptoException(std::string("PrngFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return rngPtr;
+	return rptr;
 }
 
 NAMESPACE_HELPEREND

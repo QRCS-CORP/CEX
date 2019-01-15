@@ -37,10 +37,10 @@ NAMESPACE_PROCESSING
 
 using Exception::CryptoProcessingException;
 using Routing::Event;
-using Key::Symmetric::ISymmetricKey;
+using Cipher::ISymmetricKey;
 using IO::IByteStream;
 using Mac::IMac;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// MAC stream helper class.
@@ -73,6 +73,8 @@ using Key::Symmetric::SymmetricKeySize;
 class MacStream
 {
 private:
+
+	static const std::string CLASS_NAME;
 
 	bool m_destroyEngine;
 	bool m_isDestroyed;

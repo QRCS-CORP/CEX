@@ -45,15 +45,14 @@ using Enumeration::BlockCipherExtensions;
 using Exception::CryptoProcessingException;
 using Enumeration::CipherModes;
 using Routing::Event;
-using Cipher::Symmetric::Block::IBlockCipher;
+using Cipher::Block::IBlockCipher;
 using IO::IByteStream;
-using Cipher::Symmetric::Block::Mode::ICipherMode;
-using Cipher::Symmetric::Block::Padding::IPadding;
-using Key::Symmetric::ISymmetricKey;
+using Cipher::Block::Mode::ICipherMode;
+using Cipher::Block::Padding::IPadding;
+using Cipher::ISymmetricKey;
 using Enumeration::PaddingModes;
-using Common::ParallelOptions;
 using Enumeration::SymmetricCiphers;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// Used to wrap a streaming transformation.
@@ -64,15 +63,15 @@ using Key::Symmetric::SymmetricKeySize;
 /// <description>Encrypting a memory stream using a CipherDescription preset:</description>
 /// <code>
 /// SymmetricKey kp(key, iv);
-/// MemoryStream* mIn = new MemoryStream(plaintext);
+/// MemoryStream* mpln = new MemoryStream(plaintext);
 /// MemoryStream* mOut = new MemoryStream(plaintext.size());
 /// CipherDescription cd = CipherDescription::AES256CTR();
 ///
 /// CipherStream cs(cd);
 /// cs.Initialize(true, kp);
-/// cs.Write(mIn, mOut);
+/// cs.Write(mpln, mOut);
 ///
-/// delete mIn;
+/// delete mpln;
 /// delete mOut;
 /// </code>
 /// </example>
@@ -83,10 +82,10 @@ using Key::Symmetric::SymmetricKeySize;
 /// // initialize file stream; input must be set with Read and output must be ReadWrite access
 /// FileStream* fIn = new FileStream("C://Tests//test.txt", FileStream::FileAccess::Read);
 /// FileStream* fOut = new FileStream("C://Tests//test.txt", FileStream::FileAccess::ReadWrite);
-/// Key::Symmetric::SymmetricKey kp(key, iv);
+/// Cipher::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CBC
-/// Processing::CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ISO7816);
+/// Processing::CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ESP);
 /// // initialize the cipher for encryption
 /// cs.Initialize(true, kp);
 /// // write to file
@@ -105,7 +104,7 @@ using Key::Symmetric::SymmetricKeySize;
 /// // initialize file streams; input must be set with Read and output must be ReadWrite access
 /// FileStream* fIn = new FileStream("C://Tests//test.txt", FileStream::FileAccess::Read);
 /// FileStream* fOut = new FileStream("C://Tests//testenc.txt", FileStream::FileAccess::ReadWrite);
-/// Key::Symmetric::SymmetricKey kp(key, iv);
+/// Cipher::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CTR
 /// Processing::CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CTR);
@@ -147,6 +146,8 @@ using Key::Symmetric::SymmetricKeySize;
 class CipherStream
 {
 private:
+
+	static const std::string CLASS_NAME;
 
 	std::unique_ptr<ICipherMode> m_cipherEngine;
 	std::unique_ptr<IPadding> m_cipherPadding;
@@ -230,6 +231,11 @@ public:
 	/// Read Only: The supported key, nonce, and info sizes for the selected cipher configuration
 	/// </summary>
 	const std::vector<SymmetricKeySize> LegalKeySizes();
+
+	/// <summary>
+	/// Read Only: The stream ciphers implementation name
+	/// </summary>
+	const std::string Name();
 
 	/// <summary>
 	/// Read/Write: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.

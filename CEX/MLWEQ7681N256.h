@@ -21,7 +21,7 @@
 
 #include "CexDomain.h"
 #include "BCG.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "IPrng.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"

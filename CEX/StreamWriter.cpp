@@ -28,7 +28,7 @@ StreamWriter::StreamWriter(MemoryStream &DataStream)
 StreamWriter::~StreamWriter()
 {
 	m_streamPosition = 0;
-	Utility::MemUtils::Clear(m_streamState, 0, m_streamState.size());
+	Utility::MemoryTools::Clear(m_streamState, 0, m_streamState.size());
 }
 
 //~~~Accessors~~~//
@@ -53,6 +53,7 @@ std::vector<byte> &StreamWriter::Generate()
 MemoryStream* StreamWriter::GetStream()
 {
 	m_streamState.resize(m_streamPosition);
+
 	return new MemoryStream(m_streamState);
 }
 

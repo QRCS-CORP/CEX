@@ -30,9 +30,9 @@
 #include "CryptoRandomException.h"
 #include "Drbgs.h"
 #include "IDigest.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "IPrng.h"
-#include "MemUtils.h"
+#include "MemoryTools.h"
 
 NAMESPACE_PRNG
 
@@ -65,6 +65,7 @@ class SecureRandom
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t DEF_BUFLEN = 4096;
 
 	size_t m_bufferIndex;
@@ -137,6 +138,11 @@ public:
 	/// <param name="Offset">The starting index within the Output array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
 	void Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements);
+
+	/// <summary>
+	/// Read Only: The random generators implementation name
+	/// </summary>
+	const std::string Name();
 
 	//~~~Byte~~~//
 

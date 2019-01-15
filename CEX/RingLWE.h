@@ -27,8 +27,6 @@
 
 NAMESPACE_RINGLWE
 
-using Key::Asymmetric::AsymmetricKey;
-using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::RLWEParameters;
 
 /// <summary>

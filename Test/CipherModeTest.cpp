@@ -3,17 +3,18 @@
 #include "../CEX/CFB.h"
 #include "../CEX/CTR.h"
 #include "../CEX/ECB.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/OFB.h"
 #include "../CEX/RHX.h"
 
 namespace Test
 {
-	using Utility::IntUtils;
-	using namespace Cipher::Symmetric::Block;
+	using Utility::IntegerTools;
+	using namespace Cipher::Block;
+	using Cipher::SymmetricKey;
 
+	const std::string CipherModeTest::CLASSNAME = "CipherModeTest";
 	const std::string CipherModeTest::DESCRIPTION = "NIST SP800-38A KATs testing CBC, CFB, CTR, ECB, and OFB modes.";
-	const std::string CipherModeTest::FAILURE = "FAILURE! ";
 	const std::string CipherModeTest::SUCCESS = "SUCCESS! Cipher Mode tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -31,10 +32,10 @@ namespace Test
 
 	CipherModeTest::~CipherModeTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_keys);
-		IntUtils::ClearVector(m_message);
-		IntUtils::ClearVector(m_nonce);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_keys);
+		IntegerTools::Clear(m_message);
+		IntegerTools::Clear(m_nonce);
 	}
 
 	//~~~Accessors~~~//
@@ -125,20 +126,28 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void CipherModeTest::Kat(ICipherMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<std::vector<byte>> &Message, std::vector<std::vector<byte>> &Expected, bool Encryption)
 	{
 		std::vector<byte> otp(16);
-		Key::Symmetric::SymmetricKey kp(Key, Nonce);
 
-		Cipher->Initialize(Encryption, kp);
+		if (Nonce.size() == 0)
+		{
+			SymmetricKey kp(Key);
+			Cipher->Initialize(Encryption, kp);
+		}
+		else
+		{
+			SymmetricKey kp(Key, Nonce);
+			Cipher->Initialize(Encryption, kp);
+		}
 
 		for (size_t i = 0; i < 4; ++i)
 		{
@@ -146,7 +155,7 @@ namespace Test
 
 			if (otp != Expected[i])
 			{
-				throw TestException(Cipher->Name() + " Mode: Encrypted arrays are not equal!");
+				throw TestException(std::string("Kat"), Cipher->Name(), "Mode: Encrypted arrays are not equal!");
 			}
 		}
 	}
@@ -163,13 +172,13 @@ namespace Test
 		};
 		HexConverter::Decode(keys, 3, m_keys);
 
-		const std::vector<std::string> vectors =
+		const std::vector<std::string> nonce =
 		{
 			std::string("000102030405060708090A0B0C0D0E0F"),//F.1/F.2/F.3
 			std::string("F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF"),//F.5
 			std::string("")
 		};
-		HexConverter::Decode(vectors, 3, m_nonce);
+		HexConverter::Decode(nonce, 3, m_nonce);
 
 		const std::vector<std::vector<std::string>> input =
 		{
@@ -564,7 +573,7 @@ namespace Test
 		}
 	}
 
-	void CipherModeTest::OnProgress(std::string Data)
+	void CipherModeTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

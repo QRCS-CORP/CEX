@@ -1,14 +1,16 @@
 #include "PaddingTest.h"
-#include "../CEX/CSP.h"
-#include "../CEX/ISO7816.h"
+#include "../CEX/SecureRandom.h"
+#include "../CEX/ESP.h"
 #include "../CEX/PKCS7.h"
-#include "../CEX/TBC.h"
 #include "../CEX/X923.h"
+#include "../CEX/ZeroOne.h"
 
 namespace Test
 {
+	using CEX::Prng::SecureRandom;
+
+	const std::string PaddingTest::CLASSNAME = "PaddingTest";
 	const std::string PaddingTest::DESCRIPTION = "Cipher Padding output Tests.";
-	const std::string PaddingTest::FAILURE = "FAILURE! ";
 	const std::string PaddingTest::SUCCESS = "SUCCESS! Cipher Padding tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -43,81 +45,93 @@ namespace Test
 
 		try
 		{
-			ISO7816* pad1 = new ISO7816();
-			Compare(pad1);
+			ESP* pad1 = new ESP();
+			Kat(pad1);
 			delete pad1;
-			OnProgress(std::string("PaddingTest: Passed ISO7816 comparison tests.."));
+			OnProgress(std::string("PaddingTest: Passed ESP comparison tests.."));
 
 			PKCS7* pad2 = new PKCS7();
-			Compare(pad2);
+			Kat(pad2);
 			delete pad2;
 			OnProgress(std::string("PaddingTest: Passed PKCS7 comparison tests.."));
 
-			TBC* pad3 = new TBC();
-			Compare(pad3);
+			X923* pad3 = new X923();
+			Kat(pad3);
 			delete pad3;
-			OnProgress(std::string("PaddingTest: Passed TBC comparison tests.."));
-
-			X923* pad4 = new X923();
-			Compare(pad4);
-			delete pad4;
 			OnProgress(std::string("PaddingTest: Passed X923 comparison tests.."));
+
+			ZeroOne* pad4 = new ZeroOne();
+			Kat(pad4);
+			delete pad4;
+			OnProgress(std::string("PaddingTest: Passed Zeroes and Ones comparison tests.."));
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void PaddingTest::Compare(Padding::IPadding* Padding)
+	void PaddingTest::Kat(Padding::IPadding* Padding)
 	{
 		const size_t MSGBLK = 16;
-		std::vector<byte> fill(MSGBLK);
-		CEX::Provider::CSP rng;
+		std::vector<byte> fill(MSGBLK * 2);
+		std::vector<byte> msg1(0);
+		std::vector<byte> msg2(0);
+		SecureRandom gen;
+		size_t i;
+		size_t len;
 
-		rng.Generate(fill);
+		gen.Generate(fill);
 
-		for (size_t i = 0; i < MSGBLK; i++)
+		for (i = 0; i < MSGBLK; i++)
 		{
-			std::vector<byte> msg(MSGBLK);
+			msg1.clear();
+			msg1.resize(MSGBLK);
+
 			// fill with rand
 			if (i > 0)
 			{
-				std::memcpy(msg.data(), fill.data(), MSGBLK - i);
+				std::memcpy(msg1.data(), fill.data(), MSGBLK - i);
 			}
 
 			// pad array
-			Padding->AddPadding(msg, i);
+			Padding->AddPadding(msg1, i, msg1.size());
 			// verify length
-			size_t len = Padding->GetPaddingLength(msg);
+			len = Padding->GetBlockLength(msg1);
 
 			if (len == 0 && i != 0)
 			{
-				throw TestException(std::string("PaddingTest: Failed the padding value return check! -PC1"));
+				throw TestException(std::string("Kat"), Padding->Name(), std::string("Failed the padding value return check! -PC1"));
 			}
-			else if (i != 0 && len != MSGBLK - i)
+			else if (i != 0 && len != i)
 			{
-				throw TestException(std::string("PaddingTest: Failed the padding value return check! -PC2"));
+				throw TestException(std::string("Kat"), Padding->Name(), std::string("Failed the padding value return check! -PC2"));
 			}
 
 			// test offset method
 			if (i > 0 && i < MSGBLK - 1)
 			{
-				len = Padding->GetPaddingLength(msg, i);
+				msg2.clear();
+				msg2.resize(MSGBLK + i);
+				std::memcpy(msg2.data() + i, fill.data(), MSGBLK - i);
+
+				Padding->AddPadding(msg2, i, MSGBLK + i);
+
+				len = Padding->GetBlockLength(msg2, i, MSGBLK + i);
 
 				if (len == 0 && i != 0)
 				{
-					throw TestException(std::string("PaddingTest: Failed the padding value return check! -PC3"));
+					throw TestException(std::string("Kat"), Padding->Name(), std::string("Failed the padding value return check! -PC3"));
 				}
-				else if (i != 0 && len != MSGBLK - i)
+				else if (i != 0 && len != i)
 				{
-					throw TestException(std::string("PaddingTest: Failed the offset padding value return check! -PC4"));
+					throw TestException(std::string("Kat"), Padding->Name(), std::string("Failed the offset padding value return check! -PC4"));
 				}
 			}
 		}
@@ -125,7 +139,7 @@ namespace Test
 
 	//~~~Private Functions~~~//
 
-	void PaddingTest::OnProgress(std::string Data)
+	void PaddingTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

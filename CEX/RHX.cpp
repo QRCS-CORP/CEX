@@ -1,6 +1,6 @@
 #include "RHX.h"
 #include "Rijndael.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "KdfFromName.h"
 
 NAMESPACE_BLOCK
@@ -19,7 +19,7 @@ RHX::RHX(BlockCipherExtensions CipherExtension)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
-		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("RHX:CTor", "The Kdf type is invalid!") :
+		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -37,7 +37,7 @@ RHX::RHX(Kdf::IKdf* Kdf)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf :
-		throw CryptoSymmetricCipherException("RHX:CTor", "The Kdf can not be null!")),
+		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::InvalidParam)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -56,9 +56,9 @@ RHX::~RHX()
 		m_isInitialized = false;
 		m_rndCount = 0;
 
-		Utility::IntUtils::ClearVector(m_expKey);
-		Utility::IntUtils::ClearVector(m_distCode);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntegerTools::Clear(m_expKey);
+		Utility::IntegerTools::Clear(m_distCode);
+		Utility::IntegerTools::Clear(m_legalKeySizes);
 
 		if (m_destroyEngine)
 		{
@@ -127,19 +127,19 @@ const std::string RHX::Name()
 
 	if (m_cprExtension == BlockCipherExtensions::SHAKE256)
 	{
-		txtName = CIPHER_NAME + std::string("+SHAKE-256");
+		txtName = CIPHER_NAME + std::string("-SHAKE256");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
 	{
-		txtName = CLASS_NAME + std::string("+SHAKE-512");
+		txtName = CLASS_NAME + std::string("-SHAKE512");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF256)
 	{
-		txtName = CLASS_NAME + std::string("+HKDF-SHA256");
+		txtName = CLASS_NAME + std::string("-HKDF-SHA256");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 	{
-		txtName = CLASS_NAME + std::string("+HKDF-SHA512");
+		txtName = CLASS_NAME + std::string("-HKDF-SHA512");
 	}
 	else
 	{
@@ -185,11 +185,11 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
 	{
-		throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
 	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_distCodeMax)
 	{
-		throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid info size; info parameter must be no longer than DistributionCodeMax size."), ErrorCodes::InvalidSize);
 	}
 
 	if (KeyParams.Info().size() > 0)
@@ -330,7 +330,7 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 	// copy bytes to working key
 	for (size_t i = 0; i < m_expKey.size(); ++i)
 	{
-		m_expKey[i] = Utility::IntUtils::LeBytesTo32(rawKey, i * sizeof(uint));
+		m_expKey[i] = Utility::IntegerTools::LeBytesTo32(rawKey, i * sizeof(uint));
 	}
 }
 
@@ -345,14 +345,14 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 
 	if (keyWords == 8)
 	{
-		m_expKey[0] = Utility::IntUtils::BeBytesTo32(Key, 0);
-		m_expKey[1] = Utility::IntUtils::BeBytesTo32(Key, 4);
-		m_expKey[2] = Utility::IntUtils::BeBytesTo32(Key, 8);
-		m_expKey[3] = Utility::IntUtils::BeBytesTo32(Key, 12);
-		m_expKey[4] = Utility::IntUtils::BeBytesTo32(Key, 16);
-		m_expKey[5] = Utility::IntUtils::BeBytesTo32(Key, 20);
-		m_expKey[6] = Utility::IntUtils::BeBytesTo32(Key, 24);
-		m_expKey[7] = Utility::IntUtils::BeBytesTo32(Key, 28);
+		m_expKey[0] = Utility::IntegerTools::BeBytesTo32(Key, 0);
+		m_expKey[1] = Utility::IntegerTools::BeBytesTo32(Key, 4);
+		m_expKey[2] = Utility::IntegerTools::BeBytesTo32(Key, 8);
+		m_expKey[3] = Utility::IntegerTools::BeBytesTo32(Key, 12);
+		m_expKey[4] = Utility::IntegerTools::BeBytesTo32(Key, 16);
+		m_expKey[5] = Utility::IntegerTools::BeBytesTo32(Key, 20);
+		m_expKey[6] = Utility::IntegerTools::BeBytesTo32(Key, 24);
+		m_expKey[7] = Utility::IntegerTools::BeBytesTo32(Key, 28);
 
 		// k256 R: 8,16,24,32,40,48,56 S: 12,20,28,36,44,52
 		ExpandRotBlock(m_expKey, 8, 8, 1);
@@ -371,12 +371,12 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	}
 	else if (keyWords == 6)
 	{
-		m_expKey[0] = Utility::IntUtils::BeBytesTo32(Key, 0);
-		m_expKey[1] = Utility::IntUtils::BeBytesTo32(Key, 4);
-		m_expKey[2] = Utility::IntUtils::BeBytesTo32(Key, 8);
-		m_expKey[3] = Utility::IntUtils::BeBytesTo32(Key, 12);
-		m_expKey[4] = Utility::IntUtils::BeBytesTo32(Key, 16);
-		m_expKey[5] = Utility::IntUtils::BeBytesTo32(Key, 20);
+		m_expKey[0] = Utility::IntegerTools::BeBytesTo32(Key, 0);
+		m_expKey[1] = Utility::IntegerTools::BeBytesTo32(Key, 4);
+		m_expKey[2] = Utility::IntegerTools::BeBytesTo32(Key, 8);
+		m_expKey[3] = Utility::IntegerTools::BeBytesTo32(Key, 12);
+		m_expKey[4] = Utility::IntegerTools::BeBytesTo32(Key, 16);
+		m_expKey[5] = Utility::IntegerTools::BeBytesTo32(Key, 20);
 
 		// // k192 R: 6,12,18,24,30,36,42,48
 		ExpandRotBlock(m_expKey, 6, 6, 1);
@@ -404,10 +404,10 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	}
 	else
 	{
-		m_expKey[0] = Utility::IntUtils::BeBytesTo32(Key, 0);
-		m_expKey[1] = Utility::IntUtils::BeBytesTo32(Key, 4);
-		m_expKey[2] = Utility::IntUtils::BeBytesTo32(Key, 8);
-		m_expKey[3] = Utility::IntUtils::BeBytesTo32(Key, 12);
+		m_expKey[0] = Utility::IntegerTools::BeBytesTo32(Key, 0);
+		m_expKey[1] = Utility::IntegerTools::BeBytesTo32(Key, 4);
+		m_expKey[2] = Utility::IntegerTools::BeBytesTo32(Key, 8);
+		m_expKey[3] = Utility::IntegerTools::BeBytesTo32(Key, 12);
 
 		// k128 R: 4,8,12,16,20,24,28,32,36,40
 		ExpandRotBlock(m_expKey, 4, 4, 1);
@@ -462,10 +462,10 @@ void RHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	const size_t RNDCNT = m_expKey.size() - 4;
 
 	// round 0
-	uint X0 = Utility::IntUtils::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
-	uint X1 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
-	uint X2 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
-	uint X3 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
+	uint X0 = Utility::IntegerTools::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
+	uint X1 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
+	uint X2 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
+	uint X3 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
 
 	// round 1
 	uint Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_expKey[4];
@@ -536,10 +536,10 @@ void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	const size_t RNDCNT = m_expKey.size() - 4;
 
 	// round 0
-	uint X0 = Utility::IntUtils::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
-	uint X1 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
-	uint X2 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
-	uint X3 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
+	uint X0 = Utility::IntegerTools::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
+	uint X1 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
+	uint X2 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
+	uint X3 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
 
 	// round 1
 	uint Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_expKey[4];

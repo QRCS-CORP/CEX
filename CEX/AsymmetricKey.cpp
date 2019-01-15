@@ -1,22 +1,23 @@
 #include "AsymmetricKey.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
-NAMESPACE_ASYMMETRICKEY
+NAMESPACE_ASYMMETRIC
 
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Enumeration::ErrorCodes;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 AsymmetricKey::AsymmetricKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P)
 	:
 	m_cipherEngine(CipherType != AsymmetricEngines::None ? CipherType :
-		throw CryptoAsymmetricException("AsymmetricKey::Ctor", "The cipher engine type can not be None!")),
+		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The cipher engine type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_cipherKey(CipherKeyType != AsymmetricKeyTypes::None ? CipherKeyType :
-		throw CryptoAsymmetricException("AsymmetricKey::Ctor", "The cipher key type can not be None!")),
+		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The cipher key type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_cipherParams(ParameterType != AsymmetricTransforms::None ? ParameterType :
-		throw CryptoAsymmetricException("AsymmetricKey::Ctor", "The cipher parameters type can not be None!")),
+		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The cipher parameters type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_isDestroyed(false),
 	m_polyCoeffs(P.size() != 0 ? P :
-		throw CryptoAsymmetricException("AsymmetricKey::Ctor", "The polynomial array can not be zero length!"))
+		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
 {
 }
 
@@ -26,7 +27,7 @@ AsymmetricKey::AsymmetricKey(const std::vector<byte> &KeyStream)
 	m_cipherKey(static_cast<AsymmetricKeyTypes>(KeyStream[1])),
 	m_cipherParams(static_cast<AsymmetricTransforms>(KeyStream[2])),
 	m_isDestroyed(false),
-	m_polyCoeffs(KeyStream.begin() + 7, KeyStream.begin() + 7 + IntUtils::LeBytesTo32(KeyStream, 3))
+	m_polyCoeffs(KeyStream.begin() + 7, KeyStream.begin() + 7 + IntegerTools::LeBytesTo32(KeyStream, 3))
 {
 }
 
@@ -66,7 +67,7 @@ void AsymmetricKey::Destroy()
 
 		if (m_polyCoeffs.size() > 0)
 		{
-			IntUtils::ClearVector(m_polyCoeffs);
+			IntegerTools::Clear(m_polyCoeffs);
 		}
 	}
 }
@@ -79,10 +80,10 @@ std::vector<byte> AsymmetricKey::ToBytes()
 	poly[0] = static_cast<byte>(m_cipherEngine);
 	poly[1] = static_cast<byte>(m_cipherKey);
 	poly[2] = static_cast<byte>(m_cipherParams);
-	IntUtils::Le32ToBytes(PLYLEN, poly, 3);
-	MemUtils::Copy(m_polyCoeffs, 0, poly, 7, PLYLEN);
+	IntegerTools::Le32ToBytes(PLYLEN, poly, 3);
+	MemoryTools::Copy(m_polyCoeffs, 0, poly, 7, PLYLEN);
 
 	return poly;
 }
 
-NAMESPACE_ASYMMETRICKEYEND
+NAMESPACE_ASYMMETRICEND

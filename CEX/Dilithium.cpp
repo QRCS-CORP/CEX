@@ -1,15 +1,8 @@
 #include "Dilithium.h"
-#include "AsymmetricEngines.h"
-#include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
 #include "DLMN256Q8380417.h"
 #include "PrngFromName.h"
 
 NAMESPACE_DILITHIUM
-
-using Enumeration::AsymmetricEngines;
-using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
 
 const std::string Dilithium::CLASS_NAME = "Dilithium";
 
@@ -18,10 +11,10 @@ Dilithium::Dilithium(DilithiumParameters Parameters, Prngs PrngType)
 	m_destroyEngine(true),
 	m_isInitialized(false),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
-		throw CryptoAsymmetricException("Dilithium:CTor", "The prng type can not be none!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam)),
 	m_isSigner(false),
 	m_dlmParameters(Parameters != DilithiumParameters::None ? Parameters :
-		throw CryptoAsymmetricException("Dilithium:CTor", "The parameter can not be None!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -30,10 +23,10 @@ Dilithium::Dilithium(DilithiumParameters Parameters, IPrng* Rng)
 	m_destroyEngine(false),
 	m_isInitialized(false),
 	m_rndGenerator(Rng != nullptr ? Rng :
-		throw CryptoAsymmetricException("Dilithium:CTor", "The prng can not be null!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam)),
 	m_isSigner(false),
 	m_dlmParameters(Parameters != DilithiumParameters::None ? Parameters :
-		throw CryptoAsymmetricException("Dilithium:CTor", "The parameter can not be None!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -94,19 +87,19 @@ const bool Dilithium::IsSigner()
 
 const std::string Dilithium::Name()
 {
-	std::string ret = CLASS_NAME + "-";
+	std::string ret = CLASS_NAME;
 
 	if (m_dlmParameters == DilithiumParameters::DLMS1256Q8380417)
 	{
-		ret += "DLMS1256Q8380417";
+		ret += "-DLMS1256Q8380417";
 	}
 	else if (m_dlmParameters == DilithiumParameters::DLMS2N256Q8380417)
 	{
-		ret += "DLMS2N256Q8380417";
+		ret += "-DLMS2N256Q8380417";
 	}
 	else if (m_dlmParameters == DilithiumParameters::DLMS3N256Q8380417)
 	{
-		ret += "DLMS3N256Q8380417";
+		ret += "-DLMS3N256Q8380417";
 	}
 
 	return ret;
@@ -144,11 +137,11 @@ const void Dilithium::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::Dilithium)
 	{
-		throw CryptoAsymmetricException("Dilithium:Initialize", "The key base type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
 	if (Key->KeyType() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyType() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
-		throw CryptoAsymmetricException("Dilithium:Initialize", "The key type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
 
 	if (Key->KeyType() == AsymmetricKeyTypes::SignaturePublicKey)
@@ -171,15 +164,15 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException("Dilithium:Sign", "The signature scheme has not been initialized!");
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (!m_isSigner)
 	{
-		throw CryptoAsymmetricException("Dilithium:Sign", "The signature scheme is not initialized for signing!");
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::IllegalOperation);
 	}
 	if (Message.size() == 0)
 	{
-		throw CryptoAsymmetricException("Dilithium:Sign", "The message size must be non-zero!");
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The message size must be non-zero!"), ErrorCodes::InvalidParam);
 	}
 
 	DLMN256Q8380417::DlmParams cparams = DLMN256Q8380417::GetParams(m_dlmParameters);
@@ -198,11 +191,11 @@ bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Me
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException("Dilithium:Sign", "The signature scheme has not been initialized!");
+		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (m_isSigner)
 	{
-		throw CryptoAsymmetricException("Dilithium:Sign", "The signature scheme is not initialized for verification!");
+		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme is not initialized for verification!"), ErrorCodes::IllegalOperation);
 	}
 
 	DLMN256Q8380417::DlmParams cparams = DLMN256Q8380417::GetParams(m_dlmParameters);

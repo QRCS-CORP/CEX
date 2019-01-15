@@ -6,7 +6,7 @@
 
 namespace Test
 {
-	using namespace Cipher::Symmetric::Block::Mode;
+	using namespace Cipher::Block::Mode;
 
     /// <remarks>
     /// Parallel integrity and output comparisons, targeting multi-threaded and SIMD cipher mode operations
@@ -15,8 +15,8 @@ namespace Test
     {
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t TEST_CYCLES = 100;
@@ -66,7 +66,7 @@ namespace Test
 
 	private:
 
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
     };
 }
 

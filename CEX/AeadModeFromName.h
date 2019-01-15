@@ -13,8 +13,8 @@ using Enumeration::AeadModes;
 using Enumeration::BlockCiphers;
 using Enumeration::BlockCipherExtensions;
 using Exception::CryptoException;
-using Cipher::Symmetric::Block::IBlockCipher;
-using Cipher::Symmetric::Block::Mode::IAeadMode;
+using Cipher::Block::IBlockCipher;
+using Cipher::Block::Mode::IAeadMode;
 
 /// <summary>
 /// Get a Cipher Mode instance from it's enumeration name.

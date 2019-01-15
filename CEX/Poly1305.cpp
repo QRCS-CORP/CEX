@@ -1,12 +1,12 @@
 #include "Poly1305.h"
 #include "Donna128.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_MAC
 
 using Numeric::Donna128;
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 const std::string Poly1305::CLASS_NAME("Poly1305");
 
@@ -30,9 +30,9 @@ Poly1305::~Poly1305()
 		m_isDestroyed = true;
 		m_isInitialized = false;
 		m_msgLength = 0;
-		Utility::IntUtils::ClearArray(m_macState);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_msgBuffer);
+		Utility::IntegerTools::Clear(m_macState);
+		Utility::IntegerTools::Clear(m_legalKeySizes);
+		Utility::IntegerTools::Clear(m_msgBuffer);
 
 	}
 }
@@ -59,15 +59,15 @@ std::vector<SymmetricKeySize> Poly1305::LegalKeySizes() const
 	return m_legalKeySizes;
 };
 
-const size_t Poly1305::MacSize()
-{
-	return BLOCK_SIZE;
-}
-
 const std::string Poly1305::Name()
 {
 	return CLASS_NAME;
 }
+const size_t Poly1305::TagSize()
+{
+	return BLOCK_SIZE;
+}
+
 
 //~~~Public Functions~~~//
 
@@ -75,16 +75,11 @@ void Poly1305::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("Poly1305:Compute", "The MAC has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
-	if (Output.size() < BLOCK_SIZE)
+	if (Output.size() < TagSize())
 	{
-		throw CryptoMacException("Poly1305:Compute", "The Output buffer is too short!");
-	}
-
-	if (Output.size() != BLOCK_SIZE)
-	{
-		Output.resize(BLOCK_SIZE);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	Update(Input, 0, Input.size());
@@ -95,11 +90,11 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("Poly1305:Finalize", "The MAC has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
-	if ((Output.size() - OutOffset) < BLOCK_SIZE)
+	if ((Output.size() - OutOffset) < TagSize())
 	{
-		throw CryptoMacException("Poly1305:Finalize", "The Output buffer is too short!");
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	ulong c;
@@ -117,7 +112,7 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 		if (RMDLEN > 0)
 		{
-			MemUtils::Clear(m_msgBuffer, m_msgLength + 1, RMDLEN);
+			MemoryTools::Clear(m_msgBuffer, m_msgLength + 1, RMDLEN);
 		}
 
 		Process(m_msgBuffer, 0, BLOCK_SIZE, true);
@@ -178,8 +173,8 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	h0 = ((h0) | (h1 << 44));
 	h1 = ((h1 >> 20) | (h2 << 24));
 
-	IntUtils::Le64ToBytes(h0, Output, OutOffset);
-	IntUtils::Le64ToBytes(h1, Output, OutOffset + sizeof(ulong));
+	IntegerTools::Le64ToBytes(h0, Output, OutOffset);
+	IntegerTools::Le64ToBytes(h1, Output, OutOffset + sizeof(ulong));
 
 	Reset();
 
@@ -190,7 +185,7 @@ void Poly1305::Initialize(ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size(), KeyParams.Nonce().size(), 0))
 	{
-		throw CryptoMacException("Poly1305:Initialize", "Key size is invalid; must be a legal key size!");
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Key size is invalid; must be a legal key size!"), ErrorCodes::InvalidKey);
 	}
 
 	if (m_isInitialized)
@@ -198,8 +193,8 @@ void Poly1305::Initialize(ISymmetricKey &KeyParams)
 		Reset();
 	}
 
-	const ulong T0 = IntUtils::LeBytesTo64(KeyParams.Key(), 0);
-	const ulong T1 = IntUtils::LeBytesTo64(KeyParams.Key(), 1 * sizeof(ulong));
+	const ulong T0 = IntegerTools::LeBytesTo64(KeyParams.Key(), 0);
+	const ulong T1 = IntegerTools::LeBytesTo64(KeyParams.Key(), 1 * sizeof(ulong));
 
 	m_macState[0] = T0 & 0xFFC0FFFFFFFULL;
 	m_macState[1] = ((T0 >> 44) | (T1 << 20)) & 0xFFFFFC0FFFFULL;
@@ -209,16 +204,16 @@ void Poly1305::Initialize(ISymmetricKey &KeyParams)
 	m_macState[4] = 0;
 	m_macState[5] = 0;
 	// store pad
-	m_macState[6] = IntUtils::LeBytesTo64(KeyParams.Key(), 2 * sizeof(ulong));
-	m_macState[7] = IntUtils::LeBytesTo64(KeyParams.Key(), 3 * sizeof(ulong));
+	m_macState[6] = IntegerTools::LeBytesTo64(KeyParams.Key(), 2 * sizeof(ulong));
+	m_macState[7] = IntegerTools::LeBytesTo64(KeyParams.Key(), 3 * sizeof(ulong));
 
 	m_isInitialized = true;
 }
 
 void Poly1305::Reset()
 {
-	Utility::MemUtils::Clear(m_macState, 0, m_macState.size());
-	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	Utility::MemoryTools::Clear(m_macState, 0, m_macState.size());
+	Utility::MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 	m_isInitialized = false;
 }
@@ -227,7 +222,7 @@ void Poly1305::Update(byte Input)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("Poly1305:Update", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 
 	if (m_msgLength == m_msgBuffer.size())
@@ -244,11 +239,11 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("Poly1305:Update", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException("Poly1305:Update", "The Input buffer is too short!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
@@ -258,7 +253,7 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 			if (RMDLEN != 0)
 			{
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				Utility::MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			}
 
 			Process(m_msgBuffer, 0, BLOCK_SIZE, false);
@@ -274,7 +269,7 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 		if (Length > 0)
 		{
-			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -312,8 +307,8 @@ void Poly1305::Process(const std::vector<byte> &Input, size_t InOffset, size_t L
 	while (blkCtr != 0)
 	{
 		// h += m[i]
-		const ulong T0 = IntUtils::LeBytesTo64(Input, InOffset);
-		const ulong T1 = IntUtils::LeBytesTo64(Input, InOffset + sizeof(ulong));
+		const ulong T0 = IntegerTools::LeBytesTo64(Input, InOffset);
+		const ulong T1 = IntegerTools::LeBytesTo64(Input, InOffset + sizeof(ulong));
 		h0 += T0 & 0xFFFFFFFFFFFULL;
 		h1 += ((T0 >> 44) | (T1 << 20)) & 0xFFFFFFFFFFFULL;
 		h2 += (((T1 >> 24)) & 0x3FFFFFFFFFFULL) | HIBIT;

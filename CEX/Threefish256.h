@@ -29,12 +29,11 @@
 
 #include "IStreamCipher.h"
 #include "ShakeModes.h"
-#include "SymmetricSecureKey.h"
+#include "SecureVector.h"
 
 NAMESPACE_STREAM
 
 using Enumeration::ShakeModes;
-using Key::Symmetric::SymmetricSecureKey;
 
 /// <summary>
 /// A vectorized and optionally parallelized Threefish-256 72-round stream cipher [TSX256] implementation.
@@ -156,7 +155,7 @@ private:
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ulong m_macCounter;
-	std::unique_ptr<SymmetricSecureKey> m_macKey;
+	SecureVector<byte> m_macKey;
 	std::vector<byte> m_macTag;
 	ParallelOptions m_parallelProfile;
 
@@ -233,7 +232,7 @@ public:
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Read Only: The stream ciphers class name
+	/// Read Only: The stream ciphers implementation name
 	/// </summary>
 	const std::string Name() override;
 

@@ -2,7 +2,6 @@
 #define CEX_DRBGFROMNAME_H
 
 #include "CexDomain.h"
-#include "BlockCiphers.h"
 #include "CryptoException.h"
 #include "Digests.h"
 #include "IDrbg.h"
@@ -11,7 +10,6 @@
 
 NAMESPACE_HELPER
 
-using Enumeration::BlockCiphers;
 using Exception::CryptoException;
 using Enumeration::Digests;
 using Enumeration::Drbgs;

@@ -25,6 +25,7 @@
 #define CEX_SKEINPARAMS_H
 
 #include "CexDomain.h"
+#include "CryptoDigestException.h"
 
 NAMESPACE_DIGEST
 
@@ -35,6 +36,7 @@ struct SkeinParams
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t HDR_SIZE = 24;
 
 	// skein 1.3, table 7:

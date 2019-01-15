@@ -8,7 +8,7 @@
 NAMESPACE_HELPER
 
 using Exception::CryptoException;
-using Cipher::Symmetric::Stream::IStreamCipher;
+using Cipher::Stream::IStreamCipher;
 using Enumeration::StreamCiphers;
 
 /// <summary>
@@ -24,12 +24,11 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="StreamCipherType">The stream cipher enumeration name</param>
-	/// <param name="RoundCount">The number of cipher rounds</param>
 	/// 
 	/// <returns>An uninitialized stream cipher</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IStreamCipher* GetInstance(StreamCiphers StreamCipherType, size_t RoundCount);
+	static IStreamCipher* GetInstance(StreamCiphers StreamCipherType);
 };
 
 NAMESPACE_HELPEREND

@@ -25,6 +25,7 @@
 #define CEX_SHA2PARAMS_H
 
 #include "CexDomain.h"
+#include "CryptoDigestException.h"
 
 NAMESPACE_DIGEST
 
@@ -35,6 +36,7 @@ struct SHA2Params
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t HDR_SIZE = 24;
 
 	// offset | size | type

@@ -54,6 +54,16 @@
 // global constant: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
 // class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
 // function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
+//
+// 1.0.0.8 TODOs
+// rewrite poadding modes for constant time						-done
+// Rewrite the symmetric scure key with authentication (TFX)	-
+// Add an asymmetric secure key									-
+// Reorganize the namespace (key and cipher)					-
+// Rewrite CipherStream to use stream ciphers exclusively		-
+// Review all classes for constant time operations				-
+// Update all documentation to current implementations			-
+// Add *nix random provider functions							-
 
 #include <fstream>
 #include <iostream>
@@ -131,7 +141,7 @@ std::string GetRandomString(size_t Length)
 
 void CpuCheck()
 {
-	Common::CpuDetect detect;
+	CpuDetect detect;
 	ConsoleUtils::WriteLine("L1 cache size: " + std::to_string(detect.L1CacheSize()));
 	ConsoleUtils::WriteLine("Total L1 cache size: " + std::to_string(detect.L1CacheTotal()));
 	ConsoleUtils::WriteLine("L1 cache line size: " + std::to_string(detect.L1CacheLineSize()));
@@ -218,9 +228,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("// * CEX++ Version 1.0.0.7: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("// *                                             *");
-	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7e (A7)                   *");
+	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7f (A7)                   *");
 	ConsoleUtils::WriteLine("// * License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("// * Date:      December 26, 2018                *");
+	ConsoleUtils::WriteLine("// * Date:      January 14, 2018                *");
 	ConsoleUtils::WriteLine("// * Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -246,22 +256,14 @@ void RunTest(ITest* Test)
 
 		delete Test;
 	}
-	catch (TestException &ex)
+	catch (TestException const &ex)
 	{
 		ConsoleUtils::WriteLine("");
-		ConsoleUtils::WriteLine("**// * ERROR CONDITION ***");
-
-
-		if (ex.Origin().size() != 0)
-		{
-			ConsoleUtils::WriteLine(std::string("Origin: ") + ex.Origin());
-			ConsoleUtils::WriteLine(std::string("Message: ") + ex.Message());
-		}
-		else if (ex.Message().size() != 0)
-		{
-			ConsoleUtils::WriteLine(std::string("Message: ") + ex.Message());
-		}
-
+		ConsoleUtils::WriteLine("*** ERROR CONDITION ***");
+		ConsoleUtils::WriteLine(std::string("Class: ") + ex.Location());
+		ConsoleUtils::WriteLine(std::string("Function: ") + ex.Function());
+		ConsoleUtils::WriteLine(std::string("Origin: ") + ex.Origin());
+		ConsoleUtils::WriteLine(std::string("Message: ") + ex.Message());
 		ConsoleUtils::WriteLine(std::string("Time: ") + GetTime());
 		ConsoleUtils::WriteLine("");
 
@@ -269,9 +271,8 @@ void RunTest(ITest* Test)
 		ConsoleUtils::WriteLine("Continue Testing? Press 'Y' to continue, all other keys abort..");
 
 		std::string resp;
-		std::getline(std::cin, resp);
 
-		if (CanTest(resp))
+		if (!CanTest(resp))
 		{
 			CloseApp();
 		}
@@ -326,7 +327,7 @@ int main()
 
 	try
 	{
-		Common::CpuDetect detect;
+		CpuDetect detect;
 
 		hasAes = detect.AESNI();
 		hasAvx = detect.AVX();
@@ -431,7 +432,7 @@ int main()
 			RunTest(new ChaChaTest());
 			RunTest(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
-			// RunTest(new CipherStreamTest());
+			RunTest(new CipherStreamTest());
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");

@@ -3,6 +3,11 @@
 
 NAMESPACE_PROCESSING
 
+using Exception::CryptoMacException;
+using Enumeration::ErrorCodes;
+
+const std::string MacStream::CLASS_NAME("MacStream");
+
 //~~~Constructor~~~//
 
 MacStream::MacStream(MacDescription &Description)
@@ -11,7 +16,7 @@ MacStream::MacStream(MacDescription &Description)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_macEngine(Description.MacType() != Macs::GMAC ? Helper::MacFromDescription::GetInstance(Description) :
-		throw CryptoProcessingException("MacStream:CTor", "GMAC is not supported!")),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("GMAC is not supported!"), ErrorCodes::IllegalOperation)),
 	m_progressInterval(0)
 {
 }
@@ -22,7 +27,7 @@ MacStream::MacStream(IMac* Mac)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_macEngine(Mac != nullptr && Mac->Enumeral() != Macs::GMAC ? Mac :
-		throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!")),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Mac generator can not be null!"), ErrorCodes::IllegalOperation)),
 	m_progressInterval(0)
 {
 }
@@ -72,7 +77,7 @@ void MacStream::Initialize(ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{
-		throw CryptoProcessingException("CipherStream:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+		throw CryptoProcessingException(CLASS_NAME, std::string("Initialize"), std::string("Mac Key has invalid length!"), ErrorCodes::InvalidKey);
 	}
 
 	try
@@ -80,9 +85,9 @@ void MacStream::Initialize(ISymmetricKey &KeyParams)
 		m_macEngine->Initialize(KeyParams);
 		m_isInitialized = true;
 	}
-	catch (std::exception& ex)
+	catch (CryptoMacException &ex)
 	{
-		throw CryptoProcessingException("CipherStream:Initialize", "The key could not be loaded, check the key and iv sizes!", std::string(ex.what()));
+		throw CryptoProcessingException(CLASS_NAME, std::string("Initialize"), ex.Message(), ex.ErrorCode());
 	}
 }
 
@@ -189,7 +194,7 @@ std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(m_macEngine->MacSize());
+	std::vector<byte> chkSum(m_macEngine->TagSize());
 	m_macEngine->Finalize(chkSum, 0);
 	CalculateProgress(Length, prcLen);
 
@@ -222,7 +227,7 @@ std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOf
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(m_macEngine->MacSize());
+	std::vector<byte> chkSum(m_macEngine->TagSize());
 	m_macEngine->Finalize(chkSum, 0);
 	CalculateProgress(Length, prcLen);
 

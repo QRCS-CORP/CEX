@@ -3,13 +3,16 @@
 
 #include "ITest.h"
 #include "../CEX/CipherDescription.h"
-#include "../CEX/ICipherMode.h"
-#include "../CEX/IPadding.h"
+#include "../CEX/CipherStream.h"
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::Mode::ICipherMode;
-	using Cipher::Symmetric::Block::Padding::IPadding;
+	using Processing::CipherDescription;
+	using Processing::CipherStream;
+
+	static const std::string CLASSNAME;
+	static const std::string DESCRIPTION;
+	static const std::string SUCCESS;
 
 	/// <summary>
 	/// Tests the CipherStream Processer
@@ -19,18 +22,13 @@ namespace Test
 	private:
 
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
+		static const std::string CLASSNAME;
 		static const std::string SUCCESS;
+		static const int32_t DEF_BLOCK = 64000;
 		static const int32_t MIN_ALLOC = 4096;
 		static const int32_t MAX_ALLOC = 8192;
-		static const int32_t DEF_BLOCK = 64000;
+		static const int32_t TEST_CYCLES = 10;
 
-		std::vector<byte> m_cmpText;
-		std::vector<byte> m_decText;
-		std::vector<byte> m_encText;
-		std::vector<byte> m_iv;
-		std::vector<byte> m_key;
-		std::vector<byte> m_plnText;
 		size_t m_processorCount;
 		TestEventHandler m_progressEvent;
 
@@ -61,21 +59,39 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		/// Test cipher desription initialization
+		/// </summary>
+		void Description(CipherDescription* Description);
+
+		/// <summary>
+		/// Test file stream access (manual)
+		/// </summary>
+		void File();
+
+		/// <summary>
+		/// Test memory stream access
+		/// </summary>
+		void Memory();
+
+		/// <summary>
+		/// Test stream modes for correct operation
+		/// </summary>
+		void Mode(CipherStream* Cipher);
+
+		/// <summary>
+		/// Test parameters for correct operation
+		/// </summary>
+		void Parameters();
+
+		/// <summary>
+		/// Serialization tests
+		/// </summary>
+		void Serialization();
+
 	private:
 
-		size_t AllocateRandom(std::vector<byte> &Data, size_t Size = 0, size_t NonAlign = 0);
-		void CbcModeTest();
-		void CfbModeTest();
-		void CtrModeTest();
-		void DescriptionTest(Processing::CipherDescription* Description);
-		void FileStreamTest();
-		void Initialize();
-		void MemoryStreamTest();
-		void OnProgress(std::string Data);
-		void ParametersTest();
-		void OfbModeTest();
-		void SerializeStructTest();
-		void StreamModesTest(ICipherMode* Cipher, IPadding* Padding);
+		void OnProgress(const std::string &Data);
 	};
 }
 

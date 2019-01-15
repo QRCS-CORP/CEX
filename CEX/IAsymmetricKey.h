@@ -7,7 +7,7 @@
 #include "CryptoAsymmetricException.h"
 #include "MemoryStream.h"
 
-NAMESPACE_ASYMMETRICKEY
+NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricEngines;
 using Enumeration::AsymmetricKeyTypes;
@@ -83,6 +83,6 @@ public:
 	virtual std::vector<byte> ToBytes() = 0;
 };
 
-NAMESPACE_ASYMMETRICKEYEND
+NAMESPACE_ASYMMETRICEND
 #endif
 

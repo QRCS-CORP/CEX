@@ -1,6 +1,6 @@
 #include "AsymmetricKeyPair.h"
 
-NAMESPACE_ASYMMETRICKEY
+NAMESPACE_ASYMMETRIC
 
 //~~~Constructor~~~//
 
@@ -60,4 +60,4 @@ void AsymmetricKeyPair::Destroy()
 	}
 }
 
-NAMESPACE_ASYMMETRICKEYEND
+NAMESPACE_ASYMMETRICEND

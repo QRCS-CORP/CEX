@@ -7,8 +7,8 @@
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::IBlockCipher;
-	using Cipher::Symmetric::Block::Mode::ICipherMode;
+	using Cipher::Block::IBlockCipher;
+	using Cipher::Block::Mode::ICipherMode;
 
     /// <summary>
     /// Serpent implementation vector comparison tests.
@@ -22,8 +22,8 @@ namespace Test
     {
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t MONTE_CYCLES = 10000;
@@ -123,10 +123,10 @@ namespace Test
 
     private:
 
-		void Compare(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void Kat(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
 		void Initialize();
 		void MonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, size_t Count = 100);
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
     };
 }
 

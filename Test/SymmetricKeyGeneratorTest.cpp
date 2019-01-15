@@ -1,14 +1,21 @@
 #include "SymmetricKeyGeneratorTest.h"
-#include "../CEX/SymmetricKeyGenerator.h"
+#include "RandomUtils.h"
 #include "../CEX/CpuDetect.h"
+#include "../CEX/CryptoGeneratorException.h"
+#include "../CEX/SecureRandom.h"
+#include "../CEX/SymmetricKeyGenerator.h"
 
 namespace Test
 {
-	using Common::CpuDetect;
-	using namespace Key::Symmetric;
+	using Exception::CryptoGeneratorException;
+	using Prng::SecureRandom;
+	using Cipher::SymmetricKeyGenerator;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
+	using Cipher::SymmetricSecureKey;
 
+	const std::string SymmetricKeyGeneratorTest::CLASSNAME = "SymmetricKeyGeneratorTest";
 	const std::string SymmetricKeyGeneratorTest::DESCRIPTION = "SymmetricKeyGenerator test; verifies initialization and access methods.";
-	const std::string SymmetricKeyGeneratorTest::FAILURE = "FAILURE! ";
 	const std::string SymmetricKeyGeneratorTest::SUCCESS = "SUCCESS! All SymmetricKeyGenerator tests have executed succesfully.";
 
 	SymmetricKeyGeneratorTest::SymmetricKeyGeneratorTest()
@@ -35,126 +42,183 @@ namespace Test
 	{
 		try
 		{
-			CheckInit();
-			OnProgress(std::string("SymmetricKeyGenerator: Passed initialization tests.."));
-			CheckAccess();
-			OnProgress(std::string("SymmetricKeyGenerator: Passed output comparison tests.."));
+			Evaluate();
+			OnProgress(std::string("SymmetricKeyGenerator: Passed random output tests.."));
+			Exception();
+			OnProgress(std::string("SymmetricKeyGenerator: Passed exception handling tests.."));
+			Stress();
+			OnProgress(std::string("SymmetricKeyGenerator: Passed stress tests.."));
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void SymmetricKeyGeneratorTest::CheckAccess()
+	void SymmetricKeyGeneratorTest::Evaluate()
 	{
-		// test each provider/digest for valid output
-		SymmetricKeySize keySize(64, 16, 64);
-		SymmetricKeyGenerator keyGen;
+		std::vector<byte> tmps(SAMPLE_SIZE);
+		SymmetricKeyGenerator kgen256(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
+		OnProgress(std::string("Testing pseudo-random generation with a 256-bit security policy using the system provider"));
+		kgen256.Generate(tmps, 0, tmps.size());
+		Evaluate(kgen256.Name(), tmps);
 
-		SymmetricKey* symKey = keyGen.GetSymmetricKey(keySize);
-		if (!IsValidKey(*symKey))
-		{
-			throw TestException(std::string("CheckAccess: The key is invalid!"));
-		}
+		std::memset(tmps.data(), 0x00, tmps.size());
+		SymmetricKeyGenerator kgen512(Enumeration::SecurityPolicy::SPL512, Enumeration::Providers::CSP);
+		OnProgress(std::string("Testing pseudo-random generation with a 512-bit security policy using the system provider"));
+		kgen512.Generate(tmps, 0, tmps.size());
+		Evaluate(kgen512.Name(), tmps);
 
-		SymmetricSecureKey* secKey = keyGen.GetSecureKey(keySize);
-		if (!IsValidKey(*secKey))
-		{
-			throw TestException(std::string("CheckAccess: The key is invalid!"));
-		}
-
-		std::vector<byte> data(128);
-		keyGen.Generate(data);
-		if (!IsGoodRun(data))
-		{
-			throw TestException(std::string("CheckAccess: The key is invalid!"));
-		}
-
-		data = keyGen.Generate(data.size());
-		if (!IsGoodRun(data))
-		{
-			throw TestException(std::string("CheckAccess: The key is invalid!"));
-		}
+		std::memset(tmps.data(), 0x00, tmps.size());
+		SymmetricKeyGenerator kgen1024(Enumeration::SecurityPolicy::SPL1024, Enumeration::Providers::CSP);
+		OnProgress(std::string("Testing pseudo-random generation with a 1024-bit security policy using the system provider"));
+		kgen1024.Generate(tmps, 0, tmps.size());
+		Evaluate(kgen1024.Name(), tmps);
 	}
 
-	void SymmetricKeyGeneratorTest::CheckInit()
+	void SymmetricKeyGeneratorTest::Exception()
 	{
-		// test each access interface for valid output
-		SymmetricKeySize keySize(32, 16, 64);
-		CpuDetect detect;
-
-		// check for rdtscp
-		if (detect.RDTSCP())
+		// test initialization with invalid provider type
+		try
 		{
-			SymmetricKeyGenerator keyGen1(SHA2Digests::SHA256, Providers::CJP);
-			SymmetricKey* symKey1 = keyGen1.GetSymmetricKey(keySize);
-			if (!IsValidKey(*symKey1))
-			{
-				throw TestException(std::string("CheckInit: Key generation has failed!"));
-			}
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::None);
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE1"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 
-		SymmetricKeyGenerator keyGen2(SHA2Digests::SHA512, Providers::CSP);
-		SymmetricKey* symKey2 = keyGen2.GetSymmetricKey(keySize);
-		if (!IsValidKey(*symKey2))
+		// test initialization with invalid policy
+		try
 		{
-			throw TestException(std::string("CheckInit: Key generation has failed!"));
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::None);
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE2"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test initialization with invalid customization string
+		try
+		{
+			std::vector<byte> tmps(0);
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, tmps);
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE3"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test generating a secure-key with a zero-sized key
+		try
+		{
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
+			SymmetricKeySize ks(0, 0, 0);
+			SymmetricSecureKey* sk = kgen.GetSecureKey(ks);
+			delete sk;
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE4"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test generating a key with a zero-sized key
+		try
+		{
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
+			SymmetricKeySize ks(0, 0, 0);
+			SymmetricKey* sk = kgen.GetSymmetricKey(ks);
+			delete sk;
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE5"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 	}
 
-	bool SymmetricKeyGeneratorTest::IsGoodRun(const std::vector<byte> &Input)
+	void SymmetricKeyGeneratorTest::Stress()
 	{
-		bool state = true;
+		std::vector<byte> otp;
+		SecureRandom rnd;
+		size_t i;
+		SymmetricKeyGenerator kgen256(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
 
-		// indicates zeroed output or bad run
-		for (size_t i = 0; i < Input.size() - 4; ++i)
+		otp.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			if (Input[i] == Input[i + 1] &&
-				Input[i + 1] == Input[i + 2] &&
-				Input[i + 2] == Input[i + 3])
+			otp.resize(static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			
+			try
+			{ 
+				kgen256.Generate(otp, 0, otp.size());
+			}
+			catch (const std::exception&)
 			{
-				state = false;
-				break;
+				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress test random generation failure! -SG1"));
+			}
+
+			try
+			{
+				SymmetricKeySize ks(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC), rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC), rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+				SymmetricSecureKey* sk = kgen256.GetSecureKey(ks);
+				delete sk;
+			}
+			catch (const std::exception&)
+			{
+				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress secure key generation failure! -SG2"));
+			}
+
+			try
+			{
+				SymmetricKeySize ks(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC), rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC), rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+				SymmetricKey* sk = kgen256.GetSymmetricKey(ks);
+				delete sk;
+			}
+			catch (const std::exception&)
+			{
+				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress key generation failure! -SG3"));
 			}
 		}
-		return state;
 	}
 
-	bool SymmetricKeyGeneratorTest::IsValidKey(ISymmetricKey &KeyParam)
+	void SymmetricKeyGeneratorTest::Evaluate(const std::string &Name, std::vector<byte> &Sample)
 	{
-		if (KeyParam.Key().size() != 0)
-		{
-			if (!IsGoodRun(KeyParam.Key()))
-			{
-				return false;
-			}
-		}
-		if (KeyParam.Nonce().size() != 0)
-		{
-			if (!IsGoodRun(KeyParam.Nonce()))
-			{
-				return false;
-			}
-		}
-		if (KeyParam.Info().size() != 0)
-		{
-			if (!IsGoodRun(KeyParam.Info()))
-			{
-				return false;
-			}
-		}
-
-		return true;
+		RandomUtils::Evaluate(Name, Sample);
 	}
 
-	void SymmetricKeyGeneratorTest::OnProgress(std::string Data)
+	void SymmetricKeyGeneratorTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

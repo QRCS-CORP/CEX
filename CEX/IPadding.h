@@ -3,12 +3,14 @@
 
 #include "CexDomain.h"
 #include "CryptoPaddingException.h"
+#include "ErrorCodes.h"
 #include "PaddingModes.h"
 
 NAMESPACE_PADDING
 
-using Enumeration::PaddingModes;
 using Exception::CryptoPaddingException;
+using Enumeration::PaddingModes; 
+using Enumeration::ErrorCodes;
 
 /// <summary>
 /// Padding Mode Interface
@@ -58,33 +60,33 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Add padding to input array
+	/// Add padding to an input array
 	/// </summary>
 	///
-	/// <param name="Input">Array to modify</param>
-	/// <param name="Offset">Offset into array</param>
-	///
-	/// <returns>Length of padding</returns>
-	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset) = 0;
+	/// <param name="Input">The array to modify</param>
+	/// <param name="Offset">The starting offset in the array</param>
+	/// <param name="Length">The number of bytes to pad</param>
+	virtual void AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Get the length of padding in an array
 	/// </summary>
 	///
-	/// <param name="Input">Padded array of bytes</param>
+	/// <param name="Input">The padded array of bytes</param>
 	///
-	/// <returns>Length of padding</returns>
-	virtual size_t GetPaddingLength(const std::vector<byte> &Input) = 0;
+	/// <returns>Returns the length of padding in bytes</returns>
+	virtual size_t GetBlockLength(const std::vector<byte> &Input) = 0;
 
 	/// <summary>
-	/// Get the length of padding in an array
+	/// Get the length of padding in an array using offset and length
 	/// </summary>
 	///
-	/// <param name="Input">Padded array of bytes</param>
-	/// <param name="Offset">Offset into array</param>
+	/// <param name="Input">The padded array of bytes</param>
+	/// <param name="Offset">The starting offset in the array</param>
+	/// <param name="Length">The upper bound of bytes to check</param>
 	///
-	/// <returns>Length of padding</returns>
-	virtual size_t GetPaddingLength(const std::vector<byte> &Input, size_t Offset) = 0;
+	/// <returns>Returns the length of padding in bytes</returns>
+	virtual size_t GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 };
 
 NAMESPACE_PADDINGEND

@@ -17,8 +17,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const std::string DMK_INP;
 		static const std::string DMK_KEY;
@@ -119,7 +119,7 @@ namespace Test
 
 	private:
 
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 #endif

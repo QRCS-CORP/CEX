@@ -1,14 +1,14 @@
 #include "MPKCM12T62.h"
 #include "IAeadMode.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "McElieceUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MCELIECE
 
-using Cipher::Symmetric::Block::Mode::IAeadMode;
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Cipher::Block::Mode::IAeadMode;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 const std::array<std::array<ulong, 12>, 63> MPKCM12T62::ButterflyConsts =
 { 
@@ -743,7 +743,7 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 
 	std::array<ulong, MPKC_CND_SIZE / 8> cond;
 
-	IntUtils::BlockToLe(PrivateKey, MPKC_IRR_SIZE, cond, 0, MPKC_CND_SIZE);
+	IntegerTools::BlockToLe(PrivateKey, MPKC_IRR_SIZE, cond, 0, MPKC_CND_SIZE);
 	std::vector<ulong> recv(64);
 	PreProcess(recv, S);
 	McElieceUtils::BenesCompact(recv, cond, 1);
@@ -760,7 +760,7 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 
 	// Berlekamp Massey
 	std::array<ulong, MPKC_M> locator;
-	Utility::MemUtils::Clear(locator, 0, locator.size() * sizeof(ulong));
+	Utility::MemoryTools::Clear(locator, 0, locator.size() * sizeof(ulong));
 	BerlekampMassey(locator, sPriv);
 
 	// additive FFT
@@ -812,7 +812,7 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 
 	// compact and store
 	McElieceUtils::BenesCompact(error, cond, 0);
-	IntUtils::LeToBlock(error, 0, E, 0, error.size() * sizeof(ulong));
+	IntegerTools::LeToBlock(error, 0, E, 0, error.size() * sizeof(ulong));
 
 	t |= McElieceUtils::Weight(error) ^ MPKC_T;
 	t -= 1;
@@ -866,7 +866,7 @@ void MPKCM12T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array<s
 	std::array<ulong, MPKC_M> tmpC;
 
 	Output[0] = 1;
-	MemUtils::Copy(Output, 0, B, 0, MPKC_M * sizeof(ulong));
+	MemoryTools::Copy(Output, 0, B, 0, MPKC_M * sizeof(ulong));
 	Output[0] <<= 63;
 	B[0] <<= 62;
 	b = 1;
@@ -968,7 +968,7 @@ void MPKCM12T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array<s
 
 void MPKCM12T62::PreProcess(std::vector<ulong> &Received, const std::vector<byte> &S)
 {
-	IntUtils::BlockToLe(S, 0, Received, 0, MPKC_CPACIPHERTEXT_SIZE - 5);
+	IntegerTools::BlockToLe(S, 0, Received, 0, MPKC_CPACIPHERTEXT_SIZE - 5);
 
 	Received[MPKC_CPACIPHERTEXT_SIZE / 8] <<= 8;
 	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8) + 4];
@@ -990,7 +990,7 @@ void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, 64> &Output, std:
 	size_t i;
 
 	// computing inverses
-	MemUtils::Copy(PrivateKey, 0, skInt, 0, MPKC_M * sizeof(ulong));
+	MemoryTools::Copy(PrivateKey, 0, skInt, 0, MPKC_M * sizeof(ulong));
 	AdditiveFFT::Transform(eval, skInt);
 	Square(eval[0], eval[0]);
 	McElieceUtils::Copy(eval[0], Inverse[0]);
@@ -1089,7 +1089,7 @@ void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 
 	while (1)
 	{
-		IntUtils::Fill(ind, 0, ind.size(), Rng.get());
+		IntegerTools::Fill(ind, 0, ind.size(), Rng.get());
 
 		for (i = 0; i < MPKC_T; i++) 
 		{
@@ -1134,7 +1134,7 @@ void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 		}
 	}
 
-	IntUtils::LeToBlock(eInt, 0, E, 0, eInt.size() * sizeof(ulong));
+	IntegerTools::LeToBlock(eInt, 0, E, 0, eInt.size() * sizeof(ulong));
 }
 
 void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKey, const std::vector<byte> &E)
@@ -1143,7 +1143,7 @@ void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicK
 	const size_t COLLEN = MPKC_PKN_COLS / 8;
 
 	std::array<ulong, ARRLEN> eInt;
-	MemUtils::Copy(E, MPKC_CPACIPHERTEXT_SIZE, eInt, 0, COLLEN);
+	MemoryTools::Copy(E, MPKC_CPACIPHERTEXT_SIZE, eInt, 0, COLLEN);
 	std::array<ulong, ARRLEN> rowInt;
 	std::array<ulong, 8> tmp;
 	size_t i;
@@ -1156,7 +1156,7 @@ void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicK
 		for (cnt = 0; cnt < 8; cnt++)
 		{
 			rowInt[ARRLEN - 1] = 0;
-			MemUtils::Copy(PublicKey, ((i + cnt) * COLLEN), rowInt, 0, COLLEN);
+			MemoryTools::Copy(PublicKey, ((i + cnt) * COLLEN), rowInt, 0, COLLEN);
 			tmp[cnt] = 0;
 
 			for (j = 0; j < ARRLEN; j++)
@@ -1279,7 +1279,7 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 
 	while (1)
 	{
-		IntUtils::Fill(f, 0, f.size(), Rng.get());
+		IntegerTools::Fill(f, 0, f.size(), Rng.get());
 
 		for (i = 0; i < MPKC_T; i++) 
 		{
@@ -1302,15 +1302,15 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 			skInt[i] |= (irr[cnt] >> i) & 1;
 		}
 
-		IntUtils::Le64ToBytes(skInt[i], PrivateKey, i * 8);
+		IntegerTools::Le64ToBytes(skInt[i], PrivateKey, i * 8);
 	}
 
 	std::vector<ulong> cond(MPKC_CND_SIZE / 8);
-	IntUtils::Fill(cond, 0, cond.size(), Rng.get());
+	IntegerTools::Fill(cond, 0, cond.size(), Rng.get());
 
 	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
 	{
-		IntUtils::Le64ToBytes(cond[i], PrivateKey, MPKC_IRR_SIZE + i * 8);
+		IntegerTools::Le64ToBytes(cond[i], PrivateKey, MPKC_IRR_SIZE + i * 8);
 	}
 }
 
@@ -1330,7 +1330,7 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 	// compute the inverses
 	for (i = 0; i < MPKC_M; i++)
 	{
-		skInt[i] = IntUtils::LeBytesTo64(PrivateKey, i * 8);
+		skInt[i] = IntegerTools::LeBytesTo64(PrivateKey, i * 8);
 	}
 
 	std::array<std::array<ulong, MPKC_M>, 64> eval;
@@ -1381,7 +1381,7 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 	std::array<ulong, MPKC_CND_SIZE / 8> cond;
 	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
 	{
-		cond[i] = IntUtils::LeBytesTo64(PrivateKey, MPKC_IRR_SIZE + i * 8);
+		cond[i] = IntegerTools::LeBytesTo64(PrivateKey, MPKC_IRR_SIZE + i * 8);
 	}
 
 	for (i = 0; i < MPKC_PKN_ROWS; i++)
@@ -1462,7 +1462,7 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 
 			for (j = MPKC_M; j < 64; j++)
 			{
-				IntUtils::Le64ToBytes(mat[i][j], PublicKey, pos);
+				IntegerTools::Le64ToBytes(mat[i][j], PublicKey, pos);
 				pos += 8;
 			}
 		}
@@ -1965,7 +1965,7 @@ void MPKCM12T62::Square(std::array<ulong, MPKC_M> &Output, std::array<ulong, MPK
 	sum[10] = Input[5] ^ Input[11];
 	sum[11] = Input[10];
 
-	MemUtils::Copy(sum, 0, Output, 0, MPKC_M * sizeof(ulong));
+	MemoryTools::Copy(sum, 0, Output, 0, MPKC_M * sizeof(ulong));
 }
 
 NAMESPACE_MCELIECEEND

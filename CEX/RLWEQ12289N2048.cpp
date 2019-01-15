@@ -1,7 +1,7 @@
 #include "RLWEQ12289N2048.h"
 #include "BCG.h"
 #include "GCM.h"
-#include "MemUtils.h"
+#include "MemoryTools.h"
 #include "SHAKE.h"
 
 #if defined(__AVX512__)

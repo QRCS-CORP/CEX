@@ -305,16 +305,16 @@ static void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, s
 template<typename T>
 static void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R0 = Utility::IntUtils::RotL32(R0, 13);
-	R2 = Utility::IntUtils::RotL32(R2, 3);
+	R0 = Utility::IntegerTools::RotL32(R0, 13);
+	R2 = Utility::IntegerTools::RotL32(R2, 3);
 	R1 ^= R0 ^ R2;
 	R3 ^= R2 ^ (R0 << 3);
-	R1 = Utility::IntUtils::RotL32(R1, 1);
-	R3 = Utility::IntUtils::RotL32(R3, 7);
+	R1 = Utility::IntegerTools::RotL32(R1, 1);
+	R3 = Utility::IntegerTools::RotL32(R3, 7);
 	R0 ^= R1 ^ R3;
 	R2 ^= R3 ^ (R1 << 7);
-	R0 = Utility::IntUtils::RotL32(R0, 5);
-	R2 = Utility::IntUtils::RotL32(R2, 22);
+	R0 = Utility::IntegerTools::RotL32(R0, 5);
+	R2 = Utility::IntegerTools::RotL32(R2, 22);
 }
 
 template<typename T>
@@ -335,16 +335,16 @@ static void LinearTransformW(T &R0, T &R1, T &R2, T &R3)
 template<typename T>
 static void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R2 = Utility::IntUtils::RotR32(R2, 22);
-	R0 = Utility::IntUtils::RotR32(R0, 5);
+	R2 = Utility::IntegerTools::RotR32(R2, 22);
+	R0 = Utility::IntegerTools::RotR32(R0, 5);
 	R2 ^= R3 ^ (R1 << 7);
 	R0 ^= R1 ^ R3;
-	R3 = Utility::IntUtils::RotR32(R3, 7);
-	R1 = Utility::IntUtils::RotR32(R1, 1);
+	R3 = Utility::IntegerTools::RotR32(R3, 7);
+	R1 = Utility::IntegerTools::RotR32(R1, 1);
 	R3 ^= R2 ^ (R0 << 3);
 	R1 ^= R0 ^ R2;
-	R2 = Utility::IntUtils::RotR32(R2, 3);
-	R0 = Utility::IntUtils::RotR32(R0, 13);
+	R2 = Utility::IntegerTools::RotR32(R2, 3);
+	R0 = Utility::IntegerTools::RotR32(R0, 13);
 }
 
 template<typename T>

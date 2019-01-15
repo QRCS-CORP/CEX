@@ -6,7 +6,7 @@
 
 namespace Test
 {
-	using Cipher::Symmetric::Stream::IStreamCipher;
+	using Cipher::Stream::IStreamCipher;
 
 	/// <summary>
 	/// The Threefish implementation KAT, monte carlo, stress, permutation, parallelization, authentication, and exception handling tests
@@ -25,8 +25,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t MONTE_CYCLES = 10000;
@@ -98,8 +98,6 @@ namespace Test
 		/// <summary>
 		/// Test exception handlers for correct execution
 		/// </summary>
-		/// 
-		/// <param name="Cipher">The cipher instance pointer</param>
 		void Exception(IStreamCipher* Cipher);
 
 		/// <summary>
@@ -166,7 +164,7 @@ namespace Test
 	private:
 
 		void Initialize();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

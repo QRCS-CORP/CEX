@@ -8,7 +8,7 @@
 NAMESPACE_HELPER
 
 using Exception::CryptoException;
-using Cipher::Symmetric::Block::Padding::IPadding;
+using Cipher::Block::Padding::IPadding;
 using Enumeration::PaddingModes;
 
 /// <summary>

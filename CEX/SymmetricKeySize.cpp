@@ -1,10 +1,10 @@
 #include "SymmetricKeySize.h"
-#include "CryptoProcessingException.h"
-#include "MemUtils.h"
+#include "MemoryTools.h"
 
-NAMESPACE_SYMMETRICKEY
+NAMESPACE_CIPHER
 
-using Utility::MemUtils;
+using Enumeration::ErrorCodes;
+using Utility::MemoryTools;
 
 //~~~Constructor~~~//
 
@@ -24,12 +24,12 @@ SymmetricKeySize::SymmetricKeySize(const std::vector<byte> &KeyArray)
 {
 	if (KeyArray.size() < HDR_SIZE)
 	{
-		throw Exception::CryptoProcessingException("SymmetricKeySize:Ctor", "The KeyArray buffer is too small!");
+		throw CryptoProcessingException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The key array buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
-	MemUtils::CopyToValue(KeyArray, 0, m_infoSize, sizeof(uint));
-	MemUtils::CopyToValue(KeyArray, sizeof(uint), m_keySize, sizeof(uint));
-	MemUtils::CopyToValue(KeyArray, 2 * sizeof(uint), m_nonceSize, sizeof(uint));
+	MemoryTools::CopyToValue(KeyArray, 0, m_infoSize, sizeof(uint));
+	MemoryTools::CopyToValue(KeyArray, sizeof(uint), m_keySize, sizeof(uint));
+	MemoryTools::CopyToValue(KeyArray, 2 * sizeof(uint), m_nonceSize, sizeof(uint));
 }
 
 SymmetricKeySize::SymmetricKeySize(size_t KeySize, size_t NonceSize, size_t InfoSize)
@@ -80,6 +80,7 @@ bool SymmetricKeySize::Contains(std::vector<SymmetricKeySize> SymmetricKeySizes,
 			if (SymmetricKeySizes[i].KeySize() == KeySize && SymmetricKeySizes[i].NonceSize() == NonceSize && SymmetricKeySizes[i].InfoSize() == InfoSize)
 			{
 				ret = true;
+				break;
 			}
 		}
 		else if (KeySize != 0 && NonceSize != 0)
@@ -87,6 +88,7 @@ bool SymmetricKeySize::Contains(std::vector<SymmetricKeySize> SymmetricKeySizes,
 			if (SymmetricKeySizes[i].KeySize() == KeySize && SymmetricKeySizes[i].NonceSize() == NonceSize)
 			{
 				ret = true;
+				break;
 			}
 		}
 		else if (KeySize != 0 && InfoSize != 0)
@@ -94,6 +96,7 @@ bool SymmetricKeySize::Contains(std::vector<SymmetricKeySize> SymmetricKeySizes,
 			if (SymmetricKeySizes[i].KeySize() == KeySize && SymmetricKeySizes[i].InfoSize() == InfoSize)
 			{
 				ret = true;
+				break;
 			}
 		}
 		else
@@ -101,6 +104,7 @@ bool SymmetricKeySize::Contains(std::vector<SymmetricKeySize> SymmetricKeySizes,
 			if (SymmetricKeySizes[i].KeySize() == KeySize)
 			{
 				ret = true;
+				break;
 			}
 		}
 	}
@@ -145,11 +149,11 @@ std::vector<byte> SymmetricKeySize::ToBytes()
 {
 	std::vector<byte> trs(HDR_SIZE, 0);
 
-	MemUtils::CopyFromValue(m_infoSize, trs, 0, sizeof(uint));
-	MemUtils::CopyFromValue(m_keySize, trs, sizeof(uint), sizeof(uint));
-	MemUtils::CopyFromValue(m_nonceSize, trs, 2 * sizeof(uint), sizeof(uint));
+	MemoryTools::CopyFromValue(m_infoSize, trs, 0, sizeof(uint));
+	MemoryTools::CopyFromValue(m_keySize, trs, sizeof(uint), sizeof(uint));
+	MemoryTools::CopyFromValue(m_nonceSize, trs, 2 * sizeof(uint), sizeof(uint));
 
 	return trs;
 }
 
-NAMESPACE_SYMMETRICKEYEND
+NAMESPACE_CIPHEREND

@@ -1,20 +1,20 @@
 #include "SHAKETest.h"
 #include "../CEX/SHAKE.h"
 #include "../CEX/IDigest.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKeySize.h"
 
 namespace Test
 {
 	using Exception::CryptoKdfException;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 	using Kdf::SHAKE;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKeySize;
 
+	const std::string SHAKETest::CLASSNAME = "SHAKETest";
 	const std::string SHAKETest::DESCRIPTION = "SHAKE XOF Known Answer Tests";
-	const std::string SHAKETest::FAILURE = "FAILURE! ";
 	const std::string SHAKETest::SUCCESS = "SUCCESS! All SHAKE tests have executed succesfully.";
 
 	SHAKETest::SHAKETest()
@@ -28,8 +28,8 @@ namespace Test
 
 	SHAKETest::~SHAKETest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
 	}
 
 	const std::string SHAKETest::Description()
@@ -111,11 +111,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -125,9 +125,9 @@ namespace Test
 		try
 		{
 			// invalid digest choice
-			SHAKE kdf(ShakeModes::None);
+			SHAKE gen(ShakeModes::None);
 
-			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE1"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -140,12 +140,12 @@ namespace Test
 		// test initialization
 		try
 		{
-			SHAKE kdf(ShakeModes::SHAKE128);
+			SHAKE gen(ShakeModes::SHAKE128);
 			// invalid key size
 			std::vector<byte> key(1);
-			kdf.Initialize(key);
+			gen.Initialize(key);
 
-			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE2"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -158,12 +158,12 @@ namespace Test
 		// test generator state -1
 		try
 		{
-			SHAKE kdf(ShakeModes::SHAKE128);
+			SHAKE gen(ShakeModes::SHAKE128);
 			std::vector<byte> otp(32);
 			// generator was not initialized
-			kdf.Generate(otp);
+			gen.Generate(otp);
 
-			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE3"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -176,16 +176,16 @@ namespace Test
 		// test generator state -2
 		try
 		{
-			SHAKE kdf(ShakeModes::SHAKE128);
-			Key::Symmetric::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
+			SHAKE gen(ShakeModes::SHAKE128);
+			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> otp(32);
 
-			kdf.Initialize(key);
+			gen.Initialize(key);
 			// array too small
-			kdf.Generate(otp, 0, otp.size() + 1);
+			gen.Generate(otp, 0, otp.size() + 1);
 
-			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE4"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -214,7 +214,7 @@ namespace Test
 
 		if (otp != Expected)
 		{
-			throw TestException(std::string("Kat: Output does not match the known answer! -SK1"));
+			throw TestException(std::string("Kat"), Generator->Name(), std::string("Output does not match the known answer! -SK1"));
 		}
 	}
 
@@ -491,7 +491,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void SHAKETest::OnProgress(std::string Data)
+	void SHAKETest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -513,7 +513,7 @@ namespace Test
 			const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			otp1.resize(OTPLEN);
 			otp2.resize(OTPLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
 
 			// generate with the kdf
 			Generator->Initialize(key);
@@ -524,7 +524,7 @@ namespace Test
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("Reset: Returns a different array after reset! -HR1"));
+				throw TestException(std::string("Params"), Generator->Name(), std::string("Returns a different array after reset! -HR1"));
 			}
 		}
 	}
@@ -545,16 +545,16 @@ namespace Test
 			{
 				const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				otp.resize(OTPLEN);
-				IntUtils::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(key, 0, key.size(), rnd);
 
 				// generate with the kdf
 				Generator->Initialize(key);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Stress: The generator has thrown an exception! -HS1"));
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("The generator has thrown an exception! -HS1"));
 			}
 		}
 	}

@@ -10,7 +10,7 @@ NAMESPACE_HELPER
 
 using Processing::CipherDescription;
 using Exception::CryptoException;
-using Cipher::Symmetric::Block::Mode::ICipherMode;
+using Cipher::Block::Mode::ICipherMode;
 using Enumeration::BlockCiphers;
 
 /// <summary>

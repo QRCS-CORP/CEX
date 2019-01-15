@@ -8,6 +8,7 @@
 NAMESPACE_PRNG
 
 using Exception::CryptoRandomException;
+using Enumeration::ErrorCodes;
 using Enumeration::Prngs;
 
 /// <summary>

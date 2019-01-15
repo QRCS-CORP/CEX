@@ -15,14 +15,14 @@
 namespace Test
 {
 	/// <summary>
-	/// Tests the MemUtils SIMD implementations
+	/// Tests the MemoryTools SIMD implementations
 	/// </summary>
 	class MemUtilsTest final : public ITest
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 		static const std::string TESTSIZE;
 		static const size_t KB1 = 1024;
@@ -53,6 +53,11 @@ namespace Test
 		const std::string Description() override;
 
 		/// <summary>
+		/// Evaluate memory operations for correct operation
+		/// </summary>
+		void Evaluate();
+
+		/// <summary>
 		/// Progress return event callback
 		/// </summary>
 		TestEventHandler &Progress() override;
@@ -64,8 +69,8 @@ namespace Test
 
 	private:
 
-		void OnProgress(std::string Data);
-		void UtilsCompare();
+		void OnProgress(const std::string &Data);
+
 	};
 }
 

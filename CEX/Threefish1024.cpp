@@ -1,8 +1,8 @@
 #include "Threefish1024.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "MacFromName.h"
-#include "MemUtils.h"
-#include "ParallelUtils.h"
+#include "MemoryTools.h"
+#include "ParallelTools.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
 #include "Threefish.h"
@@ -15,9 +15,9 @@
 
 NAMESPACE_STREAM
 
-using Utility::IntUtils;
-using Utility::MemUtils;
-using Utility::ParallelUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
+using Utility::ParallelTools;
 
 const std::string Threefish1024::CLASS_NAME("Threefish1024");
 const std::vector<byte> Threefish1024::OMEGA_INFO = { 0x54, 0x68, 0x72, 0x65, 0x65, 0x66, 0x69, 0x73, 0x68, 0x31, 0x30, 0x32, 0x34, 0x31, 0x32, 0x30 };
@@ -41,8 +41,8 @@ struct Threefish1024::Threefish1024State
 		// 128 bits of counter
 		C[0] = 0;
 		C[1] = 0;
-		MemUtils::Clear(K, 0, K.size() * sizeof(ulong));
-		MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
+		MemoryTools::Clear(K, 0, K.size() * sizeof(ulong));
+		MemoryTools::Clear(T, 0, T.size() * sizeof(ulong));
 	}
 };
 
@@ -60,7 +60,7 @@ Threefish1024::Threefish1024(StreamAuthenticators AuthenticatorType)
 	m_macAuthenticator(m_authenticatorType == StreamAuthenticators::None ? nullptr :
 		Helper::MacFromName::GetInstance(AuthenticatorType)),
 	m_macCounter(0),
-	m_macKey(nullptr),
+	m_macKey(0),
 	m_macTag(0),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
@@ -87,14 +87,11 @@ Threefish1024::~Threefish1024()
 		{
 			m_macAuthenticator.reset(nullptr);
 		}
-		if (m_macKey != nullptr)
-		{
-			m_macKey.reset(nullptr);
-		}
 
-		IntUtils::ClearVector(m_cShakeCustom);
-		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearVector(m_macTag);
+		IntegerTools::Clear(m_cShakeCustom);
+		IntegerTools::Clear(m_legalKeySizes);
+		IntegerTools::Clear(m_macKey);
+		IntegerTools::Clear(m_macTag);
 	}
 }
 
@@ -152,33 +149,42 @@ const std::vector<SymmetricKeySize> &Threefish1024::LegalKeySizes()
 
 const std::string Threefish1024::Name()
 {
+	std::string name;
+
 	switch (m_authenticatorType)
 	{
 		case StreamAuthenticators::HMACSHA256:
 		{
-			return CLASS_NAME + "+HMAC-SHA256";
+			name = CLASS_NAME + "-HMAC-SHA256";
+			break;
 		}
 		case StreamAuthenticators::HMACSHA512:
 		{
-			return CLASS_NAME + "+HMAC-SHA512";
+			name = CLASS_NAME + "-HMAC-SHA512";
+			break;
 		}
 		case StreamAuthenticators::KMAC256:
 		{
-			return CLASS_NAME + "+KMAC-256";
+			name = CLASS_NAME + "-KMAC256";
+			break;
 		}
 		case StreamAuthenticators::KMAC512:
 		{
-			return CLASS_NAME + "+KMAC-512";
+			name = CLASS_NAME + "-KMAC512";
+			break;
 		}
 		case StreamAuthenticators::KMAC1024:
 		{
-			return CLASS_NAME + "+KMAC-1024";
+			name = CLASS_NAME + "-KMAC1024";
+			break;
 		}
 		default:
 		{
-			return CLASS_NAME;
+			name = CLASS_NAME;
 		}
 	}
+
+	return name;
 }
 
 const size_t Threefish1024::ParallelBlockSize()
@@ -198,7 +204,7 @@ const std::vector<byte> &Threefish1024::Tag()
 
 const size_t Threefish1024::TagSize()
 {
-	return m_macAuthenticator != nullptr ? m_macAuthenticator->MacSize() : 0;
+	return m_macAuthenticator != nullptr ? m_macAuthenticator->TagSize() : 0;
 }
 
 //~~~Public Functions~~~//
@@ -207,26 +213,26 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (KeyParams.Key().size() != KEY_SIZE)
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Initialize", "Key must be 64 bytes!");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 	if (KeyParams.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Initialize", "Nonce must be 16 bytes!");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidSize);
 	}
 	if (KeyParams.Info().size() > 0 && KeyParams.Info().size() > INFO_SIZE)
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Initialize", "Info must be no more than 16 bytes!");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Info must be no more than 16 bytes!"), ErrorCodes::InvalidSize);
 	}
 
 	if (m_parallelProfile.IsParallel())
 	{
 		if (m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
 		{
-			throw CryptoSymmetricCipherException("Threefish1024:Initialize", "The parallel profile block sizes are misconfigured!");
+			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size is out of bounds!"), ErrorCodes::InvalidSize);
 		}
 		if (m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		{
-			throw CryptoSymmetricCipherException("Threefish1024:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidSize);
 		}
 	}
 
@@ -234,40 +240,40 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	Reset();
 
 	// copy nonce
-	m_cipherState->C[0] = IntUtils::LeBytesTo64(KeyParams.Nonce(), 0);
-	m_cipherState->C[1] = IntUtils::LeBytesTo64(KeyParams.Nonce(), 8);
+	m_cipherState->C[0] = IntegerTools::LeBytesTo64(KeyParams.Nonce(), 0);
+	m_cipherState->C[1] = IntegerTools::LeBytesTo64(KeyParams.Nonce(), 8);
 
 	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		m_cipherState->T[0] = IntUtils::LeBytesTo64(KeyParams.Info(), 0);
-		m_cipherState->T[1] = IntUtils::LeBytesTo64(KeyParams.Info(), 8);
+		m_cipherState->T[0] = IntegerTools::LeBytesTo64(KeyParams.Info(), 0);
+		m_cipherState->T[1] = IntegerTools::LeBytesTo64(KeyParams.Info(), 8);
 	}
 	else
 	{
 		// default tweak
-		m_cipherState->T[0] = IntUtils::LeBytesTo64(OMEGA_INFO, 0);
-		m_cipherState->T[1] = IntUtils::LeBytesTo64(OMEGA_INFO, 8);
+		m_cipherState->T[0] = IntegerTools::LeBytesTo64(OMEGA_INFO, 0);
+		m_cipherState->T[1] = IntegerTools::LeBytesTo64(OMEGA_INFO, 8);
 	}
 
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
-		m_cipherState->K[0] = IntUtils::LeBytesTo64(KeyParams.Key(), 0);
-		m_cipherState->K[1] = IntUtils::LeBytesTo64(KeyParams.Key(), 8);
-		m_cipherState->K[2] = IntUtils::LeBytesTo64(KeyParams.Key(), 16);
-		m_cipherState->K[3] = IntUtils::LeBytesTo64(KeyParams.Key(), 24);
-		m_cipherState->K[4] = IntUtils::LeBytesTo64(KeyParams.Key(), 32);
-		m_cipherState->K[5] = IntUtils::LeBytesTo64(KeyParams.Key(), 40);
-		m_cipherState->K[6] = IntUtils::LeBytesTo64(KeyParams.Key(), 48);
-		m_cipherState->K[7] = IntUtils::LeBytesTo64(KeyParams.Key(), 56);
-		m_cipherState->K[8] = IntUtils::LeBytesTo64(KeyParams.Key(), 64);
-		m_cipherState->K[9] = IntUtils::LeBytesTo64(KeyParams.Key(), 72);
-		m_cipherState->K[10] = IntUtils::LeBytesTo64(KeyParams.Key(), 80);
-		m_cipherState->K[11] = IntUtils::LeBytesTo64(KeyParams.Key(), 88);
-		m_cipherState->K[12] = IntUtils::LeBytesTo64(KeyParams.Key(), 96);
-		m_cipherState->K[13] = IntUtils::LeBytesTo64(KeyParams.Key(), 104);
-		m_cipherState->K[14] = IntUtils::LeBytesTo64(KeyParams.Key(), 112);
-		m_cipherState->K[15] = IntUtils::LeBytesTo64(KeyParams.Key(), 120);
+		m_cipherState->K[0] = IntegerTools::LeBytesTo64(KeyParams.Key(), 0);
+		m_cipherState->K[1] = IntegerTools::LeBytesTo64(KeyParams.Key(), 8);
+		m_cipherState->K[2] = IntegerTools::LeBytesTo64(KeyParams.Key(), 16);
+		m_cipherState->K[3] = IntegerTools::LeBytesTo64(KeyParams.Key(), 24);
+		m_cipherState->K[4] = IntegerTools::LeBytesTo64(KeyParams.Key(), 32);
+		m_cipherState->K[5] = IntegerTools::LeBytesTo64(KeyParams.Key(), 40);
+		m_cipherState->K[6] = IntegerTools::LeBytesTo64(KeyParams.Key(), 48);
+		m_cipherState->K[7] = IntegerTools::LeBytesTo64(KeyParams.Key(), 56);
+		m_cipherState->K[8] = IntegerTools::LeBytesTo64(KeyParams.Key(), 64);
+		m_cipherState->K[9] = IntegerTools::LeBytesTo64(KeyParams.Key(), 72);
+		m_cipherState->K[10] = IntegerTools::LeBytesTo64(KeyParams.Key(), 80);
+		m_cipherState->K[11] = IntegerTools::LeBytesTo64(KeyParams.Key(), 88);
+		m_cipherState->K[12] = IntegerTools::LeBytesTo64(KeyParams.Key(), 96);
+		m_cipherState->K[13] = IntegerTools::LeBytesTo64(KeyParams.Key(), 104);
+		m_cipherState->K[14] = IntegerTools::LeBytesTo64(KeyParams.Key(), 112);
+		m_cipherState->K[15] = IntegerTools::LeBytesTo64(KeyParams.Key(), 120);
 	}
 	else
 	{
@@ -277,8 +283,8 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		// create the cSHAKE customization string
 		m_cShakeCustom.resize(sizeof(ulong) + Name().size());
 		// add mac counter and algorithm name to customization string
-		IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
-		MemUtils::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
+		IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+		MemoryTools::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE1024);
@@ -289,28 +295,30 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		gen.Generate(ck);
 
 		// copy key to state
-		m_cipherState->K[0] = IntUtils::LeBytesTo64(ck, 0);
-		m_cipherState->K[1] = IntUtils::LeBytesTo64(ck, 8);
-		m_cipherState->K[2] = IntUtils::LeBytesTo64(ck, 16);
-		m_cipherState->K[3] = IntUtils::LeBytesTo64(ck, 24);
-		m_cipherState->K[4] = IntUtils::LeBytesTo64(ck, 32);
-		m_cipherState->K[5] = IntUtils::LeBytesTo64(ck, 40);
-		m_cipherState->K[6] = IntUtils::LeBytesTo64(ck, 48);
-		m_cipherState->K[7] = IntUtils::LeBytesTo64(ck, 56);
-		m_cipherState->K[8] = IntUtils::LeBytesTo64(ck, 64);
-		m_cipherState->K[9] = IntUtils::LeBytesTo64(ck, 72);
-		m_cipherState->K[10] = IntUtils::LeBytesTo64(ck, 80);
-		m_cipherState->K[11] = IntUtils::LeBytesTo64(ck, 88);
-		m_cipherState->K[12] = IntUtils::LeBytesTo64(ck, 96);
-		m_cipherState->K[13] = IntUtils::LeBytesTo64(ck, 104);
-		m_cipherState->K[14] = IntUtils::LeBytesTo64(ck, 112);
-		m_cipherState->K[15] = IntUtils::LeBytesTo64(ck, 120);
+		m_cipherState->K[0] = IntegerTools::LeBytesTo64(ck, 0);
+		m_cipherState->K[1] = IntegerTools::LeBytesTo64(ck, 8);
+		m_cipherState->K[2] = IntegerTools::LeBytesTo64(ck, 16);
+		m_cipherState->K[3] = IntegerTools::LeBytesTo64(ck, 24);
+		m_cipherState->K[4] = IntegerTools::LeBytesTo64(ck, 32);
+		m_cipherState->K[5] = IntegerTools::LeBytesTo64(ck, 40);
+		m_cipherState->K[6] = IntegerTools::LeBytesTo64(ck, 48);
+		m_cipherState->K[7] = IntegerTools::LeBytesTo64(ck, 56);
+		m_cipherState->K[8] = IntegerTools::LeBytesTo64(ck, 64);
+		m_cipherState->K[9] = IntegerTools::LeBytesTo64(ck, 72);
+		m_cipherState->K[10] = IntegerTools::LeBytesTo64(ck, 80);
+		m_cipherState->K[11] = IntegerTools::LeBytesTo64(ck, 88);
+		m_cipherState->K[12] = IntegerTools::LeBytesTo64(ck, 96);
+		m_cipherState->K[13] = IntegerTools::LeBytesTo64(ck, 104);
+		m_cipherState->K[14] = IntegerTools::LeBytesTo64(ck, 112);
+		m_cipherState->K[15] = IntegerTools::LeBytesTo64(ck, 120);
 
 		// generate the mac key
-		std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
-		gen.Generate(mk);
-		m_macKey.reset(new SymmetricSecureKey(mk));
-		m_macAuthenticator->Initialize(*m_macKey.get());
+		std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+		gen.Generate(mack);
+		// store the key
+		m_macKey.assign(mack.begin(), mack.end());
+		// initailize the mac
+		m_macAuthenticator->Initialize(SymmetricKey(mack));
 	}
 
 	m_isEncryption = Encryption;
@@ -321,7 +329,7 @@ void Threefish1024::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoSymmetricCipherException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::InvalidParam);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -331,11 +339,11 @@ void Threefish1024::SetAssociatedData(const std::vector<byte> &Input, const size
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Finalize", "The cipher has not been initialized!");
+		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (m_macAuthenticator == nullptr)
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Finalize", "The cipher has not been configured for authentication!");
+		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
 
 	// update the authenticator
@@ -344,7 +352,52 @@ void Threefish1024::SetAssociatedData(const std::vector<byte> &Input, const size
 
 void Threefish1024::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	Process(Input, InOffset, Output, OutOffset, Length);
+	if (m_isEncryption)
+	{
+		if (m_isAuthenticated)
+		{
+			// add the starting position of the nonce
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(ulong));
+			// encrypt the stream
+			Process(Input, InOffset, Output, OutOffset, Length);
+			// update the mac with the ciphertext
+			m_macAuthenticator->Update(Output, OutOffset, Length);
+			// update the mac counter
+			m_macCounter += Length;
+			// finalize the mac and add the tag to the stream
+			Finalize(m_macTag, 0, m_macTag.size());
+			MemoryTools::Copy(m_macTag, 0, Output, OutOffset + Length, m_macTag.size());
+		}
+		else
+		{
+			// encrypt the stream
+			Process(Input, InOffset, Output, OutOffset, Length);
+		}
+	}
+	else
+	{
+		if (m_isAuthenticated)
+		{
+			// add the starting position of the nonce
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(ulong));
+			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(ulong));
+			// update the mac with the ciphertext
+			m_macAuthenticator->Update(Input, InOffset, Length);
+			// update the mac counter
+			m_macCounter += Length;
+			// finalize the mac and verify
+			Finalize(m_macTag, 0, m_macTag.size());
+
+			if (!IntegerTools::Compare(Input, InOffset + Length, m_macTag, 0, m_macTag.size()))
+			{
+				throw CryptoAuthenticationFailure(Name(), std::string("Transform"), std::string("The authentication tag does not match!"), ErrorCodes::AuthenticationFailure);
+			}
+		}
+
+		// decrypt the stream
+		Process(Input, InOffset, Output, OutOffset, Length);
+	}
 }
 
 //~~~Private Functions~~~//
@@ -353,34 +406,34 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Finalize", "The cipher has not been initialized!");
+		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (m_macAuthenticator == nullptr)
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Finalize", "The cipher has not been configured for authentication!");
+		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
-	if (Length > m_macAuthenticator->MacSize())
+	if (Length > m_macAuthenticator->TagSize())
 	{
-		throw CryptoSymmetricCipherException("Threefish1024:Finalize", "The MAC code specified is longer than the maximum length!");
+		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The MAC code specified is longer than the maximum length!"), ErrorCodes::InvalidParam);
 	}
 
 	// generate the mac code
-	std::vector<byte> code(m_macAuthenticator->MacSize());
+	std::vector<byte> code(m_macAuthenticator->TagSize());
 	m_macAuthenticator->Finalize(code, 0);
-	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
+	MemoryTools::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
 	// customization string is: mac counter + algorithm name
-	IntUtils::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+	IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
 
 	// extract the new mac key
-	std::vector<byte> mk(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	Kdf::SHAKE gen(ShakeModes::SHAKE1024);
-	gen.Initialize(m_macKey->Key(), m_cShakeCustom);
-	gen.Generate(mk);
-
+	gen.Initialize(AllocatorTools::ToVector(m_macKey), m_cShakeCustom);
+	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
+	gen.Generate(mack);
+	// store the key
+	m_macKey.assign(mack.begin(), mack.end());
 	// reset the generator with the new key
-	m_macKey.reset(new SymmetricSecureKey(mk));
-	m_macAuthenticator->Initialize(*m_macKey.get());
+	m_macAuthenticator->Initialize(SymmetricKey(mack));
 }
 
 void Threefish1024::Generate(std::array<ulong, 2> &Counter, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
@@ -402,32 +455,32 @@ void Threefish1024::Generate(std::array<ulong, 2> &Counter, std::vector<byte> &O
 		// process 8 blocks
 		while (ctr != SEGALN)
 		{
-			MemUtils::Copy(Counter, 0, ctr16, 0, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 8, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr16, 1, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 9, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr16, 2, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 10, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr16, 3, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 11, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr16, 4, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 12, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr16, 5, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 13, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr16, 6, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 14, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr16, 7, 8);
-			MemUtils::Copy(Counter, 1, ctr16, 15, 8);
-			IntUtils::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 0, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 8, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 1, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 9, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 2, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 10, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 3, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 11, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 4, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 12, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 5, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 13, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 6, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 14, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr16, 7, 8);
+			MemoryTools::Copy(Counter, 1, ctr16, 15, 8);
+			IntegerTools::LeIncrementW(Counter);
 			Threefish::PemuteP8x1024H(m_cipherState->K, ctr16, m_cipherState->T, tmp128, ROUND_COUNT);
-			MemUtils::Copy(tmp128, 0, Output, OutOffset + ctr, AVX2BLK);
+			MemoryTools::Copy(tmp128, 0, Output, OutOffset + ctr, AVX2BLK);
 			ctr += AVX512BLK;
 		}
 	}
@@ -445,20 +498,20 @@ void Threefish1024::Generate(std::array<ulong, 2> &Counter, std::vector<byte> &O
 		// process 4 blocks
 		while (ctr != SEGALN)
 		{
-			MemUtils::Copy(Counter, 0, ctr8, 0, 8);
-			MemUtils::Copy(Counter, 1, ctr8, 4, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr8, 1, 8);
-			MemUtils::Copy(Counter, 1, ctr8, 5, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr8, 2, 8);
-			MemUtils::Copy(Counter, 1, ctr8, 6, 8);
-			IntUtils::LeIncrementW(Counter);
-			MemUtils::Copy(Counter, 0, ctr8, 3, 8);
-			MemUtils::Copy(Counter, 1, ctr8, 7, 8);
-			IntUtils::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr8, 0, 8);
+			MemoryTools::Copy(Counter, 1, ctr8, 4, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr8, 1, 8);
+			MemoryTools::Copy(Counter, 1, ctr8, 5, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr8, 2, 8);
+			MemoryTools::Copy(Counter, 1, ctr8, 6, 8);
+			IntegerTools::LeIncrementW(Counter);
+			MemoryTools::Copy(Counter, 0, ctr8, 3, 8);
+			MemoryTools::Copy(Counter, 1, ctr8, 7, 8);
+			IntegerTools::LeIncrementW(Counter);
 			Threefish::PemuteP4x1024H(m_cipherState->K, ctr8, m_cipherState->T, tmp64, ROUND_COUNT);
-			MemUtils::Copy(tmp64, 0, Output, OutOffset + ctr, AVX2BLK);
+			MemoryTools::Copy(tmp64, 0, Output, OutOffset + ctr, AVX2BLK);
 			ctr += AVX2BLK;
 		}
 	}
@@ -475,8 +528,8 @@ void Threefish1024::Generate(std::array<ulong, 2> &Counter, std::vector<byte> &O
 #else
 		Threefish::PemuteR120P1024U(m_cipherState->K, Counter, m_cipherState->T, tmp);
 #endif
-		MemUtils::Copy(tmp, 0, Output, OutOffset + ctr, BLOCK_SIZE);
-		IntUtils::LeIncrementW(Counter);
+		MemoryTools::Copy(tmp, 0, Output, OutOffset + ctr, BLOCK_SIZE);
+		IntegerTools::LeIncrementW(Counter);
 		ctr += BLOCK_SIZE;
 	}
 
@@ -488,8 +541,8 @@ void Threefish1024::Generate(std::array<ulong, 2> &Counter, std::vector<byte> &O
 		Threefish::PemuteR120P1024U(m_cipherState->K, Counter, m_cipherState->T, tmp);
 #endif
 		const size_t FNLLEN = Length % BLOCK_SIZE;
-		MemUtils::Copy(tmp, 0, Output, OutOffset + ctr, FNLLEN);
-		IntUtils::LeIncrementW(Counter);
+		MemoryTools::Copy(tmp, 0, Output, OutOffset + ctr, FNLLEN);
+		IntegerTools::LeIncrementW(Counter);
 	}
 }
 
@@ -506,7 +559,7 @@ void Threefish1024::Process(const std::vector<byte> &Input, const size_t InOffse
 
 		if (ALNLEN != 0)
 		{
-			MemUtils::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
+			MemoryTools::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
 		}
 
 		// process the remaining bytes
@@ -526,25 +579,25 @@ void Threefish1024::Process(const std::vector<byte> &Input, const size_t InOffse
 		const size_t CTROFT = (CNKLEN / BLOCK_SIZE);
 		std::vector<ulong> tmpCtr(NONCE_SIZE);
 
-		ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTROFT](size_t i)
+		ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTROFT](size_t i)
 		{
 			// thread level counter
 			std::array<ulong, NONCE_SIZE> thdCtr;
 			// offset counter by chunk size
-			IntUtils::LeIncreaseW(m_cipherState->C, thdCtr, (CTROFT * i));
+			IntegerTools::LeIncreaseW(m_cipherState->C, thdCtr, (CTROFT * i));
 			// create random at offset position
 			this->Generate(thdCtr, Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// xor with input at offset
-			MemUtils::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+			MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{
-				MemUtils::Copy(thdCtr, 0, tmpCtr, 0, NONCE_SIZE * sizeof(ulong));
+				MemoryTools::Copy(thdCtr, 0, tmpCtr, 0, NONCE_SIZE * sizeof(ulong));
 			}
 		});
 
 		// copy last counter to class variable
-		MemUtils::Copy(tmpCtr, 0, m_cipherState->C, 0, NONCE_SIZE * sizeof(ulong));
+		MemoryTools::Copy(tmpCtr, 0, m_cipherState->C, 0, NONCE_SIZE * sizeof(ulong));
 
 		// last block processing
 		if (RNDLEN < PRCLEN)
@@ -558,34 +611,6 @@ void Threefish1024::Process(const std::vector<byte> &Input, const size_t InOffse
 			}
 		}
 	}
-
-	if (m_isAuthenticated)
-	{
-		m_macCounter += Length;
-
-		if (m_isEncryption)
-		{
-			m_macAuthenticator->Update(Output, OutOffset, Length);
-			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(ulong));
-			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(ulong));
-
-			Finalize(m_macTag, 0, m_macTag.size());
-			MemUtils::Copy(m_macTag, 0, Output, OutOffset + Length, m_macTag.size());
-		}
-		else
-		{
-			m_macAuthenticator->Update(Input, InOffset, Length);
-			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[0]), 0, sizeof(ulong));
-			m_macAuthenticator->Update(IntUtils::Le64ToBytes<std::vector<byte>>(m_cipherState->C[1]), 0, sizeof(ulong));
-
-			Finalize(m_macTag, 0, m_macTag.size());
-
-			if (!IntUtils::Compare(Input, InOffset + Length, m_macTag, 0, m_macTag.size()))
-			{
-				throw CryptoAuthenticationFailure("Threefish1024:Process", "The authentication tag does not match!");
-			}
-		}
-	}
 }
 
 void Threefish1024::Reset()
@@ -593,7 +618,7 @@ void Threefish1024::Reset()
 	if (m_macAuthenticator != nullptr)
 	{
 		m_macAuthenticator->Reset();
-		m_macTag.resize(m_macAuthenticator->MacSize());
+		m_macTag.resize(m_macAuthenticator->TagSize());
 	}
 
 	m_isInitialized = false;

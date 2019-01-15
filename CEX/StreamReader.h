@@ -2,8 +2,8 @@
 #define CEX_STREAMREADER_H
 
 #include "MemoryStream.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 
 NAMESPACE_IO
 
@@ -86,10 +86,10 @@ public:
 
 		if (sizeof(Array::value_type) > 1)
 		{
-			Utility::IntUtils::BlockToLe(m_streamData.ToArray(), m_streamData.Position(), Output, OutOffset, OTPLEN);
+			Utility::IntegerTools::BlockToLe(m_streamData.ToArray(), m_streamData.Position(), Output, OutOffset, OTPLEN);
 		}
 		{
-			Utility::MemUtils::Copy(m_streamData.ToArray(), m_streamData.Position(), val, OTPLEN);
+			Utility::MemoryTools::Copy(m_streamData.ToArray(), m_streamData.Position(), val, OTPLEN);
 		}
 
 		m_streamData.Seek(m_streamData.Position() + OTPLEN, SeekOrigin::Begin);
@@ -111,22 +111,22 @@ public:
 		{
 			case 8:
 			{
-				val = Utility::IntUtils::LeBytesTo64(m_streamData.ToArray(), m_streamData.Position());
+				val = Utility::IntegerTools::LeBytesTo64(m_streamData.ToArray(), m_streamData.Position());
 				break;
 			}
 			case 4:
 			{
-				val = Utility::IntUtils::LeBytesTo32(m_streamData.ToArray(), m_streamData.Position());
+				val = Utility::IntegerTools::LeBytesTo32(m_streamData.ToArray(), m_streamData.Position());
 				break;
 			}
 			case 2:
 			{
-				val = Utility::IntUtils::LeBytesTo16(m_streamData.ToArray(), m_streamData.Position());
+				val = Utility::IntegerTools::LeBytesTo16(m_streamData.ToArray(), m_streamData.Position());
 				break;
 			}
 			default:
 			{
-				Utility::MemUtils::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, VALLEN);
+				Utility::MemoryTools::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, VALLEN);
 			}
 		}
 

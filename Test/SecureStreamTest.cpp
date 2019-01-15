@@ -7,8 +7,8 @@ namespace Test
 {
 	using namespace CEX::IO;
 
+	const std::string SecureStreamTest::CLASSNAME = "SecureStreamTest";
 	const std::string SecureStreamTest::DESCRIPTION = "SecureStream test; compares serialization, reads and writes";
-	const std::string SecureStreamTest::FAILURE = "FAILURE! ";
 	const std::string SecureStreamTest::SUCCESS = "SUCCESS! All SecureStream tests have executed succesfully.";
 
 	SecureStreamTest::SecureStreamTest()
@@ -35,114 +35,114 @@ namespace Test
 	{
 		try
 		{
-			CompareSerial();
-			OnProgress(std::string("SymmetricKeyGenerator: Passed serialization tests.."));
-			CheckAccess();
-			OnProgress(std::string("SymmetricKeyGenerator: Passed read/write comparison tests.."));
+			Evaluate();
+			OnProgress(std::string("SecureStreamTest: Passed read/write comparison tests.."));
+			Serialization();
+			OnProgress(std::string("SecureStreamTest: Passed serialization tests.."));
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void SecureStreamTest::CheckAccess()
+	void SecureStreamTest::Evaluate()
 	{
-		Prng::SecureRandom rnd;
+		Prng::SecureRandom gen;
 		uint32_t cnt;
 		std::vector<byte> data;
 
 		for (size_t i = 0; i < 10; ++i)
 		{
-			cnt = rnd.NextUInt32(4000, 40);
-			data = rnd.Generate(cnt);
+			cnt = gen.NextUInt32(4000, 40);
+			data = gen.Generate(cnt);
 
 			// add array via constructor
-			SecureStream secStm1(data);
-			if (secStm1.ToArray() != data)
+			SecureStream sec1(data);
+			if (sec1.ToArray() != data)
 			{
-				throw TestException(std::string("CheckAccess: The stream is invalid!"));
+				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE1"));
 			}
 
 			// test write method
-			SecureStream secStm2;
-			secStm2.Write(data, 0, data.size());
-			if (secStm2.ToArray() != data)
+			SecureStream sec2;
+			sec2.Write(data, 0, data.size());
+			if (sec2.ToArray() != data)
 			{
-				throw TestException(std::string("CheckAccess: The stream is invalid!"));
+				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE2"));
 			}
 
 			// test read/write
 			size_t tmpSze = cnt - 1;
 			std::vector<byte> tmp1(tmpSze);
-			secStm1.Seek(0, SeekOrigin::Begin);
-			secStm1.Read(tmp1, 0, tmpSze);
+			sec1.Seek(0, SeekOrigin::Begin);
+			sec1.Read(tmp1, 0, tmpSze);
 			std::vector<byte> tmp2(tmpSze);
 			memcpy(&tmp2[0], &data[0], tmpSze);
 			if (tmp1 != tmp2)
 			{
-				throw TestException(std::string("CheckAccess: The stream is invalid!"));
+				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE3"));
 			}
 
 			// read byte from start
-			secStm2.Seek(1, SeekOrigin::Begin);
-			byte x = secStm2.ReadByte();
+			sec2.Seek(1, SeekOrigin::Begin);
+			byte x = sec2.ReadByte();
 			if (x != data[1])
 			{
-				throw TestException(std::string("CheckAccess: The stream is invalid!"));
+				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE4"));
 			}
 
 			// read byte from end
-			secStm2.Seek(1, SeekOrigin::End);
-			byte x1 = secStm2.ReadByte();
+			sec2.Seek(1, SeekOrigin::End);
+			byte x1 = sec2.ReadByte();
 			if (x1 != data[cnt - 1])
 			{
-				throw TestException(std::string("CheckAccess: The stream is invalid!"));
+				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE5"));
 			}
 
 			// prepend byte
-			secStm2.Seek(0, SeekOrigin::Begin);
-			secStm2.WriteByte(x1);
-			secStm2.Seek(0, SeekOrigin::Begin);
-			byte x2 = secStm2.ReadByte();
+			sec2.Seek(0, SeekOrigin::Begin);
+			sec2.WriteByte(x1);
+			sec2.Seek(0, SeekOrigin::Begin);
+			byte x2 = sec2.ReadByte();
 			if (x1 != x2)
 			{
-				throw TestException(std::string("CheckAccess: The stream is invalid!"));
+				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE6"));
 			}
 
 			// append byte
-			secStm2.Seek(0, SeekOrigin::Begin);
-			secStm2.WriteByte(33);
-			secStm2.Seek(0, SeekOrigin::Begin);
-			x2 = secStm2.ReadByte();
+			sec2.Seek(0, SeekOrigin::Begin);
+			sec2.WriteByte(33);
+			sec2.Seek(0, SeekOrigin::Begin);
+			x2 = sec2.ReadByte();
 			if (x2 != 33)
 			{
-				throw TestException(std::string("CheckAccess: The stream is invalid!"));
+				throw TestException(std::string("Evaluate"), gen.Name(), std::string("The stream is invalid! -SE7"));
 			}
 		}
 	}
 
-	void SecureStreamTest::CompareSerial()
+	void SecureStreamTest::Serialization()
 	{
-		Prng::SecureRandom rnd;
-		std::vector<byte> data = rnd.Generate(1023);
-		SecureStream secStm1(data);
+		Prng::SecureRandom gen;
+		std::vector<byte> data = gen.Generate(1023);
+		SecureStream sec(data);
 
-		MemoryStream memStm;
-		secStm1.CopyTo(&memStm);
-		if (memStm.ToArray() != secStm1.ToArray() || memStm.ToArray() != data)
+		MemoryStream mem;
+		sec.CopyTo(&mem);
+		if (mem.ToArray() != sec.ToArray() || mem.ToArray() != data)
 		{
-			throw TestException(std::string("CompareSerial: The serialized key is invalid!"));
+			throw TestException(std::string("Evaluate"), gen.Name(), std::string("The serialized key is invalid! -SS1"));
 		}
 	}
 
-	void SecureStreamTest::OnProgress(std::string Data)
+	void SecureStreamTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

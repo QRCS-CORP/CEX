@@ -15,25 +15,57 @@ enum class Macs : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator (CMAC)
+	/// A Cipher based Message Authentication Code generator using AES
 	/// </summary>
 	CMAC = 1,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator (GMAC)
+	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-256
 	/// </summary>
-	GMAC = 2,
+	CMACAHXS256= 2,
 	/// <summary>
-	/// A Hash based Message Authentication Code generator (HMAC)
+	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-512
 	/// </summary>
-	HMAC = 3,
+	CMACAHXS512 = 3,
 	/// <summary>
-	/// The Keccak based Message Authentication Code generator (KMAC)
+	/// A Cipher based Message Authentication Code generator using AES
 	/// </summary>
-	KMAC = 4,
+	GMAC = 4,
+	/// <summary>
+	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-256
+	/// </summary>
+	GMACAHXS256 = 5,
+	/// <summary>
+	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-512
+	/// </summary>
+	GMACAHXS512 = 6,
+	/// <summary>
+	/// A Hash based Message Authentication Code generator using SHA256
+	/// </summary>
+	HMACSHA256 = 7,
+	/// <summary>
+	/// A Hash based Message Authentication Code generator using SHA512
+	/// </summary>
+	HMACSHA512 = 8,
+	/// <summary>
+	/// The Keccak based Message Authentication Code generator using Keccak-256
+	/// </summary>
+	KMAC128 = 9,
+	/// <summary>
+	/// The Keccak based Message Authentication Code generator using Keccak-256
+	/// </summary>
+	KMAC256 = 10,
+	/// <summary>
+	/// The Keccak based Message Authentication Code generator Keccak-512
+	/// </summary>
+	KMAC512 = 11,
+	/// <summary>
+	/// The Keccak based Message Authentication Code generator Keccak-1024
+	/// </summary>
+	KMAC1024 = 12,
 	/// <summary>
 	/// The Poly1305 Message Authentication Code generator
 	/// </summary>
-	Poly1305 = 5
+	Poly1305 = 13
 };
 
 NAMESPACE_ENUMERATIONEND

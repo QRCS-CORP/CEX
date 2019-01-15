@@ -149,6 +149,8 @@ public:
 	/// 
 	/// <param name="CipherExtensionType">Sets the optional Key Schedule key-expansion engine; valid options are cSHAKE, HKDF, or None for standard mode. 
 	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a the custom cipher extension is used</exception>
 	SHX(BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
@@ -157,6 +159,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null kdf is used</exception>
 	SHX(Kdf::IKdf* Kdf);
 
 	/// <summary>

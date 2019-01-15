@@ -329,7 +329,7 @@ private:
 	{
 		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
 		{
-			State[i] ^= static_cast<ulong>(IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
+			State[i] ^= static_cast<ulong>(IntegerTools::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
 		}
 	}
 

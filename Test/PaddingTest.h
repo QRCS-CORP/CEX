@@ -6,17 +6,17 @@
 
 namespace Test
 {
-	using namespace Cipher::Symmetric::Block;
+	using namespace Cipher::Block;
 
 	/// <summary>
-	/// Tests each Padding mode for valid output
+	/// Tests each Padding mode for valid operation
 	/// </summary>
 	class PaddingTest final : public ITest
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
@@ -56,8 +56,8 @@ namespace Test
 
 	private:
 
-		void Compare(Padding::IPadding* Padding);
-		void OnProgress(std::string Data);
+		void Kat(Padding::IPadding* Padding);
+		void OnProgress(const std::string &Data);
 	};
 }
 

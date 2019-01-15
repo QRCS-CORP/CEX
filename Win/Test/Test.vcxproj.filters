@@ -613,5 +613,8 @@
     <ClCompile Include="..\..\Test\ACSTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Test\RandomUtils.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

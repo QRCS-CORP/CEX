@@ -14,12 +14,12 @@
 #include "../CEX/RDP.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SHA512.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 
 namespace Test
 {
+	const std::string RandomOutputTest::CLASSNAME = "RandomOutputTest";
 	const std::string RandomOutputTest::DESCRIPTION = "Copies generator output to a file for external testing.";
-	const std::string RandomOutputTest::FAILURE = "FAILURE! ";
 	const std::string RandomOutputTest::SUCCESS = "SUCCESS! All Random Output tests have executed succesfully.";
 
 	RandomOutputTest::RandomOutputTest()
@@ -71,17 +71,17 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void RandomOutputTest::CMGGenerateFile(std::string FilePath, size_t FileSize)
 	{
-		using namespace Cipher::Symmetric::Block;
+		using namespace Cipher::Block;
 
 		Kdf::HKDF* kdf = new Kdf::HKDF(Enumeration::SHA2Digests::SHA256);
 #if defined(__AVX__)
@@ -109,7 +109,7 @@ namespace Test
 		do
 		{
 			ctd.Generate(output);
-			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
+			size_t rmd = Utility::IntegerTools::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
 		} 
@@ -144,7 +144,7 @@ namespace Test
 		do
 		{
 			ctd.Generate(output);
-			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
+			size_t rmd = Utility::IntegerTools::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
 		} 
@@ -166,7 +166,7 @@ namespace Test
 		do
 		{
 			pvd->Generate(output);
-			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
+			size_t rmd = Utility::IntegerTools::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
 		} 
@@ -188,7 +188,7 @@ namespace Test
 		do
 		{
 			pvd->Generate(output);
-			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
+			size_t rmd = Utility::IntegerTools::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
 		} 
@@ -210,7 +210,7 @@ namespace Test
 		do
 		{
 			pvd->Generate(output);
-			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
+			size_t rmd = Utility::IntegerTools::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
 		} 
@@ -232,7 +232,7 @@ namespace Test
 		do
 		{
 			pvd->Generate(output);
-			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
+			size_t rmd = Utility::IntegerTools::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
 		} 
@@ -244,7 +244,7 @@ namespace Test
 		delete pvd;
 	}
 
-	void RandomOutputTest::OnProgress(std::string Data)
+	void RandomOutputTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

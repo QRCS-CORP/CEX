@@ -17,7 +17,7 @@ void DLMN256Q8380417::Challenge(Poly &C, const std::vector<byte> &Mu, const Poly
 	size_t j;
 	size_t k;
 
-	MemUtils::Copy(Mu, 0, tmps, 0, CRHBYTES);
+	MemoryTools::Copy(Mu, 0, tmps, 0, CRHBYTES);
 
 	for (i = 0; i < NK; ++i)
 	{
@@ -36,7 +36,7 @@ void DLMN256Q8380417::Challenge(Poly &C, const std::vector<byte> &Mu, const Poly
 
 	j = 8;
 	mask = 1;
-	MemUtils::Clear(C.coeffs, 0, C.coeffs.size() * sizeof(uint));
+	MemoryTools::Clear(C.coeffs, 0, C.coeffs.size() * sizeof(uint));
 
 	for (i = 196; i < N; ++i)
 	{
@@ -102,7 +102,7 @@ void DLMN256Q8380417::ExpandMatrix(std::vector<PolyVec> &Mat, const std::vector<
 	size_t i;
 	size_t j;
 
-	MemUtils::Copy(Rho, 0, seed, 0, SEEDBYTES);
+	MemoryTools::Copy(Rho, 0, seed, 0, SEEDBYTES);
 	SHAKE gen(Enumeration::ShakeModes::SHAKE128);
 
 	for (i = 0; i < Mat.size(); ++i)
@@ -213,7 +213,7 @@ void DLMN256Q8380417::PackPk(std::vector<byte> &Pk, const std::vector<byte> Rho,
 	const size_t NK = T1.vec.size();
 	size_t i;
 
-	MemUtils::Copy(Rho, 0, Pk, 0, SEEDBYTES);
+	MemoryTools::Copy(Rho, 0, Pk, 0, SEEDBYTES);
 
 	for (i = 0; i < NK; ++i)
 	{
@@ -300,11 +300,11 @@ void DLMN256Q8380417::PackSk(std::vector<byte> &Sk, const std::vector<byte> &Rho
 	size_t i;
 	size_t skoft;
 
-	MemUtils::Copy(Rho, 0, Sk, 0, SEEDBYTES);
+	MemoryTools::Copy(Rho, 0, Sk, 0, SEEDBYTES);
 	skoft = SEEDBYTES;
-	MemUtils::Copy(Key, 0, Sk, skoft, SEEDBYTES);
+	MemoryTools::Copy(Key, 0, Sk, skoft, SEEDBYTES);
 	skoft += SEEDBYTES;
-	MemUtils::Copy(Tr, 0, Sk, skoft, CRHBYTES);
+	MemoryTools::Copy(Tr, 0, Sk, skoft, CRHBYTES);
 	skoft += CRHBYTES;
 
 	for (i = 0; i < NL; ++i)
@@ -664,7 +664,7 @@ void DLMN256Q8380417::PolyUniformEta(Poly &A, const std::vector<byte> &Seed, byt
 	uint ctr;
 
 	SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	MemUtils::Copy(Seed, 0, tmps, 0, SEEDBYTES);
+	MemoryTools::Copy(Seed, 0, tmps, 0, SEEDBYTES);
 
 	tmps[SEEDBYTES] = Nonce;
 	gen.Initialize(tmps);
@@ -687,8 +687,8 @@ void DLMN256Q8380417::PolyUniformGamma1M1(Poly &A, const std::vector<byte> &Seed
 	std::vector<byte> tmps(SEEDBYTES + CRHBYTES + 2);
 	uint ctr;
 
-	MemUtils::Copy(Seed, 0, tmps, 0, SEEDBYTES);
-	MemUtils::Copy(Mu, 0, tmps, SEEDBYTES, CRHBYTES);
+	MemoryTools::Copy(Seed, 0, tmps, 0, SEEDBYTES);
+	MemoryTools::Copy(Mu, 0, tmps, SEEDBYTES, CRHBYTES);
 
 	tmps[SEEDBYTES + CRHBYTES] = Nonce & 0xFF;
 	tmps[SEEDBYTES + CRHBYTES + 1] = Nonce >> 8;
@@ -876,7 +876,7 @@ void DLMN256Q8380417::UnPackPk(std::vector<byte> &Rho, PolyVec &T1, const std::v
 	const size_t NK = T1.vec.size();
 	size_t i;
 
-	MemUtils::Copy(Pk, 0, Rho, 0, SEEDBYTES);
+	MemoryTools::Copy(Pk, 0, Rho, 0, SEEDBYTES);
 
 	for (i = 0; i < NK; ++i)
 	{
@@ -905,7 +905,7 @@ int32_t DLMN256Q8380417::UnPackSig(PolyVec &Z, PolyVec &H, Poly &C, const std::v
 	k = 0;
 	for (i = 0; i < NK; ++i)
 	{
-		MemUtils::Clear(H.vec[i].coeffs, 0, N * sizeof(uint));
+		MemoryTools::Clear(H.vec[i].coeffs, 0, N * sizeof(uint));
 
 		if (Signature[sigoff + Omega + i] < k || Signature[sigoff + Omega + i] > Omega)
 		{
@@ -977,13 +977,13 @@ void DLMN256Q8380417::UnPackSk(std::vector<byte> &Rho, std::vector<byte> &Key, s
 	size_t i;
 	size_t skoff;
 
-	MemUtils::Copy(Sk, 0, Rho, 0, SEEDBYTES);
+	MemoryTools::Copy(Sk, 0, Rho, 0, SEEDBYTES);
 	skoff = SEEDBYTES;
 
-	MemUtils::Copy(Sk, skoff, Key, 0, SEEDBYTES);
+	MemoryTools::Copy(Sk, skoff, Key, 0, SEEDBYTES);
 	skoff += SEEDBYTES;
 
-	MemUtils::Copy(Sk, skoff, Tr, 0, CRHBYTES);
+	MemoryTools::Copy(Sk, skoff, Tr, 0, CRHBYTES);
 	skoff += CRHBYTES;
 
 	for (i = 0; i < NL; ++i)
@@ -1144,11 +1144,11 @@ size_t DLMN256Q8380417::Sign(std::vector<byte> &Signature, const std::vector<byt
 		Signature[cparams.SignatureSize + MSGLEN - i] = Message[MSGLEN - i];
 	}
 
-	MemUtils::Copy(tr, 0, Signature, cparams.SignatureSize - CRHBYTES, CRHBYTES);
+	MemoryTools::Copy(tr, 0, Signature, cparams.SignatureSize - CRHBYTES, CRHBYTES);
 
 	// compute CRH(tr, msg)
 	SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	MemUtils::Copy(Signature, cparams.SignatureSize - CRHBYTES, tmps, 0, CRHBYTES + MSGLEN);
+	MemoryTools::Copy(Signature, cparams.SignatureSize - CRHBYTES, tmps, 0, CRHBYTES + MSGLEN);
 	gen.Initialize(tmps);
 	gen.Generate(mu, 0, CRHBYTES);
 
@@ -1300,7 +1300,7 @@ uint DLMN256Q8380417::Verify(std::vector<byte> &Message, const std::vector<byte>
 	}
 
 	// compute CRH(CRH(rho, t1), msg) using m as 'playground' buffer
-	MemUtils::Copy(Message, 0, tmsg, 0, Message.size());
+	MemoryTools::Copy(Message, 0, tmsg, 0, Message.size());
 
 	if (Signature != tmsg)
 	{
@@ -1353,7 +1353,7 @@ uint DLMN256Q8380417::Verify(std::vector<byte> &Message, const std::vector<byte>
 	}
 
 	// all good, copy msg, return 1
-	MemUtils::Copy(Signature, cparams.SignatureSize, Message, 0, MSGLEN);
+	MemoryTools::Copy(Signature, cparams.SignatureSize, Message, 0, MSGLEN);
 
 	return 1;
 }

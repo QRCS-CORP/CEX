@@ -13,79 +13,87 @@ enum class ErrorCodes : byte
 	/// <summary>
 	/// No error code was specified
 	/// </summary>
-	None = 0x00,
+	None = 0,
 	/// <summary>
 	/// The operation was successful
 	/// </summary>
-	Success = 0x01,
+	Success = 1,
 	/// <summary>
 	/// Authorization failure
 	/// </summary>
-	AuthFail = 0x02,
+	AuthenticationFailure = 2,
 	/// <summary>
 	/// Stream can not be read
 	/// </summary>
-	BadRead = 0x03,
+	BadRead = 3,
 	/// <summary>
 	/// The pipe was disconnected
 	/// </summary>
-	Disconnected = 0x04,
+	Disconnected = 4,
+	/// <summary>
+	/// Illegal operation request
+	/// </summary>
+	IllegalOperation = 5,
 	/// <summary>
 	/// Invalid key
 	/// </summary>
-	InvalidKey = 0x05,
+	InvalidKey = 6,
 	/// <summary>
 	/// Invalid parameter
 	/// </summary>
-	InvalidParam = 0x06,
+	InvalidParam = 7,
 	/// <summary>
 	/// Invalid size parameter
 	/// </summary>
-	InvalidSize = 0x07,
+	InvalidSize = 8,
+	/// <summary>
+	/// Invalid state
+	/// </summary>
+	InvalidState = 9,
 	/// <summary>
 	/// Maximum value exceeded
 	/// </summary>
-	MaxExceeded = 0x08,
+	MaxExceeded = 10,
 	/// <summary>
 	/// Access was denied
 	/// </summary>
-	NoAccess = 0x09,
+	NoAccess = 11,
 	/// <summary>
 	/// The resource was not found
 	/// </summary>
-	NotFound = 0x0A,
+	NotFound = 12,
 	/// <summary>
 	/// The host could not be found
 	/// </summary>
-	NoHost = 0x0B,
+	NoHost = 13,
 	/// <summary>
 	/// The algorithm was not initialized
 	/// </summary>
-	NotInitialized = 0x0C,
+	NotInitialized = 14,
 	/// <summary>
 	/// The operation is not supported
 	/// </summary>
-	NotSupported = 0x0D,
+	NotSupported = 15,
 	/// <summary>
 	/// The stream is read only
 	/// </summary>
-	ReadOnly = 0x0E,
+	ReadOnly = 16,
 	/// <summary>
 	/// The number of retries was exceeded
 	/// </summary>
-	RetriesExceeded = 0x0F,
+	RetriesExceeded = 17,
 	/// <summary>
 	/// The stream is write only
 	/// </summary>
-	WriteOnly = 0x10,
+	WriteOnly = 18,
 	/// <summary>
 	/// The behavior is undefined
 	/// </summary>
-	UnDefined = 0x11,
+	UnDefined = 19,
 	/// <summary>
 	/// An error of unknown origin has occured
 	/// </summary>
-	UnKnown = 0x12
+	UnKnown = 20
 };
 
 NAMESPACE_ENUMERATIONEND

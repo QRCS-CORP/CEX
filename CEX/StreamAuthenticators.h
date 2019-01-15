@@ -17,23 +17,23 @@ enum class StreamAuthenticators : byte
 	/// <summary>
 	/// A HMAC(SHA256) message authentication code generator
 	/// </summary>
-	HMACSHA256 = 1,
+	HMACSHA256 = 7,
 	/// <summary>
 	/// A HMAC(SHA512) message authentication code generator
 	/// </summary>
-	HMACSHA512 = 2,
+	HMACSHA512 = 8,
 	/// <summary>
 	/// The KMAC-256 message authentication code generator
 	/// </summary>
-	KMAC256 = 3,
+	KMAC256 = 10,
 	/// <summary>
 	/// The KMAC-512 message authentication code generator
 	/// </summary>
-	KMAC512 = 4, 
+	KMAC512 = 11, 
 	/// <summary>
 	/// The KMAC-1024 message authentication code generator (experimental)
 	/// </summary>
-	KMAC1024 = 5
+	KMAC1024 = 12
 };
 
 NAMESPACE_ENUMERATIONEND

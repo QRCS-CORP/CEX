@@ -1,10 +1,7 @@
 #include "ModuleLWE.h"
-#include "AsymmetricEngines.h"
-#include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
 #include "BCR.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 #include "MLWEQ7681N256.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
@@ -12,13 +9,10 @@
 
 NAMESPACE_MODULELWE
 
-
-using Enumeration::AsymmetricEngines;
-using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
+using Enumeration::ErrorCodes;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 using Enumeration::ShakeModes;
-using Utility::IntUtils;
-using Utility::MemUtils;
 
 const std::string ModuleLWE::CLASS_NAME = "ModuleLWE";
 
@@ -32,9 +26,9 @@ ModuleLWE::ModuleLWE(MLWEParameters Parameters, Prngs PrngType)
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_mlweParameters(Parameters != MLWEParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParameters::MLWES4Q7681N256) ? Parameters :
-		throw CryptoAsymmetricException("ModuleLWE:CTor", "The parameter set is invalid!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
-		throw CryptoAsymmetricException("ModuleLWE:CTor", "The prng type can not be none!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -46,9 +40,9 @@ ModuleLWE::ModuleLWE(MLWEParameters Parameters, IPrng* Prng)
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_mlweParameters(Parameters != MLWEParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParameters::MLWES4Q7681N256) ? Parameters :
-		throw CryptoAsymmetricException("ModuleLWE:CTor", "The parameter set is invalid!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(Prng != nullptr ? Prng :
-		throw CryptoAsymmetricException("ModuleLWE:CTor", "The prng can not be null!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -60,7 +54,7 @@ ModuleLWE::~ModuleLWE()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_mlweParameters = MLWEParameters::None;
-		IntUtils::ClearVector(m_domainKey);
+		IntegerTools::Clear(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -116,23 +110,23 @@ const bool ModuleLWE::IsInitialized()
 
 const std::string ModuleLWE::Name()
 {
-	std::string ret = CLASS_NAME + "-";
+	std::string ret = CLASS_NAME;
 
 	if (m_mlweParameters == MLWEParameters::MLWES2Q7681N256)
 	{
-		ret += "MLWES2Q7681N256";
+		ret += "-MLWES2Q7681N256";
 	}
 	else if (m_mlweParameters == MLWEParameters::MLWES3Q7681N256)
 	{
-		ret += "MLWES3Q7681N256";
+		ret += "-MLWES3Q7681N256";
 	}
 	else if (m_mlweParameters == MLWEParameters::MLWES4Q7681N256)
 	{
-		ret += "MLWES4Q7681N256";
+		ret += "-MLWES4Q7681N256";
 	}
 	else
 	{
-		ret += "UNKNOWN";
+		ret += "-UNKNOWN";
 	}
 
 	return ret;
@@ -168,15 +162,15 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	MLWEQ7681N256::Decrypt(sec, CipherText, m_privateKey->P());
 
 	// multitarget countermeasure for coins + contributory KEM
-	MemUtils::Copy(m_privateKey->P(), PUBLEN + PRILEN, sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemoryTools::Copy(m_privateKey->P(), PUBLEN + PRILEN, sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 	shk256.Initialize(sec);
 	shk256.Generate(kr);
 
 	// coins are in kr+MLWE_SEED_SIZE
-	MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
-	MemUtils::Copy(m_privateKey->P(), PRILEN, pk, 0, PUBLEN);
+	MemoryTools::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemoryTools::Copy(m_privateKey->P(), PRILEN, pk, 0, PUBLEN);
 	MLWEQ7681N256::Encrypt(cmp, sec, pk, coin);
 
 	// verify the code
@@ -187,7 +181,7 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	shk256.Generate(kr, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// overwrite pre-k with z on re-encryption failure
-	IntUtils::CMov(kr, 0, m_privateKey->P(), m_privateKey->P().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
+	IntegerTools::CMov(kr, 0, m_privateKey->P(), m_privateKey->P().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
 
 	// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 	shk256.Initialize(kr, m_domainKey);
@@ -213,7 +207,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 	m_rndGenerator->Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// don't release system RNG output
-	MemUtils::Copy(sec, 0, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemoryTools::Copy(sec, 0, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 	shk256.Initialize(coin);
 	shk256.Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
@@ -226,7 +220,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	shk256.Generate(kr);
 
 	// coins are in kr+KYBER_KEYBYTES
-	MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemoryTools::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	MLWEQ7681N256::Encrypt(CipherText, sec, m_publicKey->P(), coin);
 
 	// overwrite coins in kr with H(c)
@@ -259,7 +253,7 @@ AsymmetricKeyPair* ModuleLWE::Generate()
 	// value z for pseudo-random output on reject
 	m_rndGenerator->Generate(buff, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// copy H(p) and random coin
-	MemUtils::Copy(buff, 0, sk, PUBLEN + PRILEN, 2 * MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemoryTools::Copy(buff, 0, sk, PUBLEN + PRILEN, 2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mlweParameters), pk);
 	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_mlweParameters), sk);
@@ -271,11 +265,11 @@ void ModuleLWE::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::ModuleLWE)
 	{
-		throw CryptoAsymmetricException("ModuleLWE:Initialize", "Encryption requires a valid public key!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
-		throw CryptoAsymmetricException("ModuleLWE:Initialize", "The key type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 
 	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)

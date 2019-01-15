@@ -3,7 +3,7 @@
 
 #include "CexDomain.h"
 
-NAMESPACE_COMMON
+NAMESPACE_ROOT
 
 /// <summary>
 /// Detects Cpu features and capabilities
@@ -462,5 +462,5 @@ private:
 	std::string VendorString(std::array<uint, 4> &CpuInfo);
 };
 
-NAMESPACE_COMMONEND
+NAMESPACE_ROOTEND
 #endif

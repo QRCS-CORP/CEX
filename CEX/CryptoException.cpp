@@ -2,44 +2,10 @@
 
 NAMESPACE_EXCEPTION
 
-CryptoException::CryptoException(const std::string &Message)
+CryptoException::CryptoException(const std::string &Location, const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode)
 	:
-	m_details(""),
-	m_message(Message),
-	m_origin("")
-{
-}
-
-CryptoException::CryptoException(const std::string &Origin, const std::string &Message)
-	:
-	m_details(""),
-	m_message(Message),
-	m_origin(Origin)
-{
-}
-
-CryptoException::CryptoException(const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode)
-	:
-	m_details(""),
 	m_error(ErrorCode),
-	m_message(Message),
-	m_origin(Origin)
-{
-}
-
-CryptoException::CryptoException(const std::string &Origin, const std::string &Message, const std::string &Detail)
-	:
-	m_details(Detail),
-	m_error(ErrorCodes::None),
-	m_message(Message),
-	m_origin(Origin)
-{
-}
-
-CryptoException::CryptoException(const std::string &Origin, const std::string &Message, const std::string &Detail, ErrorCodes ErrorCode)
-	:
-	m_details(Detail),
-	m_error(ErrorCode),
+	m_location(Location),
 	m_message(Message),
 	m_origin(Origin)
 {
@@ -47,28 +13,35 @@ CryptoException::CryptoException(const std::string &Origin, const std::string &M
 
 CryptoException::~CryptoException()
 {
-	m_details.clear();
 	m_error = ErrorCodes::None;
+	m_location.clear();
 	m_message.clear();
 	m_origin.clear();
 }
 
-std::string &CryptoException::Details()
-{
-	return m_details;
-}
+//~~~Accessors~~~//
 
-ErrorCodes &CryptoException::ErrorCode()
+const ErrorCodes CryptoException::ErrorCode()
 {
 	return m_error;
 }
 
-std::string &CryptoException::Message()
-{ 
+const ExceptionTypes CryptoException::Enumeral()
+{
+	return ExceptionTypes::CryptoException;
+}
+
+const std::string CryptoException::Location()
+{
+	return m_location;
+}
+
+const std::string CryptoException::Message()
+{
 	return m_message;
 }
 
-std::string &CryptoException::Origin()
+const std::string CryptoException::Origin()
 {
 	return m_origin;
 }

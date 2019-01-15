@@ -1,7 +1,7 @@
 #include "CSG.h"
 #include "CpuDetect.h"
-#include "IntUtils.h"
-#include "ParallelUtils.h"
+#include "IntegerTools.h"
+#include "ParallelTools.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
@@ -9,8 +9,8 @@
 
 NAMESPACE_DRBG
 
-using Utility::IntUtils;
-using Utility::MemUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 using Numeric::ULong256;
 
 const std::string CSG::CLASS_NAME("CSG");
@@ -45,7 +45,7 @@ CSG::CSG(ShakeModes ShakeModeType, Providers ProviderType, bool Parallel)
 	m_secStrength((ShakeModeType == ShakeModes::SHAKE128) ? 128 : (ShakeModeType == ShakeModes::SHAKE256) ? 256 : (ShakeModeType == ShakeModes::SHAKE512) ? 512 : 1024),
 	m_seedSize(0),
 	m_shakeMode(ShakeModeType == ShakeModes::SHAKE128 || ShakeModeType == ShakeModes::SHAKE256 || ShakeModeType == ShakeModes::SHAKE512 || ShakeModeType == ShakeModes::SHAKE1024 ? ShakeModeType :
-		throw CryptoGeneratorException("CSG:Ctor", "The SHAKE mode type is invalid!")),
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type is invalid!"), ErrorCodes::InvalidParam)),
 	m_stateSize(STATE_SIZE)
 {
 	Scope();
@@ -72,7 +72,7 @@ CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 	m_legalKeySizes(0),
 	m_prdResistant(Provider != nullptr),
 	m_providerSource(Provider != nullptr ? Provider : 
-		throw CryptoGeneratorException("CSG:Ctor", "The provider can not be null!")),
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The provider can not be null!"), ErrorCodes::IllegalOperation)),
 	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
 	m_reseedCounter(0),
 	m_reseedRequests(0),
@@ -80,7 +80,7 @@ CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 	m_secStrength((ShakeModeType == ShakeModes::SHAKE128) ? 128 : (ShakeModeType == ShakeModes::SHAKE256) ? 256 : 512),
 	m_seedSize(0),
 	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
-		throw CryptoGeneratorException("CSG:Ctor", "The SHAKE mode type can not ne none!")),
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type is invalid!"), ErrorCodes::InvalidParam)),
 	m_stateSize(STATE_SIZE)
 {
 	Scope();
@@ -108,14 +108,14 @@ CSG::~CSG()
 
 		for (size_t i = 0; i < m_drbgState.size(); ++i)
 		{
-			IntUtils::ClearArray(m_drbgState[i]);
+			IntegerTools::Clear(m_drbgState[i]);
 		}
 
-		IntUtils::ClearVector(m_drbgBuffer);
-		IntUtils::ClearVector(m_drbgState);
-		IntUtils::ClearVector(m_customNonce);
-		IntUtils::ClearVector(m_distCode);
-		IntUtils::ClearVector(m_legalKeySizes);
+		IntegerTools::Clear(m_drbgBuffer);
+		IntegerTools::Clear(m_drbgState);
+		IntegerTools::Clear(m_customNonce);
+		IntegerTools::Clear(m_distCode);
+		IntegerTools::Clear(m_legalKeySizes);
 
 		if (m_destroyEngine)
 		{
@@ -180,7 +180,7 @@ const size_t CSG::MaxReseedCount()
 
 const std::string CSG::Name()
 {
-	return CLASS_NAME + "-" + IntUtils::ToString(m_secStrength);
+	return CLASS_NAME + "-" + IntegerTools::ToString(m_secStrength);
 }
 
 const size_t CSG::NonceSize()
@@ -209,11 +209,11 @@ size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoGeneratorException("CSG:Generate", "The generator must be initialized before use!");
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::IllegalOperation);
 	}
 	if ((Output.size() - OutOffset) < Length)
 	{
-		throw CryptoGeneratorException("CSG:Generate", "The output buffer is too small!");
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
 	Extract(Output, OutOffset, Length);
@@ -228,7 +228,7 @@ size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 			if (m_reseedRequests > MAX_RESEED)
 			{
-				throw CryptoGeneratorException("CSG:Generate", "The maximum reseed requests can not be exceeded, re-initialize the generator!");
+				throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::IllegalOperation);
 			}
 
 			Derive();
@@ -262,7 +262,7 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 {
 	if (Seed.size() < MIN_KEYSIZE)
 	{
-		throw CryptoGeneratorException("CSG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidKey);
 	}
 
 	if (m_isInitialized)
@@ -285,12 +285,12 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 		std::vector<byte> ctr(CSTLEN);
 
 		// add customization string to start of counter
-		MemUtils::Copy(m_customNonce, 0, ctr, 0, m_customNonce.size());
+		MemoryTools::Copy(m_customNonce, 0, ctr, 0, m_customNonce.size());
 
 		// loop through state members, initializing each to a unique set of values
 		for (size_t i = 0; i < m_drbgState.size(); ++i)
 		{
-			IntUtils::BeIncrease8(ctr, CTRIVL * (i + 1));
+			IntegerTools::BeIncrease8(ctr, CTRIVL * (i + 1));
 			Customize(ctr, m_distCode, m_drbgState[i]);
 		}
 
@@ -371,7 +371,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					State[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+					State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 				}
 
 				Permute(State);
@@ -393,7 +393,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					State[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+					State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 				}
 
 				Permute(State);
@@ -405,12 +405,12 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 		}
 	}
 
-	MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
+	MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
 	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		State[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+		State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 	}
 }
 
@@ -439,7 +439,7 @@ void CSG::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		// copy remaining bytes
 		if (bufPos != 0)
 		{
-			Utility::MemUtils::Copy(m_drbgBuffer, m_bufferIndex, Output, OutOffset, bufPos);
+			Utility::MemoryTools::Copy(m_drbgBuffer, m_bufferIndex, Output, OutOffset, bufPos);
 		}
 
 		size_t prcLen = Length - bufPos;
@@ -451,13 +451,13 @@ void CSG::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 			if (prcLen > m_drbgBuffer.size())
 			{
-				Utility::MemUtils::Copy(m_drbgBuffer, 0, Output, OutOffset + bufPos, m_drbgBuffer.size());
+				Utility::MemoryTools::Copy(m_drbgBuffer, 0, Output, OutOffset + bufPos, m_drbgBuffer.size());
 				bufPos += m_drbgBuffer.size();
 				prcLen -= m_drbgBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy(m_drbgBuffer, 0, Output, OutOffset + bufPos, prcLen);
+				Utility::MemoryTools::Copy(m_drbgBuffer, 0, Output, OutOffset + bufPos, prcLen);
 				m_bufferIndex = prcLen;
 				prcLen = 0;
 			}
@@ -465,7 +465,7 @@ void CSG::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 	else
 	{
-		Utility::MemUtils::Copy(m_drbgBuffer, m_bufferIndex, Output, OutOffset, Length);
+		Utility::MemoryTools::Copy(m_drbgBuffer, m_bufferIndex, Output, OutOffset, Length);
 		m_bufferIndex += Length;
 	}
 }
@@ -490,12 +490,12 @@ void CSG::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Len
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			MemUtils::Copy(Input, InOffset, msg, 0, Length);
+			MemoryTools::Copy(Input, InOffset, msg, 0, Length);
 		}
 
 		msg[Length] = m_domainCode;
 		++Length;
-		MemUtils::Clear(msg, Length, m_blockSize - Length);
+		MemoryTools::Clear(msg, Length, m_blockSize - Length);
 		msg[m_blockSize - 1] |= 0x80;
 
 		AbsorbBlock(msg, 0, m_blockSize, State);
@@ -507,7 +507,7 @@ void CSG::Fill()
 	if (!m_avxEnabled)
 	{
 		Permute(m_drbgState[0]);
-		MemUtils::Copy(m_drbgState[0], 0, m_drbgBuffer, 0, m_blockSize);
+		MemoryTools::Copy(m_drbgState[0], 0, m_drbgBuffer, 0, m_blockSize);
 	}
 	else
 	{
@@ -515,7 +515,7 @@ void CSG::Fill()
 
 		for (size_t i = 0; i < m_drbgState.size(); ++i)
 		{
-			MemUtils::Copy(m_drbgState[i], 0, m_drbgBuffer, i * m_blockSize, m_blockSize);
+			MemoryTools::Copy(m_drbgState[i], 0, m_drbgBuffer, i * m_blockSize, m_blockSize);
 		}
 	}
 
@@ -603,11 +603,11 @@ void CSG::PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State)
 
 void CSG::Reset()
 {
-	MemUtils::Clear(m_drbgBuffer, 0, m_blockSize);
+	MemoryTools::Clear(m_drbgBuffer, 0, m_blockSize);
 
 	for (size_t i = 0; i < m_drbgState.size(); ++i)
 	{
-		MemUtils::Clear(m_drbgState[i], 0, STATE_SIZE * sizeof(ulong));
+		MemoryTools::Clear(m_drbgState[i], 0, STATE_SIZE * sizeof(ulong));
 	}
 
 	m_bufferIndex = 0;

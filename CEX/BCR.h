@@ -133,7 +133,7 @@ public:
 	const Prngs Enumeral() override;
 
 	/// <summary>
-	/// Read Only: The random generators class name
+	/// Read Only: The random generators implementation name
 	/// </summary>
 	const std::string Name() override;
 

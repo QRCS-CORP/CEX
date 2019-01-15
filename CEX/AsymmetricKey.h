@@ -7,7 +7,7 @@
 #include "AsymmetricTransforms.h"
 #include "IAsymmetricKey.h"
 
-NAMESPACE_ASYMMETRICKEY
+NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricEngines;
 using Enumeration::AsymmetricKeyTypes;
@@ -104,5 +104,5 @@ public:
 	std::vector<byte> ToBytes() override;
 };
 
-NAMESPACE_ASYMMETRICKEYEND
+NAMESPACE_ASYMMETRICEND
 #endif

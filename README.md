@@ -29,7 +29,7 @@ If running the executable, the Win\Test\Vectors folder containing the cipher KAT
 
 For more information on the current capabilities of the library, refer to the libraries help pages.
 
-Note: This is still an early stage in the development of this library, and much of the work is formative and evolving, so stay tuned, be patient.. (eta is the summer of 2019).
+Note: This is still an early stage in the development of this library (pre-alpha), and much of the work is formative and evolving, so stay tuned, be patient.. (eta is the summer of 2019).
 
 ## Contents
 ### Asymmetric Ciphers

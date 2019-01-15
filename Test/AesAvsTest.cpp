@@ -7,10 +7,10 @@
 
 namespace Test
 {
-	using namespace Cipher::Symmetric::Block;
+	using namespace Cipher::Block;
 
+	const std::string AesAvsTest::CLASSNAME = "AesAvsTest";
 	const std::string AesAvsTest::DESCRIPTION = "NIST Advanced Encryption Standard Algorithm Validation Suite (AESAVS) tests.";
-	const std::string AesAvsTest::FAILURE = "FAILURE: ";
 	const std::string AesAvsTest::SUCCESS = "SUCCESS! AESAVS tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -62,7 +62,7 @@ namespace Test
 			TestUtils::Read(AESAVSKEY128, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -76,12 +76,12 @@ namespace Test
 #if defined(__AVX__)
 				if (m_testNI)
 				{
-					Compare(cpr2, key, msg, cpt);
+					Kat(cpr2, key, msg, cpt);
 				}
 				else
 #endif
 				{
-					Compare(cpr1, key, msg, cpt);
+					Kat(cpr1, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit key vectors test.."));
@@ -90,7 +90,7 @@ namespace Test
 			TestUtils::Read(AESAVSKEY192, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 48; i < data.size(); i += 80, j += 80)
@@ -101,12 +101,12 @@ namespace Test
 #if defined(__AVX__)
 				if (m_testNI)
 				{
-					Compare(cpr2, key, msg, cpt);
+					Kat(cpr2, key, msg, cpt);
 				}
 				else
 #endif
 				{
-					Compare(cpr1, key, msg, cpt);
+					Kat(cpr1, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit key vectors test.."));
@@ -115,7 +115,7 @@ namespace Test
 			TestUtils::Read(AESAVSKEY256, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 64; i < data.size(); i += 96, j += 96)
@@ -126,12 +126,12 @@ namespace Test
 #if defined(__AVX__)
 				if (m_testNI)
 				{
-					Compare(cpr2, key, msg, cpt);
+					Kat(cpr2, key, msg, cpt);
 				}
 				else
 #endif
 				{
-					Compare(cpr1, key, msg, cpt);
+					Kat(cpr1, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit key vectors test.."));
@@ -141,7 +141,7 @@ namespace Test
 			TestUtils::Read(AESAVSPTEXT128, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -152,12 +152,12 @@ namespace Test
 #if defined(__AVX__)
 				if (m_testNI)
 				{
-					Compare(cpr2, key, msg, cpt);
+					Kat(cpr2, key, msg, cpt);
 				}
 				else
 #endif
 				{
-					Compare(cpr1, key, msg, cpt);
+					Kat(cpr1, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit plain-text vectors test.."));
@@ -167,7 +167,7 @@ namespace Test
 			TestUtils::Read(AESAVSPTEXT192, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -178,12 +178,12 @@ namespace Test
 #if defined(__AVX__)
 				if (m_testNI)
 				{
-					Compare(cpr2, key, msg, cpt);
+					Kat(cpr2, key, msg, cpt);
 				}
 				else
 #endif
 				{
-					Compare(cpr1, key, msg, cpt);
+					Kat(cpr1, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit plain-text vectors test.."));
@@ -193,7 +193,7 @@ namespace Test
 			TestUtils::Read(AESAVSPTEXT256, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -204,12 +204,12 @@ namespace Test
 #if defined(__AVX__)
 				if (m_testNI)
 				{
-					Compare(cpr2, key, msg, cpt);
+					Kat(cpr2, key, msg, cpt);
 				}
 				else
 #endif
 				{
-					Compare(cpr1, key, msg, cpt);
+					Kat(cpr1, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit plain-text vectors test.. 960/960 vectors passed"));
@@ -218,31 +218,31 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void AesAvsTest::Compare(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	void AesAvsTest::Kat(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> otp(Input.size(), 0);
-		Key::Symmetric::SymmetricKey kp(Key);
+		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Input, otp);
 
 		if (otp != Output)
 		{
-			throw TestException(std::string("AESAVS: Encrypted arrays are not equal!"));
+			throw TestException(std::string("Kat"), Cipher->Name(), std::string("AESAVS: Encrypted arrays are not equal!"));
 		}
 	}
 
 	//~~~Private Functions~~~//
 
-	void AesAvsTest::OnProgress(std::string Data)
+	void AesAvsTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

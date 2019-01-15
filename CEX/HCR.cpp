@@ -1,9 +1,10 @@
 #include "HCR.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "ProviderFromName.h"
 
 NAMESPACE_PRNG
 
+using Utility::MemoryTools;
 using Enumeration::SHA2Digests;
 
 const std::string HCR::CLASS_NAME("HCR");
@@ -27,7 +28,7 @@ HCR::HCR(SHA2Digests DigestType, Providers ProviderType, size_t BufferSize)
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
 	m_digestType(DigestType != SHA2Digests::None ? DigestType :
-		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_isDestroyed(false),
 	m_pvdType(ProviderType),
 	m_rndSeed(0),
@@ -42,11 +43,11 @@ HCR::HCR(std::vector<byte> Seed, SHA2Digests DigestType, size_t BufferSize)
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
 	m_digestType(DigestType != SHA2Digests::None ? DigestType :
-		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_isDestroyed(false),
 	m_pvdType(Providers::ACP),
 	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestType) ? Seed :
-		throw CryptoRandomException("HCR:Ctor", "The seed is too small!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Seed size is too small!"), ErrorCodes::InvalidKey)),
 	m_rngBuffer(BufferSize),
 	m_rngGenerator(new Drbg::HCG(DigestType))
 {
@@ -63,8 +64,8 @@ HCR::~HCR()
 		m_digestType = SHA2Digests::None;
 		m_pvdType = Providers::None;
 
-		Utility::IntUtils::ClearVector(m_rndSeed);
-		Utility::IntUtils::ClearVector(m_rngBuffer);
+		Utility::IntegerTools::Clear(m_rndSeed);
+		Utility::IntegerTools::Clear(m_rngBuffer);
 
 		if (m_rngGenerator != nullptr)
 		{
@@ -88,7 +89,7 @@ void HCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	std::vector<byte> rnd = Generate(Length);
-	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
+	MemoryTools::Copy(rnd, 0, Output, Offset, Length);
 }
 
 void HCR::Generate(std::vector<byte> &Output)
@@ -102,7 +103,7 @@ void HCR::Generate(std::vector<byte> &Output)
 		// copy remaining bytes
 		if (bufSize != 0)
 		{
-			Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
+			MemoryTools::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
 		}
 
 		size_t rmd = Output.size() - bufSize;
@@ -114,13 +115,13 @@ void HCR::Generate(std::vector<byte> &Output)
 
 			if (rmd > m_rngBuffer.size())
 			{
-				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
+				MemoryTools::Copy(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
 				bufSize += m_rngBuffer.size();
 				rmd -= m_rngBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, rmd);
+				MemoryTools::Copy(m_rngBuffer, 0, Output, bufSize, rmd);
 				m_bufferIndex = rmd;
 				rmd = 0;
 			}
@@ -128,7 +129,7 @@ void HCR::Generate(std::vector<byte> &Output)
 	}
 	else
 	{
-		Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
+		MemoryTools::Copy(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -136,7 +137,7 @@ void HCR::Generate(std::vector<byte> &Output)
 ushort HCR::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -144,7 +145,7 @@ ushort HCR::NextUInt16()
 uint HCR::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -152,7 +153,7 @@ uint HCR::NextUInt32()
 ulong HCR::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }

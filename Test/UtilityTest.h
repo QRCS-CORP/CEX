@@ -12,8 +12,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
@@ -59,10 +59,10 @@ namespace Test
 			return (x >> c) | (x << ((sizeof(T) * 8) - c));
 		}
 
-		void EndianConversions();
-		void RotationCheck();
-		void OperationsCheck();
-		void OnProgress(std::string Data);
+		void Conversions();
+		void Rotation();
+		void Operations();
+		void OnProgress(const std::string &Data);
 	};
 }
 

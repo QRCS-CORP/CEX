@@ -1,6 +1,6 @@
 #include "CMACTest.h"
 #include "../CEX/CMAC.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 
@@ -10,13 +10,13 @@ namespace Test
 	using Enumeration::BlockCipherExtensions;
 	using Exception::CryptoMacException;
 	using Mac::CMAC;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
-	using Key::Symmetric::SymmetricKey;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKey;
+	using Cipher::SymmetricKeySize;
 
+	const std::string CMACTest::CLASSNAME = "CMACTest";
 	const std::string CMACTest::DESCRIPTION = "CMAC Known Answer Test Vectors for 128/192/256 bit Keys.";
-	const std::string CMACTest::FAILURE = "FAILURE! ";
 	const std::string CMACTest::SUCCESS = "SUCCESS! All CMAC tests have executed succesfully.";
 
 	CMACTest::CMACTest()
@@ -31,9 +31,9 @@ namespace Test
 
 	CMACTest::~CMACTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_message);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_message);
 	}
 
 	const std::string CMACTest::Description()
@@ -106,11 +106,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -120,9 +120,9 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			CMAC mac(BlockCiphers::None);
+			CMAC gen(BlockCiphers::None);
 
-			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE1"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -135,9 +135,9 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			CMAC mac(nullptr);
+			CMAC gen(nullptr);
 
-			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE2"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -150,13 +150,13 @@ namespace Test
 		// test initialization
 		try
 		{
-			CMAC mac(BlockCiphers::Rijndael);
+			CMAC gen(BlockCiphers::Rijndael);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
-			mac.Initialize(kp);
+			gen.Initialize(kp);
 
-			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE3"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -169,12 +169,12 @@ namespace Test
 		// test finalize state -1
 		try
 		{
-			CMAC mac(BlockCiphers::Rijndael);
+			CMAC gen(BlockCiphers::Rijndael);
 			std::vector<byte> code(16);
 			// generator was not initialized
-			mac.Finalize(code, 0);
+			gen.Finalize(code, 0);
 
-			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE4"));
 		}
 		catch (CryptoMacException const &)
 		{
@@ -246,11 +246,11 @@ namespace Test
 
 		if (Expected != code)
 		{
-			throw TestException(std::string("CMAC"), std::string("KAT: Expected values don't match! -CK1"));
+			throw TestException(std::string("Kat"), Generator->Name(), std::string("Expected values don't match! -CK1"));
 		}
 	}
 
-	void CMACTest::OnProgress(std::string Data)
+	void CMACTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -260,8 +260,8 @@ namespace Test
 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
-		std::vector<byte> otp1(Generator->MacSize());
-		std::vector<byte> otp2(Generator->MacSize());
+		std::vector<byte> otp1(Generator->TagSize());
+		std::vector<byte> otp2(Generator->TagSize());
 		SecureRandom rnd;
 		size_t i;
 
@@ -271,8 +271,8 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 			SymmetricKey kp(key);
 
 			// generate the mac
@@ -284,7 +284,7 @@ namespace Test
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("CMAC"), std::string("Reset: Returns a different array after reset! -CP1"));
+				throw TestException(std::string("Params"), Generator->Name(), std::string("Returns a different array after reset! -CP1"));
 			}
 		}
 	}
@@ -293,7 +293,7 @@ namespace Test
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
 		std::vector<byte> msg;
-		std::vector<byte> otp(Generator->MacSize());
+		std::vector<byte> otp(Generator->TagSize());
 		std::vector<byte> key(ks.KeySize());
 		SecureRandom rnd;
 		size_t i;
@@ -306,8 +306,8 @@ namespace Test
 			{
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
-				IntUtils::Fill(key, 0, key.size(), rnd);
-				IntUtils::Fill(msg, 0, msg.size(), rnd);
+				IntegerTools::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(msg, 0, msg.size(), rnd);
 				SymmetricKey kp(key);
 
 				// generate with the kdf
@@ -315,9 +315,9 @@ namespace Test
 				Generator->Compute(msg, otp);
 				Generator->Reset();
 			}
-			catch (...)
+			catch (std::exception const&)
 			{
-				throw TestException(std::string("CMAC"), std::string("Stress: The generator has thrown an exception! -CS1"));
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("The generator has thrown an exception! -CS1"));
 			}
 		}
 	}

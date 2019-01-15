@@ -20,20 +20,25 @@
 #define CEX_IASYMMETRICCIPHER_H
 
 #include "CexDomain.h"
+#include "AsymmetricEngines.h"
 #include "AsymmetricKey.h"
 #include "AsymmetricKeyPair.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
 #include "CryptoAsymmetricException.h"
 #include "CryptoAuthenticationFailure.h"
+#include "ErrorCodes.h"
 #include "IPrng.h"
 #include "Prngs.h"
 
 NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricEngines;
-using Key::Asymmetric::AsymmetricKey;
-using Key::Asymmetric::AsymmetricKeyPair;
 using Exception::CryptoAsymmetricException;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
 using Exception::CryptoAuthenticationFailure;
+using Enumeration::ErrorCodes;
 using Prng::IPrng;
 using Enumeration::Prngs;
 

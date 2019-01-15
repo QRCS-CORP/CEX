@@ -13,8 +13,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 #if defined (_DEBUG)
 		static const size_t TEST_CYCLES = 1;
@@ -88,7 +88,7 @@ namespace Test
 
 	private:
 
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

@@ -27,8 +27,6 @@
 
 NAMESPACE_MODULELWE
 
-using Key::Asymmetric::AsymmetricKey;
-using Key::Asymmetric::AsymmetricKeyPair;
 using Enumeration::MLWEParameters;
 
 /// <summary>

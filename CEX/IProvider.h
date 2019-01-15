@@ -8,6 +8,7 @@
 NAMESPACE_PROVIDER
 
 using Exception::CryptoRandomException;
+using Enumeration::ErrorCodes;
 using Enumeration::Providers;
 
 /// <summary>

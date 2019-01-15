@@ -15,19 +15,19 @@ CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.7e</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>1.0.0.7f</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   1.0.0.7e
-\date      December 26, 2018
+\version   1.0.0.7f
+\date      Januray 14, 2018
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is 1.0.0.7e (A7 version), which are the major, minor, patch, and release codes. \n \n
+The current version is 1.0.0.7f (A7 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release 1.0.0.7e (version A7):</B> \n
+<B>Current Release 1.0.0.7f (version A7):</B> \n
 
 The Dilithium asymmetric signature scheme \n
 The SPHINCS+ asymmetric signature scheme \n
@@ -88,7 +88,7 @@ Overhaul of SecureRandom and prng classes \n \n
 
 <B>Version 1.0.0.2: April 23, 2017</B> \n
 Last of 1.0 sweep of the symmetric library before the second half of the project engages, with thousands of changes made throughout, and the addition of (!experimental) AVX512 support. \n
-Added a vectorized MemUtils class, with SIMD 128/256/512 copy, clear, set-value, and xor functions. \n
+Added a vectorized MemoryTools class, with SIMD 128/256/512 copy, clear, set-value, and xor functions. \n
 Integrated vectorized replacements for memcpy, xor, and memset throughout, including cipher mode support for AVX512, (I don't have a xeon to test this, maybe you can help?). \n
 Reformatting of headers (inline accessors removed and the override hint added). \n
 Many small TODOs finished, api synchronized, and formatting and documentation changes throughout. \n \n
@@ -118,21 +118,29 @@ The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477
 *  @brief Root Namespace
 */
 NAMESPACE_ROOT
+	class CpuDetect {};
+	class Mutex {};
+	class ParallelOptions {};
+	class SecureMemory {};
+	class SecureVector {};
 
 	/*!
-	*  \addtogroup Cipher
+	*  \addtogroup Asymmetric
 	*  @{
-	*  @brief Cryptographic Cipher Namespace
+	*  @brief Asymmetric Ciphers Namespace
 	*/
-	NAMESPACE_CIPHER
+	NAMESPACE_ASYMMETRIC
+		class AsymmetricKey {};
+		class AsymmetricKeyPair {};
+		class IAsymmetricKey {};
+		class IAsymmetricKeyPair {};
 
 		/*!
-		*  \addtogroup Asymmetric
+		*  \addtogroup Encrypt
 		*  @{
 		*  @brief Asymmetric Ciphers Namespace
 		*/
-		NAMESPACE_ASYMMETRIC
-
+		NAMESPACE_ASYMMETRICENCRYPT
 			/*!
 			*  \addtogroup McEliece
 			*  @{
@@ -172,46 +180,54 @@ NAMESPACE_ROOT
 				class RingLWE {};
 			NAMESPACE_RINGLWEEND
 			/*! @} */
-
-			/*!
-			*  \addtogroup AsymmetricSign
-			*  @{
-			*  @brief Asymmetric Signature Namespace
-			*/
-			NAMESPACE_ASYMMETRICSIGN
-
-				/*!
-				*  \addtogroup Dilithium
-				*  @{
-				*  @brief The Dilithium asymmetric signature scheme Namespace
-				*/
-				NAMESPACE_DILITHIUM
-					class Dilithium {};
-				NAMESPACE_DILITHIUMEND
-				/*! @} */
-
-				/*!
-				*  \addtogroup Sphincs
-				*  @{
-				*  @brief The SPHINCS+ asymmetric signature scheme Namespace
-				*/
-				NAMESPACE_SPHINCS
-					class Sphincs {};
-				NAMESPACE_SPHINCSEND
-				/*! @} */
-
-			NAMESPACE_ASYMMETRICSIGNEND
-			/*! @} */
-
-		NAMESPACE_ASYMMETRICEND
+		NAMESPACE_ASYMMETRICENCRYPTEND
 		/*! @} */
 
 		/*!
-		*  \addtogroup Symmetric
+		*  \addtogroup Sign
 		*  @{
-		*  @brief Symmetric Cipher Namespace
+		*  @brief Asymmetric Signature Namespace
 		*/
-		NAMESPACE_SYMMETRIC
+		NAMESPACE_ASYMMETRICSIGN
+
+			/*!
+			*  \addtogroup Dilithium
+			*  @{
+			*  @brief The Dilithium asymmetric signature scheme Namespace
+			*/
+			NAMESPACE_DILITHIUM
+				class Dilithium {};
+			NAMESPACE_DILITHIUMEND
+			/*! @} */
+
+			/*!
+			*  \addtogroup Sphincs
+			*  @{
+			*  @brief The SPHINCS+ asymmetric signature scheme Namespace
+			*/
+			NAMESPACE_SPHINCS
+				class Sphincs {};
+			NAMESPACE_SPHINCSEND
+			/*! @} */
+
+		NAMESPACE_ASYMMETRICSIGNEND
+		/*! @} */
+
+	NAMESPACE_ASYMMETRICEND
+	/*! @} */
+
+
+	/*!
+	*  \addtogroup Cipher
+	*  @{
+	*  @brief Cryptographic Cipher Namespace
+	*/
+	NAMESPACE_CIPHER
+		class ISymmetricKey {};
+		class SymmetricKeyGenerator {};
+		class SymmetricKey {};
+		class SymmetricKeySize {};
+		class SymmetricSecureKey {};
 
 		/*!
 		*  \addtogroup Block
@@ -251,11 +267,10 @@ NAMESPACE_ROOT
 			*/
 			NAMESPACE_PADDING
 				class IPadding {};
-				class ISO7816 {};
+				class ESP {};
 				class PKCS7 {};
-				class TBC {};
 				class X923 {};
-				class ZeroPad {};
+				class ZeroOne {};
 			NAMESPACE_PADDINGEND
 			/*! @} */
 
@@ -278,20 +293,7 @@ NAMESPACE_ROOT
 		NAMESPACE_STREAMEND
 		/*! @} */
 
-		NAMESPACE_SYMMETRICEND
-		/*! @} */
 	NAMESPACE_CIPHEREND
-	/*! @} */
-
-	/*!
-	*  \addtogroup Common
-	*  @brief Cipher Common Utilities
-	*  @{
-	*/
-	NAMESPACE_COMMON
-		class CpuDetect {};
-		class ParallelOptions {};
-	NAMESPACE_COMMONEND
 	/*! @} */
 
 	/*!
@@ -458,42 +460,6 @@ NAMESPACE_ROOT
 	/*! @} */
 
 	/*!
-	*  \addtogroup Key
-	*  @{
-	*  @brief Cipher Keys
-	*/
-	NAMESPACE_KEY
-		/*!
-		*  \addtogroup AsymmetricKey
-		*  @{
-		*  @brief Asymmetric Key containers and generator
-		*/
-		NAMESPACE_ASYMMETRICKEY
-			class AsymmetricKey {};
-			class AsymmetricKeyPair {};
-			class IAsymmetricKey {};
-			class IAsymmetricKeyPair {};
-		NAMESPACE_ASYMMETRICKEYEND
-		/*! @} */
-
-		/*!
-		*  \addtogroup SymmetricKey
-		*  @{
-		*  @brief Symmetric Key containers and generator
-		*/
-		NAMESPACE_SYMMETRICKEY
-			class ISymmetricKey {};
-			class SymmetricKeyGenerator {};
-			class SymmetricKey {};
-			class SymmetricKeySize {};
-			class SymmetricSecureKey {};
-		NAMESPACE_SYMMETRICKEYEND
-		/*! @} */
-
-	NAMESPACE_KEYEND
-	/*! @} */
-
-	/*!
 	*  \addtogroup Mac
 	*  @{
 	*  @brief Message Authentication Code Generators
@@ -586,11 +552,12 @@ NAMESPACE_ROOT
 	*  @brief Library Utilities Classes
 	*/
 	NAMESPACE_UTILITY 
-		class ArrayUtils {};
-		class IntUtils {};
-		class MemUtils {};
-		class ParallelUtils {};
-		class SysUtils {};
+		class ArrayTools {};
+		class IntegerTools {};
+		class MemoryPool {};
+		class MemoryTools {};
+		class ParallelTools {};
+		class SystemTools {};
 		class TimeStamp {};
 	NAMESPACE_UTILITYEND
 	/*! @} */

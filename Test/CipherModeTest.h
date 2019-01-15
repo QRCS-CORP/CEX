@@ -6,7 +6,7 @@
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::Mode::ICipherMode;
+	using Cipher::Block::Mode::ICipherMode;
 
     /// <summary>
 	/// Cipher Mode implementations vector comparison test sets.
@@ -17,8 +17,8 @@ namespace Test
     {
     private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
         std::vector<std::vector<std::vector<byte>>> m_expected;
@@ -74,7 +74,7 @@ namespace Test
     private:
 
 		void Initialize();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
     };
 }
 

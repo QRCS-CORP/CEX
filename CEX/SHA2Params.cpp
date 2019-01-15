@@ -1,8 +1,12 @@
 #include "SHA2Params.h"
-#include "CryptoDigestException.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_DIGEST
+
+using Exception::CryptoDigestException;
+using Enumeration::ErrorCodes;
+
+const std::string SHA2Params::CLASS_NAME("SHA2Params");
 
 SHA2Params::SHA2Params()
 	:
@@ -30,11 +34,11 @@ SHA2Params::SHA2Params(ulong OutputSize, uint LeafSize, byte Fanout)
 {
 	if (OutputSize != 32 && OutputSize != 64)
 	{
-		throw Exception::CryptoDigestException("SHA2Params:Ctor", "The output size is invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The output size is invalid!"), ErrorCodes::IllegalOperation);
 	}
 	if (Fanout > 0 && LeafSize == 0 || Fanout == 0 && LeafSize != 0)
 	{
-		throw Exception::CryptoDigestException("SHA2Params:Ctor", "The fanout and leaf sizes are invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The fanout and leaf sizes are invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_dstCode.resize(DistributionCodeMax());
@@ -51,15 +55,18 @@ SHA2Params::SHA2Params(const std::vector<byte> &TreeArray)
 	m_reserved(0),
 	m_dstCode(0)
 {
-	CexAssert(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
+	if (TreeArray.size() < GetHeaderSize())
+	{
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The TreeArray buffer is too short!"), ErrorCodes::IllegalOperation);
+	}
 
-	m_nodeOffset = Utility::IntUtils::LeBytesTo32(TreeArray, 0);
-	m_treeVersion = Utility::IntUtils::LeBytesTo16(TreeArray, 4);
-	m_outputSize = Utility::IntUtils::LeBytesTo64(TreeArray, 6);
-	m_leafSize = Utility::IntUtils::LeBytesTo32(TreeArray, 14);
+	m_nodeOffset = Utility::IntegerTools::LeBytesTo32(TreeArray, 0);
+	m_treeVersion = Utility::IntegerTools::LeBytesTo16(TreeArray, 4);
+	m_outputSize = Utility::IntegerTools::LeBytesTo64(TreeArray, 6);
+	m_leafSize = Utility::IntegerTools::LeBytesTo32(TreeArray, 14);
 	std::memcpy(&m_treeDepth, &TreeArray[18], 1);
 	std::memcpy(&m_treeFanout, &TreeArray[19], 1);
-	m_reserved = Utility::IntUtils::LeBytesTo32(TreeArray, 20);
+	m_reserved = Utility::IntegerTools::LeBytesTo32(TreeArray, 20);
 	m_dstCode.resize(DistributionCodeMax());
 	std::memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 }
@@ -195,13 +202,13 @@ std::vector<byte> SHA2Params::ToBytes()
 {
 	std::vector<byte> config(GetHeaderSize());
 
-	Utility::IntUtils::Le32ToBytes(m_nodeOffset, config, 0);
-	Utility::IntUtils::Le16ToBytes(m_treeVersion, config, 4);
-	Utility::IntUtils::Le64ToBytes(m_outputSize, config, 6);
-	Utility::IntUtils::Le32ToBytes(m_leafSize, config, 14);
+	Utility::IntegerTools::Le32ToBytes(m_nodeOffset, config, 0);
+	Utility::IntegerTools::Le16ToBytes(m_treeVersion, config, 4);
+	Utility::IntegerTools::Le64ToBytes(m_outputSize, config, 6);
+	Utility::IntegerTools::Le32ToBytes(m_leafSize, config, 14);
 	std::memcpy(&config[18], &m_treeDepth, 1);
 	std::memcpy(&config[19], &m_treeFanout, 1);
-	Utility::IntUtils::Le32ToBytes(m_reserved, config, 20);
+	Utility::IntegerTools::Le32ToBytes(m_reserved, config, 20);
 	std::memcpy(&config[24], &m_dstCode[0], m_dstCode.size());
 
 	return config;

@@ -1,5 +1,5 @@
 #include "CSP.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 #if defined(CEX_OS_WINDOWS)
 #	include <Windows.h>
@@ -15,6 +15,8 @@
 #endif
 
 NAMESPACE_PROVIDER
+
+using Utility::MemoryTools;
 
 #if defined(CEX_OS_WINDOWS)
 #	pragma comment(lib, "advapi32.lib")
@@ -55,6 +57,10 @@ CSP::CSP()
 	m_isAvailable(false)
 #endif
 {
+	if (!m_isAvailable)
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
+	}
 }
 
 CSP::~CSP()
@@ -66,20 +72,16 @@ CSP::~CSP()
 
 void CSP::Generate(std::vector<byte> &Output)
 {
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("CSP:Generate", "Random provider is not available!");
-	}
-
 	size_t prcLen = Output.size();
 	size_t prcOffset = 0;
 
 #if defined(CEX_OS_WINDOWS)
 
 	HCRYPTPROV hProvider = NULL;
+
 	if (!CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
 	{
-		throw CryptoRandomException("CSP:Generate", "Call to CryptAcquireContext failed; random provider is not available!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
 	}
 
 	if (hProvider != NULL)
@@ -89,7 +91,7 @@ void CSP::Generate(std::vector<byte> &Output)
 		{
 			CryptReleaseContext(hProvider, 0);
 			hProvider = NULL;
-			throw CryptoRandomException("CSP:Generate", "Call to CryptGenRandom failed; random provider is not available!");
+			throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
 		}
 	}
 
@@ -105,9 +107,9 @@ void CSP::Generate(std::vector<byte> &Output)
 	{
 		do
 		{
-			size_t prcRmd = Utility::IntUtils::Min(sizeof(uint), prcLen);
+			size_t prcRmd = Utility::IntegerTools::Min(sizeof(uint), prcLen);
 			uint rndNum = arc4random();
-			Utility::MemUtils::Copy(rndNum, Output, prcOffset, prcRmd);
+			MemoryTools::Copy(rndNum, Output, prcOffset, prcRmd);
 			prcOffset += prcRmd;
 			prcLen -= prcRmd;
 		} 
@@ -115,7 +117,7 @@ void CSP::Generate(std::vector<byte> &Output)
 	}
 	catch (std::exception&)
 	{
-		throw CryptoRandomException("CSP:Generate", "Call to arc4random failed; random provider is not available!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 #else
@@ -124,7 +126,7 @@ void CSP::Generate(std::vector<byte> &Output)
 
 	if (fdHandle <= 0)
 	{
-		throw CryptoRandomException("CSP:Generate", "System RNG failed to open RNG device!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("System RNG failed to open RNG device!"), ErrorCodes::NotFound);
 	}
 
 	do
@@ -139,12 +141,12 @@ void CSP::Generate(std::vector<byte> &Output)
 			}
 			else
 			{
-				throw CryptoRandomException("CSP:Generate", "System RNG read failed error!");
+				throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
 			}
 		}
 		else if (rndLen == 0)
 		{
-			throw CryptoRandomException("CSP:Generate", "System RNG EOF on device!");
+			throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
 		}
 
 		prcOffset += rndLen;
@@ -165,12 +167,12 @@ void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException("CSP:Generate", "The output buffer is too small!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
 	std::vector<byte> rnd(Length);
 	Generate(rnd);
-	Utility::MemUtils::Copy(rnd, 0, Output, Offset, rnd.size());
+	MemoryTools::Copy(rnd, 0, Output, Offset, rnd.size());
 }
 
 std::vector<byte> CSP::Generate(size_t Length)
@@ -184,7 +186,7 @@ std::vector<byte> CSP::Generate(size_t Length)
 ushort CSP::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -192,7 +194,7 @@ ushort CSP::NextUInt16()
 uint CSP::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -200,7 +202,7 @@ uint CSP::NextUInt32()
 ulong CSP::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }

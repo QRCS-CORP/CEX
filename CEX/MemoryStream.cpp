@@ -1,5 +1,5 @@
 #include "MemoryStream.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_IO
 
@@ -48,7 +48,7 @@ MemoryStream::MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t 
 {
 	CexAssert(Length <= Data.size() - Offset, "Length exceeds input capacity");
 	m_streamData.resize(Length);
-	Utility::MemUtils::Copy(Data, Offset, m_streamData, 0, Length);
+	Utility::MemoryTools::Copy(Data, Offset, m_streamData, 0, Length);
 }
 
 MemoryStream::~MemoryStream()
@@ -117,7 +117,7 @@ void MemoryStream::Destroy()
 	{
 		m_isDestroyed = true;
 		m_streamPosition = 0;
-		Utility::IntUtils::ClearVector(m_streamData);
+		Utility::IntegerTools::Clear(m_streamData);
 	}
 }
 
@@ -130,7 +130,7 @@ size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 	if (Length > 0)
 	{
-		Utility::MemUtils::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
+		Utility::MemoryTools::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
 		m_streamPosition += Length;
 	}
 
@@ -141,7 +141,7 @@ byte MemoryStream::ReadByte()
 {
 	CexAssert(m_streamData.size() - m_streamPosition >= 1, "Stream length exceeded");
 	byte data = 0;
-	Utility::MemUtils::CopyToValue(m_streamData, m_streamPosition, data, 1);
+	Utility::MemoryTools::CopyToValue(m_streamData, m_streamPosition, data, 1);
 	m_streamPosition += 1;
 
 	return data;
@@ -149,7 +149,7 @@ byte MemoryStream::ReadByte()
 
 void MemoryStream::Reset()
 {
-	Utility::MemUtils::Clear(m_streamData, 0, m_streamData.size());
+	Utility::MemoryTools::Clear(m_streamData, 0, m_streamData.size());
 	m_streamData.resize(0);
 	m_streamPosition = 0;
 }
@@ -190,7 +190,7 @@ void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 		m_streamData.resize(ttlLen);
 	}
 
-	Utility::MemUtils::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
+	Utility::MemoryTools::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
 	m_streamPosition += Length;
 }
 
@@ -201,7 +201,7 @@ void MemoryStream::WriteByte(byte Value)
 		m_streamData.resize(m_streamData.size() + 1);
 	}
 
-	Utility::MemUtils::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
+	Utility::MemoryTools::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
 	m_streamPosition += 1;
 }
 

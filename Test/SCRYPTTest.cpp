@@ -7,14 +7,14 @@
 namespace Test
 {
 	using Exception::CryptoKdfException;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Kdf::SCRYPT;
 	using Prng::SecureRandom;
 	using Enumeration::SHA2Digests;
-	using Key::Symmetric::SymmetricKeySize;
+	using Cipher::SymmetricKeySize;
 
+	const std::string SCRYPTTest::CLASSNAME = "SCRYPTTest";
 	const std::string SCRYPTTest::DESCRIPTION = "SCRYPT SHA-2 test vectors.";
-	const std::string SCRYPTTest::FAILURE = "FAILURE! ";
 	const std::string SCRYPTTest::SUCCESS = "SUCCESS! All SCRYPT tests have executed succesfully.";
 
 	SCRYPTTest::SCRYPTTest()
@@ -29,9 +29,9 @@ namespace Test
 
 	SCRYPTTest::~SCRYPTTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_salt);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_salt);
 	}
 
 	const std::string SCRYPTTest::Description()
@@ -91,11 +91,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -105,9 +105,9 @@ namespace Test
 		try
 		{
 			// invalid digest choice
-			SCRYPT kdf(SHA2Digests::None);
+			SCRYPT gen(SHA2Digests::None);
 
-			throw TestException(std::string("SCRYPT"), std::string("Exception: Exception handling failure! -SE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE1"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -120,12 +120,12 @@ namespace Test
 		// test initialization
 		try
 		{
-			SCRYPT kdf(SHA2Digests::SHA256);
+			SCRYPT gen(SHA2Digests::SHA256);
 			// invalid key size
 			std::vector<byte> key(1);
-			kdf.Initialize(key);
+			gen.Initialize(key);
 
-			throw TestException(std::string("SCRYPT"), std::string("Exception: Exception handling failure! -SE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE2"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -138,12 +138,12 @@ namespace Test
 		// test generator state -1
 		try
 		{
-			SCRYPT kdf(SHA2Digests::SHA256);
+			SCRYPT gen(SHA2Digests::SHA256);
 			std::vector<byte> otp(32);
 			// generator was not initialized
-			kdf.Generate(otp);
+			gen.Generate(otp);
 
-			throw TestException(std::string("SCRYPT"), std::string("Exception: Exception handling failure! -SE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE3"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -156,16 +156,16 @@ namespace Test
 		// test generator state -2
 		try
 		{
-			SCRYPT kdf(SHA2Digests::SHA256);
-			Key::Symmetric::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
+			SCRYPT gen(SHA2Digests::SHA256);
+			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> otp(32);
 
-			kdf.Initialize(key);
+			gen.Initialize(key);
 			// array too small
-			kdf.Generate(otp, 0, otp.size() + 1);
+			gen.Generate(otp, 0, otp.size() + 1);
 
-			throw TestException(std::string("SCRYPT"), std::string("Exception: Exception handling failure! -SE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE4"));
 		}
 		catch (CryptoKdfException const &)
 		{
@@ -187,7 +187,7 @@ namespace Test
 
 		if (otp != Expected)
 		{
-			throw TestException(std::string("Kat: Output does not match the known answer! -SK1"));
+			throw TestException(std::string("Kat"), Generator->Name(), std::string("Output does not match the known answer! -SK1"));
 		}
 	}
 
@@ -225,7 +225,7 @@ namespace Test
 		HexConverter::Decode(salt, 4, m_salt);
 	}
 
-	void SCRYPTTest::OnProgress(std::string Data)
+	void SCRYPTTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -247,7 +247,7 @@ namespace Test
 			const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			otp1.resize(OTPLEN);
 			otp2.resize(OTPLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
 
 			// generate with the kdf
 			Generator->Initialize(key);
@@ -258,7 +258,7 @@ namespace Test
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("Reset: Returns a different array after reset! -HR1"));
+				throw TestException(std::string("Params"), Generator->Name(), std::string("Returns a different array after reset! -HR1"));
 			}
 		}
 	}
@@ -279,16 +279,16 @@ namespace Test
 			{
 				const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				otp.resize(OTPLEN);
-				IntUtils::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(key, 0, key.size(), rnd);
 
 				// generate with the kdf
 				Generator->Initialize(key);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Stress: The generator has thrown an exception! -HS1"));
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("The generator has thrown an exception! -HS1"));
 			}
 		}
 	}

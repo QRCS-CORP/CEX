@@ -8,7 +8,7 @@
 
 namespace Test
 {
-	class ConsoleUtils
+	class ConsoleUtils final
 	{
 	public:
 

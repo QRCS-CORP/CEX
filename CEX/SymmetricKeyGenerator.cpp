@@ -1,171 +1,225 @@
 #include "SymmetricKeyGenerator.h"
-#include "CSP.h"
-#include "DigestFromName.h"
-#include "HMAC.h"
-#include "IntUtils.h"
+#include "ArrayTools.h"
+#include "IntegerTools.h"
 #include "ProviderFromName.h"
+#include "SHAKE.h"
 
-NAMESPACE_SYMMETRICKEY
+NAMESPACE_CIPHER
+
+using Enumeration::ErrorCodes;
+
+const std::vector<byte> SymmetricKeyGenerator::SIGMA_INFO = { 0x53, 0x79, 0x6D, 0x6D, 0x65, 0x74, 0x72, 0x69, 0x63, 0x4B, 0x65, 0x79, 0x47, 0x65, 0x6E, 0x65, 0x72, 0x61, 0x74, 0x6F, 0x72 };
 
 //~~~Constructor~~~//
 
-SymmetricKeyGenerator::SymmetricKeyGenerator(SHA2Digests DigestType, Providers ProviderType)
+SymmetricKeyGenerator::SymmetricKeyGenerator(SecurityPolicy Policy, Providers ProviderType)
 	:
-	m_dgtType(DigestType != SHA2Digests::None ? DigestType :
-		throw CryptoGeneratorException("SymmetricKeyGenerator::Ctor", "The digest type can not be none!")),
 	m_isDestroyed(false),
-	m_pvdEngine(ProviderType != Providers::None ? Helper::ProviderFromName::GetInstance(m_pvdType) : 
-		throw CryptoGeneratorException("SymmetricKeyGenerator::Ctor", "The provider type can not be none!")),
-	m_pvdType(ProviderType)
+	m_pvdType(ProviderType != Providers::None ? ProviderType :
+		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The provider type can nor be None!"), ErrorCodes::InvalidParam)),
+	m_secPolicy(Policy != SecurityPolicy::None ? Policy :
+		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The policy type can nor be None!"), ErrorCodes::InvalidParam)),
+	m_shakeCustom(SIGMA_INFO)
+{
+}
+
+SymmetricKeyGenerator::SymmetricKeyGenerator(SecurityPolicy Policy, const std::vector<byte> &Customization, Providers ProviderType)
+	:
+	m_isDestroyed(false),
+	m_pvdType(ProviderType != Providers::None ? ProviderType :
+		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The provider type can nor be None!"), ErrorCodes::InvalidParam)),
+	m_secPolicy(Policy != SecurityPolicy::None ? Policy :
+		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The policy type can nor be None!"), ErrorCodes::InvalidParam)),
+	m_shakeCustom(Customization.size() != 0 ? Customization:
+		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The customization array can not be zero length!"), ErrorCodes::InvalidParam))
 {
 }
 
 SymmetricKeyGenerator::~SymmetricKeyGenerator()
 {
-	Destroy();
-}
-
-//~~~Public Functions~~~//
-
-void SymmetricKeyGenerator::Destroy()
-{
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_dgtType = SHA2Digests::None;
 		m_pvdType = Providers::None;
-
-		if (m_pvdEngine != 0)
-		{
-			m_pvdEngine.reset(nullptr);
-		}
+		m_secPolicy = SecurityPolicy::None;
+		Utility::IntegerTools::Clear(m_shakeCustom);
 	}
 }
+
+const std::string SymmetricKeyGenerator::Name()
+{
+	std::string name;
+
+	switch (m_secPolicy)
+	{
+		case SecurityPolicy::SPL256:
+		case SecurityPolicy::SPL256AE:
+		{
+			name = "SHAKE256";
+			break;
+		}
+		case SecurityPolicy::SPL512:
+		case SecurityPolicy::SPL512AE:
+		{
+			name = "SHAKE512";
+			break;
+		}
+		default:
+		{
+			name = "SHAKE1024";
+		}
+	}
+
+	switch (m_pvdType)
+	{
+		case Providers::ACP:
+		{
+			name += "-ACP";
+			break;
+		}
+		case Providers::CSP:
+		{
+			name += "-CSP";
+			break;
+		}
+		case Providers::ECP:
+		{
+			name += "-ECP";
+			break;
+		}
+		case Providers::RDP:
+		{
+			name += "-RDP";
+			break;
+		}
+		default:
+		{
+			name += "-CJP";
+		}
+	}
+
+	return name;
+}
+
+//~~~Public Functions~~~//
 
 SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 {
 	if (KeySize.KeySize() == 0)
 	{
-		throw CryptoGeneratorException("SymmetricKeyGenerator::GetKey", "The key size can not be zero!");
+		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("GetSymmetricKey"), std::string("The key size can not be zero!"), ErrorCodes::InvalidSize);
 	}
-	else
+
+	SymmetricKey* key;
+
+	if (KeySize.NonceSize() != 0)
 	{
-		SymmetricKey* key;
-
-		if (KeySize.NonceSize() != 0)
+		if (KeySize.InfoSize() != 0)
 		{
-			if (KeySize.InfoSize() != 0)
-			{
-				key = new SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()));
+			key = new SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()));
 
-			}
-			else
-			{
-				key = new SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()));
-			}
 		}
 		else
 		{
-			key = new SymmetricKey(Generate(KeySize.KeySize()));
+			key = new SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()));
 		}
-
-		return key;
 	}
+	else
+	{
+		key = new SymmetricKey(Generate(KeySize.KeySize()));
+	}
+
+	return key;
 }
 
 SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize)
 {
 	if (KeySize.KeySize() == 0)
 	{
-		throw CryptoGeneratorException("SymmetricKeyGenerator::GetSecureKey", "The key size can not be zero!");
+		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("GetSecureKey"), std::string("The key size can not be zero!"), ErrorCodes::InvalidSize);
 	}
-	else
-	{
-		SymmetricSecureKey* key;
 
-		if (KeySize.NonceSize() != 0)
+	SymmetricSecureKey* key = nullptr;
+
+	if (KeySize.NonceSize() != 0)
+	{
+		if (KeySize.InfoSize() != 0)
 		{
-			if (KeySize.InfoSize() != 0)
-			{
-				key = new SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()));
-			}
-			else
-			{
-				key = new SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()));
-			}
+			key = new SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()), m_secPolicy, m_shakeCustom);
 		}
 		else
 		{
-			key = new SymmetricSecureKey(Generate(KeySize.KeySize()));
+			key = new SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), m_secPolicy, m_shakeCustom);
 		}
-
-		return key;
-	}
-}
-
-void SymmetricKeyGenerator::Generate(std::vector<byte> &Output)
-{
-	std::vector<byte> rnd = Process(Output.size());
-	Utility::MemUtils::Copy(rnd, 0, Output, 0, rnd.size());
-}
-
-std::vector<byte> SymmetricKeyGenerator::Generate(size_t Length)
-{
-	return Process(Length);
-}
-
-//~~~Private Functions~~~//
-
-std::vector<byte> SymmetricKeyGenerator::Process(size_t Length)
-{
-	std::vector<byte> key(Length);
-
-	if (Length == 0)
-	{
-		key.resize(0);
 	}
 	else
 	{
-		size_t keyLen = Length;
-		size_t blkOff = 0;
-
-		do
-		{
-			std::vector<byte> rnd = ProcessBlock();
-			size_t alnLen = Utility::IntUtils::Min(keyLen, rnd.size());
-			Utility::MemUtils::Copy(rnd, 0, key, blkOff, alnLen);
-			keyLen -= alnLen;
-			blkOff += alnLen;
-		} 
-		while (keyLen != 0);
+		key = new SymmetricSecureKey(Generate(KeySize.KeySize()), m_secPolicy, m_shakeCustom);
 	}
 
 	return key;
 }
 
-std::vector<byte> SymmetricKeyGenerator::ProcessBlock()
+void SymmetricKeyGenerator::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	// seed size is 2x mac input block size less finalizer padding
-	const size_t BLKLEN = Helper::DigestFromName::GetBlockSize(static_cast<Digests>(m_dgtType));
-	size_t seedLen = (BLKLEN * 2) - Helper::DigestFromName::GetPaddingSize(static_cast<Digests>(m_dgtType));
-	std::vector<byte> seed(seedLen);
-
-	// generate the seed
-	m_pvdEngine->Generate(seed);
-
-	// get the hmac key from system entropy provider
-	std::vector<byte> key(BLKLEN);
-	Provider::CSP pvd;
-	pvd.Generate(key);
-
-	// condition random bytes with an hmac
-	Mac::HMAC mac(m_dgtType);
-	SymmetricKey kp(key);
-	mac.Initialize(kp);
-	std::vector<byte> output(mac.MacSize());
-	mac.Compute(seed, output);
-
-	return output;
+	Generate(m_pvdType, m_secPolicy, m_shakeCustom, Output, Offset, Length);
 }
 
-NAMESPACE_SYMMETRICKEYEND
+std::vector<byte> SymmetricKeyGenerator::Generate(size_t Length)
+{
+	std::vector<byte> tmpr(Length);
+
+	Generate(m_pvdType, m_secPolicy, m_shakeCustom, tmpr, 0, tmpr.size());
+
+	return tmpr;
+}
+
+//~~~Private Functions~~~//
+
+void SymmetricKeyGenerator::Generate(Providers Provider, SecurityPolicy Policy, const std::vector<byte> &Salt, std::vector<byte> &Output, size_t Offset, size_t Length)
+{
+	std::vector<byte> cust(0);
+	Enumeration::ShakeModes mode;
+	size_t klen;
+
+	switch (Policy)
+	{
+		case SecurityPolicy::SPL256:
+		case SecurityPolicy::SPL256AE:
+		{
+			mode = Enumeration::ShakeModes::SHAKE256;
+			klen = 32;
+			break;
+		}
+		case SecurityPolicy::SPL512:
+		case SecurityPolicy::SPL512AE:
+		{
+			klen = 64;
+			mode = Enumeration::ShakeModes::SHAKE512;
+			break;
+		}
+		default:
+		{
+			klen = 128;
+			mode = Enumeration::ShakeModes::SHAKE1024;
+		}
+	}
+
+	// instantiate the provider and create the seed
+	Provider::IProvider* pvd = Helper::ProviderFromName::GetInstance(Provider);
+	std::vector<byte> seed(klen);
+	pvd->Generate(seed);
+
+	// initialize cSHAKE and generate output
+	Kdf::SHAKE gen(mode);
+
+	// customization string is salt/name + provider-name + shake-name
+	Utility::ArrayTools::Append(Salt, cust);
+	Utility::ArrayTools::AppendString(pvd->Name(), cust);
+	Utility::ArrayTools::AppendString(gen.Name(), cust);
+
+	gen.Initialize(seed, Salt);
+	gen.Generate(Output, Offset, Length);
+}
+
+NAMESPACE_CIPHEREND

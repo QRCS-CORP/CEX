@@ -1,22 +1,16 @@
 #include "McEliece.h"
-#include "AsymmetricEngines.h"
-#include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
 #include "MPKCM12T62.h"
 #include "GCM.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MCELIECE
 
-using Enumeration::AsymmetricEngines;
-using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
 using Enumeration::BlockCiphers;
 using Enumeration::ShakeModes;
-using Utility::IntUtils;
+using Utility::IntegerTools;
 
 const std::string McEliece::CLASS_NAME = "McEliece";
 
@@ -30,9 +24,9 @@ McEliece::McEliece(MPKCParameters Parameters, Prngs PrngType)
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_mpkcParameters(Parameters != MPKCParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParameters::MPKCS1M12T62) ? Parameters :
-		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) : 
-		throw CryptoAsymmetricException("McEliece:CTor", "The prng type can not be none!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -44,9 +38,9 @@ McEliece::McEliece(MPKCParameters Parameters, IPrng* Prng)
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_mpkcParameters(Parameters != MPKCParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParameters::MPKCS1M12T62) ? Parameters :
-		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(Prng != nullptr ? Prng : 
-		throw CryptoAsymmetricException("McEliece:CTor", "The prng can not be null!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -58,7 +52,7 @@ McEliece::~McEliece()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_mpkcParameters = MPKCParameters::None;
-		IntUtils::ClearVector(m_domainKey);
+		IntegerTools::Clear(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -114,11 +108,11 @@ const bool McEliece::IsInitialized()
 
 const std::string McEliece::Name()
 {
-	std::string ret = CLASS_NAME + "-";
+	std::string ret = CLASS_NAME;
 
 	if (m_mpkcParameters == MPKCParameters::MPKCS1M12T62)
 	{
-		ret += "MPKCS1M12T62";
+		ret += "-MPKCS1M12T62";
 	}
 
 	return ret;
@@ -152,7 +146,7 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 	}
 
 	// copy hash of pk to coin 1
-	Utility::MemUtils::Copy(m_privateKey->P(), MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
+	Utility::MemoryTools::Copy(m_privateKey->P(), MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
 
 	// hash ct to coin 2
 	Kdf::SHAKE gen(ShakeModes::SHAKE256);
@@ -166,8 +160,8 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 
 	// decrypt the secret
 	SharedSecret.resize(CipherText.size() - MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE);
-	Cipher::Symmetric::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
-	Key::Symmetric::SymmetricKey kp(key, iv);
+	Cipher::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
+	Cipher::SymmetricKey kp(key, iv);
 	cpr.Initialize(false, kp);
 	cpr.Transform(CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret, 0, SharedSecret.size());
 	// verify the mac
@@ -211,8 +205,8 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	m_rndGenerator->Generate(SharedSecret);
 
 	// encrypt the secret and add to ct
-	Cipher::Symmetric::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
-	Key::Symmetric::SymmetricKey kp(key, iv);
+	Cipher::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
+	Cipher::SymmetricKey kp(key, iv);
 	cpr.Initialize(true, kp);
 	cpr.Transform(SharedSecret, 0, CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret.size());
 	// add the mac code
@@ -231,7 +225,7 @@ AsymmetricKeyPair* McEliece::Generate()
 
 		if (!MPKCM12T62::Generate(pk, sk, m_rndGenerator))
 		{
-			throw CryptoAsymmetricException("McEliece:Generate", "Key generation max retries failure!");
+			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
 		}
 
 		// add H(pk) to private key
@@ -250,11 +244,11 @@ void McEliece::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::McEliece)
 	{
-		throw CryptoAsymmetricException("McEliece:Initialize", "The key is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
-		throw CryptoAsymmetricException("McEliece:Initialize", "The key type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 
 	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)

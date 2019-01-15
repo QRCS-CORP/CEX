@@ -24,6 +24,7 @@
 #include "BlockCipherExtensions.h"
 #include "CipherModes.h"
 #include "CryptoCipherModeException.h"
+#include "ErrorCodes.h"
 #include "IBlockCipher.h"
 #include "ParallelOptions.h"
 #include "SymmetricKeySize.h"
@@ -34,10 +35,10 @@ using Enumeration::BlockCiphers;
 using Enumeration::BlockCipherExtensions;
 using Enumeration::CipherModes; 
 using Exception::CryptoCipherModeException;
+using Enumeration::ErrorCodes;
 using Block::IBlockCipher;
-using Key::Symmetric::ISymmetricKey;
-using Common::ParallelOptions;
-using Key::Symmetric::SymmetricKeySize;
+using Cipher::ISymmetricKey;
+using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// Block Cipher standard Mode virtual interface class.
@@ -118,7 +119,7 @@ public:
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Read Only: The cipher mode name
+	/// Read Only: The mode and cipher name
 	/// </summary>
 	virtual const std::string Name() = 0;
 

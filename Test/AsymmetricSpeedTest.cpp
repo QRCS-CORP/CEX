@@ -15,20 +15,20 @@
 
 namespace Test
 {
-	using Key::Asymmetric::AsymmetricKey;
-	using Key::Asymmetric::AsymmetricKeyPair;
-	using Cipher::Asymmetric::Sign::DLM::Dilithium;
-	using Cipher::Asymmetric::MPKC::McEliece;
-	using Cipher::Asymmetric::MLWE::ModuleLWE;
-	using Cipher::Asymmetric::NTRU::NTRU;
+	using Asymmetric::AsymmetricKey;
+	using Asymmetric::AsymmetricKeyPair;
+	using Asymmetric::Sign::DLM::Dilithium;
+	using Asymmetric::Encrypt::MPKC::McEliece;
+	using Asymmetric::Encrypt::MLWE::ModuleLWE;
+	using Asymmetric::Encrypt::NTRU::NTRU;
 	using Enumeration::Prngs;
 	using Enumeration::Providers;
-	using Cipher::Asymmetric::RLWE::RingLWE;
+	using Asymmetric::Encrypt::RLWE::RingLWE;
 	using Kdf::SHAKE;
-	using Cipher::Asymmetric::Sign::SPX::Sphincs;
+	using Asymmetric::Sign::SPX::Sphincs;
 
+	const std::string AsymmetricSpeedTest::CLASSNAME = "AsymmetricSpeedTest";
 	const std::string AsymmetricSpeedTest::DESCRIPTION = "Asymmetric Cipher and Signature Scheme Speed Tests.";
-	const std::string AsymmetricSpeedTest::FAILURE = "FAILURE! ";
 	const std::string AsymmetricSpeedTest::MESSAGE = "COMPLETE! Asymmetric Speed tests have executed succesfully.";
 
 	AsymmetricSpeedTest::AsymmetricSpeedTest()
@@ -112,7 +112,7 @@ namespace Test
 			DlmVerifyLoop(DilithiumParameters::DLMS2N256Q8380417, DEF_TEST_ITER, rngType);
 
 			OnProgress(std::string("### Asymmetric Cipher Speed Tests in sequential and parallel modes:"));
-			OnProgress(std::string(""));/**/
+			OnProgress(std::string(""));
 
 			// SPHINCS+
 			OnProgress(std::string("***Generating " + itrCnt + " Keypairs using SPHINCS+ SPXS128F256***"));
@@ -128,11 +128,7 @@ namespace Test
 		}
 		catch (std::exception const &ex)
 		{
-			return FAILURE + " : " + ex.what();
-		}
-		catch (...)
-		{
-			return FAILURE + " : Unknown Error";
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -645,7 +641,7 @@ namespace Test
 		return (uint64_t)(sze / sec);
 	}
 
-	void AsymmetricSpeedTest::OnProgress(std::string Data)
+	void AsymmetricSpeedTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

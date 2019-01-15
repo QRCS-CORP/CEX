@@ -1,7 +1,4 @@
 #include "Sphincs.h"
-#include "AsymmetricEngines.h"
-#include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
 #include "PrngFromName.h"
 #include "SecureRandom.h"
 #include "SHAKE.h"
@@ -9,10 +6,7 @@
 
 NAMESPACE_SPHINCS
 
-using Enumeration::AsymmetricEngines;
-using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
-using Utility::MemUtils;
+using Utility::MemoryTools;
 
 const std::string Sphincs::CLASS_NAME = "SPHINCS+";
 
@@ -21,10 +15,10 @@ Sphincs::Sphincs(SphincsParameters Parameters, Prngs PrngType)
 	m_destroyEngine(true),
 	m_isInitialized(false),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
-		throw CryptoAsymmetricException("Sphincs:CTor", "The prng type can not be none!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam)),
 	m_isSigner(false),
 	m_spxParameters(Parameters != SphincsParameters::None ? Parameters :
-		throw CryptoAsymmetricException("Sphincs:CTor", "The parameter can not be None!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Sphincs parameter set is invalid!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -33,10 +27,10 @@ Sphincs::Sphincs(SphincsParameters Parameters, IPrng* Rng)
 	m_destroyEngine(false),
 	m_isInitialized(false),
 	m_rndGenerator(Rng != nullptr ? Rng :
-		throw CryptoAsymmetricException("Sphincs:CTor", "The prng can not be null!")),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam)),
 	m_isSigner(false),
 	m_spxParameters(Parameters != SphincsParameters::None ? Parameters :
-		throw CryptoAsymmetricException("Sphincs:CTor", "The parameter can not be None!"))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Sphincs parameter set is invalid!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -98,15 +92,15 @@ const bool Sphincs::IsSigner()
 
 const std::string Sphincs::Name()
 {
-	std::string ret = CLASS_NAME + "-";
+	std::string ret = CLASS_NAME;
 
 	if (m_spxParameters == SphincsParameters::SPXS128F256)
 	{
-		ret += "SPXS128F256";
+		ret += "-SPXS128F256";
 	}
 	else if (m_spxParameters == SphincsParameters::SPXS256F256)
 	{
-		ret += "SPXS256F256";
+		ret += "-SPXS256F256";
 	}
 
 	return ret;
@@ -138,11 +132,11 @@ const void Sphincs::Initialize(AsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::Sphincs)
 	{
-		throw CryptoAsymmetricException("Sphincs:Initialize", "The key base type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
 	if (Key->KeyType() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyType() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
-		throw CryptoAsymmetricException("Sphincs:Initialize", "The key type is invalid!");
+		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
 
 	if (Key->KeyType() == AsymmetricKeyTypes::SignaturePublicKey)
@@ -167,15 +161,15 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme has not been initialized!");
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (!m_isSigner)
 	{
-		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme is not initialized for signing!");
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::IllegalOperation);
 	}
 	if (Message.size() == 0)
 	{
-		throw CryptoAsymmetricException("Sphincs:Sign", "The message size must be non-zero!");
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The message size must be non-zero!"), ErrorCodes::InvalidParam);
 	}
 
 	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->P(), m_rndGenerator, m_spxParameters);
@@ -189,11 +183,11 @@ bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Mess
 
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme has not been initialized!");
+		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (m_isSigner)
 	{
-		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme is not initialized for verification!");
+		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme is not initialized for verification!"), ErrorCodes::IllegalOperation);
 	}
 
 	result = SPXF256::Verify(Message, Signature, m_publicKey->P(), m_spxParameters);

@@ -2,19 +2,19 @@
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/Dilithium.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/ModuleLWE.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using namespace Key::Asymmetric;
-	using Cipher::Asymmetric::Sign::DLM::Dilithium;
+	using namespace Asymmetric;
+	using Asymmetric::Sign::DLM::Dilithium;
 	using Enumeration::DilithiumParameters;
 	using Prng::SecureRandom;
 
+	const std::string DilithiumTest::CLASSNAME = "DilithiumTest";
 	const std::string DilithiumTest::DESCRIPTION = "DilithiumTest key generation, signature generation, and verification tests..";
-	const std::string DilithiumTest::FAILURE = "FAILURE! ";
 	const std::string DilithiumTest::SUCCESS = "SUCCESS! DilithiumTest tests have executed succesfully.";
 
 	DilithiumTest::DilithiumTest()
@@ -60,11 +60,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : Unknown Error"));
+			throw TestException(CLASSNAME, std::string("Unknown Function"), std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -86,11 +86,11 @@ namespace Test
 
 		if (msg1 != msg2)
 		{
-			throw TestException(std::string("DilithiumTest: Message authentication test failed! -DA1"));
+			throw TestException(std::string("Authentication"), sgn1.Name(), std::string("Message authentication test failed! -DA1"));
 		}
 		if (ret != true)
 		{
-			throw TestException(std::string("DilithiumTest: Message authentication test failed! -DA1"));
+			throw TestException(std::string("Authentication"), sgn1.Name(), std::string("Message authentication test failed! -DA1"));
 		}
 	}
 
@@ -101,7 +101,7 @@ namespace Test
 		{
 			Dilithium sgn(DilithiumParameters::None);
 
-			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE1"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE1"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -116,7 +116,7 @@ namespace Test
 		{
 			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417, Enumeration::Prngs::None);
 
-			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE2"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE2"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -131,7 +131,7 @@ namespace Test
 		{
 			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417, nullptr);
 
-			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE3"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE3"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -149,7 +149,7 @@ namespace Test
 			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 			sgn.Sign(msg, sig);
 
-			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE4"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE4"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -167,7 +167,7 @@ namespace Test
 			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 			sgn.Verify(sig, msg);
 
-			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE5"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE5"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -181,12 +181,12 @@ namespace Test
 		try
 		{
 			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
-			Cipher::Asymmetric::MLWE::ModuleLWE cprb;
+			Asymmetric::Encrypt::MLWE::ModuleLWE cprb;
 			// create an invalid key set
 			AsymmetricKeyPair* kp = cprb.Generate();
 			sgn.Initialize(kp->PrivateKey());
 
-			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE6"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE6"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -206,7 +206,7 @@ namespace Test
 			sgn.Initialize(kp->PublicKey());
 			sgn.Sign(msg, sig);
 
-			throw TestException(std::string("Dilithium"), std::string("Exception: Exception handling failure! -DE7"));
+			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE7"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -239,7 +239,7 @@ namespace Test
 
 		if (sgn.Verify(sig, msg2))
 		{
-			throw TestException(std::string("Dilithium"), std::string("Exception: Private-key integrity test failed! -DS1"));
+			throw TestException(std::string("PrivateKey"), sgn.Name(), std::string("Private key integrity test failed! -DS1"));
 		}
 	}
 
@@ -265,7 +265,7 @@ namespace Test
 
 		if (sgn.Verify(sig, msg2))
 		{
-			throw TestException(std::string("Dilithium"), std::string("Exception: Public-key integrity test failed! -DP1"));
+			throw TestException(std::string("PublicKey"), sgn.Name(), std::string("Public key integrity test failed! -DP1"));
 		}
 	}
 
@@ -283,7 +283,7 @@ namespace Test
 
 			if (prik1->P() != prik2.P() || prik1->Parameters() != prik2.Parameters())
 			{
-				throw TestException(std::string("DilithiumTest: Private key serialization test has failed! -DR1"));
+				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Private key serialization test has failed! -DR1"));
 			}
 
 			AsymmetricKey* pubk1 = kp->PublicKey();
@@ -292,7 +292,7 @@ namespace Test
 
 			if (pubk1->P() != pubk2.P() || pubk1->Parameters() != pubk2.Parameters())
 			{
-				throw TestException(std::string("DilithiumTest: Public key serialization test has failed! -DR2"));
+				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Public key serialization test has failed! -DR2"));
 			}
 		}
 	}
@@ -317,7 +317,7 @@ namespace Test
 
 		if (sgn.Verify(sig, msg2))
 		{
-			throw TestException(std::string("Dilithium"), std::string("Exception: Public-key integrity test failed! -DS1"));
+			throw TestException(std::string("Signature"), sgn.Name(), std::string("Public key integrity test failed! -DS1"));
 		}
 	}
 
@@ -348,11 +348,11 @@ namespace Test
 
 			if (!status)
 			{
-				throw TestException(std::string("Dilithium"), std::string("Stress test authentication has failed! -DR1"));
+				throw TestException(std::string("Stress"), sgn1.Name(), std::string("Stress test authentication has failed! -DR1"));
 			}
 			if (msg1 != msg2)
 			{
-				throw TestException(std::string("Dilithium"), std::string("Stress test authentication has failed! -DR2"));
+				throw TestException(std::string("Stress"), std::string("Dilithium"), std::string("Stress test authentication has failed! -DR2"));
 			}
 
 			sig.clear();
@@ -376,11 +376,11 @@ namespace Test
 
 			if (!status)
 			{
-				throw TestException(std::string("Dilithium"), std::string("Stress test authentication has failed! -DR3"));
+				throw TestException(std::string("Stress"), sgn2.Name(), std::string("Stress test authentication has failed! -DR3"));
 			}
 			if (msg1 != msg2)
 			{
-				throw TestException(std::string("Dilithium"), std::string("Stress test authentication has failed! -DR4"));
+				throw TestException(std::string("Stress"), sgn2.Name(), std::string("Stress test authentication has failed! -DR4"));
 			}
 
 			sig.clear();
@@ -404,11 +404,11 @@ namespace Test
 
 			if (!status)
 			{
-				throw TestException(std::string("Dilithium"), std::string("Stress test authentication has failed! -DR5"));
+				throw TestException(std::string("Stress"), sgn3.Name(), std::string("Stress test authentication has failed! -DR5"));
 			}
 			if (msg1 != msg2)
 			{
-				throw TestException(std::string("Dilithium"), std::string("Stress test authentication has failed! -DR6"));
+				throw TestException(std::string("Stress"), sgn3.Name(), std::string("Stress test authentication has failed! -DR6"));
 			}
 
 			sig.clear();
@@ -418,7 +418,7 @@ namespace Test
 		}
 	}
 
-	void DilithiumTest::OnProgress(std::string Data)
+	void DilithiumTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

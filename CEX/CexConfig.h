@@ -17,12 +17,13 @@
 #endif
 
 #include <array>
-#include <exception>
 #include <iostream>
 #include <memory>
 #include <stdint.h>
 #include <string>
 #include <vector>
+
+//#include "SecureVector.h"
 
 //////////////////////////////////////////////////////
 //		 *** Constants and System Macros ***		//
@@ -112,6 +113,11 @@
 #	define CEX_HAS_POSIXMLOCK
 #endif
 
+// the secure allocator is enabled
+#if defined(CEX_HAS_VIRTUALLOCK) || defined(CEX_HAS_POSIXMLOCK)
+#	define CEX_SECURE_ALLOCATOR
+#endif
+
 #define CEX_SECMEMALLOC_DEFAULT 4096
 #define CEX_SECMEMALLOC_MIN 16
 #define CEX_SECMEMALLOC_MAX 128
@@ -169,6 +175,14 @@
 #	endif
 #endif
 
+#if defined(__GNUG__) || defined(__clang__)
+#	define CEX_MALLOC_FN __attribute__((malloc))
+#elif defined(_MSC_VER)
+#	define CEX_MALLOC_FN __declspec(restrict)
+#else
+#	define CEX_MALLOC_FN
+#endif
+
 #if defined(CEX_ARCH_X64) || defined(CEX_ARCH_AMD64) || defined(CEX_ARCH_ARM64) || defined(CEX_ARCH_IA64)
 #	define CEX_IS_X64
 #endif
@@ -176,6 +190,7 @@
 // supported os targets
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_APPLE) || defined(CEX_OS_POSIX)
 #	define CEX_SUPPORTED_OS 1
+#	define CEX_OS_HASTHREADS
 #else
 #	define CEX_SUPPORTED_OS 0
 #endif
@@ -426,6 +441,7 @@ typedef unsigned char byte;
 #	define CEX_PRAGMA_WARNING _Pragma ("warning: the operation is not supported")
 #endif
 
+// TODO: change this to a macro, not getting inlined? (test this)
 /// <summary>
 /// The global assertion handler template
 /// </summary>

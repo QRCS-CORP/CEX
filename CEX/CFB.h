@@ -217,7 +217,7 @@ public:
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Read Only: The cipher modes class name
+	/// Read Only: The mode and cipher name
 	/// </summary>
 	const std::string Name() override;
 

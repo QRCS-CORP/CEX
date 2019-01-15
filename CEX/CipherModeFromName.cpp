@@ -3,118 +3,148 @@
 #include "CTR.h"
 #include "CBC.h"
 #include "CFB.h"
+#include "CryptoCipherModeException.h"
+#include "CryptoSymmetricCipherException.h"
 #include "ICM.h"
 #include "OFB.h"
 
 NAMESPACE_HELPER
 
+using Enumeration::CipherModes;
+using Exception::CryptoCipherModeException;
+using Exception::CryptoSymmetricCipherException;
+using Enumeration::ErrorCodes;
+
 ICipherMode* CipherModeFromName::GetInstance(IBlockCipher* Cipher, CipherModes CipherModeType)
 {
-	using namespace Cipher::Symmetric::Block::Mode;
+	using namespace Cipher::Block::Mode;
 
-	ICipherMode* mdePtr = nullptr;
+	ICipherMode* mptr;
+
+	mptr = nullptr;
 
 	try
 	{
 		switch (CipherModeType)
 		{
-			case Enumeration::CipherModes::CTR:
+			case CipherModes::CTR:
 			{
-				mdePtr = new CTR(Cipher);
+				mptr = new CTR(Cipher);
 				break;
 			}
-			case Enumeration::CipherModes::CBC:
+			case CipherModes::CBC:
 			{
-				mdePtr = new CBC(Cipher);
+				mptr = new CBC(Cipher);
 				break;
 			}
-			case Enumeration::CipherModes::CFB:
+			case CipherModes::CFB:
 			{
-				mdePtr = new CFB(Cipher);
+				mptr = new CFB(Cipher);
 				break;
 			}
-			case Enumeration::CipherModes::ICM:
+			case CipherModes::ICM:
 			{
-				mdePtr = new ICM(Cipher);
+				mptr = new ICM(Cipher);
 				break;
 			}
-			case Enumeration::CipherModes::OFB:
+			case CipherModes::OFB:
 			{
-				mdePtr = new OFB(Cipher);
+				mptr = new OFB(Cipher);
 				break;
 			}
 			default:
 			{
-				throw CryptoException("CipherModeFromName:GetInstance", "The cipher mode is not supported!");
+				throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoCipherModeException &ex)
+	{
+		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("CipherModeFromName:GetInstance", "The symmetric cipher mode is unavailable!", std::string(ex.what()));
+		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return mdePtr;
+	return mptr;
 }
 
 ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType)
 {
-	using namespace Cipher::Symmetric::Block::Mode;
+	using namespace Cipher::Block::Mode;
 
-	ICipherMode* mdePtr = nullptr;
-	IBlockCipher* cprPtr = nullptr;
+	IBlockCipher* cptr;
+	ICipherMode* mptr;
+
+	cptr = nullptr;
+	mptr = nullptr;
 
 	try
 	{
-		cprPtr = BlockCipherFromName::GetInstance(CipherType, CipherExtensionType);
+		cptr = BlockCipherFromName::GetInstance(CipherType, CipherExtensionType);
 
 		switch (CipherModeType)
 		{
-			case Enumeration::CipherModes::CTR:
+			case CipherModes::CTR:
 			{
-				mdePtr = new CTR(cprPtr);
+				mptr = new CTR(cptr);
 				break;
 			}
-			case Enumeration::CipherModes::CBC:
+			case CipherModes::CBC:
 			{
-				mdePtr = new CBC(cprPtr);
+				mptr = new CBC(cptr);
 				break;
 			}
-			case Enumeration::CipherModes::CFB:
+			case CipherModes::CFB:
 			{
-				mdePtr = new CFB(cprPtr);
+				mptr = new CFB(cptr);
 				break;
 			}
-			case Enumeration::CipherModes::ICM:
+			case CipherModes::ICM:
 			{
-				mdePtr = new ICM(cprPtr);
+				mptr = new ICM(cptr);
 				break;
 			}
-			case Enumeration::CipherModes::OFB:
+			case CipherModes::OFB:
 			{
-				mdePtr = new OFB(cprPtr);
+				mptr = new OFB(cptr);
 				break;
 			}
 			default:
 			{
-				if (cprPtr != nullptr)
-				{
-					delete cprPtr;
-				}
-				throw CryptoException("CipherModeFromName:GetInstance", "The cipher mode is not supported!");
+				throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoSymmetricCipherException &ex)
+	{
+		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
+	catch (CryptoCipherModeException &ex)
+	{
+		if (cptr != nullptr)
+		{
+			delete cptr;
+		}
+
+		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
+	catch (CryptoException &ex)
+	{
+		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		if (cprPtr != nullptr)
+		if (cptr != nullptr)
 		{
-			delete cprPtr;
+			delete cptr;
 		}
-		throw CryptoException("CipherModeFromName:GetInstance", "The block cipher mode is unavailable!", std::string(ex.what()));
+
+		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return mdePtr;
+	return mptr;
 }
 
 NAMESPACE_HELPEREND

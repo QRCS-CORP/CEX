@@ -13,8 +13,8 @@ using Enumeration::BlockCiphers;
 using Enumeration::BlockCipherExtensions;
 using Enumeration::CipherModes;
 using Exception::CryptoException;
-using Cipher::Symmetric::Block::IBlockCipher;
-using Cipher::Symmetric::Block::Mode::ICipherMode;
+using Cipher::Block::IBlockCipher;
+using Cipher::Block::Mode::ICipherMode;
 
 /// <summary>
 /// Get a Cipher Mode instance from it's enumeration name.

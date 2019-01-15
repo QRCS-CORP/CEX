@@ -1,52 +1,71 @@
 #include "AeadModeFromName.h"
 #include "BlockCipherFromName.h"
+#include "CryptoCipherModeException.h"
+#include "CryptoSymmetricCipherException.h"
 #include "EAX.h"
 #include "GCM.h"
 #include "OCB.h"
 
 NAMESPACE_HELPER
 
+using Exception::CryptoCipherModeException;
+using Exception::CryptoSymmetricCipherException;
+using Enumeration::ErrorCodes;
+
 IAeadMode* AeadModeFromName::GetInstance(IBlockCipher* Cipher, AeadModes CipherModeType)
 {
-	IAeadMode* aeadPtr = nullptr;
+	using namespace Cipher::Block::Mode;
+
+	IAeadMode* mptr;
+
+	mptr = nullptr;
 
 	try
 	{
 		switch (CipherModeType)
 		{
-			case Enumeration::AeadModes::EAX:
+			case AeadModes::EAX:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::EAX(Cipher);
+				mptr = new EAX(Cipher);
 				break;
 			}
-			case Enumeration::AeadModes::GCM:
+			case AeadModes::GCM:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::GCM(Cipher);
+				mptr = new GCM(Cipher);
 				break;
 			}
-			case Enumeration::AeadModes::OCB:
+			case AeadModes::OCB:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::OCB(Cipher);
+				mptr = new OCB(Cipher);
 				break;
 			}
 			default:
 			{
-				throw CryptoException("AeadModeFromName:GetInstance", "The AEAD cipher mode is not supported!");
+				throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string("The AEAD cipher mode is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoCipherModeException &ex)
+	{
+		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("AeadModeFromName:GetInstance", "The symmetric cipher mode is unavailable!", std::string(ex.what()));
+		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return aeadPtr;
+	return mptr;
 }
 
 IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, AeadModes CipherModeType)
 {
-	IAeadMode* aeadPtr = nullptr;
-	IBlockCipher* cprPtr = nullptr;
+	using namespace Cipher::Block::Mode;
+
+	IBlockCipher* cptr;
+	IAeadMode* mptr;
+
+	cptr = nullptr;
+	mptr = nullptr;
 
 	try
 	{
@@ -54,41 +73,51 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 
 		switch (CipherModeType)
 		{
-			case Enumeration::AeadModes::EAX:
+			case AeadModes::EAX:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::EAX(cprPtr);
+				mptr = new EAX(cptr);
 				break;
 			}
-			case Enumeration::AeadModes::GCM:
+			case AeadModes::GCM:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::GCM(cprPtr);
+				mptr = new GCM(cptr);
 				break;
 			}
-			case Enumeration::AeadModes::OCB:
+			case AeadModes::OCB:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::OCB(cprPtr);
+				mptr = new OCB(cptr);
 				break;
 			}
 			default:
 			{		
-				if (cprPtr != nullptr)
-				{
-					delete cprPtr;
-				}
-				throw CryptoException("AeadModeFromName:GetInstance", "The AEAD cipher mode is not supported!");
+				throw CryptoCipherModeException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string("The AEAD cipher mode type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoCipherModeException &ex)
+	{
+		if (cptr != nullptr)
+		{
+			delete cptr;
+		}
+
+		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
+	catch (CryptoSymmetricCipherException &ex)
+	{
+		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		if (cprPtr != nullptr)
+		if (cptr != nullptr)
 		{
-			delete cprPtr;
+			delete cptr;
 		}
-		throw CryptoException("AeadModeFromName:GetInstance", "The block cipher mode is unavailable!", std::string(ex.what()));
+
+		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return aeadPtr;
+	return mptr;
 }
 
 NAMESPACE_HELPEREND

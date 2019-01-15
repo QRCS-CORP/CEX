@@ -1,9 +1,11 @@
 #include "PBR.h"
 #include "DigestFromName.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "SHA2Digests.h"
 
 NAMESPACE_PRNG
+
+using Utility::MemoryTools;
 
 const std::string PBR::CLASS_NAME("PBR");
 
@@ -13,14 +15,14 @@ PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestType, size_t Buf
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize :
-		throw CryptoRandomException("PBR:Ctor", "BufferSize must be at least 64 bytes!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Buffer is too small!"), ErrorCodes::IllegalOperation)),
 	m_digestIterations(Iterations != 0 ? Iterations : 
-		throw CryptoRandomException("PBR:Ctor", "Iterations can not be zero; at least 1 iteration is required!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Iterations can not be zero!"), ErrorCodes::IllegalOperation)),
 	m_digestType(DigestType != Digests::None ? DigestType :
-		throw CryptoRandomException("PBR:Ctor", "Digest type can not be none!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_isDestroyed(false),
 	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestType) ? Seed :
-		throw CryptoRandomException("PBR:Ctor", "The seed is too small!")),
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Seed size is too small!"), ErrorCodes::InvalidKey)),
 	m_rngBuffer(BufferSize),
 	m_rngGenerator(new Kdf::PBKDF2(static_cast<Enumeration::SHA2Digests>(DigestType), m_digestIterations))
 {
@@ -37,8 +39,8 @@ PBR::~PBR()
 		m_digestIterations = 0;
 		m_digestType = Digests::None;
 
-		Utility::IntUtils::ClearVector(m_rndSeed);
-		Utility::IntUtils::ClearVector(m_rngBuffer);
+		Utility::IntegerTools::Clear(m_rndSeed);
+		Utility::IntegerTools::Clear(m_rngBuffer);
 
 		if (m_rngGenerator != nullptr)
 		{
@@ -74,7 +76,7 @@ void PBR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	std::vector<byte> rnd = Generate(Length);
-	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
+	MemoryTools::Copy(rnd, 0, Output, Offset, Length);
 }
 
 void PBR::Generate(std::vector<byte> &Output)
@@ -88,7 +90,7 @@ void PBR::Generate(std::vector<byte> &Output)
 		// copy remaining bytes
 		if (bufSize != 0)
 		{
-			Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
+			MemoryTools::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
 		}
 
 		size_t rem = Output.size() - bufSize;
@@ -100,13 +102,13 @@ void PBR::Generate(std::vector<byte> &Output)
 
 			if (rem > m_rngBuffer.size())
 			{
-				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
+				MemoryTools::Copy(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
 				bufSize += m_rngBuffer.size();
 				rem -= m_rngBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, rem);
+				MemoryTools::Copy(m_rngBuffer, 0, Output, bufSize, rem);
 				m_bufferIndex = rem;
 				rem = 0;
 			}
@@ -114,7 +116,7 @@ void PBR::Generate(std::vector<byte> &Output)
 	}
 	else
 	{
-		Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
+		MemoryTools::Copy(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -122,7 +124,7 @@ void PBR::Generate(std::vector<byte> &Output)
 ushort PBR::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -130,7 +132,7 @@ ushort PBR::NextUInt16()
 uint PBR::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -138,7 +140,7 @@ uint PBR::NextUInt32()
 ulong PBR::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }

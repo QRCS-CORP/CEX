@@ -14,10 +14,10 @@
 
 namespace Test
 {
-	using Key::Symmetric::SymmetricKey;
+	using Cipher::SymmetricKey;
 
+	const std::string MacStreamTest::CLASSNAME = "MacStreamTest";
 	const std::string MacStreamTest::DESCRIPTION = "MacStream output test; compares output from an SHA-2 512 HMAC and MacStream.";
-	const std::string MacStreamTest::FAILURE = "FAILURE! ";
 	const std::string MacStreamTest::SUCCESS = "SUCCESS! All MacStream tests have executed succesfully.";
 
 	MacStreamTest::MacStreamTest()
@@ -46,28 +46,28 @@ namespace Test
 
 		try
 		{
-			CompareHmac();
+			EvaluateHMAC();
 			OnProgress(std::string("Passed MacStream HMAC comparison tests.."));
-			CompareCmac();
+			EvaluateCMAC();
 			OnProgress(std::string("Passed MacStream CMAC comparison tests.."));
-			CmacDescriptionTest();
+			DescriptionCMAC();
 			OnProgress(std::string("Passed CMAC description initialization test.."));
-			HmacDescriptionTest();
+			DescriptionHMAC();
 			OnProgress(std::string("Passed HMAC description initialization test.."));
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void MacStreamTest::CompareCmac()
+	void MacStreamTest::EvaluateCMAC()
 	{
 		Prng::SecureRandom rnd;
 		std::vector<byte> data(rnd.NextUInt32(1000, 100));
@@ -76,23 +76,23 @@ namespace Test
 		SymmetricKey kp(key);
 
 		// digest instance for baseline
-		Mac::CMAC* eng = new Mac::CMAC(Enumeration::BlockCiphers::Rijndael);
-		size_t macSze = eng->MacSize();
+		Mac::CMAC* gen = new Mac::CMAC(Enumeration::BlockCiphers::Rijndael);
+		size_t macSze = gen->TagSize();
 		std::vector<byte> hash1(macSze);
-		eng->Initialize(kp);
-		eng->Compute(data, hash1);
-		eng->Reset();
+		gen->Initialize(kp);
+		gen->Compute(data, hash1);
+		gen->Reset();
 
 		// test stream method
 		std::vector<byte> hash2(macSze);
-		Processing::MacStream ds(eng);
+		Processing::MacStream ds(gen);
 		ds.Initialize(kp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
 		hash2 = ds.Compute(ms);
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
+			throw TestException(std::string("EvaluateCMAC"), gen->Name(), std::string("Expected hash is not equal!"));
 		}
 
 		// test byte access method
@@ -101,11 +101,11 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
+			throw TestException(std::string("EvaluateCMAC"), gen->Name(), std::string("Expected hash is not equal!"));
 		}
 	}
 
-	void MacStreamTest::CompareHmac()
+	void MacStreamTest::EvaluateHMAC()
 	{
 		Prng::SecureRandom rnd;
 		std::vector<byte> data(rnd.NextUInt32(1000, 100));
@@ -114,23 +114,23 @@ namespace Test
 		SymmetricKey kp(key);
 
 		// digest instance for baseline
-		Mac::HMAC* eng = new Mac::HMAC(Enumeration::SHA2Digests::SHA256);
-		size_t macSze = eng->MacSize();
+		Mac::HMAC* gen = new Mac::HMAC(Enumeration::SHA2Digests::SHA256);
+		size_t macSze = gen->TagSize();
 		std::vector<byte> hash1(macSze);
-		eng->Initialize(kp);
-		eng->Compute(data, hash1);
-		eng->Reset();
+		gen->Initialize(kp);
+		gen->Compute(data, hash1);
+		gen->Reset();
 
 		// test stream method
 		std::vector<byte> hash2(macSze);
-		Processing::MacStream ds(eng);
+		Processing::MacStream ds(gen);
 		ds.Initialize(kp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
 		hash2 = ds.Compute(ms);
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
+			throw TestException(std::string("EvaluateHMAC"), gen->Name(), std::string("Expected hash is not equal!"));
 		}
 
 		// test byte access method
@@ -139,20 +139,20 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
+			throw TestException(std::string("EvaluateHMAC"), gen->Name(), std::string("Expected hash is not equal!"));
 		}
 	}
 
-	void MacStreamTest::CmacDescriptionTest()
+	void MacStreamTest::DescriptionCMAC()
 	{
 		Prng::SecureRandom rng;
 		std::vector<byte> data = rng.Generate(rng.NextUInt32(400, 100));
 		std::vector<byte> key = rng.Generate(32);
-		Mac::CMAC mac(Enumeration::BlockCiphers::Rijndael);
+		Mac::CMAC gen(Enumeration::BlockCiphers::Rijndael);
 		SymmetricKey kp(key);
-		mac.Initialize(kp);
-		std::vector<byte> c1(mac.MacSize());
-		mac.Compute(data, c1);
+		gen.Initialize(kp);
+		std::vector<byte> c1(gen.TagSize());
+		gen.Compute(data, c1);
 
 		Processing::MacDescription mds(Enumeration::Macs::CMAC, Enumeration::BlockCiphers::Rijndael);
 		Processing::MacStream mst(mds);
@@ -163,23 +163,23 @@ namespace Test
 
 		if (c1 != c2)
 		{
-			throw TestException(std::string("MacStreamTest: CMAC code arrays are not equal!"));
+			throw TestException(std::string("EvaluateCMAC"), gen.Name(), std::string("CMAC code arrays are not equal!"));
 		}
 	}
 
-	void MacStreamTest::HmacDescriptionTest()
+	void MacStreamTest::DescriptionHMAC()
 	{
 		Prng::SecureRandom rng;
 		std::vector<byte> data = rng.Generate(rng.NextUInt32(400, 100));
 		std::vector<byte> key = rng.Generate(64);
-		Mac::HMAC mac(Enumeration::SHA2Digests::SHA256);
+		Mac::HMAC gen(Enumeration::SHA2Digests::SHA256);
 		SymmetricKey kp(key);
-		mac.Initialize(kp);
-		std::vector<byte> c1(mac.MacSize());
-		mac.Compute(data, c1);
+		gen.Initialize(kp);
+		std::vector<byte> c1(gen.TagSize());
+		gen.Compute(data, c1);
 
-		Key::Symmetric::SymmetricKey mp(key);
-		Processing::MacDescription mds(Enumeration::Macs::HMAC, Enumeration::Digests::SHA256);
+		Cipher::SymmetricKey mp(key);
+		Processing::MacDescription mds(Enumeration::Macs::HMACSHA256, Enumeration::Digests::SHA256);
 		Processing::MacStream mst(mds);
 		mst.Initialize(mp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
@@ -188,11 +188,11 @@ namespace Test
 
 		if (c1 != c2)
 		{
-			throw TestException(std::string("MacStreamTest: HMAC code arrays are not equal!"));
+			throw TestException(std::string("EvaluateHMAC"), gen.Name(), std::string("HMAC code arrays are not equal!"));
 		}
 	}
 
-	void MacStreamTest::OnProgress(std::string Data)
+	void MacStreamTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

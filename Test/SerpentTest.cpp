@@ -1,19 +1,19 @@
 #include "SerpentTest.h"
 #include "../CEX/CTR.h"
 #include "../CEX/SHX.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::Mode::CTR;
-	using Utility::IntUtils;
+	using Cipher::Block::Mode::CTR;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
-	using namespace Cipher::Symmetric::Block;
+	using namespace Cipher::Block;
 	using namespace TestFiles::Nessie;
  
+	const std::string SerpentTest::CLASSNAME = "SerpentTest";
 	const std::string SerpentTest::DESCRIPTION = "Serpent Nessie tests, with 100 and 1000 round Monte Carlo runs.";
-	const std::string SerpentTest::FAILURE = "FAILURE! ";
 	const std::string SerpentTest::SUCCESS = "SUCCESS! All Serpent tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -30,9 +30,9 @@ namespace Test
 
 	SerpentTest::~SerpentTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_keys);
-		IntUtils::ClearVector(m_message);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_keys);
+		IntegerTools::Clear(m_message);
 	}
 
 	//~~~Accessors~~~//
@@ -98,35 +98,35 @@ namespace Test
 			OnProgress(std::string("SerpentTest: Passed Serpent parallel to sequential equivalence test.."));
 
 			Stress(cpr);
-			OnProgress(std::string("SerpentTest: Passed Serpentstress tests.."));
+			OnProgress(std::string("SerpentTest: Passed Serpent stress tests.."));
 			delete cpr;
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void SerpentTest::Compare(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	void SerpentTest::Kat(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
 		std::vector<byte> exp(16);
 		std::vector<byte> otp(16);
 		std::vector<byte> msg = Message;
 		SHX cpr;
-		Key::Symmetric::SymmetricKey kp(Key);
+		Cipher::SymmetricKey kp(Key);
 
 		cpr.Initialize(true, kp);
 		cpr.EncryptBlock(msg, otp);
 
 		if (otp != Expected)
 		{
-			throw TestException(std::string("Compare: Arrays are not equal! -SC1"));
+			throw TestException(std::string("Kat"), cpr.Name(), std::string("Arrays are not equal! -SC1"));
 		}
 
 		cpr.Initialize(false, kp);
@@ -134,7 +134,7 @@ namespace Test
 
 		if (msg != Message)
 		{
-			throw TestException(("Compare: Arrays are not equal! -SC2"));
+			throw TestException(std::string("Kat"), cpr.Name(), std::string("Arrays are not equal! -SC2"));
 		}
 	}
 
@@ -144,13 +144,13 @@ namespace Test
 		try
 		{
 			SHX cpr;
-			Key::Symmetric::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize() + 1);
 			SymmetricKey kp(k);
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Serpent"), std::string("Exception: Exception handling failure! -SE1"));
+			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE1"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -165,7 +165,7 @@ namespace Test
 		{
 			SHX cpr(BlockCipherExtensions::Custom);
 
-			throw TestException(std::string("Serpent"), std::string("Exception: Exception handling failure! -SE2"));
+			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE2"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -180,7 +180,7 @@ namespace Test
 		{
 			SHX cpr(nullptr);
 
-			throw TestException(std::string("Serpent"), std::string("Exception: Exception handling failure! -SE3"));
+			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE3"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -208,27 +208,27 @@ namespace Test
 
 		if (cipstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKS1"));
+			throw TestException(std::string("Kat128"), std::string("SERPENTCTEXT128"), std::string("Could not find the test file! -SKS1"));
 		}
 		TestUtils::Read(SERPENTKEY128, keystr);
 		if (keystr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKS2"));
+			throw TestException(std::string("Kat128"), std::string("SERPENTKEY128"), std::string("Could not find the test file! -SKS2"));
 		}
 		TestUtils::Read(SERPENTPTEXT128, plnstr);
 		if (plnstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKS3"));
+			throw TestException(std::string("Kat128"), std::string("SERPENTPTEXT128"), std::string("Could not find the test file! -SKS3"));
 		}
 		TestUtils::Read(SERPENTM100X128, mntstr);
 		if (mntstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKS4"));
+			throw TestException(std::string("Kat128"), std::string("SERPENTM100X128"), std::string("Could not find the test file! -SKS4"));
 		}
 		TestUtils::Read(SERPENTM1000X128, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKS5"));
+			throw TestException(std::string("Kat128"), std::string("SERPENTM1000X128"), std::string("Could not find the test file! -SKS5"));
 		}
 
 		for (size_t i = 0; i < keystr.size(); i += 32)
@@ -254,7 +254,7 @@ namespace Test
 			}
 
 			// vector comparison
-			Compare(key, pln, cip);
+			Kat(key, pln, cip);
 		}
 	}
 
@@ -275,27 +275,27 @@ namespace Test
 
 		if (cipstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKM1"));
+			throw TestException(std::string("Kat192"), std::string("SERPENTCTEXT192"), std::string("Could not find the test file! -SKM1"));
 		}
 		TestUtils::Read(SERPENTKEY192, keystr);
 		if (keystr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKM2"));
+			throw TestException(std::string("Kat192"), std::string("SERPENTKEY192"), std::string("Could not find the test file! -SKM2"));
 		}
 		TestUtils::Read(SERPENTPTEXT192, plnstr);
 		if (plnstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKM3"));
+			throw TestException(std::string("Kat192"), std::string("SERPENTPTEXT192"), std::string("Could not find the test file! -SKM3"));
 		}
 		TestUtils::Read(SERPENTM100X192, mntstr);
 		if (mntstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKM4"));
+			throw TestException(std::string("Kat192"), std::string("SERPENTM100X192"), std::string("Could not find the test file! -SKM4"));
 		}
 		TestUtils::Read(SERPENTM1000X192, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKM5"));
+			throw TestException(std::string("Kat192"), std::string("SERPENTM1000X192"), std::string("Could not find the test file! -SKM5"));
 		}
 
 		for (size_t i = 0, j = 0; j < keystr.size(); i += 32, j += 48)
@@ -318,7 +318,7 @@ namespace Test
 			}
 
 			// vector comparison
-			Compare(key, pln, cip);
+			Kat(key, pln, cip);
 		}
 	}
 
@@ -339,27 +339,27 @@ namespace Test
 
 		if (cipstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKL1"));
+			throw TestException(std::string("Kat256"), std::string("SERPENTCTEXT256"), std::string("Could not find the test file! -SKL1"));
 		}
 		TestUtils::Read(SERPENTKEY256, keystr);
 		if (keystr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKL2"));
+			throw TestException(std::string("Kat256"), std::string("SERPENTKEY256"), std::string("Could not find the test file! -SKL2"));
 		}
 		TestUtils::Read(SERPENTPTEXT256, plnstr);
 		if (plnstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKL3"));
+			throw TestException(std::string("Kat256"), std::string("SERPENTPTEXT256"), std::string("Could not find the test file! -SKL3"));
 		}
 		TestUtils::Read(SERPENTM100X256, mntstr);
 		if (mntstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKL4"));
+			throw TestException(std::string("Kat256"), std::string("SERPENTM100X256"), std::string("Could not find the test file! -SKL4"));
 		}
 		TestUtils::Read(SERPENTM1000X256, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
-			throw TestException(std::string("Could not find the test file! -SKL5"));
+			throw TestException(std::string("Kat256"), std::string("SERPENTM1000X256"), std::string("Could not find the test file! -SKL5"));
 		}
 
 		for (size_t i = 0, j = 0; j < keystr.size(); i += 32, j += 64)
@@ -382,7 +382,7 @@ namespace Test
 			}
 
 			// vector comparison
-			Compare(key, pln, cip);
+			Kat(key, pln, cip);
 		}
 	}
 
@@ -391,14 +391,14 @@ namespace Test
 		const size_t MSGLEN = Message.size();
 		std::vector<byte> enc(MSGLEN);
 		std::vector<byte> dec(MSGLEN);
-		Key::Symmetric::SymmetricKey kp(Key);
+		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, enc, 0);
 
 		if (enc != Expected)
 		{
-			throw TestException(std::string("RijndaelTest: AES: Encrypted arrays are not equal!"));
+			throw TestException(std::string("KatEx"), Cipher->Name(), std::string("Encrypted arrays are not equal!"));
 		}
 
 		Cipher->Initialize(false, kp);
@@ -406,7 +406,7 @@ namespace Test
 
 		if (dec != Message)
 		{
-			throw TestException(std::string("RijndaelTest: AES: Decrypted arrays are not equal!"));
+			throw TestException(std::string("KatEx"), Cipher->Name(), std::string("Decrypted arrays are not equal!"));
 		}
 	}
 
@@ -416,7 +416,7 @@ namespace Test
 		std::vector<byte> msg = Message;
 		std::vector<byte> enc(MSGLEN);
 		std::vector<byte> dec(MSGLEN);
-		Key::Symmetric::SymmetricKey kp(Key);
+		Cipher::SymmetricKey kp(Key);
 
 		Cipher->Initialize(true, kp);
 
@@ -428,7 +428,7 @@ namespace Test
 
 		if (enc != Expected)
 		{
-			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal!"));
+			throw TestException(std::string("MonteCarloEx"), Cipher->Name(), std::string("Arrays are not equal!"));
 		}
 
 		Cipher->Initialize(false, kp);
@@ -441,7 +441,7 @@ namespace Test
 
 		if (dec != Message)
 		{
-			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal!"));
+			throw TestException(std::string("MonteCarloEx"), Cipher->Name(), std::string("Arrays are not equal!"));
 		}
 	}
 
@@ -450,7 +450,7 @@ namespace Test
 		std::vector<byte> otp(16);
 		std::vector<byte> msg = Message;
 		SHX cpr;
-		Key::Symmetric::SymmetricKey kp(Key);
+		Cipher::SymmetricKey kp(Key);
 
 		cpr.Initialize(true, kp);
 
@@ -461,7 +461,7 @@ namespace Test
 
 		if (otp != Expected)
 		{
-			throw TestException(std::string("MonteCarlo: Arrays are not equal! -SM1"));
+			throw TestException(std::string("MonteCarlo"), cpr.Name(), std::string("Arrays are not equal! -SM1"));
 		}
 	}
 
@@ -469,7 +469,7 @@ namespace Test
 	{
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;
 		std::vector<byte> inp;
@@ -492,8 +492,8 @@ namespace Test
 			inp.resize(INPLEN);
 			otp.resize(INPLEN);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, INPLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, INPLEN, rnd);
 			SymmetricKey kp(key, iv);
 
 			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
@@ -510,7 +510,7 @@ namespace Test
 
 			if (cpt1 != cpt2)
 			{
-				throw TestException(std::string("Parallel: Cipher output is not equal! -TP1"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -TP1"));
 			}
 
 			// decrypt sequential ciphertext with parallel
@@ -520,7 +520,7 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException(std::string("Parallel: Cipher output is not equal! -TP2"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -TP2"));
 			}
 		}
 
@@ -533,7 +533,7 @@ namespace Test
 		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
 		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
-		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
@@ -554,8 +554,8 @@ namespace Test
 			inp.resize(INPLEN);
 			otp.resize(INPLEN);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, INPLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(inp, 0, INPLEN, rnd);
 			SymmetricKey kp(key, iv);
 
 			// encrypt
@@ -567,7 +567,7 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
+				throw TestException(std::string("Stress"), Cipher->Name(), std::string("Transformation output is not equal! -TS1"));
 			}
 		}
 	}
@@ -606,7 +606,7 @@ namespace Test
 		HexConverter::Decode(msg, 1, m_message);
 	}
 
-	void SerpentTest::OnProgress(std::string Data)
+	void SerpentTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

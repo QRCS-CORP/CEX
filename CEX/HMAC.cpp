@@ -1,8 +1,10 @@
 #include "HMAC.h"
 #include "DigestFromName.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_MAC
+
+using Exception::CryptoDigestException;
 
 const std::string HMAC::CLASS_NAME("HMAC");
 
@@ -12,7 +14,7 @@ HMAC::HMAC(SHA2Digests DigestType, bool Parallel)
 	:
 	m_destroyEngine(true),
 	m_dgtEngine(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType), Parallel) :
-		throw CryptoMacException("HMAC:Ctor", "The digest type is not supported!")),
+		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
 	m_inputPad(m_dgtEngine->BlockSize()),
 	m_isDestroyed(false),
 	m_isInitialized(false),
@@ -27,7 +29,7 @@ HMAC::HMAC(IDigest* Digest)
 	:
 	m_destroyEngine(false),
 	m_dgtEngine(Digest != nullptr ? Digest :
-		throw CryptoMacException("HMAC:Ctor", "The digest can not be null!")),
+		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The digest can not be null!"), ErrorCodes::IllegalOperation)),
 	m_inputPad(m_dgtEngine->BlockSize()),
 	m_isDestroyed(false),
 	m_isInitialized(false),
@@ -46,9 +48,9 @@ HMAC::~HMAC()
 		m_msgDigestType = Digests::None;
 		m_isInitialized = false;
 
-		Utility::IntUtils::ClearVector(m_inputPad);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_outputPad);
+		Utility::IntegerTools::Clear(m_inputPad);
+		Utility::IntegerTools::Clear(m_legalKeySizes);
+		Utility::IntegerTools::Clear(m_outputPad);
 
 		if (m_destroyEngine)
 		{
@@ -82,12 +84,18 @@ const Digests HMAC::DigestType()
 
 const Macs HMAC::Enumeral()
 {
-	return Macs::HMAC; 
-}
+	Macs mname;
 
-const size_t HMAC::MacSize() 
-{
-	return m_dgtEngine->DigestSize(); 
+	if (m_msgDigestType == Digests::SHA256)
+	{
+		mname = Macs::HMACSHA256;
+	}
+	else
+	{
+		mname = Macs::HMACSHA512;
+	}
+
+	return mname;
 }
 
 const bool HMAC::IsInitialized() 
@@ -120,18 +128,22 @@ ParallelOptions &HMAC::ParallelProfile()
 	return m_dgtEngine->ParallelProfile(); 
 }
 
+const size_t HMAC::TagSize() 
+{
+	return m_dgtEngine->DigestSize(); 
+}
+
 //~~~Public Functions~~~//
 
 void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("HMAC:Compute", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
-
-	if (Output.size() != m_dgtEngine->DigestSize())
+	if (Output.size() < TagSize())
 	{
-		Output.resize(m_dgtEngine->DigestSize());
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	Update(Input, 0, Input.size());
@@ -142,11 +154,11 @@ size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("HMAC:Finalize", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
-	if ((Output.size() - OutOffset) < MacSize())
+	if ((Output.size() - OutOffset) < TagSize())
 	{
-		throw CryptoMacException("HMAC:Finalize", "The Output buffer is too short!");
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	std::vector<byte> tmpV(m_dgtEngine->DigestSize(), 0);
@@ -164,7 +176,7 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 {
 	if (KeyParams.Key().size() < MIN_KEYSIZE)
 	{
-		throw CryptoMacException("HMAC:Initialize", "Key size is too small; should be a minimum of digest output size!");
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Key size is invalid; must be a legal key size!"), ErrorCodes::InvalidKey);
 	}
 
 	size_t keyLen;
@@ -188,15 +200,15 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 	}
 	else
 	{
-		Utility::MemUtils::Copy(KeyParams.Key(), 0, m_inputPad, 0, keyLen);
+		Utility::MemoryTools::Copy(KeyParams.Key(), 0, m_inputPad, 0, keyLen);
 	}
 
 	if (static_cast<int>(m_dgtEngine->BlockSize()) - static_cast<int>(keyLen) > 0)
 	{
-		Utility::MemUtils::Clear(m_inputPad, keyLen, m_dgtEngine->BlockSize() - keyLen);
+		Utility::MemoryTools::Clear(m_inputPad, keyLen, m_dgtEngine->BlockSize() - keyLen);
 	}
 
-	Utility::MemUtils::Copy(m_inputPad, 0, m_outputPad, 0, m_inputPad.size());
+	Utility::MemoryTools::Copy(m_inputPad, 0, m_outputPad, 0, m_inputPad.size());
 	XorPad(m_inputPad, IPAD);
 	XorPad(m_outputPad, OPAD);
 	m_dgtEngine->Update(m_inputPad, 0, m_inputPad.size());
@@ -210,9 +222,9 @@ void HMAC::ParallelMaxDegree(size_t Degree)
 	{
 		m_dgtEngine->ParallelMaxDegree(Degree);
 	}
-	catch (std::exception &ex)
+	catch (CryptoDigestException &ex)
 	{
-		throw CryptoMacException("HMAC:ParallelMaxDegree", "The Degree value must be a non-zero even number less than the number of processor cores!", std::string(ex.what()));
+		throw CryptoMacException(Name(), std::string("ParallelMaxDegree"), ex.Message(), ex.ErrorCode());
 	}
 }
 
@@ -230,7 +242,7 @@ void HMAC::Update(byte Input)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("HMAC:Update", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_dgtEngine->Update(Input);
@@ -240,11 +252,11 @@ void HMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException("HMAC:Update", "The generator has not been initialized!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException("HMAC:Update", "The Input buffer is too short!");
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	m_dgtEngine->Update(Input, InOffset, Length);

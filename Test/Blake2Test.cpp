@@ -4,8 +4,8 @@
 #include "../CEX/Blake256.h"
 #include "../CEX/Blake512.h"
 #include "../CEX/CpuDetect.h"
-#include "../CEX/IntUtils.h"
-#include "../CEX/MemUtils.h"
+#include "../CEX/IntegerTools.h"
+#include "../CEX/MemoryTools.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 #include <fstream>
@@ -28,8 +28,8 @@ namespace Test
 	using Digest::Blake512;
 	using Digest::BlakeParams;
 	using Exception::CryptoDigestException;
-	using Utility::IntUtils;
-	using Utility::MemUtils;
+	using Utility::IntegerTools;
+	using Utility::MemoryTools;
 	using Prng::SecureRandom;
 #if defined(__AVX2__)
 	using Numeric::UInt256;
@@ -42,8 +42,8 @@ namespace Test
 
 	using namespace TestFiles::Blake2Kat;
 
+	const std::string Blake2Test::CLASSNAME = "Blake2Test";
 	const std::string Blake2Test::DESCRIPTION = "Blake Vector KATs; tests Blake2 256/512 digests.";
-	const std::string Blake2Test::FAILURE = "FAILURE! ";
 	const std::string Blake2Test::SUCCESS = "SUCCESS! All Blake tests have executed succesfully.";
 	const std::string Blake2Test::DMK_INP = "in:	";
 	const std::string Blake2Test::DMK_KEY = "key:	";
@@ -61,8 +61,8 @@ namespace Test
 
 	Blake2Test::~Blake2Test()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_message);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_message);
 	}
 
 	//~~~Accessors~~~//
@@ -83,7 +83,7 @@ namespace Test
 	{
 		try
 		{
-			Common::CpuDetect detect;
+			CpuDetect detect;
 
 			Exception();
 			OnProgress(std::string("Blake2Test: Passed Blake2-256/512 exception handling tests.."));
@@ -136,11 +136,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -153,7 +153,7 @@ namespace Test
 			BlakeParams params(64, 2, 99, 0, 64);
 			Blake256 dgt(params);
 
-			throw TestException(std::string("Blake2"), std::string("Exception: Exception handling failure! -BE1"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -BE1"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -170,7 +170,7 @@ namespace Test
 			BlakeParams params(128, 2, 99, 0, 128);
 			Blake512 dgt(params);
 
-			throw TestException(std::string("Blake2"), std::string("Exception: Exception handling failure! -BE2"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -BE2"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -187,7 +187,7 @@ namespace Test
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
-			throw TestException(std::string("Blake2"), std::string("Exception: Exception handling failure! -BE3"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -BE3"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -204,7 +204,7 @@ namespace Test
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
-			throw TestException(std::string("Blake2"), std::string("Exception: Exception handling failure! -BE4"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -BE4"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -220,10 +220,10 @@ namespace Test
 			Blake256 dgt;
 			// set mac key to an invalid size -99
 			std::vector<byte> k(99);
-			Key::Symmetric::SymmetricKey kp(k);
+			Cipher::SymmetricKey kp(k);
 			dgt.Initialize(kp);
 
-			throw TestException(std::string("Blake2"), std::string("Exception: Exception handling failure! -BE5"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -BE5"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -239,10 +239,10 @@ namespace Test
 			Blake512 dgt;
 			// set mac key to an invalid size -99
 			std::vector<byte> k(99);
-			Key::Symmetric::SymmetricKey kp(k);
+			Cipher::SymmetricKey kp(k);
 			dgt.Initialize(kp);
 
-			throw TestException(std::string("Blake2"), std::string("Exception: Exception handling failure! -BE6"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -BE6"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -261,9 +261,9 @@ namespace Test
 		std::array<uint, 8> state2;
 		std::array<uint, 8> state3;
 
-		MemUtils::Clear(state1, 0, 8 * sizeof(uint));
-		MemUtils::Clear(state2, 0, 8 * sizeof(uint));
-		MemUtils::Clear(state3, 0, 8 * sizeof(uint));
+		MemoryTools::Clear(state1, 0, 8 * sizeof(uint));
+		MemoryTools::Clear(state2, 0, 8 * sizeof(uint));
+		MemoryTools::Clear(state3, 0, 8 * sizeof(uint));
 
 		Blake2::PermuteR10P512C(input, 0, state1, iv);
 		Blake2::PermuteR10P512U(input, 0, state2, iv);
@@ -274,14 +274,14 @@ namespace Test
 
 		if (state1 != state3)
 		{
-			throw TestException(std::string("CompareP256: Permutation output is not equal! -BCS1"));
+			throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P512"), std::string("Permutation output is not equal! -BCS1"));
 		}
 
 #endif
 
 		if (state1 != state2)
 		{
-			throw TestException(std::string("CompareP256: Permutation output is not equal! -BCS2"));
+			throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P512"), std::string("Permutation output is not equal! -BCS2"));
 		}
 
 #if defined(__AVX2__)
@@ -293,13 +293,13 @@ namespace Test
 		Blake2::PermuteR10P8x512H(input256, 0, state256, iv256);
 
 		std::vector<uint> state256ul(32);
-		MemUtils::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
+		MemoryTools::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
 			if (state256ul[i] != state1[i / 8])
 			{
-				throw TestException(std::string("CompareP256: Permutation output is not equal! -BCS3"));
+				throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P8x512H"), std::string("Permutation output is not equal! -BCS3"));
 			}
 		}
 
@@ -314,13 +314,13 @@ namespace Test
 		Blake2::PermuteR10P16x512H(input512, 0, state512, iv512);
 
 		std::vector<uint> state512ul(64);
-		MemUtils::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
+		MemoryTools::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
 			if (state512ul[i] != state1[i / 16])
 			{
-				throw TestException(std::string("CompareP256: Permutation output is not equal! -BCS4"));
+				throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P16x512H"), std::string("Permutation output is not equal! -BCS4"));
 			}
 		}
 
@@ -348,14 +348,14 @@ namespace Test
 
 		if (state1 != state3)
 		{
-			throw TestException(std::string("CompareP512: Permutation output is not equal! -BCL1"));
+			throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P1024"), std::string("Permutation output is not equal! -BCL1"));
 		}
 
 #endif
 
 		if (state1 != state2)
 		{
-			throw TestException(std::string("CompareP512: Permutation output is not equal! -BCL2"));
+			throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P1024"), std::string("Permutation output is not equal! -BCL2"));
 		}
 
 #if defined(__AVX2__)
@@ -367,13 +367,13 @@ namespace Test
 		Blake2::PermuteR12P4x1024H(input256, 0, state256, iv256);
 
 		std::vector<ulong> state256ull(32);
-		MemUtils::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
+		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
 			if (state256ull[i] != state1[i / 4])
 			{
-				throw TestException(std::string("CompareP512: Permutation output is not equal! -BCL3"));
+				throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P4x1024H"), std::string("Permutation output is not equal! -BCL3"));
 			}
 		}
 
@@ -388,13 +388,13 @@ namespace Test
 		Blake2::PermuteR12P8x1024H(input512, 0, state512, iv512);
 
 		std::vector<ulong> state512ull(64);
-		MemUtils::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
+		MemoryTools::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
 
 		for (size_t i = 0; i < 64; ++i)
 		{
 			if (state512ull[i] != state1[i / 8])
 			{
-				throw TestException(std::string("CompareP512: Permutation output is not equal! -BCL4"));
+				throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P8x1024H"), std::string("Permutation output is not equal! -BCL4"));
 			}
 		}
 
@@ -406,7 +406,7 @@ namespace Test
 		std::ifstream stream(BLAKE2BKAT);
 		if (!stream)
 		{
-			throw TestException(std::string("KatBlake2B: Could not open file: ") + BLAKE2BKAT + std::string(" -BKB1"));
+			throw TestException(std::string("KatBlake2B"), std::string("BLAKE2BKAT"), std::string("Could not open file: ") + BLAKE2BKAT + std::string(" -BKB1"));
 		}
 
 		std::string line;
@@ -442,14 +442,14 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 					}
 
-					Key::Symmetric::SymmetricKey mkey(key);
+					Cipher::SymmetricKey mkey(key);
 					Blake512 blake2b(false);
 					blake2b.Initialize(mkey);
 					blake2b.Compute(input, hash);
 
 					if (hash != expect)
 					{
-						throw TestException(std::string("KatBlake2B: KAT test has failed! -BKB2"));
+						throw TestException(std::string("KatBlake2B"), blake2b.Name(), std::string("KAT test has failed! -BKB2"));
 					}
 				}
 			}
@@ -462,7 +462,7 @@ namespace Test
 		std::ifstream stream(BLAKE2BPKAT);
 		if (!stream)
 		{
-			throw TestException(std::string("KatBlake2BP: Could not open file: ") + BLAKE2BPKAT + std::string(" -BKBP1"));
+			throw TestException(std::string("KatBlake2BP"), std::string("BLAKE2BPKAT"), std::string("Could not open file: ") + BLAKE2BPKAT + std::string(" -BKBP1"));
 		}
 
 		std::string line;
@@ -502,7 +502,7 @@ namespace Test
 					// Note: the official default is 4 threads, my default on all digests is 8 threads
 					BlakeParams params(64, 2, 4, 0, 64);
 					Blake512 blake2bp(params);
-					Key::Symmetric::SymmetricKey mkey(key);
+					Cipher::SymmetricKey mkey(key);
 					// hard code for test
 					blake2bp.ParallelProfile().SetMaxDegree(4);
 					blake2bp.Initialize(mkey);
@@ -510,7 +510,7 @@ namespace Test
 
 					if (hash != expect)
 					{
-						throw TestException(std::string("KatBlake2BP: KAT test has failed! -BKBP2"));
+						throw TestException(std::string("KatBlake2BP"), blake2bp.Name(), std::string("KAT test has failed! -BKBP2"));
 					}
 				}
 			}
@@ -523,7 +523,7 @@ namespace Test
 		std::ifstream stream(BLAKE2SKAT);
 		if (!stream)
 		{
-			throw TestException(std::string("KatBlake2S: Could not open file: ") + BLAKE2SKAT + std::string(" -BKS1"));
+			throw TestException(std::string("KatBlake2S"), std::string("BLAKE2SKAT"), std::string("Could not open file: ") + BLAKE2SKAT + std::string(" -BKS1"));
 		}
 
 		std::string line;
@@ -559,14 +559,14 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 					}
 
-					Key::Symmetric::SymmetricKey mkey(key);
+					Cipher::SymmetricKey mkey(key);
 					Blake256 blake2s(false);
 					blake2s.Initialize(mkey);
 					blake2s.Compute(input, hash);
 
 					if (hash != expect)
 					{
-						throw TestException(std::string("KatBlake2S: KAT test has failed! -BKS2"));
+						throw TestException(std::string("KatBlake2S"), blake2s.Name(), std::string("KAT test has failed! -BKS2"));
 					}
 				}
 			}
@@ -579,7 +579,7 @@ namespace Test
 		std::ifstream stream(BLAKE2SPKAT);
 		if (!stream)
 		{
-			throw TestException(std::string("KatBlake2SP: Could not open file: ") + BLAKE2SPKAT + std::string(" -BKSP1"));
+			throw TestException(std::string("KatBlake2SP"), std::string("BLAKE2SPKAT"), std::string("Could not open file: ") + BLAKE2SPKAT + std::string(" -BKSP1"));
 		}
 
 		std::string line;
@@ -615,7 +615,7 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 					}
 
-					Key::Symmetric::SymmetricKey mkey(key);
+					Cipher::SymmetricKey mkey(key);
 					Blake256 blake2sp(true);
 					// hard code for test
 					blake2sp.ParallelProfile().SetMaxDegree(8);
@@ -624,7 +624,7 @@ namespace Test
 
 					if (hash != expect)
 					{
-						throw TestException(std::string("KatBlake2SP: KAT test has failed! -BKSP2"));
+						throw TestException(std::string("KatBlake2SP"), blake2sp.Name(), std::string("KAT test has failed! -BKSP2"));
 					}
 				}
 			}
@@ -649,7 +649,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
 			msg.resize(INPLEN);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 			reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
 
 			try
@@ -669,9 +669,9 @@ namespace Test
 				Digest->ParallelMaxDegree(PRLDGR);
 				Digest->ParallelProfile().ParallelBlockSize() = PRLLEN;
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Parallel: Parallel integrity test has failed! -BP1"));
+				throw TestException(std::string("Parallel"), Digest->Name(), std::string("Parallel integrity test has failed! -BP1"));
 			}
 		}
 	}
@@ -693,7 +693,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
 			msg.resize(INPLEN);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 
 			try
 			{
@@ -703,14 +703,14 @@ namespace Test
 				Digest->Update(msg, 0, msg.size());
 				Digest->Finalize(code2, 0);
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Stress: The digest has thrown an exception! -BS1"));
+				throw TestException(std::string("Stress"), Digest->Name(), std::string("Stress: The digest has thrown an exception! -BS1"));
 			}
 
 			if (code1 != code2)
 			{
-				throw TestException(std::string("Stress: Hash output is not equal! -BS2"));
+				throw TestException(std::string("Stress"), Digest->Name(), std::string("Stress: Hash output is not equal! -BS2"));
 			}
 		}
 	}
@@ -725,7 +725,7 @@ namespace Test
 
 		if (!tree1.Equals(tree2))
 		{
-			throw TestException(std::string("TreeParams: Tree parameters test failed! -BT1"));
+			throw TestException(std::string("TreeParams"), std::string("BlakeParams"), std::string("TreeParams: Tree parameters test failed! -BT1"));
 		}
 
 		std::vector<byte> code2(12, 3);
@@ -735,13 +735,13 @@ namespace Test
 
 		if (!tree3.Equals(tree4))
 		{
-			throw TestException(std::string("TreeParams: Tree parameters test failed! -BT2"));
+			throw TestException(std::string("TreeParams"), std::string("BlakeParams"), std::string("TreeParams: Tree parameters test failed! -BT2"));
 		}
 	}
 
 	//~~~Private Functions~~~//
 
-	void Blake2Test::OnProgress(std::string Data)
+	void Blake2Test::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

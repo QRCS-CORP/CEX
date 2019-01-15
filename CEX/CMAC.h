@@ -36,9 +36,9 @@ NAMESPACE_MAC
 
 using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
-using Cipher::Symmetric::Block::IBlockCipher;
-using Cipher::Symmetric::Block::Mode::ICipherMode;
-using Key::Symmetric::SymmetricSecureKey;
+using Cipher::Block::IBlockCipher;
+using Cipher::Block::Mode::ICipherMode;
+using Cipher::SymmetricSecureKey;
 
 /// <summary>
 /// An implementation of a symmetric Cipher based Message Authentication Code generator
@@ -191,10 +191,10 @@ public:
 	/// <summary>
 	/// Read Only: Size of returned mac in bytes
 	/// </summary>
-	const size_t MacSize() override;
+	const size_t TagSize() override;
 
 	/// <summary>
-	/// Read Only: Mac generators class name
+	/// Read Only: Mac generators implementation name
 	/// </summary>
 	const std::string Name() override;
 
@@ -256,6 +256,7 @@ public:
 private:
 
 	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
+	void Pad(std::vector<byte> &Input, size_t Offset, size_t Length);
 	void Scope();
 };
 

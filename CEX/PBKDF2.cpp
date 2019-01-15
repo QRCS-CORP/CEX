@@ -1,6 +1,6 @@
 #include "PBKDF2.h"
 #include "DigestFromName.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF
@@ -12,7 +12,7 @@ const std::string PBKDF2::CLASS_NAME("PBKDF2");
 PBKDF2::PBKDF2(SHA2Digests DigestType, size_t Iterations)
 	:
 	m_macGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
-		throw CryptoKdfException("PBKDF2:Ctor", "The digest type is not supported!")),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
@@ -20,11 +20,11 @@ PBKDF2::PBKDF2(SHA2Digests DigestType, size_t Iterations)
 	m_kdfCounter(1),
 	m_kdfDigestType(static_cast<Digests>(DigestType)),
 	m_kdfIterations(Iterations != 0 ? Iterations : 
-		throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!")),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("Iterations count can not be zero!"), ErrorCodes::InvalidParam)),
 	m_kdfKey(0),
 	m_kdfSalt(0),
 	m_legalKeySizes(0),
-	m_macSize(m_macGenerator->MacSize())
+	m_macSize(m_macGenerator->TagSize())
 {
 	LoadState();
 }
@@ -32,7 +32,7 @@ PBKDF2::PBKDF2(SHA2Digests DigestType, size_t Iterations)
 PBKDF2::PBKDF2(IDigest* Digest, size_t Iterations)
 	:
 	m_macGenerator(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? new HMAC(Digest) :
-		throw CryptoKdfException("PBKDF2:Ctor", "The digest type is not supported!")),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
@@ -40,11 +40,11 @@ PBKDF2::PBKDF2(IDigest* Digest, size_t Iterations)
 	m_kdfCounter(1),
 	m_kdfDigestType(Digest->Enumeral()),
 	m_kdfIterations(Iterations != 0 ? Iterations : 
-		throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!")),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("Iterations count can not be zero!"), ErrorCodes::InvalidParam)),
 	m_kdfKey(0),
 	m_kdfSalt(0),
 	m_legalKeySizes(0),
-	m_macSize(m_macGenerator->MacSize())
+	m_macSize(m_macGenerator->TagSize())
 {
 	LoadState();
 }
@@ -52,7 +52,7 @@ PBKDF2::PBKDF2(IDigest* Digest, size_t Iterations)
 PBKDF2::PBKDF2(HMAC* Mac, size_t Iterations)
 	:
 	m_macGenerator(Mac != nullptr ? Mac : 
-		throw CryptoKdfException("PBKDF2:CTor", "HMAC instance can not be null!")),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_kdfCounter(1),
 	m_destroyEngine(false),
@@ -60,11 +60,11 @@ PBKDF2::PBKDF2(HMAC* Mac, size_t Iterations)
 	m_isInitialized(false),
 	m_kdfDigestType(m_macGenerator->DigestType()),
 	m_kdfIterations(Iterations != 0 ? Iterations : 
-		throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!")),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("Iterations count can not be zero!"), ErrorCodes::InvalidParam)),
 	m_kdfKey(0),
 	m_kdfSalt(0),
 	m_legalKeySizes(0),
-	m_macSize(m_macGenerator->MacSize())
+	m_macSize(m_macGenerator->TagSize())
 {
 	LoadState();
 }
@@ -81,9 +81,9 @@ PBKDF2::~PBKDF2()
 		m_kdfIterations = 0;
 		m_macSize = 0;
 
-		Utility::IntUtils::ClearVector(m_kdfKey);
-		Utility::IntUtils::ClearVector(m_kdfSalt);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntegerTools::Clear(m_kdfKey);
+		Utility::IntegerTools::Clear(m_kdfSalt);
+		Utility::IntegerTools::Clear(m_legalKeySizes);
 
 		if (m_destroyEngine)
 		{
@@ -142,7 +142,7 @@ size_t PBKDF2::Generate(std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException("PBKDF2:Generate", "The generator has not been initialized!");
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 
 	return Expand(Output, 0, Output.size());
@@ -152,11 +152,11 @@ size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException("PBKDF2:Generate", "The generator has not been initialized!");
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (Output.size() - OutOffset < Length)
 	{
-		throw CryptoKdfException("PBKDF2:Generate", "The output buffer is too short!");
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	return Expand(Output, OutOffset, Length);
@@ -166,7 +166,7 @@ void PBKDF2::Initialize(ISymmetricKey &GenParam)
 {
 	if (GenParam.Key().size() < MIN_PASSLEN)
 	{
-		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 
 	if (GenParam.Nonce().size() != 0)
@@ -190,7 +190,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Key)
 {
 	if (Key.size() < MIN_PASSLEN)
 	{
-		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 
 	if (m_isInitialized)
@@ -199,7 +199,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Key)
 	}
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_isInitialized = true;
 }
 
@@ -207,11 +207,11 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Leng
 {
 	if (Key.size() < MIN_PASSLEN)
 	{
-		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 
 	std::vector<byte> tmpK(Length);
-	Utility::MemUtils::Copy(Key, Offset, tmpK, 0, Length);
+	Utility::MemoryTools::Copy(Key, Offset, tmpK, 0, Length);
 	Initialize(tmpK);
 }
 
@@ -219,11 +219,11 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 {
 	if (Key.size() < MIN_PASSLEN)
 	{
-		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small, must be a minumum of 4 bytes!");
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 	if (Salt.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException("PBKDF2:Initialize", "Salt size is too small, must be a minumum of 4 bytes!");
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 
 	if (m_isInitialized)
@@ -232,9 +232,9 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 	}
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size());
-	Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
+	Utility::MemoryTools::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
 
 	m_isInitialized = true;
 }
@@ -243,11 +243,11 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 {
 	if (Key.size() < MIN_PASSLEN)
 	{
-		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small, must be a minumum of 4 bytes!");
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 	if (Salt.size() + Info.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException("PBKDF2:Initialize", "Salt with info size is too small, combined must be a minumum of 4 bytes!");
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 
 	if (m_isInitialized)
@@ -256,16 +256,16 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 	}
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size() + Info.size());
 
 	if (Salt.size() > 0)
 	{
-		Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
+		Utility::MemoryTools::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
 	}
 	if (Info.size() > 0)
 	{
-		Utility::MemUtils::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
+		Utility::MemoryTools::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
 	}
 
 	m_isInitialized = true;
@@ -275,7 +275,7 @@ void PBKDF2::ReSeed(const std::vector<byte> &Seed)
 {
 	if (Seed.size() < MIN_PASSLEN)
 	{
-		throw CryptoKdfException("PBKDF2:ReSeed", "Seed can not be less than 4 bytes in length!");
+		throw CryptoKdfException(Name(), std::string("ReSeed"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
 	}
 
 	if (Seed.size() > m_kdfSalt.size())
@@ -283,7 +283,7 @@ void PBKDF2::ReSeed(const std::vector<byte> &Seed)
 		m_kdfSalt.resize(Seed.size());
 	}
 
-	Utility::MemUtils::Copy(Seed, 0, m_kdfSalt, 0, Seed.size());
+	Utility::MemoryTools::Copy(Seed, 0, m_kdfSalt, 0, Seed.size());
 }
 
 void PBKDF2::Reset()
@@ -303,7 +303,7 @@ size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 
 	do
 	{
-		size_t prcRmd = Utility::IntUtils::Min(m_macSize, prcLen);
+		size_t prcRmd = Utility::IntegerTools::Min(m_macSize, prcLen);
 
 		if (prcRmd >= m_macSize)
 		{
@@ -313,7 +313,7 @@ size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 		{
 			std::vector<byte> tmp(m_macSize);
 			Process(tmp, 0);
-			Utility::MemUtils::Copy(tmp, 0, Output, OutOffset, prcRmd);
+			Utility::MemoryTools::Copy(tmp, 0, Output, OutOffset, prcRmd);
 		}
 
 		prcLen -= prcRmd;
@@ -327,7 +327,7 @@ size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 
 void PBKDF2::Process(std::vector<byte> &Output, size_t OutOffset)
 {
-	Key::Symmetric::SymmetricKey kp(m_kdfKey);
+	Cipher::SymmetricKey kp(m_kdfKey);
 	m_macGenerator->Initialize(kp);
 
 	if (m_kdfSalt.size() != 0)
@@ -336,12 +336,12 @@ void PBKDF2::Process(std::vector<byte> &Output, size_t OutOffset)
 	}
 
 	std::vector<byte> counter(4, 0);
-	Utility::IntUtils::Be32ToBytes(m_kdfCounter, counter, 0);
+	Utility::IntegerTools::Be32ToBytes(m_kdfCounter, counter, 0);
 	m_macGenerator->Update(counter, 0, counter.size());
 
 	std::vector<byte> state(m_macSize);
 	m_macGenerator->Finalize(state, 0);
-	Utility::MemUtils::Copy(state, 0, Output, OutOffset, state.size());
+	Utility::MemoryTools::Copy(state, 0, Output, OutOffset, state.size());
 
 	for (int i = 1; i != m_kdfIterations; ++i)
 	{
@@ -362,11 +362,11 @@ void PBKDF2::LoadState()
 	// this is the recommended size: 
 	// ideally, salt should be passphrase len - (4 bytes of counter + digest finalizer code)
 	// you want to fill one complete block, and avoid hmac compression on > block-size
-	m_legalKeySizes[0] = SymmetricKeySize(m_macGenerator->MacSize(), 0, 0);
+	m_legalKeySizes[0] = SymmetricKeySize(m_macGenerator->TagSize(), 0, 0);
 	// 2nd recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(m_macGenerator->MacSize(), m_macGenerator->MacSize(), 0);
+	m_legalKeySizes[1] = SymmetricKeySize(m_macGenerator->TagSize(), m_macGenerator->TagSize(), 0);
 	// max recommended
-	m_legalKeySizes[2] = SymmetricKeySize(m_macGenerator->MacSize() * 2, m_macGenerator->MacSize(), 0);
+	m_legalKeySizes[2] = SymmetricKeySize(m_macGenerator->TagSize() * 2, m_macGenerator->TagSize(), 0);
 }
 
 NAMESPACE_KDFEND

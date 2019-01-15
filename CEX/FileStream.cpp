@@ -10,6 +10,8 @@
 
 NAMESPACE_IO
 
+using Enumeration::ErrorCodes;
+
 const std::string FileStream::CLASS_NAME("FileStream");
 
 //~~~Constructor~~~//
@@ -26,7 +28,7 @@ FileStream::FileStream(const std::string &FileName, FileAccess Access, FileModes
 {
 	if (Access == FileAccess::Read && !FileExists(m_fileName))
 	{
-		throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
+		throw CryptoProcessingException(std::string("FileStream"), std::string("Constructor"), std::string("The file does not exist!"), ErrorCodes::InvalidParam);
 	}
 
 	m_fileSize = FileSize(m_fileName);
@@ -36,9 +38,9 @@ FileStream::FileStream(const std::string &FileName, FileAccess Access, FileModes
 		m_fileStream.open(m_fileName, static_cast<int>(Access) | static_cast<int>(Mode));
 		m_fileStream.unsetf(std::ios::skipws);
 	}
-	catch (std::exception& ex)
+	catch (std::exception&)
 	{
-		throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!", std::string(ex.what()));
+		throw CryptoProcessingException(std::string("FileStream"), std::string("Constructor"), std::string("The file could not be opened!"), ErrorCodes::UnKnown);
 	}
 }
 

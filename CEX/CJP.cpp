@@ -1,9 +1,11 @@
 #include "CJP.h"
 #include "CpuDetect.h"
-#include "IntUtils.h"
-#include "SysUtils.h"
+#include "IntegerTools.h"
+#include "SystemTools.h"
 
 NAMESPACE_PROVIDER
+
+using Utility::MemoryTools;
 
 const std::string CJP::CLASS_NAME("CJP");
 
@@ -13,7 +15,7 @@ CJP::CJP()
 	:
 	m_enableAccess(true),
 	m_enableDebias(true),
-	m_hasTsc(Utility::SysUtils::HasRdtsc()),
+	m_hasTsc(Utility::SystemTools::HasRdtsc()),
 	m_isAvailable(false),
 	m_lastDelta(0),
 	m_lastDelta2(0),
@@ -37,11 +39,15 @@ CJP::CJP()
 		Detect();
 		Prime();
 	}
+	else
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
+	}
 }
 
 CJP::~CJP()
 {
-	Utility::IntUtils::ClearVector(m_memState);
+	Utility::IntegerTools::Clear(m_memState);
 	m_enableAccess = false;
 	m_enableDebias = false;
 	m_hasTsc = false;
@@ -102,11 +108,6 @@ bool &CJP::SecureCache()
 
 void CJP::Generate(std::vector<byte> &Output)
 {
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("CJP:Generate", "High resolution timer not available or too coarse for RNG!");
-	}
-
 	Process(Output, 0, Output.size());
 }
 
@@ -114,11 +115,7 @@ void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException("CJP:Generate", "The output buffer is too small!");
-	}
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("CJP:Generate", "High resolution timer not available or too coarse for RNG!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
 	Process(Output, Offset, Length);
@@ -126,11 +123,6 @@ void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 std::vector<byte> CJP::Generate(size_t Length)
 {
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("CJP:Generate", "High resolution timer not available or too coarse for RNG!");
-	}
-
 	std::vector<byte> rnd(Length);
 	Process(rnd, 0, rnd.size());
 
@@ -140,7 +132,7 @@ std::vector<byte> CJP::Generate(size_t Length)
 ushort CJP::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -148,7 +140,7 @@ ushort CJP::NextUInt16()
 uint CJP::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -156,7 +148,7 @@ uint CJP::NextUInt32()
 ulong CJP::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }
@@ -169,7 +161,7 @@ void CJP::Reset()
 	}
 	catch (std::exception &ex)
 	{
-		throw CryptoRandomException("CJP:Reset", "Entropy collection has failed!", std::string(ex.what()));
+		throw CryptoRandomException(CLASS_NAME, std::string("Reset"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 }
 
@@ -228,7 +220,7 @@ void CJP::Detect()
 {
 	try
 	{
-		Common::CpuDetect detect;
+		CpuDetect detect;
 
 		if (detect.L1CacheTotal() != 0)
 		{
@@ -298,7 +290,7 @@ void CJP::Generate64()
 		m_rndState ^= ((m_rndState >> 60) & 1);
 		m_rndState ^= ((m_rndState >> 59) & 1);
 		// the current position is always the LSB, the polynom only needs to shift data in from the left without wrap
-		m_rndState = Utility::IntUtils::RotL64(m_rndState, 1);
+		m_rndState = Utility::IntegerTools::RotL64(m_rndState, 1);
 
 		// enforce the StuckCheck test
 		if (m_stuckTest)
@@ -322,7 +314,7 @@ void CJP::Generate64()
 
 ulong CJP::GetTimeStamp()
 {
-	return Utility::SysUtils::TimeStamp(m_hasTsc);
+	return Utility::SystemTools::TimeStamp(m_hasTsc);
 }
 
 ulong CJP::MeasureJitter()
@@ -383,7 +375,7 @@ size_t CJP::Process(std::vector<byte> &Output, size_t Offset, size_t Length)
 	{
 		size_t rmdLen = (Length < RNDLEN) ? Length : RNDLEN;
 		Generate64();
-		Utility::MemUtils::CopyFromValue(m_rndState, Output, Offset, rmdLen);
+		MemoryTools::CopyFromValue(m_rndState, Output, Offset, rmdLen);
 		Length -= rmdLen;
 		Offset += rmdLen;
 	} while (Length != 0);
@@ -464,7 +456,7 @@ void CJP::StirPool()
 			mixer.u64 ^= constant.u64;
 		}
 
-		mixer.u64 = Utility::IntUtils::RotL64(mixer.u64, 1);
+		mixer.u64 = Utility::IntegerTools::RotL64(mixer.u64, 1);
 	}
 
 	m_rndState ^= mixer.u64;
@@ -502,9 +494,9 @@ bool CJP::TimerCheck()
 		ulong delta = 0;
 		ulong folded = 0;
 
-		ulong time = Utility::SysUtils::TimeStamp(m_hasTsc);
+		ulong time = Utility::SystemTools::TimeStamp(m_hasTsc);
 		FoldTime(time, folded);
-		ulong time2 = Utility::SysUtils::TimeStamp(m_hasTsc);
+		ulong time2 = Utility::SystemTools::TimeStamp(m_hasTsc);
 
 		// test whether timer works
 		if (time == 0 || time2 == 0)

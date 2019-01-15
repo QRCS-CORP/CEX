@@ -1,7 +1,7 @@
 #include "ECB.h"
 #include "BlockCipherFromName.h"
-#include "IntUtils.h"
-#include "ParallelUtils.h"
+#include "IntegerTools.h"
+#include "ParallelTools.h"
 
 NAMESPACE_MODE
 
@@ -12,7 +12,7 @@ const std::string ECB::CLASS_NAME("ECB");
 ECB::ECB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
 	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
-		throw CryptoCipherModeException("ECB:CTor", "The Cipher type can not be none!")),
+		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
@@ -26,7 +26,7 @@ ECB::ECB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 ECB::ECB(IBlockCipher* Cipher)
 	:
 	m_blockCipher(Cipher != nullptr ? Cipher :
-		throw CryptoCipherModeException("ECB:CTor", "The Cipher can not be null!")),
+		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_cipherType(m_blockCipher->Enumeral()),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
@@ -150,15 +150,19 @@ void ECB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{
-		throw CryptoSymmetricCipherException("ECB:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}
-	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+
+	if (m_parallelProfile.IsParallel())
 	{
-		throw CryptoSymmetricCipherException("ECB:Initialize", "The parallel block size is out of bounds!");
-	}
-	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
-	{
-		throw CryptoSymmetricCipherException("ECB:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+		if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+		{
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size is out of bounds!"), ErrorCodes::InvalidSize);
+		}
+		if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
+		{
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidSize);
+		}
 	}
 
 	Scope();
@@ -172,7 +176,7 @@ void ECB::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException("ECB:ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -181,7 +185,7 @@ void ECB::ParallelMaxDegree(size_t Degree)
 void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized");
-	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length");
+	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length");
 	CexAssert(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block size");
 
 	const size_t PRLBLK = m_parallelProfile.ParallelBlockSize();
@@ -214,7 +218,7 @@ void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 void ECB::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
 
 	m_blockCipher->EncryptBlock(Input, InOffset, Output, OutOffset);
 }
@@ -298,7 +302,7 @@ void ECB::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t SEGLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t BLKCNT = (SEGLEN / BLOCK_SIZE);
 
-	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, SEGLEN, BLKCNT](size_t i)
+	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, SEGLEN, BLKCNT](size_t i)
 	{
 		this->Generate(Input, InOffset + (i * SEGLEN), Output, OutOffset + (i * SEGLEN), BLKCNT);
 	});

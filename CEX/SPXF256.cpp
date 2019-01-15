@@ -1,14 +1,14 @@
 #include "SPXF256.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 #include "SphincsUtils.h"
 #include "Keccak.h"
 
 NAMESPACE_SPHINCS
 
-using Utility::IntUtils;
+using Utility::IntegerTools;
 using Digest::Keccak;
-using Utility::MemUtils;
+using Utility::MemoryTools;
 
 void SPXF256::AddressToBytes(std::vector<byte> &Output, size_t Offset, const std::array<uint, 8> &Address)
 {
@@ -69,13 +69,13 @@ void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std:
 	// and AuthPath has to go left, otherwise it is the other way around
 	if ((LeafOffset & 1) == 1)
 	{
-		MemUtils::Copy(Leaf, 0, buf1, SPX_N, SPX_N);
-		MemUtils::Copy(AuthPath, AuthOffset, buf1, 0, SPX_N);
+		MemoryTools::Copy(Leaf, 0, buf1, SPX_N, SPX_N);
+		MemoryTools::Copy(AuthPath, AuthOffset, buf1, 0, SPX_N);
 	}
 	else
 	{
-		MemUtils::Copy(Leaf, 0, buf1, 0, SPX_N);
-		MemUtils::Copy(AuthPath, AuthOffset, buf1, SPX_N, SPX_N);
+		MemoryTools::Copy(Leaf, 0, buf1, 0, SPX_N);
+		MemoryTools::Copy(AuthPath, AuthOffset, buf1, SPX_N, SPX_N);
 	}
 
 	AuthOffset += SPX_N;
@@ -93,12 +93,12 @@ void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std:
 		if (LeafOffset & 1)
 		{
 			THash(buf1, SPX_N, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
-			MemUtils::Copy(AuthPath, AuthOffset, buf1, 0, SPX_N);
+			MemoryTools::Copy(AuthPath, AuthOffset, buf1, 0, SPX_N);
 		}
 		else
 		{
 			THash(buf1, 0, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
-			MemUtils::Copy(AuthPath, AuthOffset, buf1, SPX_N, SPX_N);
+			MemoryTools::Copy(AuthPath, AuthOffset, buf1, SPX_N, SPX_N);
 		}
 
 		AuthOffset += SPX_N;
@@ -221,7 +221,7 @@ void SPXF256::GenChain(std::vector<byte> &Output, size_t OutOffset, const std::v
 	uint idx;
 
 	// initialize out with the value at position 'start'
-	MemUtils::Copy(Input, InOffset, Output, OutOffset, SPX_N);
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, SPX_N);
 
 	// iterate 'steps' calls to the hash function
 	for (idx = Start; idx < (Start + Steps) && idx < SPX_WOTS_W; ++idx)
@@ -233,11 +233,11 @@ void SPXF256::GenChain(std::vector<byte> &Output, size_t OutOffset, const std::v
 
 void SPXF256::GenMessageRandom(const std::array<byte, SPX_N> &SkPrf, const std::vector<byte> &OptRnd, std::vector<byte> &Message, size_t MsgOffset, size_t MsgLength, size_t Rate)
 {
-	MemUtils::Copy(SkPrf, 0, Message, MsgOffset - (2 * SPX_N), SPX_N);
-	MemUtils::Copy(OptRnd, 0, Message, MsgOffset - SPX_N, SPX_N);
+	MemoryTools::Copy(SkPrf, 0, Message, MsgOffset - (2 * SPX_N), SPX_N);
+	MemoryTools::Copy(OptRnd, 0, Message, MsgOffset - SPX_N, SPX_N);
 
 	std::vector<byte> k(MsgLength + (2 * SPX_N));
-	MemUtils::Copy(Message, MsgOffset - (2 * SPX_N), k, 0, k.size());
+	MemoryTools::Copy(Message, MsgOffset - (2 * SPX_N), k, 0, k.size());
 
 	XOF(k, 0, k.size(), Message, 0, SPX_N, Rate);
 }
@@ -251,15 +251,15 @@ void SPXF256::HashMessage(std::array<byte, SPX_FORS_MSG_BYTES> &Digest, ulong &T
 	const int32_t SPX_DGST_BYTES = (SPX_FORS_MSG_BYTES + SPX_TREE_BYTES + SPX_LEAF_BYTES);
 	std::vector<byte> buf(SPX_DGST_BYTES);
 
-	MemUtils::Copy(Rand, 0, Message, MsgOffset - SPX_N - SPX_PK_BYTES, SPX_N);
-	MemUtils::Copy(PublicKey, 0, Message, MsgOffset - SPX_PK_BYTES, SPX_PK_BYTES);
+	MemoryTools::Copy(Rand, 0, Message, MsgOffset - SPX_N - SPX_PK_BYTES, SPX_N);
+	MemoryTools::Copy(PublicKey, 0, Message, MsgOffset - SPX_PK_BYTES, SPX_PK_BYTES);
 
 	std::vector<byte> k(MsgLength + SPX_N + SPX_PK_BYTES);
-	MemUtils::Copy(Message, MsgOffset - SPX_N - SPX_PK_BYTES, k, 0, k.size());
+	MemoryTools::Copy(Message, MsgOffset - SPX_N - SPX_PK_BYTES, k, 0, k.size());
 
 	XOF(k, 0, k.size(), buf, 0, SPX_DGST_BYTES, Rate);
 
-	MemUtils::Copy(buf, 0, Digest, 0, SPX_FORS_MSG_BYTES);
+	MemoryTools::Copy(buf, 0, Digest, 0, SPX_FORS_MSG_BYTES);
 	Tree = SphincsUtils::BytesToUll(buf, SPX_FORS_MSG_BYTES, SPX_TREE_BYTES);
 	Tree &= (~(ulong)0) >> (64 - SPX_TREE_BITS);
 	LeafIndex = SphincsUtils::BytesToUll(buf, SPX_FORS_MSG_BYTES + SPX_TREE_BYTES, SPX_LEAF_BYTES);
@@ -290,11 +290,11 @@ void SPXF256::PrfAddress(std::vector<byte> &Output, size_t Offset, const std::ve
 {
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES);
 
-	MemUtils::Copy(Key, 0, buf, 0, SPX_N);
+	MemoryTools::Copy(Key, 0, buf, 0, SPX_N);
 	AddressToBytes(buf, SPX_N, Address);
 
 	std::vector<byte> k(SPX_N + SPX_ADDR_BYTES);
-	MemUtils::Copy(buf, 0, k, 0, k.size());
+	MemoryTools::Copy(buf, 0, k, 0, k.size());
 
 	XOF(k, 0, k.size(), Output, Offset, SPX_N, Rate);
 }
@@ -303,13 +303,13 @@ void SPXF256::THash(std::vector<byte> &Output, size_t OutOffset, const std::vect
 {
 	size_t i;
 
-	MemUtils::Clear(Buffer, 0, Buffer.size());
-	MemUtils::Clear(Mask, 0, Mask.size());
-	MemUtils::Copy(PkSeed, 0, Buffer, 0, SPX_N);
+	MemoryTools::Clear(Buffer, 0, Buffer.size());
+	MemoryTools::Clear(Mask, 0, Mask.size());
+	MemoryTools::Copy(PkSeed, 0, Buffer, 0, SPX_N);
 	AddressToBytes(Buffer, SPX_N, Address);
 
 	std::vector<byte> k(SPX_N + SPX_ADDR_BYTES);
-	MemUtils::Copy(Buffer, 0, k, 0, k.size());
+	MemoryTools::Copy(Buffer, 0, k, 0, k.size());
 
 	XOF(k, 0, k.size(), Mask, 0, InputBlocks * SPX_N, Rate);
 
@@ -319,7 +319,7 @@ void SPXF256::THash(std::vector<byte> &Output, size_t OutOffset, const std::vect
 	}
 
 	k.resize(SPX_N + SPX_ADDR_BYTES + InputBlocks * SPX_N);
-	MemUtils::Copy(Buffer, 0, k, 0, k.size());
+	MemoryTools::Copy(Buffer, 0, k, 0, k.size());
 
 	XOF(k, 0, k.size(), Output, OutOffset, SPX_N, Rate);
 }
@@ -340,14 +340,14 @@ void SPXF256::TreeHashF(std::vector<byte> &Root, size_t RootOffset, std::vector<
 	{
 		// add the next leaf node to the stack
 		ForsGenLeaf(leaf, SkSeed, PkSeed, idx + IndexOffset, TreeAddress, Rate);
-		MemUtils::Copy(leaf, 0, Stack, offset * SPX_N, SPX_N);
+		MemoryTools::Copy(leaf, 0, Stack, offset * SPX_N, SPX_N);
 		offset++;
 		Heights[offset - 1] = 0;
 
 		// if this is a node we need for the auth path
 		if ((LeafIndex ^ 0x1) == idx)
 		{
-			MemUtils::Copy(Stack, ((offset - 1) * SPX_N), Authpath, AuthOffset, SPX_N);
+			MemoryTools::Copy(Stack, ((offset - 1) * SPX_N), Authpath, AuthOffset, SPX_N);
 		}
 
 		// while the top-most nodes are of equal height
@@ -367,12 +367,12 @@ void SPXF256::TreeHashF(std::vector<byte> &Root, size_t RootOffset, std::vector<
 			// if this is a node we need for the auth path
 			if (((LeafIndex >> Heights[offset - 1]) ^ 0x1) == treeidx)
 			{
-				MemUtils::Copy(Stack, (offset - 1) * SPX_N, Authpath, AuthOffset + (Heights[offset - 1] * SPX_N), SPX_N);
+				MemoryTools::Copy(Stack, (offset - 1) * SPX_N, Authpath, AuthOffset + (Heights[offset - 1] * SPX_N), SPX_N);
 			}
 		}
 	}
 
-	MemUtils::Copy(Stack, 0, Root, RootOffset, SPX_N);
+	MemoryTools::Copy(Stack, 0, Root, RootOffset, SPX_N);
 }
 
 void SPXF256::TreeHashW(std::vector<byte> &Root, std::vector<byte> &Authpath, size_t AuthOffset, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, uint LeafIndex,
@@ -396,7 +396,7 @@ void SPXF256::TreeHashW(std::vector<byte> &Root, std::vector<byte> &Authpath, si
 		// if this is a node we need for the auth path
 		if ((LeafIndex ^ 0x1) == idx)
 		{
-			MemUtils::Copy(Stack, ((offset - 1) * SPX_N), Authpath, AuthOffset, SPX_N);
+			MemoryTools::Copy(Stack, ((offset - 1) * SPX_N), Authpath, AuthOffset, SPX_N);
 		}
 
 		// while the top-most nodes are of equal height
@@ -416,12 +416,12 @@ void SPXF256::TreeHashW(std::vector<byte> &Root, std::vector<byte> &Authpath, si
 			// if this is a node we need for the auth path
 			if (((LeafIndex >> Heights[offset - 1]) ^ 0x1) == treeidx)
 			{
-				MemUtils::Copy(Stack, ((offset - 1) * SPX_N), Authpath, AuthOffset + Heights[offset - 1] * SPX_N, SPX_N);
+				MemoryTools::Copy(Stack, ((offset - 1) * SPX_N), Authpath, AuthOffset + Heights[offset - 1] * SPX_N, SPX_N);
 			}
 		}
 	}
 
-	MemUtils::Copy(Stack, 0, Root, 0, SPX_N);
+	MemoryTools::Copy(Stack, 0, Root, 0, SPX_N);
 }
 
 void SPXF256::WotsChecksum(std::vector<int> &CSumBaseW, size_t BaseOffset, const std::vector<int> &MsgBaseW)
@@ -550,11 +550,11 @@ void SPXF256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateK
 	TreeHashW(root, authpath, 0, skseed, pkseed, 0, 0, SPX_TREE_HEIGHT, toptreeaddr, stack, heights, rate);
 
 	// copy root and seeds to private key
-	MemUtils::Copy(root, 0, PrivateKey, 3 * SPX_N, SPX_N);
-	MemUtils::Copy(pkseed, 0, PrivateKey, 2 * SPX_N, SPX_N);
-	MemUtils::Copy(skseed, 0, PrivateKey, 0, SPX_N);
+	MemoryTools::Copy(root, 0, PrivateKey, 3 * SPX_N, SPX_N);
+	MemoryTools::Copy(pkseed, 0, PrivateKey, 2 * SPX_N, SPX_N);
+	MemoryTools::Copy(skseed, 0, PrivateKey, 0, SPX_N);
 	// copy root and pkseed to public key
-	MemUtils::Copy(PrivateKey, 2 * SPX_N, PublicKey, 0, 2 * SPX_N);
+	MemoryTools::Copy(PrivateKey, 2 * SPX_N, PublicKey, 0, 2 * SPX_N);
 }
 
 size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, SphincsParameters Parameters)
@@ -578,9 +578,9 @@ size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 	size_t rate;
 
 	rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
-	MemUtils::Copy(PrivateKey, 0, skseed, 0, SPX_N);
-	MemUtils::Copy(PrivateKey, SPX_N, skprf, 0, SPX_N);
-	MemUtils::Copy(PrivateKey, 2 * SPX_N, pk, 0, 2 * SPX_N);
+	MemoryTools::Copy(PrivateKey, 0, skseed, 0, SPX_N);
+	MemoryTools::Copy(PrivateKey, SPX_N, skprf, 0, SPX_N);
+	MemoryTools::Copy(PrivateKey, 2 * SPX_N, pk, 0, 2 * SPX_N);
 	SphincsUtils::SetType(wotsaddr, SPX_ADDR_TYPE_WOTS);
 	SphincsUtils::SetType(treeaddr, SPX_ADDR_TYPE_HASHTREE);
 	Signature.resize(Message.size() + SPHINCS_SIGNATURE_SIZE);
@@ -657,8 +657,8 @@ uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signat
 
 	rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
 	idxsig = 0;
-	MemUtils::Copy(PublicKey, SPX_N, pkroot, 0, SPX_N);
-	MemUtils::Copy(PublicKey, 0, pkseed, 0, SPX_N);
+	MemoryTools::Copy(PublicKey, SPX_N, pkroot, 0, SPX_N);
+	MemoryTools::Copy(PublicKey, 0, pkseed, 0, SPX_N);
 	SphincsUtils::SetType(wotsaddr, SPX_ADDR_TYPE_WOTS);
 	SphincsUtils::SetType(treeaddr, SPX_ADDR_TYPE_HASHTREE);
 	SphincsUtils::SetType(wotspkaddr, SPX_ADDR_TYPE_WOTSPK);
@@ -673,9 +673,9 @@ uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signat
 
 	// put the message all the way at the end of the m buffer, so that we can
 	// prepend the required other inputs for the hash function
-	MemUtils::Copy(Signature, SPX_BYTES, tmsg, SPX_BYTES, msglen);
+	MemoryTools::Copy(Signature, SPX_BYTES, tmsg, SPX_BYTES, msglen);
 	// create a copy of the signature so that m = sm is not an issue
-	MemUtils::Copy(Signature, 0, sig, 0, SPX_BYTES);
+	MemoryTools::Copy(Signature, 0, sig, 0, SPX_BYTES);
 	// derive the message digest and leaf index from R || PK || M
 	// the additional SPX_N is a result of the hash domain separator
 	HashMessage(mhash, tree, idxleaf, sig, PublicKey, tmsg, SPX_BYTES, msglen, rate);
@@ -709,17 +709,17 @@ uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signat
 	}
 
 	// check if the root node equals the root node in the public key
-	if (!IntUtils::Compare(root, 0, pkroot, 0, SPX_N))
+	if (!IntegerTools::Compare(root, 0, pkroot, 0, SPX_N))
 	{
 		// if not, zero the message
-		MemUtils::Clear(tmsg, 0, tmsg.size());
+		MemoryTools::Clear(tmsg, 0, tmsg.size());
 
 		return 0;
 	}
 
 	// if verification was successful, resize and move the message
 	Message.resize(msglen);
-	MemUtils::Copy(tmsg, SPX_BYTES, Message, 0, msglen);
+	MemoryTools::Copy(tmsg, SPX_BYTES, Message, 0, msglen);
 
 	return 1;
 }

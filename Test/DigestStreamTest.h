@@ -13,9 +13,9 @@ namespace Test
 	{
 	private:
 
-		const std::string DESCRIPTION = "DigestStream output test; compares output from SHA 256/512 digests and DigestStream.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All DigestStream tests have executed succesfully.";
+		static const std::string CLASSNAME;
+		static const std::string DESCRIPTION;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -41,6 +41,11 @@ namespace Test
 		const std::string Description() override;
 
 		/// <summary>
+		/// Evaluate the digest steam for correct operation
+		/// </summary>
+		void Evaluate(Enumeration::Digests Engine);
+
+		/// <summary>
 		/// Progress return event callback
 		/// </summary>
 		TestEventHandler &Progress() override;
@@ -52,8 +57,7 @@ namespace Test
 
 	private:
 
-		void CompareOutput(Enumeration::Digests Engine);
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

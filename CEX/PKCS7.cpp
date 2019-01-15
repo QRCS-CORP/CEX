@@ -1,6 +1,9 @@
 #include "PKCS7.h"
+#include "IntegerTools.h"
 
 NAMESPACE_PADDING
+
+using Utility::IntegerTools;
 
 const std::string PKCS7::CLASS_NAME("PKCS7");
 
@@ -22,80 +25,77 @@ const std::string PKCS7::Name()
 	return CLASS_NAME; 
 }
 
-size_t PKCS7::AddPadding(std::vector<byte> &Input, size_t Offset)
+void PKCS7::AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	byte code;
-
-	if (Offset != Input.size())
+	if (Length > Input.size())
 	{
-		code = static_cast<byte>(Input.size() - Offset);
-
-		while (Offset < Input.size())
-		{
-			Input[Offset] = code;
-			++Offset;
-		}
+		throw CryptoPaddingException(Name(), std::string("AddPadding"), std::string("The length is longer than the array!"), ErrorCodes::InvalidSize);
 	}
 
-	return static_cast<size_t>(code);
-}
-
-size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input)
-{
-	// note: even with the check, if the last decrypted byte is equal to 1,
-	// pkcs will see this last data byte as indicating a single byte of padding and return 1.. (unavoidable)
-	// If an input does not need padding, mark the corresponding padding flag (in ex. CipherDescription) to None
-	size_t len;
+	size_t i;
 	byte code;
 
-	len = Input.size() - 1;
-	code = Input[len];
+	code = static_cast<byte>(Length - Offset);
 
-	if (static_cast<int>(code) > len)
+	for (i = Offset; i < Length; ++i)
 	{
-		return (code > len + 1) ? 0 : len + 1;
-	}
-	else
-	{
-		// double check
-		for (size_t i = Input.size() - 1; i >= Input.size() - code; --i)
-		{
-			if (Input[i] != code)
-			{
-				code = 0;
-				break;
-			}
-		}
-
-		return code;
+		Input[i] = code;
 	}
 }
 
-size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
+size_t PKCS7::GetBlockLength(const std::vector<byte> &Input)
 {
-	size_t len;
-	byte code;
+	const size_t BLKLEN = Input.size();
+	const byte FNLPAD = Input[BLKLEN - 1];
+	size_t ctr;
+	size_t inp;
+	size_t pos;
 
-	len = Input.size() - (Offset + 1);
-	code = Input[Input.size() - 1];
+	ctr = BLKLEN - 2;
+	inp = 0;
+	pos = BLKLEN - FNLPAD;
 
-	if (static_cast<int>(code) > len)
+	inp |= IntegerTools::ExpandMask<size_t>(FNLPAD > BLKLEN);
+
+	while (ctr != 0)
 	{
-		return (code > len + 1) ? 0 : len + 1;
+		inp |= (~IntegerTools::IsEqual(Input[ctr], FNLPAD)) & IntegerTools::ExpandMask<byte>(ctr >= pos);
+		--ctr;
 	}
-	else
-	{
-		for (size_t i = Input.size() - 1; i >= Input.size() - code; --i)
-		{
-			if (Input[i] != code)
-			{
-				code = 0;
-				break;
-			}
-		}
 
-		return code;
+	IntegerTools::ConditionalCopy(inp, &pos, &BLKLEN, &pos, 1);
+
+	return pos;
+}
+
+size_t PKCS7::GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t Length)
+{
+	if (Length > Input.size())
+	{
+		throw CryptoPaddingException(CLASS_NAME, std::string("GetBlockLength"), std::string("The length is longer than the array!"), ErrorCodes::InvalidSize);
 	}
+
+	const size_t BLKLEN = Length;
+	const byte FNLPAD = Input[BLKLEN - 1];
+	size_t ctr;
+	size_t inp;
+	size_t pos;
+
+	ctr = BLKLEN - 2;
+	inp = 0;
+	pos = BLKLEN - FNLPAD;
+
+	inp |= IntegerTools::ExpandMask<size_t>(FNLPAD > BLKLEN);
+
+	while (ctr != Offset)
+	{
+		inp |= (~IntegerTools::IsEqual(Input[ctr], FNLPAD)) & IntegerTools::ExpandMask<byte>(ctr >= pos);
+		--ctr;
+	}
+
+	IntegerTools::ConditionalCopy(inp, &pos, &BLKLEN, &pos, 1);
+
+	return pos;
 }
 
 NAMESPACE_PADDINGEND

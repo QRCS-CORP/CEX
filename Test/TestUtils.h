@@ -9,11 +9,29 @@
 
 namespace Test
 {
-	using CEX::Key::Symmetric::SymmetricKey;
+	using CEX::Cipher::SymmetricKey;
 
-	class TestUtils
+	class TestUtils final
 	{
+	private:
+
+		// maximum meaningful z value
+		const static double Z_MAX;
+		// log (sqrt (pi))
+		const static double LOG_SQRT_PI;
+		// 1 / sqrt (pi)
+		const static double I_SQRT_PI;
+		// max value to represent exp (x)
+		const static double BIGX;
+
 	public:
+
+		/// <summary>
+		/// Outputs a string to console
+		/// </summary>
+		/// 
+		/// <param name="Data">The string to print</param>
+		static void Print(const std::string &Data);
 
 		/// <summary>
 		/// Outputs a formatted hex integer array to console
@@ -42,10 +60,7 @@ namespace Test
 		/// <param name="Data">The array to convert</param>
 		/// <param name="Size">The number of integers to convert</param>
 		/// <param name="Suffix">The integer type suffix</param>
-		static void PrintHex(byte* Data, size_t Size)
-		{
-			std::cout << ToHex(Data, Size);
-		}
+		static void PrintHex(byte* Data, size_t Size);
 
 		/// <summary>
 		/// Outputs a delineated, formatted hex byte array to console
@@ -121,7 +136,7 @@ namespace Test
 		/// <param name="Size">The number of integers to convert</param>
 		/// <param name="Suffix">The integer type suffix</param>
 		template<typename Array>
-		static std::string ToHex(const Array &Data, size_t Size, std::string &Suffix)
+		static std::string ToHex(const Array &Data, size_t Size, const std::string &Suffix)
 		{
 			std::string ret = "";
 			std::ostringstream oss;
@@ -143,7 +158,7 @@ namespace Test
 		/// <param name="Size">The number of integers to convert</param>
 		/// <param name="Suffix">The integer type suffix</param>
 		template<typename Array>
-		static std::string ToHex(const Array &Data, size_t Size, std::string &Prefix, std::string &Suffix)
+		static std::string ToHex(const Array &Data, size_t Size, std::string &Prefix, const std::string &Suffix)
 		{
 			std::string ret = "";
 			std::ostringstream oss;
@@ -186,16 +201,8 @@ namespace Test
 		static void Reverse(std::vector<byte> &Data);
 		static bool SuccesiveZeros(const std::vector<byte> &Input, size_t Threshold = 4);
 
-	private:
+private:
 
-		// maximum meaningful z value
-		const static double Z_MAX;
-		// log (sqrt (pi))
-		const static double LOG_SQRT_PI;
-		// 1 / sqrt (pi)
-		const static double I_SQRT_PI;
-         // max value to represent exp (x)
-		const static double BIGX;
 		static double PoChiSq(const double Ax, const int Df);
 		static double Poz(const double Z);
 	};

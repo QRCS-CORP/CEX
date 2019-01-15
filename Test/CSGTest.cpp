@@ -1,7 +1,8 @@
 #include "CSGTest.h"
+#include "RandomUtils.h"
 #include "../CEX/CSG.h"
 #include "../CEX/CSP.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/Providers.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SHAKE.h"
@@ -11,13 +12,13 @@
 namespace Test
 {
 	using namespace Drbg;
-	using Utility::IntUtils;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 	using Kdf::SHAKE;
 	using Enumeration::ShakeModes;
 
+	const std::string CSGTest::CLASSNAME = "CSGTest";
 	const std::string CSGTest::DESCRIPTION = "CSG implementations vector comparison tests.";
-	const std::string CSGTest::FAILURE = "FAILURE! ";
 	const std::string CSGTest::SUCCESS = "SUCCESS! All CSG tests have executed succesfully.";
 
 	CSGTest::CSGTest()
@@ -32,9 +33,9 @@ namespace Test
 
 	CSGTest::~CSGTest()
 	{
-		IntUtils::ClearVector(m_custom);
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
+		IntegerTools::Clear(m_custom);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
 	}
 
 	const std::string CSGTest::Description()
@@ -81,6 +82,7 @@ namespace Test
 			Evaluate(gen256);
 			Evaluate(gen512);
 			Evaluate(gen1024);
+
 			delete gen128;
 			delete gen256;
 			delete gen512;
@@ -95,79 +97,33 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void CSGTest::Evaluate(IDrbg* Rng)
 	{
-		std::vector<byte> otp(SAMPLE_SIZE);
-		Key::Symmetric::SymmetricKeySize ks = Rng->LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
-		SecureRandom rnd;
-		double x;
-		std::string status;
+		size_t i;
 
-		IntUtils::Fill(key, 0, key.size(), rnd);
-		IntUtils::Fill(iv, 0, iv.size(), rnd);
-		SymmetricKey kp(key, iv);
-
-		Rng->Initialize(kp);
-		Rng->Generate(otp);
-
-		// mean value test
-		x = TestUtils::MeanValue(otp);
-
-		status = (Rng->Name() + std::string(": Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
-
-		if (x < 122.5 || x > 132.5)
+		try
 		{
-			status += std::string("(FAIL)");
+			const size_t SEGCNT = SAMPLE_SIZE / Rng->MaxRequestSize();
+			std::vector<byte> smp(SEGCNT * Rng->MaxRequestSize());
+
+			for (i = 0; i < SEGCNT; ++i)
+			{
+				Rng->Generate(smp, i * Rng->MaxRequestSize(), Rng->MaxRequestSize());
+			}
+
+			RandomUtils::Evaluate(Rng->Name(), smp);
 		}
-		else if (x < 125.0 || x > 130.0)
+		catch (TestException const &ex)
 		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-
-		OnProgress(std::string(status));
-
-		// ChiSquare
-		x = TestUtils::ChiSquare(otp) * 100;
-		status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
-
-		if (x < 1.0 || x > 99.0)
-		{
-			status += std::string("(FAIL)");
-		}
-		else if (x < 5.0 || x > 95.0)
-		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-		OnProgress(std::string(status));
-
-		// ordered runs
-		if (TestUtils::OrderedRuns(otp))
-		{
-			throw TestException(std::string("CSG"), std::string("Exception: Ordered runs test failure! -CE1"));
-		}
-
-		// succesive zeroes
-		if (TestUtils::SuccesiveZeros(otp))
-		{
-			throw TestException(std::string("CSG"), std::string("Exception: Succesive zeroes test failure! -CE2"));
+			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-BE1"));
 		}
 	}
 
@@ -177,9 +133,9 @@ namespace Test
 		try
 		{
 			// invalid shake choice
-			CSG drbg(ShakeModes::None, Providers::None);
+			CSG gen(ShakeModes::None, Providers::None);
 
-			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE3"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -193,9 +149,9 @@ namespace Test
 		try
 		{
 			// invalid null provider instance
-			CSG drbg(ShakeModes::SHAKE128, nullptr);
+			CSG gen(ShakeModes::SHAKE128, nullptr);
 
-			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE4"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -208,12 +164,12 @@ namespace Test
 		// test initialization
 		try
 		{
-			CSG drbg(ShakeModes::SHAKE128, Providers::CSP);
+			CSG gen(ShakeModes::SHAKE128, Providers::CSP);
 			// invalid key size
 			std::vector<byte> k(1);
-			drbg.Initialize(k);
+			gen.Initialize(k);
 
-			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE5"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE5"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -226,12 +182,12 @@ namespace Test
 		// test invalid generator state -1
 		try
 		{
-			CSG drbg(ShakeModes::SHAKE128, Providers::CSP);
+			CSG gen(ShakeModes::SHAKE128, Providers::CSP);
 			std::vector<byte> m(16);
 			// cipher was not initialized
-			drbg.Generate(m);
+			gen.Generate(m);
 
-			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE6"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE6"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -244,15 +200,15 @@ namespace Test
 		// test invalid generator state -2
 		try
 		{
-			CSG drbg(ShakeModes::SHAKE128, Providers::CSP);
-			SymmetricKeySize ks = drbg.LegalKeySizes()[0];
+			CSG gen(ShakeModes::SHAKE128, Providers::CSP);
+			SymmetricKeySize ks = gen.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize());
-			drbg.Initialize(k);
+			gen.Initialize(k);
 			std::vector<byte> m(16);
 			// array is too small
-			drbg.Generate(m, 0, m.size() + 1);
+			gen.Generate(m, 0, m.size() + 1);
 
-			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE7"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE7"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -275,7 +231,7 @@ namespace Test
 
 		if (exp != Expected)
 		{
-			throw TestException(std::string("Kat: Output does not match the known answer! -CK1"));
+			throw TestException(std::string("Kat"), Rng->Name(), std::string("Output does not match the known answer! -CK1"));
 		}
 	}
 
@@ -316,7 +272,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void CSGTest::OnProgress(std::string Data)
+	void CSGTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -324,8 +280,8 @@ namespace Test
 	void CSGTest::Stress()
 	{
 		SHAKE kdf(ShakeModes::SHAKE256);
-		CSG drbg(ShakeModes::SHAKE256, Providers::None);
-		Key::Symmetric::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
+		CSG gen(ShakeModes::SHAKE256, Providers::None);
+		Cipher::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
 		std::vector<byte> name(0);
 		std::vector<byte> otp1;
 		std::vector<byte> otp2;
@@ -341,18 +297,18 @@ namespace Test
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			otp1.resize(INPLEN);
 			otp2.resize(INPLEN);
-			IntUtils::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
 
 			// generate with the kdf
 			kdf.Initialize(key, m_custom, name);
 			kdf.Generate(otp1, 0, INPLEN);
-			// generate with the drbg
-			drbg.Initialize(key, m_custom, name);
-			drbg.Generate(otp2, 0, INPLEN);
+			// generate with the gen
+			gen.Initialize(key, m_custom, name);
+			gen.Generate(otp2, 0, INPLEN);
 
 			if (otp1 != otp2)
 			{
-				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
+				throw TestException(std::string("Stress"), gen.Name(), std::string("Transformation output is not equal! -TS1"));
 			}
 		}
 	}

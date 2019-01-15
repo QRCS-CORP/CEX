@@ -1,9 +1,11 @@
 #include "RDP.h"
 #include "CpuDetect.h"
 #include "Intrinsics.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_PROVIDER
+
+using Utility::MemoryTools;
 
 const std::string RDP::CLASS_NAME("RDP");
 
@@ -11,12 +13,28 @@ const std::string RDP::CLASS_NAME("RDP");
 
 RDP::RDP(RdEngines RdEngineType)
 	:
-	m_engineType(RdEngineType)
+	m_engineType(RdEngineType != RdEngines::None ? RdEngineType :
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Random provider is not available!"), ErrorCodes::IllegalOperation))
 {
 #if !defined(__AVX__) && !defined(__AVX2__) && !defined(__AVX512__)
-	throw CryptoRandomException("RDP:CTor", "RDRAND is not supported on this system!");
+	throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("DRAND is not supported on this system!"), ErrorCodes::IllegalOperation);
 #endif
-	Reset();
+
+	CpuDetect detect;
+
+	if (detect.RDSEED())
+	{
+		m_engineType = RdEngines::RdSeed;
+	}
+	else if (detect.RDRAND())
+	{
+		m_engineType = RdEngines::RdRand;
+	}
+	else
+	{
+		m_engineType = RdEngines::None;
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("DRAND is not supported on this system!"), ErrorCodes::NotFound);
+	}
 }
 
 RDP::~RDP()
@@ -47,18 +65,14 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException("RDP:Generate", "The output buffer is too small!");
-	}
-	if (m_engineType == RdEngines::None)
-	{
-		throw CryptoRandomException("RDP:Generate", "Random provider is not available!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (m_engineType == RdEngines::RdSeed && Output.size() > SEED_MAX)
 	{
-		throw CryptoRandomException("RDP:Generate", "The seed providers maximum output is 64MB per request!");
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
 	}
 
-#if defined (__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
 	int res = 0;
 	size_t failCtr = 0;
@@ -89,8 +103,8 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 		if (res == RDR_SUCCESS)
 		{
-			const size_t RMDLEN = Utility::IntUtils::Min(sizeof(rnd), Length);
-			Utility::MemUtils::CopyFromValue(rnd, Output, Offset, RMDLEN);
+			const size_t RMDLEN = Utility::IntegerTools::Min(sizeof(rnd), Length);
+			MemoryTools::CopyFromValue(rnd, Output, Offset, RMDLEN);
 			Offset += RMDLEN;
 			Length -= RMDLEN;
 			failCtr = 0;
@@ -101,7 +115,7 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 			if ((m_engineType == RdEngines::RdRand && failCtr >= RDR_RETRY) || failCtr >= RDS_RETRY)
 			{
-				throw CryptoRandomException("RDP:Generate", "Exceeded the maximum number of retries!");
+				throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::MaxExceeded);
 			}
 		}
 	}
@@ -112,7 +126,7 @@ void RDP::Generate(std::vector<byte> &Output)
 {
 	std::vector<byte> rnd(Output.size());
 	Generate(rnd, 0, rnd.size());
-	Utility::MemUtils::Copy(rnd, 0, Output, 0, rnd.size());
+	MemoryTools::Copy(rnd, 0, Output, 0, rnd.size());
 }
 
 std::vector<byte> RDP::Generate(size_t Length)
@@ -126,7 +140,7 @@ std::vector<byte> RDP::Generate(size_t Length)
 ushort RDP::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -134,7 +148,7 @@ ushort RDP::NextUInt16()
 uint RDP::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -142,27 +156,13 @@ uint RDP::NextUInt32()
 ulong RDP::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }
 
 void RDP::Reset()
 {
-	Common::CpuDetect detect;
-
-	if (detect.RDSEED())
-	{
-		m_engineType = RdEngines::RdSeed;
-	}
-	else if (detect.RDRAND())
-	{
-		m_engineType = RdEngines::RdRand;
-	}
-	else
-	{
-		m_engineType = RdEngines::None;
-	}
 }
 
 NAMESPACE_PROVIDEREND

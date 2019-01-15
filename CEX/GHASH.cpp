@@ -1,6 +1,6 @@
 #include "GHASH.h"
 #include "CpuDetect.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #if defined(__AVX2__)
 #	include "Intrinsics.h"
 #	include <wmmintrin.h>
@@ -42,16 +42,16 @@ void GHASH::FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextS
 	{
 		if (m_msgOffset != BLOCK_SIZE)
 		{
-			Utility::MemUtils::Clear(m_msgBuffer, m_msgOffset, m_msgBuffer.size() - m_msgOffset);
+			Utility::MemoryTools::Clear(m_msgBuffer, m_msgOffset, m_msgBuffer.size() - m_msgOffset);
 		}
 
 		ProcessSegment(m_msgBuffer, 0, Output, m_msgOffset);
 	}
 
 	std::vector<byte> fnlBlock(BLOCK_SIZE);
-	Utility::IntUtils::Be64ToBytes(8 * AdSize, fnlBlock, 0);
-	Utility::IntUtils::Be64ToBytes(8 * TextSize, fnlBlock, 8);
-	Utility::MemUtils::XOR128(fnlBlock, 0, Output, 0);
+	Utility::IntegerTools::Be64ToBytes(8 * AdSize, fnlBlock, 0);
+	Utility::IntegerTools::Be64ToBytes(8 * TextSize, fnlBlock, 8);
+	Utility::MemoryTools::XOR128(fnlBlock, 0, Output, 0);
 
 	GcmMultiply(Output);
 }
@@ -64,7 +64,7 @@ void GHASH::Initialize(const std::vector<ulong> &Key)
 
 void GHASH::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output)
 {
-	Utility::MemUtils::XOR128(Input, InOffset, Output, 0);
+	Utility::MemoryTools::XOR128(Input, InOffset, Output, 0);
 	GcmMultiply(Output);
 }
 
@@ -72,8 +72,8 @@ void GHASH::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std:
 {
 	while (Length != 0)
 	{
-		const size_t DIFFLEN = Utility::IntUtils::Min(Length, BLOCK_SIZE);
-		Utility::MemUtils::XOR(Input, InOffset, Output, 0, DIFFLEN);
+		const size_t DIFFLEN = Utility::IntegerTools::Min(Length, BLOCK_SIZE);
+		Utility::MemoryTools::XOR(Input, InOffset, Output, 0, DIFFLEN);
 		GcmMultiply(Output);
 		InOffset += DIFFLEN;
 		Length -= DIFFLEN;
@@ -86,7 +86,7 @@ void GHASH::Reset(bool Erase)
 	{
 		if (m_ghashKey.size() != 0)
 		{
-			Utility::MemUtils::Clear(m_ghashKey, 0, m_ghashKey.size() * sizeof(ulong));
+			Utility::MemoryTools::Clear(m_ghashKey, 0, m_ghashKey.size() * sizeof(ulong));
 		}
 
 		m_hasCMul = false;
@@ -94,7 +94,7 @@ void GHASH::Reset(bool Erase)
 
 	if (m_msgBuffer.size() != 0)
 	{
-		Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+		Utility::MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	}
 
 	m_msgOffset = 0;
@@ -113,7 +113,7 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 		const size_t RMDLEN = BLOCK_SIZE - m_msgOffset;
 		if (Length > RMDLEN)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMDLEN);
+			Utility::MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMDLEN);
 			ProcessBlock(m_msgBuffer, 0, Output);
 			m_msgOffset = 0;
 			Length -= RMDLEN;
@@ -129,7 +129,7 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 
 		if (Length > 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, Length);
+			Utility::MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, Length);
 			m_msgOffset += Length;
 		}
 	}
@@ -137,7 +137,7 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 
 void GHASH::Detect()
 {
-	Common::CpuDetect detect;
+	CpuDetect detect;
 	m_hasCMul = detect.CMUL() && detect.SSSE3();
 }
 
@@ -155,8 +155,8 @@ void GHASH::GcmMultiply(std::vector<byte> &X)
 
 void GHASH::Multiply(const std::vector<ulong> &H, std::vector<byte> &X)
 {
-	const ulong X0 = Utility::IntUtils::BeBytesTo64(X, 0);
-	const ulong X1 = Utility::IntUtils::BeBytesTo64(X, 8);
+	const ulong X0 = Utility::IntegerTools::BeBytesTo64(X, 0);
+	const ulong X1 = Utility::IntegerTools::BeBytesTo64(X, 8);
 	const ulong R = 0xE100000000000000ULL;
 	ulong T0 = H[0];
 	ulong T1 = H[1];
@@ -168,11 +168,11 @@ void GHASH::Multiply(const std::vector<ulong> &H, std::vector<byte> &X)
 
 	for (size_t i = 0; i != 64; ++i)
 	{
-		xMask = Utility::IntUtils::ExpandMask<ulong>(X0 & maskPos);
+		xMask = Utility::IntegerTools::ExpandMask<ulong>(X0 & maskPos);
 		maskPos >>= 1;
 		Z0 ^= T0 & xMask;
 		Z1 ^= T1 & xMask;
-		xCarry = R & Utility::IntUtils::ExpandMask<ulong>(T1 & 1);
+		xCarry = R & Utility::IntegerTools::ExpandMask<ulong>(T1 & 1);
 		T1 = (T1 >> 1) | (T0 << 63);
 		T0 = (T0 >> 1) ^ xCarry;
 	}
@@ -181,20 +181,20 @@ void GHASH::Multiply(const std::vector<ulong> &H, std::vector<byte> &X)
 
 	for (size_t i = 0; i != 63; ++i)
 	{
-		xMask = Utility::IntUtils::ExpandMask<ulong>(X1 & maskPos);
+		xMask = Utility::IntegerTools::ExpandMask<ulong>(X1 & maskPos);
 		maskPos >>= 1;
 		Z0 ^= T0 & xMask;
 		Z1 ^= T1 & xMask;
-		xCarry = R & Utility::IntUtils::ExpandMask<ulong>(T1 & 1);
+		xCarry = R & Utility::IntegerTools::ExpandMask<ulong>(T1 & 1);
 		T1 = (T1 >> 1) | (T0 << 63);
 		T0 = (T0 >> 1) ^ xCarry;
 	}
 
-	xMask = Utility::IntUtils::ExpandMask<ulong>(X1 & maskPos);
+	xMask = Utility::IntegerTools::ExpandMask<ulong>(X1 & maskPos);
 	Z0 ^= T0 & xMask;
 	Z1 ^= T1 & xMask;
-	Utility::IntUtils::Be64ToBytes(Z0, X, 0);
-	Utility::IntUtils::Be64ToBytes(Z1, X, 8);
+	Utility::IntegerTools::Be64ToBytes(Z0, X, 0);
+	Utility::IntegerTools::Be64ToBytes(Z1, X, 8);
 }
 
 void GHASH::MultiplyW(const std::vector<ulong> &H, std::vector<byte> &X)

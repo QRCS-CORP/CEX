@@ -1,14 +1,14 @@
 #include "MemUtilsTest.h"
-#include "../CEX/MemUtils.h"
+#include "../CEX/MemoryTools.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using Utility::MemUtils;
+	using Utility::MemoryTools;
 
-	const std::string MemUtilsTest::DESCRIPTION = "MemUtils test; tests output and speed of parallelized memory functions.";
-	const std::string MemUtilsTest::FAILURE = "FAILURE! ";
-	const std::string MemUtilsTest::SUCCESS = "SUCCESS! All MemUtils tests have executed succesfully.";
+	const std::string MemUtilsTest::CLASSNAME = "MemUtilsTest";
+	const std::string MemUtilsTest::DESCRIPTION = "MemoryTools test; tests output and speed of parallelized memory functions.";
+	const std::string MemUtilsTest::SUCCESS = "SUCCESS! All MemoryTools tests have executed succesfully.";
 
 	MemUtilsTest::MemUtilsTest()
 		:
@@ -34,22 +34,22 @@ namespace Test
 	{
 		try
 		{
-			UtilsCompare();
+			Evaluate();
 			OnProgress(std::string("MemUtilsTest: Passed output comparison tests.."));
 
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
-	void MemUtilsTest::UtilsCompare()
+	void MemUtilsTest::Evaluate()
 	{
 		Prng::SecureRandom rng;
 		//~~~COPY~~~//
@@ -59,11 +59,11 @@ namespace Test
 			uint inpSze = rng.NextUInt32(10000, 100);
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::Copy(input, 0, output, 0, inpSze);
+			MemoryTools::Copy(input, 0, output, 0, inpSze);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("Copy"), std::string("Byte comparison failed! -ME1"));
 			}
 		}
 
@@ -73,11 +73,11 @@ namespace Test
 			uint inpSze = 16;
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::COPY128(input, 0, output, 0);
+			MemoryTools::COPY128(input, 0, output, 0);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("COPY128"), std::string("Byte comparison failed! -ME2"));
 			}
 		}
 
@@ -87,11 +87,11 @@ namespace Test
 			uint inpSze = 32;
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::COPY256(input, 0, output, 0);
+			MemoryTools::COPY256(input, 0, output, 0);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("COPY256"), std::string("Byte comparison failed! -ME3"));
 			}
 		}
 
@@ -101,11 +101,11 @@ namespace Test
 			uint inpSze = 64;
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::COPY512(input, 0, output, 0);
+			MemoryTools::COPY512(input, 0, output, 0);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("COPY512"), std::string("Byte comparison failed! -ME4"));
 			}
 		}
 
@@ -114,13 +114,13 @@ namespace Test
 		{
 			ulong inpVal = rng.NextUInt64(1000000, 100);
 			std::vector<byte> output(8);
-			MemUtils::CopyFromValue(inpVal, output, 0, 8);
+			MemoryTools::CopyFromValue(inpVal, output, 0, 8);
 			ulong cmpVal = 0;
-			MemUtils::CopyToValue(output, 0, cmpVal, 8);
+			MemoryTools::CopyToValue(output, 0, cmpVal, 8);
 
 			if (cmpVal != inpVal)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("CopyToValue"), std::string("Byte comparison failed! -ME5"));
 			}
 		}
 
@@ -131,11 +131,11 @@ namespace Test
 			uint inpSze = rng.NextUInt32(10000, 100);
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::Clear(input, 0, inpSze);
+			MemoryTools::Clear(input, 0, inpSze);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("Clear"), std::string("Evaluate: Byte comparison failed! -ME6"));
 			}
 		}
 
@@ -146,11 +146,11 @@ namespace Test
 			uint inpSze = 16;
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::CLEAR128(input, 0);
+			MemoryTools::CLEAR128(input, 0);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("CLEAR128"), std::string("Byte comparison failed! -ME7"));
 			}
 		}
 
@@ -160,11 +160,11 @@ namespace Test
 			uint inpSze = 32;
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::CLEAR256(input, 0);
+			MemoryTools::CLEAR256(input, 0);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("CLEAR256"), std::string("Byte comparison failed! -ME8"));
 			}
 		}
 
@@ -174,11 +174,11 @@ namespace Test
 			uint inpSze = 64;
 			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
-			MemUtils::CLEAR512(input, 0);
+			MemoryTools::CLEAR512(input, 0);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("CLEAR512"), std::string("Byte comparison failed! -ME9"));
 			}
 		}
 
@@ -190,11 +190,11 @@ namespace Test
 			std::vector<byte> input(inpSze);
 			std::vector<byte> output(inpSze);
 			std::memset(&input[0], (byte)0xff, inpSze);
-			MemUtils::SetValue(output, 0, inpSze, (byte)0xff);
+			MemoryTools::SetValue(output, 0, inpSze, (byte)0xff);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("SetValue"), std::string("Byte comparison failed! -ME10"));
 			}
 		}
 
@@ -205,11 +205,11 @@ namespace Test
 			byte val = (byte)rng.NextInt16(255, 1);
 			std::vector<byte> input(inpSze, val);
 			std::vector<byte> output(input.size());
-			MemUtils::SETVAL128(output, 0, val);
+			MemoryTools::SETVAL128(output, 0, val);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("SETVAL128"), std::string("Byte comparison failed! -ME11"));
 			}
 		}
 
@@ -220,11 +220,11 @@ namespace Test
 			byte val = (byte)rng.NextInt16(255, 1);
 			std::vector<byte> input(inpSze, val);
 			std::vector<byte> output(input.size());
-			MemUtils::SETVAL256(output, 0, val);
+			MemoryTools::SETVAL256(output, 0, val);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("SETVAL256"), std::string("Byte comparison failed! -ME12"));
 			}
 		}
 
@@ -235,16 +235,16 @@ namespace Test
 			byte val = (byte)rng.NextInt16(255, 1);
 			std::vector<byte> input(inpSze, val);
 			std::vector<byte> output(input.size());
-			MemUtils::SETVAL512(output, 0, val);
+			MemoryTools::SETVAL512(output, 0, val);
 
 			if (input != output)
 			{
-				throw TestException(std::string("CompareOutput: byte comparison failed!"));
+				throw TestException(std::string("Evaluate"), std::string("SETVAL512"), std::string("Byte comparison failed! -ME13"));
 			}
 		}
 	}
 
-	void MemUtilsTest::OnProgress(std::string Data)
+	void MemUtilsTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

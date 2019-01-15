@@ -3,11 +3,13 @@
 
 #include "CexDomain.h"
 #include "CpuCores.h"
+#include "CryptoProcessingException.h"
 #include "SimdProfiles.h"
 
-NAMESPACE_COMMON
+NAMESPACE_ROOT
 
 using Enumeration::CpuCores;
+using Exception::CryptoProcessingException;
 using Enumeration::SimdProfiles;
 
 /// <summary>
@@ -28,6 +30,8 @@ using Enumeration::SimdProfiles;
 class ParallelOptions
 {
 private:
+
+	static const std::string CLASS_NAME;
 
 	struct AutoParallelParams
 	{
@@ -267,5 +271,5 @@ public:
 };
 
 
-NAMESPACE_COMMONEND
+NAMESPACE_ROOTEND
 #endif

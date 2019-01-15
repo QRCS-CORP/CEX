@@ -15,8 +15,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
@@ -48,11 +48,19 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		/// Test functions for correctness
+		/// </summary>
+		void Evaluate();
+
+		/// <summary>
+		/// Serialization tests
+		/// </summary>
+		void Serialization();
+
 	private:
 
-		void CheckAccess();
-		void CompareSerial();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

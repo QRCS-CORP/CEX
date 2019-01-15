@@ -35,18 +35,17 @@
 #include "IMac.h"
 #include "ShakeModes.h"
 #include "StreamAuthenticators.h"
-#include "SymmetricSecureKey.h"
+#include "SecureVector.h"
 
 NAMESPACE_STREAM
 
 using Enumeration::BlockCiphers;
 using Enumeration::BlockCipherExtensions;
-using Cipher::Symmetric::Block::Mode::CTR;
-using Cipher::Symmetric::Block::Mode::IBlockCipher;
+using Cipher::Block::Mode::CTR;
+using Cipher::Block::Mode::IBlockCipher;
 using Mac::IMac;
 using Enumeration::ShakeModes;
 using Enumeration::StreamAuthenticators;
-using Key::Symmetric::SymmetricSecureKey;
 
 /// <summary>
 /// An Encrypt and Authenticate AEAD stream cipher implementation (Authenticated Cipher Stream).
@@ -168,7 +167,7 @@ private:
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ulong m_macCounter;
-	std::unique_ptr<SymmetricSecureKey> m_macKey;
+	SecureVector<byte> m_macKey;
 	std::vector<byte> m_macTag;
 	ParallelOptions m_parallelProfile;
 
@@ -245,7 +244,7 @@ public:
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Read Only: The stream ciphers class name
+	/// Read Only: The stream ciphers implementation name
 	/// </summary>
 	const std::string Name() override;
 

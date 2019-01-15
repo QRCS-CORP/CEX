@@ -8,7 +8,7 @@ namespace Test
 	/// <summary>
 	/// A Hexadecimal conversion helper class
 	/// </summary>
-	class HexConverter
+	class HexConverter final
 	{
 	public:
 

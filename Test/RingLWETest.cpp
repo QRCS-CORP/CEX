@@ -1,31 +1,31 @@
 #include "RingLWETest.h"
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/ModuleLWE.h"
 #include "../CEX/RHX.h"
 #include "../CEX/RingLWE.h"
+#include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using namespace Key::Asymmetric;
-	using namespace Cipher::Asymmetric::RLWE;
+	using namespace Asymmetric;
+	using namespace Asymmetric::Encrypt::RLWE;
 	using Enumeration::RLWEParameters;
+	using Prng::SecureRandom;
 
+	const std::string RingLWETest::CLASSNAME = "RingLWETest";
 	const std::string RingLWETest::DESCRIPTION = "RingLWE key generation, encryption, and decryption tests..";
-	const std::string RingLWETest::FAILURE = "FAILURE! ";
 	const std::string RingLWETest::SUCCESS = "SUCCESS! RingLWE tests have executed succesfully.";
 
 	RingLWETest::RingLWETest()
 		:
-		m_progressEvent(),
-		m_rngPtr(new Prng::BCR)
+		m_progressEvent()
 	{
 	}
 
 	RingLWETest::~RingLWETest()
 	{
-		delete m_rngPtr;
 	}
 
 	const std::string RingLWETest::Description()
@@ -59,11 +59,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : Unknown Error"));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -72,22 +72,23 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
+		SecureRandom gen;
 
 		// test param 1: RLWES1Q12289N1024
-		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
+		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->Generate(cpt, 0, 4);
+		gen.Generate(cpt, 0, 4);
 
 		cpr1.Initialize(kp1->PrivateKey());
 
 		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RLWE"), std::string("Message authentication test failed! -RA1"));
+			throw TestException(std::string("Authentication"), cpr1.Name(), std::string("Message authentication test failed! -RA1"));
 		}
 
 		cpt.clear();
@@ -99,20 +100,20 @@ namespace Test
 		delete kp1;
 
 		// test param 2: RLWES2Q12289N2048
-		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048, m_rngPtr);
+		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->Generate(cpt, 0, 4);
+		gen.Generate(cpt, 0, 4);
 
 		cpr2.Initialize(kp2->PrivateKey());
 
 		if (cpr2.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RLWE"), std::string("Message authentication test failed! -RA2"));
+			throw TestException(std::string("Authentication"), cpr2.Name(), std::string("Message authentication test failed! -RA2"));
 		}
 
 		delete kp2;
@@ -123,22 +124,23 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
+		SecureRandom gen;
 
 		// test param 1: RLWES1Q12289N1024
-		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
+		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->Generate(cpt, 0, 4);
+		gen.Generate(cpt, 0, 4);
 
 		cpr1.Initialize(kp1->PrivateKey());
 
 		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RLWE"), std::string("Cipher-text integrity test failed! -RC1"));
+			throw TestException(std::string("CipherText"), cpr1.Name(), std::string("Cipher text integrity test failed! -RC1"));
 		}
 
 		cpt.clear();
@@ -150,20 +152,20 @@ namespace Test
 		delete kp1;
 
 		// test param 2: RLWES2Q12289N2048
-		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048, m_rngPtr);
+		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->Generate(cpt, 0, 4);
+		gen.Generate(cpt, 0, 4);
 
 		cpr2.Initialize(kp2->PrivateKey());
 
 		if (cpr2.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RLWE"), std::string("Cipher-text integrity test failed! -RC2"));
+			throw TestException(std::string("CipherText"), cpr2.Name(), std::string("Cipher text integrity test failed! -RC2"));
 		}
 
 		delete kp2;
@@ -174,9 +176,9 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			RingLWE cpr(RLWEParameters::None, m_rngPtr);
+			RingLWE cpr(RLWEParameters::None);
 
-			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE1"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE1"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -190,7 +192,7 @@ namespace Test
 		{
 			RingLWE cpr(RLWEParameters::RLWES1Q12289N1024, Enumeration::Prngs::None);
 
-			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE2"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE2"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -204,12 +206,12 @@ namespace Test
 		try
 		{
 			RingLWE cpra(RLWEParameters::RLWES1Q12289N1024, Enumeration::Prngs::BCR);
-			Cipher::Asymmetric::MLWE::ModuleLWE cprb;
+			Asymmetric::Encrypt::MLWE::ModuleLWE cpr;
 			// create an invalid key set
-			AsymmetricKeyPair* kp = cprb.Generate();
+			AsymmetricKeyPair* kp = cpr.Generate();
 			cpra.Initialize(kp->PrivateKey());
 
-			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE3"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE3"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -227,7 +229,7 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// test param 1: RLWES1Q12289N1024
-		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
+		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
@@ -242,7 +244,7 @@ namespace Test
 
 		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RLWE"), std::string("Public key integrity test failed! -RP1"));
+			throw TestException(std::string("PublicKey"), cpr1.Name(), std::string("Public key integrity test failed! -RP1"));
 		}
 
 		cpt.clear();
@@ -254,7 +256,7 @@ namespace Test
 		delete kp1;
 
 		// test param 2: RLWES2Q12289N2048
-		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048, m_rngPtr);
+		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
@@ -269,7 +271,7 @@ namespace Test
 
 		if (cpr2.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RLWE"), std::string("Public key integrity test failed! -RP2"));
+			throw TestException(std::string("PublicKey"), cpr2.Name(), std::string("Public key integrity test failed! -RP2"));
 		}
 
 		delete kp2;
@@ -280,7 +282,7 @@ namespace Test
 		std::vector<byte> skey(0);
 
 		// test param 1: RLWES1Q12289N1024
-		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
+		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -291,7 +293,7 @@ namespace Test
 
 			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 			{
-				throw TestException(std::string("RLWE"), std::string("Private key serialization test has failed! -RS1"));
+				throw TestException(std::string("Serialization"), cpr1.Name(), std::string("Private key serialization test has failed! -RS1"));
 			}
 
 			AsymmetricKey* pubK1 = kp->PublicKey();
@@ -300,14 +302,14 @@ namespace Test
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
-				throw TestException(std::string("RLWE"), std::string("Public key serialization test has failed! -RS2"));
+				throw TestException(std::string("Serialization"), std::string("RLWE"), std::string("Public key serialization test has failed! -RS2"));
 			}
 		}
 
 		skey.resize(0);
 
 		// test param 2: RLWES2Q12289N2048
-		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048, m_rngPtr);
+		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -318,7 +320,7 @@ namespace Test
 
 			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
 			{
-				throw TestException(std::string("RLWE"), std::string("Private key serialization test has failed! -RS1"));
+				throw TestException(std::string("Serialization"), cpr2.Name(), std::string("Private key serialization test has failed! -RS1"));
 			}
 
 			AsymmetricKey* pubK1 = kp->PublicKey();
@@ -327,7 +329,7 @@ namespace Test
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
-				throw TestException(std::string("RLWE"), std::string("Public key serialization test has failed! -RS2"));
+				throw TestException(std::string("Serialization"), cpr2.Name(), std::string("Public key serialization test has failed! -RS2"));
 			}
 		}
 	}
@@ -338,13 +340,14 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
+		SecureRandom gen;
 
 		// test param 1: RLWES1Q12289N1024
-		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
+		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
-			m_rngPtr->Generate(msg);
+			gen.Generate(msg);
 			AsymmetricKeyPair* kp = cpr1.Generate();
 
 			cpr1.Initialize(kp->PublicKey());
@@ -353,14 +356,14 @@ namespace Test
 
 			if (!cpr1.Decapsulate(cpt, sec2))
 			{
-				throw TestException(std::string("RLWE"), std::string("Stress test authentication has failed! -RR1"));
+				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test authentication has failed! -RR1"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException(std::string("RLWE"), std::string("Stress test has failed! -RR2"));
+				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test has failed! -RR2"));
 			}
 		}
 
@@ -372,11 +375,11 @@ namespace Test
 		sec2.resize(64);
 
 		// test param 2: RLWES2Q12289N2048
-		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048, m_rngPtr);
+		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
-			m_rngPtr->Generate(msg);
+			gen.Generate(msg);
 			AsymmetricKeyPair* kp = cpr2.Generate();
 
 			cpr2.Initialize(kp->PublicKey());
@@ -386,19 +389,19 @@ namespace Test
 
 			if (!cpr2.Decapsulate(cpt, sec2))
 			{
-				throw TestException(std::string("RLWE"), std::string("Stress test authentication has failed! -RR3"));
+				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test authentication has failed! -RR3"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException(std::string("RLWE"), std::string("Stress test has failed! -RR4"));
+				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test has failed! -RR4"));
 			}
 		}
 	}
 
-	void RingLWETest::OnProgress(std::string Data)
+	void RingLWETest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

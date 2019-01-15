@@ -1,8 +1,12 @@
 #include "SkeinParams.h"
-#include "CryptoDigestException.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 
 NAMESPACE_DIGEST
+
+using Exception::CryptoDigestException;
+using Enumeration::ErrorCodes;
+
+const std::string SkeinParams::CLASS_NAME("SkeinParams");
 
 SkeinParams::SkeinParams()
 	:
@@ -37,11 +41,11 @@ SkeinParams::SkeinParams(ulong OutputSize, byte LeafSize, byte Fanout)
 
 	if (OutputSize != 32 && OutputSize != 64 && OutputSize != 128)
 	{
-		throw Exception::CryptoDigestException("SkeinParams:Ctor", "The output size is invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The output size is invalid!"), ErrorCodes::IllegalOperation);
 	}
 	if (Fanout > 0 && LeafSize == 0 || Fanout == 0 && LeafSize != 0)
 	{
-		throw Exception::CryptoDigestException("SkeinParams:Ctor", "The fanout and leaf sizes are invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The fanout and leaf sizes are invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_dstCode.resize(DistributionCodeMax());
@@ -60,17 +64,20 @@ SkeinParams::SkeinParams(const std::vector<byte> &TreeArray)
 	m_reserved3(0),
 	m_dstCode(0)
 {
-	CexAssert(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
+	if (TreeArray.size() < GetHeaderSize())
+	{
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The TreeArray buffer size is invalid!"), ErrorCodes::IllegalOperation);
+	}
 
 	std::memcpy(&m_treeSchema[0], &TreeArray[0], 4);
-	m_treeVersion = Utility::IntUtils::LeBytesTo16(TreeArray, 4);
-	m_reserved1 = Utility::IntUtils::LeBytesTo16(TreeArray, 6);
-	m_outputSize = Utility::IntUtils::LeBytesTo64(TreeArray, 8);
+	m_treeVersion = Utility::IntegerTools::LeBytesTo16(TreeArray, 4);
+	m_reserved1 = Utility::IntegerTools::LeBytesTo16(TreeArray, 6);
+	m_outputSize = Utility::IntegerTools::LeBytesTo64(TreeArray, 8);
 	std::memcpy(&m_leafSize, &TreeArray[16], 1);
 	std::memcpy(&m_treeDepth, &TreeArray[17], 1);
 	std::memcpy(&m_treeFanout, &TreeArray[18], 1);
 	std::memcpy(&m_reserved2, &TreeArray[19], 1);
-	m_reserved3 = Utility::IntUtils::LeBytesTo32(TreeArray, 20);
+	m_reserved3 = Utility::IntegerTools::LeBytesTo32(TreeArray, 20);
 	m_dstCode.resize(DistributionCodeMax());
 	std::memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 }
@@ -155,7 +162,7 @@ std::vector<ulong> SkeinParams::GetConfig()
 	std::vector<ulong> config(m_outputSize / sizeof(ulong));
 
 	// set schema bytes
-	config[0] = Utility::IntUtils::LeBytesTo32(m_treeSchema, 0);
+	config[0] = Utility::IntegerTools::LeBytesTo32(m_treeSchema, 0);
 	// version and key size
 	config[0] |= (static_cast<ulong>(m_treeVersion) << 32);
 	config[0] |= (static_cast<ulong>(m_reserved1) << 48);
@@ -171,7 +178,7 @@ std::vector<ulong> SkeinParams::GetConfig()
 	// distribution code
 	for (size_t i = 3; i < config.size(); ++i)
 	{
-		config[i] = Utility::IntUtils::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
+		config[i] = Utility::IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
 	}
 
 	return config;
@@ -239,14 +246,14 @@ std::vector<byte> SkeinParams::ToBytes()
 	std::vector<byte> trs(GetHeaderSize(), 0);
 
 	std::memcpy(&trs[0], &m_treeSchema[0], 4);
-	Utility::IntUtils::Le16ToBytes(m_treeVersion, trs, 4);
-	Utility::IntUtils::Le16ToBytes(m_reserved1, trs, 6);
-	Utility::IntUtils::Le64ToBytes(m_outputSize, trs, 8);
+	Utility::IntegerTools::Le16ToBytes(m_treeVersion, trs, 4);
+	Utility::IntegerTools::Le16ToBytes(m_reserved1, trs, 6);
+	Utility::IntegerTools::Le64ToBytes(m_outputSize, trs, 8);
 	std::memcpy(&trs[16], &m_leafSize, 1);
 	std::memcpy(&trs[17], &m_treeDepth, 1);
 	std::memcpy(&trs[18], &m_treeFanout, 1);
 	std::memcpy(&trs[19], &m_reserved2, 1);
-	Utility::IntUtils::Le32ToBytes(m_reserved3, trs, 20);
+	Utility::IntegerTools::Le32ToBytes(m_reserved3, trs, 20);
 	std::memcpy(&trs[24], &m_dstCode[0], m_dstCode.size());
 
 	return trs;

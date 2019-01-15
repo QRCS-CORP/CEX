@@ -2,15 +2,21 @@
 #include "ACS.h"
 #include "ChaCha256.h"
 #include "ChaCha512.h"
+#include "CryptoSymmetricCipherException.h"
 #include "Threefish256.h"
 #include "Threefish512.h"
 #include "Threefish1024.h"
 
 NAMESPACE_HELPER
 
-IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType, size_t RoundCount)
+using Exception::CryptoSymmetricCipherException;
+using Enumeration::ErrorCodes;
+
+IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 {
-	IStreamCipher* cprPtr = nullptr;
+	IStreamCipher* cptr;
+
+	cptr = nullptr;
 
 	try
 	{
@@ -19,61 +25,90 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType,
 			case StreamCiphers::ACS:
 			case StreamCiphers::ACS512A:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE512, Enumeration::StreamAuthenticators::KMAC512);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE512, Enumeration::StreamAuthenticators::KMAC512);
 				break;
 			}
 			case StreamCiphers::ACS256A:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::KMAC256);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::KMAC256);
 				break;
 			}
 			case StreamCiphers::ACS256S:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::ACS(Enumeration::BlockCiphers::SHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::KMAC256);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::SHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::KMAC256);
 				break;
 			}
 			case StreamCiphers::ACS512S:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::ACS(Enumeration::BlockCiphers::SHX, Enumeration::BlockCipherExtensions::SHAKE512, Enumeration::StreamAuthenticators::KMAC512);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::SHX, Enumeration::BlockCipherExtensions::SHAKE512, Enumeration::StreamAuthenticators::KMAC512);
 				break;
 			}
 			case StreamCiphers::ChaCha256:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::ChaCha256;
+				cptr = new Cipher::Stream::ChaCha256(Enumeration::StreamAuthenticators::None);
+				break;
+			}
+			case StreamCiphers::ChaCha256AE:
+			{
+				cptr = new Cipher::Stream::ChaCha256(Enumeration::StreamAuthenticators::KMAC256);
 				break;
 			}
 			case StreamCiphers::ChaCha512:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::ChaCha512;
+				cptr = new Cipher::Stream::ChaCha512(Enumeration::StreamAuthenticators::None);
+				break;
+			}
+			case StreamCiphers::ChaCha512AE:
+			{
+				cptr = new Cipher::Stream::ChaCha512(Enumeration::StreamAuthenticators::KMAC512);
 				break;
 			}
 			case StreamCiphers::Threefish256:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::Threefish256;
+				cptr = new Cipher::Stream::Threefish256(Enumeration::StreamAuthenticators::None);
+				break;
+			}
+			case StreamCiphers::Threefish256AE:
+			{
+				cptr = new Cipher::Stream::Threefish256(Enumeration::StreamAuthenticators::KMAC256);
 				break;
 			}
 			case StreamCiphers::Threefish512:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::Threefish512;
+				cptr = new Cipher::Stream::Threefish512(Enumeration::StreamAuthenticators::None);
+				break;
+			}
+			case StreamCiphers::Threefish512AE:
+			{
+				cptr = new Cipher::Stream::Threefish512(Enumeration::StreamAuthenticators::KMAC512);
 				break;
 			}
 			case StreamCiphers::Threefish1024:
 			{
-				cprPtr = new Cipher::Symmetric::Stream::Threefish1024;
+				cptr = new Cipher::Stream::Threefish1024(Enumeration::StreamAuthenticators::None);
+				break;
+			}
+			case StreamCiphers::Threefish1024AE:
+			{
+				cptr = new Cipher::Stream::Threefish1024(Enumeration::StreamAuthenticators::KMAC1024);
 				break;
 			}
 			default:
 			{
-				throw CryptoException("StreamCipherFromName:GetStreamEngine", "The stream cipher is not recognized!");
+				throw CryptoException(std::string("StreamCipherFromName"), std::string("GetInstance"), std::string("The stream cipher type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoSymmetricCipherException &ex)
+	{
+		throw CryptoException(std::string("StreamCipherFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("StreamCipherFromName:GetInstance", "The stream cipher is unavailable!", std::string(ex.what()));
+		throw CryptoException(std::string("StreamCipherFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
-	return cprPtr;
+	return cptr;
 }
 
 NAMESPACE_HELPEREND

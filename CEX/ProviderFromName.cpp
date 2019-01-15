@@ -2,16 +2,20 @@
 #include "ACP.h"
 #include "CJP.h"
 #include "CpuDetect.h"
+#include "CryptoRandomException.h"
 #include "CSP.h"
 #include "ECP.h"
 #include "RDP.h"
 
 NAMESPACE_HELPER
 
+using Exception::CryptoRandomException;
+using Enumeration::ErrorCodes;
+
 IProvider* ProviderFromName::GetInstance(Providers ProviderType)
 {
 	IProvider* rndPtr = nullptr;
-	Common::CpuDetect detect;
+	CpuDetect detect;
 
 	try
 	{
@@ -58,13 +62,17 @@ IProvider* ProviderFromName::GetInstance(Providers ProviderType)
 			}
 			default:
 			{
-				throw CryptoException("ProviderFromName:GetInstance", "The specified entropy source type is unrecognized!");
+				throw CryptoException(std::string("ProviderFromName"), std::string("GetInstance"), std::string("The entropy provider type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
+	catch (CryptoRandomException &ex)
+	{
+		throw CryptoException(std::string("ProviderFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("ProviderFromName:GetInstance", "The specified entropy source type is unavailable!", std::string(ex.what()));
+		throw CryptoException(std::string("ProviderFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return rndPtr;

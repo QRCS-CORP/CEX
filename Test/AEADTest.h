@@ -6,7 +6,7 @@
 
 namespace Test
 {
-	using Cipher::Symmetric::Block::Mode::IAeadMode;
+	using Cipher::Block::Mode::IAeadMode;
 
 	/// <summary>
 	/// Tests the AEAD cipher modes; EAX, OCB and GCM.
@@ -16,18 +16,15 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
-		static const size_t NONCE_LEN = 8;
-		static const size_t MAC_LEN = 8;
 		static const size_t AUTHEN_LEN = 20;
+		static const size_t MAC_LEN = 8;
 		static const size_t MIN_ALLOC = 1024;
 		static const size_t MAX_ALLOC = 4096;
-		static const size_t EAX_TESTSIZE = 10;
-		static const size_t OCB_TESTSIZE = 16;
-		static const size_t GCM_TESTSIZE = 18;
+		static const size_t NONCE_LEN = 8;
 
 		std::vector<std::vector<byte>> m_associatedText;
 		std::vector<std::vector<byte>> m_cipherText;
@@ -108,7 +105,7 @@ namespace Test
 	private:
 
 		void Initialize();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

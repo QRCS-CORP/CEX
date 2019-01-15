@@ -1,14 +1,14 @@
 #include "Skein512.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
-#include "ParallelUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
+#include "ParallelTools.h"
 #include "Skein.h"
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-using Utility::MemUtils;
-using Utility::ParallelUtils;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
+using Utility::ParallelTools;
 
 const std::string Skein512::CLASS_NAME("Skein512");
 
@@ -33,9 +33,9 @@ struct Skein512::Skein512State
 
 	void Reset()
 	{
-		MemUtils::Clear(S, 0, S.size() * sizeof(ulong));
-		MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
-		MemUtils::Clear(V, 0, V.size() * sizeof(ulong));
+		MemoryTools::Clear(S, 0, S.size() * sizeof(ulong));
+		MemoryTools::Clear(T, 0, T.size() * sizeof(ulong));
+		MemoryTools::Clear(V, 0, V.size() * sizeof(ulong));
 	}
 };
 
@@ -55,7 +55,7 @@ Skein512::Skein512(bool Parallel)
 	// TODO: implement parallel alternate for single core cpu
 	if (Parallel && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException("Skein512::Ctor", "Cpu does not support parallel processing!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
 	}
 
 	if (m_parallelProfile.IsParallel())
@@ -79,11 +79,11 @@ Skein512::Skein512(SkeinParams &Params)
 {
 	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException("Skein512::Ctor", "Cpu does not support parallel processing!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
 	}
 	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
 	{
-		throw CryptoDigestException("Skein512::Ctor", "The tree parameters are invalid!");
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The tree parameters are invalid!"), ErrorCodes::InvalidParam);
 	}
 
 	if (m_treeParams.FanOut() > 1)
@@ -119,8 +119,8 @@ Skein512::~Skein512()
 			m_dgtState[i].Reset();
 		}
 
-		IntUtils::ClearVector(m_dgtState);
-		IntUtils::ClearVector(m_msgBuffer);
+		IntegerTools::Clear(m_dgtState);
+		IntegerTools::Clear(m_msgBuffer);
 	}
 }
 
@@ -148,18 +148,18 @@ const bool Skein512::IsParallel()
 
 const std::string Skein512::Name()
 {
-	std::string txtName = "";
+	std::string name;
 
 	if (m_parallelProfile.IsParallel())
 	{
-		txtName = CLASS_NAME + "-P" + IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+		name = CLASS_NAME + "-P" + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 	else
 	{
-		txtName = CLASS_NAME;
+		name = CLASS_NAME;
 	}
 
-	return txtName;
+	return name;
 }
 
 const size_t Skein512::ParallelBlockSize()
@@ -190,7 +190,7 @@ size_t Skein512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		// process buffer
@@ -218,25 +218,25 @@ size_t Skein512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntUtils::LeULL512ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * BLOCK_SIZE);
+			IntegerTools::LeULL512ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * BLOCK_SIZE);
 			m_msgLength += BLOCK_SIZE;
 		}
 
 		// finalize and store
 		HashFinal(m_msgBuffer, 0, m_msgLength, rootState, 0);
-		IntUtils::LeULL512ToBlock(rootState[0].S, 0, Output, OutOffset);
+		IntegerTools::LeULL512ToBlock(rootState[0].S, 0, Output, OutOffset);
 	}
 	else
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		// finalize and store
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState, 0);
-		IntUtils::LeULL512ToBlock(m_dgtState[0].S, 0, Output, OutOffset);
+		IntegerTools::LeULL512ToBlock(m_dgtState[0].S, 0, Output, OutOffset);
 	}
 
 	Reset();
@@ -248,7 +248,7 @@ void Skein512::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException("Skein512::ParallelMaxDegree", "Degree setting is invalid!");
+		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -271,7 +271,7 @@ void Skein512::Reset()
 	}
 
 	// reset bytes filled
-	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 	m_isInitialized = false;
 }
@@ -296,11 +296,11 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				// empty the message buffer
-				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
 					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_dgtState, i);
 				});
@@ -316,7 +316,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
 
 				// process large blocks
-				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRCLEN);
 				});
@@ -329,7 +329,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			{
 				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
 
-				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRMLEN);
 				});
@@ -345,7 +345,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
@@ -366,7 +366,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -410,9 +410,9 @@ void Skein512::Initialize()
 			// compress previous state
 			Permute(m_dgtState[i - 1].V, m_dgtState[i]);
 			// store the new state in V for reset
-			MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
+			MemoryTools::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
-			MemUtils::XOR512(cfg, 0, m_dgtState[i].V, 0);
+			MemoryTools::XOR512(cfg, 0, m_dgtState[i].V, 0);
 		}
 	}
 
@@ -427,9 +427,9 @@ void Skein512::LoadState(Skein512State &State, std::array<ulong, 8> &Config)
 	State.Increase(32);
 	Permute(Config, State);
 	// store the initial state for reset
-	MemUtils::Copy(State.S, 0, State.V, 0, State.V.size() * sizeof(ulong));
+	MemoryTools::Copy(State.S, 0, State.V, 0, State.V.size() * sizeof(ulong));
 	// add the config string
-	MemUtils::XOR512(Config, 0, State.V, 0);
+	MemoryTools::XOR512(Config, 0, State.V, 0);
 }
 
 void Skein512::Permute(std::array<ulong, 8> &Message, Skein512State &State)
@@ -451,11 +451,11 @@ void Skein512::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	State[StateOffset].Increase(Length);
 	// encrypt block
 	std::array<ulong, 8> msg;
-	IntUtils::LeBytesToULL512(Input, InOffset, msg, 0);
+	IntegerTools::LeBytesToULL512(Input, InOffset, msg, 0);
 	Permute(msg, State[StateOffset]);
 
 	// feed-forward input with state
-	MemUtils::XOR512(msg, 0, State[StateOffset].S, 0);
+	MemoryTools::XOR512(msg, 0, State[StateOffset].S, 0);
 
 	// clear first flag
 	if (!m_isInitialized && StateOffset == 0)

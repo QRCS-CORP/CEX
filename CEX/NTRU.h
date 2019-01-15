@@ -28,8 +28,6 @@
 
 NAMESPACE_NTRU
 
-using Key::Asymmetric::AsymmetricKeyPair;
-using Key::Asymmetric::AsymmetricKey;
 using Enumeration::NTRUParameters;
 
 

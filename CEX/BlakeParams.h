@@ -20,8 +20,11 @@
 #define CEX_BLAKEPARAMS_H
 
 #include "CexDomain.h"
+#include "CryptoDigestException.h"
 
 NAMESPACE_DIGEST
+
+using Exception::CryptoDigestException;
 
 /// <summary>
 /// The parallel Blake2 parameters structure
@@ -30,6 +33,7 @@ struct BlakeParams
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t HDR_BASE = 12;
 
 	// 256=12, 512=40
@@ -190,7 +194,7 @@ public:
 
 			for (size_t i = 3; i < Config.size(); ++i)
 			{
-				Config[i] = Utility::IntUtils::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
+				Config[i] = Utility::IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
 			}
 		}
 		else
@@ -207,7 +211,7 @@ public:
 
 			for (size_t i = 5; i < Config.size(); ++i)
 			{
-				Config[i] = Utility::IntUtils::LeBytesTo32(m_dstCode, (i - 5) * sizeof(uint));
+				Config[i] = Utility::IntegerTools::LeBytesTo32(m_dstCode, (i - 5) * sizeof(uint));
 			}
 		}
 	}

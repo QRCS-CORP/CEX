@@ -1,8 +1,10 @@
 #include "CSR.h"
-#include "IntUtils.h"
+#include "IntegerTools.h"
 #include "ProviderFromName.h"
 
 NAMESPACE_PRNG
+
+using Utility::MemoryTools;
 
 const std::string CSR::CLASS_NAME("CSR");
 
@@ -29,7 +31,7 @@ CSR::CSR(ShakeModes ShakeModeType, Providers SeedEngine, size_t BufferSize)
 	m_rngBuffer(BufferSize != 0 ? BufferSize : (ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_rngGenerator(new Drbg::CSG(ShakeModeType, SeedEngine)),
 	m_shakeType(ShakeModeType != ShakeModes::None ? ShakeModeType :
-		throw CryptoRandomException("CSR:Ctor", "SHAKE type can not be none!"))
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Shake type can not be none!"), ErrorCodes::IllegalOperation))
 {
 	Reset();
 }
@@ -43,7 +45,7 @@ CSR::CSR(std::vector<byte> Seed, ShakeModes ShakeModeType, size_t BufferSize)
 	m_rngBuffer(BufferSize != 0 ? BufferSize : (ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_rngGenerator(new Drbg::CSG(ShakeModeType, Providers::None)),
 	m_shakeType(ShakeModeType != ShakeModes::None ? ShakeModeType :
-		throw CryptoRandomException("CSR:Ctor", "SHAKE type can not be none!"))
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Shake type can not be none!"), ErrorCodes::IllegalOperation))
 {
 	Reset();
 }
@@ -57,8 +59,8 @@ CSR::~CSR()
 		m_shakeType = ShakeModes::None;
 		m_pvdType = Providers::None;
 
-		Utility::IntUtils::ClearVector(m_rndSeed);
-		Utility::IntUtils::ClearVector(m_rngBuffer);
+		Utility::IntegerTools::Clear(m_rndSeed);
+		Utility::IntegerTools::Clear(m_rngBuffer);
 
 		if (m_rngGenerator != nullptr)
 		{
@@ -82,7 +84,7 @@ void CSR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	std::vector<byte> rnd = Generate(Length);
-	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
+	MemoryTools::Copy(rnd, 0, Output, Offset, Length);
 }
 
 void CSR::Generate(std::vector<byte> &Output)
@@ -96,7 +98,7 @@ void CSR::Generate(std::vector<byte> &Output)
 		// copy remaining bytes
 		if (bufSize != 0)
 		{
-			Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
+			MemoryTools::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
 		}
 
 		size_t rmd = Output.size() - bufSize;
@@ -108,13 +110,13 @@ void CSR::Generate(std::vector<byte> &Output)
 
 			if (rmd > m_rngBuffer.size())
 			{
-				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
+				MemoryTools::Copy(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
 				bufSize += m_rngBuffer.size();
 				rmd -= m_rngBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, rmd);
+				MemoryTools::Copy(m_rngBuffer, 0, Output, bufSize, rmd);
 				m_bufferIndex = rmd;
 				rmd = 0;
 			}
@@ -122,7 +124,7 @@ void CSR::Generate(std::vector<byte> &Output)
 	}
 	else
 	{
-		Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
+		MemoryTools::Copy(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -130,7 +132,7 @@ void CSR::Generate(std::vector<byte> &Output)
 ushort CSR::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -138,7 +140,7 @@ ushort CSR::NextUInt16()
 uint CSR::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -146,7 +148,7 @@ uint CSR::NextUInt32()
 ulong CSR::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }

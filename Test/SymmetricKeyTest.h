@@ -5,7 +5,7 @@
 
 namespace Test
 {
-	using namespace Key::Symmetric;
+	using namespace Cipher;
 	using namespace IO;
 
 	/// <summary>
@@ -15,9 +15,12 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string SUCCESS;
+		static const size_t MINM_ALLOC = 1;
+		static const size_t MAXM_ALLOC = 10240;
+		static const size_t TEST_CYCLES = 100;
 
 		TestEventHandler m_progressEvent;
 
@@ -48,12 +51,29 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
+
+		/// <summary>
+		/// Test each initialization configuration for correct operation
+		/// </summary>
+		void Initialization();
+
+		/// <summary>
+		/// Compare serialization output
+		/// </summary>
+		void Serialization();
+
+		/// <summary>
+		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data
+		/// </summary>
+		void Stress();
+
 	private:
 
-		void CheckAccess();
-		void CheckInit();
-		void CompareSerial();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

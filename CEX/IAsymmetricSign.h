@@ -21,18 +21,22 @@
 
 #include "CexDomain.h"
 #include "AsymmetricEngines.h"
-#include "CryptoAsymmetricException.h"
 #include "AsymmetricKey.h"
 #include "AsymmetricKeyPair.h"
+#include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
+#include "CryptoAsymmetricException.h"
+#include "ErrorCodes.h"
 #include "IPrng.h"
 #include "Prngs.h"
 
 NAMESPACE_ASYMMETRICSIGN
 
 using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricTransforms;
 using Exception::CryptoAsymmetricException;
-using Key::Asymmetric::AsymmetricKey;
-using Key::Asymmetric::AsymmetricKeyPair;
+using Enumeration::ErrorCodes;
 using Prng::IPrng;
 using Enumeration::Prngs;
 

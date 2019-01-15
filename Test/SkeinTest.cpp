@@ -1,7 +1,7 @@
 #include "SkeinTest.h"
 #include "../CEX/CpuDetect.h"
-#include "../CEX/IntUtils.h"
-#include "../CEX/MemUtils.h"
+#include "../CEX/IntegerTools.h"
+#include "../CEX/MemoryTools.h"
 #include "../CEX/Skein.h"
 #include "../CEX/Skein256.h"
 #include "../CEX/Skein512.h"
@@ -18,8 +18,8 @@
 namespace Test
 {
 	using Exception::CryptoDigestException;
-	using Utility::IntUtils;
-	using Utility::MemUtils;
+	using Utility::IntegerTools;
+	using Utility::MemoryTools;
 	using Prng::SecureRandom;
 	using Digest::Skein;
 	using Digest::Skein256;
@@ -33,8 +33,8 @@ namespace Test
 	using Numeric::ULong512;
 #endif
 
+	const std::string SkeinTest::CLASSNAME = "SkeinTest";
 	const std::string SkeinTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of Skein.";
-	const std::string SkeinTest::FAILURE = "FAILURE! ";
 	const std::string SkeinTest::SUCCESS = "SUCCESS! All Skein tests have executed succesfully.";
 
 	//~~~Constructor~~~//
@@ -50,8 +50,8 @@ namespace Test
 
 	SkeinTest::~SkeinTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_message);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_message);
 	}
 
 	//~~~Accessors~~~//
@@ -72,7 +72,7 @@ namespace Test
 	{
 		try
 		{
-			Common::CpuDetect detect;
+			CpuDetect detect;
 
 			Exception();
 			OnProgress(std::string("SkeinTest: Passed Skein-256/512/1024 exception handling tests.."));
@@ -147,11 +147,11 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -164,7 +164,7 @@ namespace Test
 			SkeinParams params(32, 32, 99);
 			Skein256 dgt(params);
 
-			throw TestException(std::string("Skein"), std::string("Exception: Exception handling failure! -SE1"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE1"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -181,7 +181,7 @@ namespace Test
 			SkeinParams params(64, 64, 99);
 			Skein512 dgt(params);
 
-			throw TestException(std::string("Skein"), std::string("Exception: Exception handling failure! -SE2"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE2"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -198,7 +198,7 @@ namespace Test
 			SkeinParams params(128, 128, 99);
 			Skein1024 dgt(params);
 
-			throw TestException(std::string("Skein"), std::string("Exception: Exception handling failure! -SE3"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE3"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -215,7 +215,7 @@ namespace Test
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
-			throw TestException(std::string("Skein"), std::string("Exception: Exception handling failure! -SE4"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE4"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -232,7 +232,7 @@ namespace Test
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
-			throw TestException(std::string("Skein"), std::string("Exception: Exception handling failure! -SE5"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE5"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -249,7 +249,7 @@ namespace Test
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
-			throw TestException(std::string("Skein"), std::string("Exception: Exception handling failure! -SE6"));
+			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE6"));
 		}
 		catch (CryptoDigestException const &)
 		{
@@ -270,14 +270,14 @@ namespace Test
 
 		if (hash1 != Expected)
 		{
-			throw TestException(std::string("SKein Vector: Expected hash is not equal! -SK1"));
+			throw TestException(std::string("Kat"), Digest->Name(), std::string("Expected hash is not equal! -SK1"));
 		}
 
 		Digest->Compute(Input, hash2);
 
 		if (hash2 != Expected)
 		{
-			throw TestException(std::string("SKein Vector: Expected hash is not equal! -SK2"));
+			throw TestException(std::string("Kat"), Digest->Name(), std::string("Expected hash is not equal! -SK2"));
 		}
 	}
 
@@ -298,7 +298,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
 			msg.resize(INPLEN);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 			reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
 
 			try
@@ -318,9 +318,9 @@ namespace Test
 				Digest->ParallelMaxDegree(PRLDGR);
 				Digest->ParallelProfile().ParallelBlockSize() = PRLLEN;
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Parallel: Parallel integrity test has failed! -BP1"));
+				throw TestException(std::string("Parallel"), Digest->Name(), std::string("Parallel integrity test has failed! -BP1"));
 			}
 		}
 	}
@@ -332,15 +332,15 @@ namespace Test
 		std::array<ulong, 4> state1;
 		std::array<ulong, 4> state2;
 
-		MemUtils::Clear(state1, 0, 4 * sizeof(ulong));
-		MemUtils::Clear(state2, 0, 4 * sizeof(ulong));
+		MemoryTools::Clear(state1, 0, 4 * sizeof(ulong));
+		MemoryTools::Clear(state2, 0, 4 * sizeof(ulong));
 
 		Skein::PemuteP256C(input, tweak, state1, 72);
 		Skein::PemuteR72P256U(input, tweak, state2);
 
 		if (state1 != state2)
 		{
-			throw TestException(std::string("Permutation72: Permutation output is not equal! -SP1"));
+			throw TestException(std::string("PermutationR72"), std::string("PemuteP256"), std::string("Permutation output is not equal! -SP1"));
 		}
 	}
 
@@ -352,17 +352,17 @@ namespace Test
 		std::array<ulong, 16> state2;
 		Prng::SecureRandom rnd;
 
-		IntUtils::Fill(input, 0, 16, rnd);
-		IntUtils::Fill(tweak, 0, 2, rnd);
-		MemUtils::Clear(state1, 0, 16 * sizeof(ulong));
-		MemUtils::Clear(state2, 0, 16 * sizeof(ulong));
+		IntegerTools::Fill(input, 0, 16, rnd);
+		IntegerTools::Fill(tweak, 0, 2, rnd);
+		MemoryTools::Clear(state1, 0, 16 * sizeof(ulong));
+		MemoryTools::Clear(state2, 0, 16 * sizeof(ulong));
 
 		Skein::PemuteP1024C(input, tweak, state1, 80);
 		Skein::PemuteR80P1024U(input, tweak, state2);
 
 		if (state1 != state2)
 		{
-			throw TestException(std::string("Permutation80: Permutation output is not equal! -SP2"));
+			throw TestException(std::string("PermutationR80"), std::string("PemuteP1024"), std::string("Permutation output is not equal! -SP2"));
 		}
 	}
 
@@ -383,7 +383,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
 			msg.resize(INPLEN);
-			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			IntegerTools::Fill(msg, 0, msg.size(), rnd);
 
 			try
 			{
@@ -393,14 +393,14 @@ namespace Test
 				Digest->Update(msg, 0, msg.size());
 				Digest->Finalize(code2, 0);
 			}
-			catch (...)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Stress: The digest has thrown an exception! -TS1"));
+				throw TestException(std::string("Stress"), Digest->Name(), std::string("The digest has thrown an exception! -TS1"));
 			}
 
 			if (code1 != code2)
 			{
-				throw TestException(std::string("Stress: Hash output is not equal! -TS2"));
+				throw TestException(std::string("Stress"), Digest->Name(), std::string("Hash output is not equal! -TS2"));
 			}
 		}
 	}
@@ -408,7 +408,6 @@ namespace Test
 	void SkeinTest::TreeParams()
 	{
 		std::vector<byte> code1(8, 7);
-
 		SkeinParams tree1(32, 32, 8);
 		tree1.DistributionCode() = code1;
 		std::vector<byte> tres = tree1.ToBytes();
@@ -416,7 +415,7 @@ namespace Test
 
 		if (!tree1.Equals(tree2))
 		{
-			throw std::string(std::string("TreeParams: Tree parameters test failed! -ST1"));
+			throw TestException(std::string("TreeParams"), std::string("SkeinParams"), std::string("Tree parameters test failed! -ST1"));
 		}
 
 		std::vector<byte> code2(20, 7);
@@ -426,7 +425,7 @@ namespace Test
 
 		if (!tree3.Equals(tree4))
 		{
-			throw std::string(std::string("TreeParams: Tree parameters test failed! -ST2"));
+			throw TestException(std::string("TreeParams"), std::string("SkeinParams"), std::string("Tree parameters test failed! -ST2"));
 		}
 	}
 
@@ -465,7 +464,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void SkeinTest::OnProgress(std::string Data)
+	void SkeinTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

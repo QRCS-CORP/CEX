@@ -1,8 +1,8 @@
 #include "AHX.h"
 #if defined(__AVX__)
 #	include "KdfFromName.h"
-#	include "IntUtils.h"
-#	include "MemUtils.h"
+#	include "IntegerTools.h"
+#	include "MemoryTools.h"
 #	include "UInt128.h"
 #endif
 
@@ -23,7 +23,7 @@ AHX::AHX(BlockCipherExtensions CipherExtension)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr : 
-		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!") :
+		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -41,7 +41,7 @@ AHX::AHX(Kdf::IKdf* Kdf)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf : 
-		throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!")),
+		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::InvalidParam)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -60,9 +60,9 @@ AHX::~AHX()
 		m_isInitialized = false;
 		m_rndCount = 0;
 
-		Utility::IntUtils::ClearVector(m_expKey);
-		Utility::IntUtils::ClearVector(m_distCode);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntegerTools::Clear(m_expKey);
+		Utility::IntegerTools::Clear(m_distCode);
+		Utility::IntegerTools::Clear(m_legalKeySizes);
 
 		if (m_destroyEngine)
 		{
@@ -131,19 +131,19 @@ const std::string AHX::Name()
 
 	if (m_cprExtension == BlockCipherExtensions::SHAKE256)
 	{
-		txtName = CIPHER_NAME + std::string("+SHAKE-256");
+		txtName = CIPHER_NAME + std::string("-SHAKE256");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
 	{
-		txtName = CLASS_NAME + std::string("+SHAKE512-");
+		txtName = CLASS_NAME + std::string("-SHAKE512");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF256)
 	{
-		txtName = CLASS_NAME + std::string("+HKDF-SHA2-256");
+		txtName = CLASS_NAME + std::string("-HKDF-SHA256");
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 	{
-		txtName = CLASS_NAME + std::string("+HKDF-SHA2-512");
+		txtName = CLASS_NAME + std::string("-HKDF-SHA2512");
 	}
 	else
 	{
@@ -189,11 +189,11 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
 	{
-		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
 	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_distCodeMax)
 	{
-		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid info size; info parameter must be no longer than DistributionCodeMax size."), ErrorCodes::InvalidSize);
 	}
 
 	if (KeyParams.Info().size() > 0)
@@ -324,8 +324,8 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	// big endian format to align with test vectors
 	for (size_t i = 0; i < rawKey.size(); i += 4)
 	{
-		uint tmpbk = Utility::IntUtils::BeBytesTo32(rawKey, i);
-		Utility::IntUtils::Le32ToBytes(tmpbk, rawKey, i);
+		uint tmpbk = Utility::IntegerTools::BeBytesTo32(rawKey, i);
+		Utility::IntegerTools::Le32ToBytes(tmpbk, rawKey, i);
 	}
 
 	// copy bytes to working key
@@ -437,11 +437,11 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 
 		Offset += 16;
 		std::vector<byte> tmpB(4);
-		Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
+		Utility::IntegerTools::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
 		std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
 
 		Offset += 4;
-		Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
+		Utility::IntegerTools::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
 		std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
 	}
 }

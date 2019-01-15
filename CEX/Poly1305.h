@@ -139,7 +139,7 @@ public:
 	/// <summary>
 	/// Read Only: Size of returned mac in bytes
 	/// </summary>
-	const size_t MacSize() override;
+	const size_t TagSize() override;
 
 	/// <summary>
 	/// Read Only: Mac generators class name

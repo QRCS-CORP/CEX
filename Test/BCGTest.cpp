@@ -3,7 +3,7 @@
 #include "../CEX/BCG.h"
 #include "../CEX/CTR.h"
 #include "../CEX/HKDF.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SHX.h"
@@ -11,14 +11,14 @@
 
 namespace Test
 {
-	using namespace Cipher::Symmetric::Block;
+	using namespace Cipher::Block;
 	using namespace Drbg;
-	using namespace Cipher::Symmetric::Block::Mode;
-	using Utility::IntUtils;
+	using namespace Cipher::Block::Mode;
+	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 
+	const std::string BCGTest::CLASSNAME = "BCGTest";
 	const std::string BCGTest::DESCRIPTION = "Block Cipher Generator implementations vector comparison tests.";
-	const std::string BCGTest::FAILURE = "FAILURE! ";
 	const std::string BCGTest::SUCCESS = "SUCCESS! All BCG tests have executed succesfully.";
 
 	BCGTest::BCGTest()
@@ -33,9 +33,9 @@ namespace Test
 
 	BCGTest::~BCGTest()
 	{
-		IntUtils::ClearVector(m_expected);
-		IntUtils::ClearVector(m_key);
-		IntUtils::ClearVector(m_nonce);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_key);
+		IntegerTools::Clear(m_nonce);
 	}
 
 	const std::string BCGTest::Description()
@@ -59,53 +59,53 @@ namespace Test
 			OnProgress(std::string("BCGTest: Passed Block Cipher Generatorstress tests.."));
 
 			// rijndael engine
-			BCG* drbg1 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::None, Providers::None);
-			Kat(drbg1, m_key[0], m_nonce[0], m_expected[0]);
-			BCG* drbg2 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::HKDF256, Providers::None);
-			Kat(drbg2, m_key[0], m_nonce[0], m_expected[1]);
-			BCG* drbg3 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::HKDF512, Providers::None);
-			Kat(drbg3, m_key[1], m_nonce[0], m_expected[2]);
-			BCG* drbg4 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::SHAKE256, Providers::None);
-			Kat(drbg4, m_key[0], m_nonce[0], m_expected[3]);
-			BCG* drbg5 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::SHAKE512, Providers::None);
-			Kat(drbg5, m_key[1], m_nonce[0], m_expected[4]);
+			BCG* genrhxs = new BCG(BlockCiphers::RHX, BlockCipherExtensions::None, Providers::None);
+			Kat(genrhxs, m_key[0], m_nonce[0], m_expected[0]);
+			BCG* genrhxh256 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::HKDF256, Providers::None);
+			Kat(genrhxh256, m_key[0], m_nonce[0], m_expected[1]);
+			BCG* genrhxh512 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::HKDF512, Providers::None);
+			Kat(genrhxh512, m_key[1], m_nonce[0], m_expected[2]);
+			BCG* genrhxs256 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::SHAKE256, Providers::None);
+			Kat(genrhxs256, m_key[0], m_nonce[0], m_expected[3]);
+			BCG* genrhxs512 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::SHAKE512, Providers::None);
+			Kat(genrhxs512, m_key[1], m_nonce[0], m_expected[4]);
 			OnProgress(std::string("BCGTest: Passed BCG-RHX known answer tests.."));
 			// serpent engine
-			BCG* drbg6 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::None, Providers::None);
-			Kat(drbg6, m_key[0], m_nonce[0], m_expected[5]);
-			BCG* drbg7 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::HKDF256, Providers::None);
-			Kat(drbg7, m_key[0], m_nonce[0], m_expected[6]);
-			BCG* drbg8 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::HKDF512, Providers::None);
-			Kat(drbg8, m_key[1], m_nonce[0], m_expected[7]);
-			BCG* drbg9 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::SHAKE256, Providers::None);
-			Kat(drbg9, m_key[0], m_nonce[0], m_expected[8]);
-			BCG* drbg10 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::SHAKE512, Providers::None);
-			Kat(drbg10, m_key[1], m_nonce[0], m_expected[9]);
+			BCG* genshxs = new BCG(BlockCiphers::SHX, BlockCipherExtensions::None, Providers::None);
+			Kat(genshxs, m_key[0], m_nonce[0], m_expected[5]);
+			BCG* genshxh256 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::HKDF256, Providers::None);
+			Kat(genshxh256, m_key[0], m_nonce[0], m_expected[6]);
+			BCG* genshxh512 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::HKDF512, Providers::None);
+			Kat(genshxh512, m_key[1], m_nonce[0], m_expected[7]);
+			BCG* genshxs256 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::SHAKE256, Providers::None);
+			Kat(genshxs256, m_key[0], m_nonce[0], m_expected[8]);
+			BCG* genshxs512 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::SHAKE512, Providers::None);
+			Kat(genshxs512, m_key[1], m_nonce[0], m_expected[9]);
 			OnProgress(std::string("BCGTest: Passed BCG-SHX known answer tests.."));
 
 			OnProgress(std::string(""));
 			OnProgress(std::string("BCGTest: Evaluate random qualities using ChiSquare, Mean, and Ordered Runs for each generator variant"));
-			Evaluate(drbg1);
-			Evaluate(drbg2);
-			Evaluate(drbg3);
-			Evaluate(drbg4);
-			Evaluate(drbg5);
-			Evaluate(drbg6);
-			Evaluate(drbg7);
-			Evaluate(drbg8);
-			Evaluate(drbg9);
-			Evaluate(drbg10);
+			Evaluate(genrhxs);
+			Evaluate(genrhxh256);
+			Evaluate(genrhxh512);
+			Evaluate(genrhxs256);
+			Evaluate(genrhxs512);
+			Evaluate(genshxs);
+			Evaluate(genshxh256);
+			Evaluate(genshxh512);
+			Evaluate(genshxs256);
+			Evaluate(genshxs512);
 
-			delete drbg1;
-			delete drbg2;
-			delete drbg3;
-			delete drbg4;
-			delete drbg5;
-			delete drbg6;
-			delete drbg7;
-			delete drbg8;
-			delete drbg9;
-			delete drbg10;
+			delete genrhxs;
+			delete genrhxh256;
+			delete genrhxh512;
+			delete genrhxs256;
+			delete genrhxs512;
+			delete genshxs;
+			delete genshxh256;
+			delete genshxh512;
+			delete genshxs256;
+			delete genshxs512;
 
 			OnProgress(std::string("BCGTest: Passed Block Cipher Generator random evaluation tests.."));
 
@@ -113,79 +113,33 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(FAILURE + std::string(" : ") + ex.Message());
+			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
-		catch (...)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
 	void BCGTest::Evaluate(IDrbg* Rng)
 	{
-		std::vector<byte> otp(SAMPLE_SIZE);
-		Key::Symmetric::SymmetricKeySize ks = Rng->LegalKeySizes()[1];
-		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
-		SecureRandom rnd;
-		double x;
-		std::string status;
+		size_t i;
 
-		IntUtils::Fill(key, 0, key.size(), rnd);
-		IntUtils::Fill(iv, 0, iv.size(), rnd);
-		SymmetricKey kp(key, iv);
-
-		Rng->Initialize(kp);
-		Rng->Generate(otp);
-
-		// mean value test
-		x = TestUtils::MeanValue(otp);
-
-		status = (Rng->Name() + std::string(": Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
-
-		if (x < 122.5 || x > 132.5)
+		try
 		{
-			status += std::string("(FAIL)");
+			const size_t SEGCNT = SAMPLE_SIZE / Rng->MaxRequestSize();
+			std::vector<byte> smp(SEGCNT * Rng->MaxRequestSize());
+
+			for (i = 0; i < SEGCNT; ++i)
+			{
+				Rng->Generate(smp, i * Rng->MaxRequestSize(), Rng->MaxRequestSize());
+			}
+
+			RandomUtils::Evaluate(Rng->Name(), smp);
 		}
-		else if (x < 125.0 || x > 130.0)
+		catch (TestException const &ex)
 		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-
-		OnProgress(std::string(status));
-
-		// ChiSquare
-		x = TestUtils::ChiSquare(otp) * 100;
-		status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
-
-		if (x < 1.0 || x > 99.0)
-		{
-			status += std::string("(FAIL)");
-		}
-		else if (x < 5.0 || x > 95.0)
-		{
-			status += std::string("(WARN)");
-		}
-		else
-		{
-			status += std::string("(PASS)");
-		}
-		OnProgress(std::string(status));
-
-		// ordered runs
-		if (TestUtils::OrderedRuns(otp))
-		{
-			throw TestException(std::string("BCG"), std::string("Exception: Ordered runs test failure! -VE1"));
-		}
-
-		// succesive zeroes
-		if (TestUtils::SuccesiveZeros(otp))
-		{
-			throw TestException(std::string("BCG"), std::string("Exception: Succesive zeroes test failure! -VE2"));
+			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-BE1"));
 		}
 	}
 
@@ -195,9 +149,9 @@ namespace Test
 		try
 		{
 			// invalid block cipher choice
-			BCG drbg(BlockCiphers::None);
+			BCG gen(BlockCiphers::None);
 
-			throw TestException(std::string("BCG"), std::string("Exception: Exception handling failure! -BE1"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -BE1"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -211,9 +165,9 @@ namespace Test
 		try
 		{
 			// invalid null block cipher instance
-			BCG drbg(nullptr);
+			BCG gen(nullptr);
 
-			throw TestException(std::string("BCG"), std::string("Exception: Exception handling failure! -BE2"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -BE2"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -226,12 +180,12 @@ namespace Test
 		// test initialization
 		try
 		{
-			BCG drbg(BlockCiphers::Rijndael);
+			BCG gen(BlockCiphers::Rijndael);
 			// invalid key size
 			std::vector<byte> k(1);
-			drbg.Initialize(k);
+			gen.Initialize(k);
 
-			throw TestException(std::string("BCG"), std::string("Exception: Exception handling failure! -BE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -BE3"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -244,14 +198,14 @@ namespace Test
 		// test parallel degree
 		try
 		{
-			BCG drbg(BlockCiphers::Rijndael);
-			SymmetricKeySize ks = drbg.LegalKeySizes()[0];
+			BCG gen(BlockCiphers::Rijndael);
+			SymmetricKeySize ks = gen.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize());
-			drbg.Initialize(k);
+			gen.Initialize(k);
 			// invalid max parallel -99
-			drbg.ParallelMaxDegree(99);
+			gen.ParallelMaxDegree(99);
 
-			throw TestException(std::string("BCG"), std::string("Exception: Exception handling failure! -BE4"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -BE4"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -264,12 +218,12 @@ namespace Test
 		// test invalid generator state -1
 		try
 		{
-			BCG drbg(BlockCiphers::Rijndael);
+			BCG gen(BlockCiphers::Rijndael);
 			std::vector<byte> m(16);
 			// cipher was not initialized
-			drbg.Generate(m);
+			gen.Generate(m);
 
-			throw TestException(std::string("BCG"), std::string("Exception: Exception handling failure! -BE5"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -BE5"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -282,16 +236,16 @@ namespace Test
 		// test invalid generator state -2
 		try
 		{
-			BCG drbg(BlockCiphers::Rijndael);			
-			SymmetricKeySize ks = drbg.LegalKeySizes()[0];
+			BCG gen(BlockCiphers::Rijndael);			
+			SymmetricKeySize ks = gen.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize());
 			std::vector<byte> n(ks.NonceSize());
-			drbg.Initialize(k, n);
+			gen.Initialize(k, n);
 			std::vector<byte> m(16);
 			// array is too small
-			drbg.Generate(m, 0, m.size() + 1);
+			gen.Generate(m, 0, m.size() + 1);
 
-			throw TestException(std::string("BCG"), std::string("Exception: Exception handling failure! -BE6"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -BE6"));
 		}
 		catch (CryptoGeneratorException const &)
 		{
@@ -349,11 +303,11 @@ namespace Test
 
 		if (exp != Expected)
 		{
-			throw TestException(std::string("Kat: Output does not match the known answer! -BK1"));
+			throw TestException(std::string("Kat"), Rng->Name(), std::string("Output does not match the known answer! -BK1"));
 		}
 	}
 
-	void BCGTest::OnProgress(std::string Data)
+	void BCGTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -363,8 +317,8 @@ namespace Test
 		CTR cpr(BlockCiphers::Rijndael);
 		const uint MINPRL = static_cast<uint>(cpr.ParallelProfile().ParallelMinimumSize());
 		const uint MAXPRL = static_cast<uint>(cpr.ParallelProfile().ParallelBlockSize() * 4);
-		BCG drbg(BlockCiphers::Rijndael, BlockCipherExtensions::None, Providers::None);
-		Key::Symmetric::SymmetricKeySize ks = cpr.LegalKeySizes()[1];
+		BCG gen(BlockCiphers::Rijndael, BlockCipherExtensions::None, Providers::None);
+		Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[1];
 
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
@@ -385,20 +339,20 @@ namespace Test
 			inp.resize(INPLEN, 0x00);
 			otp.resize(INPLEN, 0x00);
 
-			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(iv, 0, iv.size(), rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(iv, 0, iv.size(), rnd);
 			SymmetricKey kp(key, iv);
 
 			// encrypt with aes
 			cpr.Initialize(true, kp);
 			cpr.Transform(inp, 0, cpt, 0, INPLEN);
 			// decrypt
-			drbg.Initialize(kp);
-			drbg.Generate(otp, 0, INPLEN);
+			gen.Initialize(kp);
+			gen.Generate(otp, 0, INPLEN);
 
 			if (otp != cpt)
 			{
-				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
+				throw TestException(std::string("Stress"), gen.Name(), std::string("Transformation output is not equal! -TS1"));
 			}
 		}
 	}

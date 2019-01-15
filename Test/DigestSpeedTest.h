@@ -13,8 +13,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string MESSAGE;
 		static const uint64_t KB1 = 1000;
 		static const uint64_t MB1 = KB1 * 1000;
@@ -57,7 +57,7 @@ namespace Test
 
 		void DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops = DEFITER, bool Parallel = false);
 		uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

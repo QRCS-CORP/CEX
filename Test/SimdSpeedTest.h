@@ -12,8 +12,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string MESSAGE;
 		static const std::string TESTSIZE;
 		static const uint64_t B512 = 512;
@@ -67,7 +67,7 @@ namespace Test
 		void CopyVectorSpeed(uint64_t Length, size_t Loops);
 		static uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void Initialize();
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 		void PostPerfResult(uint64_t Duration, uint64_t Length, const std::string &Message);
 		void SetBlockSpeed(uint64_t Length, size_t Loops);
 		void SetVectorSpeed(uint64_t Length, size_t Loops);

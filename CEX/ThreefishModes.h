@@ -17,15 +17,27 @@ enum class ThreefishModes : byte
 	/// <summary>
 	/// The Threefish 256-bit stream cipher
 	/// </summary>
-	Threefish256 = 66,
+	Threefish256 = 128,
+	/// <summary>
+	/// The Threefish 256-bit stream cipher authenticated with KMAC256
+	/// </summary>
+	Threefish256AE = 129,
 	/// <summary>
 	/// The Threefish 512-bit stream cipher
 	/// </summary>
-	Threefish512 = 67,
+	Threefish512 = 130,
+	/// <summary>
+	/// The Threefish 512-bit stream cipher authenticated with KMAC512
+	/// </summary>
+	Threefish512AE = 131,
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher
 	/// </summary>
-	Threefish1024 = 68
+	Threefish1024 = 132,
+	/// <summary>
+	/// The Threefish 1024-bit stream cipher authenticated with KMAC1024
+	/// </summary>
+	Threefish1024AE = 133
 };
 
 NAMESPACE_ENUMERATIONEND

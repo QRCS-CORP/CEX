@@ -1,8 +1,11 @@
 #include "X923.h"
 #include "CSP.h"
-#include "MemUtils.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 
 NAMESPACE_PADDING
+
+using Utility::IntegerTools;
 
 const std::string X923::CLASS_NAME("X923");
 
@@ -24,57 +27,74 @@ const std::string X923::Name()
 	return CLASS_NAME; 
 }
 
-size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
+void X923::AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	byte code;
+	size_t i;
 
-	code = 0;
-
-	if (Offset != Input.size())
+	if (Length > Input.size())
 	{
-		const size_t INPLEN = (Input.size() - Offset) - 1;
-		code = static_cast<byte>(Input.size() - Offset);
-
-		if (INPLEN > 0)
-		{
-			std::vector<byte> data(INPLEN);
-			Provider::CSP rnd;
-			rnd.Generate(data);
-			Utility::MemUtils::Copy(data, 0, Input, Offset, INPLEN);
-		}
-
-		Input[Input.size() - 1] = code;
+		throw CryptoPaddingException(Name(), std::string("AddPadding"), std::string("The length is longer than the array!"), ErrorCodes::InvalidSize);
 	}
 
-	return static_cast<size_t>(code);
+	for (i = Offset; i < Length - 1; ++i)
+	{
+		Input[i] = 0;
+	}
+
+	Input[Length - 1] = static_cast<byte>(Length - Offset);
 }
 
-size_t X923::GetPaddingLength(const std::vector<byte> &Input)
+size_t X923::GetBlockLength(const std::vector<byte> &Input)
 {
-	size_t code;
+	const size_t BLKLEN = Input.size();
+	const size_t FNLPAD = Input[BLKLEN - 1];
+	size_t ctr;
+	size_t inp;
+	size_t pos;
 
-	code = Input[Input.size() - 1] & 0xFF;
+	inp = 0;
+	inp |= IntegerTools::ExpandMask<size_t>(FNLPAD > BLKLEN);
+	pos = BLKLEN - FNLPAD;
+	ctr = BLKLEN - 2;
 
-	if (code > Input.size() - 1)
+	while (ctr != 0)
 	{
-		code = 0;
+		inp |= (~IntegerTools::IsZero(Input[ctr])) & IntegerTools::ExpandMask<byte>(ctr >= pos);
+		--ctr;
 	}
 
-	return code;
+	IntegerTools::ConditionalCopy(inp, &pos, &BLKLEN, &pos, 1);
+
+	return pos;
 }
 
-size_t X923::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
+size_t X923::GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	size_t code;
-
-	code = Input[Input.size() - 1] & 0xFF;
-
-	if (code > Input.size() - 1)
+	if (Length > Input.size())
 	{
-		code = 0;
+		throw CryptoPaddingException(CLASS_NAME, std::string("GetBlockLength"), std::string("The length is longer than the array!"), ErrorCodes::InvalidSize);
 	}
 
-	return code;
+	const size_t BLKLEN = Length;
+	const size_t FNLPAD = Input[BLKLEN - 1];
+	size_t ctr;
+	size_t inp;
+	size_t pos;
+
+	inp = 0;
+	inp |= IntegerTools::ExpandMask<size_t>(FNLPAD > BLKLEN);
+	pos = BLKLEN - FNLPAD;
+	ctr = BLKLEN - 2;
+
+	while (ctr != Offset)
+	{
+		inp |= (~IntegerTools::IsZero(Input[ctr])) & IntegerTools::ExpandMask<byte>(ctr >= pos);
+		--ctr;
+	}
+
+	IntegerTools::ConditionalCopy(inp, &pos, &BLKLEN, &pos, 1);
+
+	return pos;
 }
 
 NAMESPACE_PADDINGEND

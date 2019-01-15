@@ -16,7 +16,7 @@ namespace Test
 {
 	using Enumeration::BlockCiphers;
 	using Enumeration::DilithiumParameters;
-	using Cipher::Symmetric::Block::IBlockCipher;
+	using Cipher::Block::IBlockCipher;
 	using Enumeration::MLWEParameters;
 	using Enumeration::MPKCParameters;
 	using Enumeration::NTRUParameters;
@@ -31,8 +31,8 @@ namespace Test
 	{
 	private:
 
+		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
-		static const std::string FAILURE;
 		static const std::string MESSAGE;
 		static const uint64_t KB1 = 1000;
 		static const uint64_t MB1 = KB1 * 1000;
@@ -96,7 +96,7 @@ namespace Test
 		void SpxSignLoop(SphincsParameters Params, size_t Loops, Prngs PrngType);
 		void SpxVerifyLoop(SphincsParameters Params, size_t Loops, Prngs PrngType);
 		uint64_t GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count);
-		void OnProgress(std::string Data);
+		void OnProgress(const std::string &Data);
 	};
 }
 

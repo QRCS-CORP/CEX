@@ -1,12 +1,12 @@
 #include "DigestSpeedTest.h"
 #include "../CEX/IDigest.h"
 #include "../CEX/DigestFromName.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/IntegerTools.h"
 
 namespace Test
 {
+	const std::string DigestSpeedTest::CLASSNAME = "DigestSpeedTest";
 	const std::string DigestSpeedTest::DESCRIPTION = "Digest Speed Tests.";
-	const std::string DigestSpeedTest::FAILURE = "FAILURE! ";
 	const std::string DigestSpeedTest::MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
 
 	DigestSpeedTest::DigestSpeedTest()
@@ -95,11 +95,7 @@ namespace Test
 		}
 		catch (std::exception const &ex)
 		{
-			return FAILURE + " : " + ex.what();
-		}
-		catch (...)
-		{
-			return FAILURE + " : Unknown Error";
+			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
 		}
 	}
 
@@ -152,7 +148,7 @@ namespace Test
 		return (uint64_t)(sze / sec);
 	}
 
-	void DigestSpeedTest::OnProgress(std::string Data)
+	void DigestSpeedTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
