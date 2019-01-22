@@ -23,8 +23,10 @@
 #include "ArrayTools.h"
 #include "CpuDetect.h"
 #include <chrono>
+#include <string>
 
 #if defined(CEX_OS_WINDOWS)
+#define _WINSOCKAPI_
 #	include <Windows.h>
 #	pragma comment(lib, "IPHLPAPI.lib")
 #	include <iphlpapi.h>
@@ -34,10 +36,6 @@
 #	if defined(CEX_COMPILER_MSC)
 #		include <VersionHelpers.h>
 #	endif
-#elif defined(CEX_OS_ANDROID)
-
-#elif defined(CEX_OS_LINUX)
-
 #elif defined(CEX_OS_UNIX)
 #	include <time.h>
 #	include <unistd.h>
@@ -47,7 +45,12 @@
 #	include <time.h>
 #endif
 #if defined(CEX_OS_POSIX)
+#	include <dirent.h>
+#	include <fstream>
+#	include <ios>
+#	include <iostream>
 #	include <limits.h>
+#	include <pwd.h>
 #	include <stdio.h>
 #	include <stdlib.h>
 #	include <sys/resource.h>
@@ -95,6 +98,13 @@ public:
 	///
 	/// <returns>A vector of 64bit uint sizes</returns>
 	static std::vector<ulong> DriveSpace(const std::string &Drive);
+
+	/// <summary>
+	/// Return the intel RDRAND instructions
+	/// </summary>
+	/// 
+	/// <returns>Returns the availability of the RDRAND instructions on this system</returns>
+	static bool HasRdRand();
 
 	/// <summary>
 	/// Return the RDTSC frequency
@@ -211,6 +221,13 @@ public:
 	static POINT CursorPosition();
 
 	/// <summary>
+	/// Return the handle to the current module
+	/// </summary>
+	/// 
+	/// <returns>An HMODULE handle</returns>
+	static HMODULE GetCurrentModule();
+
+	/// <summary>
 	/// Return an array of heap entry structures for all running processes
 	/// </summary>
 	/// 
@@ -230,13 +247,6 @@ public:
 	/// 
 	/// <returns>A MEMORYSTATUSEX structure</returns>
 	static MEMORYSTATUSEX MemoryStatus();
-
-	/// <summary>
-	/// Return the handle to the current module
-	/// </summary>
-	/// 
-	/// <returns>An HMODULE handle</returns>
-	static HMODULE GetCurrentModule();
 
 	/// <summary>
 	/// Return an array of module entry structures for all running processes
@@ -326,6 +336,50 @@ public:
 #elif defined(CEX_OS_POSIX)
 
 	/// <summary>
+	/// The available free space on the primary hard drive
+	/// </summary>
+	/// 
+	/// <returns>The available free space</returns>
+	static ulong AvailableFreeSpace();
+
+	/// <summary>
+	/// Get a list of directories in the path
+	/// </summary>
+	///
+	/// <param name="Path"></param>
+	/// 
+	/// <returns>A list of directory names in the path</returns>
+	static std::vector<std::string> GetDirectories(std::string &Path);
+
+	/// <summary>
+	/// Get the file names in a directory
+	/// </summary>
+	/// 
+	/// <returns>A list of file names in the directory</returns>
+	static std::vector<std::string> GetFiles(std::string &Path);
+
+	/// <summary>
+	/// Get the path of the users home directory
+	/// </summary>
+	/// 
+	/// <returns>The name of the users home directory</returns>
+	static std::string GetHomeDirectory();
+
+	/// <summary>
+	/// Get the memory usage statistics
+	/// </summary>
+	/// 
+	/// <returns>A binary dump of the memory statistics</returns>
+	static std::string MemoryStatistics();
+
+	/// <summary>
+	/// Get the memory usage statistics
+	/// </summary>
+	/// 
+	/// <returns>A binary dump of the network statistics</returns>
+	static std::string NetworkStatistics();
+
+	/// <summary>
 	/// Return an array of process related values
 	/// </summary>
 	/// 
@@ -345,15 +399,6 @@ public:
 	/// 
 	/// <returns>A string containing the user id</returns>
 	static std::string UserId();
-
-// TODO: fill all of these out and merge..
-#elif defined(CEX_OS_ANDROID)
-
-#elif defined(CEX_OS_LINUX)
-
-#elif defined(CEX_OS_UNIX)
-
-#elif defined(CEX_OS_APPLE)
 
 #endif
 };

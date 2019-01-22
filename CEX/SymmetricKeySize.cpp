@@ -6,6 +6,8 @@ NAMESPACE_CIPHER
 using Enumeration::ErrorCodes;
 using Utility::MemoryTools;
 
+const std::string SymmetricKeySize::CLASS_NAME = "AsymmetricKey";
+
 //~~~Constructor~~~//
 
 SymmetricKeySize::SymmetricKeySize()
@@ -24,7 +26,7 @@ SymmetricKeySize::SymmetricKeySize(const std::vector<byte> &KeyArray)
 {
 	if (KeyArray.size() < HDR_SIZE)
 	{
-		throw CryptoProcessingException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The key array buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The key array buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
 	MemoryTools::CopyToValue(KeyArray, 0, m_infoSize, sizeof(uint));

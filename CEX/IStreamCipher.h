@@ -162,6 +162,8 @@ public:
 	/// 
 	/// <param name="KeyParams">Cipher key container. The LegalKeySizes property contains valid sizes</param>
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
+	///
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
@@ -172,7 +174,7 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
@@ -184,7 +186,7 @@ public:
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if state has been processed</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if state has been processed</exception>
 	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
 
 	/// <summary>

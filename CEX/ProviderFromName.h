@@ -16,6 +16,10 @@ using Enumeration::Providers;
 /// </summary>
 class ProviderFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -26,7 +30,7 @@ public:
 	/// 
 	/// <returns>An initialized entropy provider</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the entropy provider type is not supported</exception>
 	static IProvider* GetInstance(Providers ProviderType);
 };
 

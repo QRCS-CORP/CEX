@@ -157,7 +157,7 @@ public:
 	template<typename T, typename Alloc>
 	static size_t Insert(std::vector<T, Alloc> &Output, size_t OutOffset, const T Input[], size_t Length)
 	{
-		CexAssert(OutOffset <= Output.size(), "The buffer is too small");
+		CEXASSERT(OutOffset <= Output.size(), "The buffer is too small");
 
 		const size_t CPYLEN = std::min(Length, Output.size() - OutOffset);
 
@@ -172,7 +172,7 @@ public:
 	template<typename T, typename Alloc1, typename Alloc2>
 	static size_t Insert(std::vector<T, Alloc1> &Output, size_t OutOffset, const std::vector<T, Alloc2> &Input)
 	{
-		CexAssert(OutOffset <= Output.size(), "The buffer is too small");
+		CEXASSERT(OutOffset <= Output.size(), "The buffer is too small");
 
 		const size_t CPYLEN = std::min(Input.size(), Output.size() - OutOffset);
 

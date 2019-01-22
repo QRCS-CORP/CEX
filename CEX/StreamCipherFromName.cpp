@@ -12,6 +12,8 @@ NAMESPACE_HELPER
 using Exception::CryptoSymmetricCipherException;
 using Enumeration::ErrorCodes;
 
+const std::string StreamCipherFromName::CLASS_NAME("StreamCipherFromName");
+
 IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 {
 	IStreamCipher* cptr;
@@ -95,17 +97,17 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 			}
 			default:
 			{
-				throw CryptoException(std::string("StreamCipherFromName"), std::string("GetInstance"), std::string("The stream cipher type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The stream cipher type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoSymmetricCipherException &ex)
 	{
-		throw CryptoException(std::string("StreamCipherFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("StreamCipherFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return cptr;

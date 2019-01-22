@@ -115,6 +115,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>

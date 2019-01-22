@@ -2,7 +2,6 @@
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
 #include "../CEX/IntegerTools.h"
-#include "../CEX/OCB.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
@@ -10,7 +9,6 @@ namespace Test
 	using Cipher::Block::IBlockCipher;
 	using Cipher::Block::Mode::EAX;
 	using Cipher::Block::Mode::GCM;
-	using Cipher::Block::Mode::OCB;
 	using Utility::IntegerTools;
 
 	const std::string AeadTest::CLASSNAME = "AeadTest";
@@ -83,36 +81,6 @@ namespace Test
 			OnProgress(std::string("AeadTest: Passed EAX auto incrementing tests.."));
 
 			delete cpr1;
-
-			OCB* cpr2 = new OCB(Enumeration::BlockCiphers::Rijndael);
-			Kat(cpr2, m_key[10], m_nonce[10], m_associatedText[10], m_plainText[10], m_cipherText[10], m_expectedCode[10]);
-			Kat(cpr2, m_key[11], m_nonce[11], m_associatedText[11], m_plainText[11], m_cipherText[11], m_expectedCode[11]);
-			Kat(cpr2, m_key[12], m_nonce[12], m_associatedText[12], m_plainText[12], m_cipherText[12], m_expectedCode[12]);
-			Kat(cpr2, m_key[13], m_nonce[13], m_associatedText[13], m_plainText[13], m_cipherText[13], m_expectedCode[13]);
-			Kat(cpr2, m_key[14], m_nonce[14], m_associatedText[14], m_plainText[14], m_cipherText[14], m_expectedCode[14]);
-			Kat(cpr2, m_key[15], m_nonce[15], m_associatedText[15], m_plainText[15], m_cipherText[15], m_expectedCode[15]);
-			Kat(cpr2, m_key[16], m_nonce[16], m_associatedText[16], m_plainText[16], m_cipherText[16], m_expectedCode[16]);
-			Kat(cpr2, m_key[17], m_nonce[17], m_associatedText[17], m_plainText[17], m_cipherText[17], m_expectedCode[17]);
-			Kat(cpr2, m_key[18], m_nonce[18], m_associatedText[18], m_plainText[18], m_cipherText[18], m_expectedCode[18]);
-			Kat(cpr2, m_key[19], m_nonce[19], m_associatedText[19], m_plainText[19], m_cipherText[19], m_expectedCode[19]);
-			Kat(cpr2, m_key[20], m_nonce[20], m_associatedText[20], m_plainText[20], m_cipherText[20], m_expectedCode[20]);
-			Kat(cpr2, m_key[21], m_nonce[21], m_associatedText[21], m_plainText[21], m_cipherText[21], m_expectedCode[21]);
-			Kat(cpr2, m_key[22], m_nonce[22], m_associatedText[22], m_plainText[22], m_cipherText[22], m_expectedCode[22]);
-			Kat(cpr2, m_key[23], m_nonce[23], m_associatedText[23], m_plainText[23], m_cipherText[23], m_expectedCode[23]);
-			Kat(cpr2, m_key[24], m_nonce[24], m_associatedText[24], m_plainText[24], m_cipherText[24], m_expectedCode[24]);
-			Kat(cpr2, m_key[25], m_nonce[25], m_associatedText[25], m_plainText[25], m_cipherText[25], m_expectedCode[25]);
-			OnProgress(std::string("AeadTest: Passed OCB known answer comparison tests.."));
-
-			Stress(cpr2);
-			OnProgress(std::string("AeadTest: Passed OCB stress tests.."));
-
-			Parallel(cpr2);
-			OnProgress(std::string("AeadTest: Passed OCB parallel tests.."));
-
-			Incremental(cpr2);
-			OnProgress(std::string("AeadTest: Passed OCB auto incrementing tests.."));
-
-			delete cpr2;
 
 			GCM* cpr3 = new GCM(Enumeration::BlockCiphers::Rijndael);
 			Kat(cpr3, m_key[26], m_nonce[26], m_associatedText[26], m_plainText[26], m_cipherText[26], m_expectedCode[26]);

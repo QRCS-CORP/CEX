@@ -102,7 +102,7 @@ public:
 	/// <param name="SeedEngine">The Seed engine used to create the salt (default is auto-seed)</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
 	HCR(SHA2Digests DigestType = SHA2Digests::SHA512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
 
 	/// <summary>
@@ -113,7 +113,7 @@ public:
 	/// <param name="DigestType">The digest that powers the rng (default is SHA512)</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
 	explicit HCR(std::vector<byte> Seed, SHA2Digests DigestType = SHA2Digests::SHA512, size_t BufferSize = 1024);
 
 	/// <summary>

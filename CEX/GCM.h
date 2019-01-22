@@ -16,15 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// This algorithm (OCB) was designed and patented by Phillip Rogaway.
-// This implementation of OCB is free for open source projects (GPL), 
-// otherwise, it's use may be subject to additional licensing restrictions.
-// The list of free OCB licenses are available on the OCB website:
-// http://web.cs.ucdavis.edu/~rogaway/ocb/license.htm
-//
-//
 // Implementation Details:
-// An implementation of an Offset CodeBook authenticated mode (OCB).
+// An implementation of an Offset CodeBook authenticated mode (GCM).
 // Written by John Underhill, February 3, 2017
 // Updated April 18, 2017
 // Updated October 14, 2017
@@ -187,7 +180,7 @@ public:
 	/// <param name="CipherType">The enumeration name of the block cipher</param>
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid block cipher type is selected</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if an invalid block cipher type is selected</exception>
 	explicit GCM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
@@ -196,7 +189,7 @@ public:
 	///
 	/// <param name="Cipher">An uninitialized Block Cipher instance; can not be null</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if a null block cipher is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if a null block cipher is used</exception>
 	explicit GCM(IBlockCipher* Cipher);
 
 	/// <summary>
@@ -296,7 +289,7 @@ public:
 	/// Read Only: Returns the full finalized MAC code value array
 	/// </summary>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
 	const std::vector<byte> Tag() override;
 
 	//~~~Public Functions~~~//
@@ -357,7 +350,7 @@ public:
 	/// <param name="Length">The number of MAC code bytes to write to the output array.
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
 	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 	/// <summary>
@@ -379,6 +372,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
@@ -391,7 +386,7 @@ public:
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized</exception>
 	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 	/// <summary>
@@ -424,7 +419,7 @@ public:
 	/// 
 	/// <returns>Returns false if the MAC code does not match</returns>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
 	bool Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 private:

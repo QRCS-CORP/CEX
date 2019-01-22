@@ -16,6 +16,8 @@ NAMESPACE_HELPER
 using Exception::CryptoDigestException;
 using Enumeration::ErrorCodes;
 
+const std::string DigestFromName::CLASS_NAME("DigestFromName");
+
 IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 {
 	using namespace Digest;
@@ -80,7 +82,7 @@ IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 			}
 			default:
 			{
-				throw CryptoException(std::string("DigestFromName"), std::string("GetInstance"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
@@ -141,7 +143,7 @@ size_t DigestFromName::GetBlockSize(Digests DigestType)
 		}
 		default:
 		{
-			throw CryptoException(std::string("DigestFromName"), std::string("GetBlockSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
+			throw CryptoException(CLASS_NAME, std::string("GetBlockSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -185,7 +187,7 @@ size_t DigestFromName::GetDigestSize(Digests DigestType)
 		}
 		default:
 		{
-			throw CryptoException(std::string("DigestFromName"), std::string("GetDigestSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
+			throw CryptoException(CLASS_NAME, std::string("GetDigestSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -229,7 +231,7 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 		}
 		default:
 		{
-			throw CryptoException(std::string("DigestFromName"), std::string("GetPaddingSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
+			throw CryptoException(CLASS_NAME, std::string("GetPaddingSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
 

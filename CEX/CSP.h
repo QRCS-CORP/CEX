@@ -1,7 +1,7 @@
 #ifndef CEX_CSP_H
 #define CEX_CSP_H
 
-#include "IProvider.h"
+#include "ProviderBase.h"
 
 NAMESPACE_PROVIDER
 
@@ -30,13 +30,15 @@ NAMESPACE_PROVIDER
 /// <item><description>RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requirements for Security.</description></item>
 /// </list> 
 /// </remarks>
-class CSP final : public IProvider
+class CSP final : public ProviderBase
 {
 private:
 
 	static const std::string CLASS_NAME;
 
-	bool m_isAvailable;
+#if defined(CEX_FIPS140_ENABLED)
+	ProviderSelfTest m_pvdSelfTest;
+#endif
 
 public:
 
@@ -62,23 +64,6 @@ public:
 	/// </summary>
 	~CSP() override;
 
-	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read Only: The providers type name
-	/// </summary>
-	const Providers Enumeral() override;
-
-	/// <summary>
-	/// Read Only: The entropy provider is available on this system
-	/// </summary>
-	const bool IsAvailable() override;
-
-	/// <summary>
-	/// Read Only: Cipher name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Public Functions~~~//
 
 	/// <summary>
@@ -87,7 +72,7 @@ public:
 	///
 	/// <param name="Output">The output array to fill</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -98,45 +83,38 @@ public:
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Return an array with pseudo-random bytes
+	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
 	/// 
-	/// <param name="Length">The size of the expected array returned</param>
-	/// 
-	/// <returns>An array of pseudo-random of bytes</returns>
-	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	std::vector<byte> Generate(size_t Length) override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
+	/// Fill the SecureVector with pseudo-random bytes using offsets
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the Output array</param>
+	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUInt16() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint NextUInt32() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextUInt64() override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
 	void Reset() override;
+
+private:
+
+	bool FipsTest();
+	static void GetEntropy(byte* Output, size_t Length);
 };
 
 NAMESPACE_PROVIDEREND

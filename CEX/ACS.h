@@ -96,7 +96,7 @@ using Enumeration::StreamAuthenticators;
 /// ACS is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. \n
 /// It also has provable security, dependant on the block cipher used by the mode. \n
 /// ACS first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a MAC function used for data authentication. \n
-/// When encryption is completed, the MAC code is generated and appended to the output stream automatically. \n
+/// When each transform call encryption is completed, the MAC code is generated and appended to the output stream automatically. \n
 /// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text. \n
 /// During decryption, if the MAC codes do not match, a CryptoAuthenticationFailure exception error is thrown.</para>
 ///
@@ -194,7 +194,7 @@ public:
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF; the default is SHAKE256</param>
 	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block cipher type is used</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid block cipher type is used</exception>
 	ACS(BlockCiphers CipherType = BlockCiphers::AHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::SHAKE256, StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
@@ -292,7 +292,7 @@ public:
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="KeyParams">Cipher key structure, containing cipher key, nonce, and optional info array</param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
 
 	/// <summary>
@@ -302,6 +302,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
@@ -313,7 +315,7 @@ public:
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if the cipher is not initialized</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if the cipher is not initialized</exception>
 	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 	/// <summary>
@@ -329,7 +331,7 @@ public:
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">Number of bytes to process</param>
 	///
-	/// <exception cref="Exception::CryptoAuthenticationFailure">Thrown during decryption if the the ciphertext fails authentication</exception>
+	/// <exception cref="CryptoAuthenticationFailure">Thrown during decryption if the the ciphertext fails authentication</exception>
 	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 private:

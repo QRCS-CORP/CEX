@@ -228,9 +228,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("// * CEX++ Version 1.0.0.7: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("// *                                             *");
-	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7f (A7)                   *");
+	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7g (A7)                   *");
 	ConsoleUtils::WriteLine("// * License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("// * Date:      January 14, 2018                *");
+	ConsoleUtils::WriteLine("// * Date:      January 21, 2018                 *");
 	ConsoleUtils::WriteLine("// * Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");

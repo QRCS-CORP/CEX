@@ -20,6 +20,10 @@ using Enumeration::StreamAuthenticators;
 /// </summary>
 class MacFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -30,7 +34,7 @@ public:
 	/// 
 	/// <returns>An uninitialized MAC generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the MAC is not supported</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if the MAC type is not supported</exception>
 	static IMac* GetInstance(Macs MacType);
 
 	/// <summary>
@@ -41,7 +45,7 @@ public:
 	/// 
 	/// <returns>An uninitialized MAC generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the MAC is not supported</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if the MAC authenticator type is not supported</exception>
 	static IMac* GetInstance(StreamAuthenticators AuthenticatorType);
 };
 

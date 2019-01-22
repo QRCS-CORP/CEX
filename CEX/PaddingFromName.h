@@ -16,6 +16,10 @@ using Enumeration::PaddingModes;
 /// </summary>
 class PaddingFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -26,7 +30,7 @@ public:
 	/// 
 	/// <returns>A padding mode instance</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the padding type is not supported</exception>
 	static IPadding* GetInstance(PaddingModes PaddingType);
 };
 

@@ -22,6 +22,10 @@ using Cipher::Block::Mode::ICipherMode;
 /// </summary>
 class CipherModeFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -34,7 +38,7 @@ public:
 	/// 
 	/// <returns>An uninitialized block cipher mode instance</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the block cipher, extension or mode are not supported</exception>
 	static ICipherMode* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType);
 
 	/// <summary>
@@ -46,7 +50,7 @@ public:
 	/// 
 	/// <returns>An uninitialized block cipher mode instance</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the cipher is null or the mode is not supported</exception>
 	static ICipherMode* GetInstance(IBlockCipher* Cipher, CipherModes CipherModeType);
 };
 

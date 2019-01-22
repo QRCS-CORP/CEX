@@ -25,15 +25,7 @@ Keccak1024::Keccak1024(bool Parallel)
 	m_treeParams(Parallel ? KeccakParams(DIGEST_SIZE, static_cast<byte>(Keccak::KECCAK_RATE1024_SIZE), DEF_PRLDEGREE) : KeccakParams(DIGEST_SIZE, 0, 0))
 {
 	// TODO: implement parallel alternate for single core cpu
-	if (Parallel && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
-	}
-
-	if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = Parallel;
-	}
+	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
 	Reset();
 }
@@ -50,7 +42,7 @@ Keccak1024::Keccak1024(KeccakParams &Params)
 {
 	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::NotSupported);
 	}
 	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
 	{
@@ -252,7 +244,7 @@ void Keccak1024::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
+		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -286,7 +278,7 @@ void Keccak1024::Update(byte Input)
 
 void Keccak1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
 
 	if (Length != 0)
 	{

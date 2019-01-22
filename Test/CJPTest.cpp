@@ -42,8 +42,6 @@ namespace Test
 			Exception();
 			OnProgress(std::string("CJPTest: Passed CJP exception handling tests.."));
 
-#if !defined(_DEBUG)
-
 			CJP* gen = new CJP;
 			Evaluate(gen);
 			OnProgress(std::string("CJPTest: Passed CJP random evaluation.."));
@@ -51,8 +49,6 @@ namespace Test
 
 			Stress();
 			OnProgress(std::string("CJPTest: Passed CJP stress tests.."));
-
-#endif
 
 			return SUCCESS;
 		}

@@ -18,6 +18,10 @@ using Cipher::Block::IBlockCipher;
 /// </summary>
 class BlockCipherFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -29,7 +33,7 @@ public:
 	/// 
 	/// <returns>A symmetric block cipher instance</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the block cipher type is not supported</exception>
 	static IBlockCipher* GetInstance(BlockCiphers CipherType);
 
 	/// <summary>
@@ -41,7 +45,7 @@ public:
 	/// 
 	/// <returns>A symmetric block cipher instance</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the block cipher type is not supported</exception>
 	static IBlockCipher* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType);
 };
 

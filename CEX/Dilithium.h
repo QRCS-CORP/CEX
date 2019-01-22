@@ -63,16 +63,10 @@ using Kdf::IKdf;
 /// Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 /// sgn.Initialize(PublicKey);
 /// std::vector&lt;byte&gt; message(0);
-/// 
-/// try
-/// {
-///		// if authentication fails, this will throw
-///		sgn.Verify(Signature, msg);
-/// }
-/// catch (const CryptoAuthenticationFailure &ex)
-/// {
-///		// handle the authentication failure
-/// }
+/// bool status;
+///
+///	// if authentication fails, do something
+///	status = sgn.Verify(Signature, msg);
 /// </code>
 /// </example>
 /// 
@@ -139,7 +133,7 @@ public:
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Rng">A pointer to the seed Prng function</param>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
+	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
 	Dilithium(DilithiumParameters Parameters, IPrng* Rng);
 
 	/// <summary>
@@ -187,7 +181,7 @@ public:
 	/// 
 	/// <returns>A public/private key pair</returns>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
+	/// <exception cref="CryptoAsymmetricException">Thrown if the key generation call fails</exception>
 	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
@@ -195,6 +189,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Key">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
+	/// 
+	/// <exception cref="CryptoAsymmetricException">Throws on invalid key or configuration error</exception>
 	const void Initialize(AsymmetricKey* Key) override;
 
 	/// <summary>

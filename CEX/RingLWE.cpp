@@ -145,10 +145,10 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 	{
 		case (RLWEParameters::RLWES1Q12289N1024):
 		{
-			CexAssert(m_isInitialized, "The cipher has not been initialized");
-			CexAssert(CipherText.size() >= RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
-			CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-			CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+			CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+			CEXASSERT(CipherText.size() >= RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
+			CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+			CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 			sec.resize(2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
 			cmp.resize(RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE);
@@ -194,10 +194,10 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 		}
 		case (RLWEParameters::RLWES2Q12289N2048):
 		{
-			CexAssert(m_isInitialized, "The cipher has not been initialized");
-			CexAssert(CipherText.size() >= RLWEQ12289N2048::RLWE_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
-			CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-			CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+			CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+			CEXASSERT(CipherText.size() >= RLWEQ12289N2048::RLWE_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
+			CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+			CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 			sec.resize(2 * RLWEQ12289N2048::RLWE_SEED_SIZE);
 			cmp.resize(RLWEQ12289N2048::RLWE_CCACIPHERTEXT_SIZE);
@@ -240,9 +240,9 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 
 void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> sec(0);
 	std::vector<byte> coin(0);
@@ -328,7 +328,7 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 
 AsymmetricKeyPair* RingLWE::Generate()
 {
-	CexAssert(m_rlweParameters != RLWEParameters::None, "The parameter setting is invalid");
+	CEXASSERT(m_rlweParameters != RLWEParameters::None, "The parameter setting is invalid");
 
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);

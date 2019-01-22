@@ -292,7 +292,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotL32(const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		ymm = _mm256_or_si256(_mm256_slli_epi32(ymm, static_cast<int>(Shift)), _mm256_srli_epi32(ymm, static_cast<int>(32 - Shift)));
 	}
 
@@ -306,7 +306,7 @@ public:
 	/// <returns>The rotated UInt256</returns>
 	inline static UInt256 RotL32(const UInt256 &X, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_or_si256(_mm256_slli_epi32(X.ymm, static_cast<int>(Shift)), _mm256_srli_epi32(X.ymm, static_cast<int>(32 - Shift))));
 	}
 
@@ -317,7 +317,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotR32(const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
 	}
 
@@ -331,7 +331,7 @@ public:
 	/// <returns>The rotated UInt256</returns>
 	inline static UInt256 RotR32(const UInt256 &X, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return RotL32(X, 32 - Shift);
 	}
 
@@ -345,7 +345,7 @@ public:
 	/// <returns>The processed UInt256</returns>
 	inline static UInt256 ShiftRA(const UInt256 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_sra_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -359,7 +359,7 @@ public:
 	/// <returns>The processed UInt256</returns>
 	inline static UInt256 ShiftRL(const UInt256 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -528,7 +528,7 @@ public:
 		std::array<uint, 8> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
 
 		return UInt256(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
@@ -548,7 +548,7 @@ public:
 		std::array<uint, 8> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
 
 		ymm = _mm256_set_epi32(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);

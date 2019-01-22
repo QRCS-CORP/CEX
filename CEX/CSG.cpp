@@ -209,11 +209,15 @@ size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::IllegalOperation);
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::NotInitialized);
 	}
 	if ((Output.size() - OutOffset) < Length)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+	}
+	if (Length > MAX_REQUEST)
+	{
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too large, max request is 64KB!"), ErrorCodes::MaxExceeded);
 	}
 
 	Extract(Output, OutOffset, Length);
@@ -228,7 +232,7 @@ size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 			if (m_reseedRequests > MAX_RESEED)
 			{
-				throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::IllegalOperation);
+				throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::MaxExceeded);
 			}
 
 			Derive();
@@ -351,7 +355,7 @@ void CSG::Update(const std::vector<byte> &Seed)
 
 void CSG::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::array<ulong, STATE_SIZE> &State)
 {
-	CexAssert(Customization.size() + Name.size() <= 196, "the input buffer is too large");
+	CEXASSERT(Customization.size() + Name.size() <= 196, "The input buffer is too large");
 
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
@@ -430,7 +434,7 @@ void CSG::Derive()
 
 void CSG::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(Output.size() != 0, "output size must be at least 1 in length");
+	CEXASSERT(Output.size() != 0, "Output size must be at least 1 in length");
 
 	if (m_drbgBuffer.size() - m_bufferIndex < Length)
 	{
@@ -474,7 +478,7 @@ void CSG::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Len
 {
 	std::array<byte, BUFFER_SIZE> msg;
 
-	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The Output buffer is too short!");
 
 	if (Length != 0)
 	{

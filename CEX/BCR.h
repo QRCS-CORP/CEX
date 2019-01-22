@@ -106,7 +106,7 @@ public:
 	/// <param name="ProviderType">The Seed engine used to create keyng material (default is none)</param>
 	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the selected parameters are invalid</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the selected parameters are invalid</exception>
 	explicit BCR(BlockCiphers CipherType = BlockCiphers::AHX, Providers ProviderType = Providers::None, bool Parallel = true);
 
 	/// <summary>
@@ -117,7 +117,7 @@ public:
 	/// <param name="CipherType">The block cipher that powers the rng (default is AHX)</param>
 	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the selected parameters are invalid</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the selected parameters are invalid</exception>
 	explicit BCR(std::vector<byte> &Seed, BlockCiphers CipherType = BlockCiphers::AHX, bool Parallel = true);
 
 	/// <summary>

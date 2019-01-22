@@ -132,23 +132,23 @@ const NTRUParameters NTRU::Parameters()
 
 bool NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> secret(32);
 	int result = 0;
 
 	if (m_ntruParameters == NTRUParameters::NTRUS2SQ4591N761)
 	{
-		CexAssert(CipherText.size() >= NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
+		CEXASSERT(CipherText.size() >= NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		// process message from B and return shared secret
 		result = NTRUSQ4591N761::Decrypt(secret, CipherText, m_privateKey->P());
 	}
 	else if (m_ntruParameters == NTRUParameters::NTRUS1LQ4591N761)
 	{
-		CexAssert(CipherText.size() >= NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
+		CEXASSERT(CipherText.size() >= NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->P());
 	}
@@ -163,15 +163,15 @@ bool NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &S
 
 void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> secret(32);
 
 	if (m_ntruParameters == NTRUParameters::NTRUS2SQ4591N761)
 	{
-		CexAssert(m_publicKey->P().size() >= NTRUSQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
+		CEXASSERT(m_publicKey->P().size() >= NTRUSQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
 
 		CipherText.resize(NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE);
 
@@ -180,7 +180,7 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 	}
 	else if (m_ntruParameters == NTRUParameters::NTRUS1LQ4591N761)
 	{
-		CexAssert(m_publicKey->P().size() >= NTRULQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
+		CEXASSERT(m_publicKey->P().size() >= NTRULQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
 
 		CipherText.resize(NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE);
 
@@ -194,7 +194,7 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 
 AsymmetricKeyPair* NTRU::Generate()
 {
-	CexAssert(m_ntruParameters != NTRUParameters::None, "The parameter setting is invalid");
+	CEXASSERT(m_ntruParameters != NTRUParameters::None, "The parameter setting is invalid");
 
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);

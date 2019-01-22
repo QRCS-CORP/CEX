@@ -103,7 +103,7 @@ public:
 	/// <param name="DigestType">The digest that powers the rng (default is Keccak512)</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
 	explicit PBR(std::vector<byte> &Seed, int Iterations = 5000, Digests DigestType = Digests::SHA512, size_t BufferSize = 1024);
 
 	/// <summary>

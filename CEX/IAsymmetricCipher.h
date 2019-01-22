@@ -26,18 +26,15 @@
 #include "AsymmetricKeyTypes.h"
 #include "AsymmetricTransforms.h"
 #include "CryptoAsymmetricException.h"
-#include "CryptoAuthenticationFailure.h"
-#include "ErrorCodes.h"
 #include "IPrng.h"
 #include "Prngs.h"
 
 NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricEngines;
-using Exception::CryptoAsymmetricException;
 using Enumeration::AsymmetricKeyTypes;
 using Enumeration::AsymmetricTransforms;
-using Exception::CryptoAuthenticationFailure;
+using Exception::CryptoAsymmetricException;
 using Enumeration::ErrorCodes;
 using Prng::IPrng;
 using Enumeration::Prngs;
@@ -137,7 +134,7 @@ public:
 	/// 
 	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
+	/// <exception cref="CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
 	virtual void Initialize(AsymmetricKey* Key) = 0;
 };
 

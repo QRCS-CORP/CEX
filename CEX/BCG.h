@@ -183,7 +183,7 @@ public:
 	/// <param name="Parallel">Enable/disable the multi-threading engine; default is false.
 	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
 	///
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
 	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::HKDF256, Providers ProviderType = Providers::None, bool Parallel = false);
 
 	/// <summary>
@@ -198,7 +198,7 @@ public:
 	/// <param name="Parallel">Enable/disable the multi-threading engine; default is false.
 	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null block cipher is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if a null block cipher is used</exception>
 	explicit BCG(IBlockCipher* Cipher, IKdf* Kdf = nullptr, IProvider* Provider = nullptr, bool Parallel = false);
 
 	/// <summary>
@@ -304,6 +304,9 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -315,6 +318,9 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
@@ -323,7 +329,7 @@ public:
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -332,7 +338,7 @@ public:
 	/// 
 	/// <param name="Seed">The primary key array used to seed the generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed) override;
 
 	/// <summary>
@@ -343,7 +349,7 @@ public:
 	/// <param name="Seed">The primary key array used to seed the generator</param>
 	/// <param name="Nonce">The nonce value containing an additional source of entropy</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce) override;
 
 	/// <summary>
@@ -358,7 +364,7 @@ public:
 	/// <param name="Nonce">The nonce value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used to create a unique distribution or as a third source of entropy</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info) override;
 
 	/// <summary>
@@ -369,7 +375,7 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
@@ -379,7 +385,7 @@ public:
 	/// 
 	/// <param name="Seed">The secret seed array</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is too small</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
 	void Update(const std::vector<byte> &Seed) override;
 
 private:

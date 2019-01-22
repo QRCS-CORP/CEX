@@ -25,15 +25,7 @@ Keccak256::Keccak256(bool Parallel)
 	m_treeParams(Parallel ? KeccakParams(DIGEST_SIZE, static_cast<byte>(Keccak::KECCAK_RATE256_SIZE), DEF_PRLDEGREE) : KeccakParams(DIGEST_SIZE, 0, 0))
 {
 	// TODO: implement parallel alternate for single core cpu
-	if (Parallel && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
-	}
-
-	if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = Parallel;
-	}
+	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
 	Reset();
 }
@@ -50,7 +42,7 @@ Keccak256::Keccak256(KeccakParams &Params)
 {
 	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::NotSupported);
 	}
 	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
 	{
@@ -153,7 +145,7 @@ void Keccak256::Compute(const std::vector<byte> &Input, std::vector<byte> &Outpu
 
 size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CexAssert(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
+	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -227,7 +219,7 @@ void Keccak256::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
+		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -261,7 +253,7 @@ void Keccak256::Update(byte Input)
 
 void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
 
 	if (Length != 0)
 	{

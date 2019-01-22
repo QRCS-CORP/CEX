@@ -13,6 +13,7 @@ using Exception::CryptoMacException;
 using Enumeration::ErrorCodes;
 using Enumeration::Macs;
 
+const std::string MacFromDescription::CLASS_NAME("MacFromDescription");
 
 IMac* MacFromDescription::GetInstance(MacDescription &Description)
 {
@@ -73,17 +74,17 @@ IMac* MacFromDescription::GetInstance(MacDescription &Description)
 			}
 			default:
 			{
-				throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoMacException &ex)
 	{
-		throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return mptr;

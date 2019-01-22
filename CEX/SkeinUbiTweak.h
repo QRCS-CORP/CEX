@@ -185,7 +185,7 @@ public:
 	{
 		if (Value > 63)
 		{
-			throw CryptoDigestException("Skein:TreeLevel", "Tree level must be between 0 and 63, inclusive.");
+			throw CryptoDigestException(std::string("SkeinUbiTweak"), std::string("TreeLevel"), std::string("Tree level must be between 0 and 63, inclusive."), Enumeration::ErrorCodes::InvalidParam);
 		}
 
 		Tweak[1] &= ~(static_cast<ulong>(0x3f) << 48);

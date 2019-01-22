@@ -42,7 +42,7 @@ public:
 	/// <param name="MaxAlloc">The maximum allocation allowed</param>
 	/// <param name="AlignBit">The alignment bit</param>
 	///
-	/// <exception cref="Exception::CryptoException">Thrown if invalid parameters are passed</exception>
+	/// <exception cref="CryptoException">Thrown if invalid parameters are passed</exception>
 	MemoryPool(byte* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, byte AlignBit);
 
 	/// <summary>
@@ -53,7 +53,7 @@ public:
 	///
 	/// <returns>Returns a pointer to the allocated memory</returns>
 	///
-	/// <exception cref="Exception::CryptoException">Thrown if invalid parameters are passed</exception>
+	/// <exception cref="CryptoException">Thrown if invalid parameters are passed</exception>
 	void* Allocate(size_t Length);
 
 	/// <summary>

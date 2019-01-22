@@ -104,7 +104,7 @@ public:
 	template<typename Array>
 	static void Absorb(const Array &Input, size_t InOffset, size_t InLength, std::array<ulong, KECCAK_STATE_SIZE> &State)
 	{
-		CexAssert(InLength % sizeof(ulong) == 0, "the input length is not 64-bit aligned");
+		CEXASSERT(InLength % sizeof(ulong) == 0, "The input length is not 64-bit aligned");
 
 #if !defined(CEX_IS_LITTLE_ENDIAN)
 		MemoryTools::XOR(Input, InOffset, State, 0, InLength);

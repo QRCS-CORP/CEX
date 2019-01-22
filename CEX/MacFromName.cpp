@@ -16,6 +16,8 @@ using Enumeration::ErrorCodes;
 using Enumeration::SHA2Digests;
 using Enumeration::ShakeModes;
 
+const std::string MacFromName::CLASS_NAME("MacFromName");
+
 IMac* MacFromName::GetInstance(Macs MacType)
 {
 	using namespace Mac;
@@ -90,17 +92,17 @@ IMac* MacFromName::GetInstance(Macs MacType)
 			}
 			default:
 			{
-				throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoMacException &ex)
 	{
-		throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return mptr;
@@ -145,17 +147,17 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 			}
 			default:
 			{
-				throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoMacException &ex)
 	{
-		throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("MacFromDescription"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return mptr;

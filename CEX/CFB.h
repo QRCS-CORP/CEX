@@ -154,7 +154,7 @@ public:
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
 	explicit CFB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, size_t RegisterSize = 16);
 
 	/// <summary>
@@ -164,7 +164,7 @@ public:
 	/// <param name="Cipher">An uninitialized block cipher instance; can not be null</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size; default value is 16 bytes</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if a null Block Cipher is used, or the specified block size is invalid</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if a null Block Cipher is used, or the specified block size is invalid</exception>
 	explicit CFB(IBlockCipher* Cipher, size_t RegisterSize = 16);
 
 	/// <summary>
@@ -285,7 +285,7 @@ public:
 	/// <param name="Encryption">True if cipher is used for encryption, False to decrypt</param>
 	/// <param name="KeyParams">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
-	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or Nonce is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if an invalid key or nonce is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
 
 	/// <summary>
@@ -295,6 +295,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

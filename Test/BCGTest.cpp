@@ -316,7 +316,7 @@ namespace Test
 	{
 		CTR cpr(BlockCiphers::Rijndael);
 		const uint MINPRL = static_cast<uint>(cpr.ParallelProfile().ParallelMinimumSize());
-		const uint MAXPRL = static_cast<uint>(cpr.ParallelProfile().ParallelBlockSize() * 4);
+		const uint MAXPRL = static_cast<uint>(cpr.ParallelProfile().ParallelBlockSize());
 		BCG gen(BlockCiphers::Rijndael, BlockCipherExtensions::None, Providers::None);
 		Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[1];
 

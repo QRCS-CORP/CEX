@@ -224,11 +224,15 @@ size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::IllegalOperation);
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::NotInitialized);
 	}
 	if ((Output.size() - OutOffset) < Length)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+	}
+	if (Length > MAX_REQUEST)
+	{
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too large, max request is 64KB!"), ErrorCodes::MaxExceeded);
 	}
 
 	GenerateBlock(Output, OutOffset, Length);
@@ -243,7 +247,7 @@ size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 			if (m_reseedRequests > MAX_RESEED)
 			{
-				throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::IllegalOperation);
+				throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::MaxExceeded);
 			}
 
 			m_reseedCounter = 0;

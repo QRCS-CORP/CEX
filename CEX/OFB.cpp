@@ -164,13 +164,9 @@ void OFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void OFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	if (KeyParams.Nonce().size() < 1)
+	if (KeyParams.Nonce().size() < 1 || KeyParams.Nonce().size() > m_blockCipher->BlockSize())
 	{
-		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of Nonce!"), ErrorCodes::InvalidSize);
-	}
-	if (KeyParams.Nonce().size() > m_blockCipher->BlockSize())
-	{
-		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Nonce can not be larger than the cipher block size!"), ErrorCodes::InvalidSize);
+		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of nonce, and no larger than the block size!"), ErrorCodes::InvalidNonce);
 	}
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{
@@ -201,9 +197,9 @@ void OFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
-	CexAssert(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block ciphers block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+	CEXASSERT(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block ciphers block-size!");
 
 	const size_t BLKLEN = m_blockCipher->BlockSize();
 
@@ -222,8 +218,8 @@ void OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void OFB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
 
 	m_blockCipher->Transform(m_ofbVector, 0, m_ofbBuffer, 0);
 

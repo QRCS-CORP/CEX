@@ -10,6 +10,8 @@ using Exception::CryptoCipherModeException;
 using Exception::CryptoSymmetricCipherException;
 using Enumeration::ErrorCodes;
 
+const std::string CipherFromDescription::CLASS_NAME("CipherFromDescription");
+
 ICipherMode* CipherFromDescription::GetInstance(CipherDescription &Description)
 {
 	IBlockCipher* cptr;
@@ -25,15 +27,15 @@ ICipherMode* CipherFromDescription::GetInstance(CipherDescription &Description)
 	}
 	catch (CryptoCipherModeException &ex)
 	{
-		throw CryptoException(std::string("CipherFromDescription"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (CryptoSymmetricCipherException &ex)
 	{
-		throw CryptoException(std::string("CipherFromDescription"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (CryptoException &ex)
 	{
-		throw CryptoException(std::string("CipherFromDescription"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
@@ -42,7 +44,7 @@ ICipherMode* CipherFromDescription::GetInstance(CipherDescription &Description)
 			delete cptr;
 		}
 
-		throw CryptoException(std::string("CipherFromDescription"), std::string("GetInstance"), std::string(ex.what()), Enumeration::ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), Enumeration::ErrorCodes::UnKnown);
 	}
 
 	return mptr;

@@ -44,7 +44,7 @@ public:
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	explicit SymmetricKey(const std::vector<byte> &Key);
 
 	/// <summary>
@@ -54,7 +54,7 @@ public:
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce);
 
 	/// <summary>
@@ -65,7 +65,7 @@ public:
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
 
 	/// <summary>

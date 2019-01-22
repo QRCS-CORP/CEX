@@ -157,20 +157,20 @@ const void Sphincs::Initialize(AsymmetricKey* Key)
 
 size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature)
 {
-	size_t sgnlen;
-
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (!m_isSigner)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::NotInitialized);
 	}
 	if (Message.size() == 0)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The message size must be non-zero!"), ErrorCodes::InvalidParam);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::InvalidParam);
 	}
+
+	size_t sgnlen;
 
 	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->P(), m_rndGenerator, m_spxParameters);
 
@@ -179,16 +179,16 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 
 bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message)
 {
-	uint result;
-
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (m_isSigner)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme is not initialized for verification!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for verification!"), ErrorCodes::NotInitialized);
 	}
+
+	uint result;
 
 	result = SPXF256::Verify(Message, Signature, m_publicKey->P(), m_spxParameters);
 

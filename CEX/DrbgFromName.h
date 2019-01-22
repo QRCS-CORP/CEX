@@ -22,6 +22,10 @@ using Drbg::IDrbg;
 /// </summary>
 class DrbgFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -33,7 +37,7 @@ public:
 	/// 
 	/// <returns>An uninitialized Kdf generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the Kdf or Digest type is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the DRBG type is not supported</exception>
 	static IDrbg* GetInstance(Drbgs DrbgType);
 
 	/// <summary>
@@ -46,7 +50,7 @@ public:
 	/// 
 	/// <returns>An uninitialized DRBG generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the DRBG or Digest type is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the DRBG, Digest or Provider type is not supported</exception>
 	static IDrbg* GetInstance(Drbgs DrbgType, Digests DigestType, Providers ProviderType);
 };
 

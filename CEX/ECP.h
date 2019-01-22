@@ -1,10 +1,12 @@
 #ifndef CEX_ECP_H
 #define CEX_ECP_H
 
-#include "IProvider.h"
 #include "IKdf.h"
+#include "ProviderBase.h"
 
 NAMESPACE_PROVIDER
+
+using Kdf::IKdf;
 
 /// <summary>
 /// An implementation of a system Entropy Collector Provider.
@@ -38,16 +40,18 @@ NAMESPACE_PROVIDER
 /// <item><description>ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySources.pdf">X9.82: </a>Entropy and Entropy Sources in X9.82.</description></item>
 /// </list> 
 /// </remarks>
-class ECP final : public IProvider
+class ECP final : public ProviderBase
 {
 private:
 
 	static const std::string CLASS_NAME;
 	static const size_t DEF_STATECAP = 1024;
+	static const bool TIMER_HAS_TSC;
 
-	std::unique_ptr<Kdf::IKdf> m_kdfGenerator;
-	bool m_hasTsc;
-	bool m_isAvailable;
+#if defined(CEX_FIPS140_ENABLED)
+	ProviderSelfTest m_pvdSelfTest;
+#endif
+	std::unique_ptr<IKdf> m_kdfGenerator;
 
 public:
 
@@ -73,23 +77,6 @@ public:
 	/// </summary>
 	~ECP() override;
 
-	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read Only: The providers type name
-	/// </summary>
-	const Providers Enumeral() override;
-
-	/// <summary>
-	/// Read Only: The entropy provider is available on this system
-	/// </summary>
-	const bool IsAvailable() override;
-
-	/// <summary>
-	/// Read Only: The provider class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Public Functions~~~//
 
 	/// <summary>
@@ -98,7 +85,7 @@ public:
 	///
 	/// <param name="Output">The output array to fill</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -109,60 +96,52 @@ public:
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Return an array with pseudo-random bytes
+	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
 	/// 
-	/// <param name="Length">The size of the expected array returned</param>
-	/// 
-	/// <returns>An array of pseudo-random of bytes</returns>
-	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	std::vector<byte> Generate(size_t Length) override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
+	/// Fill the SecureVector with pseudo-random bytes using offsets
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the Output array</param>
+	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUInt16() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint NextUInt32() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextUInt64() override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown on entropy collection failure</exception>
+	/// <exception cref="CryptoRandomException">Thrown on entropy collection failure</exception>
 	void Reset() override;
 
 private:
 
-	void Collect();
-	void Filter(std::vector<byte> &State);
-	std::vector<byte> DriveInfo();
-	std::vector<byte> MemoryInfo();
-	std::vector<byte> NetworkInfo();
-	std::vector<byte> ProcessInfo();
-	std::vector<byte> ProcessorInfo();
-	std::vector<byte> SystemInfo();
-	std::vector<byte> TimeInfo();
-	std::vector<byte> UserInfo();
+	bool FipsTest();
+
+	static std::vector<byte> Collect();
+	static std::vector<byte> Compress(std::vector<byte> &State);
+	static std::vector<byte> DriveInfo();
+	static void Filter(std::vector<byte> &State);
+	static void GetEntropy(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator);
+	static std::vector<byte> MemoryInfo();
+	static std::vector<byte> NetworkInfo();
+	static std::vector<byte> ProcessInfo();
+	static std::vector<byte> ProcessorInfo();
+	static std::vector<byte> SystemInfo();
+	static std::vector<byte> TimeInfo();
+	static std::vector<byte> UserInfo();
 };
 
 NAMESPACE_PROVIDEREND

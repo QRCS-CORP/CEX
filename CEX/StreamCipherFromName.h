@@ -17,6 +17,10 @@ using Enumeration::StreamCiphers;
 /// </summary>
 class StreamCipherFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -27,7 +31,7 @@ public:
 	/// 
 	/// <returns>An uninitialized stream cipher</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the stream cipher type is not supported</exception>
 	static IStreamCipher* GetInstance(StreamCiphers StreamCipherType);
 };
 

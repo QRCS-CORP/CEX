@@ -148,7 +148,7 @@ public:
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
 	explicit ICM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
@@ -157,7 +157,7 @@ public:
 	///
 	/// <param name="Cipher">The uninitialized block cipher instance; can not be null</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if a null block cipher is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if a null block cipher is used</exception>
 	explicit ICM(IBlockCipher* Cipher);
 
 	/// <summary>
@@ -278,7 +278,7 @@ public:
 	/// <param name="Encryption">True if cipher is used for encryption, False to decrypt</param>
 	/// <param name="KeyParams">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
-	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or Nonce is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if an invalid key or nonce is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
 
 	/// <summary>
@@ -288,6 +288,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

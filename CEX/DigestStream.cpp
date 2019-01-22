@@ -56,8 +56,8 @@ ParallelOptions &DigestStream::ParallelProfile()
 
 std::vector<byte> DigestStream::Compute(IByteStream* InStream)
 {
-	CexAssert(InStream->Length() - InStream->Position() > 0, "the input stream is too short");
-	CexAssert(InStream->CanRead(), "the input stream is set to write only!");
+	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too short");
+	CEXASSERT(InStream->CanRead(), "The input stream is set to write only!");
 
 	size_t dataLen = InStream->Length() - InStream->Position();
 	CalculateInterval(dataLen);
@@ -68,7 +68,7 @@ std::vector<byte> DigestStream::Compute(IByteStream* InStream)
 
 std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "the input array is too short");
+	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "The input array is too short");
 
 	CalculateInterval(Length);
 	m_digestEngine->Reset();

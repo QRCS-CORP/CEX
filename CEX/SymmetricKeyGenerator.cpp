@@ -8,6 +8,8 @@ NAMESPACE_CIPHER
 
 using Enumeration::ErrorCodes;
 
+const std::string SymmetricKeyGenerator::CLASS_NAME = "SymmetricKeyGenerator";
+
 const std::vector<byte> SymmetricKeyGenerator::SIGMA_INFO = { 0x53, 0x79, 0x6D, 0x6D, 0x65, 0x74, 0x72, 0x69, 0x63, 0x4B, 0x65, 0x79, 0x47, 0x65, 0x6E, 0x65, 0x72, 0x61, 0x74, 0x6F, 0x72 };
 
 //~~~Constructor~~~//
@@ -16,9 +18,9 @@ SymmetricKeyGenerator::SymmetricKeyGenerator(SecurityPolicy Policy, Providers Pr
 	:
 	m_isDestroyed(false),
 	m_pvdType(ProviderType != Providers::None ? ProviderType :
-		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The provider type can nor be None!"), ErrorCodes::InvalidParam)),
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The provider type can nor be None!"), ErrorCodes::InvalidParam)),
 	m_secPolicy(Policy != SecurityPolicy::None ? Policy :
-		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The policy type can nor be None!"), ErrorCodes::InvalidParam)),
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The policy type can nor be None!"), ErrorCodes::InvalidParam)),
 	m_shakeCustom(SIGMA_INFO)
 {
 }
@@ -27,11 +29,11 @@ SymmetricKeyGenerator::SymmetricKeyGenerator(SecurityPolicy Policy, const std::v
 	:
 	m_isDestroyed(false),
 	m_pvdType(ProviderType != Providers::None ? ProviderType :
-		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The provider type can nor be None!"), ErrorCodes::InvalidParam)),
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The provider type can nor be None!"), ErrorCodes::InvalidParam)),
 	m_secPolicy(Policy != SecurityPolicy::None ? Policy :
-		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The policy type can nor be None!"), ErrorCodes::InvalidParam)),
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The policy type can nor be None!"), ErrorCodes::InvalidParam)),
 	m_shakeCustom(Customization.size() != 0 ? Customization:
-		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("Constructor"), std::string("The customization array can not be zero length!"), ErrorCodes::InvalidParam))
+		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The customization array can not be zero length!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -107,7 +109,7 @@ SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 {
 	if (KeySize.KeySize() == 0)
 	{
-		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("GetSymmetricKey"), std::string("The key size can not be zero!"), ErrorCodes::InvalidSize);
+		throw CryptoGeneratorException(CLASS_NAME, std::string("GetSymmetricKey"), std::string("The key size can not be zero!"), ErrorCodes::InvalidSize);
 	}
 
 	SymmetricKey* key;
@@ -136,7 +138,7 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 {
 	if (KeySize.KeySize() == 0)
 	{
-		throw CryptoGeneratorException(std::string("SymmetricKeyGenerator"), std::string("GetSecureKey"), std::string("The key size can not be zero!"), ErrorCodes::InvalidSize);
+		throw CryptoGeneratorException(CLASS_NAME, std::string("GetSecureKey"), std::string("The key size can not be zero!"), ErrorCodes::InvalidSize);
 	}
 
 	SymmetricSecureKey* key = nullptr;

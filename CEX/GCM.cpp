@@ -196,7 +196,7 @@ bool &GCM::PreserveAD()
 
 const std::vector<byte> GCM::Tag()
 {
-	CexAssert(m_isFinalized, "The cipher mode has not been finalized");
+	CEXASSERT(m_isFinalized, "The cipher mode has not been finalized");
 
 	return m_msgTag;
 }
@@ -225,8 +225,8 @@ void GCM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void GCM::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized");
-	CexAssert(Length >= MIN_TAGSIZE || Length <= BLOCK_SIZE, "The cipher mode has not been initialized");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized");
+	CEXASSERT(Length >= MIN_TAGSIZE || Length <= BLOCK_SIZE, "The cipher mode has not been initialized");
 
 	CalculateMac();
 	Utility::MemoryTools::Copy(m_msgTag, 0, Output, OutOffset, Length);
@@ -238,7 +238,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	if (KeyParams.Nonce().size() < 8)
 	{
-		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a nonce of minimum 10 bytes in length!"), ErrorCodes::InvalidSize);
+		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a nonce of minimum 10 bytes in length!"), ErrorCodes::InvalidNonce);
 	}
 
 	if (m_parallelProfile.IsParallel())
@@ -249,7 +249,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		}
 		if (IsParallel() && ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		{
-			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidSize);
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -257,11 +257,11 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	{
 		if (KeyParams.Nonce() == m_gcmNonce)
 		{
-			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The nonce can not be zeroised or repeating!"), ErrorCodes::InvalidParam);
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The nonce can not be zeroised or repeating!"), ErrorCodes::InvalidNonce);
 		}
 		if (!m_cipherMode->IsInitialized())
 		{
-			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("First initialization requires a key and nonce!"), ErrorCodes::InvalidParam);
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("First initialization requires a key and nonce!"), ErrorCodes::IllegalOperation);
 		}
 	}
 	else
@@ -321,7 +321,7 @@ void GCM::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::InvalidParam);
+		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -331,7 +331,7 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_aadLoaded)
 	{
@@ -348,8 +348,8 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 
 void GCM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
 
 	if (m_isEncryption)
 	{
@@ -367,9 +367,16 @@ void GCM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
 {
-	CexAssert(!m_isEncryption, "the cipher mode has not been initialized for decryption");
-	CexAssert(Length >= MIN_TAGSIZE || Length <= BLOCK_SIZE, "the length must be minimum of 12 and maximum of MAC code size");
-	CexAssert(!(!m_isInitialized && !m_isFinalized), "the cipher mode has not been initialized for decryption");
+	CEXASSERT(Length >= MIN_TAGSIZE || Length <= BLOCK_SIZE, "The length must be minimum of 12 and maximum of MAC code size");
+
+	if (m_isEncryption)
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized for decryption!"), ErrorCodes::NotInitialized);
+	}
+	if (!m_isInitialized && !m_isFinalized)
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized for decryption!"), ErrorCodes::NotInitialized);
+	}
 
 	if (!m_isFinalized)
 	{
@@ -406,8 +413,8 @@ void GCM::CalculateMac()
 
 void GCM::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
 	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);
 	m_cipherMode->EncryptBlock(Input, InOffset, Output, OutOffset);
@@ -416,8 +423,8 @@ void GCM::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void GCM::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
 	m_cipherMode->EncryptBlock(Input, InOffset, Output, OutOffset);
 	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);

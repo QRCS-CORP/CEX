@@ -217,11 +217,11 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 	if (KeyParams.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidSize);
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidNonce);
 	}
 	if (KeyParams.Info().size() > 0 && KeyParams.Info().size() > INFO_SIZE)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Info must be no more than 16 bytes!"), ErrorCodes::InvalidSize);
+		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Info must be no more than 16 bytes!"), ErrorCodes::InvalidInfo);
 	}
 
 	if (m_parallelProfile.IsParallel())
@@ -232,7 +232,7 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		}
 		if (m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		{
-			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidSize);
+			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -329,7 +329,7 @@ void Threefish1024::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::InvalidParam);
+		throw CryptoSymmetricCipherException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -339,7 +339,7 @@ void Threefish1024::SetAssociatedData(const std::vector<byte> &Input, const size
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_macAuthenticator == nullptr)
 	{
@@ -406,7 +406,7 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_macAuthenticator == nullptr)
 	{

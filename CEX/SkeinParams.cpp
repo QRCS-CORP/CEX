@@ -36,8 +36,8 @@ SkeinParams::SkeinParams(ulong OutputSize, byte LeafSize, byte Fanout)
 	m_reserved3(0),
 	m_dstCode(0)
 {
-	CexAssert(OutputSize == 32 || OutputSize == 64 || OutputSize == 128, "The output size is invalid!");
-	CexAssert(Fanout > 0 && LeafSize > 0 || Fanout == 0 && LeafSize == 0, "The fanout and leaf sizes are invalid!");
+	CEXASSERT(OutputSize == 32 || OutputSize == 64 || OutputSize == 128, "The output size is invalid!");
+	CEXASSERT(Fanout > 0 && LeafSize > 0 || Fanout == 0 && LeafSize == 0, "The fanout and leaf sizes are invalid!");
 
 	if (OutputSize != 32 && OutputSize != 64 && OutputSize != 128)
 	{
@@ -97,10 +97,10 @@ SkeinParams::SkeinParams(const std::vector<byte> &Schema, ulong OutputSize, usho
 {
 	m_dstCode.resize(DistributionCodeMax());
 
-	CexAssert(Schema.size() == 4, "The Schema must be 4 bytes in length!");
-	CexAssert(TreeDepth == 0, "The tree depth is always 0!");
-	CexAssert(Version == 1, "The version number must be 1!");
-	CexAssert(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
+	CEXASSERT(Schema.size() == 4, "The Schema must be 4 bytes in length!");
+	CEXASSERT(TreeDepth == 0, "The tree depth is always 0!");
+	CEXASSERT(Version == 1, "The version number must be 1!");
+	CEXASSERT(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
 }
 
 //~~~Accessors~~~//

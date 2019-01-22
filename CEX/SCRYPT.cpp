@@ -40,7 +40,7 @@ SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t Parallelization)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_msgDigest(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? Digest :
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
 	m_msgDigestType(m_msgDigest->Enumeral()),
 	m_kdfKey(0),
 	m_kdfSalt(0),
@@ -142,7 +142,7 @@ size_t SCRYPT::Generate(std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 
 	return Expand(Output, 0, Output.size());
@@ -152,7 +152,7 @@ size_t SCRYPT::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (Output.size() - OutOffset < Length)
 	{
@@ -223,7 +223,7 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 	}
 	if (Salt.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 	}
 
 	if (m_isInitialized)
@@ -247,7 +247,7 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 	}
 	if (Salt.size() + Info.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 	}
 
 	if (m_isInitialized)

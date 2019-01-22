@@ -85,7 +85,7 @@ using Cipher::SymmetricKeySize;
 /// Cipher::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CBC
-/// Processing::CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ESP);
+/// CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ESP);
 /// // initialize the cipher for encryption
 /// cs.Initialize(true, kp);
 /// // write to file
@@ -107,7 +107,7 @@ using Cipher::SymmetricKeySize;
 /// Cipher::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CTR
-/// Processing::CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CTR);
+/// CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CTR);
 /// // initialize the cipher for encryption
 /// cs.Initialize(true, kp);
 /// // write to file
@@ -185,7 +185,7 @@ public:
 	/// 
 	/// <param name="Description">The block cipher configuration parameters</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	CipherStream(CipherDescription* Description);
 
 	/// <summary>
@@ -198,7 +198,7 @@ public:
 	/// <param name="CipherModeType">The cipher mode enumeration name</param>
 	/// <param name="PaddingType">The padding mode enumeration name</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	CipherStream(BlockCiphers CipherType = BlockCiphers::Rijndael, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, CipherModes CipherModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
 
 	/// <summary>
@@ -210,7 +210,7 @@ public:
 	/// <param name="Cipher">The block cipher wrapped in a cipher mode</param>
 	/// <param name="Padding">The block cipher padding instance</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null cipher mode is used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if a null cipher mode is used</exception>
 	explicit CipherStream(ICipherMode* Cipher, IPadding* Padding = 0);
 
 	/// <summary>
@@ -261,7 +261,7 @@ public:
 	/// <param name="Encryption">The cipher is initialized for encryption</param>
 	/// <param name="KeyParams">The ISymmetricKey containing the cipher key and initialization vector</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid key sizes are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams);
 
 	/// <summary>
@@ -271,6 +271,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if invalid degree value is used</exception>
 	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
@@ -281,7 +283,7 @@ public:
 	/// <param name="InStream">The input stream containing the data to transform</param>
 	/// <param name="OutStream">The output stream that receives the transformed bytes</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Write is called before Initialize, or the Input stream is empty</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if Write is called before Initialize, or the Input stream is empty</exception>
 	void Write(IByteStream* InStream, IByteStream* OutStream);
 
 	/// <summary>
@@ -294,7 +296,7 @@ public:
 	/// <param name="Output">The Output array</param>
 	/// <param name="OutOffset">The starting offset within the Output array</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Write is called before Initialize, or if array sizes are misaligned</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if Write is called before Initialize, or if array sizes are misaligned</exception>
 	void Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 
 private:

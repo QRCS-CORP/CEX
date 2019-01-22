@@ -20,6 +20,8 @@ class AsymmetricKey final : public IAsymmetricKey
 {
 private:
 
+	static const std::string CLASS_NAME;
+
 	AsymmetricEngines m_cipherEngine;
 	AsymmetricKeyTypes m_cipherKey;
 	AsymmetricTransforms m_cipherParams;
@@ -54,7 +56,7 @@ public:
 	/// <param name="ParameterType">The asymmetric cipher parameter-set enumeration name</param>
 	/// <param name="P">The cipher key polynomial array</param>
 	///
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are used</exception>
 	AsymmetricKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P);
 
 	/// <summary>

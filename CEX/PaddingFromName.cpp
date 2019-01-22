@@ -10,6 +10,8 @@ NAMESPACE_HELPER
 using Exception::CryptoPaddingException;
 using Enumeration::ErrorCodes;
 
+const std::string PaddingFromName::CLASS_NAME("PaddingFromName");
+
 IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
 {
 	using namespace Cipher::Block::Padding;
@@ -42,17 +44,17 @@ IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
 			}
 			default:
 			{
-				throw CryptoException(std::string("PaddingFromName"), std::string("GetInstance"), std::string("The padding mode type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The padding mode type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoPaddingException &ex)
 	{
-		throw CryptoException(std::string("PaddingFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("PaddingFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return pptr;

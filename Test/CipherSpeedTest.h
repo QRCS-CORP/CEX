@@ -151,7 +151,6 @@ namespace Test
 		static uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void ICMSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void Initialize();
-		void OCBSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void OFBSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void OnProgress(const std::string &Data);
 		void RHXSpeedTest(size_t KeySize = 32);

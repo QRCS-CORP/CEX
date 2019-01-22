@@ -48,9 +48,9 @@ const std::vector<SymmetricKeySize> MacStream::LegalKeySizes()
 
 std::vector<byte> MacStream::Compute(IByteStream* InStream)
 {
-	CexAssert(m_isInitialized, "the mac has not been initialized");
-	CexAssert(InStream->Length() - InStream->Position() > 0, "the input stream is too short");
-	CexAssert(InStream->CanRead(), "the input stream is set to write only!");
+	CEXASSERT(m_isInitialized, "The mac has not been initialized");
+	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too short");
+	CEXASSERT(InStream->CanRead(), "The input stream is set to write only!");
 
 	size_t dataLen;
 
@@ -62,8 +62,8 @@ std::vector<byte> MacStream::Compute(IByteStream* InStream)
 
 std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "the mac has not been initialized");
-	CexAssert((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "the input array is too short");
+	CEXASSERT(m_isInitialized, "The mac has not been initialized");
+	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "The input array is too short");
 
 	size_t dataLen;
 

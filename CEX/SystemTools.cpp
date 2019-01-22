@@ -119,6 +119,13 @@ ulong SystemTools::GetRdtscFrequency()
 	}
 }
 
+bool SystemTools::HasRdRand()
+{
+	CpuDetect detect;
+
+ 	return detect.RDRAND();
+}
+
 bool SystemTools::HasRdtsc()
 {
 	if (!TMR_RDTSC)
@@ -335,51 +342,6 @@ uint SystemTools::ProcessId()
 #endif
 }
 
-std::string SystemTools::UserName()
-{
-	std::string ret("");
-
-#if defined(CEX_OS_WINDOWS)
-
-	try
-	{
-		TCHAR buffer[UNLEN + 1];
-		DWORD buffLen = sizeof(buffer) / sizeof(TCHAR);
-		GetUserName(buffer, &buffLen);
-#if defined(UNICODE)
-		std::wstring cpy((wchar_t*)buffer, buffLen);
-		ret.assign(cpy.begin(), cpy.end());
-#else
-		ret.assign((char*)buffer, buffLen);
-#endif
-	}
-	catch (std::exception&)
-	{
-	}
-
-#elif defined(CEX_OS_POSIX)
-
-	try
-	{
-		char buffer[LOGIN_NAME_MAX];
-		getlogin_r(buffer, LOGIN_NAME_MAX);
-		size_t buffLen = sizeof(buffer) / sizeof(char);
-#if defined(UNICODE)
-		std::wstring cpy((wchar_t*)buffer, buffLen);
-		ret.assign(cpy.begin(), cpy.end());
-#else
-		ret.assign((char*)buffer, buffLen);
-#endif
-	}
-	catch (std::exception&) 
-	{
-	}
-
-#endif
-
-	return ret;
-}
-
 ulong SystemTools::TimeCurrentNS()
 {
 	return static_cast<ulong>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
@@ -589,6 +551,51 @@ ulong SystemTools::TimeSinceBoot()
 #else
 	return 0;
 #endif
+}
+
+std::string SystemTools::UserName()
+{
+	std::string ret("");
+
+#if defined(CEX_OS_WINDOWS)
+
+	try
+	{
+		TCHAR buffer[UNLEN + 1];
+		DWORD buffLen = sizeof(buffer) / sizeof(TCHAR);
+		GetUserName(buffer, &buffLen);
+#if defined(UNICODE)
+		std::wstring cpy((wchar_t*)buffer, buffLen);
+		ret.assign(cpy.begin(), cpy.end());
+#else
+		ret.assign((char*)buffer, buffLen);
+#endif
+	}
+	catch (std::exception&)
+	{
+	}
+
+#elif defined(CEX_OS_POSIX)
+
+	try
+	{
+		char buffer[LOGIN_NAME_MAX];
+		getlogin_r(buffer, LOGIN_NAME_MAX);
+		size_t buffLen = sizeof(buffer) / sizeof(char);
+#if defined(UNICODE)
+		std::wstring cpy((wchar_t*)buffer, buffLen);
+		ret.assign(cpy.begin(), cpy.end());
+#else
+		ret.assign((char*)buffer, buffLen);
+#endif
+	}
+	catch (std::exception&) 
+	{
+	}
+
+#endif
+
+	return ret;
 }
 
 std::string SystemTools::Version()
@@ -1129,13 +1136,13 @@ std::string SystemTools::Version()
 
 			if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
 			{
-				// Get the size of the memory buffer needed for the SID
+				// get the size of the memory buffer needed for the SID
 				DWORD dwBufferSize = 0;
 				if (GetTokenInformation(hToken, TokenUser, NULL, 0, &dwBufferSize) && (GetLastError() != ERROR_INSUFFICIENT_BUFFER))
 				{
-					// Allocate buffer for user token data
+					// allocate buffer for user token data
 					buffer.resize(dwBufferSize);
-					// Retrieve the token information in a TOKEN_USER structure
+					// retrieve the token information in a TOKEN_USER structure
 					GetTokenInformation(hToken, TokenUser, reinterpret_cast<PTOKEN_USER>(&buffer[0]), dwBufferSize, &dwBufferSize);
 				}
 			}
@@ -1156,60 +1163,274 @@ std::string SystemTools::Version()
 
 #elif defined(CEX_OS_POSIX)
 
-	std::vector<uint> SystemTools::ProcessEntries()
+	ulong SystemTools::AvailableFreeSpace()
 	{
-		std::vector<uint> retValues(0);
+		struct statvfs stat;
+		ulong ret;
+
+		ret = 0;
 
 		try
 		{
-			retValues.push_back(static_cast<uint>(::getpid()));
-			retValues.push_back(static_cast<uint>(::getppid()));
-			retValues.push_back(static_cast<uint>(::getuid()));
-			retValues.push_back(static_cast<uint>(::getgid()));
-			retValues.push_back(static_cast<uint>(::getpgrp()));
+			struct passwd *pw = getpwuid(getuid());
+
+			if (NULL != pw && 0 == statvfs(pw->pw_dir, &stat))
+			{
+				ret = (uint64_t)stat.f_bavail * stat.f_frsize;
+			}
 		}
 		catch (std::exception&)
 		{
 		}
 
-		return retValues;
+		return ret;
 	}
 
-	struct ::rusage SystemTools::SystemInfo()
+	std::string SystemTools::DeviceStatistics()
 	{
-		struct ::rusage usage;
+		// TODO: refine this to specific statistics
+		std::string stats;
+
+		stats = std::string("");
 
 		try
 		{
-			::getrusage(RUSAGE_SELF, &usage);
+			std::ifstream is("/proc/net/dev", std::ifstream::binary);
+			if (is)
+			{
+				is.seekg(0, is.end);
+				int length = is.tellg();
+				is.seekg(0, is.beg);
+
+				char* buffer = new char[length];
+				is.read(buffer, length);
+				is.close();
+
+				stats = std::string(buffer);
+				delete[] buffer;
+			}
+
 		}
 		catch (std::exception&)
 		{
 		}
 
-		return usage;
+		return stats;
+	}
+
+	std::vector<std::string> SystemTools::GetDirectories(std::string &Path)
+	{
+		DIR * d = opendir(Path.c_str());
+		std::vector<std::string> ret(0);
+
+		try
+		{
+			if (d != NULL)
+			{
+				struct dirent * dir;
+
+				while ((dir = readdir(d)) != NULL) 
+				{
+					if (dir->d_type == DT_DIR && strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
+					{
+						ret.push_back(std::string(dir->d_name));
+						char dpath[255];
+						GetDirectories(dpath);
+					}
+				}
+				closedir(d);
+			}
+		}
+		catch (std::exception&)
+		{
+		}
+
+		return ret;
+	}
+
+	std::vector<std::string> SystemTools::GetFiles(std::string &Path)
+	{
+		std::vector<std::string> ret(0);
+
+		try
+		{
+			struct dirent *entry;
+			DIR *dir = opendir(Path.c_str());
+
+			if (dir != NULL)
+			{
+
+				while ((entry = readdir(dir)) != NULL)
+				{
+					ret.push_back(std::string(entry->d_name));
+				}
+
+				closedir(dir);
+			}
+
+		}
+		catch (std::exception&)
+		{
+		}
+
+		return ret;
+	}
+
+	std::string SystemTools::GetHomeDirectory()
+	{
+		struct passwd pwd;
+		struct passwd* result;
+		const char* homedir;
+		char* buf;
+		size_t bufsize;
+		int s;
+
+		try
+		{
+			if ((homedir = getenv("HOME")) == NULL)
+			{
+				homedir = getpwuid(getuid())->pw_dir;
+			}
+
+			bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
+			if (bufsize == -1)
+			{
+				bufsize = 0x4000;
+			}
+
+			buf = malloc(bufsize);
+			if (buf != NULL)
+			{
+				s = getpwuid_r(getuid(), &pwd, buf, bufsize, &result);
+			}
+
+			char *homedir = result.pw_dir;
+		}
+		catch (std::exception&)
+		{
+		}
+
+		return std::string(homedir);
+	}
+
+	std::string SystemTools::MemoryStatistics()
+	{
+		// TODO: refine this to specific statistics
+		std::string stats;
+
+		stats = std::string("");
+
+		try
+		{
+			std::ifstream is("/proc/self/stat", std::ifstream::binary);
+
+			if (is)
+			{
+				is.seekg(0, is.end);
+				int length = is.tellg();
+				is.seekg(0, is.beg);
+
+				char* buffer = new char[length];
+				is.read(buffer, length);
+				is.close();
+
+				stats = std::string(buffer);
+				delete[] buffer;
+			}
+
+		}
+		catch (std::exception&)
+		{
+		}
+
+		return stats;
+	}
+
+	std::string SystemTools::NetworkStatistics()
+	{
+		// TODO: refine this to specific statistics
+		std::string stats;
+
+		stats = std::string("");
+
+		try
+		{
+			std::ifstream is("/proc/net/netstat", std::ifstream::binary);
+			if (is) 
+			{
+				is.seekg(0, is.end);
+				int length = is.tellg();
+				is.seekg(0, is.beg);
+
+				char* buffer = new char[length];
+				is.read(buffer, length);
+				is.close();
+
+				stats = std::string(buffer);
+				delete[] buffer;
+			}
+
+		}
+		catch (std::exception&)
+		{
+		}
+
+		return stats;
+	}
+
+	std::vector<uint> SystemTools::ProcessEntries()
+	{
+		std::vector<uint> ret(0);
+
+		try
+		{
+			ret.push_back(static_cast<uint>(::getpid()));
+			ret.push_back(static_cast<uint>(::getppid()));
+			ret.push_back(static_cast<uint>(::getuid()));
+			ret.push_back(static_cast<uint>(::getgid()));
+			ret.push_back(static_cast<uint>(::getpgrp()));
+		}
+		catch (std::exception&)
+		{
+		}
+
+		return ret;
+	}
+
+	std::vector<byte> SystemTools::SystemInfo()
+	{
+		struct ::rusage suse;
+		std::vector<byte> ret;
+
+		try
+		{
+			::getrusage(RUSAGE_SELF, &suse);
+			ret.resize(sizeof(suse));
+			std::memcpy(ret.data(), &suse, ret.size());
+		}
+		catch (std::exception&)
+		{
+		}
+
+		return ret;
 	}
 
 	std::string SystemTools::UserId()
 	{
+		std::string ret;
+
+		ret = std::string("");
+
 		try
 		{
-			return std::string(static_cast<uint>(::getuid()));
+			ret = std::string(static_cast<uint>(::getuid()));
 		}
 		catch (std::exception&) 
 		{
-			return std::string("");
 		}
+
+		return ret;
 	}
-
-// TODO: fill all of these out and merge..
-#elif defined(CEX_OS_ANDROID)
-
-#elif defined(CEX_OS_LINUX)
-
-#elif defined(CEX_OS_UNIX)
-
-#elif defined(CEX_OS_APPLE)
 
 #endif
 

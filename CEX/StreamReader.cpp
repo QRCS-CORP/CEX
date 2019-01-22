@@ -30,7 +30,7 @@ const size_t StreamReader::Position()
 
 byte StreamReader::ReadByte()
 {
-	CexAssert(m_streamData.Position() + sizeof(byte) <= m_streamData.Length(), "Exceeds stream length");
+	CEXASSERT(m_streamData.Position() + sizeof(byte) <= m_streamData.Length(), "Exceeds stream length");
 
 	std::vector<byte> data(1);
 	m_streamData.Read(data, 0, 1);
@@ -39,7 +39,7 @@ byte StreamReader::ReadByte()
 
 std::vector<byte> StreamReader::ReadBytes(size_t Length)
 {
-	CexAssert(m_streamData.Position() + Length <= m_streamData.Length(), "Exceeds stream length");
+	CEXASSERT(m_streamData.Position() + Length <= m_streamData.Length(), "Exceeds stream length");
 
 	std::vector<byte> data(Length);
 	m_streamData.Read(data, 0, Length);

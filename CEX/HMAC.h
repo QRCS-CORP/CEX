@@ -139,7 +139,7 @@ public:
 	/// 
 	/// <param name="Digest">Message Digest instance</param>
 	/// 
-	/// <exception cref="Exception::CryptoMacException">Thrown if the digest is null</exception>
+	/// <exception cref="CryptoMacException">Thrown if the digest is null</exception>
 	explicit HMAC(IDigest* Digest);
 
 	/// <summary>
@@ -215,6 +215,8 @@ public:
 	/// 
 	/// <param name="Input">The input data byte array</param>
 	/// <param name="Output">The output Mac code array</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -226,6 +228,8 @@ public:
 	/// <param name="OutOffset">The offset in the output array</param>
 	/// 
 	/// <returns>The number of bytes processed</returns>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
@@ -236,7 +240,7 @@ public:
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
 	/// 
-	/// <exception cref="Exception::CryptoMacException">Thrown if an invalid key size is used</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
@@ -247,7 +251,7 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="CryptoDigestException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>

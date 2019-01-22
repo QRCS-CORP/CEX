@@ -106,7 +106,7 @@ public:
 	/// <param name="DigestType">The digest enumeration member</param>
 	/// <param name="Parallel">Instantiates the multi-threaded implementation of the digest</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	explicit DigestStream(Digests DigestType, bool Parallel = false);
 
 	/// <summary>
@@ -116,7 +116,7 @@ public:
 	/// 
 	/// <param name="Digest">The initialized Digest instance</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null digest is used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if a null digest is used</exception>
 	explicit DigestStream(IDigest* Digest);
 
 	/// <summary>

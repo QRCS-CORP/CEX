@@ -157,7 +157,7 @@ void CipherStream::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_cipherEngine->ParallelProfile().ProcessorCount())
 	{
-		throw CryptoProcessingException(CLASS_NAME, std::string("ParallelMaxDegree"), std::string("Degree setting is invalid"), ErrorCodes::InvalidParam);
+		throw CryptoProcessingException(CLASS_NAME, std::string("ParallelMaxDegree"), std::string("Degree setting is invalid"), ErrorCodes::NotSupported);
 	}
 
 	m_cipherEngine->ParallelProfile().SetMaxDegree(Degree);
@@ -165,10 +165,10 @@ void CipherStream::ParallelMaxDegree(size_t Degree)
 
 void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 {
-	CexAssert(m_isInitialized, "the cipher has not been initialized");
-	CexAssert(InStream->Length() - InStream->Position() > 0, "the Input stream is too short");
-	CexAssert(InStream->CanRead(), "the Input stream is set to write only!");
-	CexAssert(OutStream->CanRead() || OutStream->CanWrite(), "the Output stream is to read only!");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The Input stream is too short");
+	CEXASSERT(InStream->CanRead(), "The Input stream is set to write only!");
+	CEXASSERT(OutStream->CanRead() || OutStream->CanWrite(), "The Output stream is to read only!");
 
 	BlockTransform(InStream, OutStream);
 
@@ -180,9 +180,9 @@ void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 
 void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "the cipher has not been initialized");
-	CexAssert(Input.size() - InOffset > 0, "the input array is too short");
-	CexAssert(Input.size() - InOffset <= Output.size() - OutOffset, "the output array is too short!");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(Input.size() - InOffset > 0, "The input array is too short");
+	CEXASSERT(Input.size() - InOffset <= Output.size() - OutOffset, "The output array is too short!");
 
 	BlockTransform(Input, InOffset, Output, OutOffset);
 }

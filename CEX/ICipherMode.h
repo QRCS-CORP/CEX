@@ -24,7 +24,6 @@
 #include "BlockCipherExtensions.h"
 #include "CipherModes.h"
 #include "CryptoCipherModeException.h"
-#include "ErrorCodes.h"
 #include "IBlockCipher.h"
 #include "ParallelOptions.h"
 #include "SymmetricKeySize.h"
@@ -189,6 +188,8 @@ public:
 	///
 	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
 	/// <param name="KeyParams">The SymmetricKey containing key and vector</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if an invalid key or nonce is used</exception>
 	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
@@ -199,7 +200,7 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>

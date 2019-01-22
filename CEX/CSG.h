@@ -155,7 +155,7 @@ public:
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	///
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
 	CSG(ShakeModes ShakeModeType = ShakeModes::SHAKE256, Providers ProviderType = Providers::ACP, bool Parallel = false);
 
 	/// <summary>
@@ -166,7 +166,7 @@ public:
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
 	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if a null digest is used</exception>
 	explicit CSG(ShakeModes ShakeModeType, IProvider* Provider = 0, bool Parallel = false);
 
 	/// <summary>
@@ -253,7 +253,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
@@ -267,7 +267,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
@@ -277,7 +277,7 @@ public:
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -287,7 +287,7 @@ public:
 	/// 
 	/// <param name="Seed">The secret primary key array used to seed the generator; this initialization call creates a SHAKE implementation</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed) override;
 
 	/// <summary>
@@ -298,7 +298,7 @@ public:
 	/// <param name="Seed">The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</param>
 	/// <param name="Nonce">The secret nonce value used as the customization string to initialize a simple cSHAKE variant</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce) override;
 
 	/// <summary>
@@ -310,7 +310,7 @@ public:
 	/// <param name="Nonce">The secret nonce value used as the customization string to initialize a cSHAKE instance</param>
 	/// <param name="Info">The info parameter used as a finction name or secret salt to initialize a cSHAKE instance</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info) override;
 
 	/// <summary>
@@ -319,7 +319,7 @@ public:
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is too small</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
 	void Update(const std::vector<byte> &Seed) override;
 
 private:

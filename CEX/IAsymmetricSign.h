@@ -26,7 +26,6 @@
 #include "AsymmetricKeyTypes.h"
 #include "AsymmetricTransforms.h"
 #include "CryptoAsymmetricException.h"
-#include "ErrorCodes.h"
 #include "IPrng.h"
 #include "Prngs.h"
 
@@ -113,7 +112,7 @@ public:
 	/// 
 	/// <returns>A public/private key pair</returns>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
+	/// <exception cref="CryptoAsymmetricException">Thrown if the key generation call fails</exception>
 	virtual AsymmetricKeyPair* Generate() = 0;
 
 	/// <summary>
@@ -121,6 +120,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="AsymmetricKey">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
+	/// 
+	/// <exception cref="CryptoAsymmetricException">Throws on invalid key or configuration error</exception>
 	virtual const void Initialize(AsymmetricKey* AsymmetricKey) = 0;
 
 	/// <summary>

@@ -26,7 +26,7 @@
 #ifndef CEX_CJP_H
 #define CEX_CJP_H
 
-#include "IProvider.h"
+#include "ProviderBase.h"
 
 NAMESPACE_PROVIDER
 
@@ -58,43 +58,32 @@ NAMESPACE_PROVIDER
 /// <item><description>RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requirements for Security.</description></item>
 /// </list> 
 /// </remarks>
-class CJP final : public IProvider
+class CJP final : public ProviderBase
 {
 private:
 
-	static const uint ACC_LOOP_BIT_MAX = 7;
-	static const uint ACC_LOOP_BIT_MIN = 0;
+	static const size_t ACC_LOOP_BIT_MAX = 7;
+	static const size_t ACC_LOOP_BIT_MIN = 0;
 	static const std::string CLASS_NAME;
-	static const uint CLEARCACHE = 100;
-	static const uint DATA_SIZE_BITS = ((sizeof(ulong)) * 8);
-	static const uint FOLD_LOOP_BIT_MAX = 4;
-	static const uint FOLD_LOOP_BIT_MIN = 0;
-	static const uint LOOP_TEST_COUNT = 300;
-	static const uint MEMORY_ACCESSLOOPS = 256;
-	static const uint MEMORY_BLOCKS = 512;
-	static const uint MEMORY_BLOCKSIZE = 32;
-	static const uint MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
-	static const uint OVRSMP_RATE_MAX = 128;
-	static const uint OVRSMP_RATE_MIN = 1;
+	static const size_t CLEARCACHE = 100;
+	static const size_t DATA_SIZE_BITS = ((sizeof(ulong)) * 8);
+	static const size_t FOLD_LOOP_BIT_MAX = 4;
+	static const size_t FOLD_LOOP_BIT_MIN = 0;
+	static const size_t LOOP_TEST_COUNT = 300;
+	static const size_t MEMORY_ACCESSLOOPS = 256;
+	static const size_t MEMORY_BLOCKS = 512;
+	static const size_t MEMORY_BLOCKSIZE = 32;
+	static const size_t MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
+	static const size_t OVRSMP_RATE_MAX = 128;
+	static const size_t OVRSMP_RATE_MIN = 1;
+	static const bool TIMER_HAS_TSC;
 
-	bool m_enableAccess;
-	bool m_enableDebias;
-	bool m_hasTsc;
-	bool m_isAvailable;
-	ulong m_lastDelta;
-	ulong m_lastDelta2;
-	uint m_memAccessLoops;
-	uint m_memBlocks;
-	uint m_memBlockSize;
-	uint m_memPosition;
-	uint m_memTotalSize;
-	std::vector<byte> m_memState;
-	uint m_overSampleRate;
-	ulong m_prevTime;
-	ulong m_rndState;
-	bool m_secureCache;
-	bool m_stirPool;
-	uint m_stuckTest;
+	struct JitterState;
+
+#if defined(CEX_FIPS140_ENABLED)
+	ProviderSelfTest m_pvdSelfTest;
+#endif
+	std::unique_ptr<JitterState> m_pvdState;
 
 public:
 
@@ -123,40 +112,11 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: Enable the memory access noise source.
-	/// <para>Memory access delays are injected into the random generation mechanism; enabled by default.</para>
-	/// </summary>
-	bool &EnableAccess();
-
-	/// <summary>
-	/// Read/Write: Enable the Von Neumann debiasing extractor.
-	/// <para>The default and recommended value is true, which enables the bit debiasing extractor.</para>
-	/// </summary>
-	bool &EnableDebias();
-
-	/// <summary>
-	/// Read Only: The providers type name
-	/// </summary>
-	const Providers Enumeral() override;
-
-	/// <summary>
-	/// Read Only: The entropy provider is available on this system.
-	/// <para>This value should be tested after class instantiation and before a request for data is made. 
-	/// If the timer resolution is too small, or the provider is otherwise unavailable, requesting data will throw an exception.</para>
-	/// </summary>
-	const bool IsAvailable() override;
-
-	/// <summary>
-	/// Read Only: provider class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
 	/// Read/Write: The number of overlapping passes through the jitter entropy collector.
 	/// <para>Accepted values are between 1 and 128; the default is 1.
 	/// Increasing this value will increase generation times significantly.</para>
 	/// </summary>
-	uint &OverSampleRate();
+	size_t &OverSampleRate();
 
 	/// <summary>
 	/// Read/Write: Populate the random cache with an unused value after each generation cycle
@@ -173,7 +133,7 @@ public:
 	///
 	/// <param name="Output">The output array to fill</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -184,63 +144,49 @@ public:
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Return an array with pseudo-random bytes
+	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
 	/// 
-	/// <param name="Length">The size of the expected array returned</param>
-	/// 
-	/// <returns>An array of pseudo-random of bytes</returns>
-	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	std::vector<byte> Generate(size_t Length) override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
+	/// Fill the SecureVector with pseudo-random bytes using offsets
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the Output array</param>
+	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUInt16() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint NextUInt32() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextUInt64() override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown on entropy collection failure</exception>
+	/// <exception cref="CryptoRandomException">Thrown on entropy collection failure</exception>
 	void Reset() override;
 
 private:
 
-	void AccessMemory();
-	ulong DebiasBit();
-	void Detect();
-	void FoldTime(ulong TimeStamp, ulong &Folded);
-	void Generate64();
-	ulong GetTimeStamp();
-	ulong MeasureJitter();
-	void Prime();
-	size_t Process(std::vector<byte> &Output, size_t Offset, size_t Length);
-	size_t ShuffleLoop(uint LowBits, uint MinShift);
-	void StirPool();
-	void StuckCheck(ulong CurrentDelta);
-	bool TimerCheck();
+	bool FipsTest();
+	static void FoldTime(std::unique_ptr<JitterState> &State, ulong TimeStamp);
+	static void GetEntropy(std::unique_ptr<JitterState> &State);
+	static void GetEntropy(std::unique_ptr<JitterState> &State, byte* Output, size_t Length);
+	static ulong GetTime();
+	static bool MeasureJitter(std::unique_ptr<JitterState> &State);
+	static void MemoryJitter(std::unique_ptr<JitterState> &State);
+	static std::unique_ptr<JitterState> Prime();
+	static size_t ShuffleLoop(std::unique_ptr<JitterState> &State, size_t LowBits, size_t MinShift);
+	static bool StuckCheck(std::unique_ptr<JitterState> &State, ulong CurrentDelta);
+	static bool TimerCheck(std::unique_ptr<JitterState> &State);
 };
 
 NAMESPACE_PROVIDEREND

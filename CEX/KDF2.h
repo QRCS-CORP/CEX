@@ -132,7 +132,7 @@ public:
 	/// 
 	/// <param name="DigestType">The hash functions type-name enumeral</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest type is used</exception>
+	/// <exception cref="CryptoKdfException">Thrown if an invalid digest type is used</exception>
 	explicit KDF2(SHA2Digests DigestType);
 
 	/// <summary>
@@ -141,7 +141,7 @@ public:
 	/// 
 	/// <param name="Digest">The initialized message digest instance</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if a null digest is used</exception>
+	/// <exception cref="CryptoKdfException">Thrown if a null digest is used</exception>
 	explicit KDF2(Digest::IDigest* Digest);
 
 	/// <summary>
@@ -187,7 +187,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -200,7 +200,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
@@ -210,7 +210,7 @@ public:
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -220,7 +220,7 @@ public:
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>>
 	void Initialize(const std::vector<byte> &Key) override;
 
 	/// <summary>
@@ -231,7 +231,7 @@ public:
 	/// <param name="Offset">The starting position within the key array</param>
 	/// <param name="Length">The number of key bytes to use</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length) override;
 
 	/// <summary>
@@ -241,7 +241,7 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value containing an additional source of entropy</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
 
 	/// <summary>
@@ -252,7 +252,7 @@ public:
 	/// <param name="Salt">The salt value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
 
 	/// <summary>
@@ -261,7 +261,7 @@ public:
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void ReSeed(const std::vector<byte> &Seed) override;
 
 	/// <summary>

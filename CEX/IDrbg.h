@@ -127,8 +127,9 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	virtual size_t Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
@@ -140,6 +141,9 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
@@ -147,6 +151,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	virtual void Initialize(ISymmetricKey &GenParam) = 0;
 
 	/// <summary>
@@ -154,6 +160,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	virtual void Initialize(const std::vector<byte> &Key) = 0;
 
 	/// <summary>
@@ -162,6 +170,8 @@ public:
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value containing an additional source of entropy</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) = 0;
 
 	/// <summary>
@@ -171,6 +181,8 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) = 0;
 
 	/// <summary>
@@ -178,6 +190,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Seed">The new seed value array</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
 	virtual void Update(const std::vector<byte> &Seed) = 0;
 };
 

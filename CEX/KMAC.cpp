@@ -25,7 +25,7 @@ KMAC::KMAC(ShakeModes ShakeModeType)
 		(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
 	m_msgLength(0),
 	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
-		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type can not ne none!"), ErrorCodes::IllegalOperation))
+		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type can not ne none!"), ErrorCodes::InvalidParam))
 {
 	Scope();
 }
@@ -119,7 +119,7 @@ void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (Output.size() < TagSize())
 	{
@@ -134,7 +134,7 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if ((Output.size() - OutOffset) < TagSize())
 	{
@@ -214,14 +214,8 @@ void KMAC::Update(byte Input)
 
 void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!m_isInitialized)
-	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
-	}
-	if ((Input.size() - InOffset) < Length)
-	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
-	}
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(m_isInitialized, "The mac is not initialized!");
 
 	if (Length != 0)
 	{
@@ -262,8 +256,8 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name)
 {
-	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
-	CexAssert(Customization.size() + Name.size() <= 196, "the input buffer is too large");
+	CEXASSERT(!m_isInitialized, "The domain string must be set before initialization");
+	CEXASSERT(Customization.size() + Name.size() <= 196, "The input buffer is too large");
 
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
@@ -328,7 +322,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 
 void KMAC::LoadKey(const std::vector<byte> &Key)
 {
-	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
+	CEXASSERT(!m_isInitialized, "The domain string must be set before initialization");
 
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;

@@ -44,12 +44,7 @@ Blake512::Blake512(bool Parallel)
 	m_treeParams(Parallel ? BlakeParams(static_cast<byte>(DIGEST_SIZE), 2, DEF_PRLDEGREE, 0, static_cast<byte>(DIGEST_SIZE)) : BlakeParams(static_cast<byte>(DIGEST_SIZE), 1, 1, 0, 0))
 {
 	// TODO: implement parallel alternate for single core cpu
-	if (Parallel && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
-	}
-
-	m_parallelProfile.IsParallel() = m_parallelProfile.IsParallel() ? Parallel : false;
+	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -70,18 +65,13 @@ Blake512::Blake512(BlakeParams &Params)
 	m_treeDestroy(false),
 	m_treeParams(Params)
 {
-	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
-	}
-
-	m_parallelProfile.IsParallel() = m_parallelProfile.IsParallel() ? m_treeParams.FanOut() > 1 : false;
+	m_parallelProfile.IsParallel() == true ? m_treeParams.FanOut() > 1 : false;
 
 	if (m_parallelProfile.IsParallel())
 	{
 		if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
 		{
-			throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The LeafLength parameter is invalid! Must be evenly divisible by digest block size!"), ErrorCodes::InvalidParam);
+			throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The LeafLength parameter is invalid! Must be evenly divisible by digest block size!"), ErrorCodes::InvalidSize);
 		}
 		if (Params.FanOut() < 2 || Params.FanOut() % 2 != 0)
 		{
@@ -305,7 +295,7 @@ void Blake512::Initialize(Cipher::ISymmetricKey &MacKey)
 	{
 		if (MacKey.Nonce().size() != 16)
 		{
-			throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Salt has invalid length!"), ErrorCodes::InvalidSize);
+			throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Salt has invalid length!"), ErrorCodes::InvalidNonce);
 		}
 
 		config[4] = IntegerTools::LeBytesTo64(MacKey.Nonce(), 0);
@@ -316,7 +306,7 @@ void Blake512::Initialize(Cipher::ISymmetricKey &MacKey)
 	{
 		if (MacKey.Info().size() != 16)
 		{
-			throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Info has invalid length"), ErrorCodes::InvalidSize);
+			throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Info has invalid length"), ErrorCodes::InvalidInfo);
 		}
 
 		config[6] = IntegerTools::LeBytesTo64(MacKey.Info(), 0);
@@ -351,7 +341,7 @@ void Blake512::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
+		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -407,6 +397,8 @@ void Blake512::Update(byte Input)
 
 void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+
 	if (Length != 0)
 	{
 		if (m_parallelProfile.IsParallel())

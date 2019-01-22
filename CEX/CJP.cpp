@@ -5,159 +5,157 @@
 
 NAMESPACE_PROVIDER
 
+using Utility::IntegerTools;
 using Utility::MemoryTools;
+using Utility::SystemTools;
 
 const std::string CJP::CLASS_NAME("CJP");
+const bool CJP::TIMER_HAS_TSC = SystemTools::HasRdtsc();
+
+struct CJP::JitterState
+{
+	std::vector<byte> MemoryState;
+	ulong LastDelta;
+	ulong LastDelta2;
+	ulong PreviousTime;
+	ulong RandomState;
+	size_t MemoryBlocks;
+	size_t MemoryBlockSize;
+	size_t MemoryIterations;
+	size_t MemoryPosition;
+	size_t MemoryTotalSize;
+	size_t OverSampleRate;
+	bool SecureCache;
+
+	void Reset()
+	{
+		LastDelta = 0;
+		LastDelta2 = 0;
+		MemoryBlocks = 0;
+		MemoryBlockSize = 0;
+		MemoryIterations = 0;
+		MemoryPosition = 0;
+		MemoryTotalSize = 0;
+		OverSampleRate = 0;
+		PreviousTime = 0;
+		RandomState = 0;
+		SecureCache;
+
+		if (MemoryState.size() != 0)
+		{
+			IntegerTools::Clear(MemoryState);
+		}
+	}
+};
 
 //~~~Constructor~~~//
 
 CJP::CJP()
 	:
-	m_enableAccess(true),
-	m_enableDebias(true),
-	m_hasTsc(Utility::SystemTools::HasRdtsc()),
-	m_isAvailable(false),
-	m_lastDelta(0),
-	m_lastDelta2(0),
-	m_memAccessLoops(MEMORY_ACCESSLOOPS),
-	m_memBlocks(MEMORY_BLOCKS),
-	m_memBlockSize(MEMORY_BLOCKSIZE),
-	m_memPosition(0),
-	m_memTotalSize(MEMORY_SIZE),
-	m_memState(0),
-	m_overSampleRate(OVRSMP_RATE_MIN),
-	m_prevTime(0),
-	m_rndState(0),
-	m_secureCache(true),
-	m_stirPool(true),
-	m_stuckTest(1)
+#if defined(CEX_FIPS140_ENABLED)
+	m_pvdSelfTest(),
+#endif
+	ProviderBase(TIMER_HAS_TSC, Providers::CJP, CLASS_NAME),
+	m_pvdState(Prime())
 {
-	m_isAvailable = TimerCheck();
-
-	if (m_isAvailable)
+	if (!TimerCheck(m_pvdState))
 	{
-		Detect();
-		Prime();
-	}
-	else
-	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("The timer evaluation check has failed!"), ErrorCodes::NotSupported);
 	}
 }
 
 CJP::~CJP()
 {
-	Utility::IntegerTools::Clear(m_memState);
-	m_enableAccess = false;
-	m_enableDebias = false;
-	m_hasTsc = false;
-	m_isAvailable = false;
-	m_lastDelta = 0;
-	m_lastDelta2 = 0;
-	m_memAccessLoops = 0;
-	m_memBlocks = 0;
-	m_memBlockSize = 0;
-	m_memPosition = 0;
-	m_memTotalSize = 0;
-	m_overSampleRate = 0;
-	m_prevTime = 0;
-	m_rndState = 0;
-	m_secureCache = false;
-	m_stirPool = false;
-	m_stuckTest = 0;
+	if (m_pvdState != nullptr)
+	{
+		m_pvdState->Reset();
+		m_pvdState.reset(nullptr);
+	}
 }
 
 //~~~Accessors~~~//
 
-bool &CJP::EnableAccess()
-{ 
-	return m_enableAccess;
-}
-
-bool &CJP::EnableDebias() 
-{ 
-	return m_enableDebias; 
-}
-
-const Enumeration::Providers CJP::Enumeral()
+size_t &CJP::OverSampleRate() 
 {
-	return Enumeration::Providers::CJP;
-}
-
-const bool CJP::IsAvailable()
-{
-	return m_isAvailable;
-}
-
-const std::string CJP::Name()
-{ 
-	return CLASS_NAME; 
-}
-
-uint &CJP::OverSampleRate() 
-{
-	return m_overSampleRate; 
+	return m_pvdState->OverSampleRate;
 }
 
 bool &CJP::SecureCache()
 {
-	return m_secureCache;
+	return m_pvdState->SecureCache;
 }
 
 //~~~Public Functions~~~//
 
 void CJP::Generate(std::vector<byte> &Output)
 {
-	Process(Output, 0, Output.size());
+	if (!IsAvailable())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+	}
+	if (!FipsTest())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+	}
+
+	GetEntropy(m_pvdState, Output.data(), Output.size());
 }
 
 void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
+	if (!IsAvailable())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+	}
 	if ((Output.size() - Offset) < Length)
 	{
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
+	if (!FipsTest())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+	}
 
-	Process(Output, Offset, Length);
+	GetEntropy(m_pvdState, Output.data() + Offset, Length);
 }
 
-std::vector<byte> CJP::Generate(size_t Length)
+void CJP::Generate(SecureVector<byte> &Output)
 {
-	std::vector<byte> rnd(Length);
-	Process(rnd, 0, rnd.size());
+	if (!IsAvailable())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+	}
+	if (!FipsTest())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+	}
 
-	return rnd;
+	GetEntropy(m_pvdState, Output.data(), Output.size());
 }
 
-ushort CJP::NextUInt16()
+void CJP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
-	ushort x = 0;
-	MemoryTools::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
+	if (!IsAvailable())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+	}
+	if ((Output.size() - Offset) < Length)
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+	}
+	if (!FipsTest())
+	{
+		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+	}
 
-	return x;
-}
-
-uint CJP::NextUInt32()
-{
-	uint x = 0;
-	MemoryTools::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
-
-	return x;
-}
-
-ulong CJP::NextUInt64()
-{
-	ulong x = 0;
-	MemoryTools::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
-
-	return x;
+	GetEntropy(m_pvdState, Output.data() + Offset, Length);
 }
 
 void CJP::Reset()
 {
 	try
 	{
-		Prime();
+		m_pvdState = Prime();
 	}
 	catch (std::exception &ex)
 	{
@@ -165,246 +163,226 @@ void CJP::Reset()
 	}
 }
 
-//~~~Private Functions~~~//
-
-CEX_OPTIMIZE_IGNORE
-void CJP::AccessMemory()
+bool CJP::FipsTest()
 {
-	// this is a noise source based on variations in memory access times
-	// this function performs memory accesses which will add to the timing variations due to an unknown amount of CPU wait states that need to be
-	// added when accessing memory.
-	// the memory size should be larger than the L1 caches as outlined in the documentation and the associated testing.
-	// the L1 cache has a very high bandwidth, albeit its access rate is usually slower than accessing CPU registers. 
-	// therefore, L1 accesses only add minimal variations as the CPU has hardly to wait. 
-	// starting with L2, significant variations are added because L2 typically does not belong to the CPU any more and therefore a wider range of CPU wait states is necessary for accesses.
-	// L3 and real memory accesses have even a wider range of wait states. However, to reliably access either L3 or memory, the ec->m_memState memory must be quite large which is usually not desirable.
+	bool fail;
 
-	byte tmpState;
-	const uint WRPLEN = m_memBlockSize * m_memBlocks;
-	const size_t ACLCNT = (m_memAccessLoops + ShuffleLoop(ACC_LOOP_BIT_MAX, ACC_LOOP_BIT_MIN));
+	fail = false;
 
-	for (size_t i = 0; i < ACLCNT; ++i)
+#if defined(CEX_FIPS140_ENABLED)
+
+	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
+
+	GetEntropy(m_pvdState, smp.data(), smp.size());
+
+	if (!m_pvdSelfTest.SelfTest(smp))
 	{
-		tmpState = m_memState[m_memPosition];
-		// memory access; just add 1 to one byte, wrap at 255; memory access implies read from and write to memory location
-		tmpState = (tmpState + 1) & 0xFF;
-		m_memState[m_memPosition] = tmpState;
-		// addition of memBlockSize - 1 to pointer with wrap around logic to ensure that every memory location is hit evenly
-		m_memPosition = m_memPosition + m_memBlockSize - 1;
-		m_memPosition = m_memPosition % WRPLEN;
+		fail = true;
 	}
-}
-CEX_OPTIMIZE_RESUME
 
-ulong CJP::DebiasBit()
-{
-	// Von Neuman unbias function as explained in RFC 4086 section 4.2.
-	do
-	{
-		ulong a = MeasureJitter();
-		ulong b = MeasureJitter();
+#endif
 
-		if (a == b)
-		{
-			continue;
-		}
-		else
-		{
-			return a;
-		}
-	} 
-	while (1);
-}
-
-void CJP::Detect()
-{
-	try
-	{
-		CpuDetect detect;
-
-		if (detect.L1CacheTotal() != 0)
-		{
-			m_memBlockSize = static_cast<uint>(detect.L1CacheLineSize());
-			m_memBlocks = (static_cast<uint>(detect.L1CacheTotal()) / static_cast<uint>(detect.VirtualCores()) / m_memBlockSize);
-			m_memTotalSize = m_memBlocks * m_memBlockSize;
-			m_memAccessLoops = (m_memTotalSize / m_memBlockSize) * 2;
-		}
-	}
-	catch (std::exception&)
-	{
-		m_memBlocks = MEMORY_BLOCKS;
-		m_memBlockSize = MEMORY_BLOCKSIZE;
-		m_memTotalSize = MEMORY_SIZE;
-		m_memAccessLoops = MEMORY_ACCESSLOOPS;
-	}
+	return (fail == false);
 }
 
 CEX_OPTIMIZE_IGNORE
-void CJP::FoldTime(ulong TimeStamp, ulong &Folded)
+void CJP::FoldTime(std::unique_ptr<JitterState> &State, ulong TimeStamp)
 {
-	// CPU jitter noise source; this is the noise source based on the CPU execution time jitter.
-	// This function not only acts as folding operation, but this function's execution is used to measure the CPU execution time jitter. 
+	// CPU jitter noise source; this is the noise source based on the CPU execution time jitter
+	// this function not only acts as folding operation, but this function's execution is used to measure the CPU execution time jitter
+	const size_t FLDCNT = ShuffleLoop(State, FOLD_LOOP_BIT_MAX, FOLD_LOOP_BIT_MIN);
+	ulong fldt;
+	ulong tmpt;
+	size_t i;
+	size_t j;
 
-	const size_t FLDCNT = ShuffleLoop(FOLD_LOOP_BIT_MAX, FOLD_LOOP_BIT_MIN);
-	ulong fldTmp = 0;
+	fldt = 0;
 
-	for (size_t j = 0; j < FLDCNT; ++j)
+	for (i = 0; i < FLDCNT; ++i)
 	{
-		fldTmp = 0;
-		for (size_t i = 1; (DATA_SIZE_BITS) >= i; ++i)
+		fldt = State->RandomState;
+
+		for (j = 1; DATA_SIZE_BITS >= j; ++j)
 		{
-			ulong tmp = TimeStamp << (DATA_SIZE_BITS - i);
-			tmp = tmp >> (DATA_SIZE_BITS - 1);
-			fldTmp ^= tmp;
+			tmpt = TimeStamp << (DATA_SIZE_BITS - j);
+			tmpt = tmpt >> (DATA_SIZE_BITS - 1);
+			tmpt ^= ((fldt >> 63) & 1);
+			tmpt ^= ((fldt >> 60) & 1);
+			tmpt ^= ((fldt >> 55) & 1);
+			tmpt ^= ((fldt >> 30) & 1);
+			tmpt ^= ((fldt >> 27) & 1);
+			tmpt ^= ((fldt >> 22) & 1);
+			fldt <<= 1;
+			fldt ^= tmpt;
 		}
 	}
 
-	Folded = fldTmp;
+	State->RandomState = fldt;
 }
 CEX_OPTIMIZE_RESUME
 
-void CJP::Generate64()
+void CJP::GetEntropy(std::unique_ptr<JitterState> &State)
 {
-	// priming of the m_prevTime value
-	MeasureJitter();
+	size_t k;
 
-	uint smpCtr = 0;
+	// priming of the PreviousTime value
+	MeasureJitter(State);
+	k = 0;
 
-	while (true)
+	while (true) 
 	{
-		ulong jitter = 0;
-
-		if (m_enableDebias)
+		// if a stuck measurement is received, repeat measurement
+		if (MeasureJitter(State) != 0)
 		{
-			jitter = DebiasBit();
-		}
-		else
-		{
-			jitter = MeasureJitter();
-		}
-
-		// Fibonacci LSFR with polynom of 64, 63, 61, 60; the shift values are the polynom values minus one due to counting bits from 0 to 63. 
-		m_rndState ^= jitter;
-		m_rndState ^= ((m_rndState >> 63) & 1);
-		m_rndState ^= ((m_rndState >> 62) & 1);
-		m_rndState ^= ((m_rndState >> 60) & 1);
-		m_rndState ^= ((m_rndState >> 59) & 1);
-		// the current position is always the LSB, the polynom only needs to shift data in from the left without wrap
-		m_rndState = Utility::IntegerTools::RotL64(m_rndState, 1);
-
-		// enforce the StuckCheck test
-		if (m_stuckTest)
-		{
-			m_stuckTest = 0;
 			continue;
 		}
 
-		// multiply the loop value with OverSampleRate to obtain the oversampling rate requested by the caller
-		if (++smpCtr >= (DATA_SIZE_BITS * m_overSampleRate))
+		++k;
+		// we multiply the loop value with ->osr to obtain the oversampling rate requested by the caller
+		if (k >= (DATA_SIZE_BITS * State->OverSampleRate))
 		{
 			break;
 		}
 	}
-
-	if (m_stirPool)
-	{
-		StirPool();
-	}
 }
 
-ulong CJP::GetTimeStamp()
+void CJP::GetEntropy(std::unique_ptr<JitterState> &State, byte* Output, size_t Length)
 {
-	return Utility::SystemTools::TimeStamp(m_hasTsc);
-}
+	size_t i;
+	size_t poff;
 
-ulong CJP::MeasureJitter()
-{
-	// The heart of the entropy generation process; calculate time deltas and use the CPU jitter in the time deltas.
-	// The jitter is folded into one bit; this function is the "random bit generator" as it produces one random bit per invocation.
-	ulong delta = 0;
-	ulong folded = 0;
-
-	// Invoke one noise source before time measurement to add variations
-	if (m_enableAccess)
-	{
-		AccessMemory();
-	}
-	// Get time stamp and calculate time delta to previous invocation to measure the timing variations
-	ulong time = GetTimeStamp();
-	delta = time - m_prevTime;
-	m_prevTime = time;
-	// Now call the next noise sources which also folds the data
-	FoldTime(delta, folded);
-	// Check whether we have a stuck test measurement; the enforcement is performed after the stuck test value has been mixed into the entropy pool
-	StuckCheck(delta);
-
-	return folded;
-}
-
-void CJP::Prime()
-{
-	// this is a reset
-	if (m_memState.size() != 0 && m_memTotalSize != 0)
-	{
-		m_rndState = 0;
-		std::memset(m_memState.data(), 0, m_memTotalSize);
-		m_memPosition = 0;
-		m_lastDelta = 0;
-		m_lastDelta2 = 0;
-		m_prevTime = 0;
-		m_stuckTest = 1;
-	}
-
-	m_memState.resize(m_memTotalSize, 0);
-
-	// verify oversampling rate; minimum sampling rate is 1
-	if (m_overSampleRate == 0)
-	{
-		m_overSampleRate = 1;
-	}
-
-	// fill the state with non-zero values
-	Generate64();
-}
-
-size_t CJP::Process(std::vector<byte> &Output, size_t Offset, size_t Length)
-{
-	const size_t RNDLEN = sizeof(ulong);
+	poff = 0;
 
 	do
 	{
-		size_t rmdLen = (Length < RNDLEN) ? Length : RNDLEN;
-		Generate64();
-		MemoryTools::CopyFromValue(m_rndState, Output, Offset, rmdLen);
-		Length -= rmdLen;
-		Offset += rmdLen;
-	} while (Length != 0);
+		GetEntropy(State);
 
-	// To be on the safe side, we generate one more round of entropy which we do not give out to the caller. 
-	// That round shall ensure that in case the calling application crashes, memory dumps, pages out, 
-	// or due to the CPU Jitter RNG lingering in memory for a long time without being moved and an attacker cracks the application,
-	// all he reads in the entropy pool is a value that is never to be used. 
-	// Thus, he does NOT see the previous value that was returned to the caller for cryptographic purposes.
-	// If we use secured memory, do not use this precaution as the secure memory protects the entropy pool. 
-	// Moreover, note that using this call reduces the speed of the RNG by up to half
-	if (m_secureCache)
+		const size_t RMDLEN = (Length > sizeof(ulong)) ? sizeof(ulong) : Length;
+
+		for (i = 0; i < RMDLEN; ++i)
+		{
+			Output[poff + i] = static_cast<byte>(State->RandomState >> (i * 8));
+		}
+
+		Length -= RMDLEN;
+		poff += RMDLEN;
+	} 
+	while (Length != 0);
+
+	if (State->SecureCache)
 	{
-		Generate64();
+		GetEntropy(State);
 	}
-
-	return Length;
 }
 
-size_t CJP::ShuffleLoop(uint LowBits, uint MinShift)
+ulong CJP::GetTime()
+{
+	return SystemTools::TimeStamp(TIMER_HAS_TSC);
+}
+
+bool CJP::MeasureJitter(std::unique_ptr<JitterState> &State)
+{
+	ulong delta;
+
+	// the heart of the entropy generation process; calculate time deltas and use the CPU jitter in the time deltas
+	// the jitter is folded into one bit; this function is the "random bit generator" as it produces one random bit per invocation
+	delta = 0;
+
+	// invoke one noise source before time measurement to add variations
+	MemoryJitter(State);
+
+	// get time stamp and calculate time delta to previous invocation to measure the timing variations
+	ulong time = GetTime();
+	delta = time - State->PreviousTime;
+	State->PreviousTime = time;
+	// call the next noise sources which also folds the data
+	FoldTime(State, delta);
+
+	// check whether we have a stuck test measurement; the enforcement is performed after the stuck test value has been mixed into the entropy pool
+	return StuckCheck(State, delta);
+}
+
+CEX_OPTIMIZE_IGNORE
+void CJP::MemoryJitter(std::unique_ptr<JitterState> &State)
+{
+	const size_t WRPLEN = State->MemoryBlockSize * State->MemoryBlocks;
+	const size_t ACLCNT = State->MemoryIterations + ShuffleLoop(State, ACC_LOOP_BIT_MAX, ACC_LOOP_BIT_MIN);
+	size_t i;
+	byte tmps;
+
+	for (i = 0; i < ACLCNT; ++i)
+	{
+		tmps = State->MemoryState[State->MemoryPosition];
+		// memory access; just add 1 to one byte, wrap at 255; memory access implies read from and write to memory location
+		tmps = (tmps + 1) & 0xFF;
+		State->MemoryState[State->MemoryPosition] = tmps;
+		// addition of memBlockSize - 1 to pointer with wrap around logic to ensure that every memory location is hit evenly
+		State->MemoryPosition = State->MemoryPosition + State->MemoryBlockSize - 1;
+		State->MemoryPosition = State->MemoryPosition % WRPLEN;
+	}
+}
+CEX_OPTIMIZE_RESUME
+
+std::unique_ptr<CJP::JitterState> CJP::Prime()
+{
+	std::unique_ptr<JitterState> state(new JitterState());
+
+	state->LastDelta = 0;
+	state->LastDelta2 = 0;
+	state->MemoryPosition = 0;
+	state->OverSampleRate = OVRSMP_RATE_MIN;
+	state->PreviousTime = 0;
+	state->RandomState = 0;
+	state->SecureCache = true;
+
+	CpuDetect detect;
+
+	if (detect.L1CacheTotal() != 0)
+	{
+		state->MemoryBlockSize = static_cast<uint>(detect.L1CacheLineSize());
+		state->MemoryBlocks = (detect.L1CacheTotal() / detect.VirtualCores() / state->MemoryBlockSize);
+		state->MemoryTotalSize = state->MemoryBlocks * state->MemoryBlockSize;
+		state->MemoryIterations = (state->MemoryTotalSize / state->MemoryBlockSize) * 2;
+	}
+	else
+	{
+		state->MemoryBlocks = MEMORY_BLOCKS;
+		state->MemoryBlockSize = MEMORY_BLOCKSIZE;
+		state->MemoryTotalSize = MEMORY_SIZE;
+		state->MemoryIterations = MEMORY_ACCESSLOOPS;
+	}
+
+	// this is a reset
+	if (state->MemoryState.size() != 0 && state->MemoryTotalSize != 0)
+	{
+
+		std::memset(state->MemoryState.data(), 0, state->MemoryTotalSize);
+
+
+	}
+	else
+	{
+		state->MemoryState.resize(state->MemoryTotalSize, 0);
+	}
+
+	// fill the state with non-zero values
+	GetEntropy(state);
+
+	return state;
+}
+
+size_t CJP::ShuffleLoop(std::unique_ptr<JitterState> &State, size_t LowBits, size_t MinShift)
 {
 	// update of the loop count used for the next round of an entropy collection
 	const uint SHFMSK = (1 << LowBits) - 1;
-	ulong shuffle = 0;
+	ulong shuffle;
+	ulong time;
 
 	// store the timestamp
-	ulong time = GetTimeStamp();
+	time = GetTime();
 	// mix the current state of the random number into the shuffle calculation to balance that shuffle a bit more
-	time ^= m_rndState;
+	time ^= State->RandomState;
+	shuffle = 0;
 
 	// fold the time value as much as possible to ensure that as many bits of the time stamp are included as possible
 	for (size_t i = 0; (DATA_SIZE_BITS / LowBits) > i; ++i)
@@ -417,86 +395,49 @@ size_t CJP::ShuffleLoop(uint LowBits, uint MinShift)
 	return (static_cast<size_t>(shuffle) + (static_cast<size_t>(1) << MinShift));
 }
 
-void CJP::StirPool()
+bool CJP::StuckCheck(std::unique_ptr<JitterState> &State, ulong CurrentDelta)
 {
-	// TODO: replace unions
+	const ulong DELTA2 = State->LastDelta - CurrentDelta;
+	const ulong DELTA3 = DELTA2 - State->LastDelta2;
+	bool ret;
 
-	// Shuffle the pool by mixing some value with a bijective function (XOR) into the pool.
-	// This function generates a mixer value that depends on the bits set and the
-	// location of the set bits in the random number generated by the entropy source.
-	// Therefore, based on the generated random number, this mixer value can have 2**64 different values.
-	// That mixer value is initialized with the first two SHA-1 constants.
-	// After obtaining the mixer value, it is XORed into the random number.
-	// The mixer value is not assumed to contain any entropy,
-	// but due to the XOR operation, it can also not destroy any entropy present in the entropy pool.
-	union c
-	{
-		ulong u64;
-		uint u32[2];
-	};
-
-	// This constant is derived from the first two 32 bit initialization vectors of SHA-1 as defined in FIPS 180-4 section 5.3.1
-	union c constant;
-	// The start value of the mixer variable is derived from the third and fourth 32 bit initialization vector of SHA-1 as defined in FIPS 180-4 section 5.3.1
-	union c mixer;
-
-	// Store the SHA-1 constants in reverse order to make up the 64 bit value; this applies to a little endian system, on a big endian system, 
-	// it reverses as expected. But this really does not matter as we do not rely on the specific numbers. 
-	// We just pick the SHA-1 constants as they have a good mix of bit set and unset.
-	constant.u32[1] = 0x67452301UL;
-	constant.u32[0] = 0xEFCDAB89UL;
-	mixer.u32[1] = 0x98BADCFEUL;
-	mixer.u32[0] = 0x10325476UL;
-
-	for (size_t i = 0; i < DATA_SIZE_BITS; ++i)
-	{
-		// get the i-th bit of the input random number and only XOR the constant into the mixer value when that bit is set
-		if ((m_rndState >> i) & 1)
-		{
-			mixer.u64 ^= constant.u64;
-		}
-
-		mixer.u64 = Utility::IntegerTools::RotL64(mixer.u64, 1);
-	}
-
-	m_rndState ^= mixer.u64;
-}
-
-void CJP::StuckCheck(ulong CurrentDelta)
-{
-	// Checks the 1st derivation of the jitter measurement (time delta), 
-	// 2nd derivation of the jitter measurement (delta of time deltas),
-	// and the 3rd derivation of the jitter measurement (delta of delta of time deltas).
-	// A 0 jitter measurement not stuck test (good bit), 1 jitter measurement stuck test (reject bit).
-	const ulong DELTA2 = m_lastDelta - CurrentDelta;
-	const ulong DELTA3 = DELTA2 - m_lastDelta2;
-
-	m_lastDelta = CurrentDelta;
-	m_lastDelta2 = DELTA2;
+	ret = false;
+	State->LastDelta = CurrentDelta;
+	State->LastDelta2 = DELTA2;
 
 	if (CurrentDelta == 0 || DELTA2 == 0 || DELTA3 == 0)
 	{
-		m_stuckTest = 1;
+		ret = true;
 	}
+
+	return ret;
 }
 
-bool CJP::TimerCheck()
+bool CJP::TimerCheck(std::unique_ptr<JitterState> &State)
 {
-	ulong sumDelta = 0;
-	ulong oldDelta = 0;
-	size_t backCtr = 0;
-	size_t varCtr = 0;
-	size_t modCtr = 0;
-	bool result = false;
+	ulong delta;
+	ulong olddelta;
+	ulong sumdelta;
+	ulong time;
+	ulong time2;
+	size_t backctr;
+	size_t varctr;
+	size_t modctr;
+	bool result;
+
+	sumdelta = 0;
+	olddelta = 0;
+	backctr = 0;
+	varctr = 0;
+	modctr = 0;
+	result = false;
 
 	for (size_t i = 0; (LOOP_TEST_COUNT + CLEARCACHE) > i; i++)
 	{
-		ulong delta = 0;
-		ulong folded = 0;
-
-		ulong time = Utility::SystemTools::TimeStamp(m_hasTsc);
-		FoldTime(time, folded);
-		ulong time2 = Utility::SystemTools::TimeStamp(m_hasTsc);
+		delta = 0;
+		time = SystemTools::TimeStamp(TIMER_HAS_TSC);
+		FoldTime(State, time);
+		time2 = SystemTools::TimeStamp(TIMER_HAS_TSC);
 
 		// test whether timer works
 		if (time == 0 || time2 == 0)
@@ -505,14 +446,13 @@ bool CJP::TimerCheck()
 		}
 
 		delta = time2 - time;
-		// test whether timer is fine grained enough to provide delta even when called shortly after each other; 
-		// this implies that we also have a high resolution timer
+		// test whether timer is fine grained enough to provide delta even when called shortly after each other
 		if (delta == 0)
 		{
 			break;
 		}
 
-		// up to here we did not modify any variable that will be evaluated later, but we already performed some work;
+		// up to here we did not modify any variable that will be evaluated later, but we already performed some work
 		// thus we already have had an impact on the caches, branch prediction, etc. with the goal to clear it to get the worst case measurements
 		if (i < CLEARCACHE)
 		{
@@ -522,37 +462,37 @@ bool CJP::TimerCheck()
 		// test whether we have an increasing timer
 		if (time2 <= time)
 		{
-			backCtr++;
+			backctr++;
 		}
 		if (delta % 100 == 0)
 		{
-			modCtr++;
+			modctr++;
 		}
 
-		// ensure that we have a varying delta timer which is necessary for the calculation of entropy;
+		// ensure that we have a varying delta timer which is necessary for the calculation of entropy
 		// perform this check only after the first loop is executed as we need to prime the oldDelta value
 		if (i != 0)
 		{
-			if (delta != oldDelta)
+			if (delta != olddelta)
 			{
-				varCtr++;
+				varctr++;
 			}
-			if (delta > oldDelta)
+			if (delta > olddelta)
 			{
-				sumDelta += (delta - oldDelta);
+				sumdelta += (delta - olddelta);
 			}
 			else
 			{
-				sumDelta += (oldDelta - delta);
+				sumdelta += (olddelta - delta);
 			}
 		}
 
-		oldDelta = delta;
+		olddelta = delta;
 	}
 
-	// we allow up to three times the time running backwards. CLOCK_REALTIME is affected by adjtime and NTP operations. 
-	// Thus, if such an operation just happens to interfere with our test, it should not fail. The value of 3 should cover the NTP case being performed during our test run.
-	if (3 >= backCtr && sumDelta > 1 && ((LOOP_TEST_COUNT / 10) * 9) >= modCtr)
+	// we allow up to three times the time running backwards. CLOCK_REALTIME is affected by adjtime and NTP operations
+	// Thus, if such an operation just happens to interfere with our test, it should not fail. The value of 3 should cover the NTP case being performed during our test run
+	if (3 >= backctr && sumdelta > 1 && ((LOOP_TEST_COUNT / 10) * 9) >= modctr)
 	{
 		result = true;
 	}

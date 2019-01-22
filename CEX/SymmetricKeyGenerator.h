@@ -44,6 +44,7 @@ class SymmetricKeyGenerator
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const std::vector<byte> SIGMA_INFO;
 
 	bool m_isDestroyed;
@@ -73,7 +74,7 @@ public:
 	/// <param name="Policy">The security policy, controls expected strength of internal used primitives</param>
 	/// <param name="ProviderType">The entropy provider, supplies the seed material for the pseudo-random generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an invalid parameter is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if an invalid parameter is used</exception>
 	SymmetricKeyGenerator(SecurityPolicy Policy= SecurityPolicy::SPL512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
@@ -85,7 +86,7 @@ public:
 	/// <param name="Customization">The non-default cSHAKE customization array; this can be used to add additional entropy to the generator sequence</param>
 	/// <param name="ProviderType">The entropy provider, supplies the seed material for the pseudo-random generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an invalid parameter is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if an invalid parameter is used</exception>
 	SymmetricKeyGenerator(SecurityPolicy Policy, const std::vector<byte> &Customization, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
@@ -110,7 +111,7 @@ public:
 	/// 
 	/// <returns>A populated SymmetricKey class</returns>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key size is zero length</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the key size is zero length</exception>
 	SymmetricKey* GetSymmetricKey(SymmetricKeySize KeySize);
 
 	/// <summary>
@@ -121,7 +122,7 @@ public:
 	/// 
 	/// <returns>A populated SymmetricSecureKey class</returns>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key size is zero length</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the key size is zero length</exception>
 	SymmetricSecureKey* GetSecureKey(SymmetricKeySize KeySize);
 
 	/// <summary>

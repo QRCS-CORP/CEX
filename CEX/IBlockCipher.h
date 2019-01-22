@@ -190,7 +190,7 @@ public:
 	/// <param name="KeyParams">Cipher key container. 
 	/// <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>

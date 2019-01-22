@@ -272,7 +272,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 64</param>
 	inline void RotL64(const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		zmm = _mm512_or_si512(_mm512_slli_epi64(zmm, static_cast<int>(Shift)), _mm512_srli_epi64(zmm, static_cast<int>(64 - Shift)));
 	}
 
@@ -286,7 +286,7 @@ public:
 	/// <returns>The rotated ULong512</returns>
 	inline static ULong512 RotL64(const ULong512 &X, const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		return ULong512(_mm512_or_si512(_mm512_slli_epi64(X.zmm, static_cast<int>(Shift)), _mm512_srli_epi64(X.zmm, static_cast<int>(64 - Shift))));
 	}
 
@@ -297,7 +297,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 64</param>
 	inline void RotR64(const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		RotL64(64 - Shift);
 	}
 
@@ -311,7 +311,7 @@ public:
 	/// <returns>The rotated ULong512</returns>
 	inline static ULong512 RotR64(const ULong512 &X, const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		return RotL64(X, 64 - Shift);
 	}
 
@@ -325,7 +325,7 @@ public:
 	/// <returns>The processed ULong512</returns>
 	inline static ULong512 ShiftRA(const ULong512 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		return ULong512(_mm512_sra_epi64(Value, _mm_set1_epi64(Shift)));
 	}
 
@@ -339,7 +339,7 @@ public:
 	/// <returns>The processed ULong512</returns>
 	inline static ULong512 ShiftRL(const ULong512 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		return ULong512(_mm512_srl_epi64(Value, _mm_set1_epi64(Shift)));
 	}
 
@@ -490,7 +490,7 @@ public:
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
 
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
 
 		return ULong512(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
@@ -512,7 +512,7 @@ public:
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
 
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
 
 		zmm = _mm512_set_epi64(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);

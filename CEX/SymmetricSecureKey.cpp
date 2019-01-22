@@ -19,7 +19,7 @@ using Enumeration::ShakeModes;
 using Helper::StreamCipherFromName;
 using Utility::SystemTools;
 
-
+const std::string SymmetricSecureKey::CLASS_NAME = "SymmetricSecureKey";
 const std::vector<byte> SymmetricSecureKey::SIGMA_INFO = { 0x53, 0x79, 0x6D, 0x6D, 0x65, 0x74, 0x72, 0x69, 0x63, 0x53, 0x65, 0x63, 0x75, 0x72, 0x65, 0x4B, 0x65, 0x79 };
 
 //~~~Constructors~~~//
@@ -34,7 +34,7 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key)
 {
 	if (Key.size() == 0)
 	{
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam);
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam);
 	}
 
 	MemoryTools::Copy(SIGMA_INFO, 0, m_keySalt, 0, SIGMA_INFO.size());
@@ -52,7 +52,7 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 {
 	if (Key.size() == 0 && Nonce.size() == 0)
 	{
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam);
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam);
 	}
 
 	MemoryTools::Copy(SIGMA_INFO, 0, m_keySalt, 0, SIGMA_INFO.size());
@@ -70,7 +70,7 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 {
 	if (Key.size() == 0 && Nonce.size() == 0 && Info.size() == 0)
 	{
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam);
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam);
 	}
 
 	MemoryTools::Copy(SIGMA_INFO, 0, m_keySalt, 0, SIGMA_INFO.size());
@@ -81,15 +81,15 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, SecurityPol
 	:
 	m_isDestroyed(false),
 	m_keySalt(Salt.size() != 0 ? Salt.size() :
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The salt can not be zero sized!"), ErrorCodes::InvalidParam)),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The salt can not be zero sized!"), ErrorCodes::InvalidParam)),
 	m_keySizes(Key.size(), 0, 0),
 	m_keyState(Key.size()),
 	m_secPolicy(Policy != SecurityPolicy::None ? Policy :
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The policy can not be None!"), ErrorCodes::InvalidParam))
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The policy can not be None!"), ErrorCodes::InvalidParam))
 {
 	if (Key.size() == 0)
 	{
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam);
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam);
 	}
 
 	MemoryTools::Copy(Salt, 0, m_keySalt, 0, m_keySalt.size());
@@ -101,15 +101,15 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	:
 	m_isDestroyed(false),
 	m_keySalt(Salt.size() != 0 ? Salt.size() :
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The salt can not be zero sized!"), ErrorCodes::InvalidParam)),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The salt can not be zero sized!"), ErrorCodes::InvalidParam)),
 	m_keySizes(Key.size(), Nonce.size(), 0),
 	m_keyState(Key.size() + Nonce.size()),
 	m_secPolicy(Policy != SecurityPolicy::None ? Policy :
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The policy can not be None!"), ErrorCodes::InvalidParam))
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The policy can not be None!"), ErrorCodes::InvalidParam))
 {
 	if (Key.size() == 0 && Nonce.size() == 0)
 	{
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam);
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam);
 	}
 
 	MemoryTools::Copy(Salt, 0, m_keySalt, 0, m_keySalt.size());
@@ -121,15 +121,15 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	:
 	m_isDestroyed(false),
 	m_keySalt(Salt.size() != 0 ? Salt.size() :
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The salt can not be zero sized!"), ErrorCodes::InvalidParam)),
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The salt can not be zero sized!"), ErrorCodes::InvalidParam)),
 	m_keySizes(Key.size(), Nonce.size(), Info.size()),
 	m_keyState(Key.size() + Nonce.size() + Info.size()),
 	m_secPolicy(Policy != SecurityPolicy::None ? Policy :
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The policy can not be None!"), ErrorCodes::InvalidParam))
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The policy can not be None!"), ErrorCodes::InvalidParam))
 {
 	if (Key.size() == 0 && Nonce.size() == 0 && Info.size() == 0)
 	{
-		throw CryptoProcessingException(std::string("SymmetricSecureKey"), std::string("Constructor"), std::string("The key, nonce, and info can not be zero sized!"), ErrorCodes::InvalidParam);
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The key, nonce, and info can not be zero sized!"), ErrorCodes::InvalidParam);
 	}
 
 	MemoryTools::Copy(Salt, 0, m_keySalt, 0, m_keySalt.size());
@@ -153,7 +153,7 @@ const std::vector<byte> SymmetricSecureKey::Info()
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
-		throw CryptoAuthenticationFailure(std::string("SymmetricSecureKey"), std::string("Info"), ex.Message(), ErrorCodes::AuthenticationFailure);
+		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Info"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
 	return seed;
@@ -169,7 +169,7 @@ const std::vector<byte> SymmetricSecureKey::Key()
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
-		throw CryptoAuthenticationFailure(std::string("SymmetricSecureKey"), std::string("Key"), ex.Message(), ErrorCodes::AuthenticationFailure);
+		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Key"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
 	return seed;
@@ -190,7 +190,7 @@ const std::vector<byte> SymmetricSecureKey::Nonce()
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
-		throw CryptoAuthenticationFailure(std::string("SymmetricSecureKey"), std::string("Nonce"), ex.Message(), ErrorCodes::AuthenticationFailure);
+		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Nonce"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
 	return seed;
@@ -402,15 +402,15 @@ void SymmetricSecureKey::GetSystemKey(SecurityPolicy Policy, const SecureVector<
 	ArrayTools::AppendString(SystemTools::OsName(), cust);
 	ArrayTools::AppendString(SystemTools::UserId(), cust);
 	ArrayTools::AppendString(SystemTools::UserName(), cust);
-	ArrayTools::Append(SystemTools::ProcessId(), cust);
-	ArrayTools::Append(detect.BusRefFrequency(), cust);
-	ArrayTools::Append(detect.FrequencyBase(), cust);
-	ArrayTools::Append(detect.FrequencyMax(), cust);
-	ArrayTools::Append(detect.L1CacheLineSize(), cust);
-	ArrayTools::Append(detect.L1CacheSize(), cust);
-	ArrayTools::Append(detect.L2CacheSize(), cust);
+	ArrayTools::AppendValue(SystemTools::ProcessId(), cust);
+	ArrayTools::AppendValue(detect.BusRefFrequency(), cust);
+	ArrayTools::AppendValue(detect.FrequencyBase(), cust);
+	ArrayTools::AppendValue(detect.FrequencyMax(), cust);
+	ArrayTools::AppendValue(detect.L1CacheLineSize(), cust);
+	ArrayTools::AppendValue(detect.L1CacheSize(), cust);
+	ArrayTools::AppendValue(detect.L2CacheSize(), cust);
 	ArrayTools::AppendString(detect.SerialNumber(), cust);
-	ArrayTools::Append(detect.Vendor(), cust);
+	ArrayTools::AppendValue(detect.Vendor(), cust);
 
 	switch (Policy)
 	{

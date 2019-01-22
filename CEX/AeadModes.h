@@ -21,11 +21,7 @@ enum class AeadModes : byte
 	/// <summary>
 	/// Galois Counter AEAD Mode
 	/// </summary>
-	GCM = 6,
-	/// <summary>
-	/// Offset CodeBook AEAD Mode
-	/// </summary>
-	OCB = 8
+	GCM = 6
 };
 
 NAMESPACE_ENUMERATIONEND

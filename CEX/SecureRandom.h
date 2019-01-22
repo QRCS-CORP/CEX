@@ -102,7 +102,7 @@ public:
 	/// <param name="DigestType">The message digest function used by the drbg as either the base PRF for that function (HCR or DCR), or to invoke the extended cipher configuration when using BCR</param>
 	/// <param name="BufferSize">The byte size of the internal buffer; default is 4096</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the selected parameters are invalid</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the selected parameters are invalid</exception>
 	explicit SecureRandom(Prngs PrngType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None, size_t BufferSize = 4096);
 
 	/// <summary>

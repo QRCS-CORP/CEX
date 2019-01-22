@@ -54,7 +54,7 @@ KeccakParams::KeccakParams(const std::vector<byte> &TreeArray)
 	m_reserved(0),
 	m_dstCode(0)
 {
-	CexAssert(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
+	CEXASSERT(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
 
 	m_nodeOffset = Utility::IntegerTools::LeBytesTo32(TreeArray, 0);
 	m_treeVersion = Utility::IntegerTools::LeBytesTo16(TreeArray, 4);
@@ -80,7 +80,7 @@ KeccakParams::KeccakParams(uint NodeOffset, ulong OutputSize, ushort Version, ui
 {
 	m_dstCode.resize(DistributionCodeMax());
 
-	CexAssert(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
+	CEXASSERT(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
 }
 
 //~~~Accessors~~~//

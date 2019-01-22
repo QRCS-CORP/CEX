@@ -272,7 +272,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotL32(const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		xmm = _mm_or_si128(_mm_slli_epi32(xmm, static_cast<int>(Shift)), _mm_srli_epi32(xmm, static_cast<int>(32 - Shift)));
 	}
 
@@ -286,7 +286,7 @@ public:
 	/// <returns>The rotated UInt128</returns>
 	inline static UInt128 RotL32(const UInt128 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt128(_mm_or_si128(_mm_slli_epi32(Value.xmm, static_cast<int>(Shift)), _mm_srli_epi32(Value.xmm, static_cast<int>(32 - Shift))));
 	}
 
@@ -297,7 +297,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotR32(const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
 	}
 
@@ -311,7 +311,7 @@ public:
 	/// <returns>The rotated UInt128</returns>
 	inline static UInt128 RotR32(const UInt128 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return RotL32(Value, 32 - Shift);
 	}
 
@@ -325,7 +325,7 @@ public:
 	/// <returns>The processed UInt128</returns>
 	inline static UInt128 ShiftRA(const UInt128 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt128(_mm_sra_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -339,7 +339,7 @@ public:
 	/// <returns>The processed UInt128</returns>
 	inline static UInt128 ShiftRL(const UInt128 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt128(_mm_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -515,7 +515,7 @@ public:
 		std::array<uint, 4> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
 
 		return UInt128(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 		// TODO: finish this
@@ -533,7 +533,7 @@ public:
 		std::array<uint, 4> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
 
 		xmm = _mm_set_epi32(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 	}

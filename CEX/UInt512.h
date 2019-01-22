@@ -298,7 +298,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotL32(const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		zmm = _mm512_or_si512(_mm512_slli_epi32(zmm, static_cast<int>(Shift)), _mm512_srli_epi32(zmm, static_cast<int>(32 - Shift)));
 	}
 
@@ -312,7 +312,7 @@ public:
 	/// <returns>The rotated UInt512</returns>
 	inline static UInt512 RotL32(const UInt512 &X, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_or_si512(_mm512_slli_epi32(X.zmm, static_cast<int>(Shift)), _mm512_srli_epi32(X.zmm, static_cast<int>(32 - Shift))));
 	}
 
@@ -323,7 +323,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotR32(const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
 	}
 
@@ -337,7 +337,7 @@ public:
 	/// <returns>The rotated UInt512</returns>
 	inline static UInt512 RotR32(const UInt512 &X, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return RotL32(X, 32 - Shift);
 	}
 
@@ -351,7 +351,7 @@ public:
 	/// <returns>The processed UInt512</returns>
 	inline static UInt512 ShiftRA(const UInt512 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_sra_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -365,7 +365,7 @@ public:
 	/// <returns>The processed UInt512</returns>
 	inline static UInt512 ShiftRL(const UInt512 &Value, const int Shift)
 	{
-		CexAssert(Shift <= 32, "Shift size is too large");
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -534,7 +534,7 @@ public:
 		std::array<uint, 16> tmpB;
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 && 
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 && 
 			tmpB[8] != 0 && tmpB[9] != 0 && tmpB[10] != 0 && tmpB[11] != 0 && tmpB[12] != 0 && tmpB[13] != 0 && tmpB[14] != 0 && tmpB[15] != 0, "Division by zero");
 
 		return UInt512(tmpA[15] / tmpB[15], tmpA[14] / tmpB[14], tmpA[13] / tmpB[13], tmpA[12] / tmpB[12],
@@ -557,7 +557,7 @@ public:
 		std::array<uint, 16> tmpB;
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 &&
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 &&
 			tmpB[8] != 0 && tmpB[9] != 0 && tmpB[10] != 0 && tmpB[11] != 0 && tmpB[12] != 0 && tmpB[13] != 0 && tmpB[14] != 0 && tmpB[15] != 0, "Division by zero");
 
 		zmm = _mm512_set_epi32(tmpA[15] / tmpB[15], tmpA[14] / tmpB[14], tmpA[13] / tmpB[13], tmpA[12] / tmpB[12],

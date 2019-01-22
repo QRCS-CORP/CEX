@@ -66,6 +66,8 @@ public:
 	/// <param name="Input">The array to modify</param>
 	/// <param name="Offset">The starting offset in the array</param>
 	/// <param name="Length">The number of bytes to pad</param>
+	///
+	/// <exception cref="CryptoPaddingException">Thrown if the padding length is longer than the array length</exception>
 	virtual void AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
@@ -86,6 +88,8 @@ public:
 	/// <param name="Length">The upper bound of bytes to check</param>
 	///
 	/// <returns>Returns the length of padding in bytes</returns>
+	///
+	/// <exception cref="CryptoPaddingException">Thrown if the length is longer than the array length</exception>
 	virtual size_t GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 };
 

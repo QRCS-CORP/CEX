@@ -9,7 +9,7 @@ namespace Test
 	using Cipher::Block::Mode::IAeadMode;
 
 	/// <summary>
-	/// Tests the AEAD cipher modes; EAX, OCB and GCM.
+	/// Tests the AEAD cipher modes; EAX and GCM.
 	/// <para>Tests each AEAD mode for correct operation, including KAT, parallel-mode, auto-increment, and stress tests.</para>
 	/// </summary>
 	class AeadTest final : public ITest

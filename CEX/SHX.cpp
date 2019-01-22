@@ -45,7 +45,7 @@ SHX::SHX(Kdf::IKdf* Kdf)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf :
-		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::InvalidParam)),
+		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::IllegalOperation)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),

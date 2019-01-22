@@ -58,7 +58,7 @@ const std::string SecureRandom::Name()
 
 void SecureRandom::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+	CEXASSERT(Output.size() - Offset <= Elements, "The output array is too short");
 
 	const size_t BUFLEN = Elements * sizeof(ushort);
 	std::vector<byte> buf(BUFLEN);
@@ -68,7 +68,7 @@ void SecureRandom::Fill(std::vector<ushort> &Output, size_t Offset, size_t Eleme
 
 void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+	CEXASSERT(Output.size() - Offset <= Elements, "The output array is too short");
 
 	const size_t BUFLEN = Elements * sizeof(uint);
 	std::vector<byte> buf(BUFLEN);
@@ -78,7 +78,7 @@ void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Element
 
 void SecureRandom::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
 {
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+	CEXASSERT(Output.size() - Offset <= Elements, "The output array is too short");
 
 	const size_t BUFLEN = Elements * sizeof(ulong);
 	std::vector<byte> buf(BUFLEN);
@@ -96,7 +96,7 @@ std::vector<byte> SecureRandom::Generate(size_t Length)
 
 void SecureRandom::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+	CEXASSERT(Offset + Length <= Output.size(), "The array is too small to fulfill this request");
 
 	std::vector<byte> rnd = Generate(Length);
 	MemoryTools::Copy(rnd, 0, Output, Offset, Length);
@@ -104,7 +104,7 @@ void SecureRandom::Generate(std::vector<byte> &Output, size_t Offset, size_t Len
 
 void SecureRandom::Generate(std::vector<byte> &Output)
 {
-	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
+	CEXASSERT(Output.size() != 0, "Buffer size must be at least 1 in length");
 
 	if (m_rndBuffer.size() - m_bufferIndex < Output.size())
 	{
@@ -364,7 +364,7 @@ uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 		throw CryptoRandomException(CLASS_NAME, std::string("NextUInt32"), std::string("Maximum can not be less than Minimum!"), ErrorCodes::IllegalOperation);
 	}
 
-	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
+	CEXASSERT(Maximum > Minimum, "Maximum must be more than minimum");
 
 	const uint SMPTHR = (Maximum - Minimum + 1);
 	const uint SMPMAX = static_cast<uint>(std::numeric_limits<uint>::max() - (std::numeric_limits<uint>::max() % SMPTHR));

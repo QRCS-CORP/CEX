@@ -59,7 +59,7 @@ SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length
 	m_streamData(0),
 	m_streamPosition(0)
 {
-	CexAssert(Length <= Data.size() - Offset, "length is longer than the array size");
+	CEXASSERT(Length <= Data.size() - Offset, "Length is longer than the array size");
 
 	m_streamData.resize(Length);
 	Utility::MemoryTools::Copy(Data, Offset, m_streamData, 0, Length);
@@ -160,7 +160,7 @@ size_t SecureStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 byte SecureStream::ReadByte()
 {
-	CexAssert(m_streamData.size() - m_streamPosition >= 1, "Stream capacity exceeded");
+	CEXASSERT(m_streamData.size() - m_streamPosition >= 1, "Stream capacity exceeded");
 
 	byte data = 0;
 	Transform();
@@ -215,7 +215,7 @@ std::vector<byte> SecureStream::ToArray()
 
 void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Input.size(), "length is longer than the array size");
+	CEXASSERT(Offset + Length <= Input.size(), "Length is longer than the array size");
 
 	size_t len = m_streamPosition + Length;
 	if (m_streamData.capacity() - m_streamPosition < Length)
@@ -253,7 +253,7 @@ std::vector<byte> SecureStream::GetSystemKey()
 	std::vector<byte> state(0);
 	Utility::ArrayTools::AppendString(Utility::SystemTools::ComputerName(), state);
 	Utility::ArrayTools::AppendString(Utility::SystemTools::OsName(), state);
-	Utility::ArrayTools::Append(Utility::SystemTools::ProcessId(), state);
+	Utility::ArrayTools::AppendValue(Utility::SystemTools::ProcessId(), state);
 	Utility::ArrayTools::AppendString(Utility::SystemTools::UserId(), state);
 	Utility::ArrayTools::AppendString(Utility::SystemTools::UserName(), state);
 

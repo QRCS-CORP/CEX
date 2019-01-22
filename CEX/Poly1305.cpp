@@ -75,7 +75,7 @@ void Poly1305::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (Output.size() < TagSize())
 	{
@@ -90,7 +90,7 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if ((Output.size() - OutOffset) < TagSize())
 	{
@@ -220,10 +220,7 @@ void Poly1305::Reset()
 
 void Poly1305::Update(byte Input)
 {
-	if (!m_isInitialized)
-	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
-	}
+	CEXASSERT(m_isInitialized, "The mac is not initialized!");
 
 	if (m_msgLength == m_msgBuffer.size())
 	{
@@ -237,14 +234,8 @@ void Poly1305::Update(byte Input)
 
 void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!m_isInitialized)
-	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
-	}
-	if ((Input.size() - InOffset) < Length)
-	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
-	}
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(m_isInitialized, "The mac is not initialized!");
 
 	if (Length != 0)
 	{

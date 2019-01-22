@@ -92,7 +92,7 @@ public:
 	/// Read Only: Returns the full finalized MAC code value array
 	/// </summary>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
 	virtual const std::vector<byte> Tag() = 0;
 
 	//~~~Public Functions~~~//
@@ -109,7 +109,7 @@ public:
 	/// <param name="Length">The number of MAC code bytes to write to the output array.
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
 	virtual void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
 
 	/// <summary>
@@ -122,7 +122,7 @@ public:
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state has been processed</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
 	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
 
 	/// <summary>
@@ -140,7 +140,7 @@ public:
 	/// 
 	/// <returns>Returns false if the MAC code does not match</returns>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
 	virtual bool Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
 };
 

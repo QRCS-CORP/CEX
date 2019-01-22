@@ -17,7 +17,7 @@ const std::string CMAC::CLASS_NAME("CMAC");
 CMAC::CMAC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
 	m_cipherMode(CipherType != BlockCiphers::None ? new Cipher::Block::Mode::CBC(CipherType, CipherExtensionType) :
-		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
+		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
@@ -132,7 +132,7 @@ void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (Output.size() < TagSize())
 	{
@@ -152,7 +152,7 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if ((Output.size() - OutOffset) < m_macSize)
 	{
@@ -223,7 +223,7 @@ void CMAC::Update(byte Input)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 
 	if (m_msgLength == m_msgBuffer.size())
@@ -238,9 +238,12 @@ void CMAC::Update(byte Input)
 
 void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
+	CEXASSERT(m_isInitialized, "The mac is not initialized!");
+
 	if (!m_isInitialized)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if ((Input.size() - InOffset) < Length)
 	{

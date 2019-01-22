@@ -382,6 +382,10 @@ typedef unsigned char byte;
 #	endif
 #endif
 
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#	define CEX_AVX_INTRINSICS
+#endif
+
 // native openmp support
 #if defined(_OPENMP)
 #	define CEX_HAS_OPENMP
@@ -441,29 +445,33 @@ typedef unsigned char byte;
 #	define CEX_PRAGMA_WARNING _Pragma ("warning: the operation is not supported")
 #endif
 
-// TODO: change this to a macro, not getting inlined? (test this)
-/// <summary>
-/// The global assertion handler template
-/// </summary>
-///
-/// <param name="Condition">The condition, must evaluate to true or assert is invoked</param>
-/// <param name="Message">The error message</param>
-template<typename T>
-inline static void CexAssert(bool Condition, const T Message)
-{
-#if (!defined(CEX_NO_DEBUG)) || defined(CEX_THROW_ASSERTIONS)
-	if (!Condition)
-	{
-		std::cerr << "Assertion failed in " << (__FILE__) << " line " << (__LINE__) << ": " << Message << std::endl;
-		std::terminate();
-	} 
+#if (!defined(CEX_NO_DEBUG))
+
+#	define CEXASSERT(Condition, Message)																					\
+	do {																													\
+		if (!(bool)(Condition))																								\
+		{																													\
+			std::cerr << "Assertion failed in " << (__FILE__) << " line " << (__LINE__) << ": " << Message << std::endl;	\
+			std::terminate();																								\
+		}																													\
+	} while(0)																												\
+
+#else
+
+// compiler will exclude this in release
+#	define CEXASSERT(Condition, Message)	\
+	do {									\
+	} while (0)								\
+
 #endif
-}
 
 //////////////////////////////////////////////////
 //		*** User Configurable Section ***		//
 // Settings in this section can be modified		//
 //////////////////////////////////////////////////
+
+// enable FIPS 140.2 entropy provider wellness test
+#define CEX_FIPS140_ENABLED
 
 // enabling this value uses the volatile memset to erase array data
 #define CEX_VOLATILE_MEMSET

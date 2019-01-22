@@ -159,7 +159,7 @@ void CFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (KeyParams.Nonce().size() < 1)
 	{
-		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of Nonce!"), ErrorCodes::InvalidSize);
+		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of Nonce!"), ErrorCodes::InvalidNonce);
 	}
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{
@@ -174,7 +174,7 @@ void CFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		}
 		if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		{
-			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidSize);
+			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -192,7 +192,7 @@ void CFB::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
+		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -207,8 +207,8 @@ void CFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void CFB::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
 
 	m_blockCipher->Transform(m_cfbVector, 0, Output, OutOffset);
 
@@ -286,8 +286,8 @@ void CFB::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 
 void CFB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
 
 	// encrypt the register
 	m_blockCipher->Transform(m_cfbVector, 0, Output, OutOffset);
@@ -310,9 +310,9 @@ void CFB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void CFB::Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
-	CexAssert(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
-	CexAssert(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block ciphers block-size!");
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block ciphers block-size!");
 
 	size_t blkCtr = Length / m_blockSize;
 

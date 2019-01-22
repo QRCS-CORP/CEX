@@ -34,6 +34,7 @@ class SymmetricSecureKey final : public ISymmetricKey
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const std::vector<byte> SIGMA_INFO;
 
 	bool m_isDestroyed;
@@ -68,7 +69,7 @@ public:
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricSecureKey(const std::vector<byte> &Key);
 
 	/// <summary>
@@ -79,7 +80,7 @@ public:
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or salt array</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce);
 
 	/// <summary>
@@ -91,7 +92,7 @@ public:
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
 
 	/// <summary>
@@ -103,7 +104,7 @@ public:
 	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
 	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricSecureKey(const std::vector<byte> &Key, SecurityPolicy Policy, const std::vector<byte> &Salt);
 
 	/// <summary>
@@ -116,7 +117,7 @@ public:
 	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
 	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, SecurityPolicy Policy, const std::vector<byte> &Salt);
 
 	/// <summary>
@@ -130,7 +131,7 @@ public:
 	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
 	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, SecurityPolicy Policy, const std::vector<byte> &Salt);
 
 	/// <summary>

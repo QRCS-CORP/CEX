@@ -164,15 +164,15 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (!m_isSigner)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::NotInitialized);
 	}
 	if (Message.size() == 0)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The message size must be non-zero!"), ErrorCodes::InvalidParam);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::InvalidParam);
 	}
 
 	DLMN256Q8380417::DlmParams cparams = DLMN256Q8380417::GetParams(m_dlmParameters);
@@ -191,11 +191,11 @@ bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Me
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
 	if (m_isSigner)
 	{
-		throw CryptoAsymmetricException(Name(), std::string("Verify"), std::string("The signature scheme is not initialized for verification!"), ErrorCodes::IllegalOperation);
+		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for verification!"), ErrorCodes::NotInitialized);
 	}
 
 	DLMN256Q8380417::DlmParams cparams = DLMN256Q8380417::GetParams(m_dlmParameters);

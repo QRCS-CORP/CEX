@@ -15,6 +15,8 @@ using Enumeration::BlockCiphers;
 using Exception::CryptoGeneratorException;
 using Enumeration::ErrorCodes;
 
+const std::string DrbgFromName::CLASS_NAME("DrbgFromName");
+
 IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 {
 	using namespace Drbg;
@@ -44,17 +46,17 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 			}
 			default:
 			{
-				throw CryptoException(std::string("DrbgFromName"), std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoGeneratorException &ex)
 	{
-		throw CryptoException(std::string("DrbgFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("DrbgFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return dptr;
@@ -96,7 +98,7 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 				}
 				else
 				{
-					throw CryptoException(std::string("DrbgFromName"), std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
+					throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
 				}
 			}
 			case Drbgs::CSG:
@@ -111,17 +113,17 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 			}
 			default:
 			{
-				throw CryptoException(std::string("DrbgFromName"), std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoGeneratorException &ex)
 	{
-		throw CryptoException(std::string("DrbgFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("DrbgFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return dptr;

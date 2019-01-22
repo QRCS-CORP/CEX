@@ -6,7 +6,6 @@
 #include "../CEX/ICM.h"
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
-#include "../CEX/OCB.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
@@ -82,11 +81,6 @@ namespace Test
 			OnProgress(std::string("ParallelModeTest: Passed GCM parallel to sequential equivalence test.."));
 			delete cpr6;
 
-			OCB* cpr7 = new OCB(Enumeration::BlockCiphers::RHX);
-			Stress(cpr7, true);
-			OnProgress(std::string("ParallelModeTest: Passed OCB parallel to sequential equivalence test.."));
-			delete cpr7;
-
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
@@ -133,8 +127,7 @@ namespace Test
 			otp.resize(inpLen);
 
 			if (Cipher->Enumeral() == Enumeration::CipherModes::EAX ||
-				Cipher->Enumeral() == Enumeration::CipherModes::GCM ||
-				Cipher->Enumeral() == Enumeration::CipherModes::OCB)
+				Cipher->Enumeral() == Enumeration::CipherModes::GCM)
 			{
 				cpt1.resize(inpLen + ((IAeadMode*)Cipher)->MaxTagSize());
 				cpt2.resize(cpt1.size());

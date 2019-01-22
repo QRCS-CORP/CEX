@@ -14,7 +14,6 @@
 #include "../CEX/ICM.h"
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
-#include "../CEX/OCB.h"
 #include "../CEX/ACS.h"
 #include "../CEX/ChaCha256.h"
 #include "../CEX/ChaCha512.h"
@@ -124,7 +123,7 @@ namespace Test
 			OFBSpeedTest(engine, true, false);
 
 			OnProgress(std::string("### AEAD Authenticated Cipher Modes ###"));
-			OnProgress(std::string("### Tests speeds of EAX, GCM, and OCB authenticated modes"));
+			OnProgress(std::string("### Tests speeds of EAX and GCM authenticated modes"));
 			OnProgress(std::string("### Uses the standard rounds and a 256 bit key"));
 			OnProgress(std::string(""));
 
@@ -137,11 +136,6 @@ namespace Test
 			GCMSpeedTest(engine, true, false);
 			OnProgress(std::string("***AES-GCM Parallel Encryption***"));
 			GCMSpeedTest(engine, true, true);
-
-			OnProgress(std::string("***AES-OCB Sequential Encryption***"));
-			OCBSpeedTest(engine, true, false);
-			OnProgress(std::string("***AES-OCB Parallel Encryption***"));
-			OCBSpeedTest(engine, true, true);
 
 			if (engine != nullptr)
 			{
@@ -260,13 +254,6 @@ namespace Test
 	void CipherSpeedTest::GCMSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
 	{
 		Mode::GCM* cipher = new Mode::GCM(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 12, 10, m_progressEvent);
-		delete cipher;
-	}
-
-	void CipherSpeedTest::OCBSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
-	{
-		Mode::OCB* cipher = new Mode::OCB(Engine);
 		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 12, 10, m_progressEvent);
 		delete cipher;
 	}

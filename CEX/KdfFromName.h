@@ -20,6 +20,10 @@ using Enumeration::Kdfs;
 /// </summary>
 class KdfFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -30,7 +34,7 @@ public:
 	/// 
 	/// <returns>An uninitialized Kdf generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the Kdf is not supported</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if the Kdf type is not supported</exception>
 	static IKdf* GetInstance(Kdfs KdfType);
 
 	/// <summary>
@@ -41,7 +45,7 @@ public:
 	/// 
 	/// <returns>An uninitialized Kdf generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the Kdf is not supported</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if the block cipher extension type is not supported</exception>
 	static IKdf* GetInstance(BlockCipherExtensions ExtensionType);
 };
 

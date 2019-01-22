@@ -35,65 +35,77 @@ enum class ErrorCodes : byte
 	/// </summary>
 	IllegalOperation = 5,
 	/// <summary>
-	/// Invalid key
+	/// Invalid symmetric key parameter; information
 	/// </summary>
-	InvalidKey = 6,
+	InvalidInfo = 6,
+	/// <summary>
+	/// Invalid symmetric key parameter; key
+	/// </summary>
+	InvalidKey = 7,
+	/// <summary>
+	/// Invalid symmetric key parameter; nonce
+	/// </summary>
+	InvalidNonce = 8,
 	/// <summary>
 	/// Invalid parameter
 	/// </summary>
-	InvalidParam = 7,
+	InvalidParam = 9,
+	/// <summary>
+	/// Invalid salt parameter
+	/// </summary>
+	InvalidSalt = 10,
 	/// <summary>
 	/// Invalid size parameter
 	/// </summary>
-	InvalidSize = 8,
+	InvalidSize = 11,
 	/// <summary>
 	/// Invalid state
 	/// </summary>
-	InvalidState = 9,
+	InvalidState = 12,
 	/// <summary>
 	/// Maximum value exceeded
 	/// </summary>
-	MaxExceeded = 10,
+	MaxExceeded = 13,
 	/// <summary>
 	/// Access was denied
 	/// </summary>
-	NoAccess = 11,
+	NoAccess = 14,
 	/// <summary>
 	/// The resource was not found
 	/// </summary>
-	NotFound = 12,
+	NotFound = 15,
 	/// <summary>
 	/// The host could not be found
 	/// </summary>
-	NoHost = 13,
+	NoHost = 16,
 	/// <summary>
 	/// The algorithm was not initialized
 	/// </summary>
-	NotInitialized = 14,
+	NotInitialized = 17,
 	/// <summary>
 	/// The operation is not supported
 	/// </summary>
-	NotSupported = 15,
+	NotSupported = 18,
 	/// <summary>
 	/// The stream is read only
 	/// </summary>
-	ReadOnly = 16,
+	ReadOnly = 19,
 	/// <summary>
 	/// The number of retries was exceeded
 	/// </summary>
-	RetriesExceeded = 17,
+	RetriesExceeded = 20,
 	/// <summary>
 	/// The stream is write only
 	/// </summary>
-	WriteOnly = 18,
+	WriteOnly = 21,
 	/// <summary>
 	/// The behavior is undefined
 	/// </summary>
-	UnDefined = 19,
+	UnDefined = 22,
 	/// <summary>
 	/// An error of unknown origin has occured
 	/// </summary>
-	UnKnown = 20
+	UnKnown = 23
 };
 
 NAMESPACE_ENUMERATIONEND

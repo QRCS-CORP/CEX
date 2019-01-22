@@ -142,7 +142,7 @@ public:
 	///
 	/// <param name="Cipher">Instance of the block cipher</param>
 	/// 
-	/// <exception cref="Exception::CryptoMacException">Thrown if the block cipher is null</exception>
+	/// <exception cref="CryptoMacException">Thrown if the block cipher is null</exception>
 	explicit GMAC(IBlockCipher* Cipher);
 
 	/// <summary>
@@ -196,6 +196,8 @@ public:
 	/// 
 	/// <param name="Input">The input data byte array</param>
 	/// <param name="Output">The output Mac code array</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -207,6 +209,8 @@ public:
 	/// <param name="OutOffset">The offset in the output array</param>
 	/// 
 	/// <returns>The number of bytes processed</returns>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
@@ -219,7 +223,7 @@ public:
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
 	/// 
-	/// <exception cref="Exception::CryptoMacException">Thrown if an invalid key size is used</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>

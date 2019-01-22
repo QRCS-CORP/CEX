@@ -20,11 +20,15 @@
 #define CEX_ARRAYUTILS_H
 
 #include "CexDomain.h"
+#include "IntegerTools.h"
 #include "SecureRandom.h"
 #include <algorithm>
 #include <iterator>
 
 NAMESPACE_UTILITY
+
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 /// <summary>
 /// Array functions class
@@ -51,23 +55,23 @@ public:
 	}
 
 	/// <summary>
-	/// Append an integer value to an 8bit integer array
+	/// Append an integer array to another integer array
 	/// </summary>
-	/// 
-	/// <param name="Value">The source integer value</param>
+	///
+	/// <param name="Input">The pointer to the object in memory</param>
 	/// <param name="Output">The destination byte array</param>
+	/// <param name="Length">The number of bytes to copy</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
-	template <typename T>
-	static size_t Append(T Value, std::vector<byte> &Output)
+	template <typename Pointer, typename A>
+	static size_t AppendObject(const Pointer* Input, std::vector<A> &Output, size_t Length)
 	{
-		const size_t VARLEN = sizeof(T);
-		const size_t ARRLEN = Output.size();
+		const size_t OTPLEN = sizeof(A) * Output.size();
 
-		Output.resize(Output.size() + VARLEN);
-		std::memcpy(&Output[ARRLEN], &Value, VARLEN);
+		Output.resize(OTPLEN + Length);
+		MemoryTools::CopyFromObject(Input, Output, OTPLEN, Length);
 
-		return VARLEN;
+		return Length;
 	}
 
 	/// <summary>
@@ -102,6 +106,26 @@ public:
 	}
 
 	/// <summary>
+	/// Append an integer value to an 8-bit integer array
+	/// </summary>
+	/// 
+	/// <param name="Value">The source integer value</param>
+	/// <param name="Output">The destination byte array</param>
+	/// 
+	/// <returns>The number of bytes added</returns>
+	template <typename T>
+	static size_t AppendValue(T Value, std::vector<byte> &Output)
+	{
+		const size_t VARLEN = sizeof(T);
+		const size_t ARRLEN = Output.size();
+
+		Output.resize(Output.size() + VARLEN);
+		MemoryTools::CopyFromValue(Value, Output, ARRLEN, VARLEN);
+
+		return VARLEN;
+	}
+
+	/// <summary>
 	/// Append an integer array to another integer array
 	/// </summary>
 	/// 
@@ -109,19 +133,16 @@ public:
 	/// <param name="Output">The destination byte array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
-	template <typename ArrayA, typename ArrayB>
-	static size_t Append(const ArrayA &Input, ArrayB &Output)
+	template <typename A, typename B>
+	static size_t Append(const std::vector<A> &Input, std::vector<B> &Output)
 	{
-		const size_t VARLEN = sizeof(ArrayA::value_type) * Input.size();
-		const size_t ARRLEN = sizeof(ArrayB::value_type) * Output.size();
+		const size_t INPLEN = sizeof(A) * Input.size();
+		const size_t OTPLEN = sizeof(B) * Output.size();
 
-		if (Input.size() != 0)
-		{
-			Output.resize(VARLEN + ARRLEN);
-			std::memcpy(&Output[ARRLEN], &Input[0], VARLEN);
-		}
+		Output.resize(INPLEN + OTPLEN);
+		MemoryTools::Copy(Input, 0, Output, OTPLEN, INPLEN);
 
-		return VARLEN;
+		return 0;
 	}
 
 	/// <summary>
@@ -318,8 +339,19 @@ public:
 	template <typename T>
 	static std::string ToString(T* Input)
 	{
-		size_t len = strlen(reinterpret_cast<char*>(Input));
-		std::string ret(reinterpret_cast<char*>(Input), len);
+		std::string ret;
+
+		if (sizeof(T) == 1)
+		{
+			size_t len = strlen(reinterpret_cast<char*>(Input));
+			ret = std::string(reinterpret_cast<char*>(Input), len);
+		}
+		else
+		{
+			size_t len = wcslen(reinterpret_cast<wchar_t*>(Input));
+			std::wstring tmp(reinterpret_cast<wchar_t*>(Input), len);
+			ret.assign(tmp.begin(), tmp.end());
+		}
 
 		return ret;
 	}

@@ -2,6 +2,8 @@
 
 NAMESPACE_ROOT
 
+const std::string SecureMemory::CLASS_NAME = "SecureMemory";
+
 void* SecureMemory::Allocate(size_t Length)
 {
 	const size_t PGESZE = PageSize();
@@ -63,9 +65,23 @@ void* SecureMemory::Allocate(size_t Length)
 		}
 	}
 
+
+#else
+
+	throw CryptoException(CLASS_NAME, std::string("Allocate"), std::string("Secure memory not supported on this system!"), Enumeration::ErrorCodes::NotSupported);
+
 #endif
 
 	return ptr;
+}
+
+const bool SecureMemory::Available()
+{
+#if defined(CEX_OS_POSIX) || defined(CEX_HAS_VIRTUALLOCK)
+	return true;
+#else
+	return false;
+#endif
 }
 
 void SecureMemory::Erase(void* Pointer, size_t Length)
@@ -118,7 +134,7 @@ void SecureMemory::Free(void* Pointer, size_t Length)
 
 #else
 
-		throw CryptoException(std::string("SecureMemory"), std::string("Free"), std::string("Secure memory not supported on this system!"), Enumeration::ErrorCodes::NoAccess);
+		throw CryptoException(CLASS_NAME, std::string("Free"), std::string("Secure memory not supported on this system!"), Enumeration::ErrorCodes::NotSupported);
 
 #endif
 	}

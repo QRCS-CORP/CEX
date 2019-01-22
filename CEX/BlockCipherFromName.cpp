@@ -12,6 +12,8 @@ NAMESPACE_HELPER
 using Exception::CryptoSymmetricCipherException;
 using Enumeration::ErrorCodes;
 
+const std::string BlockCipherFromName::CLASS_NAME("BlockCipherFromName");
+
 IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 {
 	using namespace Cipher::Block;
@@ -150,17 +152,17 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 			default:
 			{
-				throw CryptoException(std::string("BlockCipherFromName"), std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoSymmetricCipherException &ex)
 	{
-		throw CryptoException(std::string("BlockCipherFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("BlockCipherFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return cptr;
@@ -225,17 +227,17 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCip
 			}
 			default:
 			{
-				throw CryptoException(std::string("BlockCipherFromName"), std::string("GetInstance"), std::string("The block cipher type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The block cipher type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoSymmetricCipherException &ex)
 	{
-		throw CryptoException(std::string("BlockCipherFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("BlockCipherFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return cptr;

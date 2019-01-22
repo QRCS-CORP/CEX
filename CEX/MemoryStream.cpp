@@ -46,7 +46,8 @@ MemoryStream::MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t 
 	m_streamData(0),
 	m_streamPosition(0)
 {
-	CexAssert(Length <= Data.size() - Offset, "Length exceeds input capacity");
+	CEXASSERT(Length <= Data.size() - Offset, "Length exceeds input capacity");
+
 	m_streamData.resize(Length);
 	Utility::MemoryTools::Copy(Data, Offset, m_streamData, 0, Length);
 }
@@ -139,7 +140,7 @@ size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 byte MemoryStream::ReadByte()
 {
-	CexAssert(m_streamData.size() - m_streamPosition >= 1, "Stream length exceeded");
+	CEXASSERT(m_streamData.size() - m_streamPosition >= 1, "Stream length exceeded");
 	byte data = 0;
 	Utility::MemoryTools::CopyToValue(m_streamData, m_streamPosition, data, 1);
 	m_streamPosition += 1;
@@ -177,7 +178,7 @@ void MemoryStream::SetLength(ulong Length)
 
 void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Input.size(), "Input stream length exceeded");
+	CEXASSERT(Offset + Length <= Input.size(), "Input stream length exceeded");
 
 	size_t ttlLen = m_streamPosition + Length;
 

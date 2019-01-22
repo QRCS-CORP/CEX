@@ -133,8 +133,6 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the multi-threaded Skein variant.</param>
-	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid parallel parameters are used</exception>
 	explicit Skein1024(bool Parallel = false);
 
 	/// <summary>
@@ -228,6 +226,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

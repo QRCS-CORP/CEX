@@ -4,6 +4,7 @@
 #include "CexDomain.h"
 #include "CryptoRandomException.h"
 #include "Providers.h"
+#include "SecureVector.h"
 
 NAMESPACE_PROVIDER
 
@@ -68,7 +69,18 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
+	/// 
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	virtual void Generate(std::vector<byte> &Output) = 0;
+
+	/// <summary>
+	/// Fill a SecureVector with pseudo-random bytes
+	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
+	/// 
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	virtual void Generate(SecureVector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Fill the buffer with pseudo-random bytes using offsets
@@ -77,16 +89,20 @@ public:
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
+	/// 
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
-	/// Return an array with pseudo-random bytes
+	/// Fill the SecureVector with pseudo-random bytes using offsets
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the Output array</param>
+	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <param name="Length">The size of the expected array returned</param>
-	/// 
-	/// <returns>An array of pseudo-random of bytes</returns>
-	virtual std::vector<byte> Generate(size_t Length) = 0;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	virtual void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 16bit integer

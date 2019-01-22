@@ -20,6 +20,8 @@ class AsymmetricSecureKey final : public IAsymmetricKey
 {
 private:
 
+	static const std::string CLASS_NAME;
+
 	AsymmetricEngines m_cipherEngine;
 	AsymmetricKeyTypes m_cipherKey;
 	AsymmetricTransforms m_cipherParams;
@@ -55,7 +57,7 @@ public:
 	/// <param name="P">The cipher key polynomial array</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
 	///
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are used</exception>
 	AsymmetricSecureKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P, ulong KeySalt = 0);
 
 	/// <summary>

@@ -15,6 +15,7 @@ struct SymmetricKeySize
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t HDR_SIZE = sizeof(uint) * 3;
 
 	uint m_infoSize;
@@ -36,7 +37,7 @@ public:
 	/// 
 	/// <param name="KeyArray">Key byte array containing a serialized SymmetricKeySize structure</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the key array is too small</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if the key array is too small</exception>
 	explicit SymmetricKeySize(const std::vector<byte> &KeyArray);
 
 	/// <summary>

@@ -12,7 +12,7 @@ const std::string PBKDF2::CLASS_NAME("PBKDF2");
 PBKDF2::PBKDF2(SHA2Digests DigestType, size_t Iterations)
 	:
 	m_macGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
@@ -142,7 +142,7 @@ size_t PBKDF2::Generate(std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 
 	return Expand(Output, 0, Output.size());
@@ -152,7 +152,7 @@ size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (Output.size() - OutOffset < Length)
 	{
@@ -223,7 +223,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 	}
 	if (Salt.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 	}
 
 	if (m_isInitialized)
@@ -247,7 +247,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 	}
 	if (Salt.size() + Info.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 	}
 
 	if (m_isInitialized)

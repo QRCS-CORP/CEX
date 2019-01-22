@@ -84,7 +84,7 @@ SHA2Params::SHA2Params(uint NodeOffset, ulong OutputSize, ushort Version, uint L
 {
 	m_dstCode.resize(DistributionCodeMax());
 
-	CexAssert(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
+	CEXASSERT(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
 }
 
 SHA2Params::~SHA2Params()

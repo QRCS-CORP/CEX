@@ -28,15 +28,7 @@ SHA256::SHA256(bool Parallel)
 	m_treeParams(Parallel ? SHA2Params(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : SHA2Params(DIGEST_SIZE, 0, 0))
 {
 	// TODO: implement parallel alternate for single core cpu
-	if (Parallel && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
-	}
-
-	if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = Parallel;
-	}
+	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
 	Reset();
 }
@@ -53,7 +45,7 @@ SHA256::SHA256(SHA2Params &Params)
 {
 	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
 	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::InvalidParam);
+		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::NotSupported);
 	}
 	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
 	{
@@ -156,7 +148,7 @@ void SHA256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t SHA256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 {
-	CexAssert(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
+	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -226,7 +218,7 @@ void SHA256::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::IllegalOperation);
+		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -265,7 +257,7 @@ void SHA256::Update(byte Input)
 
 void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
+	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
 
 	if (Length != 0)
 	{

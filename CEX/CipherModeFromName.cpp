@@ -15,6 +15,8 @@ using Exception::CryptoCipherModeException;
 using Exception::CryptoSymmetricCipherException;
 using Enumeration::ErrorCodes;
 
+const std::string CipherModeFromName::CLASS_NAME("CipherModeFromName");
+
 ICipherMode* CipherModeFromName::GetInstance(IBlockCipher* Cipher, CipherModes CipherModeType)
 {
 	using namespace Cipher::Block::Mode;
@@ -54,17 +56,17 @@ ICipherMode* CipherModeFromName::GetInstance(IBlockCipher* Cipher, CipherModes C
 			}
 			default:
 			{
-				throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoCipherModeException &ex)
 	{
-		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return mptr;
@@ -113,13 +115,13 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, BlockCiphe
 			}
 			default:
 			{
-				throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoSymmetricCipherException &ex)
 	{
-		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (CryptoCipherModeException &ex)
 	{
@@ -128,11 +130,11 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, BlockCiphe
 			delete cptr;
 		}
 
-		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (CryptoException &ex)
 	{
-		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
@@ -141,7 +143,7 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, BlockCiphe
 			delete cptr;
 		}
 
-		throw CryptoException(std::string("CipherModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return mptr;

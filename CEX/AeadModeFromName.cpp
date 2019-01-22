@@ -4,13 +4,14 @@
 #include "CryptoSymmetricCipherException.h"
 #include "EAX.h"
 #include "GCM.h"
-#include "OCB.h"
 
 NAMESPACE_HELPER
 
 using Exception::CryptoCipherModeException;
 using Exception::CryptoSymmetricCipherException;
 using Enumeration::ErrorCodes;
+
+const std::string AeadModeFromName::CLASS_NAME("AeadModeFromName");
 
 IAeadMode* AeadModeFromName::GetInstance(IBlockCipher* Cipher, AeadModes CipherModeType)
 {
@@ -34,24 +35,19 @@ IAeadMode* AeadModeFromName::GetInstance(IBlockCipher* Cipher, AeadModes CipherM
 				mptr = new GCM(Cipher);
 				break;
 			}
-			case AeadModes::OCB:
-			{
-				mptr = new OCB(Cipher);
-				break;
-			}
 			default:
 			{
-				throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string("The AEAD cipher mode is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The AEAD cipher mode is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
 	catch (CryptoCipherModeException &ex)
 	{
-		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return mptr;
@@ -83,14 +79,9 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 				mptr = new GCM(cptr);
 				break;
 			}
-			case AeadModes::OCB:
-			{
-				mptr = new OCB(cptr);
-				break;
-			}
 			default:
 			{		
-				throw CryptoCipherModeException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string("The AEAD cipher mode type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoCipherModeException(CLASS_NAME, std::string("GetInstance"), std::string("The AEAD cipher mode type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
@@ -101,11 +92,11 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 			delete cptr;
 		}
 
-		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (CryptoSymmetricCipherException &ex)
 	{
-		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (const std::exception &ex)
 	{
@@ -114,7 +105,7 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 			delete cptr;
 		}
 
-		throw CryptoException(std::string("AeadModeFromName"), std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 	return mptr;

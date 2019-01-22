@@ -6,17 +6,19 @@ NAMESPACE_ASYMMETRIC
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 
+const std::string AsymmetricSecureKey::CLASS_NAME = "AsymmetricSecureKey";
+
 AsymmetricSecureKey::AsymmetricSecureKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P, ulong KeySalt)
 	:
 	m_cipherEngine(CipherType != AsymmetricEngines::None ? CipherType :
-		throw CryptoAsymmetricException(std::string("AsymmetricSecureKey"), std::string("Constructor"), std::string("The cipher engine type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher engine type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_cipherKey(CipherKeyType != AsymmetricKeyTypes::None ? CipherKeyType :
-		throw CryptoAsymmetricException(std::string("AsymmetricSecureKey"), std::string("Constructor"), std::string("The cipher key type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher key type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_cipherParams(ParameterType != AsymmetricTransforms::None ? ParameterType :
-		throw CryptoAsymmetricException(std::string("AsymmetricSecureKey"), std::string("Constructor"), std::string("The cipher parameters type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher parameters type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_isDestroyed(false),
 	m_polyCoeffs(P.size() != 0 ? P :
-		throw CryptoAsymmetricException(std::string("AsymmetricSecureKey"), std::string("Constructor"), std::string("The polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
 {
 	throw; // not completed yet!
 }

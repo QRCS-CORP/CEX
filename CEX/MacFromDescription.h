@@ -18,6 +18,10 @@ using Processing::MacDescription;
 /// </summary>
 class MacFromDescription
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -28,7 +32,7 @@ public:
 	/// 
 	/// <returns>An uninitialized Mac generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the Mac type is not supported</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if the Mac description is not supported</exception>
 	static IMac* GetInstance(MacDescription &Description);
 };
 

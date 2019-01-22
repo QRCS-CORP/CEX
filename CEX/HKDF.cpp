@@ -12,7 +12,7 @@ const std::string HKDF::CLASS_NAME("HKDF");
 HKDF::HKDF(SHA2Digests DigestType)
 	:
 	m_macGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
+		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
@@ -134,7 +134,7 @@ size_t HKDF::Generate(std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
 	{
@@ -148,7 +148,7 @@ size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
 	{
@@ -200,7 +200,7 @@ void HKDF::Initialize(const std::vector<byte> &Key)
 
 void HKDF::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 {
-	CexAssert(Key.size() >= Length + Offset, "The key is too small");
+	CEXASSERT(Key.size() >= Length + Offset, "The key is too small");
 
 	std::vector<byte> tmpK(Length);
 
@@ -216,7 +216,7 @@ void HKDF::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 	}
 	if (Salt.size() != 0 && Salt.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 	}
 
 	if (m_isInitialized)
@@ -239,7 +239,7 @@ void HKDF::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 	}
 	if (Salt.size() != 0 && Salt.size() < MIN_SALTLEN)
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 	}
 
 	if (m_isInitialized)

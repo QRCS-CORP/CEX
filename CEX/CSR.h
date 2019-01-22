@@ -96,7 +96,7 @@ public:
 	/// <param name="SeedEngine">The random provider used to seed the rng</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
 	explicit CSR(ShakeModes ShakeModeType = ShakeModes::SHAKE256, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
 
 	/// <summary>
@@ -107,7 +107,7 @@ public:
 	/// <param name="ShakeModeType">The underlying SHAKE instance type</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
 	explicit CSR(std::vector<byte> Seed, ShakeModes ShakeModeType = ShakeModes::SHAKE256, size_t BufferSize = 1024);
 
 	/// <summary>

@@ -87,6 +87,8 @@ public:
 	///
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The output Mac code</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized</exception>
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
@@ -97,6 +99,8 @@ public:
 	/// <param name="OutOffset">Offset within Output array</param>
 	///
 	/// <returns>The number of bytes processed</returns>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
@@ -105,6 +109,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>

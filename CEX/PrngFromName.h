@@ -20,6 +20,10 @@ using Enumeration::Providers;
 /// </summary>
 class PrngFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -31,7 +35,7 @@ public:
 	/// 
 	/// <returns>An initialized Prng</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the PRNG, or entropy provider type is not supported</exception>
 	static IPrng* GetInstance(Prngs PrngType, Providers ProviderType = Providers::ACP);
 };
 

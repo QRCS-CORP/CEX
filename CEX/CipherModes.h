@@ -47,10 +47,6 @@ enum class CipherModes : byte
 	/// </summary>
 	ICM = 8,
 	/// <summary>
-	/// Offset CodeBook AEAD Mode
-	/// </summary>
-	OCB = 9,
-	/// <summary>
 	/// Output FeedBack Mode
 	/// </summary>
 	OFB = 10

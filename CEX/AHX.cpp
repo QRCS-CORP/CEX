@@ -41,7 +41,7 @@ AHX::AHX(Kdf::IKdf* Kdf)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf : 
-		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::InvalidParam)),
+		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::IllegalOperation)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -143,7 +143,7 @@ const std::string AHX::Name()
 	}
 	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 	{
-		txtName = CLASS_NAME + std::string("-HKDF-SHA2512");
+		txtName = CLASS_NAME + std::string("-HKDF-SHA512");
 	}
 	else
 	{
@@ -317,7 +317,6 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	m_kdfGenerator->Generate(rawKey);
 	// initialize round-key array
 	m_expKey.resize(keySize);
-
 	// initialize working key
 	m_expKey.resize(keySize);
 

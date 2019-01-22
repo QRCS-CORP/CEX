@@ -22,7 +22,12 @@ using Cipher::Block::Mode::IAeadMode;
 /// </summary>
 class AeadModeFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
+
 	/// <summary>
 	/// Get an uninitialized AEAD mode instance by name
 	/// </summary>
@@ -33,7 +38,7 @@ public:
 	/// 
 	/// <returns>An uninitialized AEAD block-cipher mode instance</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the cipher, extension or mode types are not supported</exception>
 	static IAeadMode* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, AeadModes CipherModeType);
 
 	/// <summary>
@@ -45,7 +50,7 @@ public:
 	/// 
 	/// <returns>An uninitialized AEAD block-cipher mode instance</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the cipher is null or AEAD mode is not supported</exception>
 	static IAeadMode* GetInstance(IBlockCipher* Cipher, AeadModes CipherModeType);
 };
 

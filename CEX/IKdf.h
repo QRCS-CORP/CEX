@@ -84,6 +84,8 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	virtual size_t Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
@@ -95,6 +97,8 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
@@ -102,6 +106,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	virtual void Initialize(ISymmetricKey &GenParam) = 0;
 
 	/// <summary>
@@ -109,6 +115,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	virtual void Initialize(const std::vector<byte> &Key) = 0;
 
 	/// <summary>
@@ -119,7 +127,7 @@ public:
 	/// <param name="Offset">The starting position within the key array</param>
 	/// <param name="Length">The number of key bytes to use</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	virtual void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
@@ -128,6 +136,8 @@ public:
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value containing an additional source of entropy</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) = 0;
 
 	/// <summary>
@@ -137,6 +147,8 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) = 0;
 
 	/// <summary>
@@ -144,6 +156,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Seed">The new seed value array</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the seed is not a legal size</exception>
 	virtual void ReSeed(const std::vector<byte> &Seed) = 0;
 
 	/// <summary>

@@ -1,9 +1,12 @@
 #ifndef CEX_RDP_H
 #define CEX_RDP_H
 
-#include "IProvider.h"
+#include "ProviderBase.h"
+#include "DrandEngines.h"
 
 NAMESPACE_PROVIDER
+
+using Enumeration::DrandEngines;
 
 /// <summary>
 /// An implementation of the Intel RdRand digital random number generator
@@ -38,29 +41,8 @@ NAMESPACE_PROVIDER
 /// <item><description>A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec2015.pdf">Secure Key RNG</a>.</description></item>
 /// </list> 
 /// </remarks>
-class RDP final : public IProvider
+class RDP final : public ProviderBase
 {
-public:
-
-	/// <summary>
-	/// The Intel DRNG providers engine configuration type
-	/// </summary>
-	enum RdEngines : byte
-	{
-		/// <summary>
-		/// The random provider is available
-		/// </summary>
-		None = 0,
-		/// <summary>
-		/// The random number provider
-		/// </summary>
-		RdRand = 1,
-		/// <summary>
-		/// The random seed generator
-		/// </summary>
-		RdSeed = 2
-	};
-
 private:
 
 	static const std::string CLASS_NAME;
@@ -73,7 +55,10 @@ private:
 	static const size_t SEED_MAX = 64 * 1000 * 1000;
 	static const size_t RDR_SUCCESS = 1;
 
-	RdEngines m_engineType;
+#if defined(CEX_FIPS140_ENABLED)
+	ProviderSelfTest m_pvdSelfTest;
+#endif
+	DrandEngines m_randType;
 
 public:
 
@@ -94,29 +79,12 @@ public:
 	/// </summary>
 	///
 	/// <param name="RdEngineType">The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</param>
-	RDP(RdEngines RdEngineType = RdEngines::RdRand);
+	RDP(DrandEngines DrandType = DrandEngines::RdRand);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
 	~RDP() override;
-
-	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read Only: The providers type name
-	/// </summary>
-	const Providers Enumeral() override;
-
-	/// <summary>
-	/// Read Only: The entropy provider is available on this system
-	/// </summary>
-	const bool IsAvailable() override;
-
-	/// <summary>
-	/// Read Only: The provider class name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 
@@ -126,7 +94,7 @@ public:
 	///
 	/// <param name="Output">The output array to fill</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -137,45 +105,39 @@ public:
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Return an array with pseudo-random bytes
+	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
 	/// 
-	/// <param name="Length">The size of the expected array returned</param>
-	/// 
-	/// <returns>An array of pseudo-random of bytes</returns>
-	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	std::vector<byte> Generate(size_t Length) override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
+	/// Fill the SecureVector with pseudo-random bytes using offsets
 	/// </summary>
+	///
+	/// <param name="Output">The output SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the Output array</param>
+	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUInt16() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint NextUInt32() override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextUInt64() override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
 	void Reset() override;
+
+private:
+
+	static DrandEngines Capability();
+	bool FipsTest();
+	static void GetEntropy(byte* Output, size_t Length, DrandEngines DrandType);
 };
 
 NAMESPACE_PROVIDEREND

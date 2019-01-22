@@ -103,7 +103,7 @@ public:
 	{
 		const size_t VALLEN = sizeof(T);
 
-		CexAssert(m_streamData.Position() + VALLEN <= m_streamData.Length(), "Stream length exceeded");
+		CEXASSERT(m_streamData.Position() + VALLEN <= m_streamData.Length(), "Stream length exceeded");
 
 		T val = 0;
 

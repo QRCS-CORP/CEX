@@ -151,12 +151,11 @@ public:
 
 	/// <summary>
 	/// Initialize the class as either the 2S or 2SP.
-	/// <para>Initialize as either the parallel version Blake2SP, or sequential Blake2S.</para>
+	/// <para>Initialize as either the parallel version Blake2SP, or sequential Blake2S.
+	/// Note: this constructor will revert to sequential processing when set to parallel on a system that does not support parallel processing</para>
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2SP variant.</param>
-	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid parallel parameters are used</exception>
 	explicit Blake256(bool Parallel = false);
 
 	/// <summary>
@@ -169,7 +168,7 @@ public:
 	/// 
 	/// <param name="Params">The BlakeParams structure, containing the tree configuration settings.</param>
 	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid configuration parameters are used</exception>
+	/// <exception cref="CryptoDigestException">Thrown if an invalid configuration parameters are used</exception>
 	explicit Blake256(BlakeParams &Params);
 
 	/// <summary>
@@ -252,7 +251,7 @@ public:
 	/// If either the Salt or Info parameters are used, their size must be 8 bytes.
 	/// The maximum combined size of Key, Salt, and Info, must be 64 bytes or less.</para></param>
 	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid key size is used</exception>
+	/// <exception cref="CryptoDigestException">Thrown if an invalid key size is used</exception>
 	void Initialize(ISymmetricKey &MacKey);
 
 	/// <summary>
@@ -262,6 +261,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

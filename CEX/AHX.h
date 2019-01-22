@@ -152,7 +152,7 @@ public:
 	/// <param name="CipherExtensionType">Sets the optional Key Schedule key-expansion engine; valid options are cSHAKE, HKDF, or None for standard mode. 
 	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a the custom cipher extension is used</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if a the custom cipher extension enumeral is used</exception>
 	AHX(BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
@@ -161,7 +161,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
-	AHX(Kdf::IKdf* Kdf);
+	///
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null kdf is used</exception>
+	AHX(IKdf* Kdf);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -283,14 +285,14 @@ public:
 	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
-	/// Initialize the cipher
+	/// Initialize the cipher with a populated SymmetricKey or SymmetricSecureKey container
 	/// </summary>
 	///
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="KeyParams">Cipher key container. 
 	/// <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
 
 	/// <summary>

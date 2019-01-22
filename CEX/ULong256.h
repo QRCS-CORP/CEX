@@ -172,7 +172,7 @@ public:
 	template<typename Array>
 	inline void LoadULL(const Array &Input, size_t Offset)
 	{
-		CexAssert(sizeof(uint) <= sizeof(Array::value_type), "the input array integer size must be less or equal to uint32");
+		CEXASSERT(sizeof(uint) <= sizeof(Array::value_type), "The input array integer size must be less or equal to uint32");
 
 		zmm = _mm256_set_epi64x(static_cast<uint>(Input[Offset]),
 			static_cast<uint>(Input[Offset + (sizeof(uint) / sizeof(Array::value_type))]),
@@ -256,7 +256,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 64</param>
 	inline void RotL64(const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		ymm = _mm256_or_si256(_mm256_slli_epi64(ymm, static_cast<int>(Shift)), _mm256_srli_epi64(ymm, static_cast<int>(64 - Shift)));
 	}
 
@@ -270,7 +270,7 @@ public:
 	/// <returns>The rotated ULong256</returns>
 	inline static ULong256 RotL64(const ULong256 &X, const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		return ULong256(_mm256_or_si256(_mm256_slli_epi64(X.ymm, static_cast<int>(Shift)), _mm256_srli_epi64(X.ymm, static_cast<int>(64 - Shift))));
 	}
 
@@ -281,7 +281,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 64</param>
 	inline void RotR64(const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		RotL64(64 - Shift);
 	}
 
@@ -295,7 +295,7 @@ public:
 	/// <returns>The rotated ULong256</returns>
 	static ULong256 RotR64(const ULong256 &X, const int Shift)
 	{
-		CexAssert(Shift <= 64, "Shift size is too large");
+		CEXASSERT(Shift <= 64, "Shift size is too large");
 		return RotL64(X, 64 - Shift);
 	}
 
@@ -433,7 +433,7 @@ public:
 		std::array<ulong, 4> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
 
 		return ULong256(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 	}
@@ -449,7 +449,7 @@ public:
 		std::array<ulong, 4> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
-		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
 
 		ymm = _mm256_set_epi64x(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 	}

@@ -73,7 +73,7 @@ size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input, size_t Offset, si
 {
 	if (Length > Input.size())
 	{
-		throw CryptoPaddingException(CLASS_NAME, std::string("GetBlockLength"), std::string("The length is longer than the array!"), ErrorCodes::InvalidSize);
+		throw CryptoPaddingException(Name(), std::string("GetBlockLength"), std::string("The length is longer than the array!"), ErrorCodes::InvalidSize);
 	}
 
 	const size_t BLKSZE = Length;

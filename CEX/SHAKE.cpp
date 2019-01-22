@@ -55,11 +55,6 @@ const size_t SHAKE::BlockSize()
 	return m_blockSize;
 }
 
-const size_t SHAKE::Rate()
-{
-	return m_blockSize;
-}
-
 const Kdfs SHAKE::Enumeral()
 {
 	return static_cast<Kdfs>(m_shakeMode);
@@ -82,7 +77,12 @@ const size_t SHAKE::MinKeySize()
 
 const std::string SHAKE::Name()
 {
-	return CLASS_NAME + "-" + IntegerTools::ToString(m_hashSize * 8);
+	return CLASS_NAME + "-" + IntegerTools::ToString(SecurityLevel());
+}
+
+const size_t SHAKE::SecurityLevel()
+{
+	return m_hashSize * 8;
 }
 
 //~~~Public Functions~~~//
@@ -98,7 +98,7 @@ size_t SHAKE::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Lengt
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::IllegalOperation);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (Output.size() - OutOffset < Length)
 	{
@@ -131,7 +131,7 @@ void SHAKE::Initialize(ISymmetricKey &GenParam)
 
 void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 {
-	CexAssert(Key.size() >= Length + Offset, "The key is too small");
+	CEXASSERT(Key.size() >= Length + Offset, "The key is too small");
 
 	std::vector<byte> tmpK(Length);
 
@@ -213,7 +213,7 @@ void SHAKE::Reset()
 
 void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name)
 {
-	CexAssert(Customization.size() + Name.size() <= 196, "the input buffer is too large");
+	CEXASSERT(Customization.size() + Name.size() <= 196, "The input buffer is too large");
 
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
@@ -301,9 +301,9 @@ void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	std::array<byte, BUFFER_SIZE> msg;
+	CEXASSERT(Input.size() - InOffset >= Length, "The output buffer is too short!");
 
-	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
+	std::array<byte, BUFFER_SIZE> msg;
 
 	if (Length != 0)
 	{

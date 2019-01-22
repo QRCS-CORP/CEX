@@ -20,8 +20,6 @@
 #define CEX_MODULELWE_H
 
 #include "CexDomain.h"
-#include "AsymmetricKey.h"
-#include "AsymmetricKeyPair.h"
 #include "IAsymmetricCipher.h"
 #include "MLWEParameters.h"
 
@@ -125,7 +123,7 @@ public:
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
+	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
 	ModuleLWE(MLWEParameters Parameters = MLWEParameters::MLWES3Q7681N256, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
@@ -135,7 +133,7 @@ public:
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
+	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
 	ModuleLWE(MLWEParameters Parameters, IPrng* Prng);
 
 	/// <summary>
@@ -209,8 +207,6 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A public/private key pair</returns>
-	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
 	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
@@ -219,7 +215,7 @@ public:
 	/// 
 	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
+	/// <exception cref="CryptoAsymmetricException">Throws on invalid key or configuration error</exception>
 	void Initialize(AsymmetricKey* Key) override;
 
 private:

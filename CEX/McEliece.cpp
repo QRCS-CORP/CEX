@@ -9,8 +9,9 @@
 NAMESPACE_MCELIECE
 
 using Enumeration::BlockCiphers;
-using Enumeration::ShakeModes;
 using Utility::IntegerTools;
+using Enumeration::ShakeModes;
+
 
 const std::string McEliece::CLASS_NAME = "McEliece";
 
@@ -40,7 +41,7 @@ McEliece::McEliece(MPKCParameters Parameters, IPrng* Prng)
 	m_mpkcParameters(Parameters != MPKCParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParameters::MPKCS1M12T62) ? Parameters :
 		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam)),
 	m_rndGenerator(Prng != nullptr ? Prng : 
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::IllegalOperation))
 {
 }
 
@@ -127,7 +128,7 @@ const MPKCParameters McEliece::Parameters()
 
 bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
 
 	std::vector<byte> e(0);
 	std::vector<byte> key(32);
@@ -138,7 +139,7 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 
 	if (m_mpkcParameters == MPKCParameters::MPKCS1M12T62)
 	{
-		CexAssert(CipherText.size() >= MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
+		CEXASSERT(CipherText.size() >= MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		e.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
 
@@ -172,9 +173,9 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 
 void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> e(0);
 	std::vector<byte> key(32);

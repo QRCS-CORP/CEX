@@ -29,7 +29,16 @@ using Exception::CryptoException;
 /// </summary>
 class SecureMemory
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
+
+	/// <summary>
+	/// Read Only: Returns true if secure memory is available on this system
+	/// </summary>
+	static const bool Available();
 
 	/// <summary>
 	/// Allocate a set of memory pages locked to this process.
@@ -40,6 +49,8 @@ public:
 	/// <param name="Length">The number of bytes in the allocatation request</param>
 	/// 
 	/// <returns>The number of bytes allocated, zero for allocation failure</returns>
+	///
+	/// <exception cref="CryptoException">Thrown if secure memory is not supported on this system</exception>
 	static void* Allocate(size_t Length);
 
 	/// <summary>
@@ -56,6 +67,8 @@ public:
 	///
 	/// <param name="Pointer">A pointer to the base address of the locked pages</param>
 	/// <param name="Length">The number of bytes to allocate; should be a multiple of the system page size</param>
+	///
+	/// <exception cref="CryptoException">Thrown if secure memory is not supported on this system</exception>
 	static void Free(void* Pointer, size_t Length);
 
 	/// <summary>

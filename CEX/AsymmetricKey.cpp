@@ -7,17 +7,19 @@ using Enumeration::ErrorCodes;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 
+const std::string AsymmetricKey::CLASS_NAME = "AsymmetricKey";
+
 AsymmetricKey::AsymmetricKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P)
 	:
 	m_cipherEngine(CipherType != AsymmetricEngines::None ? CipherType :
-		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The cipher engine type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher engine type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_cipherKey(CipherKeyType != AsymmetricKeyTypes::None ? CipherKeyType :
-		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The cipher key type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher key type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_cipherParams(ParameterType != AsymmetricTransforms::None ? ParameterType :
-		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The cipher parameters type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher parameters type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
 	m_isDestroyed(false),
 	m_polyCoeffs(P.size() != 0 ? P :
-		throw CryptoAsymmetricException(std::string("AsymmetricKey"), std::string("Constructor"), std::string("The polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
 {
 }
 

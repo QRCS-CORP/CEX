@@ -154,12 +154,11 @@ public:
 
 	/// <summary>
 	/// Initialize the class with either the Parallel or Sequential hashing engine.
-	/// <para>Initialize as parallel instantiates tree hashing, if false uses the standard SHA-2 256bit hashing instance.</para>
+	/// <para>Initialize as parallel instantiates tree hashing, if false uses the standard SHA-2 256bit hashing instance.
+	/// Note: this constructor will revert to sequential processing when set to parallel on a system that does not support parallel processing</para>
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the multi-threaded SHA-2 variant.</param>
-	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid parallel parameters are used</exception>
 	explicit SHA256(bool Parallel = false);
 
 	/// <summary>
@@ -253,6 +252,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

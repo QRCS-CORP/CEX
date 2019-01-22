@@ -79,7 +79,7 @@ public:
 	/// <param name="Access">The level of access requested</param>
 	/// <param name="Mode">The file processing mode</param>
 	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file could not be opened</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if the file could not be opened</exception>
 	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileModes Mode = FileModes::Binary);
 
 	/// <summary>

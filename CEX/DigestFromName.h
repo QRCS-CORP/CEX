@@ -16,6 +16,10 @@ using Digest::IDigest;
 /// </summary>
 class DigestFromName
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -27,7 +31,7 @@ public:
 	/// 
 	/// <returns>An initialized digest</returns>
 	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the digest type is not supported</exception>
 	static IDigest* GetInstance(Digests DigestType, bool Parallel = false);
 
 	/// <summary>
@@ -37,6 +41,8 @@ public:
 	/// <param name="DigestType">The message digests enumeration type name</param>
 	/// 
 	/// <returns>The block in bytes</returns>
+	/// 
+	/// <exception cref="CryptoException">Thrown if the digest type is not supported</exception>
 	static size_t GetBlockSize(Digests DigestType);
 
 	/// <summary>
@@ -46,6 +52,8 @@ public:
 	/// <param name="DigestType">The Digest enumeration member</param>
 	/// 
 	/// <returns>The hash size in bytes</returns>
+	/// 
+	/// <exception cref="CryptoException">Thrown if the digest type is not supported</exception>
 	static size_t GetDigestSize(Digests DigestType);
 
 
@@ -56,6 +64,8 @@ public:
 	/// <param name="DigestType">The Digest enumeration member</param>
 	/// 
 	/// <returns>The padding size size in bytes</returns>
+	/// 
+	/// <exception cref="CryptoException">Thrown if the digest type is not supported</exception>
 	static size_t GetPaddingSize(Digests DigestType);
 };
 

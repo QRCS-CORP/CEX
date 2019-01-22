@@ -19,6 +19,10 @@ using Enumeration::BlockCiphers;
 /// </summary>
 class CipherFromDescription
 {
+private:
+
+	static const std::string CLASS_NAME;
+
 public:
 
 	/// <summary>
@@ -29,7 +33,7 @@ public:
 	/// 
 	/// <returns>An uninitialized symmetric cipher mode</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the cipher type is not supported</exception>
+	/// <exception cref="CryptoException">Thrown if the cipher description is not supported</exception>
 	static ICipherMode* GetInstance(CipherDescription &Description);
 };
 

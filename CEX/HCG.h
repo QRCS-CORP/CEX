@@ -206,7 +206,7 @@ public:
 	/// <param name="DigestType">The hash digests enumeration type name; the default is SHA512</param>
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	///
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
 	explicit HCG(SHA2Digests DigestType = SHA2Digests::SHA512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
@@ -216,7 +216,7 @@ public:
 	/// <param name="Digest">The hash digest instance</param>
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if a null digest is used</exception>
 	explicit HCG(IDigest* Digest, IProvider* Provider = nullptr);
 
 	/// <summary>
@@ -303,7 +303,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
@@ -317,7 +317,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
@@ -327,7 +327,7 @@ public:
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -336,7 +336,7 @@ public:
 	/// 
 	/// <param name="Seed">The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed) override;
 
 	/// <summary>
@@ -346,7 +346,7 @@ public:
 	/// <param name="Seed">The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</param>
 	/// <param name="Nonce">The secret nonce value used to initialize the state counter; value must be NonceSize() bytes in length</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce) override;
 
 	/// <summary>
@@ -357,7 +357,7 @@ public:
 	/// <param name="Nonce">The secret nonce value used to initialize the state counter; value must be NonceSize() bytes in length</param>
 	/// <param name="Info">The info parameter can be used as a secret salt, or as a distribution code; for best security it should be secret, random, and DistributionCodeMax in length</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info) override;
 
 	/// <summary>
@@ -366,7 +366,7 @@ public:
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is too small</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
 	void Update(const std::vector<byte> &Seed) override;
 
 private:

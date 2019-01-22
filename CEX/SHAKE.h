@@ -118,7 +118,7 @@ public:
 	/// 
 	/// <param name="ShakeModeType">The SHAKE mode type</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid mode type is used</exception>
+	/// <exception cref="CryptoKdfException">Thrown if an invalid mode type is used</exception>
 	explicit SHAKE(ShakeModes ShakeModeType = ShakeModes::SHAKE256);
 
 	/// <summary>
@@ -162,7 +162,7 @@ public:
 	/// <summary>
 	/// Read Only: The absorbtion rate; input size in bytes of one block
 	/// </summary>
-	const size_t Rate();
+	const size_t SecurityLevel();
 
 	//~~~Public Functions~~~//
 
@@ -174,7 +174,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -187,7 +187,7 @@ public:
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
@@ -197,7 +197,7 @@ public:
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -208,7 +208,7 @@ public:
 	/// <param name="Offset">The starting position within the key array</param>
 	/// <param name="Length">The number of key bytes to use</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length) override;
 
 	/// <summary>
@@ -217,7 +217,7 @@ public:
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Key) override;
 
 	/// <summary>
@@ -228,7 +228,7 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value used as a customization string</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
 
 	/// <summary>
@@ -240,7 +240,7 @@ public:
 	/// <param name="Salt">The salt array used as a customization string</param>
 	/// <param name="Info">The Info array used as a name string</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
 
 	/// <summary>
@@ -249,7 +249,7 @@ public:
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	void ReSeed(const std::vector<byte> &Seed) override;
 
 	/// <summary>

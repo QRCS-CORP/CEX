@@ -146,10 +146,10 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	const size_t PUBLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
 	const size_t PRILEN = (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE);
 
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-	CexAssert(CipherText.size() >= CPTLEN, "The cipher-text array is too small");
-	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(CipherText.size() >= CPTLEN, "The cipher-text array is too small");
+	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> cmp(CPTLEN);
 	std::vector<byte> coin(MLWEQ7681N256::MLWE_SEED_SIZE);
@@ -195,9 +195,9 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	const size_t K = (m_mlweParameters == MLWEParameters::MLWES3Q7681N256) ? 3 : (m_mlweParameters == MLWEParameters::MLWES4Q7681N256) ? 4 : 2;
 	const size_t CPTLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> coin(MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> kr(2 * MLWEQ7681N256::MLWE_SEED_SIZE);

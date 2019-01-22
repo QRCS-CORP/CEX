@@ -86,7 +86,7 @@ std::vector<byte> BCR::Generate(size_t Length)
 
 void BCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+	CEXASSERT(Offset + Length <= Output.size(), "The array is too small to fulfill this request");
 
 	std::vector<byte> rnd = Generate(Length);
 	MemoryTools::Copy(rnd, 0, Output, Offset, Length);
@@ -94,7 +94,7 @@ void BCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 void BCR::Generate(std::vector<byte> &Output)
 {
-	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
+	CEXASSERT(Output.size() != 0, "Buffer size must be at least 1 byte in length");
 
 	if (m_rngBuffer.size() - m_bufferIndex < Output.size())
 	{

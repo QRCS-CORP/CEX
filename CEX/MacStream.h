@@ -112,7 +112,7 @@ public:
 	/// 
 	/// <param name="Description">A MacDescription structure containing details about the Mac generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	explicit MacStream(MacDescription &Description);
 
 	/// <summary>
@@ -121,7 +121,7 @@ public:
 	/// 
 	/// <param name="Mac">The <see cref="Mac::IMac"/> instance</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	explicit MacStream(IMac* Mac);
 
 	/// <summary>
@@ -166,7 +166,7 @@ public:
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid key sizes are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are used</exception>
 	void Initialize(ISymmetricKey &KeyParams);
 
 private:
