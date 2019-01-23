@@ -83,7 +83,7 @@ namespace Test
 		{
 			ACP gen;
 			std::vector<byte> smp(16);
-			// generator was not initialized
+			// buffer is too small
 			gen.Generate(smp, 0, smp.size() + 1);
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -AE3"));
@@ -118,7 +118,7 @@ namespace Test
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
 
-				//gen.Generate(msg);
+				gen.Generate(msg);
 				gen.Reset();
 			}
 			catch (const std::exception&)

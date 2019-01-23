@@ -20,11 +20,7 @@
 #define CEX_NTRUSQ4591N761_H
 
 #include "CexDomain.h"
-#include "BCG.h"
-#include "CSP.h"
-#include "CSR.h"
 #include "IPrng.h"
-#include "Keccak512.h"
 
 NAMESPACE_NTRU
 

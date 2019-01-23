@@ -8,7 +8,7 @@
 
 NAMESPACE_ROOT
 
-/*! \cond private */
+/// cond private
 
 #if defined(CEX_OS_HASTHREADS)
 

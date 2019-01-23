@@ -7,6 +7,8 @@
 
 NAMESPACE_IO
 
+using Utility::MemoryTools;
+
 const std::string SecureStream::CLASS_NAME("SecureStream");
 
 //~~~Constructor~~~//
@@ -30,7 +32,7 @@ SecureStream::SecureStream(size_t Length, ulong KeySalt)
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::MemoryTools::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
+		MemoryTools::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
 	}
 
 	m_streamData.reserve(Length);
@@ -46,7 +48,7 @@ SecureStream::SecureStream(const std::vector<byte> &Data, ulong KeySalt)
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::MemoryTools::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
+		MemoryTools::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
 	}
 
 	Transform();
@@ -62,12 +64,12 @@ SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length
 	CEXASSERT(Length <= Data.size() - Offset, "Length is longer than the array size");
 
 	m_streamData.resize(Length);
-	Utility::MemoryTools::Copy(Data, Offset, m_streamData, 0, Length);
+	MemoryTools::Copy(Data, Offset, m_streamData, 0, Length);
 
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::MemoryTools::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
+		MemoryTools::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
 	}
 
 	Transform();
@@ -136,7 +138,8 @@ void SecureStream::Destroy()
 	{
 		m_isDestroyed = true;
 		m_streamPosition = 0;
-		Utility::IntegerTools::Clear(m_streamData);
+		MemoryTools::Clear(m_streamData, 0, m_streamData.size());
+		m_streamData.clear();
 	}
 }
 
@@ -150,7 +153,7 @@ size_t SecureStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 	if (Length > 0)
 	{
 		Transform();
-		Utility::MemoryTools::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
+		MemoryTools::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
 		Transform();
 		m_streamPosition += Length;
 	}
@@ -164,7 +167,7 @@ byte SecureStream::ReadByte()
 
 	byte data = 0;
 	Transform();
-	Utility::MemoryTools::CopyToValue(m_streamData, m_streamPosition, data, 1);
+	MemoryTools::CopyToValue(m_streamData, m_streamPosition, data, 1);
 	Transform();
 	m_streamPosition += 1;
 
@@ -228,7 +231,7 @@ void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 	}
 
 	Transform();
-	Utility::MemoryTools::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
+	MemoryTools::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
 	Transform();
 	m_streamPosition += Length;
 }
@@ -241,7 +244,7 @@ void SecureStream::WriteByte(byte Value)
 	}
 
 	Transform();
-	Utility::MemoryTools::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
+	MemoryTools::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
 	Transform();
 	m_streamPosition += 1;
 }
@@ -259,7 +262,7 @@ std::vector<byte> SecureStream::GetSystemKey()
 
 	if (m_keySalt.size() != 0)
 	{
-		Utility::ArrayTools::Append(m_keySalt, state);
+		Utility::ArrayTools::AppendVector(m_keySalt, state);
 	}
 
 	Digest::SHA512 dgt;
@@ -277,8 +280,8 @@ void SecureStream::Transform()
 		std::vector<byte> key(32);
 		std::vector<byte> iv(16);
 
-		Utility::MemoryTools::Copy(seed, 0, key, 0, key.size());
-		Utility::MemoryTools::Copy(seed, key.size(), iv, 0, iv.size());
+		MemoryTools::Copy(seed, 0, key, 0, key.size());
+		MemoryTools::Copy(seed, key.size(), iv, 0, iv.size());
 		Cipher::SymmetricKey kp(key, iv);
 
 		// AES256-CTR

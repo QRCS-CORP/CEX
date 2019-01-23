@@ -83,7 +83,7 @@ namespace Test
 		{
 			ECP gen;
 			std::vector<byte> rnd(16);
-			// generator was not initialized
+			// buffer is too small
 			gen.Generate(rnd, 0, rnd.size() + 1);
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -EE3"));

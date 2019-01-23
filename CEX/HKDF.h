@@ -49,7 +49,7 @@ using Enumeration::SHA2Digests;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Generate an array of pseudo random bytes:</description>
+/// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
 /// // use the enumeration constructor
 /// HKDF kdf(Enumeration::Digests::SHA256);
@@ -62,8 +62,8 @@ using Enumeration::SHA2Digests;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>HKDF uses an HMAC as a pseudo random function to produce pseudo-random output in a process known as key stretching. \n
-/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-compresses key and optional salt and info parameters into a pseudo random key. \n
+/// <para>HKDF uses an HMAC as a pseudo-random function to produce pseudo-random output in a process known as key stretching. \n
+/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-compresses key and optional salt and info parameters into a pseudo-random key. \n
 /// The Extract step is called if the the KDF is initialized with the salt or info parameters, this compresses the input material to a key used by the HMAC. \n
 /// The Info parameter may also be set via the Info() property, this can be used to bypass the extract step, while adding additional input to the HMAC compression cycle. \n
 /// For best possible security, the Extract step should be skipped, the KDF is initialized with a key equal in size to the hash functions internal block-size, 
@@ -219,7 +219,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo random bytes
+	/// Generate a block of pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>
@@ -230,7 +230,7 @@ public:
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo random bytes using offset and length parameters
+	/// Generate pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>

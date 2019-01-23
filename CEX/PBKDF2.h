@@ -45,7 +45,7 @@ using Enumeration::SHA2Digests;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Generate an array of pseudo random bytes:</description>
+/// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
 /// // set to 10,000 rounds (default: 4000)
 /// PBKDF2 kdf(Enumeration::Digests::SHA256, 10000);
@@ -58,7 +58,7 @@ using Enumeration::SHA2Digests;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>PBKDF2 uses an HMAC as a pseudo random function to process a passphrase repeatedly, producing pseudo-random output in a process known as key stretching. \n
+/// <para>PBKDF2 uses an HMAC as a pseudo-random function to process a passphrase repeatedly, producing pseudo-random output in a process known as key stretching. \n
 /// By increasing the number of iterations in which the function is applied, the amount of time required to derive the key becomes more computationally expensive. \n
 /// A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase.</para>
 /// 
@@ -206,7 +206,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo random bytes
+	/// Generate a block of pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>
@@ -217,7 +217,7 @@ public:
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo random bytes using offset and length parameters
+	/// Generate pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>

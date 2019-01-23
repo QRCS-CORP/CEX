@@ -18,9 +18,9 @@ namespace Test
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
-		static const size_t MAXM_ALLOC = 262140;
+		static const size_t MAXM_ALLOC = 65536;
 		static const size_t MINM_ALLOC = 1024;
-		static const size_t SAMPLE_SIZE = 1024000;
+		static const size_t SAMPLE_SIZE = 65536;
 		static const size_t TEST_CYCLES = 10;
 
 		TestEventHandler m_progressEvent;

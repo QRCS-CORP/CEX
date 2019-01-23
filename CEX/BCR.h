@@ -25,23 +25,24 @@
 #ifndef CEX_BCR_H
 #define CEX_BCR_H
 
+#include "PrngBase.h"
 #include "BlockCiphers.h"
-#include "BCG.h"
-#include "IPrng.h"
+#include "IDrbg.h"
 #include "Providers.h"
 
 NAMESPACE_PRNG
 
 using Enumeration::BlockCiphers;
+using Drbg::IDrbg;
 using Enumeration::Providers;
 
 /// <summary>
 /// An implementation of a Block cipher Counter mode PRNG.
-/// <para>Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</para>
+/// <para>Uses a keyed block cipher run in counter mode to generate pseudo-random output..</para>
 /// </summary> 
 /// 
 /// <example>
-/// <description>Example of generating a pseudo random integer:</description>
+/// <description>Example of generating a pseudo-random integer:</description>
 /// <code>
 /// BCR rnd([BlockCiphers], [Providers]);
 /// // get random int
@@ -53,9 +54,9 @@ using Enumeration::Providers;
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Wraps the Counter Mode Generator (BCG) drbg implementation.</description></item>
-/// <item><description>Can be initialized with any of the implemented block ciphers.</description></item>
-/// <item><description>Can use either a random seed generator for initialization, or a user supplied Seed array.</description></item>
-/// <item><description>Using the same seed value will produce the same random output.</description></item>
+/// <item><description>Can be initialized with any of the implemented block-ciphers run in CTR mode.</description></item>
+/// <item><description>Uses an internal entropy provider to seed the underlying DRBG.</description></item>
+/// <item><description>The underlying DRBG instance can be optionally multi-threaded through the constructors Parallel parameter.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -66,7 +67,7 @@ using Enumeration::Providers;
 /// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
-class BCR final : public IPrng
+class BCR final : public PrngBase
 {
 private:
 
@@ -75,14 +76,11 @@ private:
 	static const size_t BUFFER_MIN = 64;
 	static const std::string CLASS_NAME;
 
-	size_t m_bufferIndex;
-	BlockCiphers m_rngGeneratorType;
 	bool m_isDestroyed;
 	bool m_isParallel;
 	Providers m_pvdType;
-	std::vector<byte>  m_rndSeed;
-	std::vector<byte> m_rngBuffer;
-	std::unique_ptr<Drbg::BCG> m_rngGenerator;
+	std::unique_ptr<IDrbg> m_rngGenerator;
+	BlockCiphers m_rngGeneratorType;
 
 public:
 
@@ -102,23 +100,12 @@ public:
 	/// Initialize this class with parameters
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The block cipher that powers the rng (default is AHX)</param>
-	/// <param name="ProviderType">The Seed engine used to create keyng material (default is none)</param>
-	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode</param>
+	/// <param name="CipherType">The block cipher that powers the rng; default is AHX</param>
+	/// <param name="ProviderType">The random provider used to create keyng material; default is ACP</param>
+	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode; default is sequential operation</param>
 	/// 
-	/// <exception cref="CryptoRandomException">Thrown if the selected parameters are invalid</exception>
-	explicit BCR(BlockCiphers CipherType = BlockCiphers::AHX, Providers ProviderType = Providers::None, bool Parallel = true);
-
-	/// <summary>
-	/// Initialize the class with a Seed; note: the same seed will produce the same random output
-	/// </summary>
-	/// 
-	/// <param name="Seed">The Seed bytes used to initialize the digest counter; (min. length is key size + counter 16)</param>
-	/// <param name="CipherType">The block cipher that powers the rng (default is AHX)</param>
-	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode</param>
-	/// 
-	/// <exception cref="CryptoRandomException">Thrown if the selected parameters are invalid</exception>
-	explicit BCR(std::vector<byte> &Seed, BlockCiphers CipherType = BlockCiphers::AHX, bool Parallel = true);
+	/// <exception cref="CryptoRandomException">Thrown if the cipher or provider type is invalid</exception>
+	BCR(BlockCiphers CipherType = BlockCiphers::AHX, Providers ProviderType = Providers::ACP, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -128,11 +115,6 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The random generators type name
-	/// </summary>
-	const Prngs Enumeral() override;
-
-	/// <summary>
 	/// Read Only: The random generators implementation name
 	/// </summary>
 	const std::string Name() override;
@@ -140,55 +122,52 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Return an array filled with pseudo random bytes
-	/// </summary>
-	/// 
-	/// <param name="Length">Size of requested byte array</param>
-	/// 
-	/// <returns>Random byte array</returns>
-	std::vector<byte> Generate(size_t Length) override;
-
-	/// <summary>
-	/// Fill the buffer with pseudo-random bytes using offsets
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The output array to fill</param>
-	/// <param name="Offset">The starting position within the Output array</param>
-	/// <param name="Length">The number of bytes to write to the Output array</param>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
-
-	/// <summary>
-	/// Fill an array with pseudo random bytes
-	/// </summary>
-	///
-	/// <param name="Output">Output array</param>
+	/// <param name="Output">The destination standard vector to fill</param>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
+	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
+	///
+	/// <param name="Output">The destination SecureVector to fill</param>
 	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUInt16() override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
+	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint NextUInt32() override;
+	///
+	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Offset">The starting position within the destination vector</param>
+	/// <param name="Length">The number of bytes to write to the destination vector</param>
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 64bit integer
+	/// Fill a SecureVector with pseudo-random bytes using offset and length parameters
 	/// </summary>
+	///
+	/// <param name="Output">The destination SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the destination vector</param>
+	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextUInt64() override;
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the generator instance
 	/// </summary>
+	/// 
+	/// <exception cref="CryptoRandomException">Thrown if the random provider can not be instantiated</exception>
 	void Reset() override;
+
+private:
+
+	static void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	static void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
 };
 
 NAMESPACE_PRNGEND

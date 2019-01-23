@@ -126,7 +126,7 @@ public:
 	SymmetricSecureKey* GetSecureKey(SymmetricKeySize KeySize);
 
 	/// <summary>
-	/// Fill an array with pseudo random bytes
+	/// Fill an array with pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">The array to fill with random bytes</param>
@@ -135,7 +135,7 @@ public:
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Return an array filled with pseudo random bytes
+	/// Return an array filled with pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Length">Size of requested byte array</param>

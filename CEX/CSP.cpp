@@ -60,7 +60,7 @@ void CSP::Generate(std::vector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data(), Output.size());
+	GetRandom(Output.data(), Output.size());
 }
 
 void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -78,7 +78,7 @@ void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data() + Offset, Length);
+	GetRandom(Output.data() + Offset, Length);
 }
 
 void CSP::Generate(SecureVector<byte> &Output)
@@ -92,7 +92,7 @@ void CSP::Generate(SecureVector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data(), Output.size());
+	GetRandom(Output.data(), Output.size());
 }
 
 void CSP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
@@ -110,10 +110,10 @@ void CSP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data() + Offset, Length);
+	GetRandom(Output.data() + Offset, Length);
 }
 
-void CSP::GetEntropy(byte* Output, size_t Length)
+void CSP::GetRandom(byte* Output, size_t Length)
 {
 	size_t poff = 0;
 
@@ -224,7 +224,7 @@ bool CSP::FipsTest()
 
 	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
 
-	GetEntropy(smp.data(), smp.size());
+	GetRandom(smp.data(), smp.size());
 
 	if (!m_pvdSelfTest.SelfTest(smp))
 	{

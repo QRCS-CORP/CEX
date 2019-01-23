@@ -1,4 +1,5 @@
 #include "NTRUSQ4591N761.h"
+#include "SHAKE.h"
 
 NAMESPACE_NTRU
 
@@ -55,8 +56,10 @@ int NTRUSQ4591N761::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &
 	}
 
 	SmallEncode(rstr, 0, r);
-	Digest::Keccak512 dgt;
-	dgt.Compute(rstr, hash);
+
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	gen.Initialize(rstr);
+	gen.Generate(hash);
 
 	result |= Verify32(hash, CipherText);
 
@@ -78,8 +81,10 @@ void NTRUSQ4591N761::Encrypt(std::vector<byte> &Secret, std::vector<byte> &Ciphe
 
 	SmallRandomWeightW(r, Rng);
 	SmallEncode(rstr, 0, r);
-	Digest::Keccak512 dgt;
-	dgt.Compute(rstr, hash);
+
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	gen.Initialize(rstr);
+	gen.Generate(hash);
 
 	RqDecode(h, PublicKey);
 	RqMult(c, h, r);

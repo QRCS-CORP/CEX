@@ -55,7 +55,7 @@ enum class ExceptionTypes : byte
 	/// </summary>
 	CryptoProcessingException = 10,
 	/// <summary>
-	/// Cryptographic pseudo random number generator exception
+	/// Cryptographic pseudo-random number generator exception
 	/// </summary>
 	CryptoRandomException = 11,
 	/// <summary>

@@ -67,41 +67,41 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a buffer with pseudo-random bytes
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The output array to fill</param>
+	/// <param name="Output">The destination standard vector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill the buffer with pseudo-random bytes using offsets
-	/// </summary>
-	///
-	/// <param name="Output">The output array to fill</param>
-	/// <param name="Offset">The starting position within the Output array</param>
-	/// <param name="Length">The number of bytes to write to the Output array</param>
-	/// 
-	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
-
-	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The output SecureVector to fill</param>
+	/// <param name="Output">The destination SecureVector to fill</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill the SecureVector with pseudo-random bytes using offsets
+	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The output SecureVector to fill</param>
-	/// <param name="Offset">The starting position within the Output array</param>
-	/// <param name="Length">The number of bytes to write to the Output array</param>
+	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Offset">The starting position within the destination vector</param>
+	/// <param name="Length">The number of bytes to write to the destination vector</param>
+	/// 
+	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+
+	/// <summary>
+	/// Fill a SecureVector with pseudo-random bytes using offset and length parameters
+	/// </summary>
+	///
+	/// <param name="Output">The destination SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the destination vector</param>
+	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the random provider is not available</exception>
 	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
@@ -114,7 +114,7 @@ public:
 private:
 
 	bool FipsTest();
-	static void GetEntropy(byte* Output, size_t Length);
+	static void GetRandom(byte* Output, size_t Length);
 };
 
 NAMESPACE_PROVIDEREND

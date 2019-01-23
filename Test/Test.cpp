@@ -80,6 +80,7 @@
 #include "../Test/AesAvsTest.h"
 #include "../Test/AsymmetricSpeedTest.h"
 #include "../Test/BCGTest.h"
+#include "../Test/BCRTest.h"
 #include "../Test/Blake2Test.h"
 #include "../Test/ChaChaTest.h"
 #include "../Test/CipherModeTest.h"
@@ -90,11 +91,13 @@
 #include "../Test/ConsoleUtils.h"
 #include "../Test/CSGTest.h"
 #include "../Test/CSPTest.h"
+#include "../Test/CSRTest.h"
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
 #include "../Test/DilithiumTest.h"
 #include "../Test/ECPTest.h"
 #include "../Test/GMACTest.h"
+#include "../Test/HCRTest.h"
 #include "../Test/KDF2Test.h"
 #include "../Test/KeccakTest.h"
 #include "../Test/KMACTest.h"
@@ -230,7 +233,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("// *                                             *");
 	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7g (A7)                   *");
 	ConsoleUtils::WriteLine("// * License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("// * Date:      January 21, 2018                 *");
+	ConsoleUtils::WriteLine("// * Date:      January 23, 2018                 *");
 	ConsoleUtils::WriteLine("// * Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -446,12 +449,16 @@ int main()
 			RunTest(new HMACTest());
 			RunTest(new KMACTest());
 			RunTest(new Poly1305Test());
-			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
+			PrintHeader("TESTING RANDOM ENTROPY PROVIDERS");
 			RunTest(new ACPTest());
 			RunTest(new CJPTest());
 			RunTest(new CSPTest());
 			RunTest(new ECPTest());
 			RunTest(new RDPTest());
+			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
+			RunTest(new BCRTest());
+			RunTest(new CSRTest());
+			RunTest(new HCRTest());
 			PrintHeader("TESTING KEY DERIVATION FUNCTIONS");
 			RunTest(new HKDFTest());
 			RunTest(new KDF2Test());

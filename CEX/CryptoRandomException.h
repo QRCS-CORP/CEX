@@ -11,7 +11,7 @@ using Enumeration::ErrorCodes;
 using Enumeration::ExceptionTypes;
 
 /// <summary>
-/// Cryptographic pseudo random number generator exception
+/// Cryptographic pseudo-random number generator exception
 /// </summary>
 class CryptoRandomException : public CryptoException
 {

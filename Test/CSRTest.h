@@ -1,17 +1,17 @@
-#ifndef CEXTEST_RDPTEST_H
-#define CEXTEST_RDPTEST_H
+#ifndef CEXTEST_CSRTEST_H
+#define CEXTEST_CSRTEST_H
 
 #include "ITest.h"
-#include "../CEX/IProvider.h"
+#include "../CEX/IPrng.h"
 
 namespace Test
 {
-	using Provider::IProvider;
+	using Prng::IPrng;
 
 	/// <summary>
-	/// Tests the RdRand entropy provider output with random sampling analysis, and stress tests
+	/// Tests the cSHAKE generator based PRNG for exception handling, randomness, and stress testing
 	/// </summary>
-	class RDPTest final : public ITest
+	class CSRTest final : public ITest
 	{
 	private:
 
@@ -30,12 +30,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CMAC vectors for equality
 		/// </summary>
-		RDPTest();
+		CSRTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~RDPTest();
+		~CSRTest();
 
 		/// <summary>
 		/// Get: The test description
@@ -55,7 +55,7 @@ namespace Test
 		/// <summary>
 		///  Test drbg output using chisquare, mean value, and ordered runs tests
 		/// </summary>
-		void Evaluate(IProvider* Rng);
+		void Evaluate(IPrng* Rng);
 
 		/// <summary>
 		/// Test exception handlers for correct execution

@@ -44,7 +44,7 @@ using Enumeration::Providers;
 using Provider::IProvider;
 
 /// <summary>
-/// An implementation of a cryptographically secure pseudo random number generator.
+/// An implementation of a cryptographically secure pseudo-random number generator.
 /// </summary>
 ///
 /// <remarks>
@@ -147,7 +147,7 @@ public:
 	//~~~Byte~~~//
 
 	/// <summary>
-	/// Return an array filled with pseudo random bytes
+	/// Return an array filled with pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Length">Size of requested byte array</param>
@@ -165,7 +165,7 @@ public:
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Fill an array with pseudo random bytes
+	/// Fill an array with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>

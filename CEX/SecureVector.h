@@ -3,40 +3,19 @@
 
 #include "CexDomain.h"
 #include "CryptoException.h"
+#include "LockingAllocator.h"
 #include "MemoryPool.h"
-#include <deque>
+#include "MemoryTools.h"
 
 NAMESPACE_ROOT
 
+using Utility::LockingAllocator;
 using Utility::MemoryPool;
+using Utility::MemoryTools;
 
-/*! \cond private */
-
-class LockingAllocator final
-{
-private:
-
-	byte* m_lockedPages;
-	size_t m_lockedPagesSize;
-	std::unique_ptr<MemoryPool> m_memoryPool;
-
-	LockingAllocator(const LockingAllocator&) = delete;
-
-	LockingAllocator& operator=(const LockingAllocator&) = delete;
-
-	LockingAllocator();
-
-	~LockingAllocator();
-
-public:
-
-	static LockingAllocator& Instance();
-
-	void* allocate(size_t Elements, size_t ElementSize);
-
-	bool deallocate(void* Pointer, size_t Elements, size_t ElementSize);
-};
-
+/// <summary>
+/// A secure allocator template used internally to create locked memory allocations
+/// </summary>
 template<typename T>
 class SecureAllocator
 {
@@ -76,138 +55,340 @@ public:
 
 	T* allocate(size_t n)
 	{
-		return static_cast<T*>(AllocatorTools::Allocate(n, sizeof(T)));
+		return static_cast<T*>(LockingAllocator::Allocate(n, sizeof(T)));
 	}
 
 	void deallocate(T* p, size_t n)
 	{
-		AllocatorTools::Deallocate(p, n, sizeof(T));
+		LockingAllocator::Deallocate(p, n, sizeof(T));
 	}
 };
 
-template<typename T> using SecureDeque = std::deque<T, SecureAllocator<T>>;
+/// <summary>
+/// A secure vector template using locking memory allocations
+/// </summary>
+template<typename T> 
+using SecureVector = std::vector<T, SecureAllocator<T>>;
 
-template<typename T> using SecureVector = std::vector<T, SecureAllocator<T>>;
-
-template<typename T, typename U> inline bool operator == (const SecureAllocator<T>&, const SecureAllocator<U>&) { return true; }
-
-template<typename T, typename U> inline bool operator != (const SecureAllocator<T>&, const SecureAllocator<U>&) { return false; }
-
-template<typename T, typename Alloc, typename Alloc2>
-std::vector<T, Alloc>& operator += (std::vector<T, Alloc> &Output, const std::vector<T, Alloc2> &Input)
+/// <summary>
+/// Compare two arrays for equality
+/// </summary>
+/// 
+/// <returns>Returns true if equal</returns>
+template<typename T, typename U>
+inline bool operator == (const SecureAllocator<T>&, const SecureAllocator<U>&)
 {
-	const size_t CPYOFT = Output.size();
-
-	Output.resize(Output.size() + Input.size());
-
-	if (Input.size() > 0)
-	{
-		std::memcpy(&Output[CPYOFT], Input.data(), Input.size());
-	}
-
-	return Output;
+	return true;
 }
 
-template<typename T, typename Alloc>
-std::vector<T, Alloc>& operator += (std::vector<T, Alloc> &Output, T Input)
+/// <summary>
+/// Compare two arrays for inequality
+/// </summary>
+/// 
+/// <returns>Returns true if not equal</returns>
+template<typename T, typename U>
+inline bool operator != (const SecureAllocator<T>&, const SecureAllocator<U>&)
 {
-	Output.push_back(Input);
-
-	return Output;
+	return false;
 }
 
-template<typename T, typename Alloc, typename L>
-std::vector<T, Alloc>& operator += (std::vector<T, Alloc> &Output, const std::pair<const T*, L> &Input)
+/// <summary>
+/// Erase a standard vector and resize it to zero
+/// </summary>
+///
+/// <param name="Input">The SecureVector to erase</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void Clear(std::vector<T> &Input)
 {
-	const size_t CPYOFT = Output.size();
+	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
+	Input.clear();
+}
+CEX_OPTIMIZE_RESUME
 
-	Output.resize(Output.size() + Input.second);
+/// <summary>
+/// Erase a SecureVector and resize it to zero
+/// </summary>
+///
+/// <param name="Input">The SecureVector to erase</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void Clear(SecureVector<T> &Input)
+{
+	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
+	Input.clear();
+}
+CEX_OPTIMIZE_RESUME
 
-	if (Input.second > 0)
-	{
-		std::memcpy(&Output[CPYOFT], Input.first, Input.second);
-	}
+/// <summary>
+/// Copy a length of bytes between two SecureVector arrays.</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// <param name="InOffset">The starting offset within the SecureVector array</param>
+/// <param name="Output">The SecureVector destination array</param>
+/// <param name="OutOffset">The starting offset within the standard vector</param>
+/// <param name="Length">The number of bytes to copy</param>
+template<typename T>
+inline static void Copy(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Length)
+{
+	CEXASSERT(Input.size() - InOffset >= Length, "The length is longer than the input array");
+	CEXASSERT(Output.size() - OutOffset >= Length, "The length is longer than the output array");
 
-	return Output;
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
 }
 
-template<typename T, typename Alloc, typename L>
-std::vector<T, Alloc>& operator += (std::vector<T, Alloc> &Output, const std::pair<T*, L> &Input)
+/// <summary>
+/// Extract integers from a SecureVector and copy them to a standard vector.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// <param name="Output">The standard vector destination</param>
+template<typename T>
+inline static void Extract(const SecureVector<T> &Input, std::vector<T> &Output)
 {
-	const size_t CPYOFT = Output.size();
+	const size_t OTPSZE = Output.size();
 
-	Output.resize(Output.size() + Input.second);
-
-	if (Input.second > 0)
-	{
-		std::memcpy(&Output[CPYOFT], Input.first, Input.second);
-	}
-
-	return Output;
+	Output.resize(OTPSZE + Input.size());
+	MemoryTools::Copy(Input, 0, Output, OTPSZE, Input.size() * sizeof(T));
 }
 
-class AllocatorTools final
+/// <summary>
+/// Extract integers from a SecureVector and copy them to another SecureVector.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// <param name="Output">The SecureVector destination array</param>
+template<typename T>
+inline static void Extract(const SecureVector<T> &Input, SecureVector<T> &Output)
 {
-private:
+	const size_t OTPSZE = Output.size();
 
-	static const std::string CLASS_NAME;
+	Output.resize(OTPSZE + Input.size());
+	MemoryTools::Copy(Input, 0, Output, OTPSZE, Input.size() * sizeof(T));
+}
 
-public:
+/// <summary>
+/// Extract integers from a SecureVector and copy them to a standard vector using offsets and an element count.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// <param name="InOffset">The starting offset within the source SecureVector</param>
+/// <param name="Output">The standard vector destination array</param>
+/// <param name="OutOffset">The starting offset within the destination SecureVector</param>
+/// <param name="Elements">The number of vector elements to copy</param>
+template<typename T>
+inline static void Extract(const SecureVector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Elements)
+{
+	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
 
-	template<typename T, typename Alloc>
-	static size_t Insert(std::vector<T, Alloc> &Output, size_t OutOffset, const T Input[], size_t Length)
+	if (OTPSZE != 0)
 	{
-		CEXASSERT(OutOffset <= Output.size(), "The buffer is too small");
-
-		const size_t CPYLEN = std::min(Length, Output.size() - OutOffset);
-
-		if (CPYLEN > 0)
-		{
-			std::memcpy(&Output[OutOffset], Input, CPYLEN);
-		}
-
-		return CPYLEN;
+		Output.resize(OTPSZE);
 	}
 
-	template<typename T, typename Alloc1, typename Alloc2>
-	static size_t Insert(std::vector<T, Alloc1> &Output, size_t OutOffset, const std::vector<T, Alloc2> &Input)
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Input.size() * sizeof(T));
+}
+
+/// <summary>
+/// Extract integers from a SecureVector and copy them to another SecureVector, using offsets and an element count.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// <param name="InOffset">The starting offset within the source SecureVector</param>
+/// <param name="Output">The standard vector destination array</param>
+/// <param name="OutOffset">The starting offset within the destination SecureVector</param>
+/// <param name="Elements">The number of vector elements to copy</param>
+template<typename T>
+inline static void Extract(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
+{
+	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
+
+	if (OTPSZE != 0)
 	{
-		CEXASSERT(OutOffset <= Output.size(), "The buffer is too small");
-
-		const size_t CPYLEN = std::min(Input.size(), Output.size() - OutOffset);
-
-		if (CPYLEN > 0)
-		{
-			std::memcpy(&Output[OutOffset], Input.data(), CPYLEN);
-		}
-
-		return CPYLEN;
+		Output.resize(OTPSZE);
 	}
 
-	template<typename T, typename Alloc>
-	static std::vector<T> ToVector(const std::vector<T, Alloc> &Input)
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Input.size() * sizeof(T));
+}
+
+/// <summary>
+/// Insert a standard vector into a SecureVector array.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The standard vector source array</param>
+/// <param name="Output">The SecureVector destination array</param>
+template<typename T>
+inline static void Insert(const std::vector<T> &Input, SecureVector<T> &Output)
+{
+	const size_t OTPSZE = Output.size();
+
+	Output.resize(OTPSZE + Input.size());
+	MemoryTools::Copy(Input, 0, Output, OTPSZE, Input.size() * sizeof(T));
+}
+
+/// <summary>
+/// Insert a SecureVector into another SecureVector array.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// <param name="Output">The SecureVector destination array</param>
+template<typename T>
+inline static void Insert(const SecureVector<T> &Input, SecureVector<T> &Output)
+{
+	const size_t OTPSZE = Output.size();
+
+	Output.resize(OTPSZE + Input.size());
+	MemoryTools::Copy(Input, 0, Output, OTPSZE, Input.size() * sizeof(T));
+}
+
+/// <summary>
+/// Insert a standard vector into a SecureVector array using offsets and an element count.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The standard vector source array</param>
+/// <param name="InOffset">The starting offset within the standard vector</param>
+/// <param name="Output">The SecureVector destination array</param>
+/// <param name="OutOffset">The starting offset within the SecureVector</param>
+/// <param name="Elements">The number of elements to copy</param>
+template<typename T>
+inline static void Insert(const std::vector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
+{
+	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
+
+	if (OTPSZE != 0)
 	{
-		std::vector<T> otp(Input.size());
-
-		std::memcpy(otp.data(), Input.data(), Input.size() * sizeof(T));
-
-		return otp;
+		Output.resize(OTPSZE);
 	}
 
-	template<typename T>
-	static std::vector<T> Unlock(const SecureVector<T> &Input)
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Elements * sizeof(T));
+}
+
+/// <summary>
+/// Insert a SecureVector into another SecureVector array using offsets and an element count.
+/// <para>This method will expand the output array to size.</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// <param name="InOffset">The starting offset within the source SecureVector</param>
+/// <param name="Output">The SecureVector destination array</param>
+/// <param name="OutOffset">The starting offset within the destination SecureVector</param>
+/// <param name="Elements">The number of elements to copy</param>
+template<typename T>
+inline static void Insert(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
+{
+	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
+
+	if (OTPSZE != 0)
 	{
-		std::vector<T> otp(Input.size());
-
-		std::memcpy(otp.data(), Input.data(), Input.size());
-
-		return otp;
+		Output.resize(OTPSZE);
 	}
 
-	static CEX_MALLOC_FN void* Allocate(size_t Elements, size_t ElementSize);
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Elements * sizeof(T));
+}
 
-	static void Deallocate(void* Pointer, size_t Elements, size_t ElementSize);
-};
+/// <summary>
+/// Copy a standard vector to a SecureVector
+/// </summary>
+///
+/// <param name="Input">The input source array to copy</param>
+/// 
+/// <returns>A SecureVector copy of the input array</returns>
+template<typename T>
+inline static SecureVector<T> Lock(const std::vector<T> &Input)
+{
+	SecureVector<T> ret(Input.size());
+
+	MemoryTools::Copy(Input, 0, ret, 0, ret.size() * sizeof(T));
+
+	return ret;
+}
+
+/// <summary>
+/// Copy a standard vector to a SecureVector, and erase the input vector
+/// </summary>
+///
+/// <param name="Input">The input vector array, this will be erased and cleared</param>
+/// 
+/// <returns>A SecureVector copy of the input array</returns>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static SecureVector<T> LockClear(std::vector<T> &Input)
+{
+	SecureVector<T> ret(Input.size());
+
+	MemoryTools::Copy(Input, 0, ret, 0, ret.size() * sizeof(T));
+	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
+	Input.clear();
+
+	return ret;
+}
+CEX_OPTIMIZE_RESUME
+
+/// <summary>
+/// Move a SecureVector array to another SecureVector array, clearing the source</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array; will be cleared after copying</param>
+/// <param name="Output">The SecureVector destination array</param>
+/// <param name="OutOffset">The starting offset within the standard vector</param>
+/// <param name="Length">The number of bytes to copy</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void Move(SecureVector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
+{
+	CEXASSERT(Output.size() - OutOffset >= Input.size(), "The input array is longer than the output array");
+
+	MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size());
+	MemoryTools::Clear(Input);
+	Input.clear();
+}
+CEX_OPTIMIZE_RESUME
+
+/// <summary>
+/// Copy a SecureVector to a standard vector array
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// 
+/// <returns>A standard vector copy of the SecureArray</returns>
+template<typename T>
+inline static std::vector<T> Unlock(const SecureVector<T> &Input)
+{
+	std::vector<T> ret(Input.size());
+
+	MemoryTools::Copy(Input, 0, ret, 0, ret.size() * sizeof(T));
+
+	return ret;
+}
+
+/// <summary>
+/// Copy a SecureVector to a standard vector, and erase the input SecureArray
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array</param>
+/// 
+/// <returns>A standard vector copy of the SecureArray</returns>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static std::vector<T> UnlockClear(SecureVector<T> &Input)
+{
+	std::vector<T> ret(Input.size());
+
+	MemoryTools::Copy(Input, 0, ret, 0, ret.size() * sizeof(T));
+	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
+	Input.clear();
+
+	return ret;
+}
+CEX_OPTIMIZE_RESUME
 
 NAMESPACE_ROOTEND
 #endif

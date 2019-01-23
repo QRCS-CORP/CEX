@@ -54,7 +54,7 @@ void ECP::Generate(std::vector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output, 0, Output.size(), m_kdfGenerator);
+	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
 }
 
 void ECP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -72,7 +72,7 @@ void ECP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output, Offset, Length, m_kdfGenerator);
+	GetRandom(Output, Offset, Length, m_kdfGenerator);
 }
 
 void ECP::Generate(SecureVector<byte> &Output)
@@ -86,10 +86,7 @@ void ECP::Generate(SecureVector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	std::vector<byte> smp(Output.size());
-	GetEntropy(smp, 0, smp.size(), m_kdfGenerator);
-	MemoryTools::Copy(smp, 0, Output, 0, Output.size());
-	MemoryTools::Clear(smp, 0, smp.size());
+	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
 }
 
 void ECP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
@@ -103,10 +100,7 @@ void ECP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	std::vector<byte> smp(Output.size());
-	m_kdfGenerator->Generate(smp, 0, smp.size());
-	MemoryTools::Copy(smp, 0, Output, 0, Output.size());
-	MemoryTools::Clear(smp, 0, smp.size());
+	GetRandom(Output, Offset, Length, m_kdfGenerator);
 }
 
 void ECP::Reset()
@@ -148,25 +142,25 @@ std::vector<byte> ECP::Collect()
 	CSP pvd;
 	pvd.Generate(buffer);
 	// first block is system provider
-	ArrayTools::Append(buffer, state);
+	ArrayTools::AppendVector(buffer, state);
 	// get the first timestamp
 	ArrayTools::AppendValue(ts, state);
 	// collect the entropy
-	ArrayTools::Append(DriveInfo(), state);
+	ArrayTools::AppendVector(DriveInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(MemoryInfo(), state);
+	ArrayTools::AppendVector(MemoryInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(NetworkInfo(), state);
+	ArrayTools::AppendVector(NetworkInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(ProcessInfo(), state);
+	ArrayTools::AppendVector(ProcessInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(ProcessorInfo(), state);
+	ArrayTools::AppendVector(ProcessorInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(SystemInfo(), state);
+	ArrayTools::AppendVector(SystemInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(TimeInfo(), state);
+	ArrayTools::AppendVector(TimeInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(UserInfo(), state);
+	ArrayTools::AppendVector(UserInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
 
 	// filter zeroes
@@ -208,7 +202,7 @@ bool ECP::FipsTest()
 	std::vector<byte> tmp(m_pvdSelfTest.SELFTEST_LENGTH);
 	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
 
-	GetEntropy(tmp, 0, tmp.size(), m_kdfGenerator);
+	GetRandom(tmp, 0, tmp.size(), m_kdfGenerator);
 	MemoryTools::Copy(tmp, 0, smp, 0, smp.size());
 	MemoryTools::Clear(tmp, 0, tmp.size());
 
@@ -231,7 +225,7 @@ std::vector<byte> ECP::DriveInfo()
 
 	for (size_t i = 0; i < drives.size(); ++i)
 	{
-		ArrayTools::Append(SystemTools::DriveSpace(drives[i]), state);
+		ArrayTools::AppendVector(SystemTools::DriveSpace(drives[i]), state);
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -243,9 +237,18 @@ std::vector<byte> ECP::DriveInfo()
 	return state;
 }
 
-void ECP::GetEntropy(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+void ECP::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
 {
 	Generator->Generate(Output, Offset, Length);
+}
+
+void ECP::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+{
+	std::vector<byte> smp(Length);
+
+	Generator->Generate(smp, 0, Length);
+	Insert(smp, 0, Output, Offset, Length);
+	Clear(smp);
 }
 
 std::vector<byte> ECP::MemoryInfo()
@@ -293,7 +296,7 @@ std::vector<byte> ECP::NetworkInfo()
 		for (size_t i = 0; i < info.size(); ++i)
 		{
 			ArrayTools::AppendString(ArrayTools::ToString(info[i]->AdapterName), state);
-			ArrayTools::Append(ArrayTools::ToByteArray(info[i]->Address, 8), state);
+			ArrayTools::AppendVector(ArrayTools::ToByteArray(info[i]->Address, 8), state);
 			ArrayTools::AppendValue(info[i]->ComboIndex, state);
 			ArrayTools::AppendString(ArrayTools::ToString(info[i]->Description), state);
 			ArrayTools::AppendValue(info[i]->DhcpServer.IpAddress.String, state);
@@ -316,7 +319,7 @@ std::vector<byte> ECP::NetworkInfo()
 
 #elif defined(CEX_OS_POSIX)
 	
-	ArrayTools::Append(SystemTools::NetworkStatistics(), state);
+	ArrayTools::AppendVector(SystemTools::NetworkStatistics(), state);
 
 #endif
 
@@ -399,7 +402,7 @@ std::vector<byte> ECP::ProcessInfo()
 
 	try
 	{
-		ArrayTools::Append(SystemTools::ProcessEntries(), state);
+		ArrayTools::AppendVector(SystemTools::ProcessEntries(), state);
 	}
 	catch (std::exception&)
 	{
@@ -481,7 +484,7 @@ std::vector<byte> ECP::UserInfo()
 
 	ArrayTools::AppendString(SystemTools::UserName(), state);
 	ArrayTools::AppendString(SystemTools::UserId(), state);
-	ArrayTools::Append(SystemTools::UserToken(), state);
+	ArrayTools::AppendVector(SystemTools::UserToken(), state);
 
 	return state;
 }

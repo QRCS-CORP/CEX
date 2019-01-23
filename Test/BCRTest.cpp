@@ -1,54 +1,54 @@
-#include "CJPTest.h"
+#include "BCRTest.h"
 #include "RandomUtils.h"
-#include "../CEX/CJP.h"
+#include "../CEX/BCR.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using Provider::CJP;
+	using Prng::BCR;
 	using Exception::CryptoRandomException;
 	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 
-	const std::string CJPTest::CLASSNAME = "CJPTest";
-	const std::string CJPTest::DESCRIPTION = "CJP stress and random evaluation tests.";
-	const std::string CJPTest::SUCCESS = "SUCCESS! All CJP tests have executed succesfully.";
+	const std::string BCRTest::CLASSNAME = "BCRTest";
+	const std::string BCRTest::DESCRIPTION = "BCR stress and random evaluation tests.";
+	const std::string BCRTest::SUCCESS = "SUCCESS! All BCR tests have executed succesfully.";
 
-	CJPTest::CJPTest()
+	BCRTest::BCRTest()
 		:
 		m_progressEvent()
 	{
 	}
 
-	CJPTest::~CJPTest()
+	BCRTest::~BCRTest()
 	{
 	}
 
-	const std::string CJPTest::Description()
+	const std::string BCRTest::Description()
 	{
 		return DESCRIPTION;
 	}
 
-	TestEventHandler &CJPTest::Progress()
+	TestEventHandler &BCRTest::Progress()
 	{
 		return m_progressEvent;
 	}
 
-	std::string CJPTest::Run()
+	std::string BCRTest::Run()
 	{
 		try
 		{
 			Exception();
-			OnProgress(std::string("CJPTest: Passed CJP exception handling tests.."));
+			OnProgress(std::string("BCRTest: Passed BCR exception handling tests.."));
 
-			CJP* gen = new CJP;
+			BCR* gen = new BCR;
 			Evaluate(gen);
-			OnProgress(std::string("CJPTest: Passed CJP random evaluation.."));
+			OnProgress(std::string("BCRTest: Passed BCR random evaluation.."));
 			delete gen;
 
 			Stress();
-			OnProgress(std::string("CJPTest: Passed CJP stress tests.."));
+			OnProgress(std::string("BCRTest: Passed BCR stress tests.."));
 
 			return SUCCESS;
 		}
@@ -62,7 +62,7 @@ namespace Test
 		}
 	}
 
-	void CJPTest::Evaluate(IProvider* Rng)
+	void BCRTest::Evaluate(IPrng* Rng)
 	{
 		try
 		{
@@ -72,21 +72,21 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-CE1"));
+			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-AE1"));
 		}
 	}
 
-	void CJPTest::Exception()
+	void BCRTest::Exception()
 	{
 		// test generate
 		try
 		{
-			CJP gen;
-			std::vector<byte> rnd(16);
-			// buffer is too small
-			gen.Generate(rnd, 0, rnd.size() + 1);
+			BCR gen;
+			std::vector<byte> smp(16);
+			// generator was not initialized
+			gen.Generate(smp, 0, smp.size() + 1);
 
-			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -CE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -AE3"));
 		}
 		catch (CryptoRandomException const &)
 		{
@@ -97,16 +97,16 @@ namespace Test
 		}
 	}
 
-	void CJPTest::OnProgress(const std::string &Data)
+	void BCRTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
 
-	void CJPTest::Stress()
+	void BCRTest::Stress()
 	{
 		std::vector<byte> msg;
 		SecureRandom rnd;
-		CJP gen;
+		BCR gen;
 		size_t i;
 
 		msg.reserve(MAXM_ALLOC);
@@ -118,12 +118,12 @@ namespace Test
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
 
-				gen.Generate(msg);
+				//gen.Generate(msg);
 				gen.Reset();
 			}
 			catch (const std::exception&)
 			{
-				throw TestException(std::string("Stress"), gen.Name(), std::string("The generator has thrown an exception! -CS1"));
+				throw TestException(std::string("Stress"), gen.Name(), std::string("The generator has thrown an exception! -AS1"));
 			}
 		}
 	}

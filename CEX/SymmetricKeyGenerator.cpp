@@ -140,7 +140,7 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 	{
 		throw CryptoGeneratorException(CLASS_NAME, std::string("GetSecureKey"), std::string("The key size can not be zero!"), ErrorCodes::InvalidSize);
 	}
-
+	// TODO: fill with secure vectors from updated prngs..
 	SymmetricSecureKey* key = nullptr;
 
 	if (KeySize.NonceSize() != 0)
@@ -216,7 +216,7 @@ void SymmetricKeyGenerator::Generate(Providers Provider, SecurityPolicy Policy, 
 	Kdf::SHAKE gen(mode);
 
 	// customization string is salt/name + provider-name + shake-name
-	Utility::ArrayTools::Append(Salt, cust);
+	Utility::ArrayTools::AppendVector(Salt, cust);
 	Utility::ArrayTools::AppendString(pvd->Name(), cust);
 	Utility::ArrayTools::AppendString(gen.Name(), cust);
 

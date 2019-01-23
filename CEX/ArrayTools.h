@@ -55,7 +55,7 @@ public:
 	}
 
 	/// <summary>
-	/// Append an integer array to another integer array
+	/// Append an objects memory array to an integer array
 	/// </summary>
 	///
 	/// <param name="Input">The pointer to the object in memory</param>
@@ -134,7 +134,7 @@ public:
 	/// 
 	/// <returns>The number of bytes added</returns>
 	template <typename A, typename B>
-	static size_t Append(const std::vector<A> &Input, std::vector<B> &Output)
+	static size_t AppendVector(const std::vector<A> &Input, std::vector<B> &Output)
 	{
 		const size_t INPLEN = sizeof(A) * Input.size();
 		const size_t OTPLEN = sizeof(B) * Output.size();

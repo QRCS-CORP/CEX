@@ -501,7 +501,6 @@ NAMESPACE_ROOT
 		class BCR {};
 		class DCR {};
 		class IPrng {};
-		class PBR {};
 		class SecureRandom {};
 	NAMESPACE_PRNGEND
 	/*! @} */

@@ -211,45 +211,7 @@ public:
 	}
 
 	/// <summary>
-	/// Copy bytes from an array to an integer.
-	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
-	/// The length must not be larger than the integer (V) type byte size.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The integer source array to copy</param>
-	/// <param name="InOffset">The offset within the source array</param>
-	/// <param name="Value">The destination value</param>
-	/// <param name="Length">The number of bytes to copy</param>
-	template <typename Array, typename V>
-	inline static void CopyToValue(const Array &Input, size_t InOffset, V &Value, size_t Length)
-	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input capacity");
-		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
-
-		std::memcpy(&Value, &Input[InOffset], Length);
-	}
-
-	/// <summary>
-	/// Copy bytes from an integer to an array.
-	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
-	/// The length must not be larger than the integer arrays byte size.</para>
-	/// </summary>
-	/// 
-	/// <param name="Value">The source integer value</param>
-	/// <param name="Output">The destination integer array</param>
-	/// <param name="OutOffset">The offset within the destination array</param>
-	/// <param name="Length">The number of bytes to copy</param>
-	template <typename V, typename Array>
-	inline static void CopyFromValue(const V Value, Array &Output, size_t OutOffset, size_t Length)
-	{
-		CEXASSERT((Output.size() - OutOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input capacity");
-		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
-
-		std::memcpy(&Output[OutOffset], &Value, Length);
-	}
-
-	/// <summary>
-	/// Copy memory using a pointer to an integer array.
+	/// Copy memory from an object using a pointer to an integer array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
 	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512),
 	/// the operation is vectorized, otherwise this is a sequential copy operation.</para>
@@ -305,15 +267,15 @@ public:
 	}
 
 	/// <summary>
-	/// Copy memory using a pointer to an integer array.
+	/// Copy an integer array to an objects memory pointer.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
 	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512),
 	/// the operation is vectorized, otherwise this is a sequential copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The object pointer to copy memory from</param>
-	/// <param name="Output">The integer destination array</param>
-	/// <param name="OutOffset">The offset within the destination array</param>
+	/// <param name="Input">The integer source array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destinations object pointer</param>
 	/// <param name="Length">The number of bytes to copy</param>
 	template <typename Object, typename Array>
 	inline static void CopyToObject(const Array &Input, size_t InOffset, Object* Output, size_t Length)
@@ -358,6 +320,44 @@ public:
 				std::memcpy(Output + prcCtr, &Input[InOffset + prcCtr], Length - (prcCtr * ELMLEN));
 			}
 		}
+	}
+
+	/// <summary>
+	/// Copy bytes from an array to an integer.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
+	/// The length must not be larger than the integer (V) type byte size.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The integer source array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Value">The destination value</param>
+	/// <param name="Length">The number of bytes to copy</param>
+	template <typename Array, typename V>
+	inline static void CopyToValue(const Array &Input, size_t InOffset, V &Value, size_t Length)
+	{
+		CEXASSERT((Input.size() - InOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input capacity");
+		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
+
+		std::memcpy(&Value, &Input[InOffset], Length);
+	}
+
+	/// <summary>
+	/// Copy bytes from an integer to an array.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
+	/// The length must not be larger than the integer arrays byte size.</para>
+	/// </summary>
+	/// 
+	/// <param name="Value">The source integer value</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	/// <param name="Length">The number of bytes to copy</param>
+	template <typename V, typename Array>
+	inline static void CopyFromValue(const V Value, Array &Output, size_t OutOffset, size_t Length)
+	{
+		CEXASSERT((Output.size() - OutOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input capacity");
+		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
+
+		std::memcpy(&Output[OutOffset], &Value, Length);
 	}
 
 	/// <summary>
@@ -479,7 +479,7 @@ public:
 	}
 
 	/// <summary>
-	/// Copy 128 bits from a pointer to an array.
+	/// Copy 128 bits from an object pointer to an array.
 	/// <para>This is an AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
@@ -497,13 +497,13 @@ public:
 	}
 
 	/// <summary>
-	/// Copy 128 bits from a array to a pointer.
+	/// Copy 128 bits from an array to an object pointer.
 	/// <para>This is an AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Object">The object pointer to copy memory from</param>
-	/// <param name="Output">The destination integer array</param>
-	/// <param name="OutOffset">The offset within the destination array</param>
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination object pointer</param>
 	template <typename Object, typename Array>
 	inline static void COPY128(Array &Input, size_t InOffset, const Object* Output)
 	{
@@ -534,26 +534,7 @@ public:
 	}
 
 	/// <summary>
-	/// Copy 256 bits from a pointer to an array.
-	/// <para>This is an AVX2/AVX vectorized copy operation.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The object pointer to copy memory from</param>
-	/// <param name="Output">The destination integer array</param>
-	/// <param name="OutOffset">The offset within the destination array</param>
-	template <typename Object, typename Array>
-	inline static void COPY256(const Array &Input, size_t InOffset, Object* Output)
-	{
-#if defined(__AVX2__)
-		_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
-#else
-		COPY128(Input, InOffset, Output);
-		COPY128(Input + InOffset + (16 / sizeof(ArrayB::value_type)), Output + 16);
-#endif
-	}
-
-	/// <summary>
-	/// Copy 256 bits from a pointer to an array.
+	/// Copy 256 bits from an object pointer to an array.
 	/// <para>This is an AVX2/AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
@@ -568,6 +549,25 @@ public:
 #else
 		COPY128(Input, Output, OutOffset);
 		COPY128(Input + 16, Output, OutOffset + (16 / sizeof(ArrayB::value_type)));
+#endif
+	}
+
+	/// <summary>
+	/// Copy 256 bits from an array to an object pointer.
+	/// <para>This is an AVX2/AVX vectorized copy operation.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination object pointer</param>
+	template <typename Object, typename Array>
+	inline static void COPY256(const Array &Input, size_t InOffset, Object* Output)
+	{
+#if defined(__AVX2__)
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
+#else
+		COPY128(Input, InOffset, Output);
+		COPY128(Input + InOffset + (16 / sizeof(ArrayB::value_type)), Output + 16);
 #endif
 	}
 
@@ -592,7 +592,7 @@ public:
 	}
 
 	/// <summary>
-	/// Copy 512 bits from a pointer to an array.
+	/// Copy 512 bits from an object pointer to an array.
 	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
@@ -611,13 +611,13 @@ public:
 	}
 
 	/// <summary>
-	/// Copy 512 bits from a pointer to an array.
+	/// Copy 512 bits from an array to an object pointer.
 	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The object pointer to copy memory from</param>
-	/// <param name="Output">The destination integer array</param>
-	/// <param name="OutOffset">The offset within the destination array</param>
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination object pointer</param>
 	template <typename Object, typename Array>
 	inline static void COPY512(const Array &Input, size_t InOffset, Object* Output)
 	{

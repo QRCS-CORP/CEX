@@ -1,54 +1,54 @@
-#include "RDPTest.h"
+#include "HCRTest.h"
 #include "RandomUtils.h"
-#include "../CEX/RDP.h"
+#include "../CEX/HCR.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using Provider::RDP;
+	using Prng::HCR;
 	using Exception::CryptoRandomException;
 	using Utility::IntegerTools;
 	using Prng::SecureRandom;
 
-	const std::string RDPTest::CLASSNAME = "RDPTest";
-	const std::string RDPTest::DESCRIPTION = "RDP stress and random evaluation tests.";
-	const std::string RDPTest::SUCCESS = "SUCCESS! All RDP tests have executed succesfully.";
+	const std::string HCRTest::CLASSNAME = "HCRTest";
+	const std::string HCRTest::DESCRIPTION = "HCR stress and random evaluation tests.";
+	const std::string HCRTest::SUCCESS = "SUCCESS! All HCR tests have executed succesfully.";
 
-	RDPTest::RDPTest()
+	HCRTest::HCRTest()
 		:
 		m_progressEvent()
 	{
 	}
 
-	RDPTest::~RDPTest()
+	HCRTest::~HCRTest()
 	{
 	}
 
-	const std::string RDPTest::Description()
+	const std::string HCRTest::Description()
 	{
 		return DESCRIPTION;
 	}
 
-	TestEventHandler &RDPTest::Progress()
+	TestEventHandler &HCRTest::Progress()
 	{
 		return m_progressEvent;
 	}
 
-	std::string RDPTest::Run()
+	std::string HCRTest::Run()
 	{
 		try
 		{
 			Exception();
-			OnProgress(std::string("RDPTest: Passed RDP exception handling tests.."));
+			OnProgress(std::string("HCRTest: Passed HCR exception handling tests.."));
 
-			RDP* gen = new RDP;
+			HCR* gen = new HCR;
 			Evaluate(gen);
-			OnProgress(std::string("RDPTest: Passed RDP random evaluation.."));
+			OnProgress(std::string("HCRTest: Passed HCR random evaluation.."));
 			delete gen;
 
 			Stress();
-			OnProgress(std::string("RDPTest: Passed RDP stress tests.."));
+			OnProgress(std::string("HCRTest: Passed HCR stress tests.."));
 
 			return SUCCESS;
 		}
@@ -62,7 +62,7 @@ namespace Test
 		}
 	}
 
-	void RDPTest::Evaluate(IProvider* Rng)
+	void HCRTest::Evaluate(IPrng* Rng)
 	{
 		try
 		{
@@ -72,21 +72,21 @@ namespace Test
 		}
 		catch (TestException const &ex)
 		{
-			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-RE1"));
+			throw TestException(std::string("Evaluate"), Rng->Name(), ex.Message() + std::string("-AE1"));
 		}
 	}
 
-	void RDPTest::Exception()
+	void HCRTest::Exception()
 	{
 		// test generate
 		try
 		{
-			RDP gen;
-			std::vector<byte> rnd(16);
-			// buffer is too small
-			gen.Generate(rnd, 0, rnd.size() + 1);
+			HCR gen;
+			std::vector<byte> smp(16);
+			// generator was not initialized
+			gen.Generate(smp, 0, smp.size() + 1);
 
-			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -RE3"));
+			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -AE3"));
 		}
 		catch (CryptoRandomException const &)
 		{
@@ -97,16 +97,16 @@ namespace Test
 		}
 	}
 
-	void RDPTest::OnProgress(const std::string &Data)
+	void HCRTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}
 
-	void RDPTest::Stress()
+	void HCRTest::Stress()
 	{
 		std::vector<byte> msg;
 		SecureRandom rnd;
-		RDP gen;
+		HCR gen;
 		size_t i;
 
 		msg.reserve(MAXM_ALLOC);
@@ -121,9 +121,9 @@ namespace Test
 				gen.Generate(msg);
 				gen.Reset();
 			}
-			catch (std::exception const&)
+			catch (const std::exception&)
 			{
-				throw TestException(std::string("Exception"), gen.Name(), std::string("The generator has thrown an exception! -RS1"));
+				throw TestException(std::string("Stress"), gen.Name(), std::string("The generator has thrown an exception! -AS1"));
 			}
 		}
 	}

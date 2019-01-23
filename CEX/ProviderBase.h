@@ -68,28 +68,28 @@ public:
 	const bool IsAvailable() override;
 
 	/// <summary>
-	/// Read Only: The provider class name
+	/// Read Only: The providers class name
 	/// </summary>
 	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
+	/// Get a pseudo-random unsigned 16bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
 	ushort NextUInt16() override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
+	/// Get a pseudo-random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
 	uint NextUInt32() override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 64bit integer
+	/// Get a pseudo-random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>

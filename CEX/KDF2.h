@@ -42,7 +42,7 @@ using Enumeration::SHA2Digests;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Generate an array of pseudo random bytes:</description>
+/// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
 /// // set to 10,000 rounds (default: 4000)
 /// KDF2 kdf(Enumeration::Digests::SHA256);
@@ -55,7 +55,7 @@ using Enumeration::SHA2Digests;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>KDF2 uses a hash digest as a pseudo random function to produce pseudo-random output in a process known as key stretching. \n
+/// <para>KDF2 uses a hash digest as a pseudo-random function to produce pseudo-random output in a process known as key stretching. \n
 /// Using the same input key, and optional salt and information strings, produces the exact same output. \n
 /// It is recommended that a salt value is added along with the key, this mitigates some attacks against the function.</para>
 /// 
@@ -180,7 +180,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo random bytes
+	/// Generate a block of pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>
@@ -191,7 +191,7 @@ public:
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo random bytes using offset and length parameters
+	/// Generate pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>

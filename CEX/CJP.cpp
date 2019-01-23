@@ -98,7 +98,7 @@ void CJP::Generate(std::vector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(m_pvdState, Output.data(), Output.size());
+	GetRandom(m_pvdState, Output.data(), Output.size());
 }
 
 void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -116,7 +116,7 @@ void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(m_pvdState, Output.data() + Offset, Length);
+	GetRandom(m_pvdState, Output.data() + Offset, Length);
 }
 
 void CJP::Generate(SecureVector<byte> &Output)
@@ -130,7 +130,7 @@ void CJP::Generate(SecureVector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(m_pvdState, Output.data(), Output.size());
+	GetRandom(m_pvdState, Output.data(), Output.size());
 }
 
 void CJP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
@@ -148,7 +148,7 @@ void CJP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(m_pvdState, Output.data() + Offset, Length);
+	GetRandom(m_pvdState, Output.data() + Offset, Length);
 }
 
 void CJP::Reset()
@@ -173,7 +173,7 @@ bool CJP::FipsTest()
 
 	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
 
-	GetEntropy(m_pvdState, smp.data(), smp.size());
+	GetRandom(m_pvdState, smp.data(), smp.size());
 
 	if (!m_pvdSelfTest.SelfTest(smp))
 	{
@@ -221,7 +221,7 @@ void CJP::FoldTime(std::unique_ptr<JitterState> &State, ulong TimeStamp)
 }
 CEX_OPTIMIZE_RESUME
 
-void CJP::GetEntropy(std::unique_ptr<JitterState> &State)
+void CJP::GetRandom(std::unique_ptr<JitterState> &State)
 {
 	size_t k;
 
@@ -246,7 +246,7 @@ void CJP::GetEntropy(std::unique_ptr<JitterState> &State)
 	}
 }
 
-void CJP::GetEntropy(std::unique_ptr<JitterState> &State, byte* Output, size_t Length)
+void CJP::GetRandom(std::unique_ptr<JitterState> &State, byte* Output, size_t Length)
 {
 	size_t i;
 	size_t poff;
@@ -255,7 +255,7 @@ void CJP::GetEntropy(std::unique_ptr<JitterState> &State, byte* Output, size_t L
 
 	do
 	{
-		GetEntropy(State);
+		GetRandom(State);
 
 		const size_t RMDLEN = (Length > sizeof(ulong)) ? sizeof(ulong) : Length;
 
@@ -271,7 +271,7 @@ void CJP::GetEntropy(std::unique_ptr<JitterState> &State, byte* Output, size_t L
 
 	if (State->SecureCache)
 	{
-		GetEntropy(State);
+		GetRandom(State);
 	}
 }
 
@@ -366,7 +366,7 @@ std::unique_ptr<CJP::JitterState> CJP::Prime()
 	}
 
 	// fill the state with non-zero values
-	GetEntropy(state);
+	GetRandom(state);
 
 	return state;
 }
@@ -490,8 +490,7 @@ bool CJP::TimerCheck(std::unique_ptr<JitterState> &State)
 		olddelta = delta;
 	}
 
-	// we allow up to three times the time running backwards. CLOCK_REALTIME is affected by adjtime and NTP operations
-	// Thus, if such an operation just happens to interfere with our test, it should not fail. The value of 3 should cover the NTP case being performed during our test run
+	// we allow up to three times the time running backwards to account for ntp
 	if (3 >= backctr && sumdelta > 1 && ((LOOP_TEST_COUNT / 10) * 9) >= modctr)
 	{
 		result = true;

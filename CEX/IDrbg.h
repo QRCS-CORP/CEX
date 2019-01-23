@@ -123,7 +123,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo random bytes
+	/// Generate a block of pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>
@@ -133,7 +133,7 @@ public:
 	virtual size_t Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Generate pseudo random bytes using offset and length parameters
+	/// Generate pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>

@@ -44,7 +44,7 @@ using Enumeration::Providers;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Generate an array of pseudo random bytes:</description>
+/// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
 /// CSG gen(ShakeModes::SHAKE256, [Providers::CSP]);
 /// // initialize
@@ -246,7 +246,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo random bytes
+	/// Generate a block of pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>
@@ -258,7 +258,7 @@ public:
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo random bytes using offset and length parameters
+	/// Generate pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>

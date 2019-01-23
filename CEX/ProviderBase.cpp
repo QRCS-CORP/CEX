@@ -43,36 +43,39 @@ const std::string ProviderBase::Name()
 
 ushort ProviderBase::NextUInt16()
 {
-	ushort x = 0;
+	ushort x;
 	SecureVector<byte> smp(sizeof(ushort));
 
+	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(ushort));
-	MemoryTools::Clear(smp, 0, smp.size());
+	Clear(smp);
 
 	return x;
 }
 
 uint ProviderBase::NextUInt32()
 {
-	uint x = 0;
+	uint x;
 	SecureVector<byte> smp(sizeof(uint));
 
+	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint));
-	MemoryTools::Clear(smp, 0, smp.size());
+	Clear(smp);
 
 	return x;
 }
 
 ulong ProviderBase::NextUInt64()
 {
-	ulong x = 0;
+	ulong x;
 	SecureVector<byte> smp(sizeof(ulong));
 
+	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(ulong));
-	MemoryTools::Clear(smp, 0, smp.size());
+	Clear(smp);
 
 	return x;
 }

@@ -56,7 +56,7 @@ void ACP::Generate(std::vector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output, 0, Output.size(), m_kdfGenerator);
+	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
 }
 
 void ACP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -74,7 +74,7 @@ void ACP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output, Offset, Length, m_kdfGenerator);
+	GetRandom(Output, Offset, Length, m_kdfGenerator);
 }
 
 void ACP::Generate(SecureVector<byte> &Output)
@@ -88,10 +88,7 @@ void ACP::Generate(SecureVector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	std::vector<byte> smp(Output.size());
-	m_kdfGenerator->Generate(smp, 0, smp.size());
-	MemoryTools::Copy(smp, 0, Output, 0, Output.size());
-	MemoryTools::Clear(smp, 0, smp.size());
+	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
 }
 
 void ACP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
@@ -109,10 +106,7 @@ void ACP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	std::vector<byte> smp(Output.size());
-	m_kdfGenerator->Generate(smp, 0, smp.size());
-	MemoryTools::Copy(smp, 0, Output, 0, Output.size());
-	MemoryTools::Clear(smp, 0, smp.size());
+	GetRandom(Output, Offset, Length, m_kdfGenerator);
 }
 
 void ACP::Reset()
@@ -157,13 +151,13 @@ std::vector<byte> ACP::Collect()
 	ArrayTools::AppendValue(ts, state);
 
 	// add system state and mix in timer delta
-	ArrayTools::Append(MemoryInfo(), state);
+	ArrayTools::AppendVector(MemoryInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(ProcessInfo(), state);
+	ArrayTools::AppendVector(ProcessInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(SystemInfo(), state);
+	ArrayTools::AppendVector(SystemInfo(), state);
 	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
-	ArrayTools::Append(TimeInfo(), state);
+	ArrayTools::AppendVector(TimeInfo(), state);
 
 	// filter zeroes
 	Filter(state);
@@ -175,8 +169,7 @@ std::vector<byte> ACP::Collect()
 	{
 		RDP rpv;
 		rpv.Generate(buffer);
-		ArrayTools::Append(buffer, state);
-		ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+		ArrayTools::AppendVector(buffer, state);
 	}
 
 	// add jitter block
@@ -184,8 +177,7 @@ std::vector<byte> ACP::Collect()
 	{
 		CJP jpv;
 		jpv.Generate(buffer);
-		ArrayTools::Append(buffer, state);
-		ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+		ArrayTools::AppendVector(buffer, state);
 	}
 
 	return state;
@@ -221,7 +213,7 @@ bool ACP::FipsTest()
 	std::vector<byte> tmp(m_pvdSelfTest.SELFTEST_LENGTH);
 	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
 
-	GetEntropy(tmp, 0, tmp.size(), m_kdfGenerator);
+	GetRandom(tmp, 0, tmp.size(), m_kdfGenerator);
 	MemoryTools::Copy(tmp, 0, smp, 0, smp.size());
 	MemoryTools::Clear(tmp, 0, tmp.size());
 
@@ -235,9 +227,18 @@ bool ACP::FipsTest()
 	return (fail == false);
 }
 
-void ACP::GetEntropy(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+void ACP::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
 {
 	Generator->Generate(Output, Offset, Length);
+}
+
+void ACP::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+{
+	std::vector<byte> smp(Length);
+
+	Generator->Generate(smp, 0, Length);
+	Insert(smp, 0, Output, Offset, Length);
+	Clear(smp);
 }
 
 std::vector<byte> ACP::MemoryInfo()
@@ -348,7 +349,7 @@ std::vector<byte> ACP::ProcessInfo()
 
 	try
 	{
-		ArrayTools::Append(SystemTools::ProcessEntries(), state);
+		ArrayTools::AppendVector(SystemTools::ProcessEntries(), state);
 	}
 	catch (std::exception&)
 	{

@@ -45,11 +45,7 @@ enum class Prngs : byte
 	/// <summary>
 	/// An HMAC based random number generator using SHA512
 	/// </summary>
-	HCRS512 = 8,
-	/// <summary>
-	/// An implementation of a passphrase based PKCS#5 random number generator
-	/// </summary>
-	PBR = 9
+	HCRS512 = 8
 };
 
 NAMESPACE_ENUMERATIONEND

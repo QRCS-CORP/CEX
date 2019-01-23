@@ -284,10 +284,10 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		// generate the mac key
 		std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 		gen.Generate(mack);
-		// store the key
-		m_macKey.assign(mack.begin(), mack.end());
 		// initailize the mac
 		m_macAuthenticator->Initialize(SymmetricKey(mack));
+		// store the key
+		m_macKey = LockClear(mack);
 	}
 
 	m_isEncryption = Encryption;
@@ -426,13 +426,13 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 
 	// extract the new mac key
 	Kdf::SHAKE gen(ShakeModes::SHAKE512);
-	gen.Initialize(AllocatorTools::ToVector(m_macKey), m_cShakeCustom);
+	gen.Initialize(UnlockClear(m_macKey), m_cShakeCustom);
 	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	gen.Generate(mack);
-	// store the key
-	m_macKey.assign(mack.begin(), mack.end());
 	// reset the generator with the new key
 	m_macAuthenticator->Initialize(SymmetricKey(mack));
+	// store the key
+	m_macKey = LockClear(mack);
 }
 
 void ChaCha512::Generate(std::vector<byte> &Output, const size_t OutOffset, std::array<uint, 2> &Counter, const size_t Length)

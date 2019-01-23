@@ -48,7 +48,7 @@ using Kdf::IKdf;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Generate an array of pseudo random bytes:</description>
+/// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
 /// BCG rng(BlockCiphers::RHX, Digests::SHA512, [Providers::CSP]);
 /// // initialize
@@ -190,7 +190,7 @@ public:
 	/// Instantiate the class using a block cipher instance and an optional entropy source
 	/// </summary>
 	/// 
-	/// <param name="Cipher">The block cipher instance, acting as the primary pseudo random function</param>
+	/// <param name="Cipher">The block cipher instance, acting as the primary pseudo-random function</param>
 	/// <param name="Kdf">The [optional] KDF instance used by the key extraction function.
 	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
 	/// <param name="Provider">The [optional] entropy source, enabling predictive resistance; can be set to nullptr.
@@ -298,7 +298,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo random bytes
+	/// Generate a block of pseudo-random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>
@@ -310,7 +310,7 @@ public:
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo random bytes using offset and length parameters
+	/// Generate pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
 	/// <param name="Output">Output array filled with random bytes</param>

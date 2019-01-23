@@ -19,28 +19,26 @@
 #ifndef CEX_HCR_H
 #define CEX_HCR_H
 
-#include "IPrng.h"
-#include "HCG.h"
-#include "Digests.h"
-#include "Providers.h"
+#include "PrngBase.h"
+#include "IDrbg.h"
 #include "Providers.h"
 #include "SHA2Digests.h"
 
 NAMESPACE_PRNG
 
-using Enumeration::Digests;
+using Drbg::IDrbg;
 using Enumeration::Providers;
 using Enumeration::SHA2Digests;
 
 /// <summary>
-/// An implementation of an HMAC Counter PRNG.
-/// <para>Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</para>
+/// An implementation of an HMAC Counter mode PRNG.
+/// <para>Uses a keyed SHA2 HMAC run in counter mode to generate pseudo-random output..</para>
 /// </summary> 
 /// 
 /// <example>
-/// <description>Example of generating a pseudo random integer:</description>
+/// <description>Example of generating a pseudo-random integer:</description>
 /// <code>
-/// HCR rnd([Digests], [Providers], [Buffer Size]);
+/// HCR rnd([SHA2Digests], [Providers], [Buffer Size]);
 /// int num = rnd.NextUInt32([Minimum], [Maximum]);
 /// </code>
 /// </example>
@@ -48,10 +46,9 @@ using Enumeration::SHA2Digests;
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Wraps the Digest Counter mode Generator (HCG) drbg implementation.</description></item>
-/// <item><description>Can be initialized with any of the implemented hash digests.</description></item>
-/// <item><description>Can use either a random seed generator for initialization, or a user supplied Seed array.</description></item>
-/// <item><description>Numbers generated with the same seed will produce the same random output.</description></item>
+/// <item><description>Wraps the Digest Counter mode Generator (HCG) DRBG implementation.</description></item>
+/// <item><description>Can be initialized with any of the implemented SHA2 digests.</description></item>
+/// <item><description>Uses an internal entropy provider to seed the underlying DRBG.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -64,21 +61,17 @@ using Enumeration::SHA2Digests;
 /// </list>
 /// 
 /// </remarks>
-class HCR final : public IPrng
+class HCR final : public PrngBase
 {
 private:
 	static const size_t BUFFER_SIZE = 1024;
 	static const size_t MIN_BUFLEN = 64;
 	static const std::string CLASS_NAME;
 
-	size_t m_bufferIndex;
-	size_t m_bufferSize;
 	SHA2Digests m_digestType;
 	bool m_isDestroyed;
 	Providers m_pvdType;
-	std::vector<byte> m_rndSeed;
-	std::vector<byte> m_rngBuffer;
-	std::unique_ptr<Drbg::HCG> m_rngGenerator;
+	std::unique_ptr<IDrbg> m_rngGenerator;
 
 public:
 
@@ -98,23 +91,11 @@ public:
 	/// Initialize the class with parameters
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The digest that powers the rng (default is SHA512)</param>
-	/// <param name="SeedEngine">The Seed engine used to create the salt (default is auto-seed)</param>
-	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
+	/// <param name="DigestType">The digest that powers the rng; default is SHA512</param>
+	/// <param name="ProviderType">The random provider used to create keyng material; default is ACP</param>
 	/// 
-	/// <exception cref="CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	HCR(SHA2Digests DigestType = SHA2Digests::SHA512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
-
-	/// <summary>
-	/// Initialize the class with a Seed; note: the same seed will produce the same random output
-	/// </summary>
-	/// 
-	/// <param name="Seed">The Seed bytes used to initialize the digest counter; (min. length is digest blocksize + 8)</param>
-	/// <param name="DigestType">The digest that powers the rng (default is SHA512)</param>
-	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
-	/// 
-	/// <exception cref="CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
-	explicit HCR(std::vector<byte> Seed, SHA2Digests DigestType = SHA2Digests::SHA512, size_t BufferSize = 1024);
+	/// <exception cref="CryptoRandomException">Thrown if the digest or provider type is invalid</exception>
+	HCR(SHA2Digests DigestType = SHA2Digests::SHA512, Providers SeedEngine = Providers::ACP);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -124,11 +105,6 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The random generators type name
-	/// </summary>
-	const Prngs Enumeral() override;
-
-	/// <summary>
 	/// Read Only: The random generators implementation name
 	/// </summary>
 	const std::string Name() override;
@@ -136,59 +112,52 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Return an array filled with pseudo random bytes
-	/// </summary>
-	/// 
-	/// <param name="Length">Size of requested byte array</param>
-	/// 
-	/// <returns>Random byte array</returns>
-	std::vector<byte> Generate(size_t Length) override;
-
-	/// <summary>
-	/// Fill the buffer with pseudo-random bytes using offsets
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The output array to fill</param>
-	/// <param name="Offset">The starting position within the Output array</param>
-	/// <param name="Length">The number of bytes to write to the Output array</param>
-	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
-
-	/// <summary>
-	/// Fill an array with pseudo random bytes
-	/// </summary>
-	///
-	/// <param name="Output">Output array</param>
+	/// <param name="Output">The destination standard vector to fill</param>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
+	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
-	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUInt16() override;
+	///
+	/// <param name="Output">The destination standard vector to fill</param>
+	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
+	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
+	///
+	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Offset">The starting position within the destination vector</param>
+	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint NextUInt32() override;
+	/// <exception cref="CryptoRandomException">Thrown if the output array is too small</exception>
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Get a pseudo random unsigned 64bit integer
+	/// Fill a SecureVector with pseudo-random bytes using offset and length parameters
 	/// </summary>
+	///
+	/// <param name="Output">The destination SecureVector to fill</param>
+	/// <param name="Offset">The starting position within the destination vector</param>
+	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextUInt64() override;
+	/// <exception cref="CryptoRandomException">Thrown if the output array is too small</exception>
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Reset the generator instance
 	/// </summary>
+	/// 
+	/// <exception cref="CryptoRandomException">Thrown if the random provider can not be instantiated</exception>
 	void Reset() override;
 
 private:
 
-	uint GetMinimumSeedSize(SHA2Digests RngEngine);
+	static void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	static void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
 };
 
 NAMESPACE_PRNGEND

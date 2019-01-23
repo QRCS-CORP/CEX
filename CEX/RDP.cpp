@@ -43,7 +43,7 @@ void RDP::Generate(std::vector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data(), Output.size(), m_randType);
+	GetRandom(Output.data(), Output.size(), m_randType);
 }
 
 void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -65,7 +65,7 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data() + Offset, Length, m_randType);
+	GetRandom(Output.data() + Offset, Length, m_randType);
 }
 
 void RDP::Generate(SecureVector<byte> &Output)
@@ -83,7 +83,7 @@ void RDP::Generate(SecureVector<byte> &Output)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data(), Output.size(), m_randType);
+	GetRandom(Output.data(), Output.size(), m_randType);
 }
 
 void RDP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
@@ -105,7 +105,7 @@ void RDP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetEntropy(Output.data() + Offset, Length, m_randType);
+	GetRandom(Output.data() + Offset, Length, m_randType);
 }
 
 void RDP::Reset()
@@ -147,7 +147,7 @@ bool RDP::FipsTest()
 
 	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
 
-	GetEntropy(smp.data(), smp.size(), m_randType);
+	GetRandom(smp.data(), smp.size(), m_randType);
 
 	if (!m_pvdSelfTest.SelfTest(smp))
 	{
@@ -159,7 +159,7 @@ bool RDP::FipsTest()
 	return (fail == false);
 }
 
-void RDP::GetEntropy(byte* Output, size_t Length, DrandEngines DrandType)
+void RDP::GetRandom(byte* Output, size_t Length, DrandEngines DrandType)
 {
 	size_t fctr;
 	size_t i;

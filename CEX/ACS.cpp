@@ -255,10 +255,10 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		// generate the mac key
 		std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 		gen.Generate(mack);
-		// store the key
-		m_macKey.assign(mack.begin(), mack.end());
 		// initailize the mac
 		m_macAuthenticator->Initialize(SymmetricKey(mack));
+		// store the key
+		m_macKey = LockClear(mack);
 	}
 
 	m_isEncryption = Encryption;
@@ -368,13 +368,13 @@ void ACS::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 
 	// extract the new mac key
 	Kdf::SHAKE gen(m_expansionMode);
-	gen.Initialize(AllocatorTools::ToVector(m_macKey), m_cShakeCustom);
+	gen.Initialize(UnlockClear(m_macKey), m_cShakeCustom);
 	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	gen.Generate(mack);
-	// store the key
-	m_macKey.assign(mack.begin(), mack.end());
 	// reset the generator with the new key
 	m_macAuthenticator->Initialize(SymmetricKey(mack));
+	// store the key
+	m_macKey = LockClear(mack);
 }
 
 void ACS::Reset()

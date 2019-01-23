@@ -1,14 +1,13 @@
-#include "SecureVector.h"
+#include "LockingAllocator.h"
 #include "SecureMemory.h"
 #include <cstdlib>
 #include <memory>
 
-NAMESPACE_ROOT
+NAMESPACE_UTILITY
 
 using Exception::CryptoException;
 using Enumeration::ErrorCodes;
-
-const std::string AllocatorTools::CLASS_NAME("SecureVector");
+using Utility::MemoryPool;
 
 //~~~LockingAllocator~~~//
 
@@ -81,9 +80,7 @@ bool LockingAllocator::deallocate(void* Pointer, size_t Elements, size_t Element
 	return ret;
 }
 
-//~~~AllocatorTools~~~//
-
-CEX_MALLOC_FN void* AllocatorTools::Allocate(size_t Elements, size_t ElementSize)
+CEX_MALLOC_FN void* LockingAllocator::Allocate(size_t Elements, size_t ElementSize)
 {
 	void* ptr;
 
@@ -99,14 +96,14 @@ CEX_MALLOC_FN void* AllocatorTools::Allocate(size_t Elements, size_t ElementSize
 
 		if (ptr == nullptr)
 		{
-			throw CryptoException(CLASS_NAME, std::string("Allocate"), std::string("Memory allocation has failed!"), ErrorCodes::IllegalOperation);
+			throw CryptoException(std::string("LockingAllocator"), std::string("Allocate"), std::string("Memory allocation has failed!"), ErrorCodes::IllegalOperation);
 		}
 	}
 
 	return ptr;
 }
 
-void AllocatorTools::Deallocate(void* Pointer, size_t Elements, size_t ElementSize)
+void LockingAllocator::Deallocate(void* Pointer, size_t Elements, size_t ElementSize)
 {
 	if (Pointer != nullptr)
 	{
@@ -129,4 +126,4 @@ void AllocatorTools::Deallocate(void* Pointer, size_t Elements, size_t ElementSi
 	}
 }
 
-NAMESPACE_ROOTEND
+NAMESPACE_UTILITYEND

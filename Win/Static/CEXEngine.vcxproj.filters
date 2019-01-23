@@ -298,6 +298,12 @@
     <Filter Include="Header Files\Provider\Base">
       <UniqueIdentifier>{e3221aa5-734e-4dbc-8a72-ac394ae73318}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Prng\Base">
+      <UniqueIdentifier>{43839cf4-56ee-413a-9f58-6ed7c79d618b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Prng\Base">
+      <UniqueIdentifier>{1d402a83-b6bc-4c40-b3d5-0e70b372f45a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -663,9 +669,6 @@
     <ClInclude Include="..\..\CEX\ACP.h">
       <Filter>Header Files\Provider</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\PBR.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\BCG.h">
       <Filter>Header Files\Drbg</Filter>
     </ClInclude>
@@ -945,6 +948,12 @@
     <ClInclude Include="..\..\CEX\ProviderSelfTest.h">
       <Filter>Header Files\Provider\Base</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\LockingAllocator.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PrngBase.h">
+      <Filter>Header Files\Prng\Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1160,9 +1169,6 @@
     <ClCompile Include="..\..\CEX\ACP.cpp">
       <Filter>Source Files\Provider</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\PBR.cpp">
-      <Filter>Source Files\Prng</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\BCG.cpp">
       <Filter>Source Files\Drbg</Filter>
     </ClCompile>
@@ -1307,9 +1313,6 @@
     <ClCompile Include="..\..\CEX\ZeroOne.cpp">
       <Filter>Source Files\Cipher\Block\Padding</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\SecureVector.cpp">
-      <Filter>Source Files\Common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\MemoryPool.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -1351,6 +1354,12 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\ProviderSelfTest.cpp">
       <Filter>Source Files\Provider\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\LockingAllocator.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PrngBase.cpp">
+      <Filter>Source Files\Prng\Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
