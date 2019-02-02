@@ -36,5 +36,28 @@ enum class PaddingModes : byte
 	ZeroOne = 5
 };
 
+class PaddingModeConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the PaddingModes formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The PaddingModes enumeration member</param>
+	///
+	/// <returns>The matching PaddingModes string name</returns>
+	static std::string ToName(PaddingModes Enumeral);
+
+	/// <summary>
+	/// Derive the PaddingModes enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The PaddingModes string name</param>
+	///
+	/// <returns>The matching PaddingModes enumeration type name</returns>
+	static PaddingModes FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif

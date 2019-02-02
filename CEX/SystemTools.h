@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -79,6 +79,7 @@ private:
 	static const int CEX_VERSION_PATCH = 0;
 	static const int CEX_VERSION_RELEASE = 4;
 
+	static bool HAS_RDRAND;
 	static bool TMR_RDTSC;
 
 public:

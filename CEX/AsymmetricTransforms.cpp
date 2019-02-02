@@ -1,0 +1,129 @@
+#include "AsymmetricTransforms.h"
+
+NAMESPACE_ENUMERATION
+
+std::string AsymmetricTransformConvert::ToName(AsymmetricTransforms Enumeral)
+{
+	std::string name("");
+
+	switch (Enumeral)
+	{
+	case AsymmetricTransforms::DLMS1256Q8380417:
+		name = std::string("DLMS1256Q8380417");
+		break;
+	case AsymmetricTransforms::DLMS2N256Q8380417:
+		name = std::string("DLMS2N256Q8380417");
+		break;
+	case AsymmetricTransforms::DLMS3N256Q8380417:
+		name = std::string("DLMS3N256Q8380417");
+		break;
+	case AsymmetricTransforms::MLWES2Q7681N256:
+		name = std::string("MLWES2Q7681N256");
+		break;
+	case AsymmetricTransforms::MLWES3Q7681N256:
+		name = std::string("MLWES3Q7681N256");
+		break;
+	case AsymmetricTransforms::MLWES4Q7681N256:
+		name = std::string("MLWES4Q7681N256");
+		break;
+	case AsymmetricTransforms::MPKCS1M12T62:
+		name = std::string("MPKCS1M12T62");
+		break;
+	case AsymmetricTransforms::NTRUS1LQ4591N761:
+		name = std::string("NTRUS1LQ4591N761");
+		break;
+	case AsymmetricTransforms::NTRUS2SQ4591N761:
+		name = std::string("NTRUS2SQ4591N761");
+		break;
+	case AsymmetricTransforms::RLWES1Q12289N1024:
+		name = std::string("RLWES1Q12289N1024");
+		break;
+	case AsymmetricTransforms::RLWES2Q12289N2048:
+		name = std::string("RLWES2Q12289N2048");
+		break;
+	case AsymmetricTransforms::SPXS128F256:
+		name = std::string("SPXS128F256");
+		break;
+	case AsymmetricTransforms::SPXS256F256:
+		name = std::string("SPXS256F256");
+		break;
+	case AsymmetricTransforms::SPXS512F256:
+		name = std::string("SPXS512F256");
+		break;
+	default:
+		name = std::string("None");
+		break;
+	}
+
+	return name;
+}
+
+AsymmetricTransforms AsymmetricTransformConvert::FromName(std::string &Name)
+{
+	AsymmetricTransforms tname;
+
+	if (Name == std::string("DLMS1256Q8380417"))
+	{
+		tname = AsymmetricTransforms::DLMS1256Q8380417;
+	}
+	else if (Name == std::string("DLMS2N256Q8380417"))
+	{
+		tname = AsymmetricTransforms::DLMS2N256Q8380417;
+	}
+	else if (Name == std::string("DLMS3N256Q8380417"))
+	{
+		tname = AsymmetricTransforms::DLMS3N256Q8380417;
+	}
+	else if (Name == std::string("MLWES2Q7681N256"))
+	{
+		tname = AsymmetricTransforms::MLWES2Q7681N256;
+	}
+	else if (Name == std::string("MLWES3Q7681N256"))
+	{
+		tname = AsymmetricTransforms::MLWES3Q7681N256;
+	}
+	else if (Name == std::string("MLWES4Q7681N256"))
+	{
+		tname = AsymmetricTransforms::MLWES4Q7681N256;
+	}
+	else if (Name == std::string("MPKCS1M12T62"))
+	{
+		tname = AsymmetricTransforms::MPKCS1M12T62;
+	}
+	else if (Name == std::string("NTRUS1LQ4591N761"))
+	{
+		tname = AsymmetricTransforms::NTRUS1LQ4591N761;
+	}
+	else if (Name == std::string("NTRUS2SQ4591N761"))
+	{
+		tname = AsymmetricTransforms::NTRUS2SQ4591N761;
+	}
+	else if (Name == std::string("RLWES1Q12289N1024"))
+	{
+		tname = AsymmetricTransforms::RLWES1Q12289N1024;
+	}
+	else if (Name == std::string("RLWES2Q12289N2048"))
+	{
+		tname = AsymmetricTransforms::RLWES2Q12289N2048;
+	}
+	else if (Name == std::string("SPXS128F256"))
+	{
+		tname = AsymmetricTransforms::SPXS128F256;
+	}
+	else if (Name == std::string("SPXS256F256"))
+	{
+		tname = AsymmetricTransforms::SPXS256F256;
+	}
+	else if (Name == std::string("SPXS512F256"))
+	{
+		tname = AsymmetricTransforms::SPXS512F256;
+	}
+	else
+	{
+		tname = AsymmetricTransforms::None;
+	}
+
+	return tname;
+}
+
+NAMESPACE_ENUMERATIONEND

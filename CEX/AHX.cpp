@@ -107,7 +107,7 @@ const size_t AHX::DistributionCodeMax()
 
 const BlockCiphers AHX::Enumeral()
 {
-	return (m_cprExtension == BlockCipherExtensions::None) ? BlockCiphers::Rijndael : BlockCiphers::AHX;
+	return BlockCiphers::AES;
 }
 
 const bool AHX::IsEncryption()
@@ -279,7 +279,7 @@ void AHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 	}
 	else
 	{
-		// standard rijndael key expansion + k512
+		// standard rijndael key expansion
 		StandardExpand(Key);
 	}
 
@@ -312,7 +312,8 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	// salt is not used
 	std::vector<byte> salt(0);
 	// initialize the generator
-	m_kdfGenerator->Initialize(Key, salt, m_distCode);
+	SymmetricKey kp(Key, salt, m_distCode);
+	m_kdfGenerator->Initialize(kp);
 	// generate the keying material
 	m_kdfGenerator->Generate(rawKey);
 	// initialize round-key array

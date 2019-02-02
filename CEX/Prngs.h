@@ -19,33 +19,64 @@ enum class Prngs : byte
 	/// </summary>
 	BCR = 1,
 	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator using AHX/RHX and cSHAKE-256
+	/// A Symmetric Cipher Counter mode random number generator using RHX and cSHAKE-256
 	/// </summary>
 	BCRAHXS256 = 2,
 	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator using AHX/RHX and cSHAKE-512
+	/// A Symmetric Cipher Counter mode random number generator using RHX and cSHAKE-512
 	/// </summary>
 	BCRAHXS512 = 3,
 	/// <summary>
+	/// A Symmetric Cipher Counter mode random number generator using Serpent and cSHAKE-256
+	/// </summary>
+	BCRSHXS256 = 4,
+	/// <summary>
+	/// A Symmetric Cipher Counter mode random number generator using Serpent and cSHAKE-512
+	/// </summary>
+	BCRSHXS512 = 5,
+	/// <summary>
 	/// A SHAKE based random number generator using cSHAKE-256
 	/// </summary>
-	CSR = 4,
+	CSR = 6,
 	/// <summary>
 	/// A SHAKE based random number generator using cSHAKE-512
 	/// </summary>
-	CSRC512 = 5,
+	CSRC512 = 7,
 	/// <summary>
 	/// A SHAKE based random number generator using cSHAKE-1024
 	/// </summary>
-	CSRC1024 = 6,
+	CSRC1024 = 8,
 	/// <summary>
 	/// An HMAC based random number generator using SHA256
 	/// </summary>
-	HCR = 7,
+	HCR = 9,
 	/// <summary>
 	/// An HMAC based random number generator using SHA512
 	/// </summary>
-	HCRS512 = 8
+	HCRS512 = 10
+};
+
+class PrngConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the Prngs formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The Prngs enumeration member</param>
+	///
+	/// <returns>The matching Prngs string name</returns>
+	static std::string ToName(Prngs Enumeral);
+
+	/// <summary>
+	/// Derive the Prngs enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The Prngs string name</param>
+	///
+	/// <returns>The matching Prngs enumeration type name</returns>
+	static Prngs FromName(std::string &Name);
 };
 
 NAMESPACE_ENUMERATIONEND

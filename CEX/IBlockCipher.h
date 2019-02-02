@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -26,7 +26,9 @@
 #include "ErrorCodes.h"
 #include "IKdf.h"
 #include "ISymmetricKey.h"
+#include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
+#include "SymmetricSecureKey.h"
 
 NAMESPACE_BLOCK
 
@@ -36,7 +38,9 @@ using Exception::CryptoSymmetricCipherException;
 using Enumeration::ErrorCodes;
 using Kdf::IKdf;
 using Cipher::ISymmetricKey;
+using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
+using Cipher::SymmetricSecureKey;
 
 /// <summary>
 /// The Block Cipher Interface class

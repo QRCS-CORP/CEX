@@ -111,7 +111,7 @@ const size_t SHX::DistributionCodeMax()
 
 const BlockCiphers SHX::Enumeral()
 {
-	return (m_cprExtension == BlockCipherExtensions::None) ? BlockCiphers::Serpent : BlockCiphers::SHX;
+	return BlockCiphers::Serpent;
 }
 
 const bool SHX::IsEncryption()
@@ -298,7 +298,8 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 	// salt is not used
 	std::vector<byte> salt(0);
 	// initialize the generator
-	m_kdfGenerator->Initialize(Key, salt, m_distCode);
+	SymmetricKey kp(Key, salt, m_distCode);
+	m_kdfGenerator->Initialize(kp);
 	// generate the keying material
 	m_kdfGenerator->Generate(rawKey);
 	// initialize round-key array

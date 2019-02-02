@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -16,18 +16,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
-// Implementation Details:
-// An implementation of the Scrypt Derivation Function (SCRYPT) written by Colin Percival.
-// Written by John Underhill, March 24, 2017// Updated April 19, 2017
+// Updated by January 28, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_SCRYPT_H
 #define CEX_SCRYPT_H
 
-#include "IKdf.h"
 #include "Digests.h"
 #include "IDigest.h"
+#include "KdfBase.h"
 #include "ParallelOptions.h"
 #include "SHA2Digests.h"
 
@@ -56,10 +53,10 @@ using Enumeration::SHA2Digests;
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>SCRYPT is a password-based key derivation function created by Colin Percival, originally for the Tarsnap online backup service. \n
-/// SCRYPT uses a combination of a message digest and the Salsa stream cipher to make it costly to perform large-scale hardware attacks by requiring large amounts of memory
+/// SCRYPT uses a combination of an underlying message digest and the Salsa stream cipher permutation function to make it costly to perform large-scale hardware attacks by requiring large amounts of memory
 /// to generate an output key. \n
-/// Using the same input key, and optional salt, produces the exact same output. \n
-/// It is recommended that a salt value is added along with the key.</para>
+/// Using the same input key, and optional salt, will produce the exact same output. \n
+/// It is recommended that a salt value is added along with the key, this strongly mitigates rainbow-table based attacks on the passphrase.</para>
 /// 
 /// <description><B>Description:</B></description> \n
 /// <EM>Legend:</EM> \n
@@ -73,11 +70,12 @@ using Enumeration::SHA2Digests;
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
 /// <item><description>This implementation only supports the SHA2-256 and SHA2-512 message digests.</description></item>
-/// <item><description>Class can be initialized with a message digest instance, or by using a digests enumeration type name.</description></item>
-/// <item><description>The minimum key size is the size the digests return array in bytes, a key equal to the digests block size is recommended.</description></item>
+/// <item><description>SCRYPT can be initialized with a message digest instance, or by using a digests enumeration type name.</description></item>
+/// <item><description>The minimum recommended key size is the size the underlying digests output-size in bytes.</description></item>
 /// <item><description>The use of a salt value can strongly mitigate some attack vectors targeting the key, and is highly recommended with SCRYPT.</description></item>
-/// <item><description>The minimum salt size is 4 bytes, larger (pseudo-random) salt values are more secure.</description></item>
-/// <item><description>The generator must be initialized with a key using one of the Initialize() functions before output can be generated.</description></item>
+/// <item><description>The minimum salt size is 4 bytes, however larger pseudo-random salt values are more secure.</description></item>
+/// <item><description>The generator must be initialized with a key using the Initialize() functions before output can be generated.</description></item>
+/// <item><description>The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material.</description></item>
 /// </list>
 /// 
 /// <description><B>Guiding Publications:</B></description>
@@ -87,44 +85,26 @@ using Enumeration::SHA2Digests;
 /// <item><description>Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a>.</description></item>
 /// </list>
 /// </remarks>
-class SCRYPT final : public IKdf
+class SCRYPT final : public KdfBase
 {
 private:
 
-	struct ScryptParameters
-	{
-		size_t CpuCost;
-		size_t Parallelization;
+	static const size_t MAXGEN_REQUESTS = 1024000;
+	static const size_t MEMORY_COST = 8;
+#if defined(CEX_ENFORCE_KEYMIN)
 
-		ScryptParameters(size_t Cost, size_t Parallel)
-			:
-			CpuCost(Cost),
-			Parallelization(Parallel)
-		{
-		}
+#else
 
-		void Reset()
-		{
-			CpuCost = 0;
-			Parallelization = 0;
-		}
-	};
+#endif
+	static const size_t MINKEY_LENGTH = 6;
+	static const size_t MINSALT_LENGTH = 4;
 
-	static const std::string CLASS_NAME;
-	static const size_t MEM_COST = 8;
-	static const size_t MIN_PASSLEN = 6;
-	static const size_t MIN_SALTLEN = 4;
-
-	std::unique_ptr<IDigest> m_msgDigest;
-	bool m_destroyEngine;
+	class ScryptState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	Digests m_msgDigestType;
-	std::vector<byte> m_kdfKey;
-	std::vector<byte> m_kdfSalt;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
 	ParallelOptions m_parallelProfile;
-	ScryptParameters m_scryptParameters;
+	std::unique_ptr<IDigest> m_scryptGenerator;
+	std::unique_ptr<ScryptState> m_scryptState;
 
 public:
 
@@ -190,12 +170,7 @@ public:
 	size_t &CpuCost();
 
 	/// <summary>
-	/// Read Only: The Kdf generators type name
-	/// </summary>
-	const Kdfs Enumeral() override;
-
-	/// <summary>
-	/// Read Only: Generator is ready to produce random
+	/// Read Only: Generator is initialized and ready to produce pseudo-random
 	/// </summary>
 	const bool IsInitialized() override;
 
@@ -205,22 +180,6 @@ public:
 	/// Multi-threading and SIMD parallelization can be modified through the ParallelProfile() accessor.</para>
 	/// </summary>
 	const bool IsParallel();
-
-	/// <summary>
-	/// Minimum recommended initialization key size in bytes.
-	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
-	/// </summary>
-	const size_t MinKeySize() override;
-
-	/// <summary>
-	/// Read Only: Available Kdf Key Sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const  override;
-
-	/// <summary>
-	/// Read Only: The Kdf generators class name
-	/// </summary>
-	const std::string Name() override;
 
 	/// <summary>
 	/// The Parallelization parameter; indicates the number of threads used by the generator. 
@@ -238,103 +197,66 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo-random bytes
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <param name="Output">The destination standard vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	size_t Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo-random bytes using offset and length parameters
+	/// Fill a secure vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// <param name="OutOffset">The starting position within the Output array</param>
+	/// <param name="Output">The destination secure vector to fill</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
+	void Generate(SecureVector<byte> &Output) override;
+
+	/// <summary>
+	/// Fill an array with pseudo-random bytes, using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+
+	/// <summary>
+	/// Fill a secure vector with pseudo-random bytes, using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
+	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Initialize the generator with a SymmetricKey structure containing the key, and optional salt, and info string.
-	/// <para>The use of a salt value mitigates some attacks against a passphrase, and is highly recommended with SCRYPT.</para>
+	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 	/// </summary>
 	/// 
-	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// <param name="KeyParams">The symmetric key container with the generators keying material</param>
 	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(ISymmetricKey &GenParam) override;
+	/// <exception cref="CryptoKdfException">Thrown if the key values are not a legal size</exception>
+	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
-	/// Initialize the generator with a key.
-	/// <para>The use of a salt value mitigates some attacks against a passphrase, and is highly recommended with SCRYPT.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key) override;
-
-	/// <summary>
-	/// Initialize the generator with a key, using length and offset arguments
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Offset">The starting position within the key array</param>
-	/// <param name="Length">The number of key bytes to use</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length) override;
-
-	/// <summary>
-	/// Initialize the generator with key and salt arrays
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value containing an additional source of entropy</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
-
-	/// <summary>
-	/// Initialize the generator with a key, a salt array, and an information string or nonce
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value used as an additional source of entropy</param>
-	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
-
-	/// <summary>
-	/// Update the generators keying material
-	/// </summary>
-	///
-	/// <param name="Seed">The new seed value array</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void ReSeed(const std::vector<byte> &Seed) override;
-
-	/// <summary>
-	/// Reset the internal state; Kdf must be re-initialized before it can be used again
+	/// Reset the internal state; the generator must be re-initialized before it can be used again
 	/// </summary>
 	void Reset() override;
 
 private:
 
-	void BlockMix(std::vector<uint> &State, std::vector<uint> &Y);
-	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Key, std::vector<byte> &Salt, size_t Length);
-	void SalsaCore(std::vector<uint> &Output);
-	void Scope();
-	void SMix(std::vector<uint> &State, size_t StateOffset, size_t N);
+	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ScryptState> &State, ParallelOptions &Options, std::unique_ptr<IDigest> &Generator);
+	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ScryptState> &State, ParallelOptions &Options, std::unique_ptr<IDigest> &Generator);
+	static void Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Key, std::vector<byte> &Salt, std::unique_ptr<IDigest> &Generator);
+	static void MixBlock(std::vector<uint> &X, std::vector<uint> &Y);
+	static void MixState(std::vector<uint> &State, size_t StateOffset, size_t N);
 };
 
 NAMESPACE_KDFEND

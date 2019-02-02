@@ -7,9 +7,9 @@ NAMESPACE_PROVIDER
 
 using Utility::IntegerTools;
 using Utility::MemoryTools;
+using Enumeration::ProviderConvert;
 using Utility::SystemTools;
 
-const std::string CJP::CLASS_NAME("CJP");
 const bool CJP::TIMER_HAS_TSC = SystemTools::HasRdtsc();
 
 struct CJP::JitterState
@@ -52,15 +52,16 @@ struct CJP::JitterState
 
 CJP::CJP()
 	:
+
 #if defined(CEX_FIPS140_ENABLED)
 	m_pvdSelfTest(),
 #endif
-	ProviderBase(TIMER_HAS_TSC, Providers::CJP, CLASS_NAME),
+	ProviderBase(TIMER_HAS_TSC, Providers::CJP, ProviderConvert::ToName(Providers::CJP)),
 	m_pvdState(Prime())
 {
 	if (!TimerCheck(m_pvdState))
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("The timer evaluation check has failed!"), ErrorCodes::NotSupported);
+		throw CryptoRandomException(Name(), std::string("Constructor"), std::string("The timer evaluation check has failed!"), ErrorCodes::NotSupported);
 	}
 }
 
@@ -91,11 +92,11 @@ void CJP::Generate(std::vector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(m_pvdState, Output.data(), Output.size());
@@ -105,15 +106,15 @@ void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(m_pvdState, Output.data() + Offset, Length);
@@ -123,11 +124,11 @@ void CJP::Generate(SecureVector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(m_pvdState, Output.data(), Output.size());
@@ -137,15 +138,15 @@ void CJP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(m_pvdState, Output.data() + Offset, Length);
@@ -159,7 +160,7 @@ void CJP::Reset()
 	}
 	catch (std::exception &ex)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Reset"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoRandomException(Name(), std::string("Reset"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 }
 

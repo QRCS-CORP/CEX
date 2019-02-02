@@ -58,7 +58,7 @@ namespace Test
 	{
 		try
 		{
-			EAX* cpr1 = new EAX(Enumeration::BlockCiphers::Rijndael);
+			EAX* cpr1 = new EAX(Enumeration::BlockCiphers::AES);
 			Kat(cpr1, m_key[0], m_nonce[0], m_associatedText[0], m_plainText[0], m_cipherText[0], m_expectedCode[0]);
 			Kat(cpr1, m_key[1], m_nonce[1], m_associatedText[1], m_plainText[1], m_cipherText[1], m_expectedCode[1]);
 			Kat(cpr1, m_key[2], m_nonce[2], m_associatedText[2], m_plainText[2], m_cipherText[2], m_expectedCode[2]);
@@ -82,7 +82,7 @@ namespace Test
 
 			delete cpr1;
 
-			GCM* cpr3 = new GCM(Enumeration::BlockCiphers::Rijndael);
+			GCM* cpr3 = new GCM(Enumeration::BlockCiphers::AES);
 			Kat(cpr3, m_key[26], m_nonce[26], m_associatedText[26], m_plainText[26], m_cipherText[26], m_expectedCode[26]);
 			Kat(cpr3, m_key[27], m_nonce[27], m_associatedText[27], m_plainText[27], m_cipherText[27], m_expectedCode[27]);
 			Kat(cpr3, m_key[28], m_nonce[28], m_associatedText[28], m_plainText[28], m_cipherText[28], m_expectedCode[28]);

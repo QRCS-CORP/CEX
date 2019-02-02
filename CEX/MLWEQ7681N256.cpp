@@ -191,7 +191,7 @@ void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 
 	GenerateMatrix(a, seed, false);
 
-	Drbg::BCG* gen = new Drbg::BCG(Enumeration::BlockCiphers::Rijndael);
+	Drbg::BCG* gen = new Drbg::BCG(Enumeration::BlockCiphers::AES);
 	gen->Initialize(noise);
 	std::unique_ptr<Drbg::BCG> genP(gen);
 	eta = (K == 3) ? 4 : (K == 4) ? 3 : 5;

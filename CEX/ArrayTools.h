@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -48,10 +48,14 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	static void AbsorbBlock8to64(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t Length)
 	{
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemoryTools::XOR(Input, InOffset, Output, 0, Length);
+#else
 		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
 		{
 			Output[i] ^= IntegerTools::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
 		}
+#endif
 	}
 
 	/// <summary>

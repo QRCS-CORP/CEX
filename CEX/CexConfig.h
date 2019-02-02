@@ -470,6 +470,9 @@ typedef unsigned char byte;
 // Settings in this section can be modified		//
 //////////////////////////////////////////////////
 
+// enable the legal-key-size exception set on all primitives
+//#define CEX_ENFORCE_KEYMIN
+
 // enable FIPS 140.2 entropy provider wellness test
 #define CEX_FIPS140_ENABLED
 
@@ -479,7 +482,10 @@ typedef unsigned char byte;
 // toggles ChaCha512 from 40 to 80 rounds of mixing
 #define CEX_CHACHA512_STRONG
 
-// toggles the 48 round implementation of SHAKE in generators, asymmetric ciphers, and signature schemes
+// toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3
+//#define CEX_KECCAK_STRONG
+
+// toggles to the 48 round implementation of SHAKE in generators, asymmetric ciphers, and signature schemes
 //#define CEX_SHAKE_STRONG
 
 // toggles the compact form for all digest permutations, used for performance and small code-cache cases
@@ -503,7 +509,7 @@ typedef unsigned char byte;
 #define CEX_PREFETCH_RHX_TABLES
 
 // enabling this value will add cpu jitter to the ACP entropy collector (slightly stronger, but much slower)
-//#define CEX_ACP_JITTER
+#define CEX_ACP_JITTER
 
 // AVX512 Capabilities Check
 // TODO: future expansion (if you can test it, I'll add it)

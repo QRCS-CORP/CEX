@@ -59,27 +59,27 @@ namespace Test
 			OnProgress(std::string("BCGTest: Passed Block Cipher Generatorstress tests.."));
 
 			// rijndael engine
-			BCG* genrhxs = new BCG(BlockCiphers::RHX, BlockCipherExtensions::None, Providers::None);
+			BCG* genrhxs = new BCG(BlockCiphers::AES, Providers::None);
 			Kat(genrhxs, m_key[0], m_nonce[0], m_expected[0]);
-			BCG* genrhxh256 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::HKDF256, Providers::None);
+			BCG* genrhxh256 = new BCG(BlockCiphers::RHXH256, Providers::None);
 			Kat(genrhxh256, m_key[0], m_nonce[0], m_expected[1]);
-			BCG* genrhxh512 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::HKDF512, Providers::None);
+			BCG* genrhxh512 = new BCG(BlockCiphers::RHXH512, Providers::None);
 			Kat(genrhxh512, m_key[1], m_nonce[0], m_expected[2]);
-			BCG* genrhxs256 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::SHAKE256, Providers::None);
+			BCG* genrhxs256 = new BCG(BlockCiphers::RHXS256, Providers::None);
 			Kat(genrhxs256, m_key[0], m_nonce[0], m_expected[3]);
-			BCG* genrhxs512 = new BCG(BlockCiphers::RHX, BlockCipherExtensions::SHAKE512, Providers::None);
+			BCG* genrhxs512 = new BCG(BlockCiphers::RHXS512, Providers::None);
 			Kat(genrhxs512, m_key[1], m_nonce[0], m_expected[4]);
 			OnProgress(std::string("BCGTest: Passed BCG-RHX known answer tests.."));
 			// serpent engine
-			BCG* genshxs = new BCG(BlockCiphers::SHX, BlockCipherExtensions::None, Providers::None);
+			BCG* genshxs = new BCG(BlockCiphers::Serpent, Providers::None);
 			Kat(genshxs, m_key[0], m_nonce[0], m_expected[5]);
-			BCG* genshxh256 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::HKDF256, Providers::None);
+			BCG* genshxh256 = new BCG(BlockCiphers::SHXH256, Providers::None);
 			Kat(genshxh256, m_key[0], m_nonce[0], m_expected[6]);
-			BCG* genshxh512 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::HKDF512, Providers::None);
+			BCG* genshxh512 = new BCG(BlockCiphers::SHXH512, Providers::None);
 			Kat(genshxh512, m_key[1], m_nonce[0], m_expected[7]);
-			BCG* genshxs256 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::SHAKE256, Providers::None);
+			BCG* genshxs256 = new BCG(BlockCiphers::SHXS256, Providers::None);
 			Kat(genshxs256, m_key[0], m_nonce[0], m_expected[8]);
-			BCG* genshxs512 = new BCG(BlockCiphers::SHX, BlockCipherExtensions::SHAKE512, Providers::None);
+			BCG* genshxs512 = new BCG(BlockCiphers::SHXS512, Providers::None);
 			Kat(genshxs512, m_key[1], m_nonce[0], m_expected[9]);
 			OnProgress(std::string("BCGTest: Passed BCG-SHX known answer tests.."));
 
@@ -123,17 +123,10 @@ namespace Test
 
 	void BCGTest::Evaluate(IDrbg* Rng)
 	{
-		size_t i;
-
 		try
 		{
-			const size_t SEGCNT = SAMPLE_SIZE / Rng->MaxRequestSize();
-			std::vector<byte> smp(SEGCNT * Rng->MaxRequestSize());
-
-			for (i = 0; i < SEGCNT; ++i)
-			{
-				Rng->Generate(smp, i * Rng->MaxRequestSize(), Rng->MaxRequestSize());
-			}
+			std::vector<byte> smp(Rng->MaxRequestSize());
+			Rng->Generate(smp, 0, smp.size());
 
 			RandomUtils::Evaluate(Rng->Name(), smp);
 		}
@@ -180,7 +173,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			BCG gen(BlockCiphers::Rijndael);
+			BCG gen(BlockCiphers::AES);
 			// invalid key size
 			std::vector<byte> k(1);
 			gen.Initialize(k);
@@ -198,7 +191,7 @@ namespace Test
 		// test parallel degree
 		try
 		{
-			BCG gen(BlockCiphers::Rijndael);
+			BCG gen(BlockCiphers::AES);
 			SymmetricKeySize ks = gen.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize());
 			gen.Initialize(k);
@@ -218,7 +211,7 @@ namespace Test
 		// test invalid generator state -1
 		try
 		{
-			BCG gen(BlockCiphers::Rijndael);
+			BCG gen(BlockCiphers::AES);
 			std::vector<byte> m(16);
 			// cipher was not initialized
 			gen.Generate(m);
@@ -236,7 +229,7 @@ namespace Test
 		// test invalid generator state -2
 		try
 		{
-			BCG gen(BlockCiphers::Rijndael);			
+			BCG gen(BlockCiphers::AES);			
 			SymmetricKeySize ks = gen.LegalKeySizes()[0];
 			std::vector<byte> k(ks.KeySize());
 			std::vector<byte> n(ks.NonceSize());
@@ -314,10 +307,10 @@ namespace Test
 
 	void BCGTest::Stress()
 	{
-		CTR cpr(BlockCiphers::Rijndael);
+		CTR cpr(BlockCiphers::AES);
 		const uint MINPRL = static_cast<uint>(cpr.ParallelProfile().ParallelMinimumSize());
 		const uint MAXPRL = static_cast<uint>(cpr.ParallelProfile().ParallelBlockSize());
-		BCG gen(BlockCiphers::Rijndael, BlockCipherExtensions::None, Providers::None);
+		BCG gen(BlockCiphers::AES, Providers::None);
 		Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[1];
 
 		std::vector<byte> cpt;

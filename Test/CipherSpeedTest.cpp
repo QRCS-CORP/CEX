@@ -262,7 +262,7 @@ namespace Test
 
 	void CipherSpeedTest::ACSSpeedTest()
 	{
-		ACS* cipher = new ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::None);
+		ACS* cipher = new ACS(Enumeration::BlockCiphers::RHXS256, Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}

@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -39,7 +39,7 @@ NAMESPACE_MODE
 /// <example>
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// CTR cipher(new AHX());
+/// CTR cipher(new AES());
 /// // initialize for encryption
 /// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt one block
@@ -50,7 +50,7 @@ NAMESPACE_MODE
 /// <example>
 /// <description>Encrypting using parallel processing:</description>
 /// <code>
-/// CTR cipher(BlockCiphers::AHX);
+/// CTR cipher(BlockCiphers::AES);
 /// // enable parallel and define parallel input block size
 /// cipher.IsParallel() = true;
 /// // calculated automatically based on cache size, but overridable
@@ -144,10 +144,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
-	explicit CTR(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
+	explicit CTR(BlockCiphers CipherType);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance

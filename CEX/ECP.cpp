@@ -3,7 +3,6 @@
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
 #include "CSP.h"
-#include "SHAKE.h"
 #include "SymmetricKey.h"
 #include "SystemTools.h"
 
@@ -11,9 +10,9 @@ NAMESPACE_PROVIDER
 
 using Utility::ArrayTools;
 using Utility::MemoryTools;
+using Enumeration::ProviderConvert;
 using Utility::SystemTools;
 
-const std::string ECP::CLASS_NAME("ECP");
 const bool ECP::TIMER_HAS_TSC = SystemTools::HasRdtsc();
 
 //~~~Constructor~~~//
@@ -24,11 +23,11 @@ ECP::ECP()
 	m_pvdSelfTest(),
 #endif
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
-	ProviderBase(true, Providers::ECP, CLASS_NAME),
+	ProviderBase(true, Providers::ECP, ProviderConvert::ToName(Providers::ECP)),
 #else
-	ProviderBase(false, Providers::ECP, CLASS_NAME),
+	ProviderBase(false, Providers::ECP, ProviderConvert::ToName(Providers::ECP)),
 #endif
-	m_kdfGenerator(new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE512))
+	m_kdfGenerator(new Kdf::SHAKE(SHAKE_MODE))
 {
 	Reset();
 }
@@ -47,11 +46,11 @@ void ECP::Generate(std::vector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
@@ -61,15 +60,15 @@ void ECP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, Offset, Length, m_kdfGenerator);
@@ -79,11 +78,11 @@ void ECP::Generate(SecureVector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
@@ -93,11 +92,11 @@ void ECP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, Offset, Length, m_kdfGenerator);
@@ -237,18 +236,14 @@ std::vector<byte> ECP::DriveInfo()
 	return state;
 }
 
-void ECP::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+void ECP::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
 {
 	Generator->Generate(Output, Offset, Length);
 }
 
-void ECP::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+void ECP::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
 {
-	std::vector<byte> smp(Length);
-
-	Generator->Generate(smp, 0, Length);
-	Insert(smp, 0, Output, Offset, Length);
-	Clear(smp);
+	Generator->Generate(Output, Offset, Length);
 }
 
 std::vector<byte> ECP::MemoryInfo()

@@ -1,25 +1,15 @@
 #include "MacStream.h"
-#include "MacFromDescription.h"
+#include "Macs.h"
 
 NAMESPACE_PROCESSING
 
 using Exception::CryptoMacException;
 using Enumeration::ErrorCodes;
+using Enumeration::Macs;
 
 const std::string MacStream::CLASS_NAME("MacStream");
 
 //~~~Constructor~~~//
-
-MacStream::MacStream(MacDescription &Description)
-	:
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_macEngine(Description.MacType() != Macs::GMAC ? Helper::MacFromDescription::GetInstance(Description) :
-		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("GMAC is not supported!"), ErrorCodes::IllegalOperation)),
-	m_progressInterval(0)
-{
-}
 
 MacStream::MacStream(IMac* Mac)
 	:

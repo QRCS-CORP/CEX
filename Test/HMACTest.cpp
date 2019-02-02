@@ -240,7 +240,7 @@ namespace Test
 
 	void HMACTest::Params(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
 		std::vector<byte> otp1(Generator->TagSize());
@@ -274,7 +274,7 @@ namespace Test
 
 	void HMACTest::Stress(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> msg;
 		std::vector<byte> otp(Generator->TagSize());
 		std::vector<byte> key(ks.KeySize());

@@ -28,17 +28,17 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType)
 		{
 			case Prngs::BCR:
 			{
-				rptr = new BCR(Enumeration::BlockCiphers::AHX, ProviderType);
+				rptr = new BCR(Enumeration::BlockCiphers::AES, ProviderType);
 				break;
 			}
 			case Prngs::BCRAHXS256:
 			{
-				rptr = new BCR(Enumeration::BlockCiphers::AHXS256, ProviderType);
+				rptr = new BCR(Enumeration::BlockCiphers::RHXS256, ProviderType);
 				break;
 			}
 			case Prngs::BCRAHXS512:
 			{
-				rptr = new BCR(Enumeration::BlockCiphers::AHXS512, ProviderType);
+				rptr = new BCR(Enumeration::BlockCiphers::RHXS512, ProviderType);
 				break;
 			}
 			case Prngs::CSR:

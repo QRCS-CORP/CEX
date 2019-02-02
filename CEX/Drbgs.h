@@ -28,5 +28,28 @@ enum class Drbgs : byte
 	HCG = 3
 };
 
+class DrbgConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the Drbgs formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The Drbgs enumeration member</param>
+	///
+	/// <returns>The matching Drbgs string name</returns>
+	static std::string ToName(Drbgs Enumeral);
+
+	/// <summary>
+	/// Derive the Drbgs enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The Drbgs string name</param>
+	///
+	/// <returns>The matching Drbgs enumeration type name</returns>
+	static Drbgs FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif

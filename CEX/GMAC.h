@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -28,7 +28,7 @@
 #include "BlockCiphers.h"
 #include "GHASH.h"
 #include "IBlockCipher.h"
-#include "IMac.h"
+#include "MacBase.h"
 
 NAMESPACE_MAC
 
@@ -43,7 +43,7 @@ using Cipher::Block::IBlockCipher;
 /// <example>
 /// <description>Example generating a MAC code from an Input array</description>
 /// <code>
-/// GMAC mac(Enumeration::BlockCiphers::AHX);
+/// GMAC mac(Enumeration::BlockCiphers::AES);
 /// SymmetricKey kp(Key, Nonce);
 /// mac.Initialize(kp);
 /// mac.Update(Input, 0, Input.size());
@@ -85,27 +85,21 @@ using Cipher::Block::IBlockCipher;
 /// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
 /// </list>
 /// </remarks>
-class GMAC final : public IMac
+class GMAC final : public MacBase
 {
 private:
 
-	static const std::string CLASS_NAME;
 	static const size_t BLOCK_SIZE = 16;
-	static const size_t TAG_MINLEN = 8;
+	static const size_t MINKEY_LENGTH = 16;
+	static const size_t MINSALT_LENGTH = 12;
 
+	class GmacState;
 	std::unique_ptr<IBlockCipher> m_blockCipher;
-	BlockCiphers m_cipherType;
-	bool m_destroyEngine;
 	std::unique_ptr<GHASH> m_gmacHash;
-	std::vector<byte> m_gmacNonce;
-	std::vector<ulong> m_gmacKey;
+	std::unique_ptr<GmacState> m_gmacState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::vector<byte> m_msgBuffer;
-	std::vector<byte> m_msgCode;
-	size_t m_msgCounter;
-	size_t m_msgOffset;
+
 
 public:
 
@@ -131,10 +125,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The block cipher enumeration name</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
-	explicit GMAC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
+	explicit GMAC(BlockCiphers CipherType);
 
 	/// <summary>
 	/// Initialize this class with a block cipher instance
@@ -153,39 +146,14 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Macs internal blocksize in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
 	/// Read Only: The block cipher engine type
 	/// </summary>
 	const BlockCiphers CipherType();
 
 	/// <summary>
-	/// Read Only: Mac generators type name
-	/// </summary>
-	const Macs Enumeral() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t TagSize() override;
-
-	/// <summary>
-	/// Read Only: Mac generators implementation name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 
@@ -232,13 +200,6 @@ public:
 	void Reset() override;
 
 	/// <summary>
-	/// Update the Mac with a single byte
-	/// </summary>
-	/// 
-	/// <param name="Input">Input byte to process</param>
-	void Update(byte Input) override;
-
-	/// <summary>
 	/// Update the Mac with a block of bytes
 	/// </summary>
 	/// 
@@ -246,10 +207,6 @@ public:
 	/// <param name="InOffset">Starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
-
-private:
-
-	void Scope();
 };
 
 NAMESPACE_MACEND

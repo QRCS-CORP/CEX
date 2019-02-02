@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -105,7 +105,7 @@ private:
 	static const ulong MAX_OUTPUT = 35184372088832;
 	static const size_t MAX_REQUEST = 65536;
 	static const size_t MAX_RESEED = 536870912;
-	static const size_t MIN_KEYSIZE = 4;
+	static const size_t MINKEY_LENGTH = 4;
 	static const size_t STATE_SIZE = 25;
 	static const byte SHAKE_DOMAIN = 0x1F;
 

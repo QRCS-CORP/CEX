@@ -264,7 +264,7 @@ void CSG::Initialize(ISymmetricKey &GenParam)
 
 void CSG::Initialize(const std::vector<byte> &Seed)
 {
-	if (Seed.size() < MIN_KEYSIZE)
+	if (Seed.size() < MINKEY_LENGTH)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidKey);
 	}

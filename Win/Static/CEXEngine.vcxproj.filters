@@ -304,6 +304,21 @@
     <Filter Include="Source Files\Prng\Base">
       <UniqueIdentifier>{1d402a83-b6bc-4c40-b3d5-0e70b372f45a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Kdf\Base">
+      <UniqueIdentifier>{33e194a3-6395-45c1-be70-650f04719e3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Kdf\Base">
+      <UniqueIdentifier>{1864b807-ebbb-41eb-a2c7-dcdd4711ec9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Enumeration">
+      <UniqueIdentifier>{11b07c19-2bcf-483a-8e27-f9289da52177}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Mac\Base">
+      <UniqueIdentifier>{f93b8b4f-23d7-4346-94ae-9de66746a739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Mac\Base">
+      <UniqueIdentifier>{11a1e194-c395-4542-bf1d-374001e5c995}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -360,16 +375,10 @@
     <ClInclude Include="..\..\CEX\BlockCiphers.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\BlockSizes.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\CipherModes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Digests.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\KeySizes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Macs.h">
@@ -410,12 +419,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoSymmetricCipherException.h">
       <Filter>Header Files\Exception</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\IVSizes.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\RoundCounts.h">
-      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\StreamCiphers.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -476,12 +479,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\X923.h">
       <Filter>Header Files\Cipher\Block\Padding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CipherFromDescription.h">
-      <Filter>Header Files\Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MacFromDescription.h">
-      <Filter>Header Files\Helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CpuDetect.h">
       <Filter>Header Files\Common</Filter>
@@ -572,12 +569,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\StreamModes.h">
       <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CipherDescription.h">
-      <Filter>Header Files\Processing</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MacDescription.h">
-      <Filter>Header Files\Processing</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SecureStream.h">
       <Filter>Header Files\IO</Filter>
@@ -713,9 +704,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\IAuthenticate.h">
       <Filter>Header Files\Asymmetric\Encrypt\Authenticate</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Authenticators.h">
-      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ShakeModes.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -954,6 +942,18 @@
     <ClInclude Include="..\..\CEX\PrngBase.h">
       <Filter>Header Files\Prng\Base</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\KdfBase.h">
+      <Filter>Header Files\Kdf\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Salsa.h">
+      <Filter>Header Files\Cipher\Stream\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MacBase.h">
+      <Filter>Header Files\Mac\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KmacModes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -986,16 +986,10 @@
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\CipherFromDescription.cpp">
-      <Filter>Source Files\Helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\CipherModeFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\DigestFromName.cpp">
-      <Filter>Source Files\Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\MacFromDescription.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\PaddingFromName.cpp">
@@ -1072,12 +1066,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\BitConverter.cpp">
       <Filter>Source Files\IO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\CipherDescription.cpp">
-      <Filter>Source Files\Processing</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\MacDescription.cpp">
-      <Filter>Source Files\Processing</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\SecureStream.cpp">
       <Filter>Source Files\IO</Filter>
@@ -1360,6 +1348,93 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\PrngBase.cpp">
       <Filter>Source Files\Prng\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\KdfBase.cpp">
+      <Filter>Source Files\Kdf\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Salsa.cpp">
+      <Filter>Source Files\Cipher\Stream\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AeadModes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricEngines.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricTransforms.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CipherModes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Digests.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Drbgs.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Kdfs.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Macs.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MPKCParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PaddingModes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Prngs.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Providers.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RLWEParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SecurityPolicy.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA2Digests.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ShakeModes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\StreamAuthenticators.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\StreamCiphers.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SymmetricCiphers.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ThreefishModes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DilithiumParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MLWEParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\BlockCiphers.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MacBase.cpp">
+      <Filter>Source Files\Mac\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\KmacModes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

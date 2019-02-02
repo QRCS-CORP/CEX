@@ -234,10 +234,12 @@ void HCG::Initialize(ISymmetricKey &GenParam)
 
 void HCG::Initialize(const std::vector<byte> &Seed)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size()))
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	// pre-initialize the HMAC
 	m_hmacKey.resize(Seed.size());
@@ -292,10 +294,12 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 void HCG::Update(const std::vector<byte> &Seed)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size()))
 	{
 		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Key size is invalid; check the key property for accepted value!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	Extract(Seed);
 }
@@ -408,12 +412,11 @@ void HCG::Increase(std::vector<byte> &Counter, const uint Length)
 
 void HCG::Scope()
 {
-	const size_t  PADLEN = Helper::DigestFromName::GetPaddingSize(m_dgtMac->DigestType());
-	m_distCodeMax = m_dgtMac->BlockSize() + (m_dgtMac->BlockSize() - (m_stateCtr.size() + m_hmacState.size() + PADLEN));
+	m_distCodeMax = m_dgtMac->BlockSize() + (m_dgtMac->BlockSize() - (m_stateCtr.size() + m_hmacState.size()));
 
 	m_legalKeySizes.resize(3);
 	// minimum seed size
-	m_legalKeySizes[0] = SymmetricKeySize(m_dgtMac->BlockSize() - PADLEN, 0, 0);
+	m_legalKeySizes[0] = SymmetricKeySize(m_dgtMac->BlockSize(), 0, 0); // TODO: wrong (too big).. clean this up
 	// recommended size
 	m_legalKeySizes[1] = SymmetricKeySize(m_legalKeySizes[0].KeySize() + m_dgtMac->BlockSize(), STATECTR_SIZE, m_distCodeMax);
 	// maximum security

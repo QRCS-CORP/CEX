@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -109,6 +109,11 @@ private:
 #endif
 
 public:
+
+	const static size_t BLAKE2_RATE256_SIZE = 64;
+	const static size_t BLAKE2_RATE512_SIZE = 128;
+	const static size_t BLAKE2_MESSAGE256_SIZE = 32;
+	const static size_t BLAKE2_MESSAGE512_SIZE = 64;
 
 	static const std::vector<uint> IV256;
 	static const std::vector<ulong> IV512;

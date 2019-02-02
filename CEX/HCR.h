@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -15,6 +15,9 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Updated by January 28, 2019
+// Contact: develop@vtdev.com
 
 #ifndef CEX_HCR_H
 #define CEX_HCR_H
@@ -32,7 +35,7 @@ using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of an HMAC Counter mode PRNG.
-/// <para>Uses a keyed SHA2 HMAC run in counter mode to generate pseudo-random output..</para>
+/// <para>Uses a keyed SHA2 HMAC DRBG run in counter mode to generate pseudo-random output..</para>
 /// </summary> 
 /// 
 /// <example>
@@ -64,12 +67,11 @@ using Enumeration::SHA2Digests;
 class HCR final : public PrngBase
 {
 private:
+
 	static const size_t BUFFER_SIZE = 1024;
 	static const size_t MIN_BUFLEN = 64;
-	static const std::string CLASS_NAME;
 
 	SHA2Digests m_digestType;
-	bool m_isDestroyed;
 	Providers m_pvdType;
 	std::unique_ptr<IDrbg> m_rngGenerator;
 
@@ -101,13 +103,6 @@ public:
 	/// Destructor: finalize this class
 	/// </summary>
 	~HCR() override;
-
-	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read Only: The random generators implementation name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

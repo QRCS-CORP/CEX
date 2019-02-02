@@ -1,12 +1,34 @@
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2019 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Updated by January 28, 2019
+// Contact: develop@vtdev.com
+
 #ifndef CEX_ECP_H
 #define CEX_ECP_H
 
-#include "IKdf.h"
+#include "SHAKE.h"
 #include "ProviderBase.h"
 
 NAMESPACE_PROVIDER
 
-using Kdf::IKdf;
+using Kdf::SHAKE;
+using Enumeration::ShakeModes;
 
 /// <summary>
 /// An implementation of a system Entropy Collector Provider.
@@ -23,12 +45,9 @@ using Kdf::IKdf;
 /// </example>
 /// 
 /// <remarks>
-/// <para>The Entropy Collection Provider is a two stage entropy provider; it first collects system sources of entropy, and then uses them to initialize a block cipher CTR generator. \n 
+/// <para>The Entropy Collection Provider is a two-stage entropy provider; it first collects system sources of entropy, and then uses them to initialize a cSHAKE pseudo-random generator. \n 
 /// The first stage collects numerous caches of low entropy states; high-resolution timers, process and thread ids, the system random provider, and statistics for various hardware devices and system operations. \n
-/// These sources of entropy are compressed using Keccak to create a 512 bit cipher key. 
-/// The key initializes an (HX extended) instance of Rijndael using 38 rounds and an HKDF(SHA512) key schedule. \n
-/// The 16 byte counter and the HKDF distribution code (personalization string) are then created with the system entropy provider and used to initialize the cipher. \n
-/// Output from the ECP provider is the product of encrypting the incrementing counter.
+/// These sources of entropy are compressedand used to create the cSHAKE-512 XOF functions key and customization arrays.
 /// </para>
 /// 
 /// <description>Guiding Publications::</description>
@@ -44,14 +63,15 @@ class ECP final : public ProviderBase
 {
 private:
 
-	static const std::string CLASS_NAME;
 	static const size_t DEF_STATECAP = 1024;
+	static const bool CPU_HAS_RDRAND;
+	static const ShakeModes SHAKE_MODE = ShakeModes::SHAKE512;
 	static const bool TIMER_HAS_TSC;
 
 #if defined(CEX_FIPS140_ENABLED)
 	ProviderSelfTest m_pvdSelfTest;
 #endif
-	std::unique_ptr<IKdf> m_kdfGenerator;
+	std::unique_ptr<SHAKE> m_kdfGenerator;
 
 public:
 
@@ -134,8 +154,8 @@ private:
 	static std::vector<byte> Compress(std::vector<byte> &State);
 	static std::vector<byte> DriveInfo();
 	static void Filter(std::vector<byte> &State);
-	static void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator);
-	static void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator);
+	static void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator);
+	static void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator);
 	static std::vector<byte> MemoryInfo();
 	static std::vector<byte> NetworkInfo();
 	static std::vector<byte> ProcessInfo();

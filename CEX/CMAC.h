@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -27,17 +27,17 @@
 #ifndef CEX_CMAC_H
 #define CEX_CMAC_H
 
-#include "IMac.h"
+#include "MacBase.h"
 #include "BlockCiphers.h"
-#include "ICipherMode.h"
+#include "CBC.h"
 #include "SymmetricSecureKey.h"
 
 NAMESPACE_MAC
 
 using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
+using Cipher::Block::Mode::CBC;
 using Cipher::Block::IBlockCipher;
-using Cipher::Block::Mode::ICipherMode;
 using Cipher::SymmetricSecureKey;
 
 /// <summary>
@@ -47,7 +47,7 @@ using Cipher::SymmetricSecureKey;
 /// <example>
 /// <description>Example generating a MAC code from an Input array</description>
 /// <code>
-/// CMAC mac(Enumeration::BlockCiphers::AHX);
+/// CMAC mac(Enumeration::BlockCiphers::AES);
 /// SymmetricKey kp(Key);
 /// mac.Initialize(kp);
 /// mac.Update(Input, 0, Input.size());
@@ -97,26 +97,22 @@ using Cipher::SymmetricSecureKey;
 /// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
 /// </list>
 /// </remarks>
-class CMAC final : public IMac
+class CMAC final : public MacBase
 {
 private:
 
 	static const size_t BLOCK_SIZE = 16;
-	static const std::string CLASS_NAME;
-	static const byte CT87 = 0x87;
-	static const byte CT1B = 0x1b;
+	static const size_t MINKEY_LENGTH = 16;
+	static const size_t MINSALT_LENGTH = 16;
+	static const byte MIX_C128 = 0x87;
+	static const byte MIX_C64 = 0x1b;
 
-	std::unique_ptr<ICipherMode> m_cipherMode;
-	BlockCiphers m_cipherType;
-	bool m_destroyEngine;
+	class CmacState;
+	std::unique_ptr<CBC> m_cbcMode;
+	std::unique_ptr<CmacState> m_cmacState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::unique_ptr<SymmetricSecureKey> m_keys;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_macSize;
-	std::vector<byte> m_msgBuffer;
-	std::vector<byte> m_msgCode;
-	size_t m_msgLength;
+	std::unique_ptr<SymmetricSecureKey> m_luKey;
 
 public:
 
@@ -145,7 +141,7 @@ public:
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
-	explicit CMAC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
+	explicit CMAC(BlockCiphers CipherType);
 
 	/// <summary>
 	/// Initialize this class with a block cipher instance
@@ -164,41 +160,21 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Macs internal blocksize in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
 	/// Read Only: The block cipher engine type
 	/// </summary>
 	const BlockCiphers CipherType();
-
-	/// <summary>
-	/// Read Only: Mac generators type name
-	/// </summary>
-	const Macs Enumeral() override;
 
 	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
 
-	/// <summary>
-	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t TagSize() override;
-
-	/// <summary>
-	/// Read Only: Mac generators implementation name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// Reset the CMAC and CBC state
+	/// </summary>
+	void Clear();
 
 	/// <summary>
 	/// Process an input array and return the Mac code in the output array.
@@ -242,13 +218,6 @@ public:
 	void Reset() override;
 
 	/// <summary>
-	/// Update the Mac with a single byte
-	/// </summary>
-	/// 
-	/// <param name="Input">Input byte to process</param>
-	void Update(byte Input) override;
-
-	/// <summary>
 	/// Update the Mac with a block of bytes
 	/// </summary>
 	/// 
@@ -259,9 +228,9 @@ public:
 
 private:
 
-	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
-	void Pad(std::vector<byte> &Input, size_t Offset, size_t Length);
-	void Scope();
+	static void DoubleLu(const std::vector<byte> &Input, std::vector<byte> &Output);
+	static void Pad(std::vector<byte> &Input, size_t Offset, size_t Length);
+	static uint ShiftLeft(const std::vector<byte> &Input, std::vector<byte> &Output);
 };
 
 NAMESPACE_MACEND

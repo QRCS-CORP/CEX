@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -15,12 +15,8 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
-// 
 //
-// Implementation Details:
-// A CPU jitter implementation based on the excellent work of Stephan Müller:
-// http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
-// Written by John Underhill, November 26, 2016
+// Updated by January 28, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CJP_H
@@ -44,12 +40,12 @@ NAMESPACE_PROVIDER
 /// </example>
 /// 
 /// <remarks>
-/// <para>The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time.
+/// <para>The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time. \n 
 /// Because the CPU and cache memory are continuously being accessed by various operating system and application processes, 
-/// small timing differences can be observed and measured using a high-resolution timestamp.
+/// small timing differences can be observed and measured using a high-resolution timestamp. \n 
 /// Delays caused by events like external thread execution, branching, cache misses, and memory movement through the processor cache levels are measured, 
-/// and these small differences are collected and concentrated to produce the providers output.
-/// The CJP provider should not be used as the sole source of entropy for secret keys, but should be combined with other sources and concentrated to produce a key.</para>
+/// and these small differences are collected and concentrated to produce the providers output. \n 
+/// The CJP provider should not be used as the sole source of entropy for secret keys, but should be combined with other sources and concentrated to produce a key, such as the auto-seed collection provider ACP.</para>
 /// <description>Guiding Publications::</description>
 /// <list type="number">
 /// <item><description><a href="http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html">CPU Time Jitter</a> Based Non-Physical True Random Number Generator.</description></item>
@@ -64,7 +60,6 @@ private:
 
 	static const size_t ACC_LOOP_BIT_MAX = 7;
 	static const size_t ACC_LOOP_BIT_MIN = 0;
-	static const std::string CLASS_NAME;
 	static const size_t CLEARCACHE = 100;
 	static const size_t DATA_SIZE_BITS = ((sizeof(ulong)) * 8);
 	static const size_t FOLD_LOOP_BIT_MAX = 4;

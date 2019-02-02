@@ -1,4 +1,5 @@
 #include "MacFromName.h"
+#include "BlockCiphers.h"
 #include "CMAC.h"
 #include "CryptoMacException.h"
 #include "HMAC.h"
@@ -14,7 +15,7 @@ using Enumeration::BlockCiphers;
 using Exception::CryptoMacException;
 using Enumeration::ErrorCodes;
 using Enumeration::SHA2Digests;
-using Enumeration::ShakeModes;
+using Enumeration::KmacModes;
 
 const std::string MacFromName::CLASS_NAME("MacFromName");
 
@@ -32,32 +33,32 @@ IMac* MacFromName::GetInstance(Macs MacType)
 		{
 		case Macs::CMAC:
 			{
-				mptr = new CMAC(BlockCiphers::AHX);
+				mptr = new CMAC(BlockCiphers::AES);
 				break;
 			}
 			case Macs::CMACAHXS256:
 			{
-				mptr = new CMAC(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256);
+				mptr = new CMAC(BlockCiphers::RHXS256);
 				break;
 			}
 			case Macs::CMACAHXS512:
 			{
-				mptr = new CMAC(BlockCiphers::AHX, BlockCipherExtensions::SHAKE512);
+				mptr = new CMAC(BlockCiphers::RHXS512);
 				break;
 			}
 			case Macs::GMAC:
 			{
-				mptr = new GMAC(BlockCiphers::AHX);
+				mptr = new GMAC(BlockCiphers::AES);
 				break;
 			}
 			case Macs::GMACAHXS256:
 			{
-				mptr = new GMAC(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256);
+				mptr = new GMAC(BlockCiphers::RHXS256);
 				break;
 			}
 			case Macs::GMACAHXS512:
 			{
-				mptr = new GMAC(BlockCiphers::AHX, BlockCipherExtensions::SHAKE512);
+				mptr = new GMAC(BlockCiphers::RHXS512);
 				break;
 			}
 			case Macs::HMACSHA256:
@@ -72,17 +73,17 @@ IMac* MacFromName::GetInstance(Macs MacType)
 			}
 			case Macs::KMAC256:
 			{
-				mptr = new KMAC(ShakeModes::SHAKE256);
+				mptr = new KMAC(KmacModes::KMAC256);
 				break;
 			}
 			case Macs::KMAC512:
 			{
-				mptr = new KMAC(ShakeModes::SHAKE512);
+				mptr = new KMAC(KmacModes::KMAC512);
 				break;
 			}
 			case Macs::KMAC1024:
 			{
-				mptr = new KMAC(ShakeModes::SHAKE1024);
+				mptr = new KMAC(KmacModes::KMAC1024);
 				break;
 			}
 			case Macs::Poly1305:
@@ -132,17 +133,17 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 			}
 			case StreamAuthenticators::KMAC256:
 			{
-				mptr = new KMAC(ShakeModes::SHAKE256);
+				mptr = new KMAC(KmacModes::KMAC256);
 				break;
 			}
 			case StreamAuthenticators::KMAC512:
 			{
-				mptr = new KMAC(ShakeModes::SHAKE512);
+				mptr = new KMAC(KmacModes::KMAC512);
 				break;
 			}
 			case StreamAuthenticators::KMAC1024:
 			{
-				mptr = new KMAC(ShakeModes::SHAKE1024);
+				mptr = new KMAC(KmacModes::KMAC1024);
 				break;
 			}
 			default:

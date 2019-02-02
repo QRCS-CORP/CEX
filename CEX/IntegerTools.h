@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -16,6 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+// TODO: test big endian functions on a BE native operating system
+
 #ifndef CEX_INTUTILS_H
 #define CEX_INTUTILS_H
 
@@ -26,7 +28,7 @@
 
 NAMESPACE_UTILITY
 
-// TODO: test big endian functions on a BE native operating system
+using Utility::MemoryTools;
 
 /// <summary>
 /// An integer utility functions class
@@ -124,7 +126,7 @@ public:
 		const size_t BUFLEN = Elements * sizeof(Array::value_type);
 		std::vector<byte> buf(BUFLEN);
 		Rng.Generate(buf);
-		Utility::MemoryTools::Copy(buf, 0, Output, Offset, BUFLEN);
+		MemoryTools::Copy(buf, 0, Output, Offset, BUFLEN);
 	}
 
 	/// <summary>
@@ -144,7 +146,7 @@ public:
 		const size_t BUFLEN = Elements * sizeof(Array::value_type);
 		std::vector<byte> buf(BUFLEN);
 		Rng->Generate(buf);
-		Utility::MemoryTools::Copy(buf, 0, Output, Offset, BUFLEN);
+		MemoryTools::Copy(buf, 0, Output, Offset, BUFLEN);
 	}
 
 	/// <summary>
@@ -412,12 +414,11 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BlockToBe(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT(sizeof(ArrayA::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ArrayB::value_type) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
+		MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
 		const size_t VARLEN = sizeof(ArrayB::value_type);
 
@@ -443,12 +444,11 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BeToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT(sizeof(ArrayB::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) * sizeof(ArrayA::value_type) >= Length, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
+		MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
 		const size_t VARLEN = sizeof(ArrayA::value_type);
 
@@ -472,11 +472,10 @@ public:
 	template<typename Array>
 	inline static void Be16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
+		MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
 #else
 		Output[OutOffset + 1] = static_cast<byte>(Value);
 		Output[OutOffset] = static_cast<byte>(Value >> 8);
@@ -493,11 +492,10 @@ public:
 	template<typename Array>
 	inline static void Be32ToBytes(const uint Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than output capacity");
 
 #if defined IS_BIG_ENDIAN
-		Utility::MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
+		MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
 #else
 		Output[OutOffset + 3] = static_cast<byte>(Value);
 		Output[OutOffset + 2] = static_cast<byte>(Value >> 8);
@@ -516,11 +514,10 @@ public:
 	template<typename Array>
 	inline static void Be64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
+		MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
 #else
 		Output[OutOffset + 7] = static_cast<byte>(Value);
 		Output[OutOffset + 6] = static_cast<byte>(Value >> 8);
@@ -550,7 +547,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
 #else
 		Be32ToBytes(Input[InOffset], Output, OutOffset);
 		Be32ToBytes(Input[InOffset + 1], Output, OutOffset + 4);
@@ -580,7 +577,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
 #else
 		Be64ToBytes(Input[InOffset], Output, OutOffset);
 		Be64ToBytes(Input[InOffset + 1], Output, OutOffset + 8);
@@ -604,12 +601,11 @@ public:
 	template<typename Array>
 	inline static ushort BeBytesTo16(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		ushort value = 0;
-		Utility::MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ushort));
+		MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ushort));
 		return value;
 #else
 		return
@@ -646,12 +642,11 @@ public:
 	template<typename Array>
 	inline static uint BeBytesTo32(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		uint value = 0;
-		Utility::MemoryTools::CopyToValue(Input, InOffset, value, sizeof(uint));
+		MemoryTools::CopyToValue(Input, InOffset, value, sizeof(uint));
 
 		return value;
 #else
@@ -691,12 +686,11 @@ public:
 	template<typename Array>
 	inline static ulong BeBytesTo64(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		ulong value = 0;
-		Utility::MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ulong));
+		MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ulong));
 		return value;
 #else
 		return
@@ -741,6 +735,25 @@ public:
 
 		int i = static_cast<int>(Output.size());
 		while (--i >= 0 && ++Output[i] == 0) 
+		{
+		}
+	}
+
+	/// <summary>
+	/// Treats a byte array as a large Big Endian integer, incrementing the total value by one
+	/// </summary>
+	/// 
+	/// <param name="Output">The counter byte array</param>
+	/// <param name="Offset">The starting offset withing the array</param>
+	/// <param name="Length">The number of byte array elements to process</param>
+	template<typename Array>
+	inline static void BeIncrement8(Array &Output, size_t Offset, size_t Length)
+	{
+		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be an array of 8bit integers");
+		CEXASSERT(!std::is_signed<Array::value_type>::value, "Output must be an unsigned integer array");
+
+		int i = static_cast<int>(Length + Offset);
+		while (--i >= 0 && ++Output[Offset + i] == 0)
 		{
 		}
 	}
@@ -828,12 +841,11 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BlockToLe(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT(sizeof(ArrayA::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ArrayB::value_type) >= Length, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
+		MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
 		const size_t VARLEN = sizeof(ArrayB::value_type);
 
@@ -859,12 +871,11 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT(sizeof(ArrayB::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) * sizeof(ArrayA::value_type) >= Length, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
+		MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
 		const size_t VARLEN = sizeof(ArrayA::value_type);
 
@@ -888,11 +899,10 @@ public:
 	template<typename Array>
 	inline static void Le16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
+		MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
 #else
 		Output[OutOffset] = static_cast<byte>(Value);
 		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
@@ -926,11 +936,10 @@ public:
 	template<typename Array>
 	inline static void Le32ToBytes(const uint Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
+		MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
 #else
 		Output[OutOffset] = static_cast<byte>(Value);
 		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
@@ -966,11 +975,10 @@ public:
 	template<typename Array>
 	inline static void Le64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
+		MemoryTools::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
 #else
 		Output[OutOffset] = static_cast<byte>(Value);
 		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
@@ -1017,7 +1025,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
 #else
 		Le32ToBytes(Input[InOffset], Output, OutOffset);
 		Le32ToBytes(Input[InOffset + 1], Output, OutOffset + 4);
@@ -1047,7 +1055,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
 #else
 		Le64ToBytes(Input[InOffset], Output, OutOffset);
 		Le64ToBytes(Input[InOffset + 1], Output, OutOffset + 8);
@@ -1073,7 +1081,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
 #else
 		Le64ToBytes(Input[InOffset], Output, OutOffset);
 		Le64ToBytes(Input[InOffset + 1], Output, OutOffset + 8);
@@ -1103,8 +1111,8 @@ public:
 		CEXASSERT((Output.size() - OutOffset) >= 128, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
-		Utility::MemoryTools::COPY512(Input, InOffset + 8, Output, OutOffset + 64);
+		MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY512(Input, InOffset + 8, Output, OutOffset + 64);
 #else
 		LeULL512ToBlock(Input, InOffset, Output, OutOffset);
 		LeULL512ToBlock(Input, InOffset + 8, Output, OutOffset + 64);
@@ -1122,12 +1130,11 @@ public:
 	template<typename Array>
 	inline static ushort LeBytesTo16(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		ushort value = 0;
-		Utility::MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ushort));
+		MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ushort));
 
 		return value;
 #else
@@ -1148,12 +1155,11 @@ public:
 	template<typename Array>
 	inline static uint LeBytesTo32(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		uint value = 0;
-		Utility::MemoryTools::CopyToValue(Input, InOffset, value, sizeof(uint));
+		MemoryTools::CopyToValue(Input, InOffset, value, sizeof(uint));
 
 		return value;
 #else
@@ -1176,12 +1182,11 @@ public:
 	template<typename Array>
 	inline static ulong LeBytesTo64(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		ulong value = 0;
-		Utility::MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ulong));
+		MemoryTools::CopyToValue(Input, InOffset, value, sizeof(ulong));
 
 		return value;
 #else
@@ -1214,7 +1219,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) * sizeof(uint) >= 64, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
 #else
 		Output[OutOffset] = LeBytesTo32(Input, InOffset);
 		Output[OutOffset + 1] = LeBytesTo32(Input, InOffset + 4);
@@ -1252,7 +1257,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 32, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY256(Input, InOffset, Output, OutOffset);
 #else
 		Output[OutOffset] = LeBytesTo64(Input, InOffset);
 		Output[OutOffset + 1] = LeBytesTo64(Input, InOffset + 8);
@@ -1278,7 +1283,7 @@ public:
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 64, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
 #else
 		Output[OutOffset] = LeBytesTo64(Input, InOffset);
 		Output[OutOffset + 1] = LeBytesTo64(Input, InOffset + 8);
@@ -1308,8 +1313,8 @@ public:
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 128, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
-		Utility::MemoryTools::COPY512(Input, InOffset + 64, Output, OutOffset + 8);
+		MemoryTools::COPY512(Input, InOffset, Output, OutOffset);
+		MemoryTools::COPY512(Input, InOffset + 64, Output, OutOffset + 8);
 #else
 		LeBytesToULL512(Input, InOffset, Output, OutOffset);
 		LeBytesToULL512(Input, InOffset + 64, Output, OutOffset + 64);

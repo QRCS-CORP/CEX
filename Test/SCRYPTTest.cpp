@@ -52,6 +52,8 @@ namespace Test
 			OnProgress(std::string("SCRYPTTest: Passed SCRYPT exception handling tests.."));
 
 			SCRYPT* gen1 = new SCRYPT(SHA2Digests::SHA256);
+			SCRYPT* gen2 = new SCRYPT(SHA2Digests::SHA512);
+
 			// official sha256 vectors
 			Kat(gen1, m_key[0], m_salt[0], m_expected[0], 1024, 16);
 			Kat(gen1, m_key[1], m_salt[1], m_expected[1], 16384, 1);
@@ -61,7 +63,6 @@ namespace Test
 #endif
 			OnProgress(std::string("SCRYPTTest: Passed SCRYPT SHA256 KAT vector tests.."));
 
-			SCRYPT* gen2 = new SCRYPT(SHA2Digests::SHA512);
 			// original sha512 vectors
 			Kat(gen2, m_key[2], m_salt[2], m_expected[3], 1024, 16);
 			Kat(gen2, m_key[3], m_salt[3], m_expected[4], 16384, 1);
@@ -123,7 +124,8 @@ namespace Test
 			SCRYPT gen(SHA2Digests::SHA256);
 			// invalid key size
 			std::vector<byte> key(1);
-			gen.Initialize(key);
+			SymmetricKey kp(key);
+			gen.Initialize(kp);
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -SE2"));
 		}
@@ -160,8 +162,9 @@ namespace Test
 			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> otp(32);
+			SymmetricKey kp(key);
 
-			gen.Initialize(key);
+			gen.Initialize(kp);
 			// array too small
 			gen.Generate(otp, 0, otp.size() + 1);
 
@@ -182,7 +185,8 @@ namespace Test
 
 		dynamic_cast<SCRYPT*>(Generator)->CpuCost() = CpuCost;
 		dynamic_cast<SCRYPT*>(Generator)->Parallelization() = Parallelization;
-		Generator->Initialize(Key, Salt);
+		SymmetricKey kp(Key, Salt);
+		Generator->Initialize(kp);
 		Generator->Generate(otp);
 
 		if (otp != Expected)
@@ -250,10 +254,11 @@ namespace Test
 			IntegerTools::Fill(key, 0, key.size(), rnd);
 
 			// generate with the kdf
-			Generator->Initialize(key);
+			SymmetricKey kp(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp1, 0, OTPLEN);
 			Generator->Reset();
-			Generator->Initialize(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp2, 0, OTPLEN);
 
 			if (otp1 != otp2)
@@ -282,7 +287,8 @@ namespace Test
 				IntegerTools::Fill(key, 0, key.size(), rnd);
 
 				// generate with the kdf
-				Generator->Initialize(key);
+				SymmetricKey kp(key);
+				Generator->Initialize(kp);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
 			}

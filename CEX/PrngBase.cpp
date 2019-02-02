@@ -5,17 +5,19 @@ NAMESPACE_PRNG
 
 using Utility::MemoryTools;
 
-//~~~PrngBase~~~//
+//~~~Constructor~~~//
 
-PrngBase::PrngBase(Prngs Enumeral)
+PrngBase::PrngBase(Prngs Enumeral, std::string &Name)
 	:
-	m_prngEnumeral(Enumeral)
+	m_prngEnumeral(Enumeral),
+	m_prngName(Name)
 {
 }
 
 PrngBase::~PrngBase()
 {
 	m_prngEnumeral = Prngs::None;
+	m_prngName = "";
 }
 
 //~~~Accessors~~~//
@@ -23,6 +25,11 @@ PrngBase::~PrngBase()
 const Prngs PrngBase::Enumeral()
 {
 	return m_prngEnumeral;
+}
+
+const std::string PrngBase::Name()
+{
+	return m_prngName;
 }
 
 //~~~Public Functions~~~//

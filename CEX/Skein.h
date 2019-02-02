@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -47,6 +47,13 @@ NAMESPACE_DIGEST
 class Skein
 {
 public:
+
+	const static size_t SKEIN_RATE256_SIZE = 32;
+	const static size_t SKEIN_RATE512_SIZE = 64;
+	const static size_t SKEIN_RATE1024_SIZE = 128;
+	const static size_t SKEIN_MESSAGE256_SIZE = 32;
+	const static size_t SKEIN_MESSAGE512_SIZE = 64;
+	const static size_t SKEIN_MESSAGE1024_SIZE = 128;
 
 	//~~~Skein-256~~~//
 

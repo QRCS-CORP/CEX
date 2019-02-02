@@ -54,7 +54,7 @@ namespace Test
 			OnProgress(std::string("CMACTest: Passed CMAC exception handling tests.."));
 
 			// standard AES versions
-			CMAC* cmacaes = new CMAC(BlockCiphers::Rijndael);
+			CMAC* cmacaes = new CMAC(BlockCiphers::AES);
 			// 128-bit key
 			Kat(cmacaes, m_key[0], m_message[0], m_expected[0]);
 			Kat(cmacaes, m_key[0], m_message[1], m_expected[1]);
@@ -82,7 +82,7 @@ namespace Test
 
 			delete cmacaes;
 
-			CMAC* cmacahxh256 = new CMAC(BlockCiphers::AHX, Enumeration::BlockCipherExtensions::HKDF256);
+			CMAC* cmacahxh256 = new CMAC(BlockCiphers::RHXH256);
 			// ahx extended with HKDF(HMAC(SHA2-256))
 			Kat(cmacahxh256, m_key[2], m_message[0], m_expected[12]);
 			Kat(cmacahxh256, m_key[2], m_message[1], m_expected[13]);
@@ -92,7 +92,7 @@ namespace Test
 
 			delete cmacahxh256;
 
-			CMAC* cmacahxs256 = new CMAC(BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256);
+			CMAC* cmacahxs256 = new CMAC(BlockCiphers::RHXS256);
 			// ahx extended with cSHAKE-256
 			Kat(cmacahxs256, m_key[2], m_message[0], m_expected[16]);
 			Kat(cmacahxs256, m_key[2], m_message[1], m_expected[17]);
@@ -150,7 +150,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			CMAC gen(BlockCiphers::Rijndael);
+			CMAC gen(BlockCiphers::AES);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
@@ -169,7 +169,7 @@ namespace Test
 		// test finalize state -1
 		try
 		{
-			CMAC gen(BlockCiphers::Rijndael);
+			CMAC gen(BlockCiphers::AES);
 			std::vector<byte> code(16);
 			// generator was not initialized
 			gen.Finalize(code, 0);
@@ -257,7 +257,7 @@ namespace Test
 
 	void CMACTest::Params(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
 		std::vector<byte> otp1(Generator->TagSize());
@@ -278,7 +278,6 @@ namespace Test
 			// generate the mac
 			Generator->Initialize(kp);
 			Generator->Compute(msg, otp1);
-			Generator->Reset();
 			Generator->Initialize(kp);
 			Generator->Compute(msg, otp2);
 
@@ -291,7 +290,7 @@ namespace Test
 
 	void CMACTest::Stress(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> msg;
 		std::vector<byte> otp(Generator->TagSize());
 		std::vector<byte> key(ks.KeySize());
@@ -313,7 +312,6 @@ namespace Test
 				// generate with the kdf
 				Generator->Initialize(kp);
 				Generator->Compute(msg, otp);
-				Generator->Reset();
 			}
 			catch (std::exception const&)
 			{

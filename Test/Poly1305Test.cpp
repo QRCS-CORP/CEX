@@ -102,7 +102,7 @@ namespace Test
 		// test initialization key input-size
 		try
 		{
-			std::vector<byte> key(ks.KeySize() + 1);
+			std::vector<byte> key(ks.KeySize() - 1);
 			SymmetricKey k(key);
 
 			gen.Initialize(k);

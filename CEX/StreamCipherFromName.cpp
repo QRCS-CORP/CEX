@@ -25,24 +25,28 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 		switch (StreamCipherType)
 		{
 			case StreamCiphers::ACS:
+			{
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::AES, Enumeration::StreamAuthenticators::KMAC512);
+				break;
+			}
 			case StreamCiphers::ACS512A:
 			{
-				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE512, Enumeration::StreamAuthenticators::KMAC512);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::RHXS512, Enumeration::StreamAuthenticators::KMAC512);
 				break;
 			}
 			case StreamCiphers::ACS256A:
 			{
-				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::KMAC256);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::RHXS256, Enumeration::StreamAuthenticators::KMAC256);
 				break;
 			}
 			case StreamCiphers::ACS256S:
 			{
-				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::SHX, Enumeration::BlockCipherExtensions::SHAKE256, Enumeration::StreamAuthenticators::KMAC256);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::SHXS256, Enumeration::StreamAuthenticators::KMAC256);
 				break;
 			}
 			case StreamCiphers::ACS512S:
 			{
-				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::SHX, Enumeration::BlockCipherExtensions::SHAKE512, Enumeration::StreamAuthenticators::KMAC512);
+				cptr = new Cipher::Stream::ACS(Enumeration::BlockCiphers::SHXS512, Enumeration::StreamAuthenticators::KMAC512);
 				break;
 			}
 			case StreamCiphers::ChaCha256:

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -26,7 +26,7 @@
 #ifndef CEX_HMAC_H
 #define CEX_HMAC_H
 
-#include "IMac.h"
+#include "MacBase.h"
 #include "IDigest.h"
 #include "Digests.h"
 #include "SHA2Digests.h"
@@ -44,7 +44,7 @@ using Enumeration::SHA2Digests;
 /// <example>
 /// <description>Generating a MAC code</description>
 /// <code>
-/// HMAC mac(Enumeration::BlockCiphers::AHX);
+/// HMAC mac(Enumeration::BlockCiphers::AES);
 /// SymmetricKey kp(Key);
 /// mac.Initialize(kp);
 /// mac.Update(Input, 0, Input.size());
@@ -86,23 +86,21 @@ using Enumeration::SHA2Digests;
 /// <item><description>CRYPTO '06, Lecture <a href="http://cseweb.ucsd.edu/~mihir/papers/hmac-new.pdf">NMAC and HMAC Security</a>: NMAC and HMAC Security Proofs.</description></item>
 /// </list>
 /// </remarks>
-class HMAC final : public IMac
+class HMAC final : public MacBase
 {
 private:
 
 	static const std::string CLASS_NAME;
 	static const byte IPAD = 0x36;
+	static const size_t MINKEY_LENGTH = 4;
+	static const size_t MINSALT_LENGTH = 0;
 	static const byte OPAD = 0x5C;
-	static const size_t MIN_KEYSIZE = 4;
 
-	bool m_destroyEngine;
-	std::unique_ptr<IDigest> m_dgtEngine;
-	std::vector<byte> m_inputPad;
+	class HmacState;
+	std::unique_ptr<IDigest> m_hmacGenerator;
+	std::unique_ptr<HmacState> m_hmacState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	Digests m_msgDigestType;
-	std::vector<byte> m_outputPad;
 
 public:
 
@@ -150,29 +148,9 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Digests internal blocksize in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Read Only: The message digest engine type
-	/// </summary>
-	const Digests DigestType();
-
-	/// <summary>
-	/// Read Only: Mac generators type name
-	/// </summary>
-	const Macs Enumeral() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
 	/// Read Only: Processor parallelization availability.
@@ -180,16 +158,6 @@ public:
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	const bool IsParallel();
-
-	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t TagSize() override;
-
-	/// <summary>
-	/// Read Only: Mac generators implementation name
-	/// </summary>
-	const std::string Name() override;
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
@@ -260,13 +228,6 @@ public:
 	void Reset() override;
 
 	/// <summary>
-	/// Update the Mac with a single byte
-	/// </summary>
-	/// 
-	/// <param name="Input">Input byte to process</param>
-	void Update(byte Input) override;
-
-	/// <summary>
 	/// Update the Mac with a block of bytes
 	/// </summary>
 	/// 
@@ -274,11 +235,6 @@ public:
 	/// <param name="InOffset">Starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
-
-private:
-
-	void Scope();
-	void XorPad(std::vector<byte> &A, byte N);
 };
 
 NAMESPACE_MACEND

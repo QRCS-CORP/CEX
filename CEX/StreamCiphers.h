@@ -2,6 +2,7 @@
 #define CEX_STREAMCIPHERS_H
 
 #include "CexDomain.h"
+#include "SymmetricCiphers.h"
 
 NAMESPACE_ENUMERATION
 
@@ -15,65 +16,88 @@ enum class StreamCiphers : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The Authenticated Stream Cipher; using AHX-KMAC256
+	/// The Authenticated Stream Cipher; using RHX-KMAC256
 	/// </summary>
-	ACS256A = 64,
+	ACS256A = static_cast<byte>(SymmetricCiphers::ACS256A),
 	/// <summary>
-	/// The Authenticated Stream Cipher; using AHX-KMAC512
+	/// The Authenticated Stream Cipher; using RHX-KMAC512
 	/// </summary>
-	ACS512A = 65,
+	ACS512A = static_cast<byte>(SymmetricCiphers::ACS512A),
 	/// <summary>
 	/// The Authenticated Stream Cipher; using SHX-KMAC256
 	/// </summary>
-	ACS256S = 66,
+	ACS256S = static_cast<byte>(SymmetricCiphers::ACS256S),
 	/// <summary>
 	/// The Authenticated Stream Cipher; using SHX-KMAC512
 	/// </summary>
-	ACS512S = 67,
+	ACS512S = static_cast<byte>(SymmetricCiphers::ACS512S),
 	/// <summary>
-	/// The Authenticated Stream Cipher; using default parameters AHX-CSHAKE512-KMAC512
+	/// The Authenticated Stream Cipher; using default parameters RHX-CSHAKE512-KMAC512
 	/// </summary>
-	ACS = 68,
+	ACS = static_cast<byte>(SymmetricCiphers::ACS),
 	/// <summary>
 	/// The ChaChaPoly20 stream cipher
 	/// </summary>
-	ChaCha256 = 96,
+	ChaCha256 = static_cast<byte>(SymmetricCiphers::ChaCha256),
 	/// <summary>
 	/// The ChaChaPoly20 stream cipher authenticated with KMAC256
 	/// </summary>
-	ChaCha256AE = 97,
+	ChaCha256AE = static_cast<byte>(SymmetricCiphers::ChaCha256AE),
 	/// <summary>
 	/// The ChaChaPoly80 stream cipher
 	/// </summary>
-	ChaCha512 = 98,
+	ChaCha512 = static_cast<byte>(SymmetricCiphers::ChaCha512),
 	/// <summary>
 	/// The ChaChaPoly80 stream cipher authenticated with KMAC512
 	/// </summary>
-	ChaCha512AE = 99,
+	ChaCha512AE = static_cast<byte>(SymmetricCiphers::ChaCha512AE),
 	/// <summary>
 	/// The Threefish 256-bit stream cipher
 	/// </summary>
-	Threefish256 = 128,
+	Threefish256 = static_cast<byte>(SymmetricCiphers::Threefish256),
 	/// <summary>
 	/// The Threefish 256-bit stream cipher authenticated with KMAC256
 	/// </summary>
-	Threefish256AE = 129,
+	Threefish256AE = static_cast<byte>(SymmetricCiphers::Threefish256AE),
 	/// <summary>
 	/// The Threefish 512-bit stream cipher
 	/// </summary>
-	Threefish512 = 130,
+	Threefish512 = static_cast<byte>(SymmetricCiphers::Threefish512),
 	/// <summary>
 	/// The Threefish 512-bit stream cipher authenticated with KMAC512
 	/// </summary>
-	Threefish512AE = 131,
+	Threefish512AE = static_cast<byte>(SymmetricCiphers::Threefish512AE),
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher
 	/// </summary>
-	Threefish1024 = 132,
+	Threefish1024 = static_cast<byte>(SymmetricCiphers::Threefish1024),
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher authenticated with KMAC1024
 	/// </summary>
-	Threefish1024AE = 133
+	Threefish1024AE = static_cast<byte>(SymmetricCiphers::Threefish1024AE)
+};
+
+class StreamCipherConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the StreamCiphers formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The StreamCiphers enumeration member</param>
+	///
+	/// <returns>The matching StreamCiphers string name</returns>
+	static std::string ToName(StreamCiphers Enumeral);
+
+	/// <summary>
+	/// Derive the StreamCiphers enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The StreamCiphers string name</param>
+	///
+	/// <returns>The matching StreamCiphers enumeration type name</returns>
+	static StreamCiphers FromName(std::string &Name);
 };
 
 NAMESPACE_ENUMERATIONEND

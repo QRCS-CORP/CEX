@@ -370,7 +370,7 @@ namespace Test
 		Keccak::PermuteR24P4x1600H(state256);
 
 		std::vector<ulong> state256ull(100);
-		MemoryTools::Copy(state256, 0, state256ull, 0, 100 * sizeof(ulong));
+		std::memcpy(state256ull.data(), state256.data(), 100 * sizeof(ulong));
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -389,7 +389,7 @@ namespace Test
 		Keccak::PermuteR24P8x1600H(state512);
 
 		std::vector<ulong> state512ull(100);
-		MemoryTools::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));
+		std::memcpy(state512ull.data(), state512.data(), 200 * sizeof(ulong));
 
 		for (size_t i = 0; i < 25; ++i)
 		{

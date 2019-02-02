@@ -231,9 +231,9 @@ void SHA256::Reset()
 	std::vector<byte> params(BLOCK_SIZE);
 
 	m_dgtState.clear();
-	m_dgtState.resize(m_parallelProfile.ParallelMaxDegree());
+	m_dgtState.resize(m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelMaxDegree() : 1);
 	m_msgBuffer.clear();
-	m_msgBuffer.resize(m_parallelProfile.ParallelMaxDegree() * BLOCK_SIZE);
+	m_msgBuffer.resize(m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelMaxDegree() * BLOCK_SIZE : BLOCK_SIZE);
 	m_msgLength = 0;
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)

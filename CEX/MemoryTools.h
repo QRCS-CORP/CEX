@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -91,7 +91,7 @@ public:
 	{
 		if (Length != 0)
 		{
-			constexpr size_t ELMLEN = sizeof(Array::value_type);
+			const size_t ELMLEN = sizeof(Array::value_type);
 			CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
 			CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
@@ -226,7 +226,7 @@ public:
 	{
 		if (Length != 0)
 		{
-			constexpr size_t ELMLEN = sizeof(Array::value_type);
+			const size_t ELMLEN = sizeof(Array::value_type);
 
 			CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
 
@@ -282,7 +282,7 @@ public:
 	{
 		if (Length != 0)
 		{
-			constexpr size_t ELMLEN = sizeof(Array::value_type);
+			const size_t ELMLEN = sizeof(Array::value_type);
 
 			CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than output capacity");
 
@@ -377,7 +377,7 @@ public:
 	{
 		if (Length != 0)
 		{
-			constexpr size_t ELMLEN = sizeof(Array::value_type);
+			const size_t ELMLEN = sizeof(Array::value_type);
 
 			CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than input capacity");
 			CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
@@ -435,12 +435,11 @@ public:
 	{
 		if (Length != 0)
 		{
-			constexpr size_t INPLEN = sizeof(ArrayA::value_type);
-			constexpr size_t OUTLEN = sizeof(ArrayB::value_type);
+			const size_t INPLEN = sizeof(ArrayA::value_type);
+			const size_t OUTLEN = sizeof(ArrayB::value_type);
 
 			CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input capacity");
 			CEXASSERT((Output.size() - OutOffset) * OUTLEN >= Length, "Length is larger than output capacity");
-			CEXASSERT(INPLEN <= 64 && OUTLEN <= 64, "Integer type is larger than 128 bits");
 
 #if defined(__AVX512__)
 			const size_t SMDBLK = 64;
@@ -688,7 +687,7 @@ public:
 	{
 		if (Length != 0)
 		{
-			constexpr size_t ELMLEN = sizeof(Array::value_type);
+			const size_t ELMLEN = sizeof(Array::value_type);
 
 			CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
 			CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
@@ -806,8 +805,8 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void XOR(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		constexpr size_t INPLEN = sizeof(ArrayA::value_type);
-		constexpr size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OUTLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= Length, "Length is larger than output capacity");
@@ -860,8 +859,8 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void XOR128(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		constexpr size_t INPLEN = sizeof(ArrayA::value_type);
-		constexpr size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OUTLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 16, "Length is larger than output capacity");
@@ -887,8 +886,8 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void XOR256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		constexpr size_t INPLEN = sizeof(ArrayA::value_type);
-		constexpr size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OUTLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 32, "Length is larger than output capacity");
@@ -912,8 +911,8 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void XOR512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		constexpr size_t INPLEN = sizeof(ArrayA::value_type);
-		constexpr size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OUTLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 64, "Length is larger than output capacity");
@@ -937,8 +936,8 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void XOR1024(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		constexpr size_t INPLEN = sizeof(ArrayA::value_type);
-		constexpr size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OUTLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 64, "Length is larger than output capacity");
@@ -960,8 +959,8 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void XorPartial(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		constexpr size_t INPLEN = sizeof(ArrayA::value_type);
-		constexpr size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OUTLEN = sizeof(ArrayB::value_type);
 
 		byte* inpPtr = (byte*)Input.data() + (InOffset * INPLEN);
 		byte* outPtr = (byte*)Output.data() + (OutOffset * OUTLEN);
@@ -969,6 +968,70 @@ public:
 		for (size_t i = 0; i < Length; ++i)
 		{
 			outPtr[i] ^= inpPtr[i];
+		}
+	}
+
+	template <typename Array>
+	inline static void XorPad(Array &Output, byte N)
+	{
+		size_t i;
+
+		i = 0;
+
+#if defined(__AVX512__)
+
+		const size_t SMDLEN = sizeof(__m512i);
+		const size_t ALNLEN = (Output.size() / SMDLEN) * SMDLEN;
+
+		if (ALNLEN != 0)
+		{
+			__m256i zmm = _mm512_set1_epi8(N);
+
+			while (i != ALNLEN)
+			{
+				_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[i]), _mm512_xor_si512(zmm, _mm512_loadu_si512(reinterpret_cast<__m512i*>(&Output[i]))));
+				i += SMDLEN;
+			}
+		}
+
+#elif defined(__AVX2__)
+
+		const size_t SMDLEN = sizeof(__m256i);
+		const size_t ALNLEN = (Output.size() / SMDLEN) * SMDLEN;
+
+		if (ALNLEN != 0)
+		{
+			__m256i ymm = _mm256_set1_epi8(N);
+
+			while (i != ALNLEN)
+			{
+				_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[i]), _mm256_xor_si256(ymm, _mm256_loadu_si256(reinterpret_cast<__m256i*>(&Output[i]))));
+				i += SMDLEN;
+			}
+		}
+
+#elif defined(__AVX__)
+
+		const size_t SMDLEN = sizeof(__m128i);
+		const size_t ALNLEN = (Output.size() / SMDLEN) * SMDLEN;
+
+		if (ALNLEN != 0)
+		{
+			__m128i xmm = _mm_set1_epi8(N);
+
+			while (i != ALNLEN)
+			{
+				_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[i]), _mm_xor_si128(xmm, _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[i]))));
+				i += SMDLEN;
+			}
+		}
+
+#endif
+
+		while (i < Output.size())
+		{
+			Output[i] ^= N;
+			++i;
 		}
 	}
 };

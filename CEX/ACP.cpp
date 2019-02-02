@@ -5,7 +5,6 @@
 #include "CJP.h"
 #include "CSP.h"
 #include "RDP.h"
-#include "SHAKE.h"
 #include "SymmetricKey.h"
 #include "SystemTools.h"
 
@@ -14,9 +13,9 @@ NAMESPACE_PROVIDER
 using Utility::ArrayTools;
 using Enumeration::ErrorCodes;
 using Utility::MemoryTools;
+using Enumeration::ProviderConvert;
 using Utility::SystemTools;
 
-const std::string ACP::CLASS_NAME("ACP");
 const bool ACP::CPU_HAS_RDRAND = SystemTools::HasRdRand();
 const bool ACP::TIMER_HAS_TSC = SystemTools::HasRdtsc();
 
@@ -28,11 +27,11 @@ ACP::ACP()
 	m_pvdSelfTest(),
 #endif
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
-	ProviderBase(true, Providers::ACP, CLASS_NAME),
+	ProviderBase(true, Providers::ACP, ProviderConvert::ToName(Providers::ACP)),
 #else
-	ProviderBase(false, Providers::ACP, CLASS_NAME),
+	ProviderBase(false, Providers::ACP, ProviderConvert::ToName(Providers::ACP)),
 #endif
-	m_kdfGenerator(new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE512))
+	m_kdfGenerator(new Kdf::SHAKE(SHAKE_MODE))
 {
 	Reset();
 }
@@ -49,11 +48,11 @@ void ACP::Generate(std::vector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
@@ -63,15 +62,15 @@ void ACP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, Offset, Length, m_kdfGenerator);
@@ -81,11 +80,11 @@ void ACP::Generate(SecureVector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
@@ -95,15 +94,15 @@ void ACP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output, Offset, Length, m_kdfGenerator);
@@ -173,12 +172,14 @@ std::vector<byte> ACP::Collect()
 	}
 
 	// add jitter block
+#if defined(CEX_ACP_JITTER)
 	if (TIMER_HAS_TSC)
 	{
 		CJP jpv;
 		jpv.Generate(buffer);
 		ArrayTools::AppendVector(buffer, state);
 	}
+#endif
 
 	return state;
 }
@@ -227,18 +228,14 @@ bool ACP::FipsTest()
 	return (fail == false);
 }
 
-void ACP::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+void ACP::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
 {
 	Generator->Generate(Output, Offset, Length);
 }
 
-void ACP::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IKdf> &Generator)
+void ACP::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
 {
-	std::vector<byte> smp(Length);
-
-	Generator->Generate(smp, 0, Length);
-	Insert(smp, 0, Output, Offset, Length);
-	Clear(smp);
+	Generator->Generate(Output, Offset, Length);
 }
 
 std::vector<byte> ACP::MemoryInfo()

@@ -72,6 +72,29 @@ enum class AsymmetricTransforms : byte
 	SPXS512F256 = 14
 };
 
+class AsymmetricTransformConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the AsymmetricTransforms formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The AsymmetricTransforms enumeration member</param>
+	///
+	/// <returns>The matching AsymmetricTransforms string name</returns>
+	static std::string ToName(AsymmetricTransforms Enumeral);
+
+	/// <summary>
+	/// Derive the AsymmetricTransforms enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The AsymmetricTransforms string name</param>
+	///
+	/// <returns>The matching AsymmetricTransforms enumeration type name</returns>
+	static AsymmetricTransforms FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif
 

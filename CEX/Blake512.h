@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -48,7 +48,7 @@ using Cipher::ISymmetricKey;
 /// 
 /// <example>
 /// <description>Example using the Compute method:</description>
-/// <para>Use the Compute method for small to medium data sizes</para>
+/// <para>Use the Compute method for small to medium data sizes.</para>
 /// <code>
 /// Blake512 dgt;
 /// std::vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
@@ -109,7 +109,7 @@ class Blake512 final : public IDigest
 {
 private:
 
-	static const size_t BLOCK_SIZE = 128;
+	static const size_t BLOCK_SIZE = 128; // TODO: replace with Blake2 class constants
 	static const uint CHAIN_SIZE = 8;
 	static const std::string CLASS_NAME;
 	static const uint COUNTER_SIZE = 2;

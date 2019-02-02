@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -39,7 +39,7 @@ NAMESPACE_MODE
 /// <example>
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// OFB cipher(BlockCiphers::AHX);
+/// OFB cipher(BlockCiphers::AES);
 /// // initialize for encryption
 /// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt one block
@@ -128,11 +128,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an undefined block cipher type name is used, or the specified register size is invalid</exception>
-	explicit OFB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, size_t RegisterSize = 16);
+	explicit OFB(BlockCiphers CipherType, size_t RegisterSize = 16);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance

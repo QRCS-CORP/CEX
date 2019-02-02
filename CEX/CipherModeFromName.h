@@ -33,13 +33,12 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The block cipher enumeration name</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// <param name="CipherModeType">The cipher mode enumeration name</param>
 	/// 
 	/// <returns>An uninitialized block cipher mode instance</returns>
 	/// 
 	/// <exception cref="CryptoException">Thrown if the block cipher, extension or mode are not supported</exception>
-	static ICipherMode* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType);
+	static ICipherMode* GetInstance(BlockCiphers CipherType, CipherModes CipherModeType);
 
 	/// <summary>
 	/// Get a Cipher Mode instance by name with a block cipher instance

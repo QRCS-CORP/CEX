@@ -55,14 +55,15 @@ namespace Test
 			OnProgress(std::string("PBKDF2Test: Passed PBKDF2 exception handling tests.."));
 
 			PBKDF2* gen1 = new PBKDF2(SHA2Digests::SHA256);
+			PBKDF2* gen2 = new PBKDF2(SHA2Digests::SHA512);
+
 			// official SHA256 vectors
-			Kat(gen1, m_key[0],m_salt[0],  m_expected[0], 1);
+			Kat(gen1, m_key[0], m_salt[0], m_expected[0], 1);
 			Kat(gen1, m_key[0], m_salt[0], m_expected[1], 2);
 			Kat(gen1, m_key[0], m_salt[0], m_expected[2], 4096);
 			Kat(gen1, m_key[1], m_salt[1], m_expected[3], 4096);
 			OnProgress(std::string("PBKDF2Test: Passed PBKDF2 SHA256 KAT vector tests.."));
 
-			PBKDF2* gen2 = new PBKDF2(SHA2Digests::SHA512);
 			// original SHA512 vectors
 			Kat(gen2, m_key[2], m_salt[2], m_expected[4], 1);
 			Kat(gen2, m_key[2], m_salt[2], m_expected[5], 2);
@@ -120,7 +121,8 @@ namespace Test
 			PBKDF2 gen(SHA2Digests::SHA256);
 			// invalid key size
 			std::vector<byte> key(1);
-			gen.Initialize(key);
+			SymmetricKey kp(key);
+			gen.Initialize(kp);
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -PE2"));
 		}
@@ -157,8 +159,9 @@ namespace Test
 			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> otp(32);
+			SymmetricKey kp(key);
 
-			gen.Initialize(key);
+			gen.Initialize(kp);
 			// array too small
 			gen.Generate(otp, 0, otp.size() + 1);
 
@@ -208,12 +211,13 @@ namespace Test
 		HexConverter::Decode(salt, 4, m_salt);
 	}
 
-	void PBKDF2Test::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t Iterations)
+	void PBKDF2Test::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, uint Iterations)
 	{
 		std::vector<byte> otp(Expected.size());
-
 		dynamic_cast<PBKDF2*>(Generator)->Iterations() = Iterations;
-		Generator->Initialize(Key, Salt);
+		SymmetricKey kp(Key, Salt);
+
+		Generator->Initialize(kp);
 		Generator->Generate(otp);
 
 		if (otp != Expected)
@@ -247,10 +251,11 @@ namespace Test
 			IntegerTools::Fill(key, 0, key.size(), rnd);
 
 			// generate with the kdf
-			Generator->Initialize(key);
+			SymmetricKey kp(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp1, 0, OTPLEN);
 			Generator->Reset();
-			Generator->Initialize(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp2, 0, OTPLEN);
 
 			if (otp1 != otp2)
@@ -279,7 +284,8 @@ namespace Test
 				IntegerTools::Fill(key, 0, key.size(), rnd);
 
 				// generate with the kdf
-				Generator->Initialize(key);
+				SymmetricKey kp(key);
+				Generator->Initialize(kp);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
 			}

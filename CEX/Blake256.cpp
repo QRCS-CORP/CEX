@@ -43,7 +43,7 @@ Blake256::Blake256(bool Parallel)
 	m_treeDestroy(true),
 	m_treeParams(Parallel ? BlakeParams(static_cast<byte>(DIGEST_SIZE), 2, static_cast<byte>(m_parallelProfile.ParallelMaxDegree()), 0, static_cast<byte>(DIGEST_SIZE)) : BlakeParams(static_cast<byte>(DIGEST_SIZE), 1, 1, 0, 0))
 {
-	// TODO: implement parallel alternate for single core cpu
+	// TODO: implement parallel alternate for single core cpu + move this to init list
 	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
 	if (m_parallelProfile.IsParallel())

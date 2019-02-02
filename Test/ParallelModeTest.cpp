@@ -51,32 +51,32 @@ namespace Test
 	{
 		try
 		{
-			CBC* cpr1 = new CBC(Enumeration::BlockCiphers::RHX);
+			CBC* cpr1 = new CBC(Enumeration::BlockCiphers::AES);
 			Stress(cpr1, false);
 			OnProgress(std::string("ParallelModeTest: Passed CBC parallel to sequential equivalence test.."));
 			delete cpr1;
 
-			CTR* cpr2 = new CTR(Enumeration::BlockCiphers::RHX);
+			CTR* cpr2 = new CTR(Enumeration::BlockCiphers::AES);
 			Stress(cpr2, true);
 			OnProgress(std::string("ParallelModeTest: Passed CTR parallel to sequential equivalence test.."));
 			delete cpr2;
 
-			ECB* cpr3 = new ECB(Enumeration::BlockCiphers::RHX);
+			ECB* cpr3 = new ECB(Enumeration::BlockCiphers::AES);
 			Stress(cpr3, true);
 			OnProgress(std::string("ParallelModeTest: Passed ECB parallel to sequential equivalence test.."));
 			delete cpr3;
 
-			ICM* cpr4 = new ICM(Enumeration::BlockCiphers::RHX);
+			ICM* cpr4 = new ICM(Enumeration::BlockCiphers::AES);
 			Stress(cpr4, true);
 			OnProgress(std::string("ParallelModeTest: Passed ICM parallel to sequential equivalence test.."));
 			delete cpr4;
 
-			EAX* cpr5 = new EAX(Enumeration::BlockCiphers::RHX);
+			EAX* cpr5 = new EAX(Enumeration::BlockCiphers::AES);
 			Stress(cpr5, true);
 			OnProgress(std::string("ParallelModeTest: Passed EAX parallel to sequential equivalence test.."));
 			delete cpr5;
 
-			GCM* cpr6 = new GCM(Enumeration::BlockCiphers::RHX);
+			GCM* cpr6 = new GCM(Enumeration::BlockCiphers::AES);
 			Stress(cpr6, true);
 			OnProgress(std::string("ParallelModeTest: Passed GCM parallel to sequential equivalence test.."));
 			delete cpr6;

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -16,25 +16,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
-// Principal Algorithms:
-// An implementation of the SHA-2 digest with a 512 bit return size.
-// SHA-2 <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Specification</a>.
-// 
-// Implementation Details:
-// An implementation of an Hash based Key Derivation Function (HKDF). 
-// Written by John Underhill, September 19, 2014
-// Updated September 30, 2016
-// Updated April 19, 2017
+// Updated by January 28, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_HKDF_H
 #define CEX_HKDF_H
 
-#include "IKdf.h"
 #include "Digests.h"
-#include "IDigest.h"
 #include "HMAC.h"
+#include "IDigest.h"
+#include "KdfBase.h"
 #include "SHA2Digests.h"
 
 NAMESPACE_KDF
@@ -45,7 +36,7 @@ using Mac::HMAC;
 using Enumeration::SHA2Digests;
 
 /// <summary>
-/// An implementation of an Hash based Key Derivation Function (HKDF)
+/// An implementation of the Hash based Key Derivation Function: HKDF
 /// </summary> 
 /// 
 /// <example>
@@ -62,14 +53,13 @@ using Enumeration::SHA2Digests;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>HKDF uses an HMAC as a pseudo-random function to produce pseudo-random output in a process known as key stretching. \n
-/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-compresses key and optional salt and info parameters into a pseudo-random key. \n
-/// The Extract step is called if the the KDF is initialized with the salt or info parameters, this compresses the input material to a key used by the HMAC. \n
-/// The Info parameter may also be set via the Info() property, this can be used to bypass the extract step, while adding additional input to the HMAC compression cycle. \n
-/// For best possible security, the Extract step should be skipped, the KDF is initialized with a key equal in size to the hash functions internal block-size, 
-/// and the Info parameter is used as a secondary source of pseudo-random key input. \n
-/// If used in this configuration, the Info parameter should be sized to the hash block-size, less one byte of counter, and any padding added by the hash functions finalizer. \n
-/// Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle, and the underlying hash function processes only full blocks of input.</para>
+/// <para>HKDF uses an HMAC as a mixing function to produce pseudo-random output in a process known as key stretching. \n
+/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-processes the input key, and optional salt and info parameters into an HMAC key. \n
+/// The Extract step is called if the KKDF is initialized with the salt parameter, this compresses the input material to a key used by HMAC. \n
+/// For best possible security, the Extract step should be skipped, and HKDF initialized with a key equal in size to the desired security level, and optimally to the HMAC functions internal block-size, 
+/// with the Info parameter used as a secondary source of pseudo-random key input. \n
+/// If used in this configuration, ideally the Info parameter should be sized to the hash output-size, less one byte of counter and any padding added by the hash functions finalizer. \n
+/// Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle without the need to call additional permutation compressions, and the underlying hash function processes only full blocks of input.</para>
 /// 
 /// <description><B>Description:</B></description> \n
 /// <EM>Legend:</EM> \n
@@ -94,13 +84,12 @@ using Enumeration::SHA2Digests;
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
 /// <item><description>This implementation only supports the SHA2-256 and SHA2-512 message digests.</description></item>
-/// <item><description>This class can be instantiated with a message digest or HMAC instance, or by using a digests enumeration type name.</description></item>
-/// <item><description>The generator must be initialized with a key using one of the Initialize() functions before output can be generated.</description></item>
-/// <item><description>The Initialize() function can use a SymmetricKey key container class, or input arrays of Key, and optional Salt and Info.</description></item>
-/// <item><description>Initializing with a salt or info parameters will call the HKDF Extract function.</description></item>
-/// <item><description>The Info parameter can be set via a property, bypassing the Extract step, and can be used as an additional source of entropy.</description></item>
-/// <item><description>The recommended key and salt size is the digests block-size in bytes, the info size should be the block-size, less 1 byte of counter, and any padding added by the digests finalizer.</description></item>
-/// <item><description>The minimum recommended key size is the digests output array size in bytes.</description></item>
+/// <item><description>The generator must be initialized with a key using the Initialize() functions before output can be generated.</description></item>
+/// <item><description>The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material.</description></item>
+/// <item><description>Initializing with a salt parameter will call the HKDF Extract function, this is not recommended.</description></item>
+/// <item><description>The Info parameter can be set via a property, and can be used as an additional source of entropy.</description></item>
+/// <item><description>The recommended key and salt size is the digests block-size in bytes, the info size should be the HMAC output-size, less 1 byte of counter and any padding added by the digests finalizer.</description></item>
+/// <item><description>The minimum recommended key size is the underlying digests output-size in bytes.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -110,25 +99,19 @@ using Enumeration::SHA2Digests;
 /// <item><description><a href="http://tools.ietf.org/html/rfc5869">RFC 5869</a>: HMAC-based Extract-and-Expand Key Derivation Function.</description></item>
 /// </list>
 /// </remarks>
-class HKDF final : public IKdf
+class HKDF final : public KdfBase
 {
 private:
 
-	static const std::string CLASS_NAME;
-	static const size_t MIN_KEYLEN = 16;
-	static const size_t MIN_SALTLEN = 4;
+	static const size_t MAXGEN_REQUESTS = 255;
+	static const size_t MINKEY_LENGTH = 16;
+	static const size_t MINSALT_LENGTH = 4;
 
-	std::unique_ptr<HMAC> m_macGenerator;
-	size_t m_blockSize;
-	bool m_destroyEngine;
+	class HkdfState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	byte m_kdfCounter;
-	Digests m_kdfDigestType;
-	std::vector<byte> m_kdfInfo;
-	std::vector<byte> m_kdfState;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_macSize;
+	std::unique_ptr<HMAC> m_hkdfGenerator;
+	std::unique_ptr<HkdfState> m_hkdfState;
 
 public:
 
@@ -153,7 +136,7 @@ public:
 	/// Instantiates an HKDF generator using a message digest type name
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The hash functions type name enumeral</param>
+	/// <param name="DigestType">The SHA2 hash functions type name enumeral</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if an invalid digest type is used</exception>
 	explicit HKDF(SHA2Digests DigestType);
@@ -168,15 +151,6 @@ public:
 	explicit HKDF(IDigest* Digest);
 
 	/// <summary>
-	/// Instantiates an HKDF generator using an HMAC instance
-	/// </summary>
-	/// 
-	/// <param name="Mac">The initialized HMAC instance</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if a null HMAC is used</exception>
-	explicit HKDF(HMAC* Mac);
-
-	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
 	~HKDF() override;
@@ -184,137 +158,77 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Kdf generators type name
-	/// </summary>
-	const Kdfs Enumeral() override;
-
-	/// <summary>
 	/// Read/Write: Sets the Info value in the HKDF initialization parameters.
-	/// <para>Must be set before Initialize() function is called.
-	/// Code should be either a zero byte array, or a multiple of the HKDF digest engines return size.</para>
+	/// <para>Must be set before Initialize() function is called.</para>
 	/// </summary>
 	std::vector<byte> &Info();
 
 	/// <summary>
-	/// Read Only: Generator is ready to produce random
+	/// Read Only: Generator is initialized and ready to produce pseudo-random
 	/// </summary>
 	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Read Only: Available Kdf Key Sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Minimum recommended initialization key size in bytes.
-	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
-	/// </summary>
-	const size_t MinKeySize() override;
-
-	/// <summary>
-	/// Read Only: The Kdf generators class name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo-random bytes
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <param name="Output">The destination standard vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	size_t Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo-random bytes using offset and length parameters
+	/// Fill a secure vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// <param name="OutOffset">The starting position within the Output array</param>
+	/// <param name="Output">The destination secure vector to fill</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
+	void Generate(SecureVector<byte> &Output) override;
+
+	/// <summary>
+	/// Fill an array with pseudo-random bytes, using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+
+	/// <summary>
+	/// Fill a secure vector with pseudo-random bytes, using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
+	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Initialize the generator with a SymmetricKey structure containing the key, and optional salt, and info string.
-	/// <para>The use of a salt or info parameters will call the HKDF Extract function.</para>
+	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 	/// </summary>
 	/// 
-	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// <param name="KeyParams">The symmetric key container with the generators keying material</param>
 	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(ISymmetricKey &GenParam) override;
+	/// <exception cref="CryptoKdfException">Thrown if the key values are not a legal size</exception>
+	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
-	/// Initialize the generator with a key.
-	/// <para>This method initiatialzes HKDF without the Extract step.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is too small</exception>
-	void Initialize(const std::vector<byte> &Key) override;
-
-	/// <summary>
-	/// Initialize the SHAKE generator with a key, using length and offset arguments
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Offset">The starting position within the key array</param>
-	/// <param name="Length">The number of key bytes to use</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is too small</exception>
-	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length) override;
-
-	/// <summary>
-	/// Initialize the generator with key and salt arrays.
-	/// <para>The use of a salt will call the HKDF Extract function.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value containing an additional source of entropy</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
-
-	/// <summary>
-	/// Initialize the generator with a key, a salt array, and an information string or nonce.
-	/// <para>The use of a salt or info parameters will call the HKDF Extract function.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value used as an additional source of entropy</param>
-	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
-
-	/// <summary>
-	/// Update the generators keying material
-	/// </summary>
-	///
-	/// <param name="Seed">The new seed value array</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void ReSeed(const std::vector<byte> &Seed) override;
-
-	/// <summary>
-	/// Reset the internal state; Kdf must be re-initialized before it can be used again
+	/// Reset the internal state; the generator must be re-initialized before it can be used again
 	/// </summary>
 	void Reset() override;
 
 private:
 
-	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output);
-	void LoadState();
+	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
+	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
+	static void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
 };
 
 NAMESPACE_KDFEND

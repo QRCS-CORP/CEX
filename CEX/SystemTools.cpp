@@ -3,6 +3,7 @@
 NAMESPACE_UTILITY
 
 bool SystemTools::TMR_RDTSC = false;
+bool SystemTools::HAS_RDRAND = false;
 
 std::string SystemTools::ComputerName()
 {
@@ -121,17 +122,29 @@ ulong SystemTools::GetRdtscFrequency()
 
 bool SystemTools::HasRdRand()
 {
-	CpuDetect detect;
+	if (!HAS_RDRAND)
+	{
+#if defined(__AVX__)
+		CpuDetect detect;
+		HAS_RDRAND = detect.RDRAND();
+#else
+		HAS_RDRAND = false;
+#endif
+	}
 
- 	return detect.RDRAND();
+	return HAS_RDRAND;
 }
 
 bool SystemTools::HasRdtsc()
 {
 	if (!TMR_RDTSC)
 	{
+#if defined(__AVX__)
 		CpuDetect detect;
 		TMR_RDTSC = detect.RDTSCP();
+#else
+		TMR_RDTSC = false;
+#endif
 	}
 
 	return TMR_RDTSC;

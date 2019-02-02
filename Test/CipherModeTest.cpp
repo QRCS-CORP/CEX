@@ -58,7 +58,7 @@ namespace Test
 		try
 		{
 			// ECB 128bit key
-			Mode::ECB* cpr1 = new Mode::ECB(BlockCiphers::Rijndael);
+			Mode::ECB* cpr1 = new Mode::ECB(BlockCiphers::AES);
 			Kat(cpr1, m_keys[0], m_nonce[2], m_message[0], m_expected[0], true);
 			Kat(cpr1, m_keys[0], m_nonce[2], m_message[1], m_expected[1], false);
 			// 192bit
@@ -71,7 +71,7 @@ namespace Test
 			OnProgress(std::string("CipherModeTest: Passed ECB 128/192/256 bit key encryption/decryption tests.."));
 
 			// CBC 128bit key
-			Mode::CBC* cpr2 = new Mode::CBC(BlockCiphers::Rijndael);
+			Mode::CBC* cpr2 = new Mode::CBC(BlockCiphers::AES);
 			Kat(cpr2, m_keys[0], m_nonce[0], m_message[6], m_expected[6], true);
 			Kat(cpr2, m_keys[0], m_nonce[0], m_message[7], m_expected[7], false);
 			// 192bit
@@ -84,7 +84,7 @@ namespace Test
 			OnProgress(std::string("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests.."));
 
 			// CFB 128bit key
-			Mode::CFB* cpr3 = new Mode::CFB(BlockCiphers::Rijndael);
+			Mode::CFB* cpr3 = new Mode::CFB(BlockCiphers::AES);
 			Kat(cpr3, m_keys[0], m_nonce[0], m_message[12], m_expected[12], true);
 			Kat(cpr3, m_keys[0], m_nonce[0], m_message[13], m_expected[13], false);
 			// 192bit
@@ -97,7 +97,7 @@ namespace Test
 			OnProgress(std::string("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests.."));
 
 			// OFB 128bit key
-			Mode::OFB* cpr4 = new Mode::OFB(BlockCiphers::Rijndael);
+			Mode::OFB* cpr4 = new Mode::OFB(BlockCiphers::AES);
 			Kat(cpr4, m_keys[0], m_nonce[0], m_message[18], m_expected[18], true);
 			Kat(cpr4, m_keys[0], m_nonce[0], m_message[19], m_expected[19], false);
 			// 192bit
@@ -110,7 +110,7 @@ namespace Test
 			OnProgress(std::string("CipherModeTest: Passed OFB 128/192/256 bit key encryption/decryption tests.."));
 
 			// CTR 128bit key
-			Mode::CTR* cpr5 = new Mode::CTR(BlockCiphers::Rijndael);
+			Mode::CTR* cpr5 = new Mode::CTR(BlockCiphers::AES);
 			Kat(cpr5, m_keys[0], m_nonce[1], m_message[24], m_expected[24], true);
 			Kat(cpr5, m_keys[0], m_nonce[1], m_message[25], m_expected[25], false);
 			// 192bit

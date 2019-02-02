@@ -302,7 +302,7 @@ namespace Test
 		SHA2::PermuteR64P8x512H(input256, 0, state256);
 
 		std::vector<uint> state256ul(32);
-		MemoryTools::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
+		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
@@ -322,7 +322,7 @@ namespace Test
 		SHA2::PermuteR64P16x512H(input512, 0, state512);
 
 		std::vector<uint> state512ul(64);
-		MemoryTools::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
+		std::memcpy(state512ul.data(), state512.data(), 64 * sizeof(uint));
 
 		for (size_t i = 0; i < 64; ++i)
 		{

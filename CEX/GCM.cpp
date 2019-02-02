@@ -10,7 +10,7 @@ const std::string GCM::CLASS_NAME("GCM");
 
 //~~~Constructor~~~//
 
-GCM::GCM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
+GCM::GCM(BlockCiphers CipherType)
 	:
 	m_aadData(0),
 	m_aadLoaded(false),
@@ -18,7 +18,7 @@ GCM::GCM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	m_aadSize(0),
 	m_autoIncrement(false),
 	m_checkSum(BLOCK_SIZE),
-	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType, CipherExtensionType) :
+	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
 		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The block cipher type can nor be None!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),

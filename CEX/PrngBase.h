@@ -16,6 +16,7 @@ class PrngBase : public IPrng
 private:
 
 	Prngs m_prngEnumeral;
+	std::string m_prngName;
 
 public:
 
@@ -41,7 +42,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Enumeral">The prngs enumeration name</param>
-	PrngBase(Prngs Enumeral);
+	/// <param name="Name">The prngs formal name</param>
+	PrngBase(Prngs Enumeral, std::string &Name);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -54,6 +56,11 @@ public:
 	/// Read Only: The prngs type name
 	/// </summary>
 	const Prngs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The random generators implementation name
+	/// </summary>
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

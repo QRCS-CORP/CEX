@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -51,7 +51,7 @@ NAMESPACE_BLOCK
 /// <example>
 /// <description>Example of encrypting a block:</description>
 /// <code>
-/// CTR cipher(Enumeration::BlockCiphers::AHX);
+/// CTR cipher(Enumeration::BlockCiphers::AES);
 /// // initialize for encryption
 /// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt a block

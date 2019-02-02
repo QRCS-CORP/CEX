@@ -36,5 +36,28 @@ enum class Providers : byte
 	RDP = 5
 };
 
+class ProviderConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the Providers formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The Providers enumeration member</param>
+	///
+	/// <returns>The matching Providers string name</returns>
+	static std::string ToName(Providers Enumeral);
+
+	/// <summary>
+	/// Derive the Providers enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The Providers string name</param>
+	///
+	/// <returns>The matching Providers enumeration type name</returns>
+	static Providers FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif

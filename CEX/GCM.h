@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -39,7 +39,7 @@ NAMESPACE_MODE
 /// <example>
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// GCM cipher(BlockCiphers::Rijndael);
+/// GCM cipher(BlockCiphers::AES);
 /// // initialize for encryption
 /// cipher.Initialize(true, SymmetricKey(Key, Nonce, [Info]));
 /// // encrypt one block
@@ -53,7 +53,7 @@ NAMESPACE_MODE
 /// <example>
 /// <description>Decrypting a block of bytes:</description>
 /// <code>
-/// GCM cipher(BlockCiphers::Rijndael);
+/// GCM cipher(BlockCiphers::AES);
 /// // initialize for decryption
 /// cipher.Initialize(false, SymmetricKey(Key, Nonce, [Info]));
 /// // calculate offset; mac code should always be last block after ciphertext
@@ -178,10 +178,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The enumeration name of the block cipher</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an invalid block cipher type is selected</exception>
-	explicit GCM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
+	explicit GCM(BlockCiphers CipherType);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance

@@ -52,5 +52,28 @@ enum class CipherModes : byte
 	OFB = 10
 };
 
+class CipherModeConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the CipherModes formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The CipherModes enumeration member</param>
+	///
+	/// <returns>The matching CipherModes string name</returns>
+	static std::string ToName(CipherModes Enumeral);
+
+	/// <summary>
+	/// Derive the CipherModes enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The CipherModes string name</param>
+	///
+	/// <returns>The matching CipherModes enumeration type name</returns>
+	static CipherModes FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif

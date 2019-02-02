@@ -34,7 +34,7 @@ The SPHINCS+ asymmetric signature scheme \n
 The NTRU Prime asymmetric cipher \n
 Authenticated Threefish-256/512/1024 stream ciphers \n
 Authenticated ChaCha-256/512 stream ciphers \n
-The cSHAKE option (RSX) integrated into RHX/AHX \n
+The cSHAKE option (RSX) integrated into RHX \n
 Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
 
 <B>Planned Release 1.1.0.1</B> \n
@@ -351,13 +351,11 @@ NAMESPACE_ROOT
 		enum class Authenticators {};
 		enum class BlockCiphers {};
 		enum class BlockCipherExtensions {};
-		enum class BlockSizes {};
 		enum class CipherModes {};
 		enum class CpuCores {};
 		enum class Digests {};
 		enum class DilithiumParameters {};
 		enum class Drbgs {};
-		enum class IVSizes {};
 		enum class Kdfs {};
 		enum class KeySizes {};
 		enum class Macs {};
@@ -412,7 +410,6 @@ NAMESPACE_ROOT
 	NAMESPACE_HELPER
 		class AeadModeFromName {};
 		class BlockCipherFromName {};
-		class CipherFromDescription {};
 		class CipherModeFromName {};
 		class DigestFromName {};
 		class DrbgFromName {};
@@ -511,7 +508,6 @@ NAMESPACE_ROOT
 	*  @brief Cryptographic Processing Namespace
 	*/
 	NAMESPACE_PROCESSING
-		class CipherDescription {};
 		class CipherStream {};
 		class DigestStream {};
 		class MacDescription {};

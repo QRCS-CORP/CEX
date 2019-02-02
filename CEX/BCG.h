@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -50,7 +50,7 @@ using Kdf::IKdf;
 /// <example>
 /// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
-/// BCG rng(BlockCiphers::RHX, Digests::SHA512, [Providers::CSP]);
+/// BCG rng(BlockCiphers::AES, Digests::SHA512, [Providers::CSP]);
 /// // initialize
 /// rng.Initialize(Seed, [Nonce], [Info]);
 /// // generate bytes
@@ -130,7 +130,7 @@ private:
 	static const size_t DEF_CYCTHRESH = 1024 * 1000;
 	static const ulong MAX_OUTPUT = 35184372088832;
 	static const size_t MAX_PRLALLOC = 100000000;
-	static const size_t MAX_REQUEST = 65536;
+	static const size_t MAX_REQUEST = 102400000;
 	static const size_t MAX_RESEED = 536870912;
 	static const size_t PRC_DATACACHE = 1024 * 16;
 
@@ -144,7 +144,6 @@ private:
 	bool m_isEncryption;
 	bool m_isInitialized;
 	std::unique_ptr<IKdf> m_kdfEngine;
-	BlockCipherExtensions m_kdfEngineType;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	ParallelOptions m_parallelProfile;
 	bool m_prdResistant;
@@ -175,16 +174,14 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The block cipher type to instantiate as the primary generator.
-	/// <para>The primary pseudo-random function, the default is AHX/RHX.</para></param>
-	/// <param name="CipherExtensionType">The block-cipher extension, used to initialize an extended cipher
-	/// The default is HKDF(SHA2-256).</para></param>
+	/// <para>The primary pseudo-random function, the default is AES.</para></param>
 	/// <param name="ProviderType">The random provider-type, used to instantiate the entropy source. 
 	/// <para>Adding a random provider enables predictive resistance, and is recommended for large data (>= 1MB).</para></param>
 	/// <param name="Parallel">Enable/disable the multi-threading engine; default is false.
 	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
-	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::HKDF256, Providers ProviderType = Providers::None, bool Parallel = false);
+	explicit BCG(BlockCiphers CipherType = BlockCiphers::AES, Providers ProviderType = Providers::None, bool Parallel = false);
 
 	/// <summary>
 	/// Instantiate the class using a block cipher instance and an optional entropy source

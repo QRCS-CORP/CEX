@@ -3,6 +3,7 @@
 
 #include "CexDomain.h"
 #include "CryptoMacException.h"
+#include "ErrorCodes.h"
 #include "ISymmetricKey.h"
 #include "Macs.h"
 #include "SymmetricKeySize.h"
@@ -36,14 +37,14 @@ public:
 	/// <summary>
 	/// Constructor: Instantiate this class
 	/// </summary>
-	IMac() 
+	IMac()
 	{
 	}
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	virtual ~IMac() noexcept 
+	virtual ~IMac() noexcept
 	{
 	}
 
@@ -70,14 +71,24 @@ public:
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
 	/// <summary>
-	/// Read Only: Size of returned mac in bytes
+	/// Read Only: Minimum recommended initialization key size in bytes
 	/// </summary>
-	virtual const size_t TagSize() = 0;
+	virtual const size_t MinimumKeySize() = 0;
+
+	/// <summary>
+	/// Read Only: Minimum recommended initialization salt size in bytes
+	/// </summary>
+	virtual const size_t MinimumSaltSize() = 0;
 
 	/// <summary>
 	/// Read Only: Mac generators class name
 	/// </summary>
 	virtual const std::string Name() = 0;
+
+	/// <summary>
+	/// Read Only: Size of returned mac in bytes
+	/// </summary>
+	virtual const size_t TagSize() = 0;
 
 	//~~~Public Functions~~~//
 
@@ -87,8 +98,6 @@ public:
 	///
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The output Mac code</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized</exception>
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
@@ -99,8 +108,6 @@ public:
 	/// <param name="OutOffset">Offset within Output array</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
@@ -109,21 +116,12 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
 	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
 	/// Reset to the default state; Mac code and buffer are zeroised, but key is still loaded
 	/// </summary>
 	virtual void Reset() = 0;
-
-	/// <summary>
-	/// Update the Mac with a single byte
-	/// </summary>
-	/// 
-	/// <param name="Input">Input byte to process</param>
-	virtual void Update(byte Input) = 0;
 
 	/// <summary>
 	/// Update the Mac with a block of bytes

@@ -1,133 +1,166 @@
 #include "KDF2.h"
 #include "DigestFromName.h"
 #include "IntegerTools.h"
-
+#include "AeadModes.h"
 NAMESPACE_KDF
 
-const std::string KDF2::CLASS_NAME("KDF2");
+using Utility::IntegerTools;
+using Enumeration::KdfConvert;
+using Utility::MemoryTools;
+
+class KDF2::Kdf2State
+{
+public:
+
+	std::vector<byte> Counter;
+	std::vector<byte> Salt;
+	std::vector<byte> State;
+
+	Kdf2State(size_t StateSize, size_t SaltSize)
+		:
+		Counter{ 0x00, 0x00, 0x00, 0x01 },
+		Salt(SaltSize),
+		State(StateSize)
+	{
+	}
+
+	~Kdf2State()
+	{
+		MemoryTools::Clear(Counter, 0, Counter.size());
+		MemoryTools::Clear(Salt, 0, Salt.size());
+		MemoryTools::Clear(State, 0, State.size());
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(Counter, 0, Counter.size() - sizeof(byte));
+		Counter[Counter.size() - sizeof(byte)] = 1;
+		MemoryTools::Clear(Salt, 0, Salt.size());
+		MemoryTools::Clear(State, 0, State.size());
+	}
+};
 
 //~~~Constructor~~~//
 
 KDF2::KDF2(SHA2Digests DigestType)
 	:
-	m_msgDigest(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType)) :
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
-	m_blockSize(m_msgDigest->BlockSize()),
-	m_destroyEngine(true),
-	m_hashSize(m_msgDigest->DigestSize()),
-	m_isDestroyed(false),
+	KdfBase(
+		DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::KDF2256 : Kdfs::KDF2512) :
+			throw CryptoKdfException(std::string("KDF2"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam),
+#if defined(CEX_ENFORCE_KEYMIN)
+		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
+		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
+#else
+		MINKEY_LENGTH, 
+		MINSALT_LENGTH, 
+#endif
+		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::KDF2256) : KdfConvert::ToName(Kdfs::KDF2512)),
+		std::vector<SymmetricKeySize> {
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 32 : 64), 0, 0),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), 0, (DigestType == SHA2Digests::SHA256 ? 32 : 64)),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))}),
+	m_isDestroyed(true),
 	m_isInitialized(false),
-	m_kdfCounter(1),
-	m_kdfDigestType(static_cast<Digests>(DigestType)),
-	m_kdfKey(0),
-	m_kdfSalt(0),
-	m_legalKeySizes(0)
+	m_kdf2Generator(Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType))),
+	m_kdf2State(new Kdf2State(0, 0))
 {
-	LoadState();
 }
 
-KDF2::KDF2(Digest::IDigest* Digest)
+KDF2::KDF2(IDigest* Digest)
 	:
-	m_msgDigest(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? Digest :
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
-	m_blockSize(m_msgDigest->BlockSize()),
-	m_destroyEngine(false),
-	m_hashSize(m_msgDigest->DigestSize()),
+	KdfBase(
+		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::KDF2256 : Kdfs::KDF2512) :
+			throw CryptoKdfException(std::string("KDF2"), std::string("Constructor"), std::string("The digest instance is not supported!"), ErrorCodes::IllegalOperation)),
+#if defined(CEX_ENFORCE_KEYMIN)
+		(Digest != nullptr ? Digest->DigestSize() : 0),
+		(Digest != nullptr ? Digest->DigestSize() : 0),
+#else
+		MINKEY_LENGTH,
+		MINSALT_LENGTH,
+#endif
+		(Digest != nullptr ? Digest->Enumeral() == Digests::SHA256 ? KdfConvert::ToName(Kdfs::KDF2256) : 
+			KdfConvert::ToName(Kdfs::KDF2512) :
+			std::string("")),
+		(Digest != nullptr ? std::vector<SymmetricKeySize> {
+			SymmetricKeySize(Digest->DigestSize(), 0, 0),
+			SymmetricKeySize(Digest->BlockSize(), 0, Digest->DigestSize()),
+			SymmetricKeySize(Digest->BlockSize(), Digest->BlockSize(), Digest->DigestSize())} :
+			std::vector<SymmetricKeySize>(0))),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_kdfCounter(1),
-	m_kdfDigestType(m_msgDigest->Enumeral()),
-	m_kdfKey(0),
-	m_kdfSalt(0),
-	m_legalKeySizes(0)
+	m_kdf2Generator((Digest != nullptr && (Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512)) ? Digest :
+		throw CryptoKdfException(std::string("KDF2"), std::string("Constructor"), std::string("The digest instance is not supported!"), ErrorCodes::IllegalOperation)),
+	m_kdf2State(new Kdf2State(0, 0))
 {
-	LoadState();
 }
 
 KDF2::~KDF2()
 {
-	if (!m_isDestroyed)
+	m_isInitialized = false;
+
+	if (m_kdf2State != nullptr)
 	{
-		m_isDestroyed = true;
-		m_blockSize = 0;
-		m_kdfCounter = 0;
-		m_kdfDigestType = Digests::None;
-		m_hashSize = 0;
-		m_isInitialized = false;
+		m_kdf2State.reset(nullptr);
+	}
 
-		Utility::IntegerTools::Clear(m_kdfKey);
-		Utility::IntegerTools::Clear(m_kdfSalt);
-		Utility::IntegerTools::Clear(m_legalKeySizes);
-
-		if (m_destroyEngine)
+	if (m_kdf2Generator != nullptr)
+	{
+		if (m_isDestroyed)
 		{
-			m_destroyEngine = false;
-
-			if (m_msgDigest != nullptr)
-			{
-				m_msgDigest.reset(nullptr);
-			}
+			m_kdf2Generator.reset(nullptr);
+			m_isDestroyed = false;
 		}
 		else
 		{
-			if (m_msgDigest != nullptr)
-			{
-				m_msgDigest.release();
-			}
+			m_kdf2Generator.release();
 		}
 	}
 }
 
 //~~~Accessors~~~//
 
-const Kdfs KDF2::Enumeral()
-{ 
-	return Kdfs::KDF2256; 
-}
-
 const bool KDF2::IsInitialized() 
 { 
 	return m_isInitialized; 
 }
 
-const size_t KDF2::MinKeySize() 
-{ 
-	return m_blockSize;
-}
-
-std::vector<SymmetricKeySize> KDF2::LegalKeySizes() const 
-{
-	return m_legalKeySizes; 
-}
-
-const std::string KDF2::Name() 
-{ 
-	return CLASS_NAME + "-" + m_msgDigest->Name();
-}
-
 //~~~Public Functions~~~//
 
-size_t KDF2::Generate(std::vector<byte> &Output)
+void KDF2::Generate(std::vector<byte> &Output)
 {
-	if (!m_isInitialized)
+	if (!IsInitialized())
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
-	if (m_kdfCounter + (Output.size() / m_hashSize) > 255)
+	if (IntegerTools::BeBytesTo32(m_kdf2State->Counter, 0) + (Output.size() / m_kdf2Generator->DigestSize()) > MAXGEN_REQUESTS)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
 	}
 
-	return Expand(Output, 0, Output.size());
+	Expand(Output, 0, Output.size(), m_kdf2State, m_kdf2Generator);
 }
 
-size_t KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void KDF2::Generate(SecureVector<byte> &Output)
 {
-	if (!m_isInitialized)
+	if (!IsInitialized())
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
-	if (m_kdfCounter + (Length / m_hashSize) > 255)
+	if (IntegerTools::BeBytesTo32(m_kdf2State->Counter, 0) + (Output.size() / m_kdf2Generator->DigestSize()) > MAXGEN_REQUESTS)
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
+	}
+
+	Expand(Output, 0, Output.size(), m_kdf2State, m_kdf2Generator);
+}
+
+void KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+{
+	if (!IsInitialized())
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+	if (IntegerTools::BeBytesTo32(m_kdf2State->Counter, 0) + (Length / m_kdf2Generator->DigestSize()) > MAXGEN_REQUESTS)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
 	}
@@ -136,195 +169,135 @@ size_t KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
-	return Expand(Output, OutOffset, Length);
+	Expand(Output, OutOffset, Length, m_kdf2State, m_kdf2Generator);
 }
 
-void KDF2::Initialize(ISymmetricKey &GenParam)
+void KDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (GenParam.Nonce().size() != 0)
+	if (!IsInitialized())
 	{
-		if (GenParam.Info().size() != 0)
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+	if (IntegerTools::BeBytesTo32(m_kdf2State->Counter, 0) + (Length / m_kdf2Generator->DigestSize()) > MAXGEN_REQUESTS)
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
+	}
+	if (Output.size() - OutOffset < Length)
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+	}
+
+	Expand(Output, OutOffset, Length, m_kdf2State, m_kdf2Generator);
+}
+
+void KDF2::Initialize(ISymmetricKey &KeyParams)
+{
+	if (KeyParams.Key().size() < MinimumKeySize())
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
+	}
+
+	if (IsInitialized())
+	{
+		Reset();
+	}
+
+	if (KeyParams.Nonce().size() != 0)
+	{
+		if (KeyParams.Nonce().size() + KeyParams.Info().size() < MinimumSaltSize())
 		{
-			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
+			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
+		}
+
+		// add the key to state
+		m_kdf2State->State.resize(KeyParams.Key().size());
+		MemoryTools::Copy(KeyParams.Key(), 0, m_kdf2State->State, 0, m_kdf2State->State.size());
+
+		// resize the salt
+		m_kdf2State->Salt.resize(KeyParams.Nonce().size() + KeyParams.Info().size());
+
+		// add nonce param to salt
+		MemoryTools::Copy(KeyParams.Nonce(), 0, m_kdf2State->Salt, 0, m_kdf2State->Salt.size());
+
+		// add info as extension of salt
+		if (KeyParams.Info().size() > 0)
+		{
+			MemoryTools::Copy(KeyParams.Info(), 0, m_kdf2State->Salt, KeyParams.Nonce().size(), KeyParams.Info().size());
+		}
+	}
+	else
+	{
+		// equal or less than a full block, interpret as ISO18033
+		if (KeyParams.Key().size() <= m_kdf2Generator->BlockSize())
+		{
+			// pad the key to one block
+			m_kdf2State->State.resize(m_kdf2Generator->BlockSize());
+			MemoryTools::Copy(KeyParams.Key(), 0, m_kdf2State->State, 0, KeyParams.Key().size());
 		}
 		else
 		{
-			Initialize(GenParam.Key(), GenParam.Nonce());
-		}
-	}
-	else
-	{
-		Initialize(GenParam.Key());
-	}
-}
+			// split the key between state key and salt
+			m_kdf2State->State.resize(m_kdf2Generator->BlockSize());
+			MemoryTools::Copy(KeyParams.Key(), 0, m_kdf2State->State, 0, m_kdf2Generator->BlockSize());
+			m_kdf2State->Salt.resize(KeyParams.Key().size() - m_kdf2Generator->BlockSize());
+			MemoryTools::Copy(KeyParams.Key(), m_kdf2Generator->BlockSize(), m_kdf2State->Salt, 0, m_kdf2State->Salt.size());
 
-void KDF2::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
-{
-	if (Key.size() < MIN_KEYLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-
-	std::vector<byte> tmpK(Length);
-	Utility::MemoryTools::Copy(Key, Offset, tmpK, 0, Length);
-	Initialize(tmpK);
-}
-
-void KDF2::Initialize(const std::vector<byte> &Key)
-{
-	if (Key.size() < MIN_KEYLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-
-	if (m_isInitialized)
-	{
-		Reset();
-	}
-
-	// equal or less than a full block, interpret as ISO18033
-	if (Key.size() <= m_blockSize)
-	{
-		// pad the key to one block
-		m_kdfKey.resize(m_blockSize);
-		Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, Key.size());
-	}
-	else
-	{
-		m_kdfKey.resize(m_blockSize);
-		Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, m_blockSize);
-		m_kdfSalt.resize(Key.size() - m_blockSize);
-		Utility::MemoryTools::Copy(Key, m_blockSize, m_kdfSalt, 0, m_kdfSalt.size());
-	}
-
-	m_isInitialized = true;
-}
-
-void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
-{
-	if (Key.size() < MIN_KEYLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-	if (Salt.size() < MIN_SALTLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
-	}
-
-	if (m_isInitialized)
-	{
-		Reset();
-	}
-
-	m_kdfKey.resize(Key.size());
-	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, Key.size());
-
-	if (Salt.size() > 0)
-	{
-		m_kdfSalt.resize(Salt.size());
-		Utility::MemoryTools::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
-	}
-
-	m_isInitialized = true;
-}
-
-void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
-{
-	if (Key.size() < MIN_KEYLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-	if (Salt.size() < MIN_SALTLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
-	}
-
-	if (m_isInitialized)
-	{
-		Reset();
-	}
-
-	m_kdfKey.resize(Key.size());
-	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, Key.size());
-
-	if (Salt.size() > 0)
-	{
-		m_kdfSalt.resize(Salt.size() + Info.size());
-		Utility::MemoryTools::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
-
-		// add info as extension of salt
-		if (Info.size() > 0)
-		{
-			Utility::MemoryTools::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
+			// add info as extension of salt
+			if (KeyParams.Info().size() > 0)
+			{
+				const size_t SLTLEN = m_kdf2State->Salt.size();
+				m_kdf2State->Salt.resize(SLTLEN + KeyParams.Info().size());
+				MemoryTools::Copy(KeyParams.Info(), 0, m_kdf2State->Salt, SLTLEN, KeyParams.Info().size());
+			}
 		}
 	}
 
 	m_isInitialized = true;
-}
-
-void KDF2::ReSeed(const std::vector<byte> &Seed)
-{
-	if (Seed.size() < MIN_KEYLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("ReSeed"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-
-	Initialize(Seed);
 }
 
 void KDF2::Reset()
 {
-	m_msgDigest->Reset();
-	m_kdfCounter = 1;
-	m_kdfKey.clear();
-	m_kdfSalt.clear();
+	m_kdf2Generator->Reset();
+	m_kdf2State->Reset();
 	m_isInitialized = false;
 }
 
 //~~~Private Functions~~~//
 
-size_t KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator)
 {
-	std::vector<byte> hash(m_hashSize);
-	size_t prcLen = Length;
+	std::vector<byte> tmph(Generator->DigestSize());
 
 	do
 	{
-		m_msgDigest->Update(m_kdfKey, 0, m_kdfKey.size());
-		m_msgDigest->Update(static_cast<byte>(m_kdfCounter >> 24));
-		m_msgDigest->Update(static_cast<byte>(m_kdfCounter >> 16));
-		m_msgDigest->Update(static_cast<byte>(m_kdfCounter >> 8));
-		m_msgDigest->Update(static_cast<byte>(m_kdfCounter));
+		// update the state and counter
+		Generator->Update(State->State, 0, State->State.size());
+		Generator->Update(State->Counter, 0, sizeof(uint));
 
-		if (m_kdfSalt.size() != 0)
+		// update the salt
+		if (State->Salt.size() != 0)
 		{
-			m_msgDigest->Update(m_kdfSalt, 0, m_kdfSalt.size());
+			Generator->Update(State->Salt, 0, State->Salt.size());
 		}
 
-		m_msgDigest->Finalize(hash, 0);
-		++m_kdfCounter;
-
-		size_t prcRmd = Utility::IntegerTools::Min(m_hashSize, prcLen);
-		Utility::MemoryTools::Copy(hash, 0, Output, OutOffset, prcRmd);
-		prcLen -= prcRmd;
-		OutOffset += prcRmd;
+		// generate the temporary hash
+		Generator->Finalize(tmph, 0);
+		// increment the state counter
+		IntegerTools::BeIncrement8(State->Counter, 0, sizeof(uint));
+		// copy to output
+		const size_t PRCRMD = Utility::IntegerTools::Min(Generator->DigestSize(), Length);
+		MemoryTools::Copy(tmph, 0, Output, OutOffset, PRCRMD);
+		Length -= PRCRMD;
+		OutOffset += PRCRMD;
 	}
-	while (prcLen != 0);
-
-	return Length;
+	while (Length != 0);
 }
 
-void KDF2::LoadState()
+void KDF2::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Kdf2State> &State, std::unique_ptr<IDigest> &Generator)
 {
-	// best salt size; hash finalizer code and counter length adjusted
-	size_t saltLen = m_blockSize - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + sizeof(uint));
-	m_legalKeySizes.resize(3);
-	// minimum security is the digest output size
-	m_legalKeySizes[0] = SymmetricKeySize(m_hashSize, 0, 0);
-	// recommended size, adjusted salt size to hash full blocks
-	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, saltLen, 0);
-	// max recommended; add a block of key to info (appended to salt)
-	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, saltLen, m_blockSize);
+	std::vector<byte> tmps(Length);
+	Expand(tmps, OutOffset, Length, State, Generator);
+	Move(tmps, Output, OutOffset);
 }
 
 NAMESPACE_KDFEND

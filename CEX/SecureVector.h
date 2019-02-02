@@ -333,6 +333,26 @@ inline static SecureVector<T> LockClear(std::vector<T> &Input)
 CEX_OPTIMIZE_RESUME
 
 /// <summary>
+/// Move a standard vector to another SecureVector array, clearing the source</para>
+/// </summary>
+///
+/// <param name="Input">The SecureVector source array; will be cleared after copying</param>
+/// <param name="Output">The SecureVector destination array</param>
+/// <param name="OutOffset">The starting offset within the standard vector</param>
+/// <param name="Length">The number of bytes to copy</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void Move(std::vector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
+{
+	CEXASSERT(Output.size() - OutOffset >= Input.size(), "The input array is longer than the output array");
+
+	MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size() * sizeof(T));
+	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
+	Input.clear();
+}
+CEX_OPTIMIZE_RESUME
+
+/// <summary>
 /// Move a SecureVector array to another SecureVector array, clearing the source</para>
 /// </summary>
 ///
@@ -346,8 +366,8 @@ inline static void Move(SecureVector<T> &Input, SecureVector<T> &Output, size_t 
 {
 	CEXASSERT(Output.size() - OutOffset >= Input.size(), "The input array is longer than the output array");
 
-	MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size());
-	MemoryTools::Clear(Input);
+	MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size() * sizeof(T));
+	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
 	Input.clear();
 }
 CEX_OPTIMIZE_RESUME

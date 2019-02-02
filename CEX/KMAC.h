@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -25,13 +25,13 @@
 #ifndef CEX_KMAC_H
 #define CEX_KMAC_H
 
-#include "IMac.h"
+#include "MacBase.h"
 #include "Digests.h"
-#include "ShakeModes.h"
+#include "KmacModes.h"
 
 NAMESPACE_MAC
 
-using Enumeration::ShakeModes;
+using Enumeration::KmacModes;
 
 /// <summary>
 /// An implementation of the Keccak based Message Authentication Code generator
@@ -40,7 +40,7 @@ using Enumeration::ShakeModes;
 /// <example>
 /// <description>Generating a MAC code</description>
 /// <code>
-/// KMAC mac(Enumeration::ShakeModes::AHX);
+/// KMAC mac(Enumeration::ShakeModes::SHAKE256);
 /// SymmetricKey kp(Key);
 /// mac.Initialize(kp);
 /// mac.Update(Input, 0, Input.size());
@@ -71,26 +71,19 @@ using Enumeration::ShakeModes;
 /// <item><description>SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a></description></item>
 /// </list>
 /// </remarks>
-class KMAC final : public IMac
+class KMAC final : public MacBase
 {
 private:
 
 	static const size_t BUFFER_SIZE = 200;
-	static const std::string CLASS_NAME;
 	static const size_t DOMAIN_CODE = 0x04;
-	static const size_t MIN_KEYSIZE = 4;
+	static const size_t MINKEY_LENGTH = 4;
+	static const size_t MINSALT_LENGTH = 4;
 	static const size_t STATE_SIZE = 25;
 
-	size_t m_blockSize;
-	std::vector<byte> m_distCode;
-	bool m_isDestroyed;
+	class KmacState;
 	bool m_isInitialized;
-	std::array<ulong, STATE_SIZE> m_kdfState;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_macSize;
-	std::array<byte, BUFFER_SIZE> m_msgBuffer;
-	size_t m_msgLength;
-	ShakeModes m_shakeMode;
+	std::unique_ptr<KmacState> m_kmacState;
 
 public:
 
@@ -113,7 +106,7 @@ public:
 	/// <param name="ShakeModeType">The underlying SHAKE implementation mode</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid SHAKE mode is selected</exception>
-	explicit KMAC(ShakeModes ShakeModeType = ShakeModes::SHAKE256);
+	explicit KMAC(KmacModes ShakeModeType = KmacModes::KMAC256);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -123,20 +116,6 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Digests internal blocksize in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters, the default is 'KMAC'.
-	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
-	/// Changing this code will create a unique distribution of the generator.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
-	/// </summary>
-	std::vector<byte> &DistributionCode();
-
-	/// <summary>
 	/// Read Only: The maximum size of the distribution code in bytes.
 	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase.
 	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
@@ -144,34 +123,14 @@ public:
 	const size_t DistributionCodeMax();
 
 	/// <summary>
-	/// Read Only: Mac generators type name
-	/// </summary>
-	const Macs Enumeral() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
+	/// Read Only: The underlying KMAC security setting
 	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t TagSize() override;
-
-	/// <summary>
-	/// Read Only: Mac generators class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Read Only: The underlying cSHAKE security setting
-	/// </summary>
-	const ShakeModes ShakeMode();
+	const KmacModes KmacMode();
 
 	//~~~Public Functions~~~//
 
@@ -216,13 +175,6 @@ public:
 	void Reset() override;
 
 	/// <summary>
-	/// Update the Mac with a single byte
-	/// </summary>
-	/// 
-	/// <param name="Input">Input byte to process</param>
-	void Update(byte Input) override;
-
-	/// <summary>
 	/// Update the Mac with a block of bytes
 	/// </summary>
 	/// 
@@ -233,11 +185,10 @@ public:
 
 private:
 
-	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name);
-	void LoadKey(const std::vector<byte> &Key);
-	void Permute(std::array<ulong, 25> &State);
-	void Scope();
-	void Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	static void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::unique_ptr<KmacState> &State);
+	static void LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &State);
+	static void Permute(std::unique_ptr<KmacState> &State);
+	static void Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<KmacState> &State);
 };
 
 NAMESPACE_MACEND

@@ -37,16 +37,6 @@ namespace Test
 		const std::string Description() override;
 
 		/// <summary>
-		/// Test initialization using a CMAC description
-		/// </summary>
-		void DescriptionCMAC();
-
-		/// <summary>
-		/// Test initialization using a HMAC description
-		/// </summary>
-		void DescriptionHMAC();
-
-		/// <summary>
 		/// Evaluate correct operation using a CMAC description
 		/// </summary>
 		void EvaluateCMAC();

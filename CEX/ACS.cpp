@@ -16,10 +16,10 @@ const std::vector<byte> ACS::OMEGA_INFO = { 0x41, 0x43, 0x53, 0x20, 0x76, 0x65, 
 
 //~~~Constructor~~~//
 
-ACS::ACS(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, StreamAuthenticators AuthenticatorType)
+ACS::ACS(BlockCiphers CipherType, StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
-	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType, CipherExtensionType) :
+	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
 		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_cShakeCustom(0),

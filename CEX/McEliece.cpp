@@ -161,7 +161,7 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 
 	// decrypt the secret
 	SharedSecret.resize(CipherText.size() - MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE);
-	Cipher::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
+	Cipher::Block::Mode::GCM cpr(BlockCiphers::AES);
 	Cipher::SymmetricKey kp(key, iv);
 	cpr.Initialize(false, kp);
 	cpr.Transform(CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret, 0, SharedSecret.size());
@@ -206,7 +206,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	m_rndGenerator->Generate(SharedSecret);
 
 	// encrypt the secret and add to ct
-	Cipher::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
+	Cipher::Block::Mode::GCM cpr(BlockCiphers::AES);
 	Cipher::SymmetricKey kp(key, iv);
 	cpr.Initialize(true, kp);
 	cpr.Transform(SharedSecret, 0, CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret.size());

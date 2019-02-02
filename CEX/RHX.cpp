@@ -103,7 +103,7 @@ const size_t RHX::DistributionCodeMax()
 
 const BlockCiphers RHX::Enumeral()
 {
-	return (m_cprExtension == BlockCipherExtensions::None) ? BlockCiphers::Rijndael : BlockCiphers::RHX;
+	return BlockCiphers::AES;
 }
 
 const bool RHX::IsEncryption()
@@ -321,7 +321,8 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 	// salt is not used
 	std::vector<byte> salt(0);
 	// initialize the generator
-	m_kdfGenerator->Initialize(Key, salt, m_distCode);
+	SymmetricKey kp(Key, salt, m_distCode);
+	m_kdfGenerator->Initialize(kp);
 	// generate the keying material
 	m_kdfGenerator->Generate(rawKey);
 	// initialize round-key array

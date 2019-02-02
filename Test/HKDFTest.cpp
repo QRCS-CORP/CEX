@@ -114,7 +114,8 @@ namespace Test
 			HKDF gen(SHA2Digests::SHA256);
 			// invalid key size
 			std::vector<byte> key(1);
-			gen.Initialize(key);
+			SymmetricKey kp(key);
+			gen.Initialize(kp);
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE2"));
 		}
@@ -151,8 +152,8 @@ namespace Test
 			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> otp(32);
-
-			gen.Initialize(key);
+			SymmetricKey kp(key);
+			gen.Initialize(kp);
 			// array too small
 			gen.Generate(otp, 0, otp.size() + 1);
 
@@ -174,8 +175,8 @@ namespace Test
 			std::vector<byte> key(ks.KeySize());
 			// output exceeds maximum
 			std::vector<byte> otp(256 * 32);
-
-			gen.Initialize(key);
+			SymmetricKey kp(key);
+			gen.Initialize(kp);
 			gen.Generate(otp, 0, otp.size());
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -HE5"));
@@ -192,8 +193,8 @@ namespace Test
 	void HKDFTest::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Info, std::vector<byte> &Expected)
 	{
 		std::vector<byte> otp(Expected.size());
-
-		Generator->Initialize(Key, Salt, Info);
+		SymmetricKey kp(Key, Salt, Info);
+		Generator->Initialize(kp);
 		Generator->Generate(otp);
 
 		if (otp != Expected)
@@ -266,10 +267,11 @@ namespace Test
 			IntegerTools::Fill(key, 0, key.size(), rnd);
 
 			// generate with the gen
-			Generator->Initialize(key);
+			SymmetricKey kp(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp1, 0, OTPLEN);
 			Generator->Reset();
-			Generator->Initialize(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp2, 0, OTPLEN);
 
 			if (otp1 != otp2)
@@ -298,7 +300,8 @@ namespace Test
 				IntegerTools::Fill(key, 0, key.size(), rnd);
 
 				// generate with the kdf
-				Generator->Initialize(key);
+				SymmetricKey kp(key);
+				Generator->Initialize(kp);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
 			}

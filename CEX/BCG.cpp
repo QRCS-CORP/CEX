@@ -17,9 +17,9 @@ const std::string BCG::CLASS_NAME("BCG");
 
 //~~~Constructor~~~//
 
-BCG::BCG(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, Providers ProviderType, bool Parallel)
+BCG::BCG(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
 		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The Cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_ctrVector(COUNTER_SIZE),
@@ -29,8 +29,7 @@ BCG::BCG(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, Pro
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_kdfEngine(CipherExtensionType != BlockCipherExtensions::None ? Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtensionType)) : nullptr),
-	m_kdfEngineType(CipherExtensionType),
+	m_kdfEngine(nullptr), // TODO: replace this mechanism
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
 	m_prdResistant(ProviderType != Providers::None),
@@ -58,7 +57,6 @@ BCG::BCG(IBlockCipher* Cipher, IKdf* Kdf, IProvider* Provider, bool Parallel)
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_kdfEngine(Kdf),
-	m_kdfEngineType(m_kdfEngine != nullptr ? static_cast<BlockCipherExtensions>(m_kdfEngine->Enumeral()) : BlockCipherExtensions::None),
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
 	m_prdResistant(Provider != nullptr),
@@ -82,7 +80,6 @@ BCG::~BCG()
 		m_distCodeMax = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_kdfEngineType = BlockCipherExtensions::None;
 		m_parallelProfile.Reset();
 		m_prdResistant = false;
 		m_providerType = Providers::None;
@@ -338,7 +335,7 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	if (Info.size() > 0)
 	{
 		// info maps to HX ciphers HKDF Info parameter, value is ignored on a standard cipher
-		if (m_cipherType != BlockCiphers::Rijndael &&
+		if (m_cipherType != BlockCiphers::AES &&
 			m_cipherType != BlockCiphers::Serpent)
 		{
 			// extended cipher; sets info as HX cipher distribution code.
@@ -394,7 +391,8 @@ void BCG::Derive(std::vector<byte> &Seed)
 	// pull the rand from provider
 	m_providerSource->Generate(salt);
 	// extract the new key+counter
-	gen.Initialize(Seed, salt);
+	SymmetricKey kp(Seed, salt);
+	gen.Initialize(kp);
 	std::vector<byte> tmpK(m_seedSize);
 	gen.Generate(tmpK);
 	// reinitialize with the new key and counter

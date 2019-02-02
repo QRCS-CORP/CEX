@@ -285,7 +285,7 @@ void SecureStream::Transform()
 		Cipher::SymmetricKey kp(key, iv);
 
 		// AES256-CTR
-		Cipher::Block::Mode::CTR cpr(Enumeration::BlockCiphers::Rijndael);
+		Cipher::Block::Mode::CTR cpr(Enumeration::BlockCiphers::AES);
 		cpr.Initialize(true, kp);
 		std::vector<byte> state(m_streamData.size());
 		cpr.Transform(m_streamData, 0, state, 0, state.size());

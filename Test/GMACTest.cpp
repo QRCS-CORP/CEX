@@ -67,7 +67,7 @@ namespace Test
 			Kat(m_key[10], m_nonce[10], m_message[10], m_expected[10]);
 			OnProgress(std::string("GMACTest: Passed GMAC known answer vector tests.."));
 
-			GMAC* gen = new GMAC(BlockCiphers::Rijndael);
+			GMAC* gen = new GMAC(BlockCiphers::AES);
 
 			Params(gen);
 			OnProgress(std::string("GMACTest: Passed GMAC initialization parameters tests.."));
@@ -125,7 +125,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			GMAC gen(BlockCiphers::Rijndael);
+			GMAC gen(BlockCiphers::AES);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
@@ -144,7 +144,7 @@ namespace Test
 		// test finalize state -1
 		try
 		{
-			GMAC gen(BlockCiphers::Rijndael);
+			GMAC gen(BlockCiphers::AES);
 			std::vector<byte> code(16);
 			// generator was not initialized
 			gen.Finalize(code, 0);
@@ -229,7 +229,7 @@ namespace Test
 
 	void GMACTest::Kat(std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
-		GMAC gen(BlockCiphers::Rijndael);
+		GMAC gen(BlockCiphers::AES);
 		SymmetricKey kp(Key, Nonce);
 		std::vector<byte> code(gen.TagSize());
 
@@ -251,7 +251,7 @@ namespace Test
 
 	void GMACTest::Params(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
 		std::vector<byte> nonce(ks.NonceSize());
@@ -275,6 +275,7 @@ namespace Test
 			Generator->Initialize(kp);
 			Generator->Compute(msg, otp1);
 			Generator->Reset();
+			// post-reset generation
 			Generator->Initialize(kp);
 			Generator->Compute(msg, otp2);
 
@@ -287,7 +288,7 @@ namespace Test
 
 	void GMACTest::Stress(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> msg;
 		std::vector<byte> nonce(ks.NonceSize());
 		std::vector<byte> otp(Generator->TagSize());

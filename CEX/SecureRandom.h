@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -16,11 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
-// Implementation Details:
-// An implementation of a Cryptographically Secure Pseudo Random Number Generator (SecureRandom). 
-// Written by John Underhill, January 6, 2014
-// Updated by December 1, 2016
+// Updated by January 28, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_SECURERANDOM_H
@@ -33,6 +29,7 @@
 #include "IntegerTools.h"
 #include "IPrng.h"
 #include "MemoryTools.h"
+#include "SecureVector.h"
 
 NAMESPACE_PRNG
 
@@ -51,8 +48,7 @@ using Provider::IProvider;
 /// <para>This class is an extension wrapper that uses one of the PRNG and random provider implementations. \n
 /// The PRNG and random provider type names are loaded through the constructor, instantiating internal instances of those classes and auto-initializing the base PRNG. \n
 /// The default configuration uses and AES-256 CTR mode generator (BCR), and the auto seed collection provider. \n
-/// The secure random class can use any combination of the base PRNGs and random providers. \n
-/// Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</para>
+/// The secure random class can use any combination of the base PRNGs and random providers.</para>
 /// </remarks>
 /// 
 /// <example>
@@ -65,16 +61,6 @@ class SecureRandom
 {
 private:
 
-	static const std::string CLASS_NAME;
-	static const size_t DEF_BUFLEN = 4096;
-
-	size_t m_bufferIndex;
-	size_t m_bufferSize;
-	Digests m_digestType;
-	bool m_isDestroyed;
-	Providers m_providerType;
-	std::vector<byte> m_rndBuffer;
-	Prngs m_rngGeneratorType;
 	std::unique_ptr<IPrng> m_rngEngine;
 
 public:
@@ -103,7 +89,7 @@ public:
 	/// <param name="BufferSize">The byte size of the internal buffer; default is 4096</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the selected parameters are invalid</exception>
-	explicit SecureRandom(Prngs PrngType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None, size_t BufferSize = 4096);
+	explicit SecureRandom(Prngs PrngType = Prngs::BCR, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -113,31 +99,58 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill an array of uint16 with pseudo-random
+	/// Fill a standard vector of uint16 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The uint16 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Output">The uint16 destination array</param>
+	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
 	void Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
-	/// Fill an array of uint32 with pseudo-random
+	/// Fill a secure vector of uint16 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The uint32 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Output">The uint16 destination array</param>
+	/// <param name="Offset">The starting index within the destination array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(SecureVector<ushort> &Output, size_t Offset, size_t Elements);
+
+	/// <summary>
+	/// Fill a standard vector of uint32 with pseudo-random using offset and length parameters
+	/// </summary>
+	///
+	/// <param name="Output">The uint32 destination array</param>
+	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
 	void Fill(std::vector<uint> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
-	/// Fill an array of uint64 with pseudo-random
+	/// Fill a secure vector of uint32 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The uint64 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Output">The uint32 destination array</param>
+	/// <param name="Offset">The starting index within the destination array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(SecureVector<uint> &Output, size_t Offset, size_t Elements);
+
+	/// <summary>
+	/// Fill a standard vector of uint64 with pseudo-random using offset and length parameters
+	/// </summary>
+	///
+	/// <param name="Output">The uint64 destination array</param>
+	/// <param name="Offset">The starting index within the destination array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
 	void Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements);
+
+	/// <summary>
+	/// Fill a secure vector of uint64 with pseudo-random using offset and length parameters
+	/// </summary>
+	///
+	/// <param name="Output">The uint64 destination array</param>
+	/// <param name="Offset">The starting index within the destination array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(SecureVector<ulong> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
 	/// Read Only: The random generators implementation name
@@ -156,20 +169,36 @@ public:
 	std::vector<byte> Generate(size_t Length);
 
 	/// <summary>
-	/// Fill the buffer with pseudo-random bytes using offsets
+	/// Fill a standard byte vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The output array to fill</param>
-	/// <param name="Offset">The starting position within the Output array</param>
-	/// <param name="Length">The number of bytes to write to the Output array</param>
+	/// <param name="Output">The destination vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
+	/// <param name="Length">The number of bytes to write to the destination array</param>
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Fill an array with pseudo-random bytes
+	/// Fill a secure byte vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">Output array</param>
+	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
+	/// <param name="Length">The number of bytes to write to the destination array</param>
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length);
+
+	/// <summary>
+	/// Fill a standard vector with pseudo-random bytes
+	/// </summary>
+	///
+	/// <param name="Output">The destination vector to fill</param>
 	void Generate(std::vector<byte> &Output);
+
+	/// <summary>
+	/// Fill a secure vector with pseudo-random bytes
+	/// </summary>
+	///
+	/// <param name="Output">The destination secure vector to fill</param>
+	void Generate(SecureVector<byte> &Output);
 
 	//~~~Char~~~//
 
@@ -363,13 +392,6 @@ public:
 	/// 
 	/// <returns>Random UInt64</returns>
 	ulong NextUInt64(ulong Maximum, ulong Minimum);
-
-	//~~~Reset~~~//
-
-	/// <summary>
-	/// Reset the generator instance
-	/// </summary>
-	void Reset();
 };
 
 NAMESPACE_PRNGEND

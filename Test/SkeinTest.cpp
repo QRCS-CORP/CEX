@@ -352,8 +352,8 @@ namespace Test
 		std::array<ulong, 16> state2;
 		Prng::SecureRandom rnd;
 
-		IntegerTools::Fill(input, 0, 16, rnd);
-		IntegerTools::Fill(tweak, 0, 2, rnd);
+		IntegerTools::Fill<std::array<ulong, 16>>(input, 0, 16, rnd);
+		IntegerTools::Fill<std::array<ulong, 2>>(tweak, 0, 2, rnd);
 		MemoryTools::Clear(state1, 0, 16 * sizeof(ulong));
 		MemoryTools::Clear(state2, 0, 16 * sizeof(ulong));
 

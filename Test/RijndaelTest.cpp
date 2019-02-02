@@ -193,7 +193,7 @@ namespace Test
 #if defined(__AVX__)
 			if (m_testAesNi)
 			{
-				CTR* cpr1 = new CTR(BlockCiphers::AHX);
+				CTR* cpr1 = new CTR(BlockCiphers::AES);
 				Parallel(cpr1);
 				OnProgress(std::string("RijndaelTest: Passed Rijndael parallel to sequential equivalence test.."));
 
@@ -204,12 +204,12 @@ namespace Test
 			else
 #endif
 			{
-				CTR* cpr2 = new CTR(BlockCiphers::Rijndael);
+				CTR* cpr2 = new CTR(BlockCiphers::AES);
 				Parallel(cpr2);
 				OnProgress(std::string("RijndaelTest: Passed Rijndael parallel to sequential equivalence test.."));
 
 				Stress(cpr2);
-				OnProgress(std::string("RijndaelTest: Passed Rijndaelstress tests.."));
+				OnProgress(std::string("RijndaelTest: Passed Rijndael stress tests.."));
 				delete cpr2;
 			}
 			return SUCCESS;
@@ -402,7 +402,7 @@ namespace Test
 	void RijndaelTest::Stress(ICipherMode* Cipher)
 	{
 		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
-		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
+		const uint MAXPRL = 65536;
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 

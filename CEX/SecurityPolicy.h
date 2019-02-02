@@ -40,5 +40,28 @@ enum class SecurityPolicy : byte
 	SPL1024AE = 6
 };
 
+class SecurityPolicyConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the SecurityPolicy formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The SecurityPolicy enumeration member</param>
+	///
+	/// <returns>The matching SecurityPolicy string name</returns>
+	static std::string ToName(SecurityPolicy Enumeral);
+
+	/// <summary>
+	/// Derive the SecurityPolicy enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The SecurityPolicy string name</param>
+	///
+	/// <returns>The matching SecurityPolicy enumeration type name</returns>
+	static SecurityPolicy FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif

@@ -203,11 +203,13 @@ namespace Test
 		if (Custom)
 		{
 			std::vector<byte> name(0);
-			Generator->Initialize(Key, m_custom, name);
+			SymmetricKey kp(Key, m_custom, name);
+			Generator->Initialize(kp);
 		}
 		else
 		{
-			Generator->Initialize(Key);
+			SymmetricKey kp(Key);
+			Generator->Initialize(kp);
 		}
 
 		Generator->Generate(otp);
@@ -516,10 +518,11 @@ namespace Test
 			IntegerTools::Fill(key, 0, key.size(), rnd);
 
 			// generate with the kdf
-			Generator->Initialize(key);
+			SymmetricKey kp(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp1, 0, OTPLEN);
 			Generator->Reset();
-			Generator->Initialize(key);
+			Generator->Initialize(kp);
 			Generator->Generate(otp2, 0, OTPLEN);
 
 			if (otp1 != otp2)
@@ -548,7 +551,8 @@ namespace Test
 				IntegerTools::Fill(key, 0, key.size(), rnd);
 
 				// generate with the kdf
-				Generator->Initialize(key);
+				SymmetricKey kp(key);
+				Generator->Initialize(kp);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
 			}

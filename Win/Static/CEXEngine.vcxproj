@@ -22,7 +22,7 @@
     <ProjectGuid>{FF7AB9CB-BF7B-4E0E-A3EF-F4141810B24A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CEX</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectName>CEX</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -149,7 +149,7 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <OpenMPSupport>true</OpenMPSupport>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
@@ -206,7 +206,6 @@
     <ClInclude Include="..\..\CEX\AsymmetricKeyTypes.h" />
     <ClInclude Include="..\..\CEX\AsymmetricSecureKey.h" />
     <ClInclude Include="..\..\CEX\AsymmetricTransforms.h" />
-    <ClInclude Include="..\..\CEX\Authenticators.h" />
     <ClInclude Include="..\..\CEX\BitConverter.h" />
     <ClInclude Include="..\..\CEX\Blake256.h" />
     <ClInclude Include="..\..\CEX\Blake2.h" />
@@ -214,14 +213,11 @@
     <ClInclude Include="..\..\CEX\BlakeParams.h" />
     <ClInclude Include="..\..\CEX\BlockCipherFromName.h" />
     <ClInclude Include="..\..\CEX\BlockCiphers.h" />
-    <ClInclude Include="..\..\CEX\BlockSizes.h" />
     <ClInclude Include="..\..\CEX\CBC.h" />
     <ClInclude Include="..\..\CEX\CFB.h" />
     <ClInclude Include="..\..\CEX\ChaCha.h" />
     <ClInclude Include="..\..\CEX\ChaCha256.h" />
     <ClInclude Include="..\..\CEX\ChaCha512.h" />
-    <ClInclude Include="..\..\CEX\CipherDescription.h" />
-    <ClInclude Include="..\..\CEX\CipherFromDescription.h" />
     <ClInclude Include="..\..\CEX\CipherModeFromName.h" />
     <ClInclude Include="..\..\CEX\CipherModes.h" />
     <ClInclude Include="..\..\CEX\CipherStream.h" />
@@ -263,7 +259,10 @@
     <ClInclude Include="..\..\CEX\ErrorCodes.h" />
     <ClInclude Include="..\..\CEX\Event.h" />
     <ClInclude Include="..\..\CEX\ExceptionTypes.h" />
+    <ClInclude Include="..\..\CEX\KdfBase.h" />
+    <ClInclude Include="..\..\CEX\KmacModes.h" />
     <ClInclude Include="..\..\CEX\LockingAllocator.h" />
+    <ClInclude Include="..\..\CEX\MacBase.h" />
     <ClInclude Include="..\..\CEX\MacFromName.h" />
     <ClInclude Include="..\..\CEX\MemoryPool.h" />
     <ClInclude Include="..\..\CEX\MPKCM12T62.h" />
@@ -325,6 +324,7 @@
     <ClInclude Include="..\..\CEX\RingLWE.h" />
     <ClInclude Include="..\..\CEX\RLWEParameters.h" />
     <ClInclude Include="..\..\CEX\RLWEQ12289N2048.h" />
+    <ClInclude Include="..\..\CEX\Salsa.h" />
     <ClInclude Include="..\..\CEX\SCRYPT.h" />
     <ClInclude Include="..\..\CEX\SecureMemory.h" />
     <ClInclude Include="..\..\CEX\SecureStream.h" />
@@ -351,7 +351,6 @@
     <ClInclude Include="..\..\CEX\StreamAuthenticators.h" />
     <ClInclude Include="..\..\CEX\StreamModes.h" />
     <ClInclude Include="..\..\CEX\SymmetricKeySize.h" />
-    <ClInclude Include="..\..\CEX\MacDescription.h" />
     <ClInclude Include="..\..\CEX\MacStream.h" />
     <ClInclude Include="..\..\CEX\PrngFromName.h" />
     <ClInclude Include="..\..\CEX\RDP.h" />
@@ -371,14 +370,11 @@
     <ClInclude Include="..\..\CEX\IProvider.h" />
     <ClInclude Include="..\..\CEX\ESP.h" />
     <ClInclude Include="..\..\CEX\IStreamCipher.h" />
-    <ClInclude Include="..\..\CEX\IVSizes.h" />
     <ClInclude Include="..\..\CEX\KDF2.h" />
     <ClInclude Include="..\..\CEX\Kdfs.h" />
     <ClInclude Include="..\..\CEX\Keccak.h" />
     <ClInclude Include="..\..\CEX\SymmetricKeyGenerator.h" />
     <ClInclude Include="..\..\CEX\SymmetricKey.h" />
-    <ClInclude Include="..\..\CEX\KeySizes.h" />
-    <ClInclude Include="..\..\CEX\MacFromDescription.h" />
     <ClInclude Include="..\..\CEX\Macs.h" />
     <ClInclude Include="..\..\CEX\MemoryStream.h" />
     <ClInclude Include="..\..\CEX\OFB.h" />
@@ -390,7 +386,6 @@
     <ClInclude Include="..\..\CEX\Prngs.h" />
     <ClInclude Include="..\..\CEX\RHX.h" />
     <ClInclude Include="..\..\CEX\Rijndael.h" />
-    <ClInclude Include="..\..\CEX\RoundCounts.h" />
     <ClInclude Include="..\..\CEX\SecureRandom.h" />
     <ClInclude Include="..\..\CEX\ProviderFromName.h" />
     <ClInclude Include="..\..\CEX\Providers.h" />
@@ -414,25 +409,28 @@
     <ClCompile Include="..\..\CEX\ACS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp" />
+    <ClCompile Include="..\..\CEX\AeadModes.cpp" />
     <ClCompile Include="..\..\CEX\AHX.cpp" />
     <ClCompile Include="..\..\CEX\ArrayTools.cpp" />
+    <ClCompile Include="..\..\CEX\AsymmetricEngines.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricKey.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricKeyPair.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricSecureKey.cpp" />
+    <ClCompile Include="..\..\CEX\AsymmetricTransforms.cpp" />
     <ClCompile Include="..\..\CEX\BitConverter.cpp" />
     <ClCompile Include="..\..\CEX\Blake2.cpp" />
     <ClCompile Include="..\..\CEX\Blake256.cpp" />
     <ClCompile Include="..\..\CEX\Blake512.cpp" />
     <ClCompile Include="..\..\CEX\BlakeParams.cpp" />
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp" />
+    <ClCompile Include="..\..\CEX\BlockCiphers.cpp" />
     <ClCompile Include="..\..\CEX\CBC.cpp" />
     <ClCompile Include="..\..\CEX\CFB.cpp" />
     <ClCompile Include="..\..\CEX\ChaCha.cpp" />
     <ClCompile Include="..\..\CEX\ChaCha256.cpp" />
     <ClCompile Include="..\..\CEX\ChaCha512.cpp" />
-    <ClCompile Include="..\..\CEX\CipherDescription.cpp" />
-    <ClCompile Include="..\..\CEX\CipherFromDescription.cpp" />
     <ClCompile Include="..\..\CEX\CipherModeFromName.cpp" />
+    <ClCompile Include="..\..\CEX\CipherModes.cpp" />
     <ClCompile Include="..\..\CEX\CipherStream.cpp" />
     <ClCompile Include="..\..\CEX\CJP.cpp" />
     <ClCompile Include="..\..\CEX\CMAC.cpp" />
@@ -456,22 +454,37 @@
     <ClCompile Include="..\..\CEX\CTR.cpp" />
     <ClCompile Include="..\..\CEX\BCG.cpp" />
     <ClCompile Include="..\..\CEX\DigestFromName.cpp" />
+    <ClCompile Include="..\..\CEX\Digests.cpp" />
     <ClCompile Include="..\..\CEX\DigestStream.cpp" />
     <ClCompile Include="..\..\CEX\Dilithium.cpp" />
+    <ClCompile Include="..\..\CEX\DilithiumParameters.cpp" />
     <ClCompile Include="..\..\CEX\DLMN256Q8380417.cpp" />
     <ClCompile Include="..\..\CEX\DrbgFromName.cpp" />
+    <ClCompile Include="..\..\CEX\Drbgs.cpp" />
     <ClCompile Include="..\..\CEX\EAX.cpp" />
     <ClCompile Include="..\..\CEX\ECB.cpp" />
     <ClCompile Include="..\..\CEX\ECP.cpp" />
+    <ClCompile Include="..\..\CEX\KdfBase.cpp" />
+    <ClCompile Include="..\..\CEX\Kdfs.cpp" />
     <ClCompile Include="..\..\CEX\Keccak.cpp" />
+    <ClCompile Include="..\..\CEX\KmacModes.cpp" />
     <ClCompile Include="..\..\CEX\LockingAllocator.cpp" />
+    <ClCompile Include="..\..\CEX\MacBase.cpp" />
     <ClCompile Include="..\..\CEX\MacFromName.cpp" />
+    <ClCompile Include="..\..\CEX\Macs.cpp" />
     <ClCompile Include="..\..\CEX\MemoryPool.cpp" />
+    <ClCompile Include="..\..\CEX\MLWEParameters.cpp" />
     <ClCompile Include="..\..\CEX\MPKCM12T62.cpp" />
+    <ClCompile Include="..\..\CEX\MPKCParameters.cpp" />
+    <ClCompile Include="..\..\CEX\NTRUParameters.cpp" />
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp" />
+    <ClCompile Include="..\..\CEX\PaddingModes.cpp" />
     <ClCompile Include="..\..\CEX\PrngBase.cpp" />
+    <ClCompile Include="..\..\CEX\Prngs.cpp" />
     <ClCompile Include="..\..\CEX\ProviderBase.cpp" />
+    <ClCompile Include="..\..\CEX\Providers.cpp" />
     <ClCompile Include="..\..\CEX\ProviderSelfTest.cpp" />
+    <ClCompile Include="..\..\CEX\RLWEParameters.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
     <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
@@ -500,25 +513,31 @@
     <ClCompile Include="..\..\CEX\Poly1305.cpp" />
     <ClCompile Include="..\..\CEX\RingLWE.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N2048.cpp" />
+    <ClCompile Include="..\..\CEX\Salsa.cpp" />
     <ClCompile Include="..\..\CEX\SCRYPT.cpp" />
     <ClCompile Include="..\..\CEX\SecureMemory.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
+    <ClCompile Include="..\..\CEX\SecurityPolicy.cpp" />
     <ClCompile Include="..\..\CEX\SHA2.cpp" />
     <ClCompile Include="..\..\CEX\SHA256.cpp" />
+    <ClCompile Include="..\..\CEX\SHA2Digests.cpp" />
     <ClCompile Include="..\..\CEX\SHA2Params.cpp" />
     <ClCompile Include="..\..\CEX\SHA512.cpp" />
     <ClCompile Include="..\..\CEX\SHAKE.cpp" />
+    <ClCompile Include="..\..\CEX\ShakeModes.cpp" />
     <ClCompile Include="..\..\CEX\Skein.cpp" />
     <ClCompile Include="..\..\CEX\Skein1024.cpp" />
     <ClCompile Include="..\..\CEX\Skein256.cpp" />
     <ClCompile Include="..\..\CEX\Skein512.cpp" />
     <ClCompile Include="..\..\CEX\SkeinParams.cpp" />
     <ClCompile Include="..\..\CEX\Sphincs.cpp" />
+    <ClCompile Include="..\..\CEX\SphincsParameters.cpp" />
     <ClCompile Include="..\..\CEX\SphincsUtils.cpp" />
     <ClCompile Include="..\..\CEX\SPXF256.cpp" />
+    <ClCompile Include="..\..\CEX\StreamAuthenticators.cpp" />
+    <ClCompile Include="..\..\CEX\StreamCiphers.cpp" />
+    <ClCompile Include="..\..\CEX\SymmetricCiphers.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricKeyGenerator.cpp" />
-    <ClCompile Include="..\..\CEX\MacDescription.cpp" />
-    <ClCompile Include="..\..\CEX\MacFromDescription.cpp" />
     <ClCompile Include="..\..\CEX\MacStream.cpp" />
     <ClCompile Include="..\..\CEX\MemoryStream.cpp" />
     <ClCompile Include="..\..\CEX\OFB.cpp" />
@@ -543,6 +562,7 @@
     <ClCompile Include="..\..\CEX\Threefish1024.cpp" />
     <ClCompile Include="..\..\CEX\Threefish256.cpp" />
     <ClCompile Include="..\..\CEX\Threefish512.cpp" />
+    <ClCompile Include="..\..\CEX\ThreefishModes.cpp" />
     <ClCompile Include="..\..\CEX\TimeStamp.cpp" />
     <ClCompile Include="..\..\CEX\X923.cpp" />
     <ClCompile Include="..\..\CEX\ZeroOne.cpp" />

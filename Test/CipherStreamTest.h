@@ -2,12 +2,10 @@
 #define CEXTEST_STREAMCIPHERTEST_H
 
 #include "ITest.h"
-#include "../CEX/CipherDescription.h"
 #include "../CEX/CipherStream.h"
 
 namespace Test
 {
-	using Processing::CipherDescription;
 	using Processing::CipherStream;
 
 	static const std::string CLASSNAME;
@@ -60,11 +58,6 @@ namespace Test
 		std::string Run() override;
 
 		/// <summary>
-		/// Test cipher desription initialization
-		/// </summary>
-		void Description(CipherDescription* Description);
-
-		/// <summary>
 		/// Test file stream access (manual)
 		/// </summary>
 		void File();
@@ -83,11 +76,6 @@ namespace Test
 		/// Test parameters for correct operation
 		/// </summary>
 		void Parameters();
-
-		/// <summary>
-		/// Serialization tests
-		/// </summary>
-		void Serialization();
 
 	private:
 

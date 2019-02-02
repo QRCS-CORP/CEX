@@ -5,7 +5,7 @@ NAMESPACE_PROVIDER
 
 using Utility::MemoryTools;
 
-//~~~ProviderBase~~~//
+//~~~Constructor~~~//
 
 ProviderBase::ProviderBase(bool Available, Providers Enumeral, const std::string &Name)
 	:

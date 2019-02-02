@@ -9,9 +9,9 @@ const std::string EAX::CLASS_NAME("EAX");
 
 //~~~Constructor~~~//
 
-EAX::EAX(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
+EAX::EAX(BlockCiphers CipherType)
 	:
-	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType, CipherExtensionType) :
+	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
 		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The block cipher type can nor be none!"), ErrorCodes::InvalidParam)),
 	m_aadData(m_cipherMode->BlockSize()),
 	m_aadLoaded(false),
@@ -317,6 +317,7 @@ void EAX::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 	UpdateTag(1, std::vector<byte>(0));
 	m_macGenerator->Update(Input, Offset, Length);
 	m_macGenerator->Finalize(m_aadData, 0);
+	m_macGenerator->Clear();
 	UpdateTag(2, std::vector<byte>(0));
 	m_aadLoaded = true;
 }
@@ -413,9 +414,9 @@ void EAX::Reset()
 	}
 
 	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
-	m_isInitialized = false;
-	m_macGenerator->Reset();
+	m_macGenerator->Clear();
 	Utility::MemoryTools::Clear(m_eaxVector, 0, m_eaxVector.size());
+	m_isInitialized = false;
 }
 
 void EAX::Scope()

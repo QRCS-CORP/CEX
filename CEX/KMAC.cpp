@@ -8,84 +8,129 @@ NAMESPACE_MAC
 
 using Utility::ArrayTools;
 using Utility::IntegerTools;
+using Digest::Keccak;
+using Enumeration::MacConvert;
 using Utility::MemoryTools;
+using Enumeration::KmacModeConvert;
 
-const std::string KMAC::CLASS_NAME("KMAC");
+class KMAC::KmacState
+{
+public:
+
+	std::array<ulong, STATE_SIZE> State = { 0 };
+	std::array<byte, BUFFER_SIZE> Buffer = { 0 };
+	size_t BlockSize;
+	size_t MacSize;
+	size_t Position;
+	KmacModes KmacMode;
+
+	KmacState(size_t InputSize, size_t OutputSize, KmacModes Mode)
+		:
+		BlockSize(InputSize),
+		MacSize(OutputSize),
+		Position(0),
+		KmacMode(Mode)
+	{
+	}
+
+	~KmacState()
+	{
+		BlockSize = 0;
+		MacSize = 0;
+		Position = 0;
+		KmacMode = KmacModes::None;
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+	}
+
+	void Reset()
+	{
+		Position = 0;
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+	}
+};
 
 //~~~Constructor~~~//
 
-KMAC::KMAC(ShakeModes ShakeModeType)
+KMAC::KMAC(KmacModes KmacModeType)
 	:
-	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
-	m_distCode { 0x4B, 0x4D, 0x41, 0x43 },
-	m_isDestroyed(false),
+	MacBase(
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
+			KmacModeType == KmacModes::KMAC1024 ? Keccak::KECCAK_RATE1024_SIZE :
+				throw CryptoMacException(std::string("KMAC"), std::string("Constructor"), std::string("The kmac mode type is not supported!"), ErrorCodes::InvalidParam)),
+		static_cast<Macs>(KmacModeType),
+		KmacModeConvert::ToName(KmacModeType),
+		std::vector<SymmetricKeySize> {
+			SymmetricKeySize(
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				0,
+				0),
+			SymmetricKeySize(
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
+					Keccak::KECCAK_RATE1024_SIZE),
+				0,
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE)),
+			SymmetricKeySize(
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
+					Keccak::KECCAK_RATE1024_SIZE),
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
+					Keccak::KECCAK_RATE1024_SIZE),
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE))},
+#if defined(CEX_ENFORCE_KEYMIN)
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+			Keccak::KECCAK_MESSAGE1024_SIZE),
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+			Keccak::KECCAK_MESSAGE1024_SIZE),
+#else
+		MINKEY_LENGTH,
+		MINSALT_LENGTH,
+#endif
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+			Keccak::KECCAK_MESSAGE1024_SIZE)),
 	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_macSize((ShakeModeType == ShakeModes::SHAKE128) ? 16 : (ShakeModeType == ShakeModes::SHAKE256) ? 32 :
-		(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
-	m_msgLength(0),
-	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
-		throw CryptoMacException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type can not ne none!"), ErrorCodes::InvalidParam))
+	m_kmacState(new KmacState(BlockSize(), TagSize(), KmacModeType))
 {
-	Scope();
 }
 
 KMAC::~KMAC()
 {
-	if (!m_isDestroyed)
-	{
-		m_blockSize = 0;
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_macSize = 0;
-		m_msgLength = 0;
-		m_shakeMode = ShakeModes::None;
+	m_isInitialized = false;
 
-		IntegerTools::Clear(m_distCode);
-		IntegerTools::Clear(m_legalKeySizes);
-		IntegerTools::Clear(m_msgBuffer);
+	if (m_kmacState != nullptr)
+	{
+		m_kmacState.reset(nullptr);
 	}
 }
 
 //~~~Accessors~~~//
 
-const size_t KMAC::BlockSize()
-{
-	return m_blockSize;
-}
-
-std::vector<byte> &KMAC::DistributionCode()
-{
-	return m_distCode;
-}
-
 const size_t KMAC::DistributionCodeMax()
 {
-	return m_blockSize;
-}
-
-const Macs KMAC::Enumeral()
-{
-	Macs mname;
-
-	if (m_shakeMode == ShakeModes::SHAKE1024)
-	{ 
-		mname = Macs::KMAC1024;
-	}
-	else if (m_shakeMode == ShakeModes::SHAKE512)
-	{
-		mname = Macs::KMAC512;
-	}
-	else if (m_shakeMode == ShakeModes::SHAKE256)
-	{
-		mname = Macs::KMAC256;
-	}
-	else
-	{
-		mname = Macs::KMAC128;
-	}
-
-	return mname;
+	return BlockSize();
 }
 
 const bool KMAC::IsInitialized()
@@ -93,31 +138,16 @@ const bool KMAC::IsInitialized()
 	return m_isInitialized;
 }
 
-std::vector<SymmetricKeySize> KMAC::LegalKeySizes() const
+const KmacModes KMAC::KmacMode()
 {
-	return m_legalKeySizes;
-}
-
-const std::string KMAC::Name()
-{
-	return  CLASS_NAME + "-" + IntegerTools::ToString(m_macSize * 8);
-}
-
-const ShakeModes KMAC::ShakeMode()
-{
-	return m_shakeMode;
-}
-
-const size_t KMAC::TagSize()
-{
-	return m_macSize;
+	return m_kmacState->KmacMode;
 }
 
 //~~~Public Functions~~~//
 
 void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!m_isInitialized)
+	if (!IsInitialized())
 	{
 		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -132,7 +162,12 @@ void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	if (!m_isInitialized)
+	std::vector<byte> buf(sizeof(size_t) + 1);
+	size_t i;
+	size_t blen;
+	size_t olen;
+
+	if (!IsInitialized())
 	{
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -140,145 +175,133 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	{
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
-
-	std::vector<byte> buf(sizeof(size_t) + 1);
-	size_t i;
-	size_t outBits;
-	ulong outLen;
-
-	if (m_msgLength != m_msgBuffer.size())
+	if (m_kmacState->Position != m_kmacState->Buffer.size())
 	{
-		MemoryTools::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		MemoryTools::Clear(m_kmacState->Buffer, m_kmacState->Position, m_kmacState->Buffer.size() - m_kmacState->Position);
 	}
 
-	outLen = Output.size() - OutOffset;
-	outBits = ArrayTools::RightEncode(buf, 0, outLen * 8);
+	olen = Output.size() - OutOffset;
+	blen = ArrayTools::RightEncode(buf, 0, static_cast<ulong>(olen) * 8);
 
-	for (i = 0; i < outBits; i++)
+	for (i = 0; i < blen; i++)
 	{
-		m_msgBuffer[m_msgLength + i] = buf[i];
+		m_kmacState->Buffer[m_kmacState->Position + i] = buf[i];
 	}
 
-	m_msgLength += outBits;
-	m_msgBuffer[m_msgLength] = DOMAIN_CODE;
-	m_msgBuffer[m_blockSize - 1] |= 128;
+	m_kmacState->Position += blen;
+	m_kmacState->Buffer[m_kmacState->Position] = DOMAIN_CODE;
+	m_kmacState->Buffer[m_kmacState->BlockSize - 1] |= 128;
 
-	ArrayTools::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
-	Squeeze(m_kdfState, Output, OutOffset, static_cast<size_t>(outLen));
+	ArrayTools::AbsorbBlock8to64(m_kmacState->Buffer, 0, m_kmacState->State, m_kmacState->BlockSize);
+	Squeeze(Output, OutOffset, olen, m_kmacState);
 
-	return outLen;
+	return olen;
 }
 
 void KMAC::Initialize(ISymmetricKey &KeyParams)
 {
-	if (KeyParams.Key().size() < MIN_KEYSIZE)
+	if (KeyParams.Key().size() < MinimumKeySize())
 	{
-		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Key size is invalid; must be a legal key size!"), ErrorCodes::InvalidKey);
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
-	if (KeyParams.Info().size() > m_blockSize)
+	if (KeyParams.Nonce().size() != 0 && KeyParams.Nonce().size() < MinimumSaltSize())
 	{
-		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Info size is invalid; must be a legal info size!"), ErrorCodes::InvalidKey);
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
 	}
 
-	size_t keyLen = KeyParams.Key().size();
-
-	if (m_isInitialized)
+	if (IsInitialized())
 	{
 		Reset();
 	}
 
 	if (KeyParams.Info().size() > 0)
 	{
-		m_distCode = KeyParams.Info();
+		Customize(KeyParams.Nonce(), KeyParams.Info(), m_kmacState);
+	}
+	else
+	{
+		std::vector<byte> dcode{ 0x4B, 0x4D, 0x41, 0x43 };
+		Customize(KeyParams.Nonce(), dcode, m_kmacState);
 	}
 
-	Customize(KeyParams.Nonce(), m_distCode);
-	LoadKey(KeyParams.Key());
+	LoadKey(KeyParams.Key(), m_kmacState);
 
 	m_isInitialized = true;
 }
 
 void KMAC::Reset()
 {
-	MemoryTools::Clear(m_kdfState, 0, STATE_SIZE * sizeof(ulong));
-	MemoryTools::Clear(m_msgBuffer, 0, BUFFER_SIZE);
-	m_msgLength = 0;
+	m_kmacState->Reset();
 	m_isInitialized = false;
-}
-
-void KMAC::Update(byte Input)
-{
-	std::vector<byte> one(1, Input);
-	Update(one, 0, 1);
 }
 
 void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The input buffer is too short!");
-	CEXASSERT(m_isInitialized, "The mac is not initialized!");
+	if (!IsInitialized())
+	{
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+	if ((Input.size() - InOffset) < Length)
+	{
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
+	}
 
 	if (Length != 0)
 	{
-		if (m_msgLength != 0 && (m_msgLength + Length >= m_blockSize))
+		// update partially filled block
+		if (m_kmacState->Position != 0 && (m_kmacState->Position + Length >= m_kmacState->BlockSize))
 		{
-			const size_t RMDLEN = m_blockSize - m_msgLength;
+			const size_t RMDLEN = m_kmacState->BlockSize - m_kmacState->Position;
 			if (RMDLEN != 0)
 			{
-				MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				MemoryTools::Copy(Input, InOffset, m_kmacState->Buffer, m_kmacState->Position, RMDLEN);
 			}
 
-			ArrayTools::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
-			Permute(m_kdfState);
-			m_msgLength = 0;
+			ArrayTools::AbsorbBlock8to64(m_kmacState->Buffer, 0, m_kmacState->State, m_kmacState->BlockSize);
+			Permute(m_kmacState);
+			m_kmacState->Position = 0;
 			InOffset += RMDLEN;
 			Length -= RMDLEN;
 		}
 
-		// sequential loop through blocks
-		while (Length >= m_blockSize)
+		// sequential loop through remaining blocks
+		while (Length >= m_kmacState->BlockSize)
 		{
-			ArrayTools::AbsorbBlock8to64(Input, InOffset, m_kdfState, m_blockSize);
-			Permute(m_kdfState);
-			InOffset += m_blockSize;
-			Length -= m_blockSize;
+			ArrayTools::AbsorbBlock8to64(Input, InOffset, m_kmacState->State, m_kmacState->BlockSize);
+			Permute(m_kmacState);
+			InOffset += m_kmacState->BlockSize;
+			Length -= m_kmacState->BlockSize;
 		}
 
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
-			m_msgLength += Length;
+			MemoryTools::Copy(Input, InOffset, m_kmacState->Buffer, m_kmacState->Position, Length);
+			m_kmacState->Position += Length;
 		}
 	}
 }
 
 //~~~Private Functions~~~//
 
-void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name)
+void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::unique_ptr<KmacState> &State)
 {
-	CEXASSERT(!m_isInitialized, "The domain string must be set before initialization");
-	CEXASSERT(Customization.size() + Name.size() <= 196, "The input buffer is too large");
-
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
 	ulong offset;
 
 	MemoryTools::Clear(pad, 0, pad.size());
-	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
+	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
 	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Name.size() * 8));
 
 	if (Name.size() != 0)
 	{
 		for (i = 0; i < Name.size(); i++)
 		{
-			if (offset == m_blockSize)
+			if (offset == State->BlockSize)
 			{
-				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
-				{
-					m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
-				}
-
-				Permute(m_kdfState);
+				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Permute(State);
 				offset = 0;
 			}
 
@@ -293,14 +316,10 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 	{
 		for (i = 0; i < Customization.size(); ++i)
 		{
-			if (offset == m_blockSize)
+			if (offset == State->BlockSize)
 			{
-				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
-				{
-					m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
-				}
-
-				Permute(m_kdfState);
+				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Permute(State);
 				offset = 0;
 			}
 
@@ -314,36 +333,30 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
+		State->State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 	}
 
-	Permute(m_kdfState);
+	Permute(State);
 }
 
-void KMAC::LoadKey(const std::vector<byte> &Key)
+void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &State)
 {
-	CEXASSERT(!m_isInitialized, "The domain string must be set before initialization");
-
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
 	ulong offset;
 
 	MemoryTools::Clear(pad, 0, pad.size());
-	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
+	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
 	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Key.size() * 8));
 
 	if (Key.size() != 0)
 	{
 		for (i = 0; i < Key.size(); i++)
 		{
-			if (offset == m_blockSize)
+			if (offset == State->BlockSize)
 			{
-				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
-				{
-					m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
-				}
-
-				Permute(m_kdfState);
+				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Permute(State);
 				offset = 0;
 			}
 
@@ -357,52 +370,47 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		m_kdfState[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
+		State->State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
 	}
 
-	Permute(m_kdfState);
+	Permute(State);
 }
 
-void KMAC::Permute(std::array<ulong, 25> &State)
+void KMAC::Permute(std::unique_ptr<KmacState> &State)
 {
-	if (m_shakeMode != ShakeModes::SHAKE1024)
+	if (State->KmacMode != KmacModes::KMAC1024)
 	{
-		Digest::Keccak::PermuteR24P1600U(State);
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR24P1600C(State->State);
+#else
+		Keccak::PermuteR24P1600U(State->State);
+#endif
 	}
 	else
 	{
-		Digest::Keccak::PermuteR48P1600U(State);
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600C(State->State);
+#else
+		Keccak::PermuteR48P1600U(State->State);
+#endif
 	}
 }
 
-void KMAC::Scope()
-{
-	Reset();
-
-	m_legalKeySizes.resize(3);
-	// minimum security is half the digest output size
-	m_legalKeySizes[0] = SymmetricKeySize((m_macSize / 2), 0, 0);
-	// best perf/sec mix, the digest output size
-	m_legalKeySizes[1] = SymmetricKeySize(m_macSize, 0, 0);
-	// max recommended key input; is two times the digest output size
-	m_legalKeySizes[2] = SymmetricKeySize(m_macSize * 2, 0, 0);
-}
-
-void KMAC::Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void KMAC::Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<KmacState> &State)
 {
 	size_t i;
 	
-	while (Length > m_blockSize)
+	while (Length > State->BlockSize)
 	{
 		Permute(State);
 
-		for (i = 0; i < m_blockSize / 8; ++i)
+		for (i = 0; i < State->BlockSize / 8; ++i)
 		{
-			IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (i * 8));
+			IntegerTools::Le64ToBytes(State->State[i], Output, OutOffset + (i * 8));
 		}
 
-		OutOffset += m_blockSize;
-		Length -= m_blockSize;
+		OutOffset += State->BlockSize;
+		Length -= State->BlockSize;
 	}
 
 	if (Length > 0)
@@ -411,14 +419,14 @@ void KMAC::Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size
 
 		for (i = 0; i < Length / 8; ++i)
 		{
-			IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (i * 8));
+			IntegerTools::Le64ToBytes(State->State[i], Output, OutOffset + (i * 8));
 		}
 
 		Length -= i * 8;
 
 		if (Length > 0)
 		{
-			MemoryTools::CopyFromValue(State[i], Output, OutOffset + (i * 8), Length);
+			MemoryTools::CopyFromValue(State->State[i], Output, OutOffset + (i * 8), Length);
 		}
 	}
 }

@@ -51,7 +51,7 @@ Skein256::Skein256(bool Parallel)
 	m_treeDestroy(true),
 	m_treeParams(Parallel ? SkeinParams(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : SkeinParams(DIGEST_SIZE, 0, 0))
 {
-	// TODO: implement parallel alternate for single core cpu
+	// TODO: implement parallel alternate for single core cpu + consider inherited parallelprofile class?
 	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
 	Initialize();

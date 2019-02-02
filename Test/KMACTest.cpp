@@ -10,7 +10,7 @@ namespace Test
 	using Mac::KMAC;
 	using Utility::IntegerTools;
 	using Prng::SecureRandom;
-	using Enumeration::ShakeModes;
+	using Enumeration::KmacModes;
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
 
@@ -54,25 +54,25 @@ namespace Test
 			Exception();
 			OnProgress(std::string("KMACTest: Passed KMAC exception handling tests.."));
 
-			KMAC* gen1 = new KMAC(ShakeModes::SHAKE128);
+			KMAC* gen1 = new KMAC(KmacModes::KMAC128);
 			Kat(gen1, m_key[0], m_custom[0], m_message[0], m_expected[0]);
 			Kat(gen1, m_key[0], m_custom[1], m_message[0], m_expected[1]);
 			Kat(gen1, m_key[0], m_custom[1], m_message[1], m_expected[2]);
 			OnProgress(std::string("KMACTest: Passed KMAC-128 known answer vector tests.."));
 
-			KMAC* gen2 = new KMAC(ShakeModes::SHAKE256);
+			KMAC* gen2 = new KMAC(KmacModes::KMAC256);
 			Kat(gen2, m_key[0], m_custom[1], m_message[0], m_expected[3]);
 			Kat(gen2, m_key[0], m_custom[0], m_message[1], m_expected[4]);
 			Kat(gen2, m_key[0], m_custom[1], m_message[1], m_expected[5]);
 			OnProgress(std::string("KMACTest: Passed KMAC-256 known answer vector tests.."));
 
-			KMAC* gen3 = new KMAC(ShakeModes::SHAKE512);
+			KMAC* gen3 = new KMAC(KmacModes::KMAC512);
 			Kat(gen3, m_key[1], m_custom[1], m_message[2], m_expected[6]);
 			Kat(gen3, m_key[2], m_custom[3], m_message[2], m_expected[7]);
 			Kat(gen3, m_key[1], m_custom[2], m_message[3], m_expected[8]);
 			OnProgress(std::string("KMACTest: Passed KMAC-512 known answer vector tests.."));
 
-			KMAC* gen4 = new KMAC(ShakeModes::SHAKE1024);
+			KMAC* gen4 = new KMAC(KmacModes::KMAC1024);
 			Kat(gen4, m_key[1], m_custom[3], m_message[2], m_expected[9]);
 			Kat(gen4, m_key[2], m_custom[2], m_message[3], m_expected[10]);
 			Kat(gen4, m_key[2], m_custom[3], m_message[2], m_expected[11]);
@@ -113,7 +113,7 @@ namespace Test
 		try
 		{
 			// invalid cipher choice
-			KMAC gen(ShakeModes::None);
+			KMAC gen(KmacModes::None);
 
 			throw TestException(std::string("Exception"), gen.Name(), std::string("Exception handling failure! -KE1"));
 		}
@@ -128,7 +128,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			KMAC gen(ShakeModes::SHAKE128);
+			KMAC gen(KmacModes::KMAC128);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
@@ -147,7 +147,7 @@ namespace Test
 		// test finalize state
 		try
 		{
-			KMAC gen(ShakeModes::SHAKE128);
+			KMAC gen(KmacModes::KMAC128);
 			std::vector<byte> code(gen.TagSize());
 			// generator was not initialized
 			gen.Finalize(code, 0);
@@ -237,7 +237,7 @@ namespace Test
 
 	void KMACTest::Params(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
 		std::vector<byte> otp1(Generator->TagSize());
@@ -271,7 +271,7 @@ namespace Test
 
 	void KMACTest::Stress(IMac* Generator)
 	{
-		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
 		std::vector<byte> otp(Generator->TagSize());

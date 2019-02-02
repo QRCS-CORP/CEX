@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -25,7 +25,7 @@
 #ifndef CEX_POLY1305_H
 #define CEX_POLY1305_H
 
-#include "IMac.h"
+#include "MacBase.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MAC
@@ -38,7 +38,7 @@ NAMESPACE_MAC
 /// <description>Example generating a MAC code from an Input array</description>
 /// <code>
 /// // the default constructor uses the sequential processing mode (no cipher assist, just Poly1305)
-/// Poly1305 mac(Enumeration::BlockCiphers::Rijndael);
+/// Poly1305 mac(Enumeration::BlockCiphers::AES);
 ///
 /// // Note: if key is not pre-conditioned for Poly1305-AES, it will be clamped automatically in Initialize(&ISymmetricKey)
 /// SymmetricKey kp(Key);
@@ -75,20 +75,17 @@ NAMESPACE_MAC
 /// <item><description>Twofish: <a href="https://www.schneier.com/paper-twofish-paper.pdf">Specification</a>.</description></item>
 /// </list>
 /// </remarks>
-class Poly1305 final : public IMac
+class Poly1305 final : public MacBase
 {
 private:
 
 	static const size_t BLOCK_SIZE = 16;
-	static const std::string CLASS_NAME;
-	static const size_t KEY_SIZE = 32;
+	static const size_t POLYKEY_SIZE = 32;
+	static const size_t MINSALT_LENGTH = 0;
 
-	bool m_isDestroyed;
+	class Poly1305State;
 	bool m_isInitialized;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::array<uint64_t, 8> m_macState;
-	std::vector<byte> m_msgBuffer;
-	size_t m_msgLength;
+	std::unique_ptr<Poly1305State> m_poly1305State;
 
 public:
 
@@ -117,34 +114,9 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Macs internal blocksize in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Read Only: Mac generators type name
-	/// </summary>
-	const Macs Enumeral() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t TagSize() override;
-
-	/// <summary>
-	/// Read Only: Mac generators class name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 
@@ -190,13 +162,6 @@ public:
 	void Reset() override;
 
 	/// <summary>
-	/// Update the Mac with a single byte
-	/// </summary>
-	/// 
-	/// <param name="Input">Input byte to process</param>
-	void Update(byte Input) override;
-
-	/// <summary>
 	/// Update the Mac with a block of bytes
 	/// </summary>
 	/// 
@@ -207,7 +172,7 @@ public:
 
 private:
 
-	void Process(const std::vector<byte> &Output, size_t OutOffset, size_t Length, bool IsFinal);
+	static void Process(const std::vector<byte> &Output, size_t OutOffset, size_t Length, bool IsFinal, std::unique_ptr<Poly1305State> &State);
 };
 
 NAMESPACE_MACEND

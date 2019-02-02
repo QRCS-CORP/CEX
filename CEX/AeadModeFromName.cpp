@@ -65,7 +65,7 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 
 	try
 	{
-		BlockCipherFromName::GetInstance(CipherType, CipherExtensionType);
+		BlockCipherFromName::GetInstance(CipherType);
 
 		switch (CipherModeType)
 		{

@@ -5,7 +5,7 @@
 
 NAMESPACE_PROVIDER
 
-const std::string RDP::CLASS_NAME("RDP");
+using Enumeration::ProviderConvert;
 
 //~~~Constructor~~~//
 
@@ -14,10 +14,10 @@ RDP::RDP(DrandEngines DrandType)
 #if defined(CEX_FIPS140_ENABLED)
 	m_pvdSelfTest(),
 #endif
-	ProviderBase(Capability() != DrandEngines::None, Providers::RDP, CLASS_NAME),
+	ProviderBase(Capability() != DrandEngines::None, Providers::RDP, ProviderConvert::ToName(Providers::RDP)),
 	m_randType(DrandType == DrandEngines::RdSeed ? Capability() :
 		DrandType == DrandEngines::RdRand ? DrandType :
-			throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Random provider type can not be None!"), ErrorCodes::IllegalOperation))
+		throw CryptoRandomException(ProviderConvert::ToName(Providers::RDP), std::string("Constructor"), std::string("Random provider type can not be None!"), ErrorCodes::IllegalOperation))
 {
 }
 
@@ -32,15 +32,15 @@ void RDP::Generate(std::vector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (m_randType == DrandEngines::RdSeed && Output.size() > SEED_MAX)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data(), Output.size(), m_randType);
@@ -50,19 +50,19 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (m_randType == DrandEngines::RdSeed && Output.size() > SEED_MAX)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data() + Offset, Length, m_randType);
@@ -72,15 +72,15 @@ void RDP::Generate(SecureVector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (m_randType == DrandEngines::RdSeed && Output.size() > SEED_MAX)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data(), Output.size(), m_randType);
@@ -90,19 +90,19 @@ void RDP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (m_randType == DrandEngines::RdSeed && Output.size() > SEED_MAX)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::IllegalOperation);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data() + Offset, Length, m_randType);
@@ -208,7 +208,7 @@ void RDP::GetRandom(byte* Output, size_t Length, DrandEngines DrandType)
 
 			if ((DrandType == DrandEngines::RdRand && fctr >= RDR_RETRY) || fctr >= RDS_RETRY)
 			{
-				throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::MaxExceeded);
+				throw CryptoRandomException(ProviderConvert::ToName(Providers::RDP), std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::MaxExceeded);
 			}
 		}
 	}
@@ -248,7 +248,7 @@ void RDP::GetRandom(byte* Output, size_t Length, DrandEngines DrandType)
 
 			if ((DrandType == DrandEngines::RdRand && fctr >= RDR_RETRY) || fctr >= RDS_RETRY)
 			{
-				throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::MaxExceeded);
+				throw CryptoRandomException(ProviderConvert::ToName(Providers::RDP), std::string("Generate"), std::string("The seed providers maximum output is 64MB per request!"), ErrorCodes::MaxExceeded);
 			}
 		}
 	}
@@ -256,7 +256,7 @@ void RDP::GetRandom(byte* Output, size_t Length, DrandEngines DrandType)
 
 #else
 
-	throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("AVX is not available on this system!"), ErrorCodes::NotFound);
+	throw CryptoRandomException(ProviderConvert::ToName(Providers::RDP), std::string("Generate"), std::string("AVX is not available on this system!"), ErrorCodes::NotFound);
 
 #endif
 }

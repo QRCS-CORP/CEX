@@ -19,11 +19,11 @@ enum class Macs : byte
 	/// </summary>
 	CMAC = 1,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-256
+	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-256
 	/// </summary>
 	CMACAHXS256= 2,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-512
+	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-512
 	/// </summary>
 	CMACAHXS512 = 3,
 	/// <summary>
@@ -31,11 +31,11 @@ enum class Macs : byte
 	/// </summary>
 	GMAC = 4,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-256
+	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-256
 	/// </summary>
 	GMACAHXS256 = 5,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator using AHX/RHX and cSHAKE-512
+	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-512
 	/// </summary>
 	GMACAHXS512 = 6,
 	/// <summary>
@@ -66,6 +66,29 @@ enum class Macs : byte
 	/// The Poly1305 Message Authentication Code generator
 	/// </summary>
 	Poly1305 = 13
+};
+
+class MacConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the Macs formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The Macs enumeration member</param>
+	///
+	/// <returns>The matching Macs string name</returns>
+	static std::string ToName(Macs Enumeral);
+
+	/// <summary>
+	/// Derive the Macs enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The Macs string name</param>
+	///
+	/// <returns>The matching Macs enumeration type name</returns>
+	static Macs FromName(std::string &Name);
 };
 
 NAMESPACE_ENUMERATIONEND

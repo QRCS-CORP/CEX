@@ -64,5 +64,27 @@ enum class Kdfs : byte
 	SHAKE1024 = 12
 };
 
+class KdfConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the Kdfs formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The Kdfs enumeration member</param>
+	///
+	/// <returns>The matching Kdfs string name</returns>
+	static std::string ToName(Kdfs Enumeral);
+
+	/// <summary>
+	/// Derive the Kdfs enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The Kdfs string name</param>
+	///
+	/// <returns>The matching Kdfs enumeration type name</returns>
+	static Kdfs FromName(std::string &Name);
+};
 NAMESPACE_ENUMERATIONEND
 #endif

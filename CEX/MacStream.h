@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -30,7 +30,6 @@
 #include "IByteStream.h"
 #include "IMac.h"
 #include "ISymmetricKey.h"
-#include "MacDescription.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_PROCESSING
@@ -105,15 +104,6 @@ public:
 	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
 	MacStream() = delete;
-
-	/// <summary>
-	/// Initialize the class with a MacDescription
-	/// </summary>
-	/// 
-	/// <param name="Description">A MacDescription structure containing details about the Mac generator</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
-	explicit MacStream(MacDescription &Description);
 
 	/// <summary>
 	/// Initialize the class with a Mac instance

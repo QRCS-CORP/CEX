@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -16,32 +16,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
-// Implementation Details:
-// An implementation of Passphrase Based Key Derivation Function 2 (PBKDF2).
-// Written by John Underhill, September 24, 2014
-// Updated September 22, 2016
-// Updated April 19, 2017
+// Updated by January 28, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_PBKDF2_H
 #define CEX_PBKDF2_H
 
-#include "IKdf.h"
-#include "Digests.h"
-#include "IDigest.h"
 #include "HMAC.h"
+#include "IDigest.h"
+#include "IKdf.h"
+#include "KdfBase.h"
 #include "SHA2Digests.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
-using Digest::IDigest;
 using Mac::HMAC;
+using Digest::IDigest;
 using Enumeration::SHA2Digests;
 
 /// <summary>
-/// An implementation of the Passphrase Based Key Derivation Version 2 (PBKDF2)
+/// An implementation of the Passphrase Based Key Derivation Version 2: PBKDF2
 /// </summary> 
 /// 
 /// <example>
@@ -58,8 +53,8 @@ using Enumeration::SHA2Digests;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>PBKDF2 uses an HMAC as a pseudo-random function to process a passphrase repeatedly, producing pseudo-random output in a process known as key stretching. \n
-/// By increasing the number of iterations in which the function is applied, the amount of time required to derive the key becomes more computationally expensive. \n
+/// <para>PBKDF2 uses an HMAC as a pseudo-random function to process a passphrase in a time-complexity loop, producing pseudo-random output in a process known as key stretching. \n
+/// By increasing the number of iterations in which the internal hashing function is applied, the amount of time required to derive the key becomes more computationally expensive. \n
 /// A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase.</para>
 /// 
 /// <description><B>Description:</B></description> \n
@@ -78,14 +73,14 @@ using Enumeration::SHA2Digests;
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
 /// <item><description>This implementation only supports the SHA2-256 and SHA2-512 message digests.</description></item>
-/// <item><description>This class can be instantiated with a message digest or HMAC instance, or by using a digests enumeration type name.</description></item>
-/// <item><description>The generator must be initialized with a key using one of the Initialize() functions before output can be generated.</description></item>
-/// <item><description>The Initialize() function can use a SymmetricKey key container class, or input arrays of Key, and optional Salt and Info.</description></item>
-/// <item><description>The minimum key (passphrase) size is 4 bytes, enforcing passwords of at least 8 characters is recommended.</description></item>
-/// <item><description>The maximum number of bytes that can be generated is the digests return size * 255.</description></item>
+/// <item><description>PBKDF2 can be instantiated with a message digest instance, or by using a digests enumeration type name.</description></item>
+/// <item><description>The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material.</description></item>
+/// <item><description>The generator must be initialized with a key using the Initialize() functions before output can be generated.</description></item>
+/// <item><description>The minimum key (passphrase) size is 4 bytes, enforcing passwords of at least 32 characters is recommended.</description></item>
+/// <item><description>The maximum number of bytes that can be generated is the underlying digests output-size * 255.</description></item>
 /// <item><description>The use of a salt value can strongly mitigate some attack vectors targeting the passphrase, and is highly recommended with PBKDF2.</description></item>
-/// <item><description>The minimum salt size is 4 bytes, larger (pseudo-random) salt values are more secure.</description></item>
-/// <item><description>The default iterations count is 5000, larger values are recommended for secure server-side password hashing e.g. +100,000.</description></item>
+/// <item><description>The minimum salt size is 4 bytes, however larger pseudo-random salt values are more secure.</description></item>
+/// <item><description>The default iterations count is 10000, larger values are recommended for secure server-side password hashing e.g. +20000.</description></item>
 /// </list>
 /// 
 /// <description><B>Guiding Publications:</B></description>
@@ -95,26 +90,25 @@ using Enumeration::SHA2Digests;
 /// <item><description>NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf">Recommendation for Password-Based Key Derivation</a>.</description></item>
 /// </list>
 /// </remarks>
-class PBKDF2 final : public IKdf
+class PBKDF2 final : public KdfBase
 {
 private:
 
-	static const std::string CLASS_NAME;
-	static const size_t MIN_PASSLEN = 4;
-	static const size_t MIN_SALTLEN = 4;
+	static const size_t DEFAULT_ITERATIONS = 10000;
+	static const size_t MAXGEN_REQUESTS = 1024000;
+#if defined(CEX_ENFORCE_KEYMIN)
 
-	std::unique_ptr<HMAC> m_macGenerator;
-	size_t m_blockSize;
-	bool m_destroyEngine;
+#else
+
+#endif
+	static const size_t MINKEY_LENGTH = 4;
+	static const size_t MINSALT_LENGTH = 4;
+
+	class Pbkdf2State;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	uint m_kdfCounter;
-	Digests m_kdfDigestType;
-	size_t m_kdfIterations;
-	std::vector<byte> m_kdfKey;
-	std::vector<byte> m_kdfSalt;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_macSize;
+	std::unique_ptr<HMAC> m_pbkdf2Generator;
+	std::unique_ptr<Pbkdf2State> m_pbkdf2State;
 
 public:
 
@@ -140,30 +134,20 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DigestType">The hash functions type name enumeral</param>
-	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 5000</param>
+	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 10000</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if an invalid digest name or iterations count is used</exception>
-	PBKDF2(SHA2Digests DigestType, size_t Iterations = 5000);
+	PBKDF2(SHA2Digests DigestType, uint Iterations = 10000);
 
 	/// <summary>
 	/// Instantiates a PBKDF2 generator using a message digest instance
 	/// </summary>
 	/// 
 	/// <param name="Digest">The initialized message digest instance</param>
-	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 5000</param>
+	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 10000</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if a null digest or iterations count is used</exception>
-	PBKDF2(IDigest* Digest, size_t Iterations = 5000);
-
-	/// <summary>
-	/// Instantiates a PBKDF2 generator using an initialized HMAC instance
-	/// </summary>
-	/// 
-	/// <param name="Mac">The initialized HMAC instance</param>
-	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 5000</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if a null HMAC, or an invalid iterations count is used</exception>
-	PBKDF2(HMAC* Mac, size_t Iterations = 5000);
+	PBKDF2(IDigest* Digest, uint Iterations = 10000);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -173,134 +157,75 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Kdf generators type name
-	/// </summary>
-	const Kdfs Enumeral() override;
-
-	/// <summary>
-	/// Read Only: Generator is ready to produce random
+	/// Read Only: Generator is initialized and ready to produce pseudo-random
 	/// </summary>
 	const bool IsInitialized() override;
 
 	/// <summary>
 	/// The number of compression cycles used to produce output; must be more than zero, 10,000 recommended
 	/// </summary>
-	size_t &Iterations();
-
-	/// <summary>
-	/// Read Only: Available Kdf Key Sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Minimum recommended initialization key size in bytes.
-	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
-	/// </summary>
-	const size_t MinKeySize() override;
-
-	/// <summary>
-	/// Read Only: The Kdf generators class name
-	/// </summary>
-	const std::string Name() override;
+	uint &Iterations();
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo-random bytes
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <param name="Output">The destination standard vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	size_t Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo-random bytes using offset and length parameters
+	/// Fill a secure vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// <param name="OutOffset">The starting position within the output array</param>
+	/// <param name="Output">The destination secure vector to fill</param>
+	/// 
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
+	void Generate(SecureVector<byte> &Output) override;
+
+	/// <summary>
+	/// Fill an array with pseudo-random bytes, using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+
+	/// <summary>
+	/// Fill a secure vector with pseudo-random bytes, using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Offset">The starting position within the destination array</param>
+	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
-	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Initialize the generator with a SymmetricKey structure containing the key, and optional salt, and info string.
-	/// <para>The use of a salt value mitigates some attacks against a passphrase, and is highly recommended with PBKDF2.</para>
+	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 	/// </summary>
 	/// 
-	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// <param name="KeyParams">The symmetric key container with the generators keying material</param>
 	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(ISymmetricKey &GenParam) override;
+	/// <exception cref="CryptoKdfException">Thrown if the key values are not a legal size</exception>
+	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
-	/// Initialize the generator with a key (password).
-	/// <para>The use of a salt value mitigates some attacks against a passphrase, and is highly recommended with PBKDF2.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key (password) array used to seed the generator.
-	/// <para>The minimum passphrase size is 4 bytes.</para></param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key) override;
-
-	/// <summary>
-	/// Initialize the generator with a key, using length and offset arguments
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Offset">The starting position within the key array</param>
-	/// <param name="Length">The number of key bytes to use</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length) override;
-
-	/// <summary>
-	/// Initialize the generator with key and salt arrays
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key (password) array used to seed the generator</param>
-	/// <param name="Salt">The salt value containing an additional source of entropy</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
-
-	/// <summary>
-	/// Initialize the generator with a key, a salt array, and an information string or nonce
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value used as an additional source of entropy</param>
-	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
-
-	/// <summary>
-	/// Update the generators salt array.
-	/// </summary>
-	///
-	/// <param name="Seed">The new seed value array</param>
-	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
-	void ReSeed(const std::vector<byte> &Seed) override;
-
-	/// <summary>
-	/// Reset the internal state; Kdf must be re-initialized before it can be used again
+	/// Reset the internal state; the generator must be re-initialized before it can be used again
 	/// </summary>
 	void Reset() override;
 
 private:
 
-	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void LoadState();
-	void Process(std::vector<byte> &Output, size_t OutOffset);
+	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Pbkdf2State> &State, std::unique_ptr<HMAC> &Generator);
+	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<Pbkdf2State> &State, std::unique_ptr<HMAC> &Generator);
 };
 
 NAMESPACE_KDFEND

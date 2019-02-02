@@ -7,7 +7,9 @@
 #include "IProvider.h"
 #include "ISymmetricKey.h"
 #include "Providers.h"
+#include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
+#include "SymmetricSecureKey.h"
 
 NAMESPACE_DRBG
 
@@ -17,7 +19,9 @@ using Enumeration::ErrorCodes;
 using Provider::IProvider;
 using Cipher::ISymmetricKey;
 using Enumeration::Providers;
+using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
+using Cipher::SymmetricSecureKey;
 
 /// <summary>
 /// Deterministic Random Byte Generator (DRBG) interface class

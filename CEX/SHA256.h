@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -93,7 +93,7 @@ class SHA256 final : public IDigest
 {
 private:
 
-	static const size_t BLOCK_SIZE = 64;
+	static const size_t BLOCK_SIZE = 64; // TODO: replace with SHA2 class constants
 	static const std::string CLASS_NAME;
 	static const size_t DIGEST_SIZE = 32;
 	static const uint DEF_PRLDEGREE = 8;

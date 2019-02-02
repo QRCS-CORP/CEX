@@ -48,10 +48,10 @@ namespace Test
 	{
 		try
 		{
-			Exception();
+			//Exception();
 			OnProgress(std::string("HCGTest: Passed HMAC Generator exception handling tests.."));
 
-			Stress();
+			//Stress();
 			OnProgress(std::string("HCGTest: Passedstress tests.."));
 
 			HCG* genh256 = new HCG(SHA2Digests::SHA256, Providers::None);

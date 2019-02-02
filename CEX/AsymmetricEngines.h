@@ -40,6 +40,29 @@ enum class AsymmetricEngines : byte
 	Sphincs = 6
 };
 
+class AsymmetricEngineConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the AsymmetricEngines formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The AsymmetricEngines enumeration member</param>
+	///
+	/// <returns>The matching AsymmetricEngines string name</returns>
+	static std::string ToName(AsymmetricEngines Enumeral);
+
+	/// <summary>
+	/// Derive the AsymmetricEngines enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The AsymmetricEngines string name</param>
+	///
+	/// <returns>The matching AsymmetricEngines enumeration type name</returns>
+	static AsymmetricEngines FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif
 

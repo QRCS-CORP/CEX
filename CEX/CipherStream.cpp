@@ -14,23 +14,6 @@ const std::string CipherStream::CLASS_NAME("CipherStream");
 
 //~~~Constructor~~~//
 
-CipherStream::CipherStream(CipherDescription* Description)
-	:
-	m_cipherEngine(Description->CipherModeType() != CipherModes::None && Description->CipherType() != BlockCiphers::None ? GetCipherMode(Description->CipherType(), Description->CipherExtensionType(), Description->CipherModeType()) :
-		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
-	m_cipherPadding(Description->CipherModeType() == CipherModes::CBC || Description->CipherModeType() == CipherModes::CFB || Description->CipherModeType() == CipherModes::OFB ? GetPaddingMode(Description->PaddingType()) : nullptr),
-	m_destroyEngine(true),
-	m_isBufferedIO(false),
-	m_isCounterMode(Description->CipherModeType() == CipherModes::CTR || Description->CipherModeType() == CipherModes::ICM),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isParallel(false),
-	m_legalKeySizes(0)
-{
-	Scope();
-}
-
 CipherStream::CipherStream(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType, PaddingModes PaddingType)
 	:
 	m_cipherEngine(CipherModeType != CipherModes::None && CipherType != BlockCiphers::None ? GetCipherMode(CipherType, CipherExtensionType, CipherModeType) :
@@ -392,7 +375,7 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 
 ICipherMode* CipherStream::GetCipherMode(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType)
 {
-	return Helper::CipherModeFromName::GetInstance(CipherType, CipherExtensionType, CipherModeType);
+	return Helper::CipherModeFromName::GetInstance(CipherType, CipherModeType);
 }
 
 IPadding* CipherStream::GetPaddingMode(PaddingModes PaddingType)

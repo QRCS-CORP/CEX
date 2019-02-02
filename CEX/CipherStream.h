@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -27,7 +27,6 @@
 
 #include "CexDomain.h"
 #include "BlockCipherExtensions.h"
-#include "CipherDescription.h"
 #include "CryptoProcessingException.h"
 #include "Event.h"
 #include "IBlockCipher.h"
@@ -60,23 +59,6 @@ using Cipher::SymmetricKeySize;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Encrypting a memory stream using a CipherDescription preset:</description>
-/// <code>
-/// SymmetricKey kp(key, iv);
-/// MemoryStream* mpln = new MemoryStream(plaintext);
-/// MemoryStream* mOut = new MemoryStream(plaintext.size());
-/// CipherDescription cd = CipherDescription::AES256CTR();
-///
-/// CipherStream cs(cd);
-/// cs.Initialize(true, kp);
-/// cs.Write(mpln, mOut);
-///
-/// delete mpln;
-/// delete mOut;
-/// </code>
-/// </example>
-/// 
-/// <example>
 /// <description>Encrypting a file in-place:</description>
 /// <code>
 /// // initialize file stream; input must be set with Read and output must be ReadWrite access
@@ -85,7 +67,7 @@ using Cipher::SymmetricKeySize;
 /// Cipher::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CBC
-/// CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ESP);
+/// CipherStream cs(Enumeration::BlockCiphers::AES, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ESP);
 /// // initialize the cipher for encryption
 /// cs.Initialize(true, kp);
 /// // write to file
@@ -107,7 +89,7 @@ using Cipher::SymmetricKeySize;
 /// Cipher::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CTR
-/// CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CTR);
+/// CipherStream cs(Enumeration::BlockCiphers::AES, Enumeration::Digests::None, 14, Enumeration::CipherModes::CTR);
 /// // initialize the cipher for encryption
 /// cs.Initialize(true, kp);
 /// // write to file
@@ -180,15 +162,6 @@ public:
 	CipherStream& operator=(const CipherStream&) = delete;
 
 	/// <summary>
-	/// Initialize this class with block cipher description.
-	/// </summary>
-	/// 
-	/// <param name="Description">The block cipher configuration parameters</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
-	CipherStream(CipherDescription* Description);
-
-	/// <summary>
 	/// Initialize this class with block cipher enumeration parameters.
 	/// <para>The default parameters are AES-256, using a parallel CTR mode.</para>
 	/// </summary>
@@ -199,7 +172,7 @@ public:
 	/// <param name="PaddingType">The padding mode enumeration name</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
-	CipherStream(BlockCiphers CipherType = BlockCiphers::Rijndael, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, CipherModes CipherModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
+	CipherStream(BlockCiphers CipherType = BlockCiphers::AES, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, CipherModes CipherModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
 
 	/// <summary>
 	/// Initialize the class with a block cipher mode and (optional) padding instances.

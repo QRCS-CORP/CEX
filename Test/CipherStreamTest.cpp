@@ -20,7 +20,6 @@ namespace Test
 	using namespace Enumeration;
 	using namespace Cipher::Block::Mode;
 	using namespace Cipher::Block::Padding;
-	using Processing::CipherDescription;
 	using IO::MemoryStream;
 	using Cipher::Block::RHX;
 	using Prng::SecureRandom;
@@ -59,27 +58,27 @@ namespace Test
 			// local test
 			//FileStreamTest();
 
-			CipherStream* cs1 = new CipherStream(BlockCiphers::Rijndael, BlockCipherExtensions::None, CipherModes::CFB, PaddingModes::ESP);
+			CipherStream* cs1 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CFB, PaddingModes::ESP);
 			Mode(cs1);
 			delete cs1;
 			OnProgress(std::string("Passed CFB Mode tests.."));
 
-			CipherStream* cs2 = new CipherStream(BlockCiphers::Rijndael, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
+			CipherStream* cs2 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
 			Mode(cs2);
 			delete cs2;
 			OnProgress(std::string("Passed CBC Mode tests.."));
 			
-			CipherStream* cs3 = new CipherStream(BlockCiphers::Rijndael, BlockCipherExtensions::None, CipherModes::CTR, PaddingModes::None);
+			CipherStream* cs3 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CTR, PaddingModes::None);
 			Mode(cs3);
 			delete cs3;
 			OnProgress(std::string("Passed CTR Mode tests.."));
 			
-			CipherStream* cs4 = new CipherStream(BlockCiphers::Rijndael, BlockCipherExtensions::None, CipherModes::ICM, PaddingModes::None);
+			CipherStream* cs4 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::ICM, PaddingModes::None);
 			//ModeTest(cs4);
 			delete cs4;
 			OnProgress(std::string("Passed ICM Mode tests.."));
 
-			CipherStream* cs5 = new CipherStream(BlockCiphers::Rijndael, BlockCipherExtensions::None, CipherModes::OFB, PaddingModes::ESP);
+			CipherStream* cs5 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::OFB, PaddingModes::ESP);
 			Mode(cs5);
 			delete cs5;
 			OnProgress(std::string("Passed OFB Mode tests.."));
@@ -87,22 +86,8 @@ namespace Test
 			Memory();
 			OnProgress(std::string("Passed MemoryStream self test.. "));
 
-			Serialization();
-			OnProgress(std::string("Passed CipherDescription serialization test.."));
-
 			Parameters();
 			OnProgress(std::string("Passed Cipher Parameters tests.."));
-
-			CipherDescription cd(
-				BlockCiphers::Rijndael,			// cipher engine
-				BlockCipherExtensions::None,	// cipher extension
-				CipherModes::CTR,				// cipher mode
-				PaddingModes::None,				// padding mode
-				KeySizes::K256,					// key size
-				IVSizes::V128);					// cipher iv size
-
-			Description(&cd);
-			OnProgress(std::string("Passed CipherDescription stream test.."));
 
 			return SUCCESS;
 		}
@@ -128,7 +113,7 @@ namespace Test
 		std::vector<byte> data(1025, 3);
 
 		// initialize the cipher and key container
-		CipherStream cs(BlockCiphers::Rijndael, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
+		CipherStream cs(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
 		SymmetricKey kp(key, iv);
 
 		// encrypt the file in-place
@@ -231,38 +216,6 @@ namespace Test
 			{
 				throw TestException(std::string("Mode"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM3"));
 			}
-		}
-	}
-
-	void CipherStreamTest::Description(CipherDescription* Description)
-	{
-		std::vector<byte> iv(16);
-		std::vector<byte> key(32);
-		std::vector<byte> pln(256);
-		MemoryStream mpln;
-		MemoryStream menc;
-		MemoryStream mdec;
-		SecureRandom rng;
-		CipherStream cs(Description);
-
-		rng.Generate(iv);
-		rng.Generate(key);
-		rng.Generate(pln);
-		mpln.Write(pln, 0, pln.size());
-		mpln.Seek(0, IO::SeekOrigin::Begin);
-		SymmetricKey kp(key, iv);
-
-		cs.Initialize(true, kp);
-		cs.Write(&mpln, &menc);
-
-		menc.Seek(0, IO::SeekOrigin::Begin);
-
-		cs.Initialize(false, kp);
-		cs.Write(&menc, &mdec);
-
-		if (mdec.ToArray() != pln)
-		{
-			throw TestException(std::string("Description"), cs.Name(), std::string("Encrypted arrays are not equal! -CD1"));
 		}
 	}
 
@@ -460,28 +413,6 @@ namespace Test
 			{
 				throw TestException(std::string("Parameters"), cs.Name(), std::string("Encrypted arrays are not equal! -CP6"));
 			}
-		}
-	}
-
-	void CipherStreamTest::Serialization()
-	{
-		using namespace Enumeration;
-
-		CipherDescription cd(
-			BlockCiphers::Rijndael,		// cipher engine
-			BlockCipherExtensions::None,// cipher extension
-			CipherModes::CTR,			// cipher mode
-			PaddingModes::None,			// padding mode
-			KeySizes::K256,				// key size
-			IVSizes::V128);				// cipher iv size
-
-		MemoryStream* ms = cd.ToStream();
-		CipherDescription cy(*ms);
-		delete ms;
-
-		if (!cy.Equals(cd))
-		{
-			throw TestException(std::string("Serialization"), std::string("CipherStream"), std::string("Failed serialization tests! -CS1"));
 		}
 	}
 

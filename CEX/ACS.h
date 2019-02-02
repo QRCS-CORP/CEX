@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -56,7 +56,7 @@ using Enumeration::StreamAuthenticators;
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
 /// SymmetricKey kp(Key, Nonce);
-/// ACS cipher(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256, StreamAuthenticators::KMAC256);
+/// ACS cipher(BlockCiphers::AES, BlockCipherExtensions::SHAKE256, StreamAuthenticators::KMAC256);
 /// // mac code is appended to the cipher-text stream in authentication mode
 /// cipher.Initialize(true, kp);
 /// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
@@ -190,12 +190,11 @@ public:
 	/// <para>The cipher instance is created and destroyed automatically.</para>
 	/// </summary>
 	///
-	/// <param name="CipherType">The enumeration name of the underlying block cipher; the default is AHX</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF; the default is SHAKE256</param>
+	/// <param name="CipherType">The enumeration name of the underlying block cipher; the default is RHX</param>
 	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid block cipher type is used</exception>
-	ACS(BlockCiphers CipherType = BlockCiphers::AHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::SHAKE256, StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
+	ACS(BlockCiphers CipherType = BlockCiphers::AES, StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
 	/// Destructor: finalize this class

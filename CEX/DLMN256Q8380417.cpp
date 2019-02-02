@@ -1,4 +1,5 @@
 #include "DLMN256Q8380417.h"
+#include "SymmetricKey.h"
 
 NAMESPACE_DILITHIUM
 

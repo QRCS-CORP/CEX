@@ -70,7 +70,7 @@ namespace Test
 		/// <param name="Key">The input key</param>
 		/// <param name="Expected">The expected output</param>
 		/// <param name="Iterations">The number of loop iterations</param>
-		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t Iterations);
+		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, uint Iterations);
 
 		/// <summary>
 		/// Test the different constructor initialization options

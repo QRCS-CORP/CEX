@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -39,7 +39,7 @@ NAMESPACE_MODE
 /// <example>
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// CBC cipher(BlockCiphers::AHX);
+/// CBC cipher(BlockCiphers::AES);
 /// // initialize for encryption
 /// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt one block
@@ -129,11 +129,10 @@ public:
 	/// Initialize the Cipher Mode using a block cipher type name
 	/// </summary>
 	///
-	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
+	/// <param name="CipherType">The formal enumeration name of a block cipher variant</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
-	explicit CBC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
+	explicit CBC(BlockCiphers CipherType);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance

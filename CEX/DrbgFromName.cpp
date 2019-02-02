@@ -78,22 +78,22 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 			{
 				if (DigestType == Digests::SHA256)
 				{
-					dptr = new BCG(BlockCiphers::AHX, BlockCipherExtensions::HKDF256, ProviderType);
+					dptr = new BCG(BlockCiphers::RHXH256, ProviderType);
 					break;
 				}
 				else if (DigestType == Digests::SHAKE256)
 				{
-					dptr = new BCG(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256, ProviderType);
+					dptr = new BCG(BlockCiphers::RHXS256, ProviderType);
 					break;
 				}
 				else if (DigestType == Digests::SHA512)
 				{
-					dptr = new BCG(BlockCiphers::AHX, BlockCipherExtensions::HKDF512, ProviderType);
+					dptr = new BCG(BlockCiphers::RHXH512, ProviderType);
 					break;
 				}
 				else if (DigestType == Digests::SHAKE512)
 				{
-					dptr = new BCG(BlockCiphers::AHX, BlockCipherExtensions::SHAKE512, ProviderType);
+					dptr = new BCG(BlockCiphers::RHXS512, ProviderType);
 					break;
 				}
 				else

@@ -43,7 +43,7 @@ namespace Test
 	using namespace TestFiles::Blake2Kat;
 
 	const std::string Blake2Test::CLASSNAME = "Blake2Test";
-	const std::string Blake2Test::DESCRIPTION = "Blake Vector KATs; tests Blake2 256/512 digests.";
+	const std::string Blake2Test::DESCRIPTION = "Blake Vector KATs; tests Blake2 256/512 digests."; // TODO: update all of these, headers too
 	const std::string Blake2Test::SUCCESS = "SUCCESS! All Blake tests have executed succesfully.";
 	const std::string Blake2Test::DMK_INP = "in:	";
 	const std::string Blake2Test::DMK_KEY = "key:	";
@@ -293,7 +293,7 @@ namespace Test
 		Blake2::PermuteR10P8x512H(input256, 0, state256, iv256);
 
 		std::vector<uint> state256ul(32);
-		MemoryTools::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
+		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
 
 		for (size_t i = 0; i < 32; ++i)
 		{
@@ -314,7 +314,7 @@ namespace Test
 		Blake2::PermuteR10P16x512H(input512, 0, state512, iv512);
 
 		std::vector<uint> state512ul(64);
-		MemoryTools::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
+		std::memcpy(state512ul.data(), state512.data(), 64 * sizeof(uint));
 
 		for (size_t i = 0; i < 64; ++i)
 		{

@@ -16,6 +16,8 @@
 
 NAMESPACE_PROVIDER
 
+using Enumeration::ProviderConvert;
+
 #if defined(CEX_OS_WINDOWS)
 #	pragma comment(lib, "advapi32.lib")
 	HCRYPTPROV m_hProvider = 0;
@@ -26,8 +28,6 @@ NAMESPACE_PROVIDER
 #	define CEX_SYSTEM_RNG_DEVICE "/dev/urandom"
 #endif
 
-const std::string CSP::CLASS_NAME("CSP");
-
 //~~~Constructor~~~//
 
 CSP::CSP()
@@ -36,15 +36,18 @@ CSP::CSP()
 	m_pvdSelfTest(),
 #endif
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_POSIX)
-	ProviderBase(true, Providers::CSP, CLASS_NAME)
+	ProviderBase(true, Providers::CSP, ProviderConvert::ToName(Providers::CSP))
 #else
-	ProviderBase(false, Providers::CSP, CLASS_NAME)
+	ProviderBase(false, Providers::CSP, ProviderConvert::ToName(Providers::CSP))
 #endif
 {
 }
 
 CSP::~CSP()
 {
+#if defined(CEX_OS_WINDOWS)
+	m_hProvider = 0;
+#endif
 }
 
 //~~~Public Functions~~~//
@@ -53,11 +56,11 @@ void CSP::Generate(std::vector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data(), Output.size());
@@ -67,15 +70,15 @@ void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data() + Offset, Length);
@@ -85,11 +88,11 @@ void CSP::Generate(SecureVector<byte> &Output)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data(), Output.size());
@@ -99,15 +102,15 @@ void CSP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (!IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 	if (!FipsTest())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
 	GetRandom(Output.data() + Offset, Length);
@@ -123,7 +126,7 @@ void CSP::GetRandom(byte* Output, size_t Length)
 
 	if (!CryptAcquireContextW(&hprov, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
 	}
 
 	if (hprov != NULL)
@@ -132,7 +135,7 @@ void CSP::GetRandom(byte* Output, size_t Length)
 		{
 			CryptReleaseContext(hprov, 0);
 			hprov = NULL;
-			throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
+			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
 		}
 	}
 
@@ -158,7 +161,7 @@ void CSP::GetRandom(byte* Output, size_t Length)
 	}
 	catch (std::exception&)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string(ex.what()), ErrorCodes::UnKnown);
+		throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -167,7 +170,7 @@ void CSP::GetRandom(byte* Output, size_t Length)
 
 	if (fdhandle <= 0)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("System RNG failed to open RNG device!"), ErrorCodes::NotFound);
+		throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG failed to open RNG device!"), ErrorCodes::NotFound);
 	}
 
 	do
@@ -182,12 +185,12 @@ void CSP::GetRandom(byte* Output, size_t Length)
 			}
 			else
 			{
-				throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
+				throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
 			}
 		}
 		else if (rlen == 0)
 		{
-			throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
+			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
 		}
 
 		poff += rlen;
@@ -203,7 +206,7 @@ void CSP::GetRandom(byte* Output, size_t Length)
 
 #else
 
-	throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("No system RNG available!"), ErrorCodes::NotFound);
+	throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("No system RNG available!"), ErrorCodes::NotFound);
 
 #endif
 }

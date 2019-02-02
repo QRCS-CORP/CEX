@@ -72,7 +72,7 @@ ICipherMode* CipherModeFromName::GetInstance(IBlockCipher* Cipher, CipherModes C
 	return mptr;
 }
 
-ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType)
+ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, CipherModes CipherModeType)
 {
 	using namespace Cipher::Block::Mode;
 
@@ -84,7 +84,7 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, BlockCiphe
 
 	try
 	{
-		cptr = BlockCipherFromName::GetInstance(CipherType, CipherExtensionType);
+		cptr = BlockCipherFromName::GetInstance(CipherType);
 
 		switch (CipherModeType)
 		{

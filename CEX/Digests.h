@@ -10,6 +10,7 @@ NAMESPACE_ENUMERATION
 /// </summary>
 enum class Digests : byte
 {
+
 	/// <summary>
 	/// No hash digest is specified
 	/// </summary>
@@ -70,6 +71,29 @@ enum class Digests : byte
 	/// The Skein digest with a 1024 bit return size
 	/// </summary>
 	Skein1024 = 15
+};
+
+class DigestConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the Digests formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The Digests enumeration member</param>
+	///
+	/// <returns>The matching Digests string name</returns>
+	static std::string ToName(Digests Enumeral);
+
+	/// <summary>
+	/// Derive the Digests enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The Digests string name</param>
+	///
+	/// <returns>The matching Digests enumeration type name</returns>
+	static Digests FromName(std::string &Name);
 };
 
 NAMESPACE_ENUMERATIONEND

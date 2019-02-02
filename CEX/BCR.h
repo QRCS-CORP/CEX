@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2018 vtdev.com
+// Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -16,10 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
-// Implementation Details:
-// An implementation of a Block cipher Counter based Generator (BCR). 
-// Written by John Underhill, January 6, 2014
+// Updated by January 28, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_BCR_H
@@ -53,7 +50,7 @@ using Enumeration::Providers;
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Wraps the Counter Mode Generator (BCG) drbg implementation.</description></item>
+/// <item><description>Wraps the Counter Mode Generator (BCG) DRBG implementation.</description></item>
 /// <item><description>Can be initialized with any of the implemented block-ciphers run in CTR mode.</description></item>
 /// <item><description>Uses an internal entropy provider to seed the underlying DRBG.</description></item>
 /// <item><description>The underlying DRBG instance can be optionally multi-threaded through the constructors Parallel parameter.</description></item>
@@ -74,13 +71,11 @@ private:
 	static const size_t BLOCK_SIZE = 16;
 	static const size_t BUFFER_DEF = 4096;
 	static const size_t BUFFER_MIN = 64;
-	static const std::string CLASS_NAME;
 
 	bool m_isDestroyed;
 	bool m_isParallel;
 	Providers m_pvdType;
 	std::unique_ptr<IDrbg> m_rngGenerator;
-	BlockCiphers m_rngGeneratorType;
 
 public:
 
@@ -100,24 +95,17 @@ public:
 	/// Initialize this class with parameters
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The block cipher that powers the rng; default is AHX</param>
+	/// <param name="CipherType">The block cipher that powers the rng; default is RHX</param>
 	/// <param name="ProviderType">The random provider used to create keyng material; default is ACP</param>
 	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode; default is sequential operation</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the cipher or provider type is invalid</exception>
-	BCR(BlockCiphers CipherType = BlockCiphers::AHX, Providers ProviderType = Providers::ACP, bool Parallel = false);
+	BCR(BlockCiphers CipherType = BlockCiphers::AES, Providers ProviderType = Providers::ACP, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
 	~BCR() override;
-
-	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read Only: The random generators implementation name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

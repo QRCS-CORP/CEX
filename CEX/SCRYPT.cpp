@@ -4,87 +4,167 @@
 #include "IntegerTools.h"
 #include "PBKDF2.h"
 #include "ParallelTools.h"
+#include "Salsa.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF
 
-const std::string SCRYPT::CLASS_NAME("SCRYPT");
+using Enumeration::KdfConvert;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
+
+class SCRYPT::ScryptState
+{
+public:
+
+	std::vector<byte> Salt;
+	std::vector<byte> State;
+	size_t Counter;
+	size_t CpuCost;
+	size_t Parallelization;
+
+	ScryptState(size_t StateSize, size_t SaltSize, size_t Cost, size_t Parallel)
+		:
+		Salt(SaltSize),
+		State(StateSize),
+		Counter(0),
+		CpuCost(Cost),
+		Parallelization(Parallel)
+	{
+	}
+
+	~ScryptState()
+	{
+		Counter = 0;
+		CpuCost = 0;
+		Parallelization = 0;
+		MemoryTools::Clear(Salt, 0, Salt.size());
+		Salt.clear();
+		MemoryTools::Clear(State, 0, State.size());
+		State.clear();
+	}
+
+	void Reset()
+	{
+		Counter = 0;
+		MemoryTools::Clear(Salt, 0, Salt.size());
+		MemoryTools::Clear(State, 0, State.size());
+	}
+};
 
 //~~~Constructor~~~//
 
 SCRYPT::SCRYPT(SHA2Digests DigestType, size_t CpuCost, size_t Parallelization)
 	:
-	m_destroyEngine(true),
-	m_isDestroyed(false),
+	KdfBase(
+		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::SCRYPT256 : Kdfs::SCRYPT512) : 
+			throw CryptoKdfException(std::string("SCRYPT"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
+#if defined(CEX_ENFORCE_KEYMIN)
+		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
+		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
+#else
+		MINKEY_LENGTH, 
+		MINSALT_LENGTH, 
+#endif
+		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::SCRYPT256) : KdfConvert::ToName(Kdfs::SCRYPT512)),
+		std::vector<SymmetricKeySize> {
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 32 : 64), 0, 0),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), 0, (DigestType == SHA2Digests::SHA256 ? 32 : 64)),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))}),
+	m_isDestroyed(true),
 	m_isInitialized(false),
-	m_msgDigest(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType)) :
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
-	m_msgDigestType(static_cast<Digests>(DigestType)),
-	m_kdfKey(0),
-	m_kdfSalt(0),
-	m_legalKeySizes(0),
 	m_parallelProfile(64, true, 2048, true),
-	m_scryptParameters(CpuCost, Parallelization)
+	m_scryptGenerator(Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType))),
+	m_scryptState(new ScryptState(0, 0, CpuCost, Parallelization))
 {
 	if (CpuCost < 1024 || CpuCost % 1024 != 0)
 	{
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The cpu cost must be greater than 1024 divisible by 1024!"), ErrorCodes::InvalidParam);
+		throw CryptoKdfException(Name(), std::string("Constructor"), std::string("The cpu cost must be greater than 1024 divisible by 1024!"), ErrorCodes::InvalidParam);
 	}
 
-	Scope();
+	// enable/disable multi-threading
+	m_parallelProfile.IsParallel() = Parallelization != 1;
+
+	// set the parallel factor or adjust thread count
+	if (Parallelization == 0)
+	{
+		// auto-set
+		m_scryptState->Parallelization = m_parallelProfile.ParallelMaxDegree();
+	}
+	else if (m_scryptState->Parallelization > 1 && m_scryptState->Parallelization < m_parallelProfile.ParallelMaxDegree())
+	{
+		// custom degree
+		m_parallelProfile.SetMaxDegree(m_scryptState->Parallelization);
+	}
 }
 
 SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t Parallelization)
 	:
-	m_destroyEngine(false),
+	KdfBase(
+		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::SCRYPT256 : Kdfs::SCRYPT512) :
+			throw CryptoKdfException(std::string("SCRYPT"), std::string("Constructor"), std::string("The digest instance can not be null!"), ErrorCodes::IllegalOperation)),
+#if defined(CEX_ENFORCE_KEYMIN)
+		(Digest != nullptr ? Digest->DigestSize() : 0),
+		(Digest != nullptr ? Digest->DigestSize() : 0),
+#else
+		MINKEY_LENGTH,
+		MINSALT_LENGTH,
+#endif
+		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? KdfConvert::ToName(Kdfs::SCRYPT256) :
+			KdfConvert::ToName(Kdfs::SCRYPT512)) :
+			std::string("")),
+			(Digest != nullptr ? std::vector<SymmetricKeySize> {
+				SymmetricKeySize(Digest->DigestSize(), 0, 0),
+				SymmetricKeySize(Digest->BlockSize(), 0, Digest->DigestSize()),
+				SymmetricKeySize(Digest->BlockSize(), Digest->BlockSize(), Digest->DigestSize())} :
+				std::vector<SymmetricKeySize>(0))),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_msgDigest(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? Digest :
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
-	m_msgDigestType(m_msgDigest->Enumeral()),
-	m_kdfKey(0),
-	m_kdfSalt(0),
-	m_legalKeySizes(0),
 	m_parallelProfile(64, true, 2048, true),
-	m_scryptParameters(CpuCost, Parallelization)
+	m_scryptGenerator((Digest != nullptr && (Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512)) ? Digest :
+		throw CryptoKdfException(std::string("SCRYPT"), std::string("Constructor"), std::string("The digest instance is not supported!"), ErrorCodes::IllegalOperation)),
+	m_scryptState(new ScryptState(0, 0, CpuCost, Parallelization))
 {
 	if (CpuCost < 1024 || CpuCost % 1024 != 0)
 	{
-		throw CryptoKdfException(CLASS_NAME, std::string("Constructor"), std::string("The cpu cost must be greater than 1024 divisible by 1024!"), ErrorCodes::InvalidParam);
+		throw CryptoKdfException(Name(), std::string("Constructor"), std::string("The cpu cost must be greater than 1024 divisible by 1024!"), ErrorCodes::InvalidParam);
 	}
 
-	Scope();
+	// enable/disable multi-threading
+	m_parallelProfile.IsParallel() = Parallelization != 1;
+
+	// set the parallel factor or adjust thread count
+	if (Parallelization == 0)
+	{
+		// auto-set
+		m_scryptState->Parallelization = m_parallelProfile.ParallelMaxDegree();
+	}
+	else if (m_scryptState->Parallelization > 1 && m_scryptState->Parallelization < m_parallelProfile.ParallelMaxDegree())
+	{
+		// custom degree
+		m_parallelProfile.SetMaxDegree(m_scryptState->Parallelization);
+	}
 }
 
 SCRYPT::~SCRYPT()
 {
-	if (!m_isDestroyed)
+	m_isInitialized = false;
+
+	if (m_scryptState != nullptr)
 	{
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_msgDigestType = Digests::None;
-		m_parallelProfile.Reset();
-		m_scryptParameters.Reset();
+		m_scryptState.reset(nullptr);
+	}
 
-		Utility::IntegerTools::Clear(m_kdfKey);
-		Utility::IntegerTools::Clear(m_kdfSalt);
-		Utility::IntegerTools::Clear(m_legalKeySizes);
-
-		if (m_destroyEngine)
+	if (m_scryptGenerator != nullptr)
+	{
+		if (m_isDestroyed)
 		{
-			m_destroyEngine = false;
-
-			if (m_msgDigest != nullptr)
-			{
-				m_msgDigest.reset(nullptr);
-			}
+			m_scryptGenerator.reset(nullptr);
+			m_isDestroyed = false;
 		}
 		else
 		{
-			if (m_msgDigest != nullptr)
-			{
-				m_msgDigest.release();
-			}
+			m_scryptGenerator.release();
 		}
 	}
 }
@@ -93,12 +173,7 @@ SCRYPT::~SCRYPT()
 
 size_t &SCRYPT::CpuCost()
 {
-	return m_scryptParameters.CpuCost;
-}
-
-const Kdfs SCRYPT::Enumeral()
-{
-	return Kdfs::SCRYPT256;
+	return m_scryptState->CpuCost;
 }
 
 const bool SCRYPT::IsInitialized()
@@ -111,24 +186,9 @@ const bool SCRYPT::IsParallel()
 	return m_parallelProfile.IsParallel(); 
 }
 
-const size_t SCRYPT::MinKeySize() 
-{ 
-	return MIN_PASSLEN; 
-}
-
-std::vector<SymmetricKeySize> SCRYPT::LegalKeySizes() const 
-{ 
-	return m_legalKeySizes; 
-};
-
-const std::string SCRYPT::Name() 
-{ 
-	return CLASS_NAME + "-" + m_msgDigest->Name();
-}
-
 size_t &SCRYPT::Parallelization()
 {
-	return m_scryptParameters.Parallelization;
+	return m_scryptState->Parallelization;
 }
 
 ParallelOptions &SCRYPT::ParallelProfile() 
@@ -138,17 +198,35 @@ ParallelOptions &SCRYPT::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-size_t SCRYPT::Generate(std::vector<byte> &Output)
+void SCRYPT::Generate(std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
+	if (m_scryptState->Counter + (Output.size() / m_scryptGenerator->DigestSize()) > MAXGEN_REQUESTS)
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
+	}
 
-	return Expand(Output, 0, Output.size());
+	Expand(Output, 0, Output.size(), m_scryptState, m_parallelProfile, m_scryptGenerator);
 }
 
-size_t SCRYPT::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void SCRYPT::Generate(SecureVector<byte> &Output)
+{
+	if (!IsInitialized())
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+	if (m_scryptState->Counter + (Output.size() / m_scryptGenerator->DigestSize()) > MAXGEN_REQUESTS)
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
+	}
+
+	Expand(Output, 0, Output.size(), m_scryptState, m_parallelProfile, m_scryptGenerator);
+}
+
+void SCRYPT::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (!m_isInitialized)
 	{
@@ -158,419 +236,218 @@ size_t SCRYPT::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
-
-	return Expand(Output, OutOffset, Length);
-}
-
-void SCRYPT::Initialize(ISymmetricKey &GenParam)
-{
-	if (GenParam.Key().size() < MIN_PASSLEN)
+	if (m_scryptState->Counter + (Length / m_scryptGenerator->DigestSize()) > MAXGEN_REQUESTS)
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
 	}
 
-	if (GenParam.Nonce().size() != 0)
+	Expand(Output, OutOffset, Length, m_scryptState, m_parallelProfile, m_scryptGenerator);
+}
+
+void SCRYPT::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
+{
+	if (!m_isInitialized)
 	{
-		if (GenParam.Info().size() != 0)
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+	if (Output.size() - OutOffset < Length)
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
+	}
+	if (m_scryptState->Counter + (Length / m_scryptGenerator->DigestSize()) > MAXGEN_REQUESTS)
+	{
+		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
+	}
+
+	Expand(Output, OutOffset, Length, m_scryptState, m_parallelProfile, m_scryptGenerator);
+}
+
+void SCRYPT::Initialize(ISymmetricKey &KeyParams)
+{
+	if (KeyParams.Key().size() < MinimumKeySize())
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 6 bytes in length!"), ErrorCodes::InvalidKey);
+	}
+
+	if (IsInitialized())
+	{
+		Reset();
+	}
+
+	// add the key to the state
+	m_scryptState->State.resize(KeyParams.Key().size());
+	MemoryTools::Copy(KeyParams.Key(), 0, m_scryptState->State, 0, m_scryptState->State.size());
+
+	if (KeyParams.Nonce().size() + KeyParams.Info().size() != 0)
+	{
+		if (KeyParams.Nonce().size() + KeyParams.Info().size() < MinimumSaltSize())
 		{
-			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
+			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
-		else
+
+		m_scryptState->Salt.resize(KeyParams.Nonce().size() + KeyParams.Info().size());
+
+		// add the nonce param to salt
+		if (KeyParams.Nonce().size() > 0)
 		{
-			Initialize(GenParam.Key(), GenParam.Nonce());
+			MemoryTools::Copy(KeyParams.Nonce(), 0, m_scryptState->Salt, 0, m_scryptState->Salt.size());
+		}
+
+		// add info as extension of salt
+		if (KeyParams.Info().size() > 0)
+		{
+			MemoryTools::Copy(KeyParams.Info(), 0, m_scryptState->Salt, KeyParams.Nonce().size(), KeyParams.Info().size());
 		}
 	}
-	else
-	{
-		Initialize(GenParam.Key());
-	}
-}
-
-void SCRYPT::Initialize(const std::vector<byte> &Key)
-{
-	if (Key.size() < MIN_PASSLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 6 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-
-	if (m_isInitialized)
-	{
-		Reset();
-	}
-
-	m_kdfKey.resize(Key.size());
-	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
-	m_isInitialized = true;
-}
-
-void SCRYPT::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
-{
-	if (Key.size() < MIN_PASSLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 6 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-
-	std::vector<byte> tmpK(Length);
-	Utility::MemoryTools::Copy(Key, Offset, tmpK, 0, Length);
-	Initialize(tmpK);
-}
-
-void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
-{
-	if (Key.size() < MIN_PASSLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 6 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-	if (Salt.size() < MIN_SALTLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
-	}
-
-	if (m_isInitialized)
-	{
-		Reset();
-	}
-
-	m_kdfKey.resize(Key.size());
-	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
-	m_kdfSalt.resize(Salt.size());
-	Utility::MemoryTools::Copy(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
 
 	m_isInitialized = true;
-}
-
-void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
-{
-	if (Key.size() < MIN_PASSLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 6 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-	if (Salt.size() + Info.size() < MIN_SALTLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
-	}
-
-	if (m_isInitialized)
-	{
-		Reset();
-	}
-
-	m_kdfKey.resize(Key.size());
-	Utility::MemoryTools::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
-	m_kdfSalt.resize(Salt.size() + Info.size());
-
-	if (Salt.size() > 0)
-	{
-		Utility::MemoryTools::Copy(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
-	}
-	if (Info.size() > 0)
-	{
-		Utility::MemoryTools::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
-	}
-
-	m_isInitialized = true;
-}
-
-void SCRYPT::ReSeed(const std::vector<byte> &Seed)
-{
-	if (Seed.size() < MIN_PASSLEN)
-	{
-		throw CryptoKdfException(Name(), std::string("ReSeed"), std::string("Key value is too small, must be at least 6 bytes in length!"), ErrorCodes::InvalidKey);
-	}
-
-	if (Seed.size() > m_kdfSalt.size())
-	{
-		m_kdfSalt.resize(Seed.size());
-	}
-
-	Utility::MemoryTools::Copy(Seed, 0, m_kdfSalt, 0, Seed.size());
 }
 
 void SCRYPT::Reset()
 {
-	m_kdfKey.clear();
-	m_kdfSalt.clear();
+	m_scryptState->Reset();
+	m_scryptGenerator->Reset();
 	m_isInitialized = false;
 }
 
 //~~~Private Functions~~~//
 
-void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y)
+void SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ScryptState> &State, ParallelOptions &Options, std::unique_ptr<IDigest> &Generator)
 {
-	std::vector<uint> X(16);
-	Utility::MemoryTools::Copy(State, State.size() - 16, X, 0, 16 * sizeof(uint));
-
-	for (size_t i = 0; i < 2 * MEM_COST; i += 2)
-	{
-		Utility::MemoryTools::XOR(State, i * 16, X, 0, X.size() * sizeof(uint));
-		SalsaCore(X);
-		Utility::MemoryTools::Copy(X, 0, Y, i * 8, 16 * sizeof(uint));
-
-		Utility::MemoryTools::XOR(State, i * 16 + 16, X, 0, X.size() * sizeof(uint));
-		SalsaCore(X);
-		Utility::MemoryTools::Copy(X, 0, Y, i * 8 + MEM_COST * 16, 16 * sizeof(uint));
-	}
-
-	Utility::MemoryTools::Copy(Y, 0, State, 0, Y.size() * sizeof(uint));
-}
-
-size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
-{
-	const size_t MFLEN = MEM_COST * 128;
-	const size_t KEYLEN = m_scryptParameters.Parallelization * MFLEN;
+	const size_t MFLEN = MEMORY_COST * 128;
+	const size_t KEYLEN = State->Parallelization * MFLEN;
 	const size_t SKLEN = KEYLEN >> 2;
-
-	std::vector<byte> tmpK(KEYLEN);
-	Extract(tmpK, 0, m_kdfKey, m_kdfSalt, tmpK.size());
-
+	const size_t CPUCST = State->CpuCost;
 	const size_t MFLWRD = MFLEN >> 2;
-	const size_t PRLBLK = SKLEN / m_parallelProfile.ParallelMaxDegree();
-	size_t ttlOff = 0;
-	std::vector<uint> stateK(SKLEN);
+	const size_t PRLBLK = SKLEN / Options.ParallelMaxDegree();
+	std::vector<byte> tmpk(KEYLEN);
+	std::vector<uint> statek(SKLEN);
+	size_t toff;
+
+	Extract(tmpk, 0, tmpk.size(), State->State, State->Salt, Generator);
 
 #if defined(__AVX__)
-	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
+	for (size_t k = 0; k < 2 * MEMORY_COST * State->Parallelization; ++k)
 	{
 		for (size_t i = 0; i < 16; i++)
 		{
-			stateK[k * 16 + i] = Utility::IntegerTools::LeBytesTo32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
+			statek[k * 16 + i] = IntegerTools::LeBytesTo32(tmpk, (k * 16 + (i * 5 % 16)) * 4);
 		}
 	}
 #else
-	Utility::IntegerTools::BlockToLe(tmpK, 0, stateK, 0, tmpK.size());
+	IntegerTools::BlockToLe(tmpk, 0, statek, 0, tmpk.size());
 #endif
 
-	if (!m_parallelProfile.IsParallel() && PRLBLK >= MFLWRD)
+	toff = 0;
+
+	if (!Options.IsParallel() && PRLBLK >= MFLWRD)
 	{
-		Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &stateK, PRLBLK, MFLWRD](size_t i)
+		Utility::ParallelTools::ParallelFor(0, Options.ParallelMaxDegree(), [CPUCST, &statek, PRLBLK, MFLWRD](size_t i)
 		{
 			for (size_t j = 0; j < PRLBLK; j += MFLWRD)
 			{
-				SMix(stateK, (i * PRLBLK) + j, m_scryptParameters.CpuCost);
+				MixState(statek, (i * PRLBLK) + j, CPUCST);
 			}
 		});
 
-		ttlOff = PRLBLK * m_parallelProfile.ParallelMaxDegree();
+		toff = PRLBLK * Options.ParallelMaxDegree();
 	}
 
-	if (ttlOff != SKLEN)
+	if (toff != SKLEN)
 	{
-		for (size_t i = ttlOff; i < SKLEN; i += MFLWRD)
+		for (size_t i = toff; i < SKLEN; i += MFLWRD)
 		{
-			SMix(stateK, i, m_scryptParameters.CpuCost);
+			MixState(statek, i, State->CpuCost);
 		}
 	}
 
 #if defined(__AVX__)
-	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
+	for (size_t k = 0; k < 2 * MEMORY_COST * State->Parallelization; ++k)
 	{
 		for (size_t i = 0; i < 16; i++)
 		{
-			Utility::IntegerTools::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
+			IntegerTools::Le32ToBytes(statek[k * 16 + i], tmpk, (k * 16 + (i * 5 % 16)) * 4);
 		}
 	}
 #else
-	Utility::IntegerTools::LeToBlock(stateK, 0, tmpK, 0, tmpK.size());
+	IntegerTools::LeToBlock(statek, 0, tmpk, 0, tmpk.size());
 #endif
 
-	Extract(Output, OutOffset, m_kdfKey, tmpK, Length);
-
-	return Length;
+	Extract(Output, OutOffset, Length, State->State, tmpk, Generator);
+	++State->Counter;
 }
 
-void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Key, std::vector<byte> &Salt, size_t Length)
+void SCRYPT::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ScryptState> &State, ParallelOptions &Options, std::unique_ptr<IDigest> &Generator)
 {
-	Kdf::PBKDF2 kdf(m_msgDigest.get(), 1);
+	std::vector<byte> tmps(Length);
+	Expand(tmps, OutOffset, Length, State, Options, Generator);
+	Move(tmps, Output, OutOffset);
+}
+
+void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Key, std::vector<byte> &Salt, std::unique_ptr<IDigest> &Generator)
+{
+	Kdf::PBKDF2 kdf(Generator.get(), 1);
 	kdf.Initialize(Cipher::SymmetricKey(Key, Salt));
 	kdf.Generate(Output, OutOffset, Length);
+	Generator->Reset();
 }
+
+void SCRYPT::MixBlock(std::vector<uint> &X, std::vector<uint> &Y)
+{
+	std::vector<uint> tmpx(16);
+	MemoryTools::Copy(X, X.size() - 16, tmpx, 0, 16 * sizeof(uint));
+
+	for (size_t i = 0; i < 2 * MEMORY_COST; i += 2)
+	{
+		MemoryTools::XOR(X, i * 16, tmpx, 0, tmpx.size() * sizeof(uint));
 
 #if defined(__AVX__)
-void SCRYPT::SalsaCore(std::vector<uint> &State)
-{
-	__m128i X0, X1, X2, X3;
-	__m128i T;
-
-	X0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[0]));
-	X1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[4]));
-	X2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[8]));
-	X3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[12]));
-	std::vector<__m128i> B { X0, X1, X2, X3};
-
-	for (size_t i = 0; i < 8; i += 2)
-	{
-		T = _mm_add_epi32(X0, X3);
-		X1 = _mm_xor_si128(X1, _mm_slli_epi32(T, 7));
-		X1 = _mm_xor_si128(X1, _mm_srli_epi32(T, 25));
-		T = _mm_add_epi32(X1, X0);
-		X2 = _mm_xor_si128(X2, _mm_slli_epi32(T, 9));
-		X2 = _mm_xor_si128(X2, _mm_srli_epi32(T, 23));
-		T = _mm_add_epi32(X2, X1);
-		X3 = _mm_xor_si128(X3, _mm_slli_epi32(T, 13));
-		X3 = _mm_xor_si128(X3, _mm_srli_epi32(T, 19));
-		T = _mm_add_epi32(X3, X2);
-		X0 = _mm_xor_si128(X0, _mm_slli_epi32(T, 18));
-		X0 = _mm_xor_si128(X0, _mm_srli_epi32(T, 14));
-
-		X1 = _mm_shuffle_epi32(X1, 0x93);
-		X2 = _mm_shuffle_epi32(X2, 0x4E);
-		X3 = _mm_shuffle_epi32(X3, 0x39);
-
-		T = _mm_add_epi32(X0, X1);
-		X3 = _mm_xor_si128(X3, _mm_slli_epi32(T, 7));
-		X3 = _mm_xor_si128(X3, _mm_srli_epi32(T, 25));
-		T = _mm_add_epi32(X3, X0);
-		X2 = _mm_xor_si128(X2, _mm_slli_epi32(T, 9));
-		X2 = _mm_xor_si128(X2, _mm_srli_epi32(T, 23));
-		T = _mm_add_epi32(X2, X3);
-		X1 = _mm_xor_si128(X1, _mm_slli_epi32(T, 13));
-		X1 = _mm_xor_si128(X1, _mm_srli_epi32(T, 19));
-		T = _mm_add_epi32(X1, X2);
-		X0 = _mm_xor_si128(X0, _mm_slli_epi32(T, 18));
-		X0 = _mm_xor_si128(X0, _mm_srli_epi32(T, 14));
-
-		X1 = _mm_shuffle_epi32(X1, 0x39);
-		X2 = _mm_shuffle_epi32(X2, 0x4E);
-		X3 = _mm_shuffle_epi32(X3, 0x93);
-	}
-
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[0]), _mm_add_epi32(B[0], X0));
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[4]), _mm_add_epi32(B[1], X1));
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[8]), _mm_add_epi32(B[2], X2));
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[12]), _mm_add_epi32(B[3], X3));
-}
-
+		Cipher::Stream::Salsa::PermuteP512V(tmpx);
 #else
-
-void SCRYPT::SalsaCore(std::vector<uint> &State)
-{
-	uint X0 = State[0];
-	uint X1 = State[1];
-	uint X2 = State[2];
-	uint X3 = State[3];
-	uint X4 = State[4];
-	uint X5 = State[5];
-	uint X6 = State[6];
-	uint X7 = State[7];
-	uint X8 = State[8];
-	uint X9 = State[9];
-	uint X10 = State[10];
-	uint X11 = State[11];
-	uint X12 = State[12];
-	uint X13 = State[13];
-	uint X14 = State[14];
-	uint X15 = State[15];
-
-	size_t ctr = 8;
-	while (ctr != 0)
-	{
-		X4 ^= Utility::IntegerTools::RotFL32(X0 + X12, 7);
-		X8 ^= Utility::IntegerTools::RotFL32(X4 + X0, 9);
-		X12 ^= Utility::IntegerTools::RotFL32(X8 + X4, 13);
-		X0 ^= Utility::IntegerTools::RotFL32(X12 + X8, 18);
-		X9 ^= Utility::IntegerTools::RotFL32(X5 + X1, 7);
-		X13 ^= Utility::IntegerTools::RotFL32(X9 + X5, 9);
-		X1 ^= Utility::IntegerTools::RotFL32(X13 + X9, 13);
-		X5 ^= Utility::IntegerTools::RotFL32(X1 + X13, 18);
-		X14 ^= Utility::IntegerTools::RotFL32(X10 + X6, 7);
-		X2 ^= Utility::IntegerTools::RotFL32(X14 + X10, 9);
-		X6 ^= Utility::IntegerTools::RotFL32(X2 + X14, 13);
-		X10 ^= Utility::IntegerTools::RotFL32(X6 + X2, 18);
-		X3 ^= Utility::IntegerTools::RotFL32(X15 + X11, 7);
-		X7 ^= Utility::IntegerTools::RotFL32(X3 + X15, 9);
-		X11 ^= Utility::IntegerTools::RotFL32(X7 + X3, 13);
-		X15 ^= Utility::IntegerTools::RotFL32(X11 + X7, 18);
-		X1 ^= Utility::IntegerTools::RotFL32(X0 + X3, 7);
-		X2 ^= Utility::IntegerTools::RotFL32(X1 + X0, 9);
-		X3 ^= Utility::IntegerTools::RotFL32(X2 + X1, 13);
-		X0 ^= Utility::IntegerTools::RotFL32(X3 + X2, 18);
-		X6 ^= Utility::IntegerTools::RotFL32(X5 + X4, 7);
-		X7 ^= Utility::IntegerTools::RotFL32(X6 + X5, 9);
-		X4 ^= Utility::IntegerTools::RotFL32(X7 + X6, 13);
-		X5 ^= Utility::IntegerTools::RotFL32(X4 + X7, 18);
-		X11 ^= Utility::IntegerTools::RotFL32(X10 + X9, 7);
-		X8 ^= Utility::IntegerTools::RotFL32(X11 + X10, 9);
-		X9 ^= Utility::IntegerTools::RotFL32(X8 + X11, 13);
-		X10 ^= Utility::IntegerTools::RotFL32(X9 + X8, 18);
-		X12 ^= Utility::IntegerTools::RotFL32(X15 + X14, 7);
-		X13 ^= Utility::IntegerTools::RotFL32(X12 + X15, 9);
-		X14 ^= Utility::IntegerTools::RotFL32(X13 + X12, 13);
-		X15 ^= Utility::IntegerTools::RotFL32(X14 + X13, 18);
-		ctr -= 2;
-	}
-
-	State[0] += X0;
-	State[1] += X1;
-	State[2] += X2;
-	State[3] += X3;
-	State[4] += X4;
-	State[5] += X5;
-	State[6] += X6;
-	State[7] += X7;
-	State[8] += X8;
-	State[9] += X9;
-	State[10] += X10;
-	State[11] += X11;
-	State[12] += X12;
-	State[13] += X13;
-	State[14] += X14;
-	State[15] += X15;
-}
-
+		Cipher::Stream::Salsa::PermuteP512C(tmpx);
 #endif
 
-void SCRYPT::Scope()
-{
-	// enable/disable multi-threading
-	m_parallelProfile.IsParallel() = (m_scryptParameters.Parallelization != 1);
+		MemoryTools::Copy(tmpx, 0, Y, i * 8, 16 * sizeof(uint));
+		MemoryTools::XOR(X, (i + 1) * 16, tmpx, 0, tmpx.size() * sizeof(uint));
 
-	// set the parallel factor or adjust thread count
-	if (m_scryptParameters.Parallelization == 0)
-	{
-		// auto-set
-		m_scryptParameters.Parallelization = m_parallelProfile.ParallelMaxDegree();
-	}
-	else if (m_scryptParameters.Parallelization > 1 && m_scryptParameters.Parallelization < m_parallelProfile.ParallelMaxDegree())
-	{
-		// custom degree
-		m_parallelProfile.SetMaxDegree(m_scryptParameters.Parallelization);
+#if defined(__AVX__)
+		Cipher::Stream::Salsa::PermuteP512V(tmpx);
+#else
+		Cipher::Stream::Salsa::PermuteP512C(tmpx);
+#endif
+
+		MemoryTools::Copy(tmpx, 0, Y, (i * 8) + (MEMORY_COST * 16), 16 * sizeof(uint));
 	}
 
-	m_legalKeySizes.resize(3);
-	// this is the recommended size: 
-	// ideally, salt should be passphrase len - (4 bytes of pbkdf counter + digest finalizer code)
-	// you want to fill one complete block, and avoid hmac compression on > block-size
-	m_legalKeySizes[0] = SymmetricKeySize(m_msgDigest->DigestSize(), 0, 0);
-	// 2nd recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(m_msgDigest->BlockSize(), m_msgDigest->DigestSize(), 0);
-	// max recommended
-	m_legalKeySizes[2] = SymmetricKeySize(m_msgDigest->BlockSize(), m_msgDigest->BlockSize(), 0);
+	MemoryTools::Copy(Y, 0, X, 0, Y.size() * sizeof(uint));
 }
 
-void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
+void SCRYPT::MixState(std::vector<uint> &State, size_t StateOffset, size_t N)
 {
-	size_t bCount = MEM_COST * 32;
-	std::vector<uint> X(bCount);
-	std::vector<uint> Y(bCount);
-	std::vector<std::vector<uint>> V(N);
+	const size_t BLKCNT = MEMORY_COST * 32;
+	const uint NMASK = static_cast<uint>(N) - 1;
+	std::vector<std::vector<uint>> tmpv(N);
+	std::vector<uint> tmpx(BLKCNT);
+	std::vector<uint> tmpy(BLKCNT);
+	size_t i;
+	uint j;
 
-	Utility::MemoryTools::Copy(State, StateOffset, X, 0, bCount * sizeof(uint));
+	MemoryTools::Copy(State, StateOffset, tmpx, 0, BLKCNT * sizeof(uint));
 
-	for (size_t i = 0; i < N; ++i)
+	for (i = 0; i < N; ++i)
 	{
-		V[i] = X;
-		BlockMix(X, Y);
+		tmpv[i] = tmpx;
+		MixBlock(tmpx, tmpy);
 	}
 
-	const uint NMASK = static_cast<uint>(N - 1);
-	for (size_t i = 0; i < N; ++i)
+	for (i = 0; i < N; ++i)
 	{
-		uint j = X[bCount - 16] & NMASK;
-		Utility::MemoryTools::XOR(V[j], 0, X, 0, X.size() * sizeof(uint));
-		BlockMix(X, Y);
+		j = tmpx[BLKCNT - 16] & NMASK;
+		MemoryTools::XOR(tmpv[j], 0, tmpx, 0, tmpx.size() * sizeof(uint));
+		MixBlock(tmpx, tmpy);
 	}
 
-	Utility::MemoryTools::Copy(X, 0, State, StateOffset, bCount * sizeof(uint));
+	MemoryTools::Copy(tmpx, 0, State, StateOffset, BLKCNT * sizeof(uint));
 }
 
 NAMESPACE_KDFEND

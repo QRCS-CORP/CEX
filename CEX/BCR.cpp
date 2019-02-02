@@ -6,47 +6,36 @@
 NAMESPACE_PRNG
 
 using Drbg::BCG;
-
-const std::string BCR::CLASS_NAME("BCR");
+using Enumeration::BlockCipherConvert;
+using Enumeration::PrngConvert;
+using Enumeration::ProviderConvert;
 
 //~~~Constructor~~~//
 
 BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 	:
-	PrngBase(Prngs::BCR),
-	m_isDestroyed(false),
+	PrngBase(Prngs::BCR, PrngConvert::ToName(Prngs::BCR) + std::string("-") + BlockCipherConvert::ToName(CipherType) + std::string("-") + ProviderConvert::ToName(ProviderType)),
 	m_isParallel(Parallel),
 	m_pvdType(ProviderType != Providers::None ? ProviderType :
-		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Provider type can not be none!"), ErrorCodes::InvalidParam)),
-	m_rngGenerator(new BCG(CipherType, Enumeration::BlockCipherExtensions::HKDF256, ProviderType)),
-	m_rngGeneratorType(CipherType != BlockCiphers::None ? CipherType :
-		throw CryptoRandomException(CLASS_NAME, std::string("Constructor"), std::string("Cipher type can not be none!"), ErrorCodes::IllegalOperation))
+		throw CryptoRandomException(PrngConvert::ToName(Prngs::BCR), std::string("Constructor"), std::string("Provider type can not be none!"), ErrorCodes::InvalidParam)),
+	m_rngGenerator(CipherType != BlockCiphers::None ? new BCG(CipherType, ProviderType) :
+		throw CryptoRandomException(PrngConvert::ToName(Prngs::BCR), std::string("Constructor"), std::string("Cipher type can not be none!"), ErrorCodes::IllegalOperation))
 {
 	Reset();
 }
 
 BCR::~BCR()
 {
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isParallel = false;
-		m_pvdType = Providers::None;
-		m_rngGeneratorType = BlockCiphers::None;
+	m_isParallel = false;
+	m_pvdType = Providers::None;
 
-		if (m_rngGenerator != nullptr)
-		{
-			m_rngGenerator.reset(nullptr);
-		}
+	if (m_rngGenerator != nullptr)
+	{
+		m_rngGenerator.reset(nullptr);
 	}
 }
 
 //~~~Accessors~~~//
-
-const std::string BCR::Name() 
-{ 
-	return CLASS_NAME + "-" + m_rngGenerator->Name();
-}
 
 //~~~Public Functions~~~//
 
@@ -59,7 +48,7 @@ void BCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
 	GetRandom(Output, Offset, Length, m_rngGenerator);
@@ -75,7 +64,7 @@ void BCR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
 	if ((Output.size() - Offset) < Length)
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
 	GetRandom(Output, Offset, Length, m_rngGenerator);
@@ -97,7 +86,7 @@ void BCR::Reset()
 
 	if (!pvd->IsAvailable())
 	{
-		throw CryptoRandomException(CLASS_NAME, std::string("Reset"), std::string("The random provider can not be instantiated!"), ErrorCodes::NoAccess);
+		throw CryptoRandomException(Name(), std::string("Reset"), std::string("The random provider can not be instantiated!"), ErrorCodes::NoAccess);
 	}
 
 	pvd->Generate(key);
@@ -120,7 +109,7 @@ void BCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std
 void BCR::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
 	std::vector<byte> smp(Length);
-
+	// TODO: change this once secure vectors are in drbgs
 	Generator->Generate(smp, 0, Length);
 	Insert(smp, 0, Output, Offset, Length);
 	Clear(smp);

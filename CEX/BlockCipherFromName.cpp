@@ -28,9 +28,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 
 		switch (CipherType)
 		{
-			case BlockCiphers::AHX:
-			case BlockCiphers::RHX:
-			case BlockCiphers::Rijndael:
+			case BlockCiphers::AES:
 			{
 	#if defined(__AVX__)
 				if (detect.AESNI())
@@ -45,7 +43,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 				break;
 			}
 			case BlockCiphers::RHXH256:
-			case BlockCiphers::AHXH256:
 			{
 	#if defined(__AVX__)
 				if (detect.AESNI())
@@ -59,7 +56,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 				}
 				break;
 			}
-			case BlockCiphers::AHXH512:
 			case BlockCiphers::RHXH512:
 			{
 #if defined(__AVX__)
@@ -74,7 +70,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 				}
 				break;
 			}
-			case BlockCiphers::AHXS256:
 			case BlockCiphers::RHXS256:
 			{
 #if defined(__AVX__)
@@ -89,7 +84,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 				}
 				break;
 			}
-			case BlockCiphers::AHXS512:
 			case BlockCiphers::RHXS512:
 			{
 #if defined(__AVX__)
@@ -104,7 +98,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 				}
 				break;
 			}
-			case BlockCiphers::AHXS1024:
 			case BlockCiphers::RHXS1024:
 			{
 #if defined(__AVX__)
@@ -119,7 +112,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 				}
 				break;
 			}
-			case BlockCiphers::SHX:
 			case BlockCiphers::Serpent:
 			{
 				cptr = new SHX(BlockCipherExtensions::None);
@@ -153,81 +145,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			default:
 			{
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
-			}
-		}
-	}
-	catch (CryptoSymmetricCipherException &ex)
-	{
-		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
-	}
-	catch (const std::exception &ex)
-	{
-		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
-	}
-
-	return cptr;
-}
-
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
-{
-	using namespace Cipher::Block;
-
-	IBlockCipher* cptr;
-
-	cptr = nullptr;
-
-	try
-	{
-		CpuDetect detect;
-
-		switch (CipherType)
-		{
-			case BlockCiphers::AHX:
-			{
-	#if defined(__AVX__)
-				if (detect.AESNI())
-				{
-					cptr = new AHX(CipherExtensionType);
-				}
-				else
-	#endif
-				{
-					cptr = new RHX(CipherExtensionType);
-				}
-				break;
-			}
-			case BlockCiphers::Rijndael:
-			{
-	#if defined(__AVX__)
-				if (detect.AESNI())
-				{
-					cptr = new AHX();
-				}
-				else
-	#endif
-				{
-					cptr = new RHX();
-				}
-				break;
-			}
-			case BlockCiphers::RHX:
-			{
-				cptr = new RHX(CipherExtensionType);
-				break;
-			}
-			case BlockCiphers::Serpent:
-			{
-				cptr = new SHX();
-				break;
-			}
-			case BlockCiphers::SHX:
-			{
-				cptr = new SHX(CipherExtensionType);
-				break;
-			}
-			default:
-			{
-				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The block cipher type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
 	}
