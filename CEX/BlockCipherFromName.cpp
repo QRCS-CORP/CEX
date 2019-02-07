@@ -24,14 +24,14 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 
 	try
 	{ 
-		CpuDetect detect;
+		CpuDetect dtc;
 
 		switch (CipherType)
 		{
 			case BlockCiphers::AES:
 			{
 	#if defined(__AVX__)
-				if (detect.AESNI())
+				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::None);
 				}
@@ -45,7 +45,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			case BlockCiphers::RHXH256:
 			{
 	#if defined(__AVX__)
-				if (detect.AESNI())
+				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::HKDF256);
 				}
@@ -59,7 +59,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			case BlockCiphers::RHXH512:
 			{
 #if defined(__AVX__)
-				if (detect.AESNI())
+				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::HKDF512);
 				}
@@ -73,7 +73,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			case BlockCiphers::RHXS256:
 			{
 #if defined(__AVX__)
-				if (detect.AESNI())
+				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::SHAKE256);
 				}
@@ -87,7 +87,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			case BlockCiphers::RHXS512:
 			{
 #if defined(__AVX__)
-				if (detect.AESNI())
+				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::SHAKE512);
 				}
@@ -101,7 +101,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			case BlockCiphers::RHXS1024:
 			{
 #if defined(__AVX__)
-				if (detect.AESNI())
+				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::SHAKE1024);
 				}

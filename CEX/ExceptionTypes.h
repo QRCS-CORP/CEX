@@ -64,5 +64,28 @@ enum class ExceptionTypes : byte
 	CryptoSymmetricCipherException = 12
 };
 
+class ExceptionTypeConvert
+{
+public:
+
+	/// <summary>
+	/// Derive the ExceptionTypes formal string name from the enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The ExceptionTypes enumeration member</param>
+	///
+	/// <returns>The matching ExceptionTypes string name</returns>
+	static std::string ToName(ExceptionTypes Enumeral);
+
+	/// <summary>
+	/// Derive the ExceptionTypes enumeration type-name from the formal string name
+	/// </summary>
+	/// 
+	/// <param name="Name">The ExceptionTypes string name</param>
+	///
+	/// <returns>The matching ExceptionTypes enumeration type name</returns>
+	static ExceptionTypes FromName(std::string &Name);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif

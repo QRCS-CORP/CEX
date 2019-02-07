@@ -6,7 +6,39 @@
 #	include <wmmintrin.h>
 #endif
 
-NAMESPACE_MAC
+NAMESPACE_DIGEST
+
+using Utility::IntegerTools;
+using Utility::MemoryTools;
+
+const bool GHASH::HAS_CMUL = HasGmul();
+
+class GHASH::GhashState
+{
+public:
+
+	std::array<byte, CMUL::CMUL_BLOCK_SIZE> Buffer;
+	std::array<ulong, CMUL::CMUL_STATE_SIZE> State;
+	size_t Position;
+
+	GhashState()
+		:
+		Position(0)
+	{
+	}
+
+	~GhashState()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		Position = 0;
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+	}
+};
 
 const std::string GHASH::CLASS_NAME("GHASH");
 
@@ -14,12 +46,8 @@ const std::string GHASH::CLASS_NAME("GHASH");
 
 GHASH::GHASH()
 	:
-	m_ghashKey(0),
-	m_hasCMul(false),
-	m_msgBuffer(BLOCK_SIZE),
-	m_msgOffset(0)
+	m_ghashState(new GhashState)
 {
-	Detect();
 }
 
 GHASH::~GHASH()
@@ -27,230 +55,126 @@ GHASH::~GHASH()
 	Reset();
 }
 
-//~~~Accessors~~~//
-
-bool GHASH::HasSimd128() 
-{ 
-	return m_hasCMul; 
-}
-
 //~~~Public Functions~~~//
 
-void GHASH::FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextSize)
+void GHASH::Clear()
 {
-	if (m_msgOffset != 0)
+	MemoryTools::Clear(m_ghashState->Buffer, 0, m_ghashState->Buffer.size());
+	m_ghashState->Position = 0;
+}
+
+void GHASH::Finalize(std::vector<byte> &Output, size_t Counter, size_t Length)
+{
+	if (m_ghashState->Position != 0)
 	{
-		if (m_msgOffset != BLOCK_SIZE)
+		if (m_ghashState->Position != CMUL::CMUL_BLOCK_SIZE)
 		{
-			Utility::MemoryTools::Clear(m_msgBuffer, m_msgOffset, m_msgBuffer.size() - m_msgOffset);
+			MemoryTools::Clear(m_ghashState->Buffer, m_ghashState->Position, m_ghashState->Buffer.size() - m_ghashState->Position);
 		}
 
-		ProcessSegment(m_msgBuffer, 0, Output, m_msgOffset);
+		MemoryTools::XOR(m_ghashState->Buffer, 0, Output, 0, m_ghashState->Position);
+		Permute(m_ghashState->State, Output);
 	}
 
-	std::vector<byte> fnlBlock(BLOCK_SIZE);
-	Utility::IntegerTools::Be64ToBytes(8 * AdSize, fnlBlock, 0);
-	Utility::IntegerTools::Be64ToBytes(8 * TextSize, fnlBlock, 8);
-	Utility::MemoryTools::XOR128(fnlBlock, 0, Output, 0);
+	std::vector<byte> tmpb(CMUL::CMUL_BLOCK_SIZE);
+	IntegerTools::Be64ToBytes(static_cast<ulong>(Counter) * 8, tmpb, 0);
+	IntegerTools::Be64ToBytes(static_cast<ulong>(Length) * 8, tmpb, 8);
+	MemoryTools::XOR128(tmpb, 0, Output, 0);
 
-	GcmMultiply(Output);
+	Permute(m_ghashState->State, Output);
 }
 
 void GHASH::Initialize(const std::vector<ulong> &Key)
 {
-	m_ghashKey.resize(Key.size());
-	std::memcpy(&m_ghashKey[0], &Key[0], Key.size() * sizeof(ulong));
+	MemoryTools::Copy(Key, 0, m_ghashState->State, 0, Key.size() * sizeof(ulong));
 }
 
-void GHASH::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output)
+void GHASH::Multiply(const std::vector<byte> &Input, std::vector<byte> &Output, size_t Length)
 {
-	Utility::MemoryTools::XOR128(Input, InOffset, Output, 0);
-	GcmMultiply(Output);
-}
+	size_t boff;
 
-void GHASH::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length)
-{
+	boff = 0;
+
 	while (Length != 0)
 	{
-		const size_t DIFFLEN = Utility::IntegerTools::Min(Length, BLOCK_SIZE);
-		Utility::MemoryTools::XOR(Input, InOffset, Output, 0, DIFFLEN);
-		GcmMultiply(Output);
-		InOffset += DIFFLEN;
-		Length -= DIFFLEN;
+		const size_t RMDLEN = IntegerTools::Min(Length, CMUL::CMUL_BLOCK_SIZE);
+		MemoryTools::XOR(Input, boff, Output, 0, RMDLEN);
+		Permute(m_ghashState->State, Output);
+		boff += RMDLEN;
+		Length -= RMDLEN;
 	}
 }
 
-void GHASH::Reset(bool Erase)
+void GHASH::Reset()
 {
-	if (Erase)
-	{
-		if (m_ghashKey.size() != 0)
-		{
-			Utility::MemoryTools::Clear(m_ghashKey, 0, m_ghashKey.size() * sizeof(ulong));
-		}
-
-		m_hasCMul = false;
-	}
-
-	if (m_msgBuffer.size() != 0)
-	{
-		Utility::MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
-	}
-
-	m_msgOffset = 0;
+	m_ghashState->Reset();
 }
 
 void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length)
 {
 	if (Length != 0)
 	{
-		if (m_msgOffset == BLOCK_SIZE)
+		if (m_ghashState->Position == CMUL::CMUL_BLOCK_SIZE)
 		{
-			ProcessBlock(m_msgBuffer, 0, Output);
-			m_msgOffset = 0;
+			MemoryTools::XOR128(m_ghashState->Buffer, 0, Output, 0);
+			Permute(m_ghashState->State, Output);
+			m_ghashState->Position = 0;
 		}
 
-		const size_t RMDLEN = BLOCK_SIZE - m_msgOffset;
+		const size_t RMDLEN = CMUL::CMUL_BLOCK_SIZE - m_ghashState->Position;
+
 		if (Length > RMDLEN)
 		{
-			Utility::MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMDLEN);
-			ProcessBlock(m_msgBuffer, 0, Output);
-			m_msgOffset = 0;
+			MemoryTools::Copy(Input, InOffset, m_ghashState->Buffer, m_ghashState->Position, RMDLEN);
+			MemoryTools::XOR128(m_ghashState->Buffer, 0, Output, 0);
+			Permute(m_ghashState->State, Output);
+			m_ghashState->Position = 0;
 			Length -= RMDLEN;
 			InOffset += RMDLEN;
 
-			while (Length > BLOCK_SIZE)
+			while (Length > CMUL::CMUL_BLOCK_SIZE)
 			{
-				ProcessBlock(Input, InOffset, Output);
-				Length -= BLOCK_SIZE;
-				InOffset += BLOCK_SIZE;
+				MemoryTools::XOR128(Input, InOffset, Output, 0);
+				Permute(m_ghashState->State, Output);
+				Length -= CMUL::CMUL_BLOCK_SIZE;
+				InOffset += CMUL::CMUL_BLOCK_SIZE;
 			}
 		}
 
 		if (Length > 0)
 		{
-			Utility::MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, Length);
-			m_msgOffset += Length;
+			MemoryTools::Copy(Input, InOffset, m_ghashState->Buffer, m_ghashState->Position, Length);
+			m_ghashState->Position += Length;
 		}
 	}
 }
 
-void GHASH::Detect()
+void GHASH::Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::vector<byte> &Output)
 {
-	CpuDetect detect;
-	m_hasCMul = detect.CMUL() && detect.SSSE3();
-}
+	std::array<byte, 16> tmp;
+	std::memcpy(tmp.data(), Output.data(), 16);
 
-void GHASH::GcmMultiply(std::vector<byte> &X)
-{
-	if (m_hasCMul)
+	if (HAS_CMUL)
 	{
-		MultiplyW(m_ghashKey, X);
+		CMUL::PermuteR128P128V(State, tmp);
 	}
 	else
 	{
-		Multiply(m_ghashKey, X);
-	}
-}
-
-void GHASH::Multiply(const std::vector<ulong> &H, std::vector<byte> &X)
-{
-	const ulong X0 = Utility::IntegerTools::BeBytesTo64(X, 0);
-	const ulong X1 = Utility::IntegerTools::BeBytesTo64(X, 8);
-	const ulong R = 0xE100000000000000ULL;
-	ulong T0 = H[0];
-	ulong T1 = H[1];
-	ulong Z0 = 0;
-	ulong Z1 = 0;
-	ulong maskPos = 0x8000000000000000ULL;
-	ulong xMask = 0;
-	ulong xCarry = 0;
-
-	for (size_t i = 0; i != 64; ++i)
-	{
-		xMask = Utility::IntegerTools::ExpandMask<ulong>(X0 & maskPos);
-		maskPos >>= 1;
-		Z0 ^= T0 & xMask;
-		Z1 ^= T1 & xMask;
-		xCarry = R & Utility::IntegerTools::ExpandMask<ulong>(T1 & 1);
-		T1 = (T1 >> 1) | (T0 << 63);
-		T0 = (T0 >> 1) ^ xCarry;
-	}
-
-	maskPos = 0x8000000000000000ULL;
-
-	for (size_t i = 0; i != 63; ++i)
-	{
-		xMask = Utility::IntegerTools::ExpandMask<ulong>(X1 & maskPos);
-		maskPos >>= 1;
-		Z0 ^= T0 & xMask;
-		Z1 ^= T1 & xMask;
-		xCarry = R & Utility::IntegerTools::ExpandMask<ulong>(T1 & 1);
-		T1 = (T1 >> 1) | (T0 << 63);
-		T0 = (T0 >> 1) ^ xCarry;
-	}
-
-	xMask = Utility::IntegerTools::ExpandMask<ulong>(X1 & maskPos);
-	Z0 ^= T0 & xMask;
-	Z1 ^= T1 & xMask;
-	Utility::IntegerTools::Be64ToBytes(Z0, X, 0);
-	Utility::IntegerTools::Be64ToBytes(Z1, X, 8);
-}
-
-void GHASH::MultiplyW(const std::vector<ulong> &H, std::vector<byte> &X)
-{
-#if defined(__AVX2__)
-
-	const __m128i MASK = _mm_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-	__m128i A = _mm_loadu_si128(reinterpret_cast<const __m128i*>(X.data()));
-	__m128i B = _mm_loadu_si128(reinterpret_cast<const __m128i*>(H.data()));
-	__m128i T0, T1, T2, T3, T4, T5;
-
-	A = _mm_shuffle_epi8(A, MASK);
-	B = _mm_shuffle_epi8(B, _mm_set_epi8(8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 5, 6, 7));
-	B = _mm_shuffle_epi8(B, MASK);
-	T0 = _mm_clmulepi64_si128(A, B, 0x00);
-	T1 = _mm_clmulepi64_si128(A, B, 0x01);
-	T2 = _mm_clmulepi64_si128(A, B, 0x10);
-	T3 = _mm_clmulepi64_si128(A, B, 0x11);
-	T1 = _mm_xor_si128(T1, T2);
-	T2 = _mm_slli_si128(T1, 8);
-	T1 = _mm_srli_si128(T1, 8);
-	T0 = _mm_xor_si128(T0, T2);
-	T3 = _mm_xor_si128(T3, T1);
-	T4 = _mm_srli_epi32(T0, 31);
-	T0 = _mm_slli_epi32(T0, 1);
-	T5 = _mm_srli_epi32(T3, 31);
-	T3 = _mm_slli_epi32(T3, 1);
-	T2 = _mm_srli_si128(T4, 12);
-	T5 = _mm_slli_si128(T5, 4);
-	T4 = _mm_slli_si128(T4, 4);
-	T0 = _mm_or_si128(T0, T4);
-	T3 = _mm_or_si128(T3, T5);
-	T3 = _mm_or_si128(T3, T2);
-	T4 = _mm_slli_epi32(T0, 31);
-	T5 = _mm_slli_epi32(T0, 30);
-	T2 = _mm_slli_epi32(T0, 25);
-	T4 = _mm_xor_si128(T4, T5);
-	T4 = _mm_xor_si128(T4, T2);
-	T5 = _mm_srli_si128(T4, 4);
-	T3 = _mm_xor_si128(T3, T5);
-	T4 = _mm_slli_si128(T4, 12);
-	T0 = _mm_xor_si128(T0, T4);
-	T3 = _mm_xor_si128(T3, T0);
-	T4 = _mm_srli_epi32(T0, 1);
-	T1 = _mm_srli_epi32(T0, 2);
-	T2 = _mm_srli_epi32(T0, 7);
-	T3 = _mm_xor_si128(T3, T1);
-	T3 = _mm_xor_si128(T3, T2);
-	T3 = _mm_xor_si128(T3, T4);
-	T3 = _mm_shuffle_epi8(T3, MASK);
-
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(X.data()), T3);
-
+#if defined(CEX_DIGEST_COMPACT)
+		CMUL::PermuteR128P128C(State, tmp);
 #else
-	Multiply(H, X);
+		CMUL::PermuteR128P128U(State, tmp);
 #endif
+	}
+
+	std::memcpy(Output.data(), tmp.data(), 16);
 }
 
-NAMESPACE_MACEND
+bool GHASH::HasGmul()
+{
+	CpuDetect dtc;
+
+	return dtc.CMUL() && dtc.AVX();
+}
+
+NAMESPACE_DIGESTEND

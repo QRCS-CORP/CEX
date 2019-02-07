@@ -64,9 +64,9 @@ class ECP final : public ProviderBase
 private:
 
 	static const size_t DEF_STATECAP = 1024;
-	static const bool CPU_HAS_RDRAND;
+	static const bool HAS_RDRAND;
 	static const ShakeModes SHAKE_MODE = ShakeModes::SHAKE512;
-	static const bool TIMER_HAS_TSC;
+	static const bool HAS_TSC;
 
 #if defined(CEX_FIPS140_ENABLED)
 	ProviderSelfTest m_pvdSelfTest;

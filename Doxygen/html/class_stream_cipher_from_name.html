@@ -79,16 +79,16 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a88c352ff2d4951c0317d1bf16dc35645"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_stream_cipher.html">IStreamCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stream_cipher_from_name.html#a88c352ff2d4951c0317d1bf16dc35645">GetInstance</a> (<a class="el" href="group___enumeration.html#ga62fe0a4066025a96f0d329627b1bf127">StreamCiphers</a> StreamCipherType, size_t RoundCount)</td></tr>
-<tr class="memdesc:a88c352ff2d4951c0317d1bf16dc35645"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a stream cipher instance with specified initialization parameters  <a href="#a88c352ff2d4951c0317d1bf16dc35645">More...</a><br /></td></tr>
-<tr class="separator:a88c352ff2d4951c0317d1bf16dc35645"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afea4f5fdb9f716783efe2c8c3df66e19"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_stream_cipher.html">IStreamCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_stream_cipher_from_name.html#afea4f5fdb9f716783efe2c8c3df66e19">GetInstance</a> (<a class="el" href="group___enumeration.html#ga62fe0a4066025a96f0d329627b1bf127">StreamCiphers</a> StreamCipherType)</td></tr>
+<tr class="memdesc:afea4f5fdb9f716783efe2c8c3df66e19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a stream cipher instance with specified initialization parameters  <a href="#afea4f5fdb9f716783efe2c8c3df66e19">More...</a><br /></td></tr>
+<tr class="separator:afea4f5fdb9f716783efe2c8c3df66e19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get a Stream Cipher instance from it's enumeration name. </p>
 <p>The stream ciphers Initialize function must be called before it can be used.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a88c352ff2d4951c0317d1bf16dc35645"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a88c352ff2d4951c0317d1bf16dc35645">&#9670;&nbsp;</a></span>GetInstance()</h2>
+<a id="afea4f5fdb9f716783efe2c8c3df66e19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afea4f5fdb9f716783efe2c8c3df66e19">&#9670;&nbsp;</a></span>GetInstance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -97,21 +97,11 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_stream_cipher.html">IStreamCipher</a> * StreamCipherFromName::GetInstance </td>
+          <td class="memname"><a class="el" href="class_i_stream_cipher.html">IStreamCipher</a> * StreamCipherFromName::GetInstance </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#ga62fe0a4066025a96f0d329627b1bf127">StreamCiphers</a>&#160;</td>
-          <td class="paramname"><em>StreamCipherType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>StreamCipherType</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>RoundCount</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -125,14 +115,13 @@ Static Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">StreamCipherType</td><td>The stream cipher enumeration name</td></tr>
-    <tr><td class="paramname">RoundCount</td><td>The number of cipher rounds</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An uninitialized stream cipher</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoException</td><td>Thrown if the enumeration name is not supported</td></tr>
+    <tr><td class="paramname">CryptoException</td><td>Thrown if the stream cipher type is not supported</td></tr>
   </table>
   </dd>
 </dl>

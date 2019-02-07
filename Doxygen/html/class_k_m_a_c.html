@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the Keccak based Message Authentication Code generator  
+<p>An implementation of the Keccak based Message Authentication Code generator: KMAC  
  <a href="class_k_m_a_c.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_k_m_a_c_8h_source.html">KMAC.h</a>&gt;</code></p>
@@ -82,7 +82,8 @@ Inheritance diagram for KMAC:</div>
  <div class="center">
   <img src="class_k_m_a_c.png" usemap="#KMAC_map" alt=""/>
   <map id="KMAC_map" name="KMAC_map">
-<area href="class_i_mac.html" title="Message Authentication Code (MAC) Interface " alt="IMac" shape="rect" coords="0,0,49,24"/>
+<area href="class_mac_base.html" title="The MAC base class; this is not an operable class " alt="MacBase" shape="rect" coords="0,56,65,80"/>
+<area href="class_i_mac.html" title="Message Authentication Code (MAC) Interface " alt="IMac" shape="rect" coords="0,0,65,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -94,57 +95,76 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9e9240a5607e5a2619083e22dd02333e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_k_m_a_c.html">KMAC</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a9e9240a5607e5a2619083e22dd02333e">operator=</a> (const <a class="el" href="class_k_m_a_c.html">KMAC</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a9e9240a5607e5a2619083e22dd02333e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a9e9240a5607e5a2619083e22dd02333e">More...</a><br /></td></tr>
 <tr class="separator:a9e9240a5607e5a2619083e22dd02333e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29a96d3bb57144e2475561fe2218cd33"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a29a96d3bb57144e2475561fe2218cd33">KMAC</a> (<a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a> ShakeModeType=<a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a>)</td></tr>
-<tr class="memdesc:a29a96d3bb57144e2475561fe2218cd33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using the digest enumeration name  <a href="#a29a96d3bb57144e2475561fe2218cd33">More...</a><br /></td></tr>
-<tr class="separator:a29a96d3bb57144e2475561fe2218cd33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01e5f1e7adca8c556acd02dc296653ac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a01e5f1e7adca8c556acd02dc296653ac">KMAC</a> (KmacModes KmacModeType=KmacModes::KMAC256)</td></tr>
+<tr class="memdesc:a01e5f1e7adca8c556acd02dc296653ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using the KMAC type enumeration name  <a href="#a01e5f1e7adca8c556acd02dc296653ac">More...</a><br /></td></tr>
+<tr class="separator:a01e5f1e7adca8c556acd02dc296653ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a099074bf7cd562207c284e14d6da56"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a5a099074bf7cd562207c284e14d6da56">~KMAC</a> () override</td></tr>
 <tr class="memdesc:a5a099074bf7cd562207c284e14d6da56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a5a099074bf7cd562207c284e14d6da56">More...</a><br /></td></tr>
 <tr class="separator:a5a099074bf7cd562207c284e14d6da56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb977931261df53bccce39d965e4531a"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#afb977931261df53bccce39d965e4531a">BlockSize</a> () override</td></tr>
-<tr class="memdesc:afb977931261df53bccce39d965e4531a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Digests internal blocksize in bytes  <a href="#afb977931261df53bccce39d965e4531a">More...</a><br /></td></tr>
-<tr class="separator:afb977931261df53bccce39d965e4531a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a2853a186daef8f18da5f8d75d23543"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a1a2853a186daef8f18da5f8d75d23543">DistributionCode</a> ()</td></tr>
-<tr class="memdesc:a1a2853a186daef8f18da5f8d75d23543"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters, the default is 'KMAC'.  <a href="#a1a2853a186daef8f18da5f8d75d23543">More...</a><br /></td></tr>
-<tr class="separator:a1a2853a186daef8f18da5f8d75d23543"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a468d086c1ee62a31fd001afd1fcf14d0"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a468d086c1ee62a31fd001afd1fcf14d0">DistributionCodeMax</a> ()</td></tr>
 <tr class="memdesc:a468d086c1ee62a31fd001afd1fcf14d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum size of the distribution code in bytes.  <a href="#a468d086c1ee62a31fd001afd1fcf14d0">More...</a><br /></td></tr>
 <tr class="separator:a468d086c1ee62a31fd001afd1fcf14d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c80ca00fa303cd0a7ae22b15750fcc9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a3c80ca00fa303cd0a7ae22b15750fcc9">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a3c80ca00fa303cd0a7ae22b15750fcc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Mac generators type name  <a href="#a3c80ca00fa303cd0a7ae22b15750fcc9">More...</a><br /></td></tr>
-<tr class="separator:a3c80ca00fa303cd0a7ae22b15750fcc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abcd6fd347494b1abf461bdd4d381e346"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#abcd6fd347494b1abf461bdd4d381e346">IsInitialized</a> () override</td></tr>
-<tr class="memdesc:abcd6fd347494b1abf461bdd4d381e346"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Mac is ready to digest data  <a href="#abcd6fd347494b1abf461bdd4d381e346">More...</a><br /></td></tr>
+<tr class="memdesc:abcd6fd347494b1abf461bdd4d381e346"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The MAC generator is ready to process data  <a href="#abcd6fd347494b1abf461bdd4d381e346">More...</a><br /></td></tr>
 <tr class="separator:abcd6fd347494b1abf461bdd4d381e346"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2235e1372c661b296274dd0ad436625"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#ad2235e1372c661b296274dd0ad436625">LegalKeySizes</a> () const override</td></tr>
-<tr class="memdesc:ad2235e1372c661b296274dd0ad436625"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Recommended Mac key sizes in a SymmetricKeySize array  <a href="#ad2235e1372c661b296274dd0ad436625">More...</a><br /></td></tr>
-<tr class="separator:ad2235e1372c661b296274dd0ad436625"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a780b2efe173410520383a6d75250004d"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a780b2efe173410520383a6d75250004d">MacSize</a> () override</td></tr>
-<tr class="memdesc:a780b2efe173410520383a6d75250004d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Size of returned mac in bytes  <a href="#a780b2efe173410520383a6d75250004d">More...</a><br /></td></tr>
-<tr class="separator:a780b2efe173410520383a6d75250004d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a481a1045aaa76e6265c9564958b05eb9"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a481a1045aaa76e6265c9564958b05eb9">Name</a> () override</td></tr>
-<tr class="memdesc:a481a1045aaa76e6265c9564958b05eb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Mac generators class name  <a href="#a481a1045aaa76e6265c9564958b05eb9">More...</a><br /></td></tr>
-<tr class="separator:a481a1045aaa76e6265c9564958b05eb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a619eed3c4b833d2caf2364cd6de11a22"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a619eed3c4b833d2caf2364cd6de11a22">ShakeMode</a> ()</td></tr>
-<tr class="memdesc:a619eed3c4b833d2caf2364cd6de11a22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The underlying cSHAKE security setting  <a href="#a619eed3c4b833d2caf2364cd6de11a22">More...</a><br /></td></tr>
-<tr class="separator:a619eed3c4b833d2caf2364cd6de11a22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a5cf6fecff6bab16d6632015bcef915"><td class="memItemLeft" align="right" valign="top">const KmacModes&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a4a5cf6fecff6bab16d6632015bcef915">KmacMode</a> ()</td></tr>
+<tr class="memdesc:a4a5cf6fecff6bab16d6632015bcef915"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The underlying KMAC mode setting  <a href="#a4a5cf6fecff6bab16d6632015bcef915">More...</a><br /></td></tr>
+<tr class="separator:a4a5cf6fecff6bab16d6632015bcef915"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc5e07e96f2cd1824bfdf6da26d4cee3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#afc5e07e96f2cd1824bfdf6da26d4cee3">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:afc5e07e96f2cd1824bfdf6da26d4cee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process an input array and return the Mac code in the output array.  <a href="#afc5e07e96f2cd1824bfdf6da26d4cee3">More...</a><br /></td></tr>
+<tr class="memdesc:afc5e07e96f2cd1824bfdf6da26d4cee3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a vector of bytes and return the MAC code  <a href="#afc5e07e96f2cd1824bfdf6da26d4cee3">More...</a><br /></td></tr>
 <tr class="separator:afc5e07e96f2cd1824bfdf6da26d4cee3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5005107887cbd31b600bd6801944306a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a5005107887cbd31b600bd6801944306a">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
-<tr class="memdesc:a5005107887cbd31b600bd6801944306a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the data and return a Mac code  <a href="#a5005107887cbd31b600bd6801944306a">More...</a><br /></td></tr>
+<tr class="memdesc:a5005107887cbd31b600bd6801944306a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Completes processing and returns the MAC code in a standard vector  <a href="#a5005107887cbd31b600bd6801944306a">More...</a><br /></td></tr>
 <tr class="separator:a5005107887cbd31b600bd6801944306a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69ab1f6e61dcf52a8ecac58ddda4d7d1"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a69ab1f6e61dcf52a8ecac58ddda4d7d1">Finalize</a> (SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
+<tr class="memdesc:a69ab1f6e61dcf52a8ecac58ddda4d7d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Completes processing and returns the MAC code in a secure vector  <a href="#a69ab1f6e61dcf52a8ecac58ddda4d7d1">More...</a><br /></td></tr>
+<tr class="separator:a69ab1f6e61dcf52a8ecac58ddda4d7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a501867932ba99da2f805d8b97506e299"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a501867932ba99da2f805d8b97506e299">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:a501867932ba99da2f805d8b97506e299"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the MAC generator with a SymmetricKey key container.  <a href="#a501867932ba99da2f805d8b97506e299">More...</a><br /></td></tr>
+<tr class="memdesc:a501867932ba99da2f805d8b97506e299"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the MAC generator with an ISymmetricKey key container.  <a href="#a501867932ba99da2f805d8b97506e299">More...</a><br /></td></tr>
 <tr class="separator:a501867932ba99da2f805d8b97506e299"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27ed7db881c81ffc32b49b9486e47322"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#a27ed7db881c81ffc32b49b9486e47322">Reset</a> () override</td></tr>
-<tr class="memdesc:a27ed7db881c81ffc32b49b9486e47322"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset to the default state; Mac must be re-initialized after this call  <a href="#a27ed7db881c81ffc32b49b9486e47322">More...</a><br /></td></tr>
+<tr class="memdesc:a27ed7db881c81ffc32b49b9486e47322"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset internal state to the pre-initialization defaults.  <a href="#a27ed7db881c81ffc32b49b9486e47322">More...</a><br /></td></tr>
 <tr class="separator:a27ed7db881c81ffc32b49b9486e47322"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc867713bafa8f1040722aaeff8d0960"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#abc867713bafa8f1040722aaeff8d0960">Update</a> (byte Input) override</td></tr>
-<tr class="memdesc:abc867713bafa8f1040722aaeff8d0960"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the Mac with a single byte  <a href="#abc867713bafa8f1040722aaeff8d0960">More...</a><br /></td></tr>
-<tr class="separator:abc867713bafa8f1040722aaeff8d0960"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af143de0b09ea014e0a54067e9b5ef85d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_m_a_c.html#af143de0b09ea014e0a54067e9b5ef85d">Update</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, size_t Length) override</td></tr>
-<tr class="memdesc:af143de0b09ea014e0a54067e9b5ef85d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the Mac with a block of bytes  <a href="#af143de0b09ea014e0a54067e9b5ef85d">More...</a><br /></td></tr>
+<tr class="memdesc:af143de0b09ea014e0a54067e9b5ef85d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the Mac with a length of bytes  <a href="#af143de0b09ea014e0a54067e9b5ef85d">More...</a><br /></td></tr>
 <tr class="separator:af143de0b09ea014e0a54067e9b5ef85d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_class_mac_base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_mac_base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_mac_base.html">MacBase</a></td></tr>
+<tr class="memitem:aa58012e7753f6cbcc36e57ed6d6f6908 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#aa58012e7753f6cbcc36e57ed6d6f6908">MacBase</a> (const <a class="el" href="class_mac_base.html">MacBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:aa58012e7753f6cbcc36e57ed6d6f6908 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_mac_base.html#aa58012e7753f6cbcc36e57ed6d6f6908">More...</a><br /></td></tr>
+<tr class="separator:aa58012e7753f6cbcc36e57ed6d6f6908 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b15df6f8198e9df0073f7a3bbb69510 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_mac_base.html">MacBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a9b15df6f8198e9df0073f7a3bbb69510">operator=</a> (const <a class="el" href="class_mac_base.html">MacBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a9b15df6f8198e9df0073f7a3bbb69510 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="class_mac_base.html#a9b15df6f8198e9df0073f7a3bbb69510">More...</a><br /></td></tr>
+<tr class="separator:a9b15df6f8198e9df0073f7a3bbb69510 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3004785eade89ead6822a54fde7b57f7 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a3004785eade89ead6822a54fde7b57f7">MacBase</a> ()=delete</td></tr>
+<tr class="memdesc:a3004785eade89ead6822a54fde7b57f7 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: the default constructor is restricted, this function has been deleted  <a href="class_mac_base.html#a3004785eade89ead6822a54fde7b57f7">More...</a><br /></td></tr>
+<tr class="separator:a3004785eade89ead6822a54fde7b57f7 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f02b551dd4f25f84ab47c93b30c7366 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a8f02b551dd4f25f84ab47c93b30c7366">MacBase</a> (size_t <a class="el" href="class_mac_base.html#a7336365ab505d707f2ff8073ea5257b1">BlockSize</a>, <a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="el" href="class_mac_base.html#a144e310bacf930d3420066f31d002746">Enumeral</a>, std::string &amp;<a class="el" href="class_mac_base.html#a95060b2017e22e8c96e0b95031079922">Name</a>, std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;KeySizes, size_t MinimumKey, size_t MinimumSalt, size_t <a class="el" href="class_mac_base.html#a44524e5bbe2420cecdf7f52421b67dfa">TagSize</a>)</td></tr>
+<tr class="memdesc:a8f02b551dd4f25f84ab47c93b30c7366 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class (private member)  <a href="class_mac_base.html#a8f02b551dd4f25f84ab47c93b30c7366">More...</a><br /></td></tr>
+<tr class="separator:a8f02b551dd4f25f84ab47c93b30c7366 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e7f57c9847992e0d17b8e71a41477ab inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a7e7f57c9847992e0d17b8e71a41477ab">~MacBase</a> ()</td></tr>
+<tr class="memdesc:a7e7f57c9847992e0d17b8e71a41477ab inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="class_mac_base.html#a7e7f57c9847992e0d17b8e71a41477ab">More...</a><br /></td></tr>
+<tr class="separator:a7e7f57c9847992e0d17b8e71a41477ab inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7336365ab505d707f2ff8073ea5257b1 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a7336365ab505d707f2ff8073ea5257b1">BlockSize</a> () override</td></tr>
+<tr class="memdesc:a7336365ab505d707f2ff8073ea5257b1 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Macs internal blocksize in bytes  <a href="class_mac_base.html#a7336365ab505d707f2ff8073ea5257b1">More...</a><br /></td></tr>
+<tr class="separator:a7336365ab505d707f2ff8073ea5257b1 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a144e310bacf930d3420066f31d002746 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a144e310bacf930d3420066f31d002746">Enumeral</a> () override</td></tr>
+<tr class="memdesc:a144e310bacf930d3420066f31d002746 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The prngs type name  <a href="class_mac_base.html#a144e310bacf930d3420066f31d002746">More...</a><br /></td></tr>
+<tr class="separator:a144e310bacf930d3420066f31d002746 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa76c5ebdbca991f69b3174b8de2961d7 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#aa76c5ebdbca991f69b3174b8de2961d7">LegalKeySizes</a> () const override</td></tr>
+<tr class="memdesc:aa76c5ebdbca991f69b3174b8de2961d7 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Available MAC Key Sizes in SymmetricKeySize containers  <a href="class_mac_base.html#aa76c5ebdbca991f69b3174b8de2961d7">More...</a><br /></td></tr>
+<tr class="separator:aa76c5ebdbca991f69b3174b8de2961d7 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8b6bfa0c51107d587b8676873adee5c inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#af8b6bfa0c51107d587b8676873adee5c">MinimumKeySize</a> () override</td></tr>
+<tr class="memdesc:af8b6bfa0c51107d587b8676873adee5c inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Minimum recommended initialization key size in bytes  <a href="class_mac_base.html#af8b6bfa0c51107d587b8676873adee5c">More...</a><br /></td></tr>
+<tr class="separator:af8b6bfa0c51107d587b8676873adee5c inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0137274e8f3519daeb553cdf4239da23 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a0137274e8f3519daeb553cdf4239da23">MinimumSaltSize</a> () override</td></tr>
+<tr class="memdesc:a0137274e8f3519daeb553cdf4239da23 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Minimum recommended initialization salt size in bytes  <a href="class_mac_base.html#a0137274e8f3519daeb553cdf4239da23">More...</a><br /></td></tr>
+<tr class="separator:a0137274e8f3519daeb553cdf4239da23 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95060b2017e22e8c96e0b95031079922 inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a95060b2017e22e8c96e0b95031079922">Name</a> () override</td></tr>
+<tr class="memdesc:a95060b2017e22e8c96e0b95031079922 inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">The MAC generators formal class name  <a href="class_mac_base.html#a95060b2017e22e8c96e0b95031079922">More...</a><br /></td></tr>
+<tr class="separator:a95060b2017e22e8c96e0b95031079922 inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44524e5bbe2420cecdf7f52421b67dfa inherit pub_methods_class_mac_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_base.html#a44524e5bbe2420cecdf7f52421b67dfa">TagSize</a> () override</td></tr>
+<tr class="memdesc:a44524e5bbe2420cecdf7f52421b67dfa inherit pub_methods_class_mac_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Size of returned mac in bytes  <a href="class_mac_base.html#a44524e5bbe2420cecdf7f52421b67dfa">More...</a><br /></td></tr>
+<tr class="separator:a44524e5bbe2420cecdf7f52421b67dfa inherit pub_methods_class_mac_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_mac"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_mac')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_mac.html">IMac</a></td></tr>
 <tr class="memitem:a055e45e4de6922992e83b0ac0d29820f inherit pub_methods_class_i_mac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_mac.html#a055e45e4de6922992e83b0ac0d29820f">IMac</a> (const <a class="el" href="class_i_mac.html">IMac</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a055e45e4de6922992e83b0ac0d29820f inherit pub_methods_class_i_mac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_mac.html#a055e45e4de6922992e83b0ac0d29820f">More...</a><br /></td></tr>
@@ -160,27 +180,30 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aee88d5fa8f0e356b45fc8b3f825926ac inherit pub_methods_class_i_mac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the Keccak based Message Authentication Code generator </p>
-<p>Generating a MAC code </p><div class="fragment"><div class="line"><a class="code" href="class_k_m_a_c.html">KMAC</a> mac(Enumeration::ShakeModes::AHX);</div><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>);</div><div class="line">mac.Initialize(kp);</div><div class="line">mac.Update(Input, 0, Input.size());</div><div class="line">mac.Finalize(Output, Offset);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
-<p>A keyed Keccak Message Authentication Code generator (KMAC) uses the Keccak cryptographic hash function (cSHAKE) with a secret key to verify data integrity and authenticate a message. <br />
-The cryptographic strength of KMAC depends upon the strength of the underlying cSHAKE function, the size of its hash output, and on the size and quality of the key.</p>
+<div class="textblock"><p>An implementation of the Keccak based Message Authentication Code generator: KMAC </p>
+<p>Generating a MAC code </p><div class="fragment"><div class="line"><a class="code" href="class_k_m_a_c.html">KMAC</a> mac(Enumeration::KmacModes::KMAC256);</div><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>);</div><div class="line">mac.Initialize(kp);</div><div class="line">mac.Update(Input, 0, Input.size());</div><div class="line">mac.Finalize(Output, Offset);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>A keyed Keccak Message Authentication Code generator (KMAC) that uses the Keccak cryptographic permutation function with a secret key to verify data integrity and authenticate a message. <br />
+The cryptographic strength of KMAC depends upon the strength of the rate setting of the underlying permutation function, the size of its hash output, and on the size and quality of the key. <br />
+The minimum key size should align with the expected security level of the generator function. <br />
+For example, KMAC256 should be keyed with at least 256 bits (32 bytes) of random key. <br />
+This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
 <p>Implementation Notes: </p><ul>
 <li>
-The MAC output size is variable; changing the output array size will also change the code array values. </li>
+The MAC tag size is variable; changing the KmacMode will change the size of the MAC output, the selected length is stored in the TagSize accessor property. </li>
 <li>
-The MAC return size is derived from the size of the Output array, less the value of any offset parameter. </li>
+Block size is the underlying Keccak permutation functions internal rate-size in bytes. </li>
 <li>
-Block size is the underlying SHAKE functions internal block size in bytes. </li>
+The generator must be initialized with a key using the Initialize function before output can be generated. </li>
 <li>
-Digest size is the underlying hash functions natural output code size in bytes. </li>
+The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material. </li>
 <li>
-The key size should be equal or greater than the digests output size, and less or equal to the block-size. </li>
+The key size should be at least equal to the initialized MAC variants security size; 128/256/512/1024 (16/32/64/128 bytes). </li>
 <li>
 The Compute(Input, Output) method wraps the Update(Input, Offset, Length) and Finalize(Output, Offset) methods and should only be used on small to medium sized data./&gt; </li>
 <li>
-The Update(Input, Offset, Length) processes any length of message data, and is used in conjunction with the Finalize(Output, Offset) method, which returns the final MAC code./&gt; </li>
+The Update(Input, Offset, Length) processes any length of message data, and is used in conjunction with the Finalize(Output, Offset) method, which completes processing and returns the finalized MAC code./&gt; </li>
 <li>
-After a finalizer call (Finalize or Compute), the Mac functions state is reset and must be re-initialized with a new key. </li>
+After a finalizer call the MAC should be re-initialized with a new key. </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -217,8 +240,8 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 
 </div>
 </div>
-<a id="a29a96d3bb57144e2475561fe2218cd33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a29a96d3bb57144e2475561fe2218cd33">&#9670;&nbsp;</a></span>KMAC() <span class="overload">[2/2]</span></h2>
+<a id="a01e5f1e7adca8c556acd02dc296653ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01e5f1e7adca8c556acd02dc296653ac">&#9670;&nbsp;</a></span>KMAC() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -229,8 +252,8 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
         <tr>
           <td class="memname">KMAC::KMAC </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a>&#160;</td>
-          <td class="paramname"><em>ShakeModeType</em> = <code><a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a></code></td><td>)</td>
+          <td class="paramtype">KmacModes&#160;</td>
+          <td class="paramname"><em>KmacModeType</em> = <code>KmacModes::KMAC256</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -241,16 +264,16 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Constructor: instantiate this class using the digest enumeration name </p>
+<p>Constructor: instantiate this class using the KMAC type enumeration name </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">ShakeModeType</td><td>The underlying SHAKE implementation mode</td></tr>
+    <tr><td class="paramname">KmacModeType</td><td>The underlying KMAC type implementation mode</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoMacException</td><td>Thrown if an invalid SHAKE mode is selected</td></tr>
+    <tr><td class="paramname">CryptoMacException</td><td>Thrown if an invalid KMAC mode is selected</td></tr>
   </table>
   </dd>
 </dl>
@@ -285,35 +308,6 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="afb977931261df53bccce39d965e4531a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afb977931261df53bccce39d965e4531a">&#9670;&nbsp;</a></span>BlockSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t KMAC::BlockSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The Digests internal blocksize in bytes </p>
-
-<p>Implements <a class="el" href="class_i_mac.html#a859bd718f2cba1f0d619265f79a5c924">IMac</a>.</p>
-
-</div>
-</div>
 <a id="afc5e07e96f2cd1824bfdf6da26d4cee3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afc5e07e96f2cd1824bfdf6da26d4cee3">&#9670;&nbsp;</a></span>Compute()</h2>
 
@@ -348,37 +342,22 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Process an input array and return the Mac code in the output array. </p>
-<p>After calling this function the Macs state is reset and must be re-initialized with a new key.</p>
+<p>Process a vector of bytes and return the MAC code </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input data byte array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output Mac code array; can be any size, will create a MAC code equal to the output array size - offset</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector to process</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector containing the MAC code</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoMacException</td><td>Thrown if the mac is not initialized or the output array is too small</td></tr>
   </table>
   </dd>
 </dl>
 
 <p>Implements <a class="el" href="class_i_mac.html#a937e132ea369496b1319fba0648cc8c9">IMac</a>.</p>
-
-</div>
-</div>
-<a id="a1a2853a186daef8f18da5f8d75d23543"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a2853a186daef8f18da5f8d75d23543">&#9670;&nbsp;</a></span>DistributionCode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; byte &gt; &amp; KMAC::DistributionCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters, the default is 'KMAC'. </p>
-<p>Must be set before Initialize(ISymmetricKey) is called. Changing this code will create a unique distribution of the generator. Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size. For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</p>
 
 </div>
 </div>
@@ -402,37 +381,8 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 
 </div>
 </div>
-<a id="a3c80ca00fa303cd0a7ae22b15750fcc9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c80ca00fa303cd0a7ae22b15750fcc9">&#9670;&nbsp;</a></span>Enumeral()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> KMAC::Enumeral </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: Mac generators type name </p>
-
-<p>Implements <a class="el" href="class_i_mac.html#a99fff42ed44ea6ddc7bb043fd303e424">IMac</a>.</p>
-
-</div>
-</div>
 <a id="a5005107887cbd31b600bd6801944306a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5005107887cbd31b600bd6801944306a">&#9670;&nbsp;</a></span>Finalize()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5005107887cbd31b600bd6801944306a">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -465,18 +415,77 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Process the data and return a Mac code </p>
-<p>After calling this function the Macs state is reset and must be re-initialized with a new key.</p>
+<p>Completes processing and returns the MAC code in a standard vector </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output Mac code array; can be any size, will create a MAC code equal to the output array size - offset</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The offset in the output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The output standard vector receiving the MAC code</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output array</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes processed</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The size of the MAC code in bytes</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoMacException</td><td>Thrown if the mac is not initialized or the output array is too small</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="class_i_mac.html#a72adbf63f7fbe156e744a6771ff7a269">IMac</a>.</p>
+
+</div>
+</div>
+<a id="a69ab1f6e61dcf52a8ecac58ddda4d7d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69ab1f6e61dcf52a8ecac58ddda4d7d1">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t KMAC::Finalize </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Completes processing and returns the MAC code in a secure vector </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output secure vector receiving the MAC code</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output array</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The size of the MAC code in bytes</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoMacException</td><td>Thrown if the mac is not initialized or the output array is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_mac.html#a1ceb36389d026c72ed039cf6b0a86eae">IMac</a>.</p>
 
 </div>
 </div>
@@ -504,17 +513,17 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the MAC generator with a SymmetricKey key container. </p>
-<p>Uses a key array to initialize the MAC. The key size should be one of the LegalKeySizes; the digests input block size is recommended.</p>
+<p>Initialize the MAC generator with an ISymmetricKey key container. </p>
+<p>Can accept either the SymmetricKey or SymmetricSecureKey container to load keying material. Uses a key, salt, and info arrays to initialize the MAC.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeyParams</td><td>A SymmetricKey key container class</td></tr>
+    <tr><td class="paramname">KeyParams</td><td>An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoMacException</td><td>Thrown if an invalid key size is used</td></tr>
+    <tr><td class="paramname">CryptoMacException</td><td>Thrown if the key is not a legal size</td></tr>
   </table>
   </dd>
 </dl>
@@ -546,96 +555,28 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Mac is ready to digest data </p>
+<p>Read Only: The MAC generator is ready to process data </p>
 
 <p>Implements <a class="el" href="class_i_mac.html#a081a214676e3f199f617fef9a9bdc7ff">IMac</a>.</p>
 
 </div>
 </div>
-<a id="ad2235e1372c661b296274dd0ad436625"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2235e1372c661b296274dd0ad436625">&#9670;&nbsp;</a></span>LegalKeySizes()</h2>
+<a id="a4a5cf6fecff6bab16d6632015bcef915"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a5cf6fecff6bab16d6632015bcef915">&#9670;&nbsp;</a></span>KmacMode()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; KMAC::LegalKeySizes </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: Recommended Mac key sizes in a SymmetricKeySize array </p>
-
-<p>Implements <a class="el" href="class_i_mac.html#a671cbd60bd2a217275cfc9184641a011">IMac</a>.</p>
-
-</div>
-</div>
-<a id="a780b2efe173410520383a6d75250004d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a780b2efe173410520383a6d75250004d">&#9670;&nbsp;</a></span>MacSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t KMAC::MacSize </td>
+          <td class="memname">const KmacModes KMAC::KmacMode </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read Only: Size of returned mac in bytes </p>
-
-<p>Implements <a class="el" href="class_i_mac.html#a2f590d0a94aa2333a2acfa31e78df07c">IMac</a>.</p>
-
-</div>
-</div>
-<a id="a481a1045aaa76e6265c9564958b05eb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a481a1045aaa76e6265c9564958b05eb9">&#9670;&nbsp;</a></span>Name()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::string KMAC::Name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: Mac generators class name </p>
-
-<p>Implements <a class="el" href="class_i_mac.html#a1b13cb529b6d1774f6514b1cf59d97dd">IMac</a>.</p>
+<p>Read Only: The underlying KMAC mode setting </p>
 
 </div>
 </div>
@@ -690,69 +631,15 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Reset to the default state; Mac must be re-initialized after this call </p>
+<p>Reset internal state to the pre-initialization defaults. </p>
+<p>Internal state is zeroised, and MAC generator must be reinitialized again before being used.</p>
 
 <p>Implements <a class="el" href="class_i_mac.html#a9de73cf3fe621e20b19d1922361537a1">IMac</a>.</p>
 
 </div>
 </div>
-<a id="a619eed3c4b833d2caf2364cd6de11a22"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a619eed3c4b833d2caf2364cd6de11a22">&#9670;&nbsp;</a></span>ShakeMode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a> KMAC::ShakeMode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read Only: The underlying cSHAKE security setting </p>
-
-</div>
-</div>
-<a id="abc867713bafa8f1040722aaeff8d0960"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc867713bafa8f1040722aaeff8d0960">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void KMAC::Update </td>
-          <td>(</td>
-          <td class="paramtype">byte&#160;</td>
-          <td class="paramname"><em>Input</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Update the Mac with a single byte </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>Input byte to process</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_mac.html#aebca376a9aacd7031645001fca8168e9">IMac</a>.</p>
-
-</div>
-</div>
 <a id="af143de0b09ea014e0a54067e9b5ef85d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af143de0b09ea014e0a54067e9b5ef85d">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af143de0b09ea014e0a54067e9b5ef85d">&#9670;&nbsp;</a></span>Update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -791,12 +678,18 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Update the Mac with a block of bytes </p>
+<p>Update the Mac with a length of bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input data array to process</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting position with the input array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input data vector to process</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting position with the input array</td></tr>
     <tr><td class="paramname">Length</td><td>The length of data to process in bytes</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoMacException</td><td>Thrown if the mac is not initialized or the input array is too small</td></tr>
   </table>
   </dd>
 </dl>

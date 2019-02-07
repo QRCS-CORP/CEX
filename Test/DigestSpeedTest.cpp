@@ -93,6 +93,10 @@ namespace Test
 
 			return MESSAGE;
 		}
+		catch (CryptoException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location(), ex.Origin(), ex.Message());
+		}
 		catch (std::exception const &ex)
 		{
 			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));

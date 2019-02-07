@@ -78,11 +78,19 @@ namespace Test
 			delete gen1;
 			delete gen2;
 
-			return SUCCESS;
+			return SUCCESS; 
 		}
 		catch (TestException const &ex)
 		{
 			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
+		}
+		catch (CryptoKdfException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
+		}
+		catch (CryptoException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
 		}
 		catch (std::exception const &ex)
 		{
@@ -304,6 +312,10 @@ namespace Test
 				Generator->Initialize(kp);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
+			}
+			catch (CryptoException&)
+			{
+				throw;
 			}
 			catch (std::exception const&)
 			{

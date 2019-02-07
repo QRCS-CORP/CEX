@@ -13,4 +13,9 @@ const ExceptionTypes CryptoSymmetricCipherException::Enumeral()
 	return ExceptionTypes::CryptoSymmetricCipherException;
 }
 
+const std::string CryptoSymmetricCipherException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

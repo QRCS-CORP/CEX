@@ -79,9 +79,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ae5506bf10b9255488f332887801cabba"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_digest.html">IDigest</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_digest_from_name.html#ae5506bf10b9255488f332887801cabba">GetInstance</a> (<a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType, bool Parallel=false)</td></tr>
-<tr class="memdesc:ae5506bf10b9255488f332887801cabba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a Digest instance by name  <a href="#ae5506bf10b9255488f332887801cabba">More...</a><br /></td></tr>
-<tr class="separator:ae5506bf10b9255488f332887801cabba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8b38f4d1bb85e5d0da5be5934955de0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_digest.html">IDigest</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_digest_from_name.html#ae8b38f4d1bb85e5d0da5be5934955de0">GetInstance</a> (<a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType, bool Parallel=false)</td></tr>
+<tr class="memdesc:ae8b38f4d1bb85e5d0da5be5934955de0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a Digest instance by name  <a href="#ae8b38f4d1bb85e5d0da5be5934955de0">More...</a><br /></td></tr>
+<tr class="separator:ae8b38f4d1bb85e5d0da5be5934955de0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1d77cbcc6660a72400a49d7e4fdfa03"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_digest_from_name.html#ab1d77cbcc6660a72400a49d7e4fdfa03">GetBlockSize</a> (<a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType)</td></tr>
 <tr class="memdesc:ab1d77cbcc6660a72400a49d7e4fdfa03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the input block size of a message digest  <a href="#ab1d77cbcc6660a72400a49d7e4fdfa03">More...</a><br /></td></tr>
 <tr class="separator:ab1d77cbcc6660a72400a49d7e4fdfa03"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,6 +127,12 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The block in bytes</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoException</td><td>Thrown if the digest type is not supported</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -162,11 +168,17 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The hash size in bytes</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoException</td><td>Thrown if the digest type is not supported</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a id="ae5506bf10b9255488f332887801cabba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae5506bf10b9255488f332887801cabba">&#9670;&nbsp;</a></span>GetInstance()</h2>
+<a id="ae8b38f4d1bb85e5d0da5be5934955de0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8b38f4d1bb85e5d0da5be5934955de0">&#9670;&nbsp;</a></span>GetInstance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -175,7 +187,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_digest.html">IDigest</a> * DigestFromName::GetInstance </td>
+          <td class="memname"><a class="el" href="class_i_digest.html">IDigest</a> * DigestFromName::GetInstance </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td>
           <td class="paramname"><em>DigestType</em>, </td>
@@ -210,7 +222,7 @@ Static Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>An initialized digest</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoException</td><td>Thrown if the enumeration name is not supported</td></tr>
+    <tr><td class="paramname">CryptoException</td><td>Thrown if the digest type is not supported</td></tr>
   </table>
   </dd>
 </dl>
@@ -249,6 +261,12 @@ Static Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The padding size size in bytes</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoException</td><td>Thrown if the digest type is not supported</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

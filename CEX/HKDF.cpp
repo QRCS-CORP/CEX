@@ -40,24 +40,24 @@ public:
 HKDF::HKDF(SHA2Digests DigestType)
 	:
 	KdfBase(
-		DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::HKDF256 : 
-			Kdfs::HKDF512) :
-			throw CryptoKdfException(std::string("HKDF"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam),
+		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
 #if defined(CEX_ENFORCE_KEYMIN)
-		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
-		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
+		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
+		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 #else
 		MINKEY_LENGTH, 
 		MINSALT_LENGTH, 
 #endif
-		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::HKDF256) : KdfConvert::ToName(Kdfs::HKDF512)),
-		std::vector<SymmetricKeySize> {
+		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::HKDF256) : DigestType == SHA2Digests::SHA512 ? KdfConvert::ToName(Kdfs::HKDF512) : std::string("")),
+		(DigestType != SHA2Digests::None ? std::vector<SymmetricKeySize> {
 			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 32 : 64), 0, 0),
 			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), 0, (DigestType == SHA2Digests::SHA256 ? 32 : 64)),
-			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))}),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))} : 
+			std::vector<SymmetricKeySize>(0))),
 	m_isDestroyed(true),
 	m_isInitialized(false),
-	m_hkdfGenerator(new HMAC(DigestType)),
+	m_hkdfGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
+		throw CryptoKdfException(std::string("HKDF"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
 	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(byte), 0))
 {
 
@@ -66,8 +66,7 @@ HKDF::HKDF(SHA2Digests DigestType)
 HKDF::HKDF(IDigest* Digest)
 	:
 	KdfBase(
-		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::HKDF256 : Kdfs::HKDF512) :
-			throw CryptoKdfException(std::string("HKDF"), std::string("Constructor"), std::string("The digest instance is not supported!"), ErrorCodes::IllegalOperation)),
+		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
 #if defined(CEX_ENFORCE_KEYMIN)
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 		(Digest != nullptr ? Digest->DigestSize() : 0),
@@ -192,10 +191,17 @@ void HKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 
 void HKDF::Initialize(ISymmetricKey &KeyParams)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (KeyParams.Key().size() < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	if (IsInitialized())
 	{

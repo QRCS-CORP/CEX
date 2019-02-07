@@ -259,12 +259,6 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
   </table>
   </dd>
 </dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoDigestException</td><td>Thrown if an invalid parallel parameters are used</td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -671,6 +665,12 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the degree parameter is invalid</td></tr>
   </table>
   </dd>
 </dl>

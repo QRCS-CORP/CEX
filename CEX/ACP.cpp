@@ -16,8 +16,8 @@ using Utility::MemoryTools;
 using Enumeration::ProviderConvert;
 using Utility::SystemTools;
 
-const bool ACP::CPU_HAS_RDRAND = SystemTools::HasRdRand();
-const bool ACP::TIMER_HAS_TSC = SystemTools::HasRdtsc();
+const bool ACP::HAS_RDRAND = SystemTools::HasRdRand();
+const bool ACP::HAS_TSC = SystemTools::HasRdtsc();
 
 //~~~Constructor~~~//
 
@@ -146,16 +146,16 @@ std::vector<byte> ACP::Collect()
 	ulong ts;
 
 	// add the first timestamp
-	ts = SystemTools::TimeStamp(TIMER_HAS_TSC);
+	ts = SystemTools::TimeStamp(HAS_TSC);
 	ArrayTools::AppendValue(ts, state);
 
 	// add system state and mix in timer delta
 	ArrayTools::AppendVector(MemoryInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(ProcessInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(SystemInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(TimeInfo(), state);
 
 	// filter zeroes
@@ -164,7 +164,7 @@ std::vector<byte> ACP::Collect()
 	state = Compress(state);
 
 	// add rdrand block
-	if (CPU_HAS_RDRAND)
+	if (HAS_RDRAND)
 	{
 		RDP rpv;
 		rpv.Generate(buffer);
@@ -173,7 +173,7 @@ std::vector<byte> ACP::Collect()
 
 	// add jitter block
 #if defined(CEX_ACP_JITTER)
-	if (TIMER_HAS_TSC)
+	if (HAS_TSC)
 	{
 		CJP jpv;
 		jpv.Generate(buffer);
@@ -211,12 +211,9 @@ bool ACP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	std::vector<byte> tmp(m_pvdSelfTest.SELFTEST_LENGTH);
 	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
 
-	GetRandom(tmp, 0, tmp.size(), m_kdfGenerator);
-	MemoryTools::Copy(tmp, 0, smp, 0, smp.size());
-	MemoryTools::Clear(tmp, 0, tmp.size());
+	GetRandom(smp, 0, smp.size(), m_kdfGenerator);
 
 	if (!m_pvdSelfTest.SelfTest(smp))
 	{
@@ -401,7 +398,7 @@ std::vector<byte> ACP::TimeInfo()
 {
 	std::vector<byte> state(0);
 
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC), state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC), state);
 	ArrayTools::AppendValue(SystemTools::TimeCurrentNS(), state);
 	ArrayTools::AppendValue(SystemTools::TimeSinceBoot(), state);
 

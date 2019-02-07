@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of a cryptographically secure pseudo random number generator.  
+<p>An implementation of a cryptographically secure pseudo-random number generator.  
  <a href="class_secure_random.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_secure_random_8h_source.html">SecureRandom.h</a>&gt;</code></p>
@@ -85,30 +85,48 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a818fed2713111d275a7f3c29ab724114"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_secure_random.html">SecureRandom</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a818fed2713111d275a7f3c29ab724114">operator=</a> (const <a class="el" href="class_secure_random.html">SecureRandom</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a818fed2713111d275a7f3c29ab724114"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a818fed2713111d275a7f3c29ab724114">More...</a><br /></td></tr>
 <tr class="separator:a818fed2713111d275a7f3c29ab724114"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a075eb840cb134b10b868ed3738f74e69"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a075eb840cb134b10b868ed3738f74e69">SecureRandom</a> (<a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>, <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> ProviderType=<a class="el" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a036578329f4509e4a7be59eb39666009">Providers::ACP</a>, <a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType=Digests::None, size_t BufferSize=4096)</td></tr>
-<tr class="memdesc:a075eb840cb134b10b868ed3738f74e69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class and initialize the rng.  <a href="#a075eb840cb134b10b868ed3738f74e69">More...</a><br /></td></tr>
-<tr class="separator:a075eb840cb134b10b868ed3738f74e69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48c323b9c21656bb986b4d9d480e0661"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a48c323b9c21656bb986b4d9d480e0661">SecureRandom</a> (<a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>, <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> ProviderType=<a class="el" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a036578329f4509e4a7be59eb39666009">Providers::ACP</a>)</td></tr>
+<tr class="memdesc:a48c323b9c21656bb986b4d9d480e0661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class and initialize the rng.  <a href="#a48c323b9c21656bb986b4d9d480e0661">More...</a><br /></td></tr>
+<tr class="separator:a48c323b9c21656bb986b4d9d480e0661"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1acdcd4377c283792a1dff22419b183a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a1acdcd4377c283792a1dff22419b183a">~SecureRandom</a> ()</td></tr>
 <tr class="memdesc:a1acdcd4377c283792a1dff22419b183a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a1acdcd4377c283792a1dff22419b183a">More...</a><br /></td></tr>
 <tr class="separator:a1acdcd4377c283792a1dff22419b183a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56ab1cdbe9f300b93754738b0768f689"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a56ab1cdbe9f300b93754738b0768f689">Fill</a> (std::vector&lt; ushort &gt; &amp;Output, size_t Offset, size_t Elements)</td></tr>
-<tr class="memdesc:a56ab1cdbe9f300b93754738b0768f689"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array of uint16 with pseudo-random  <a href="#a56ab1cdbe9f300b93754738b0768f689">More...</a><br /></td></tr>
+<tr class="memdesc:a56ab1cdbe9f300b93754738b0768f689"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector of uint16 with pseudo-random using offset and length parameters  <a href="#a56ab1cdbe9f300b93754738b0768f689">More...</a><br /></td></tr>
 <tr class="separator:a56ab1cdbe9f300b93754738b0768f689"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61b5c6a9f279eb9ffa06b64d37ccde5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a61b5c6a9f279eb9ffa06b64d37ccde5c">Fill</a> (SecureVector&lt; ushort &gt; &amp;Output, size_t Offset, size_t Elements)</td></tr>
+<tr class="memdesc:a61b5c6a9f279eb9ffa06b64d37ccde5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector of uint16 with pseudo-random using offset and length parameters  <a href="#a61b5c6a9f279eb9ffa06b64d37ccde5c">More...</a><br /></td></tr>
+<tr class="separator:a61b5c6a9f279eb9ffa06b64d37ccde5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66e47269e50ffefcfd2e3bfedf9424a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a66e47269e50ffefcfd2e3bfedf9424a0">Fill</a> (std::vector&lt; uint &gt; &amp;Output, size_t Offset, size_t Elements)</td></tr>
-<tr class="memdesc:a66e47269e50ffefcfd2e3bfedf9424a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array of uint32 with pseudo-random  <a href="#a66e47269e50ffefcfd2e3bfedf9424a0">More...</a><br /></td></tr>
+<tr class="memdesc:a66e47269e50ffefcfd2e3bfedf9424a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector of uint32 with pseudo-random using offset and length parameters  <a href="#a66e47269e50ffefcfd2e3bfedf9424a0">More...</a><br /></td></tr>
 <tr class="separator:a66e47269e50ffefcfd2e3bfedf9424a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e7570fa701c7b97a16ca80abb19ed03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a7e7570fa701c7b97a16ca80abb19ed03">Fill</a> (SecureVector&lt; uint &gt; &amp;Output, size_t Offset, size_t Elements)</td></tr>
+<tr class="memdesc:a7e7570fa701c7b97a16ca80abb19ed03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector of uint32 with pseudo-random using offset and length parameters  <a href="#a7e7570fa701c7b97a16ca80abb19ed03">More...</a><br /></td></tr>
+<tr class="separator:a7e7570fa701c7b97a16ca80abb19ed03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d916ce91a68ef62e6d148147174e3a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a4d916ce91a68ef62e6d148147174e3a5">Fill</a> (std::vector&lt; ulong &gt; &amp;Output, size_t Offset, size_t Elements)</td></tr>
-<tr class="memdesc:a4d916ce91a68ef62e6d148147174e3a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array of uint64 with pseudo-random  <a href="#a4d916ce91a68ef62e6d148147174e3a5">More...</a><br /></td></tr>
+<tr class="memdesc:a4d916ce91a68ef62e6d148147174e3a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector of uint64 with pseudo-random using offset and length parameters  <a href="#a4d916ce91a68ef62e6d148147174e3a5">More...</a><br /></td></tr>
 <tr class="separator:a4d916ce91a68ef62e6d148147174e3a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc40983a572e2cd58185ca3338c2bb6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#abc40983a572e2cd58185ca3338c2bb6b">Fill</a> (SecureVector&lt; ulong &gt; &amp;Output, size_t Offset, size_t Elements)</td></tr>
+<tr class="memdesc:abc40983a572e2cd58185ca3338c2bb6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector of uint64 with pseudo-random using offset and length parameters  <a href="#abc40983a572e2cd58185ca3338c2bb6b">More...</a><br /></td></tr>
+<tr class="separator:abc40983a572e2cd58185ca3338c2bb6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52879cb1483c91643bf8eabcd497ca3f"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a52879cb1483c91643bf8eabcd497ca3f">Name</a> ()</td></tr>
+<tr class="memdesc:a52879cb1483c91643bf8eabcd497ca3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The random generators implementation name  <a href="#a52879cb1483c91643bf8eabcd497ca3f">More...</a><br /></td></tr>
+<tr class="separator:a52879cb1483c91643bf8eabcd497ca3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3e54451de41210043d7af59da9609da"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#af3e54451de41210043d7af59da9609da">Generate</a> (size_t Length)</td></tr>
-<tr class="memdesc:af3e54451de41210043d7af59da9609da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array filled with pseudo random bytes  <a href="#af3e54451de41210043d7af59da9609da">More...</a><br /></td></tr>
+<tr class="memdesc:af3e54451de41210043d7af59da9609da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array filled with pseudo-random bytes  <a href="#af3e54451de41210043d7af59da9609da">More...</a><br /></td></tr>
 <tr class="separator:af3e54451de41210043d7af59da9609da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9539cf275a5fb7c3ef32813f9a7f4fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#af9539cf275a5fb7c3ef32813f9a7f4fb">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length)</td></tr>
-<tr class="memdesc:af9539cf275a5fb7c3ef32813f9a7f4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#af9539cf275a5fb7c3ef32813f9a7f4fb">More...</a><br /></td></tr>
+<tr class="memdesc:af9539cf275a5fb7c3ef32813f9a7f4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard byte vector with pseudo-random bytes using offset and length parameters  <a href="#af9539cf275a5fb7c3ef32813f9a7f4fb">More...</a><br /></td></tr>
 <tr class="separator:af9539cf275a5fb7c3ef32813f9a7f4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e2ac20f3646d1eabb5ac99d61b74a9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a7e2ac20f3646d1eabb5ac99d61b74a9b">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length)</td></tr>
+<tr class="memdesc:a7e2ac20f3646d1eabb5ac99d61b74a9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure byte vector with pseudo-random bytes using offset and length parameters  <a href="#a7e2ac20f3646d1eabb5ac99d61b74a9b">More...</a><br /></td></tr>
+<tr class="separator:a7e2ac20f3646d1eabb5ac99d61b74a9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54a1ba7672b9a2e6a8d5f0275233f11d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a54a1ba7672b9a2e6a8d5f0275233f11d">Generate</a> (std::vector&lt; byte &gt; &amp;Output)</td></tr>
-<tr class="memdesc:a54a1ba7672b9a2e6a8d5f0275233f11d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array with pseudo random bytes  <a href="#a54a1ba7672b9a2e6a8d5f0275233f11d">More...</a><br /></td></tr>
+<tr class="memdesc:a54a1ba7672b9a2e6a8d5f0275233f11d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#a54a1ba7672b9a2e6a8d5f0275233f11d">More...</a><br /></td></tr>
 <tr class="separator:a54a1ba7672b9a2e6a8d5f0275233f11d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb828797dc12d2ffdccbd7e144000f5e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#aeb828797dc12d2ffdccbd7e144000f5e">Generate</a> (SecureVector&lt; byte &gt; &amp;Output)</td></tr>
+<tr class="memdesc:aeb828797dc12d2ffdccbd7e144000f5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes  <a href="#aeb828797dc12d2ffdccbd7e144000f5e">More...</a><br /></td></tr>
+<tr class="separator:aeb828797dc12d2ffdccbd7e144000f5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaeef7d3d68c5593279786677c4a2047c"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#aaeef7d3d68c5593279786677c4a2047c">NextChar</a> ()</td></tr>
 <tr class="memdesc:aaeef7d3d68c5593279786677c4a2047c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a random char  <a href="#aaeef7d3d68c5593279786677c4a2047c">More...</a><br /></td></tr>
 <tr class="separator:aaeef7d3d68c5593279786677c4a2047c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -172,17 +190,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a80aa593522ae1552dd9d6c9838506ffe"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#a80aa593522ae1552dd9d6c9838506ffe">NextUInt64</a> (ulong Maximum, ulong Minimum)</td></tr>
 <tr class="memdesc:a80aa593522ae1552dd9d6c9838506ffe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a random 64bit unsigned integer ranged between minimum and maximum sizes  <a href="#a80aa593522ae1552dd9d6c9838506ffe">More...</a><br /></td></tr>
 <tr class="separator:a80aa593522ae1552dd9d6c9838506ffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac37537d646aecf5e3d701519829c378e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_random.html#ac37537d646aecf5e3d701519829c378e">Reset</a> ()</td></tr>
-<tr class="memdesc:ac37537d646aecf5e3d701519829c378e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the generator instance  <a href="#ac37537d646aecf5e3d701519829c378e">More...</a><br /></td></tr>
-<tr class="separator:ac37537d646aecf5e3d701519829c378e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of a cryptographically secure pseudo random number generator. </p>
+<div class="textblock"><p>An implementation of a cryptographically secure pseudo-random number generator. </p>
 <p>This class is an extension wrapper that uses one of the PRNG and random provider implementations. <br />
 The PRNG and random provider type names are loaded through the constructor, instantiating internal instances of those classes and auto-initializing the base PRNG. <br />
 The default configuration uses and AES-256 CTR mode generator (BCR), and the auto seed collection provider. <br />
-The secure random class can use any combination of the base PRNGs and random providers. <br />
-Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</p>
+The secure random class can use any combination of the base PRNGs and random providers.</p>
 <p><code> SecureRandom rnd; int x = rnd.NextInt32(); </code> </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a93f67f0c88b56b9033726d7494da90ae"></a>
@@ -213,8 +227,8 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 
 </div>
 </div>
-<a id="a075eb840cb134b10b868ed3738f74e69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a075eb840cb134b10b868ed3738f74e69">&#9670;&nbsp;</a></span>SecureRandom() <span class="overload">[2/2]</span></h2>
+<a id="a48c323b9c21656bb986b4d9d480e0661"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48c323b9c21656bb986b4d9d480e0661">&#9670;&nbsp;</a></span>SecureRandom() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,7 +237,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_PRNG SecureRandom::SecureRandom </td>
+          <td class="memname">SecureRandom::SecureRandom </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a>&#160;</td>
           <td class="paramname"><em>PrngType</em> = <code><a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a></code>, </td>
@@ -232,19 +246,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a>&#160;</td>
-          <td class="paramname"><em>ProviderType</em> = <code><a class="el" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a036578329f4509e4a7be59eb39666009">Providers::ACP</a></code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td>
-          <td class="paramname"><em>DigestType</em> = <code>Digests::None</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>BufferSize</em> = <code>4096</code>&#160;</td>
+          <td class="paramname"><em>ProviderType</em> = <code><a class="el" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a036578329f4509e4a7be59eb39666009">Providers::ACP</a></code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -265,14 +267,12 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
   <table class="params">
     <tr><td class="paramname">PrngType</td><td>The base random bytes generator (PRNG) used to power this wrapper; default is block cipher counter</td></tr>
     <tr><td class="paramname">ProviderType</td><td>The entropy provider type used to initialize the prng</td></tr>
-    <tr><td class="paramname">DigestType</td><td>The message digest function used by the drbg as either the base PRF for that function (HCR or DCR), or to invoke the extended cipher configuration when using BCR</td></tr>
-    <tr><td class="paramname">BufferSize</td><td>The byte size of the internal buffer; default is 4096</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the selected parameters are invalid</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the selected parameters are invalid</td></tr>
   </table>
   </dd>
 </dl>
@@ -300,7 +300,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a56ab1cdbe9f300b93754738b0768f689"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56ab1cdbe9f300b93754738b0768f689">&#9670;&nbsp;</a></span>Fill() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a56ab1cdbe9f300b93754738b0768f689">&#9670;&nbsp;</a></span>Fill() <span class="overload">[1/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -331,11 +331,55 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
       </table>
 </div><div class="memdoc">
 
-<p>Fill an array of uint16 with pseudo-random </p>
+<p>Fill a standard vector of uint16 with pseudo-random using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The uint16 output array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting index within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The uint16 destination array</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting index within the destination array</td></tr>
+    <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a61b5c6a9f279eb9ffa06b64d37ccde5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61b5c6a9f279eb9ffa06b64d37ccde5c">&#9670;&nbsp;</a></span>Fill() <span class="overload">[2/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SecureRandom::Fill </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; ushort &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Elements</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector of uint16 with pseudo-random using offset and length parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The uint16 destination array</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting index within the destination array</td></tr>
     <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
   </table>
   </dd>
@@ -344,7 +388,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 </div>
 </div>
 <a id="a66e47269e50ffefcfd2e3bfedf9424a0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66e47269e50ffefcfd2e3bfedf9424a0">&#9670;&nbsp;</a></span>Fill() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a66e47269e50ffefcfd2e3bfedf9424a0">&#9670;&nbsp;</a></span>Fill() <span class="overload">[3/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -375,11 +419,55 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
       </table>
 </div><div class="memdoc">
 
-<p>Fill an array of uint32 with pseudo-random </p>
+<p>Fill a standard vector of uint32 with pseudo-random using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The uint32 output array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting index within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The uint32 destination array</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting index within the destination array</td></tr>
+    <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7e7570fa701c7b97a16ca80abb19ed03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e7570fa701c7b97a16ca80abb19ed03">&#9670;&nbsp;</a></span>Fill() <span class="overload">[4/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SecureRandom::Fill </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; uint &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Elements</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector of uint32 with pseudo-random using offset and length parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The uint32 destination array</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting index within the destination array</td></tr>
     <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
   </table>
   </dd>
@@ -388,7 +476,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 </div>
 </div>
 <a id="a4d916ce91a68ef62e6d148147174e3a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d916ce91a68ef62e6d148147174e3a5">&#9670;&nbsp;</a></span>Fill() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d916ce91a68ef62e6d148147174e3a5">&#9670;&nbsp;</a></span>Fill() <span class="overload">[5/6]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -419,11 +507,55 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
       </table>
 </div><div class="memdoc">
 
-<p>Fill an array of uint64 with pseudo-random </p>
+<p>Fill a standard vector of uint64 with pseudo-random using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The uint64 output array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting index within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The uint64 destination array</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting index within the destination array</td></tr>
+    <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abc40983a572e2cd58185ca3338c2bb6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc40983a572e2cd58185ca3338c2bb6b">&#9670;&nbsp;</a></span>Fill() <span class="overload">[6/6]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SecureRandom::Fill </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; ulong &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Elements</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector of uint64 with pseudo-random using offset and length parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The uint64 destination array</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting index within the destination array</td></tr>
     <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
   </table>
   </dd>
@@ -432,7 +564,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 </div>
 </div>
 <a id="af3e54451de41210043d7af59da9609da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3e54451de41210043d7af59da9609da">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af3e54451de41210043d7af59da9609da">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -447,7 +579,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
       </table>
 </div><div class="memdoc">
 
-<p>Return an array filled with pseudo random bytes </p>
+<p>Return an array filled with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Length</td><td>Size of requested byte array</td></tr>
@@ -459,7 +591,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 </div>
 </div>
 <a id="af9539cf275a5fb7c3ef32813f9a7f4fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af9539cf275a5fb7c3ef32813f9a7f4fb">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af9539cf275a5fb7c3ef32813f9a7f4fb">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -490,12 +622,56 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
       </table>
 </div><div class="memdoc">
 
-<p>Fill the buffer with pseudo-random bytes using offsets </p>
+<p>Fill a standard byte vector with pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output array to fill</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting position within the Output array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of bytes to write to the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination vector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to write to the destination array</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7e2ac20f3646d1eabb5ac99d61b74a9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e2ac20f3646d1eabb5ac99d61b74a9b">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SecureRandom::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fill a secure byte vector with pseudo-random bytes using offset and length parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to write to the destination array</td></tr>
   </table>
   </dd>
 </dl>
@@ -503,7 +679,7 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 </div>
 </div>
 <a id="a54a1ba7672b9a2e6a8d5f0275233f11d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54a1ba7672b9a2e6a8d5f0275233f11d">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a54a1ba7672b9a2e6a8d5f0275233f11d">&#9670;&nbsp;</a></span>Generate() <span class="overload">[4/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -518,13 +694,58 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
       </table>
 </div><div class="memdoc">
 
-<p>Fill an array with pseudo random bytes </p>
+<p>Fill a standard vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination vector to fill</td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="aeb828797dc12d2ffdccbd7e144000f5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb828797dc12d2ffdccbd7e144000f5e">&#9670;&nbsp;</a></span>Generate() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SecureRandom::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector with pseudo-random bytes </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a52879cb1483c91643bf8eabcd497ca3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52879cb1483c91643bf8eabcd497ca3f">&#9670;&nbsp;</a></span>Name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string SecureRandom::Name </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read Only: The random generators implementation name </p>
 
 </div>
 </div>
@@ -1123,25 +1344,6 @@ Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on 
 </div><div class="memdoc">
 
 <p>Copy operator: copy is restricted, this function has been deleted </p>
-
-</div>
-</div>
-<a id="ac37537d646aecf5e3d701519829c378e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac37537d646aecf5e3d701519829c378e">&#9670;&nbsp;</a></span>Reset()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SecureRandom::Reset </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Reset the generator instance </p>
 
 </div>
 </div>

@@ -53,7 +53,10 @@ using Enumeration::ShakeModes;
 /// <description><B>Overview:</B></description>
 /// <para>The SHAKE/cSHAKE family of XOF (Extended Output Function) functions use the Keccak sponge and permutation functions to generate a pseudo-random output. \n
 /// Typically SHAKE has been implemented as a message digest function, as an alternative to SHA-3, but in this implementation it is used to generate keying material like a traditional KDF. \n
-/// The cSHAKE/SHAKE 128 and 256 bit modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental.</para>
+/// The cSHAKE/SHAKE 128 and 256 bit modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental. \n
+/// The minimum key size should align with the expected security level of the generator function. \n
+/// For example, SHAKE256 should be keyed with at least 256 bits (32 bytes) of random key. \n
+/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">

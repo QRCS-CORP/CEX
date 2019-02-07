@@ -13,7 +13,7 @@ class Poly1305::Poly1305State
 {
 public:
 
-	std::array<ulong, 8> State = { 0 };
+	std::array<ulong, 8> State = { 0x00 };
 	std::vector<byte> Buffer;
 	size_t Position;
 
@@ -109,7 +109,7 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 	if (m_poly1305State->Position != 0)
 	{
-		m_poly1305State->Buffer[m_poly1305State->Position] = 1;
+		m_poly1305State->Buffer[m_poly1305State->Position] = 0x01;
 		const size_t RMDLEN = m_poly1305State->Buffer.size() - m_poly1305State->Position - 1;
 
 		if (RMDLEN > 0)
@@ -117,7 +117,7 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 			MemoryTools::Clear(m_poly1305State->Buffer, m_poly1305State->Position + 1, RMDLEN);
 		}
 
-		Process(m_poly1305State->Buffer, 0, BLOCK_SIZE, true, m_poly1305State);
+		Absorb(m_poly1305State->Buffer, 0, BLOCK_SIZE, true, m_poly1305State);
 	}
 
 	h0 = m_poly1305State->State[3];
@@ -181,6 +181,16 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
+size_t Poly1305::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+{
+	std::vector<byte> tag(TagSize());
+
+	Finalize(tag, 0);
+	Move(tag, Output, OutOffset);
+
+	return TagSize();
+}
+
 void Poly1305::Initialize(ISymmetricKey &KeyParams)
 {
 	if (KeyParams.Key().size() < MinimumKeySize())
@@ -199,7 +209,7 @@ void Poly1305::Initialize(ISymmetricKey &KeyParams)
 	m_poly1305State->State[0] = T0 & 0xFFC0FFFFFFFULL;
 	m_poly1305State->State[1] = ((T0 >> 44) | (T1 << 20)) & 0xFFFFFC0FFFFULL;
 	m_poly1305State->State[2] = ((T1 >> 24)) & 0x00FFFFFFC0FULL;
-	// h = 0
+	// h=0
 	m_poly1305State->State[3] = 0;
 	m_poly1305State->State[4] = 0;
 	m_poly1305State->State[5] = 0;
@@ -224,7 +234,7 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
@@ -237,14 +247,14 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				MemoryTools::Copy(Input, InOffset, m_poly1305State->Buffer, m_poly1305State->Position, RMDLEN);
 			}
 
-			Process(m_poly1305State->Buffer, 0, BLOCK_SIZE, false, m_poly1305State);
+			Absorb(m_poly1305State->Buffer, 0, BLOCK_SIZE, false, m_poly1305State);
 			m_poly1305State->Position = 0;
 			InOffset += RMDLEN;
 			Length -= RMDLEN;
 		}
 
 		const size_t ALNLEN = (Length / BLOCK_SIZE) * BLOCK_SIZE;
-		Process(Input, InOffset, ALNLEN, false, m_poly1305State);
+		Absorb(Input, InOffset, ALNLEN, false, m_poly1305State);
 		Length -= ALNLEN;
 		InOffset += ALNLEN;
 
@@ -258,7 +268,7 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Poly1305::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length, bool IsFinal, std::unique_ptr<Poly1305State> &State)
+void Poly1305::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, bool IsFinal, std::unique_ptr<Poly1305State> &State)
 {
 #if !defined(CEX_NATIVE_UINT128)
 	typedef Numeric::Donna128 uint128_t;
@@ -273,11 +283,11 @@ void Poly1305::Process(const std::vector<byte> &Input, size_t InOffset, size_t L
 	uint128_t d0;
 	uint128_t d1;
 	uint128_t d2;
-	size_t bctr;
 	ulong c;
 	ulong h0;
 	ulong h1;
 	ulong h2;
+	size_t bctr;
 
 	bctr = Length / BLOCK_SIZE;
 	h0 = State->State[3];

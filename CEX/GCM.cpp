@@ -22,7 +22,7 @@ GCM::GCM(BlockCiphers CipherType)
 		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The block cipher type can nor be None!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),
-	m_gcmHash(new Mac::GHASH()),
+	m_gcmHash(new Digest::GHASH()),
 	m_gcmKey(0),
 	m_gcmNonce(0),
 	m_gcmVector(0),
@@ -51,7 +51,7 @@ GCM::GCM(IBlockCipher* Cipher)
 		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The block cipher can nor be null!"), ErrorCodes::IllegalOperation)),
 	m_cipherType(Cipher->Enumeral()),
 	m_destroyEngine(false),
-	m_gcmHash(new Mac::GHASH()),
+	m_gcmHash(new Digest::GHASH()),
 	m_gcmKey(0),
 	m_gcmNonce(0),
 	m_gcmVector(0),
@@ -299,8 +299,8 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	else
 	{
 		std::vector<byte> tmpN(BLOCK_SIZE);
-		m_gcmHash->ProcessSegment(m_gcmVector, 0, tmpN, m_gcmVector.size());
-		m_gcmHash->FinalizeBlock(tmpN, 0, m_gcmVector.size());
+		m_gcmHash->Multiply(m_gcmVector, tmpN, m_gcmVector.size());
+		m_gcmHash->Finalize(tmpN, 0, m_gcmVector.size());
 		m_gcmVector = tmpN;
 	}
 
@@ -340,7 +340,7 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 
 	m_aadData.resize(Length);
 	Utility::MemoryTools::Copy(Input, Offset, m_aadData, 0, Length);
-	m_gcmHash->ProcessSegment(Input, Offset, m_checkSum, Length);
+	m_gcmHash->Multiply(m_aadData, m_checkSum, Length);
 
 	m_aadSize = Length;
 	m_aadLoaded = true;
@@ -390,7 +390,7 @@ bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 
 void GCM::CalculateMac()
 {
-	m_gcmHash->FinalizeBlock(m_checkSum, m_aadSize, m_msgSize);
+	m_gcmHash->Finalize(m_checkSum, m_aadSize, m_msgSize);
 	Utility::MemoryTools::XOR(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
 	Utility::MemoryTools::COPY128(m_checkSum, 0, m_msgTag, 0);
 	Reset();
@@ -404,7 +404,7 @@ void GCM::CalculateMac()
 
 		if (m_aadPreserve)
 		{
-			m_gcmHash->ProcessSegment(m_aadData, 0, m_checkSum, m_aadData.size());
+			m_gcmHash->Multiply(m_aadData, m_checkSum, m_aadData.size());
 		}
 	}
 
@@ -445,7 +445,7 @@ void GCM::Reset()
 	}
 
 	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
-	m_gcmHash->Reset();
+	m_gcmHash->Clear();
 	m_isInitialized = false;
 	Utility::MemoryTools::Clear(m_gcmVector, 0, m_gcmVector.size());
 	Utility::MemoryTools::Clear(m_checkSum, 0, m_checkSum.size());

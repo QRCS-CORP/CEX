@@ -57,6 +57,10 @@ namespace Test
 		{
 			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
+		catch (CryptoException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location(), ex.Origin(), ex.Message());
+		}
 		catch (std::exception const &ex)
 		{
 			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
@@ -116,12 +120,61 @@ namespace Test
 			throw;
 		}
 
+		// test symmetrickey initialization with zero sized secure-vector key
+		try
+		{
+			SecureVector<byte> key(0);
+			SymmetricKey kp(key);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE1"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test symmetrickey initialization with zero sized secure-vector nonce
+		try
+		{
+			SecureVector<byte> key(0);
+			SecureVector<byte> nonce(0);
+			SymmetricKey kp(key, nonce);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE2"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test symmetrickey initialization with zero sized secure-vector info
+		try
+		{
+			SecureVector<byte> key(0);
+			SecureVector<byte> nonce(0);
+			SecureVector<byte> info(0);
+			SymmetricKey kp(key, nonce, info);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE3"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
 
 		// test securekey initialization with zero sized key
 		try
 		{
 			std::vector<byte> key(0);
-			std::vector<byte> salt(0);
 			SymmetricSecureKey kp(key);
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE4"));
@@ -223,6 +276,111 @@ namespace Test
 			throw;
 		}
 
+		// test securekey initialization with zero sized secure-vector key
+		try
+		{
+			SecureVector<byte> key(0);
+			SymmetricSecureKey kp(key);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE4"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test securekey initialization with zero sized secure-vector nonce
+		try
+		{
+			SecureVector<byte> key(0);
+			SecureVector<byte> nonce(0);
+			SymmetricSecureKey kp(key, nonce);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE5"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test securekey initialization with zero sized secure-vector info
+		try
+		{
+			SecureVector<byte> key(0);
+			SecureVector<byte> nonce(0);
+			SecureVector<byte> info(0);
+			SymmetricSecureKey kp(key, nonce, info);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE6"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test securekey initialization with secure-vector key and zero sized salt
+		try
+		{
+			SecureVector<byte> key(32);
+			SecureVector<byte> salt(0);
+			SymmetricSecureKey kp(key, SecurityPolicy::SPL256, salt);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE7"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test securekey initialization with secure-vector key and nonce, with zero sized salt
+		try
+		{
+			SecureVector<byte> key(32);
+			SecureVector<byte> nonce(16);
+			SecureVector<byte> salt(0);
+			SymmetricSecureKey kp(key, nonce, SecurityPolicy::SPL256, salt);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE8"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test securekey initialization with secure-vector key, nonce, and info, with zero sized salt
+		try
+		{
+			SecureVector<byte> key(32);
+			SecureVector<byte> nonce(16);
+			SecureVector<byte> info(16);
+			SecureVector<byte> salt(0);
+			SymmetricSecureKey kp(key, nonce, info, SecurityPolicy::SPL256, salt);
+
+			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE9"));
+		}
+		catch (CryptoProcessingException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
 		// test securekey initialization with invalid security policy
 		try
 		{
@@ -284,12 +442,22 @@ namespace Test
 		std::vector<byte> key;
 		std::vector<byte> nonce;
 		std::vector<byte> salt;
+
+		SecureVector<byte> secinfo;
+		SecureVector<byte> seckey;
+		SecureVector<byte> secnonce;
+		SecureVector<byte> secsalt;
 		SecureRandom gen;
 
 		info = gen.Generate(64);
 		key = gen.Generate(32);
 		nonce = gen.Generate(16);
 		salt = gen.Generate(32);
+
+		secinfo = Lock(info);
+		seckey = Lock(key);
+		secnonce = Lock(nonce);
+		secsalt = Lock(salt);
 
 		// test symmetric key constructors
 		SymmetricKey kp1(key, nonce, info);
@@ -307,6 +475,7 @@ namespace Test
 		}
 
 		SymmetricKey kp2(key, nonce);
+
 		if (kp2.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI4"));
@@ -317,13 +486,48 @@ namespace Test
 		}
 
 		SymmetricKey kp3(key);
+
 		if (kp3.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI6"));
 		}
 
-		// test secure key constructors
+		// test secure-vector constructors
+		SymmetricKey sp1(seckey, secnonce, secinfo);
+		if (sp1.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI1"));
+		}
+		if (sp1.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI2"));
+		}
+		if (sp1.Info() != info)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI3"));
+		}
+
+		SymmetricKey sp2(seckey, secnonce);
+
+		if (sp2.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI4"));
+		}
+		if (sp2.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI5"));
+		}
+
+		SymmetricKey sp3(seckey);
+
+		if (sp3.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI6"));
+		}
+
+		// test secure-key constructors
 		SymmetricSecureKey sk1(key, nonce, info, SecurityPolicy::SPL256, salt);
+
 		if (sk1.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI7"));
@@ -338,6 +542,7 @@ namespace Test
 		}
 
 		SymmetricSecureKey sk2(key, nonce, SecurityPolicy::SPL256, salt);
+
 		if (sk2.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI10"));
@@ -348,13 +553,49 @@ namespace Test
 		}
 
 		SymmetricSecureKey sk3(key, SecurityPolicy::SPL256, salt);
+
 		if (sk3.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI12"));
+		}
+
+		// test secure key constructors using secure-vectors
+		SymmetricSecureKey ss1(seckey, secnonce, secinfo, SecurityPolicy::SPL256, secsalt);
+
+		if (ss1.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI7"));
+		}
+		if (ss1.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI8"));
+		}
+		if (ss1.Info() != info)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI9"));
+		}
+
+		SymmetricSecureKey ss2(seckey, secnonce, SecurityPolicy::SPL256, secsalt);
+
+		if (ss2.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI10"));
+		}
+		if (ss2.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI11"));
+		}
+
+		SymmetricSecureKey ss3(seckey, SecurityPolicy::SPL256, secsalt);
+
+		if (ss3.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI12"));
 		}
 
 		// test 512 security policy
 		SymmetricSecureKey sk4(key, nonce, info, SecurityPolicy::SPL512, salt);
+
 		if (sk4.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI13"));
@@ -368,8 +609,25 @@ namespace Test
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI15"));
 		}
 
+		// test 512 security policy using secure-vectors
+		SymmetricSecureKey ss4(seckey, secnonce, secinfo, SecurityPolicy::SPL512, secsalt);
+
+		if (ss4.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI13"));
+		}
+		if (ss4.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI14"));
+		}
+		if (ss4.Info() != info)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI15"));
+		}
+
 		// test 1024 security policy
 		SymmetricSecureKey sk5(key, nonce, info, SecurityPolicy::SPL1024, salt);
+
 		if (sk5.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI16"));
@@ -383,8 +641,25 @@ namespace Test
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI18"));
 		}
 
+		// test 1024 security policy using secure-vectors
+		SymmetricSecureKey ss5(seckey, secnonce, secinfo, SecurityPolicy::SPL1024, secsalt);
+
+		if (ss5.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI16"));
+		}
+		if (ss5.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI17"));
+		}
+		if (ss5.Info() != info)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI18"));
+		}
+
 		// test 256 authenticated security policy
 		SymmetricSecureKey sk6(key, nonce, info, SecurityPolicy::SPL256AE, salt);
+
 		if (sk6.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI19"));
@@ -398,8 +673,25 @@ namespace Test
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI21"));
 		}
 
+		// test 256 authenticated security policy using secure-vectors
+		SymmetricSecureKey ss6(seckey, secnonce, secinfo, SecurityPolicy::SPL256AE, secsalt);
+
+		if (ss6.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI19"));
+		}
+		if (ss6.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI20"));
+		}
+		if (ss6.Info() != info)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI21"));
+		}
+
 		// test 512 authenticated security policy
 		SymmetricSecureKey sk7(key, nonce, info, SecurityPolicy::SPL512AE, salt);
+
 		if (sk7.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI22"));
@@ -413,8 +705,25 @@ namespace Test
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI24"));
 		}
 
+		// test 512 authenticated security policy using secure-vectors
+		SymmetricSecureKey ss7(seckey, secnonce, secinfo, SecurityPolicy::SPL512AE, secsalt);
+
+		if (ss7.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI22"));
+		}
+		if (ss7.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI23"));
+		}
+		if (ss7.Info() != info)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI24"));
+		}
+
 		// test 1024 authenticated security policy
 		SymmetricSecureKey sk8(key, nonce, info, SecurityPolicy::SPL1024AE, salt);
+
 		if (sk8.Key() != key)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI25"));
@@ -424,6 +733,22 @@ namespace Test
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI26"));
 		}
 		if (sk8.Info() != info)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI27"));
+		}
+
+		// test 1024 authenticated security policy using secure-vectors
+		SymmetricSecureKey ss8(seckey, secnonce, secinfo, SecurityPolicy::SPL1024AE, secsalt);
+
+		if (ss8.Key() != key)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI25"));
+		}
+		if (ss8.Nonce() != nonce)
+		{
+			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI26"));
+		}
+		if (ss8.Info() != info)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI27"));
 		}
@@ -438,7 +763,8 @@ namespace Test
 		SymmetricKey* kp1 = keyGen.GetSymmetricKey(keySize);
 		MemoryStream* ks1 = SymmetricKey::Serialize(*kp1);
 		SymmetricKey* kp2 = SymmetricKey::DeSerialize(*ks1);
-		if (!kp1->Equals(*kp2))
+
+		if (kp1->Key() != kp2->Key() || kp1->Nonce() != kp2->Nonce() || kp1->Info() != kp2->Info())
 		{
 			throw TestException(std::string("Serialization"), std::string("SymmetricKey"), std::string("The symmetric key serialization has failed! -SS1"));
 		}
@@ -447,7 +773,8 @@ namespace Test
 		SymmetricSecureKey* sk1 = keyGen.GetSecureKey(keySize);
 		MemoryStream* ks2 = SymmetricSecureKey::Serialize(*sk1);
 		SymmetricKey* sk2 = SymmetricSecureKey::DeSerialize(*ks2);
-		if (!sk1->Equals(*sk2))
+
+		if (sk1->Key() != sk2->Key() || sk1->Nonce() != sk2->Nonce() || sk1->Info() != sk2->Info())
 		{
 			throw TestException(std::string("Serialization"), std::string("SymmetricSecureKey"), std::string("The symmetric key serialization has failed! -SS2"));
 		}
@@ -459,9 +786,14 @@ namespace Test
 		std::vector<byte> key;
 		std::vector<byte> nonce;
 		std::vector<byte> salt;
+		SecureVector<byte> secinfo;
+		SecureVector<byte> seckey;
+		SecureVector<byte> secnonce;
+		SecureVector<byte> secsalt;
 		size_t i;
 		SecureRandom gen;
 
+		// test standard vector standard and secure keys
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
 			info = gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
@@ -470,6 +802,7 @@ namespace Test
 			salt = gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 
 			SymmetricKey kp(key, nonce, info);
+
 			if (kp.Key() != key)
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS1"));
@@ -484,6 +817,7 @@ namespace Test
 			}
 
 			SymmetricSecureKey sk(key, nonce, info, SecurityPolicy::SPL256, salt);
+
 			if (sk.Key() != key)
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI4"));
@@ -495,6 +829,46 @@ namespace Test
 			if (sk.Info() != info)
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI6"));
+			}
+		}
+
+
+		// test standard vector standard and secure keys
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			secinfo = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			seckey = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			secnonce = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			secsalt = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+
+			SymmetricKey sp(seckey, secnonce, secinfo);
+
+			if (sp.Key() != Unlock(seckey))
+			{
+				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS7"));
+			}
+			if (sp.Nonce() != Unlock(secnonce))
+			{
+				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS8"));
+			}
+			if (sp.Info() != Unlock(secinfo))
+			{
+				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SIS9"));
+			}
+
+			SymmetricSecureKey ss(seckey, secnonce, secinfo, SecurityPolicy::SPL256, secsalt);
+
+			if (ss.Key() != Unlock(seckey))
+			{
+				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI10"));
+			}
+			if (ss.Nonce() != Unlock(secnonce))
+			{
+				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI11"));
+			}
+			if (ss.Info() != Unlock(secinfo))
+			{
+				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI12"));
 			}
 		}
 	}

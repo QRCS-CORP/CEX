@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['zeropad',['ZeroPad',['../class_zero_pad.html#a0946591bf3c80bc986d7268aff34eaae',1,'ZeroPad::ZeroPad(const ZeroPad &amp;)=delete'],['../class_zero_pad.html#a02f424076c00a1f203ddcbffb3385f35',1,'ZeroPad::ZeroPad()']]]
+  ['zeroone',['ZeroOne',['../class_zero_one.html#aaffdb7927fb729599a54caacf999f4b4',1,'ZeroOne::ZeroOne(const ZeroOne &amp;)=delete'],['../class_zero_one.html#a0c6346e17cdddae24d0a3f38c5d66798',1,'ZeroOne::ZeroOne()']]]
 ];

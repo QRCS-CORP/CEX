@@ -97,7 +97,7 @@ public:
 	/// <param name="ProviderType">The random provider used to create keyng material; default is ACP</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the digest or provider type is invalid</exception>
-	HCR(SHA2Digests DigestType = SHA2Digests::SHA512, Providers SeedEngine = Providers::ACP);
+	HCR(SHA2Digests DigestType = SHA2Digests::SHA512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
 	/// Destructor: finalize this class

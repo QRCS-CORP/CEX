@@ -13,5 +13,10 @@ const ExceptionTypes CryptoAsymmetricException::Enumeral()
 	return ExceptionTypes::CryptoAsymmetricException;
 }
 
+const std::string CryptoAsymmetricException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND
 

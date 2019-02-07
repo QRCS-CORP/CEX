@@ -41,6 +41,11 @@ const std::string CryptoException::Message()
 	return m_message;
 }
 
+const std::string CryptoException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 const std::string CryptoException::Origin()
 {
 	return m_origin;

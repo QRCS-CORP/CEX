@@ -69,7 +69,7 @@ $(function() {
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_symmetric_secure_key-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">SymmetricSecureKey Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___key.html">Key</a> &raquo; <a class="el" href="group___symmetric_key.html">SymmetricKey</a></div></div>  </div>
+<div class="title">SymmetricSecureKey Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -98,15 +98,42 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae16cb355134332b7a5c9cfea15ff2e7b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ae16cb355134332b7a5c9cfea15ff2e7b">SymmetricSecureKey</a> ()=delete</td></tr>
 <tr class="memdesc:ae16cb355134332b7a5c9cfea15ff2e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#ae16cb355134332b7a5c9cfea15ff2e7b">More...</a><br /></td></tr>
 <tr class="separator:ae16cb355134332b7a5c9cfea15ff2e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a178946be21cdb3d59184716c2fcf2401"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a178946be21cdb3d59184716c2fcf2401">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, ulong KeySalt=0)</td></tr>
-<tr class="memdesc:a178946be21cdb3d59184716c2fcf2401"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key.  <a href="#a178946be21cdb3d59184716c2fcf2401">More...</a><br /></td></tr>
-<tr class="separator:a178946be21cdb3d59184716c2fcf2401"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae595ec8b9505920c9f626df0e671fab9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ae595ec8b9505920c9f626df0e671fab9">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, ulong KeySalt=0)</td></tr>
-<tr class="memdesc:ae595ec8b9505920c9f626df0e671fab9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key, and nonce parameters.  <a href="#ae595ec8b9505920c9f626df0e671fab9">More...</a><br /></td></tr>
-<tr class="separator:ae595ec8b9505920c9f626df0e671fab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58e079e179bc7294a618b606c89c6e5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a58e079e179bc7294a618b606c89c6e5a">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a3c9e64cee3f37f092b720964e5809fa0">Info</a>, ulong KeySalt=0)</td></tr>
-<tr class="memdesc:a58e079e179bc7294a618b606c89c6e5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key, nonce, and info parameters.  <a href="#a58e079e179bc7294a618b606c89c6e5a">More...</a><br /></td></tr>
-<tr class="separator:a58e079e179bc7294a618b606c89c6e5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac65700bd62b004f3460f73cb4449121c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ac65700bd62b004f3460f73cb4449121c">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>)</td></tr>
+<tr class="memdesc:ac65700bd62b004f3460f73cb4449121c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key.  <a href="#ac65700bd62b004f3460f73cb4449121c">More...</a><br /></td></tr>
+<tr class="separator:ac65700bd62b004f3460f73cb4449121c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92cf3a719e16237cf8c9dea102d45992"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a92cf3a719e16237cf8c9dea102d45992">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>)</td></tr>
+<tr class="memdesc:a92cf3a719e16237cf8c9dea102d45992"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key, and nonce parameters.  <a href="#a92cf3a719e16237cf8c9dea102d45992">More...</a><br /></td></tr>
+<tr class="separator:a92cf3a719e16237cf8c9dea102d45992"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad60d3f915c1544042e046431b4647778"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ad60d3f915c1544042e046431b4647778">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a3c9e64cee3f37f092b720964e5809fa0">Info</a>)</td></tr>
+<tr class="memdesc:ad60d3f915c1544042e046431b4647778"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key, nonce, and info parameters.  <a href="#ad60d3f915c1544042e046431b4647778">More...</a><br /></td></tr>
+<tr class="separator:ad60d3f915c1544042e046431b4647778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa342a5056c4de0dfbeef8c146c1ec311"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#aa342a5056c4de0dfbeef8c146c1ec311">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, SecurityPolicy Policy, const std::vector&lt; byte &gt; &amp;Salt)</td></tr>
+<tr class="memdesc:aa342a5056c4de0dfbeef8c146c1ec311"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key.  <a href="#aa342a5056c4de0dfbeef8c146c1ec311">More...</a><br /></td></tr>
+<tr class="separator:aa342a5056c4de0dfbeef8c146c1ec311"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a42a9a4bf4e76aa37ca2cfa36fe64eb82"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a42a9a4bf4e76aa37ca2cfa36fe64eb82">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, SecurityPolicy Policy, const std::vector&lt; byte &gt; &amp;Salt)</td></tr>
+<tr class="memdesc:a42a9a4bf4e76aa37ca2cfa36fe64eb82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key, and nonce parameters.  <a href="#a42a9a4bf4e76aa37ca2cfa36fe64eb82">More...</a><br /></td></tr>
+<tr class="separator:a42a9a4bf4e76aa37ca2cfa36fe64eb82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a383e3aef4765b11e97116b29dd580a97"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a383e3aef4765b11e97116b29dd580a97">SymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a3c9e64cee3f37f092b720964e5809fa0">Info</a>, SecurityPolicy Policy, const std::vector&lt; byte &gt; &amp;Salt)</td></tr>
+<tr class="memdesc:a383e3aef4765b11e97116b29dd580a97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with an encryption key, nonce, and info parameters.  <a href="#a383e3aef4765b11e97116b29dd580a97">More...</a><br /></td></tr>
+<tr class="separator:a383e3aef4765b11e97116b29dd580a97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06b652b903079deb043f63f43c2992ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a06b652b903079deb043f63f43c2992ab">SymmetricSecureKey</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>)</td></tr>
+<tr class="memdesc:a06b652b903079deb043f63f43c2992ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with a SecureVector encryption key.  <a href="#a06b652b903079deb043f63f43c2992ab">More...</a><br /></td></tr>
+<tr class="separator:a06b652b903079deb043f63f43c2992ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1440110bbf1959469292003c82b05f4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#aa1440110bbf1959469292003c82b05f4">SymmetricSecureKey</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>)</td></tr>
+<tr class="memdesc:aa1440110bbf1959469292003c82b05f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters.  <a href="#aa1440110bbf1959469292003c82b05f4">More...</a><br /></td></tr>
+<tr class="separator:aa1440110bbf1959469292003c82b05f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82a03c3d3aadd05541dbfbefb7452056"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a82a03c3d3aadd05541dbfbefb7452056">SymmetricSecureKey</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a3c9e64cee3f37f092b720964e5809fa0">Info</a>)</td></tr>
+<tr class="memdesc:a82a03c3d3aadd05541dbfbefb7452056"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters.  <a href="#a82a03c3d3aadd05541dbfbefb7452056">More...</a><br /></td></tr>
+<tr class="separator:a82a03c3d3aadd05541dbfbefb7452056"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a070d013f048da1ceb547537481d709c8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a070d013f048da1ceb547537481d709c8">SymmetricSecureKey</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, SecurityPolicy Policy, const SecureVector&lt; byte &gt; &amp;Salt)</td></tr>
+<tr class="memdesc:a070d013f048da1ceb547537481d709c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with a SecureVector encryption key.  <a href="#a070d013f048da1ceb547537481d709c8">More...</a><br /></td></tr>
+<tr class="separator:a070d013f048da1ceb547537481d709c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1382fc549867a00347e77b7194b07b59"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a1382fc549867a00347e77b7194b07b59">SymmetricSecureKey</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, SecurityPolicy Policy, const SecureVector&lt; byte &gt; &amp;Salt)</td></tr>
+<tr class="memdesc:a1382fc549867a00347e77b7194b07b59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters.  <a href="#a1382fc549867a00347e77b7194b07b59">More...</a><br /></td></tr>
+<tr class="separator:a1382fc549867a00347e77b7194b07b59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac479caec504bd8a9e020f6318951ddd8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ac479caec504bd8a9e020f6318951ddd8">SymmetricSecureKey</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a>, const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a>, const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_symmetric_secure_key.html#a3c9e64cee3f37f092b720964e5809fa0">Info</a>, SecurityPolicy Policy, const SecureVector&lt; byte &gt; &amp;Salt)</td></tr>
+<tr class="memdesc:ac479caec504bd8a9e020f6318951ddd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters.  <a href="#ac479caec504bd8a9e020f6318951ddd8">More...</a><br /></td></tr>
+<tr class="separator:ac479caec504bd8a9e020f6318951ddd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd370139eefc0d14a74275a53e7e44c3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#afd370139eefc0d14a74275a53e7e44c3">~SymmetricSecureKey</a> () override</td></tr>
 <tr class="memdesc:afd370139eefc0d14a74275a53e7e44c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#afd370139eefc0d14a74275a53e7e44c3">More...</a><br /></td></tr>
 <tr class="separator:afd370139eefc0d14a74275a53e7e44c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,15 +149,21 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a39c4b042b02d69d9ea636f6e66eb7970"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a> () override</td></tr>
 <tr class="memdesc:a39c4b042b02d69d9ea636f6e66eb7970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a copy of the nonce  <a href="#a39c4b042b02d69d9ea636f6e66eb7970">More...</a><br /></td></tr>
 <tr class="separator:a39c4b042b02d69d9ea636f6e66eb7970"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab996b41cae495c7469195ac2985c8b32"><td class="memItemLeft" align="right" valign="top">const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ab996b41cae495c7469195ac2985c8b32">SecureInfo</a> ()</td></tr>
+<tr class="memdesc:ab996b41cae495c7469195ac2985c8b32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy  <a href="#ab996b41cae495c7469195ac2985c8b32">More...</a><br /></td></tr>
+<tr class="separator:ab996b41cae495c7469195ac2985c8b32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d39aa09b5e6de5121893571c604876b"><td class="memItemLeft" align="right" valign="top">const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a4d39aa09b5e6de5121893571c604876b">SecureKey</a> ()</td></tr>
+<tr class="memdesc:a4d39aa09b5e6de5121893571c604876b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure vector copy of the primary encryption key  <a href="#a4d39aa09b5e6de5121893571c604876b">More...</a><br /></td></tr>
+<tr class="separator:a4d39aa09b5e6de5121893571c604876b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a008f3504a8eb7599c1ca390b892c646e"><td class="memItemLeft" align="right" valign="top">const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a008f3504a8eb7599c1ca390b892c646e">SecureNonce</a> ()</td></tr>
+<tr class="memdesc:a008f3504a8eb7599c1ca390b892c646e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure vector copy of the nonce or salt value  <a href="#a008f3504a8eb7599c1ca390b892c646e">More...</a><br /></td></tr>
+<tr class="separator:a008f3504a8eb7599c1ca390b892c646e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a022749c18861b40c9c93d254ed9d15bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a022749c18861b40c9c93d254ed9d15bd">Clone</a> ()</td></tr>
 <tr class="memdesc:a022749c18861b40c9c93d254ed9d15bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a copy of this SymmetricSecureKey class  <a href="#a022749c18861b40c9c93d254ed9d15bd">More...</a><br /></td></tr>
 <tr class="separator:a022749c18861b40c9c93d254ed9d15bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a809a46825d388dd0680a2d33104e2610"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a809a46825d388dd0680a2d33104e2610">Destroy</a> () override</td></tr>
-<tr class="memdesc:a809a46825d388dd0680a2d33104e2610"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release all resources associated with the object; optional, called by the finalizer  <a href="#a809a46825d388dd0680a2d33104e2610">More...</a><br /></td></tr>
-<tr class="separator:a809a46825d388dd0680a2d33104e2610"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01ac7fe83a218c347397dedb515078e1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a01ac7fe83a218c347397dedb515078e1">Equals</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Input) override</td></tr>
-<tr class="memdesc:a01ac7fe83a218c347397dedb515078e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare this SymmetricSecureKey instance with another  <a href="#a01ac7fe83a218c347397dedb515078e1">More...</a><br /></td></tr>
-<tr class="separator:a01ac7fe83a218c347397dedb515078e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1bcc9cf19f801715e723abef8c1a2a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ad1bcc9cf19f801715e723abef8c1a2a7">Reset</a> () override</td></tr>
+<tr class="memdesc:ad1bcc9cf19f801715e723abef8c1a2a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release all resources associated with the object; optional, called by the finalizer  <a href="#ad1bcc9cf19f801715e723abef8c1a2a7">More...</a><br /></td></tr>
+<tr class="separator:ad1bcc9cf19f801715e723abef8c1a2a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_symmetric_key"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_symmetric_key')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a></td></tr>
 <tr class="memitem:a78b724cf8867a2395398bbf359f95c35 inherit pub_methods_class_i_symmetric_key"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_symmetric_key.html#a78b724cf8867a2395398bbf359f95c35">ISymmetricKey</a> (const <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a78b724cf8867a2395398bbf359f95c35 inherit pub_methods_class_i_symmetric_key"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_symmetric_key.html#a78b724cf8867a2395398bbf359f95c35">More...</a><br /></td></tr>
@@ -147,9 +180,9 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ad93321aa58c30a2279fe5890e31323fc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ad93321aa58c30a2279fe5890e31323fc">DeSerialize</a> (<a class="el" href="class_memory_stream.html">MemoryStream</a> &amp;KeyStream)</td></tr>
-<tr class="memdesc:ad93321aa58c30a2279fe5890e31323fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserialize a SymmetricKey stream and return a SymmetricSecureKey  <a href="#ad93321aa58c30a2279fe5890e31323fc">More...</a><br /></td></tr>
-<tr class="separator:ad93321aa58c30a2279fe5890e31323fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac641fc5609b21e835d28f585f14e2125"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_symmetric_key.html">SymmetricKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ac641fc5609b21e835d28f585f14e2125">DeSerialize</a> (<a class="el" href="class_memory_stream.html">MemoryStream</a> &amp;KeyStream)</td></tr>
+<tr class="memdesc:ac641fc5609b21e835d28f585f14e2125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserialize a SymmetricKey stream and return a SymmetricSecureKey  <a href="#ac641fc5609b21e835d28f585f14e2125">More...</a><br /></td></tr>
+<tr class="separator:ac641fc5609b21e835d28f585f14e2125"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8783f8e3e5729673219b337ef5ee4b8a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_memory_stream.html">MemoryStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a8783f8e3e5729673219b337ef5ee4b8a">Serialize</a> (<a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> &amp;KeyObj)</td></tr>
 <tr class="memdesc:a8783f8e3e5729673219b337ef5ee4b8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a SymmetricSecureKey and serialize it as a SymmetricKey stream  <a href="#a8783f8e3e5729673219b337ef5ee4b8a">More...</a><br /></td></tr>
 <tr class="separator:a8783f8e3e5729673219b337ef5ee4b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,7 +206,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </ul>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a98180c3826ed86354148ebd6286370da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a98180c3826ed86354148ebd6286370da">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[1/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a98180c3826ed86354148ebd6286370da">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[1/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -201,7 +234,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div>
 </div>
 <a id="ae16cb355134332b7a5c9cfea15ff2e7b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae16cb355134332b7a5c9cfea15ff2e7b">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[2/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae16cb355134332b7a5c9cfea15ff2e7b">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[2/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -227,8 +260,8 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 
 </div>
 </div>
-<a id="a178946be21cdb3d59184716c2fcf2401"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a178946be21cdb3d59184716c2fcf2401">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[3/5]</span></h2>
+<a id="ac65700bd62b004f3460f73cb4449121c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac65700bd62b004f3460f73cb4449121c">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[3/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -240,18 +273,8 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
           <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">ulong&#160;</td>
-          <td class="paramname"><em>KeySalt</em> = <code>0</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -262,25 +285,68 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with an encryption key. </p>
-<p>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</p>
+<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
-    <tr><td class="paramname">KeySalt</td><td>The secret 64bit salt value used in internal encryption</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="ae595ec8b9505920c9f626df0e671fab9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae595ec8b9505920c9f626df0e671fab9">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[4/5]</span></h2>
+<a id="a92cf3a719e16237cf8c9dea102d45992"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92cf3a719e16237cf8c9dea102d45992">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[4/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Nonce</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with an encryption key, and nonce parameters. </p>
+<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or salt array</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad60d3f915c1544042e046431b4647778"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad60d3f915c1544042e046431b4647778">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[5/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,8 +366,116 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ulong&#160;</td>
-          <td class="paramname"><em>KeySalt</em> = <code>0</code>&#160;</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Info</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with an encryption key, nonce, and info parameters. </p>
+<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or counter array</td></tr>
+    <tr><td class="paramname">Info</td><td>The personalization string or additional keying material</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa342a5056c4de0dfbeef8c146c1ec311"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa342a5056c4de0dfbeef8c146c1ec311">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[6/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>Policy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Salt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with an encryption key. </p>
+<p>The salt value is added to system and process information to create seed material used by the internal encryption key generator.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Policy</td><td>The security policy; determines the level of cryptographic security used internally</td></tr>
+    <tr><td class="paramname">Salt</td><td>The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a42a9a4bf4e76aa37ca2cfa36fe64eb82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42a9a4bf4e76aa37ca2cfa36fe64eb82">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[7/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Nonce</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>Policy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Salt</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -316,22 +490,23 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
-    <tr><td class="paramname">Nonce</td><td>The nonce or counter array</td></tr>
-    <tr><td class="paramname">KeySalt</td><td>The secret 64bit salt value used in internal encryption</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or salt array</td></tr>
+    <tr><td class="paramname">Policy</td><td>The security policy; determines the level of cryptographic security used internally</td></tr>
+    <tr><td class="paramname">Salt</td><td>The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a58e079e179bc7294a618b606c89c6e5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a58e079e179bc7294a618b606c89c6e5a">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[5/5]</span></h2>
+<a id="a383e3aef4765b11e97116b29dd580a97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a383e3aef4765b11e97116b29dd580a97">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[8/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -357,8 +532,14 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">ulong&#160;</td>
-          <td class="paramname"><em>KeySalt</em> = <code>0</code>&#160;</td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>Policy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Salt</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -373,15 +554,326 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
-    <tr><td class="paramname">Nonce</td><td>The nonce or counter array</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or salt array</td></tr>
     <tr><td class="paramname">Info</td><td>The personalization string or additional keying material</td></tr>
-    <tr><td class="paramname">KeySalt</td><td>The secret 64bit salt value used in internal encryption</td></tr>
+    <tr><td class="paramname">Policy</td><td>The security policy; determines the level of cryptographic security used internally</td></tr>
+    <tr><td class="paramname">Salt</td><td>The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a06b652b903079deb043f63f43c2992ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06b652b903079deb043f63f43c2992ab">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[9/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with a SecureVector encryption key. </p>
+<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa1440110bbf1959469292003c82b05f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1440110bbf1959469292003c82b05f4">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[10/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Nonce</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters. </p>
+<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or salt array</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a82a03c3d3aadd05541dbfbefb7452056"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82a03c3d3aadd05541dbfbefb7452056">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[11/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Nonce</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Info</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters. </p>
+<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or counter array</td></tr>
+    <tr><td class="paramname">Info</td><td>The personalization string or additional keying material</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a070d013f048da1ceb547537481d709c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a070d013f048da1ceb547537481d709c8">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[12/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>Policy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Salt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with a SecureVector encryption key. </p>
+<p>The salt value is added to system and process information to create seed material used by the internal encryption key generator.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Policy</td><td>The security policy; determines the level of cryptographic security used internally</td></tr>
+    <tr><td class="paramname">Salt</td><td>The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1382fc549867a00347e77b7194b07b59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1382fc549867a00347e77b7194b07b59">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[13/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Nonce</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>Policy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Salt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters. </p>
+<p>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or salt array</td></tr>
+    <tr><td class="paramname">Policy</td><td>The security policy; determines the level of cryptographic security used internally</td></tr>
+    <tr><td class="paramname">Salt</td><td>The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac479caec504bd8a9e020f6318951ddd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac479caec504bd8a9e020f6318951ddd8">&#9670;&nbsp;</a></span>SymmetricSecureKey() <span class="overload">[14/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SymmetricSecureKey::SymmetricSecureKey </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Nonce</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Info</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>Policy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Salt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters. </p>
+<p>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
+    <tr><td class="paramname">Nonce</td><td>The nonce or salt array</td></tr>
+    <tr><td class="paramname">Info</td><td>The personalization string or additional keying material</td></tr>
+    <tr><td class="paramname">Policy</td><td>The security policy; determines the level of cryptographic security used internally</td></tr>
+    <tr><td class="paramname">Salt</td><td>The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -435,8 +927,8 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 
 </div>
 </div>
-<a id="ad93321aa58c30a2279fe5890e31323fc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad93321aa58c30a2279fe5890e31323fc">&#9670;&nbsp;</a></span>DeSerialize()</h2>
+<a id="ac641fc5609b21e835d28f585f14e2125"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac641fc5609b21e835d28f585f14e2125">&#9670;&nbsp;</a></span>DeSerialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,7 +937,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> * SymmetricSecureKey::DeSerialize </td>
+          <td class="memname"><a class="el" href="class_symmetric_key.html">SymmetricKey</a> * SymmetricSecureKey::DeSerialize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_memory_stream.html">MemoryStream</a> &amp;&#160;</td>
           <td class="paramname"><em>KeyStream</em></td><td>)</td>
@@ -467,72 +959,6 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A populated SymmetricSecureKey container</dd></dl>
-
-</div>
-</div>
-<a id="a809a46825d388dd0680a2d33104e2610"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a809a46825d388dd0680a2d33104e2610">&#9670;&nbsp;</a></span>Destroy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SymmetricSecureKey::Destroy </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Release all resources associated with the object; optional, called by the finalizer </p>
-
-<p>Implements <a class="el" href="class_i_symmetric_key.html#a33b14d4729e4ca5ac6803362ba13f0cc">ISymmetricKey</a>.</p>
-
-</div>
-</div>
-<a id="a01ac7fe83a218c347397dedb515078e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01ac7fe83a218c347397dedb515078e1">&#9670;&nbsp;</a></span>Equals()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool SymmetricSecureKey::Equals </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>Input</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Compare this SymmetricSecureKey instance with another </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>Key to compare</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns true if equal</dd></dl>
-
-<p>Implements <a class="el" href="class_i_symmetric_key.html#a90b1006daf450b98c90c6cef31c41cbb">ISymmetricKey</a>.</p>
 
 </div>
 </div>
@@ -677,6 +1103,122 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Copy operator: copy is restricted, this function has been deleted </p>
+
+</div>
+</div>
+<a id="ad1bcc9cf19f801715e723abef8c1a2a7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1bcc9cf19f801715e723abef8c1a2a7">&#9670;&nbsp;</a></span>Reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SymmetricSecureKey::Reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Release all resources associated with the object; optional, called by the finalizer </p>
+
+<p>Implements <a class="el" href="class_i_symmetric_key.html#a527bcf506867dac550ca70ee76cfad4f">ISymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="ab996b41cae495c7469195ac2985c8b32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab996b41cae495c7469195ac2985c8b32">&#9670;&nbsp;</a></span>SecureInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const SecureVector&lt; byte &gt; SymmetricSecureKey::SecureInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy </p>
+
+<p>Implements <a class="el" href="class_i_symmetric_key.html#ac8c58d69f7602116c82652dee46c7462">ISymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="a4d39aa09b5e6de5121893571c604876b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d39aa09b5e6de5121893571c604876b">&#9670;&nbsp;</a></span>SecureKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const SecureVector&lt; byte &gt; SymmetricSecureKey::SecureKey </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Return a secure vector copy of the primary encryption key </p>
+
+<p>Implements <a class="el" href="class_i_symmetric_key.html#a57e4d339d66f63cabd0cb690e2ef7e29">ISymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="a008f3504a8eb7599c1ca390b892c646e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a008f3504a8eb7599c1ca390b892c646e">&#9670;&nbsp;</a></span>SecureNonce()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const SecureVector&lt; byte &gt; SymmetricSecureKey::SecureNonce </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Return a secure vector copy of the nonce or salt value </p>
+
+<p>Implements <a class="el" href="class_i_symmetric_key.html#a685d0c9724e0961ac6ace74ead22071b">ISymmetricKey</a>.</p>
 
 </div>
 </div>

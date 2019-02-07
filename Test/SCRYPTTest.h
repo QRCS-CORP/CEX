@@ -20,7 +20,7 @@ namespace Test
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
-		static const size_t MAXM_ALLOC = 32 * 255;
+		static const size_t MAXM_ALLOC = 31 * 255;
 		static const size_t MINM_ALLOC = 1024;
 		static const size_t TEST_CYCLES = 4;
 

@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_i_aead_mode-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">IAeadMode Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___symmetric.html">Symmetric</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___mode.html">Mode</a></div></div>  </div>
+<div class="title">IAeadMode Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___mode.html">Mode</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -82,10 +82,9 @@ Inheritance diagram for IAeadMode:</div>
  <div class="center">
   <img src="class_i_aead_mode.png" usemap="#IAeadMode_map" alt=""/>
   <map id="IAeadMode_map" name="IAeadMode_map">
-<area href="class_i_cipher_mode.html" title="Block Cipher standard Mode virtual interface class. " alt="ICipherMode" shape="rect" coords="95,0,180,24"/>
+<area href="class_i_cipher_mode.html" title="Block Cipher standard Mode virtual interface class. " alt="ICipherMode" shape="rect" coords="47,0,132,24"/>
 <area href="class_e_a_x.html" title="An Encrypt and Authenticate AEAD Block Cipher Mode " alt="EAX" shape="rect" coords="0,112,85,136"/>
 <area href="class_g_c_m.html" title="A Galois/Counter Authenticated Block Cipher Mode " alt="GCM" shape="rect" coords="95,112,180,136"/>
-<area href="class_o_c_b.html" title="An Offset CodeBook Authenticated Block Cipher Mode " alt="OCB" shape="rect" coords="190,112,275,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -168,7 +167,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a530595c8040b12a19a21d14f840547ab inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of allowed cipher input key byte-sizes  <a href="class_i_cipher_mode.html#a530595c8040b12a19a21d14f840547ab">More...</a><br /></td></tr>
 <tr class="separator:a530595c8040b12a19a21d14f840547ab inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af060eb48e27685b266b7526be3e5db9e inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">Name</a> ()=0</td></tr>
-<tr class="memdesc:af060eb48e27685b266b7526be3e5db9e inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher mode name  <a href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">More...</a><br /></td></tr>
+<tr class="memdesc:af060eb48e27685b266b7526be3e5db9e inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The mode and cipher name  <a href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">More...</a><br /></td></tr>
 <tr class="separator:af060eb48e27685b266b7526be3e5db9e inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae39d8aaa19ad006669bfbc593b904c15 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#ae39d8aaa19ad006669bfbc593b904c15">ParallelBlockSize</a> ()=0</td></tr>
 <tr class="memdesc:ae39d8aaa19ad006669bfbc593b904c15 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="class_i_cipher_mode.html#ae39d8aaa19ad006669bfbc593b904c15">More...</a><br /></td></tr>
@@ -311,7 +310,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called. </p>
 <p>Treats the Nonce value loaded during Initialize as a monotonic counter; incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. If set to false, requires a re-key after each finalizer cycle.</p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aba625323147d773ea7516fa4b8a81a38">GCM</a>, <a class="el" href="class_o_c_b.html#aa4ee69258e82479618df2dcb01ec3c92">OCB</a>, and <a class="el" href="class_e_a_x.html#af4498507ab74a60c1726a534c20c6839">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aba625323147d773ea7516fa4b8a81a38">GCM</a>, and <a class="el" href="class_e_a_x.html#af4498507ab74a60c1726a534c20c6839">EAX</a>.</p>
 
 </div>
 </div>
@@ -369,12 +368,12 @@ Public Member Functions</h2></td></tr>
 <p>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoCipherModeException</td><td>Thrown if the cipher is not initialized, or output array is too small</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized, or output array is too small</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ab46ad50a71cafcbabbe9d48c8f33d0df">GCM</a>, <a class="el" href="class_o_c_b.html#aa0020aa4570be52a405488ddf2f48d62">OCB</a>, and <a class="el" href="class_e_a_x.html#ac59751c47da026569f346a3087cebaee">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ab46ad50a71cafcbabbe9d48c8f33d0df">GCM</a>, and <a class="el" href="class_e_a_x.html#ac59751c47da026569f346a3087cebaee">EAX</a>.</p>
 
 </div>
 </div>
@@ -403,7 +402,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The maximum legal tag length in bytes </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aed4760123c8ce8359059a2373283ffc2">GCM</a>, <a class="el" href="class_o_c_b.html#a9206709c4e2a08fef8876696de604683">OCB</a>, and <a class="el" href="class_e_a_x.html#a04dc2179a208f53e4eef5dd862f46aec">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aed4760123c8ce8359059a2373283ffc2">GCM</a>, and <a class="el" href="class_e_a_x.html#a04dc2179a208f53e4eef5dd862f46aec">EAX</a>.</p>
 
 </div>
 </div>
@@ -432,7 +431,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The minimum legal tag length in bytes </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a0dcad5861efd189611305b8118a37ec3">GCM</a>, <a class="el" href="class_o_c_b.html#a0ec30189d6718f566a84724fe71013b6">OCB</a>, and <a class="el" href="class_e_a_x.html#a441333d6375d256652617121f921ae85">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a0dcad5861efd189611305b8118a37ec3">GCM</a>, and <a class="el" href="class_e_a_x.html#a441333d6375d256652617121f921ae85">EAX</a>.</p>
 
 </div>
 </div>
@@ -490,7 +489,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Persist a one-time associated data for the entire session. </p>
 <p>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments. Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.</p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ac2a23fd6a442332eea4d31e3c3b68b70">GCM</a>, <a class="el" href="class_o_c_b.html#a4acf50ea8253f911b05368f0b090ce3b">OCB</a>, and <a class="el" href="class_e_a_x.html#ada22f030127e5c3bc0f8fc6d8a600956">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ac2a23fd6a442332eea4d31e3c3b68b70">GCM</a>, and <a class="el" href="class_e_a_x.html#ada22f030127e5c3bc0f8fc6d8a600956">EAX</a>.</p>
 
 </div>
 </div>
@@ -547,12 +546,12 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoCipherModeException</td><td>Thrown if state has been processed</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if state has been processed</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ad020b507efe58cb0f04923f9dd81bdf5">GCM</a>, <a class="el" href="class_o_c_b.html#ad0d5a8d62870879168a7d40dc3d48bf2">OCB</a>, and <a class="el" href="class_e_a_x.html#aa4b303a623b49f0b8771e5bedcab5d96">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ad020b507efe58cb0f04923f9dd81bdf5">GCM</a>, and <a class="el" href="class_e_a_x.html#aa4b303a623b49f0b8771e5bedcab5d96">EAX</a>.</p>
 
 </div>
 </div>
@@ -582,12 +581,12 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: Returns the full finalized MAC code value array </p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoCipherModeException</td><td>Thrown if the cipher has not been finalized</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher has not been finalized</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a8e924362ca77125c395fe7d3d3a5f23b">GCM</a>, <a class="el" href="class_o_c_b.html#a52002791c389e332731fa1660db059e1">OCB</a>, and <a class="el" href="class_e_a_x.html#aab8a643c16f3f3812849580a98ba6584">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a8e924362ca77125c395fe7d3d3a5f23b">GCM</a>, and <a class="el" href="class_e_a_x.html#aab8a643c16f3f3812849580a98ba6584">EAX</a>.</p>
 
 </div>
 </div>
@@ -646,12 +645,12 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>Returns false if the MAC code does not match</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoCipherModeException</td><td>Thrown if the cipher is not initialized for decryption</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized for decryption</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aee978e3db6bc9342bf8b005909c2eb26">GCM</a>, <a class="el" href="class_o_c_b.html#ad92ff46c16e890369355d9221ed6d9b4">OCB</a>, and <a class="el" href="class_e_a_x.html#afbf46607bb416548b7c381dcae30348d">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aee978e3db6bc9342bf8b005909c2eb26">GCM</a>, and <a class="el" href="class_e_a_x.html#afbf46607bb416548b7c381dcae30348d">EAX</a>.</p>
 
 </div>
 </div>

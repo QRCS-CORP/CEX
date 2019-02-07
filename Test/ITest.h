@@ -3,6 +3,7 @@
 
 #include "TestCommon.h"
 #include "TestEventHandler.h"
+#include "../CEX/CryptoException.h"
 
 // New Test Naming convention:
 // object -> specifier
@@ -25,6 +26,7 @@
 namespace Test
 {
 	using namespace CEX;
+	using Exception::CryptoException;
 
 	/// <summary>
 	/// Test Interface

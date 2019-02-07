@@ -104,6 +104,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,9 +119,9 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
-      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
@@ -129,6 +130,7 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <OmitFramePointers>false</OmitFramePointers>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -226,6 +228,7 @@
     <ClInclude Include="..\..\CEX\CexDomain.h" />
     <ClInclude Include="..\..\CEX\BCR.h" />
     <ClInclude Include="..\..\CEX\CexConfig.h" />
+    <ClInclude Include="..\..\CEX\CMUL.h" />
     <ClInclude Include="..\..\CEX\CpuCores.h" />
     <ClInclude Include="..\..\CEX\CpuDetect.h" />
     <ClInclude Include="..\..\CEX\CryptoAsymmetricException.h" />
@@ -259,6 +262,7 @@
     <ClInclude Include="..\..\CEX\ErrorCodes.h" />
     <ClInclude Include="..\..\CEX\Event.h" />
     <ClInclude Include="..\..\CEX\ExceptionTypes.h" />
+    <ClInclude Include="..\..\CEX\GHASH.h" />
     <ClInclude Include="..\..\CEX\KdfBase.h" />
     <ClInclude Include="..\..\CEX\KmacModes.h" />
     <ClInclude Include="..\..\CEX\LockingAllocator.h" />
@@ -278,7 +282,6 @@
     <ClInclude Include="..\..\CEX\FileStream.h" />
     <ClInclude Include="..\..\CEX\Drbgs.h" />
     <ClInclude Include="..\..\CEX\GCM.h" />
-    <ClInclude Include="..\..\CEX\GHASH.h" />
     <ClInclude Include="..\..\CEX\GMAC.h" />
     <ClInclude Include="..\..\CEX\IAsymmetricParameters.h" />
     <ClInclude Include="..\..\CEX\IAuthenticate.h" />
@@ -435,6 +438,7 @@
     <ClCompile Include="..\..\CEX\CJP.cpp" />
     <ClCompile Include="..\..\CEX\CMAC.cpp" />
     <ClCompile Include="..\..\CEX\BCR.cpp" />
+    <ClCompile Include="..\..\CEX\CMUL.cpp" />
     <ClCompile Include="..\..\CEX\CpuDetect.cpp" />
     <ClCompile Include="..\..\CEX\CryptoAsymmetricException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoAuthenticationFailure.cpp" />
@@ -464,6 +468,9 @@
     <ClCompile Include="..\..\CEX\EAX.cpp" />
     <ClCompile Include="..\..\CEX\ECB.cpp" />
     <ClCompile Include="..\..\CEX\ECP.cpp" />
+    <ClCompile Include="..\..\CEX\ErrorCodes.cpp" />
+    <ClCompile Include="..\..\CEX\ExceptionTypes.cpp" />
+    <ClCompile Include="..\..\CEX\GHASH.cpp" />
     <ClCompile Include="..\..\CEX\KdfBase.cpp" />
     <ClCompile Include="..\..\CEX\Kdfs.cpp" />
     <ClCompile Include="..\..\CEX\Keccak.cpp" />
@@ -489,7 +496,6 @@
     <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
     <ClCompile Include="..\..\CEX\GCM.cpp" />
-    <ClCompile Include="..\..\CEX\GHASH.cpp" />
     <ClCompile Include="..\..\CEX\GMAC.cpp" />
     <ClCompile Include="..\..\CEX\HKDF.cpp" />
     <ClCompile Include="..\..\CEX\HMAC.cpp" />

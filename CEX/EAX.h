@@ -168,7 +168,6 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The enumeration name of the block cipher</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an invalid block cipher type is used</exception>
 	explicit EAX(BlockCiphers CipherType);

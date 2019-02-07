@@ -38,13 +38,13 @@ public:
 	CryptoException() = delete;
 
 	/// <summary>
-	/// Constructor: instantiate this class with an origin, message and inner exception
+	/// Constructor: instantiate this class with an location, origin, message and error code
 	/// </summary>
 	///
-	/// <param name="Origin">The origin of the exception</param>
+	/// <param name="Location">The class location of the exception</param>
+	/// <param name="Origin">The originating function</param>
 	/// <param name="Message">A custom message or error data</param>
-	/// <param name="Detail">The inner exception string</param>
-	/// <param name="ErrorCode">The error code enumeral</param>
+	/// <param name="ErrorCode">The error codes enumeration member</param>
 	CryptoException(const std::string &Location, const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode);
 
 	/// <summary>
@@ -55,12 +55,12 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read: The exception eror code
+	/// Read: The exception error code
 	/// </summary>
 	const ErrorCodes ErrorCode();
 
 	/// <summary>
-	/// Read Only: The exceptions type name
+	/// Read Only: The exception class type name
 	/// </summary>
 	const ExceptionTypes Enumeral();
 
@@ -73,6 +73,11 @@ public:
 	/// Read: The message associated with the error
 	/// </summary>
 	const std::string Message();
+
+	/// <summary>
+	/// Read: The formal name of this exception type
+	/// </summary>
+	const std::string Name();
 
 	/// <summary>
 	/// Read: The origin of the exception in the format Class

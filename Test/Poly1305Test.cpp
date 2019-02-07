@@ -72,7 +72,7 @@ namespace Test
 			Kat(gen, m_key[17], m_message[17], m_expected[17]);
 			Kat(gen, m_key[18], m_message[18], m_expected[18]);
 			Kat(gen, m_key[19], m_message[19], m_expected[19]);
-			OnProgress(std::string("Poly1305Test: Passed Poly1305 sequential known answer vector tests.."));
+			OnProgress(std::string("Poly1305Test: Passed Poly1305 known answer vector tests.."));
 
 			Params(gen);
 			OnProgress(std::string("Poly1305Test: Passed Poly1305 initialization parameters tests.."));
@@ -87,6 +87,14 @@ namespace Test
 		catch (TestException const &ex)
 		{
 			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
+		}
+		catch (CryptoMacException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
+		}
+		catch (CryptoException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
 		}
 		catch (std::exception const &ex)
 		{
@@ -367,24 +375,35 @@ namespace Test
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXMSG, MINMSG));
-			msg.resize(INPLEN);
-
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
-			SymmetricKey kp(key);
-
-			// compute
-			Generator->Initialize(kp);
-			Generator->Compute(msg, code1);
-			// update/finalize
-			Generator->Initialize(kp);
-			Generator->Update(msg, 0, msg.size());
-			Generator->Finalize(code2, 0);
-
-			if (code1 != code2)
+			try
 			{
-				throw TestException(std::string("Stress"), Generator->Name(), std::string("MAC output is not equal! -PS1"));
+				const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXMSG, MINMSG));
+				msg.resize(INPLEN);
+
+				IntegerTools::Fill(key, 0, key.size(), rnd);
+				IntegerTools::Fill(msg, 0, msg.size(), rnd);
+				SymmetricKey kp(key);
+
+				// compute
+				Generator->Initialize(kp);
+				Generator->Compute(msg, code1);
+				// update/finalize
+				Generator->Initialize(kp);
+				Generator->Update(msg, 0, msg.size());
+				Generator->Finalize(code2, 0);
+
+				if (code1 != code2)
+				{
+					throw TestException(std::string("Stress"), Generator->Name(), std::string("MAC output is not equal! -PS1"));
+				}
+			}
+			catch (CryptoException&)
+			{
+				throw;
+			}
+			catch (std::exception const&)
+			{
+				throw TestException(std::string("Stress"), Generator->Name(), std::string("The generator has thrown an exception! -KS1"));
 			}
 		}
 	}

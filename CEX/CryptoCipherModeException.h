@@ -18,19 +18,24 @@ class CryptoCipherModeException : public CryptoException
 public:
 
 	/// <summary>
-	/// Constructor: instantiate this class with an origin, message and inner exception
+	/// Constructor: instantiate this class with an location, origin, message and error code
 	/// </summary>
 	///
-	/// <param name="Origin">The origin of the exception</param>
+	/// <param name="Location">The class location of the exception</param>
+	/// <param name="Origin">The originating function</param>
 	/// <param name="Message">A custom message or error data</param>
-	/// <param name="Detail">The inner exception string</param>
-	/// <param name="ErrorCode">The error code enumeral</param>
+	/// <param name="ErrorCode">The error codes enumeration member</param>
 	CryptoCipherModeException(const std::string &Location, const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode);
 
 	/// <summary>
-	/// Read Only: The exceptions type name
+	/// Read Only: The exception class type name
 	/// </summary>
 	const ExceptionTypes Enumeral();
+
+	/// <summary>
+	/// Read: The formal name of this exception type
+	/// </summary>
+	const std::string Name();
 };
 
 NAMESPACE_EXCEPTIONEND

@@ -117,13 +117,13 @@ void RDP::Reset()
 DrandEngines RDP::Capability()
 {
 	DrandEngines eng;
-	CpuDetect detect;
+	CpuDetect dtc;
 
-	if (detect.RDSEED())
+	if (dtc.RDSEED())
 	{
 		eng = DrandEngines::RdSeed;
 	}
-	else if (detect.RDRAND())
+	else if (dtc.RDRAND())
 	{
 		eng = DrandEngines::RdRand;
 	}

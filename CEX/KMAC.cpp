@@ -17,8 +17,8 @@ class KMAC::KmacState
 {
 public:
 
-	std::array<ulong, STATE_SIZE> State = { 0 };
-	std::array<byte, BUFFER_SIZE> Buffer = { 0 };
+	std::array<ulong, STATE_SIZE> State = { 0ULL };
+	std::array<byte, BUFFER_SIZE> Buffer = { 0x00 };
 	size_t BlockSize;
 	size_t MacSize;
 	size_t Position;
@@ -59,8 +59,7 @@ KMAC::KMAC(KmacModes KmacModeType)
 		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
 			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
 			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
-			KmacModeType == KmacModes::KMAC1024 ? Keccak::KECCAK_RATE1024_SIZE :
-				throw CryptoMacException(std::string("KMAC"), std::string("Constructor"), std::string("The kmac mode type is not supported!"), ErrorCodes::InvalidParam)),
+			KmacModeType == KmacModes::KMAC1024 ? Keccak::KECCAK_RATE1024_SIZE : 0),
 		static_cast<Macs>(KmacModeType),
 		KmacModeConvert::ToName(KmacModeType),
 		std::vector<SymmetricKeySize> {
@@ -112,7 +111,8 @@ KMAC::KMAC(KmacModes KmacModeType)
 			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
 			Keccak::KECCAK_MESSAGE1024_SIZE)),
 	m_isInitialized(false),
-	m_kmacState(new KmacState(BlockSize(), TagSize(), KmacModeType))
+	m_kmacState(KmacModeType != KmacModes::None ? new KmacState(BlockSize(), TagSize(), KmacModeType) :
+		throw CryptoMacException(std::string("KMAC"), std::string("Constructor"), std::string("The kmac mode type is not supported!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -163,8 +163,8 @@ void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	std::vector<byte> buf(sizeof(size_t) + 1);
-	size_t i;
 	size_t blen;
+	size_t i;
 	size_t olen;
 
 	if (!IsInitialized())
@@ -198,12 +198,30 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	return olen;
 }
 
+size_t KMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+{
+	std::vector<byte> tag(TagSize());
+
+	Finalize(tag, 0);
+	Move(tag, Output, OutOffset);
+
+	return TagSize();
+}
+
 void KMAC::Initialize(ISymmetricKey &KeyParams)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (KeyParams.Key().size() < MinimumKeySize())
 	{
-		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
+
 	if (KeyParams.Nonce().size() != 0 && KeyParams.Nonce().size() < MinimumSaltSize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
@@ -243,7 +261,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)

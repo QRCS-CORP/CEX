@@ -588,12 +588,6 @@
     <ClInclude Include="..\..\CEX\GCM.h">
       <Filter>Header Files\Cipher\Block\AEAD</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\GMAC.h">
-      <Filter>Header Files\Mac</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\GHASH.h">
-      <Filter>Header Files\Mac\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SimdProfiles.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -954,6 +948,15 @@
     <ClInclude Include="..\..\CEX\KmacModes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\CMUL.h">
+      <Filter>Header Files\Numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\GHASH.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\GMAC.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1085,9 +1088,6 @@
     <ClCompile Include="..\..\CEX\GCM.cpp">
       <Filter>Source Files\Cipher\Block\AEAD</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\GMAC.cpp">
-      <Filter>Source Files\Mac</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Skein256.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
@@ -1147,9 +1147,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\CryptoSymmetricCipherException.cpp">
       <Filter>Source Files\Exception</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\GHASH.cpp">
-      <Filter>Source Files\Mac\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\RingLWE.cpp">
       <Filter>Source Files\Asymmetric\Encrypt\RingLWE</Filter>
@@ -1434,6 +1431,21 @@
       <Filter>Source Files\Mac\Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\KmacModes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CMUL.cpp">
+      <Filter>Source Files\Numeric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\GHASH.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\GMAC.cpp">
+      <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ExceptionTypes.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ErrorCodes.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
   </ItemGroup>

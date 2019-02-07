@@ -125,8 +125,8 @@ bool SystemTools::HasRdRand()
 	if (!HAS_RDRAND)
 	{
 #if defined(__AVX__)
-		CpuDetect detect;
-		HAS_RDRAND = detect.RDRAND();
+		CpuDetect dtc;
+		HAS_RDRAND = dtc.RDRAND();
 #else
 		HAS_RDRAND = false;
 #endif
@@ -140,8 +140,8 @@ bool SystemTools::HasRdtsc()
 	if (!TMR_RDTSC)
 	{
 #if defined(__AVX__)
-		CpuDetect detect;
-		TMR_RDTSC = detect.RDTSCP();
+		CpuDetect dtc;
+		TMR_RDTSC = dtc.RDTSCP();
 #else
 		TMR_RDTSC = false;
 #endif

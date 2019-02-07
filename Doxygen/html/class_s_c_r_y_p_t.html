@@ -82,6 +82,7 @@ Inheritance diagram for SCRYPT:</div>
  <div class="center">
   <img src="class_s_c_r_y_p_t.png" usemap="#SCRYPT_map" alt=""/>
   <map id="SCRYPT_map" name="SCRYPT_map">
+<area href="class_kdf_base.html" title="The KDF base class; this is not an operable class " alt="KdfBase" shape="rect" coords="0,56,61,80"/>
 <area href="class_i_kdf.html" title="Key Derivation Function (KDF) interface class " alt="IKdf" shape="rect" coords="0,0,61,24"/>
 </map>
  </div></div>
@@ -109,57 +110,67 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5b8c0f233740663ca2d7a8c5b18d0f3f"><td class="memItemLeft" align="right" valign="top">size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a5b8c0f233740663ca2d7a8c5b18d0f3f">CpuCost</a> ()</td></tr>
 <tr class="memdesc:a5b8c0f233740663ca2d7a8c5b18d0f3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The CPU cost parameter; increasing this value affects the cpu and memory cost.  <a href="#a5b8c0f233740663ca2d7a8c5b18d0f3f">More...</a><br /></td></tr>
 <tr class="separator:a5b8c0f233740663ca2d7a8c5b18d0f3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33032f41980f4b86b219874476f363b1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a33032f41980f4b86b219874476f363b1">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a33032f41980f4b86b219874476f363b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Kdf generators type name  <a href="#a33032f41980f4b86b219874476f363b1">More...</a><br /></td></tr>
-<tr class="separator:a33032f41980f4b86b219874476f363b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8824e34473190144f890e4a750085be6"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a8824e34473190144f890e4a750085be6">IsInitialized</a> () override</td></tr>
-<tr class="memdesc:a8824e34473190144f890e4a750085be6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Generator is ready to produce random  <a href="#a8824e34473190144f890e4a750085be6">More...</a><br /></td></tr>
+<tr class="memdesc:a8824e34473190144f890e4a750085be6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Generator is initialized and ready to produce pseudo-random  <a href="#a8824e34473190144f890e4a750085be6">More...</a><br /></td></tr>
 <tr class="separator:a8824e34473190144f890e4a750085be6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a420de010f7fd114655973b9121700214"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a420de010f7fd114655973b9121700214">IsParallel</a> ()</td></tr>
 <tr class="memdesc:a420de010f7fd114655973b9121700214"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#a420de010f7fd114655973b9121700214">More...</a><br /></td></tr>
 <tr class="separator:a420de010f7fd114655973b9121700214"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89b0ada56677c02cc3e91578b174ad71"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a89b0ada56677c02cc3e91578b174ad71">MinKeySize</a> () override</td></tr>
-<tr class="memdesc:a89b0ada56677c02cc3e91578b174ad71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Minimum recommended initialization key size in bytes.  <a href="#a89b0ada56677c02cc3e91578b174ad71">More...</a><br /></td></tr>
-<tr class="separator:a89b0ada56677c02cc3e91578b174ad71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9572aad55eddc5d404b39b4329677c53"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a9572aad55eddc5d404b39b4329677c53">LegalKeySizes</a> () const override</td></tr>
-<tr class="memdesc:a9572aad55eddc5d404b39b4329677c53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Available Kdf Key Sizes in bytes  <a href="#a9572aad55eddc5d404b39b4329677c53">More...</a><br /></td></tr>
-<tr class="separator:a9572aad55eddc5d404b39b4329677c53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d77232318901a82046dbc1c844b87be"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a2d77232318901a82046dbc1c844b87be">Name</a> () override</td></tr>
-<tr class="memdesc:a2d77232318901a82046dbc1c844b87be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Kdf generators class name  <a href="#a2d77232318901a82046dbc1c844b87be">More...</a><br /></td></tr>
-<tr class="separator:a2d77232318901a82046dbc1c844b87be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab111b9b2523671a0d7f1358e676d9aa3"><td class="memItemLeft" align="right" valign="top">size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#ab111b9b2523671a0d7f1358e676d9aa3">Parallelization</a> ()</td></tr>
 <tr class="memdesc:ab111b9b2523671a0d7f1358e676d9aa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Parallelization parameter; indicates the number of threads used by the generator.  <a href="#ab111b9b2523671a0d7f1358e676d9aa3">More...</a><br /></td></tr>
 <tr class="separator:ab111b9b2523671a0d7f1358e676d9aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57a600978ef6e06be8bbee24c0be1d9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_parallel_options.html">ParallelOptions</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a57a600978ef6e06be8bbee24c0be1d9f">ParallelProfile</a> ()</td></tr>
 <tr class="memdesc:a57a600978ef6e06be8bbee24c0be1d9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Parallel and SIMD capability flags and sizes  <a href="#a57a600978ef6e06be8bbee24c0be1d9f">More...</a><br /></td></tr>
 <tr class="separator:a57a600978ef6e06be8bbee24c0be1d9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad482860c7d9a52461043da6cc59be53d"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#ad482860c7d9a52461043da6cc59be53d">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:ad482860c7d9a52461043da6cc59be53d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo random bytes  <a href="#ad482860c7d9a52461043da6cc59be53d">More...</a><br /></td></tr>
-<tr class="separator:ad482860c7d9a52461043da6cc59be53d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a602e700ace6ce980ab416533df40d250"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a602e700ace6ce980ab416533df40d250">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
-<tr class="memdesc:a602e700ace6ce980ab416533df40d250"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo random bytes using offset and length parameters  <a href="#a602e700ace6ce980ab416533df40d250">More...</a><br /></td></tr>
-<tr class="separator:a602e700ace6ce980ab416533df40d250"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad022ec2d12351abe3114aa6a772ed026"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#ad022ec2d12351abe3114aa6a772ed026">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam) override</td></tr>
-<tr class="memdesc:ad022ec2d12351abe3114aa6a772ed026"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key, and optional salt, and info string.  <a href="#ad022ec2d12351abe3114aa6a772ed026">More...</a><br /></td></tr>
-<tr class="separator:ad022ec2d12351abe3114aa6a772ed026"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01ddf82ce09b2b6f5ead8788ec3e8253"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a01ddf82ce09b2b6f5ead8788ec3e8253">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
-<tr class="memdesc:a01ddf82ce09b2b6f5ead8788ec3e8253"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key.  <a href="#a01ddf82ce09b2b6f5ead8788ec3e8253">More...</a><br /></td></tr>
-<tr class="separator:a01ddf82ce09b2b6f5ead8788ec3e8253"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a75e2af53666b1519275e3bc43be37485"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a75e2af53666b1519275e3bc43be37485">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:a75e2af53666b1519275e3bc43be37485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, using length and offset arguments  <a href="#a75e2af53666b1519275e3bc43be37485">More...</a><br /></td></tr>
-<tr class="separator:a75e2af53666b1519275e3bc43be37485"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a593dee1a486a1442e1ea25862b13c72f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a593dee1a486a1442e1ea25862b13c72f">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt) override</td></tr>
-<tr class="memdesc:a593dee1a486a1442e1ea25862b13c72f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays  <a href="#a593dee1a486a1442e1ea25862b13c72f">More...</a><br /></td></tr>
-<tr class="separator:a593dee1a486a1442e1ea25862b13c72f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58535b668bc4f231a2cc269c3e86d328"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a58535b668bc4f231a2cc269c3e86d328">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt, const std::vector&lt; byte &gt; &amp;Info) override</td></tr>
-<tr class="memdesc:a58535b668bc4f231a2cc269c3e86d328"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, a salt array, and an information string or nonce  <a href="#a58535b668bc4f231a2cc269c3e86d328">More...</a><br /></td></tr>
-<tr class="separator:a58535b668bc4f231a2cc269c3e86d328"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8e4d358664c6ed9dfb21a44a7e9f660"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#ab8e4d358664c6ed9dfb21a44a7e9f660">ReSeed</a> (const std::vector&lt; byte &gt; &amp;Seed) override</td></tr>
-<tr class="memdesc:ab8e4d358664c6ed9dfb21a44a7e9f660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material  <a href="#ab8e4d358664c6ed9dfb21a44a7e9f660">More...</a><br /></td></tr>
-<tr class="separator:ab8e4d358664c6ed9dfb21a44a7e9f660"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c0103127089fcb7aebf8c197a2842e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a2c0103127089fcb7aebf8c197a2842e5">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:a2c0103127089fcb7aebf8c197a2842e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#a2c0103127089fcb7aebf8c197a2842e5">More...</a><br /></td></tr>
+<tr class="separator:a2c0103127089fcb7aebf8c197a2842e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3763ee896665b926b9c2f14e970a468"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#af3763ee896665b926b9c2f14e970a468">Generate</a> (SecureVector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:af3763ee896665b926b9c2f14e970a468"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes  <a href="#af3763ee896665b926b9c2f14e970a468">More...</a><br /></td></tr>
+<tr class="separator:af3763ee896665b926b9c2f14e970a468"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dd2b4ff2ab1c9284c12372d748471ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a6dd2b4ff2ab1c9284c12372d748471ce">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a6dd2b4ff2ab1c9284c12372d748471ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array with pseudo-random bytes, using offset and length parameters  <a href="#a6dd2b4ff2ab1c9284c12372d748471ce">More...</a><br /></td></tr>
+<tr class="separator:a6dd2b4ff2ab1c9284c12372d748471ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca71c8495467d278963999080b8ee29f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#aca71c8495467d278963999080b8ee29f">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:aca71c8495467d278963999080b8ee29f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes, using offset and length parameters  <a href="#aca71c8495467d278963999080b8ee29f">More...</a><br /></td></tr>
+<tr class="separator:aca71c8495467d278963999080b8ee29f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a3956ae267ade11ec59aa3884c4a94b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a8a3956ae267ade11ec59aa3884c4a94b">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
+<tr class="memdesc:a8a3956ae267ade11ec59aa3884c4a94b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string  <a href="#a8a3956ae267ade11ec59aa3884c4a94b">More...</a><br /></td></tr>
+<tr class="separator:a8a3956ae267ade11ec59aa3884c4a94b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a19767a300b429430aab1884dd6d91933"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a19767a300b429430aab1884dd6d91933">Reset</a> () override</td></tr>
-<tr class="memdesc:a19767a300b429430aab1884dd6d91933"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state; Kdf must be re-initialized before it can be used again  <a href="#a19767a300b429430aab1884dd6d91933">More...</a><br /></td></tr>
+<tr class="memdesc:a19767a300b429430aab1884dd6d91933"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state; the generator must be re-initialized before it can be used again  <a href="#a19767a300b429430aab1884dd6d91933">More...</a><br /></td></tr>
 <tr class="separator:a19767a300b429430aab1884dd6d91933"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_class_kdf_base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_kdf_base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_kdf_base.html">KdfBase</a></td></tr>
+<tr class="memitem:a8277272553b139b0ae89fbdb28de38af inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#a8277272553b139b0ae89fbdb28de38af">KdfBase</a> (const <a class="el" href="class_kdf_base.html">KdfBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a8277272553b139b0ae89fbdb28de38af inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_kdf_base.html#a8277272553b139b0ae89fbdb28de38af">More...</a><br /></td></tr>
+<tr class="separator:a8277272553b139b0ae89fbdb28de38af inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13619385219ea86ca137f4b8a3f30165 inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_kdf_base.html">KdfBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#a13619385219ea86ca137f4b8a3f30165">operator=</a> (const <a class="el" href="class_kdf_base.html">KdfBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a13619385219ea86ca137f4b8a3f30165 inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="class_kdf_base.html#a13619385219ea86ca137f4b8a3f30165">More...</a><br /></td></tr>
+<tr class="separator:a13619385219ea86ca137f4b8a3f30165 inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adad58efb29b9c4268aa42d74f26d3130 inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#adad58efb29b9c4268aa42d74f26d3130">KdfBase</a> ()=delete</td></tr>
+<tr class="memdesc:adad58efb29b9c4268aa42d74f26d3130 inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: the default constructor is restricted, this function has been deleted  <a href="class_kdf_base.html#adad58efb29b9c4268aa42d74f26d3130">More...</a><br /></td></tr>
+<tr class="separator:adad58efb29b9c4268aa42d74f26d3130 inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac193a9a9863a297d1fa3da0c6465dcd9 inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#ac193a9a9863a297d1fa3da0c6465dcd9">KdfBase</a> (<a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> <a class="el" href="class_kdf_base.html#ad274fa27a7dd18065ecc8c5f61ac8935">Enumeral</a>, size_t MinimumKey, size_t MinimumSalt, std::string &amp;<a class="el" href="class_kdf_base.html#adfc5a53837c85cac391871dca137222a">Name</a>, std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;KeySizes)</td></tr>
+<tr class="memdesc:ac193a9a9863a297d1fa3da0c6465dcd9 inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class (private member)  <a href="class_kdf_base.html#ac193a9a9863a297d1fa3da0c6465dcd9">More...</a><br /></td></tr>
+<tr class="separator:ac193a9a9863a297d1fa3da0c6465dcd9 inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a134f2219716892770d0a51a4e3967a1c inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#a134f2219716892770d0a51a4e3967a1c">~KdfBase</a> ()</td></tr>
+<tr class="memdesc:a134f2219716892770d0a51a4e3967a1c inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="class_kdf_base.html#a134f2219716892770d0a51a4e3967a1c">More...</a><br /></td></tr>
+<tr class="separator:a134f2219716892770d0a51a4e3967a1c inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad274fa27a7dd18065ecc8c5f61ac8935 inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#ad274fa27a7dd18065ecc8c5f61ac8935">Enumeral</a> () override</td></tr>
+<tr class="memdesc:ad274fa27a7dd18065ecc8c5f61ac8935 inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The prngs type name  <a href="class_kdf_base.html#ad274fa27a7dd18065ecc8c5f61ac8935">More...</a><br /></td></tr>
+<tr class="separator:ad274fa27a7dd18065ecc8c5f61ac8935 inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6a3e6b5c874665f666dc051857a4d1f inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#ae6a3e6b5c874665f666dc051857a4d1f">LegalKeySizes</a> () const override</td></tr>
+<tr class="memdesc:ae6a3e6b5c874665f666dc051857a4d1f inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Available KDF Key Sizes in SymmetricKeySize containers  <a href="class_kdf_base.html#ae6a3e6b5c874665f666dc051857a4d1f">More...</a><br /></td></tr>
+<tr class="separator:ae6a3e6b5c874665f666dc051857a4d1f inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae96f11a6ae02e090da6298ed89140256 inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#ae96f11a6ae02e090da6298ed89140256">MinimumKeySize</a> () override</td></tr>
+<tr class="memdesc:ae96f11a6ae02e090da6298ed89140256 inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Minimum recommended initialization key size in bytes  <a href="class_kdf_base.html#ae96f11a6ae02e090da6298ed89140256">More...</a><br /></td></tr>
+<tr class="separator:ae96f11a6ae02e090da6298ed89140256 inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5534826cd6d35eb92c0f163bfa449c2 inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#ae5534826cd6d35eb92c0f163bfa449c2">MinimumSaltSize</a> () override</td></tr>
+<tr class="memdesc:ae5534826cd6d35eb92c0f163bfa449c2 inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Minimum recommended salt size in bytes  <a href="class_kdf_base.html#ae5534826cd6d35eb92c0f163bfa449c2">More...</a><br /></td></tr>
+<tr class="separator:ae5534826cd6d35eb92c0f163bfa449c2 inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfc5a53837c85cac391871dca137222a inherit pub_methods_class_kdf_base"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_base.html#adfc5a53837c85cac391871dca137222a">Name</a> () override</td></tr>
+<tr class="memdesc:adfc5a53837c85cac391871dca137222a inherit pub_methods_class_kdf_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">The KDF generators formal class name  <a href="class_kdf_base.html#adfc5a53837c85cac391871dca137222a">More...</a><br /></td></tr>
+<tr class="separator:adfc5a53837c85cac391871dca137222a inherit pub_methods_class_kdf_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_kdf"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_kdf')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_kdf.html">IKdf</a></td></tr>
 <tr class="memitem:a2e2389da178b392c24961387717d5b3f inherit pub_methods_class_i_kdf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_kdf.html#a2e2389da178b392c24961387717d5b3f">IKdf</a> (const <a class="el" href="class_i_kdf.html">IKdf</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a2e2389da178b392c24961387717d5b3f inherit pub_methods_class_i_kdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_kdf.html#a2e2389da178b392c24961387717d5b3f">More...</a><br /></td></tr>
@@ -176,11 +187,14 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Key Derivation Function: SCRYPT </p>
-<p>Generate an array of pseudo random bytes: </p><div class="fragment"><div class="line"><span class="comment">// set to 10,000 rounds (default: 4000)</span></div><div class="line"><a class="code" href="class_s_c_r_y_p_t.html">SCRYPT</a> kdf(Enumeration::Digests::SHA256, 16384, 8, 1);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">kdf.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, [Salt]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">kdf.Generate(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>Generate an array of pseudo-random bytes: </p><div class="fragment"><div class="line"><span class="comment">// set to 10,000 rounds (default: 4000)</span></div><div class="line"><a class="code" href="class_s_c_r_y_p_t.html">SCRYPT</a> kdf(Enumeration::Digests::SHA256, 16384, 8, 1);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">kdf.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, [Salt]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">kdf.Generate(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>SCRYPT is a password-based key derivation function created by Colin Percival, originally for the Tarsnap online backup service. <br />
-SCRYPT uses a combination of a message digest and the Salsa stream cipher to make it costly to perform large-scale hardware attacks by requiring large amounts of memory to generate an output key. <br />
-Using the same input key, and optional salt, produces the exact same output. <br />
-It is recommended that a salt value is added along with the key.</p>
+SCRYPT uses a combination of an underlying message digest and the Salsa stream cipher permutation function to make it costly to perform large-scale hardware attacks by requiring large amounts of memory to generate an output key. <br />
+Using the same input key, and optional salt, will produce the exact same output. <br />
+It is recommended that a salt value is added along with the key, this strongly mitigates rainbow-table based attacks on the passphrase. <br />
+The minimum key size should align with the expected security level of the generator function. <br />
+For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. <br />
+This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
 <p><b>Description:</b> <br />
 <em>Legend:</em> <br />
 <b>P</b>=passphrase, <b>S</b>=salt, <b>N</b>=cpu/memory cost, <b>r</b>=block-size, <b>P</b>=parallelization parameter, <b>DK</b>=derived key <br />
@@ -194,15 +208,17 @@ It is recommended that a salt value is added along with the key.</p>
 <li>
 This implementation only supports the SHA2-256 and SHA2-512 message digests. </li>
 <li>
-Class can be initialized with a message digest instance, or by using a digests enumeration type name. </li>
+SCRYPT can be initialized with a message digest instance, or by using a digests enumeration type name. </li>
 <li>
-The minimum key size is the size the digests return array in bytes, a key equal to the digests block size is recommended. </li>
+The minimum recommended key size is the size the underlying digests output-size in bytes. </li>
 <li>
 The use of a salt value can strongly mitigate some attack vectors targeting the key, and is highly recommended with SCRYPT. </li>
 <li>
-The minimum salt size is 4 bytes, larger (pseudo-random) salt values are more secure. </li>
+The minimum salt size is 4 bytes, however larger pseudo-random salt values are more secure. </li>
 <li>
-The generator must be initialized with a key using one of the Initialize() functions before output can be generated. </li>
+The generator must be initialized with a key using the Initialize() functions before output can be generated. </li>
+<li>
+The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material. </li>
 </ul>
 <p><b>Guiding Publications:</b> </p><ol>
 <li>
@@ -326,7 +342,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 <p>Change this value to multiply the cpu cost by this factor, the default value is 1. Setting this value to 0 will automatically use the number of system processor cores.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if an invalid digest name or parameters are used</td></tr>
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if an invalid digest name or parameters are used</td></tr>
   </table>
   </dd>
 </dl>
@@ -392,7 +408,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 <p>Change this value to multiply the cpu cost by this factor, the default value is 1. Setting this value to 0 will automatically use the number of system processor cores.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if a null digest or invalid parameters are used</td></tr>
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if a null digest or invalid parameters are used</td></tr>
   </table>
   </dd>
 </dl>
@@ -447,8 +463,8 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 
 </div>
 </div>
-<a id="a33032f41980f4b86b219874476f363b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33032f41980f4b86b219874476f363b1">&#9670;&nbsp;</a></span>Enumeral()</h2>
+<a id="a2c0103127089fcb7aebf8c197a2842e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c0103127089fcb7aebf8c197a2842e5">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -457,36 +473,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> SCRYPT::Enumeral </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The Kdf generators type name </p>
-
-<p>Implements <a class="el" href="class_i_kdf.html#a53a335b836fe5c9b5d95b75e555b0113">IKdf</a>.</p>
-
-</div>
-</div>
-<a id="ad482860c7d9a52461043da6cc59be53d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad482860c7d9a52461043da6cc59be53d">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t SCRYPT::Generate </td>
+          <td class="memname">void SCRYPT::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -500,21 +487,26 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Generate a block of pseudo random bytes </p>
+<p>Fill a standard vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if the maximum request size is exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implements <a class="el" href="class_i_kdf.html#a734cc71c00aaee070c8ae09f84d8c52f">IKdf</a>.</p>
+<p>Implements <a class="el" href="class_i_kdf.html#ae4170f0bc1047c634f00d66bb3314e66">IKdf</a>.</p>
 
 </div>
 </div>
-<a id="a602e700ace6ce980ab416533df40d250"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a602e700ace6ce980ab416533df40d250">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/2]</span></h2>
+<a id="af3763ee896665b926b9c2f14e970a468"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3763ee896665b926b9c2f14e970a468">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -523,151 +515,52 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t SCRYPT::Generate </td>
+          <td class="memname">void SCRYPT::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector with pseudo-random bytes </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if the maximum request size is exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_kdf.html#a17946a6232716bd83a28c86e061521a7">IKdf</a>.</p>
+
+</div>
+</div>
+<a id="a6dd2b4ff2ab1c9284c12372d748471ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dd2b4ff2ab1c9284c12372d748471ce">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SCRYPT::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Generate pseudo random bytes using offset and length parameters </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting position within the Output array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
-
-<p>Implements <a class="el" href="class_i_kdf.html#ae2913d74bf129e0910d578b0bb41367f">IKdf</a>.</p>
-
-</div>
-</div>
-<a id="ad022ec2d12351abe3114aa6a772ed026"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad022ec2d12351abe3114aa6a772ed026">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[1/5]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SCRYPT::Initialize </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>GenParam</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with a SymmetricKey structure containing the key, and optional salt, and info string. </p>
-<p>The use of a salt value mitigates some attacks against a passphrase, and is highly recommended with SCRYPT.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">GenParam</td><td>The SymmetricKey containing the generators keying material</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the seed is not a legal seed size</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_kdf.html#a389f742e9f1a59e3b3bb1d4f708de24a">IKdf</a>.</p>
-
-</div>
-</div>
-<a id="a01ddf82ce09b2b6f5ead8788ec3e8253"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01ddf82ce09b2b6f5ead8788ec3e8253">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[2/5]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SCRYPT::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with a key. </p>
-<p>The use of a salt value mitigates some attacks against a passphrase, and is highly recommended with SCRYPT.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_kdf.html#a32badd58a069f9d363e5ba62c9df7734">IKdf</a>.</p>
-
-</div>
-</div>
-<a id="a75e2af53666b1519275e3bc43be37485"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75e2af53666b1519275e3bc43be37485">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[3/5]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SCRYPT::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -694,28 +587,28 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the generator with a key, using length and offset arguments </p>
+<p>Fill an array with pseudo-random bytes, using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting position within the key array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of key bytes to use</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if the maximum request size is exceeded</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_kdf.html#a6979e54c8e654607b107d40dd621f4de">IKdf</a>.</p>
+<p>Implements <a class="el" href="class_i_kdf.html#af3b318806e82833fcb5908c9fe6994e3">IKdf</a>.</p>
 
 </div>
 </div>
-<a id="a593dee1a486a1442e1ea25862b13c72f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a593dee1a486a1442e1ea25862b13c72f">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[4/5]</span></h2>
+<a id="aca71c8495467d278963999080b8ee29f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca71c8495467d278963999080b8ee29f">&#9670;&nbsp;</a></span>Generate() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -724,16 +617,22 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void SCRYPT::Initialize </td>
+          <td class="memname">void SCRYPT::Generate </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Salt</em>&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -748,27 +647,28 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the generator with key and salt arrays </p>
+<p>Fill a secure vector with pseudo-random bytes, using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Salt</td><td>The salt value containing an additional source of entropy</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if the maximum request size is exceeded</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_kdf.html#a2bbbec9b4c467530a278d3d4f6a5aaba">IKdf</a>.</p>
+<p>Implements <a class="el" href="class_i_kdf.html#af996f770794e8f433ec85e37fc40e1de">IKdf</a>.</p>
 
 </div>
 </div>
-<a id="a58535b668bc4f231a2cc269c3e86d328"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a58535b668bc4f231a2cc269c3e86d328">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[5/5]</span></h2>
+<a id="a8a3956ae267ade11ec59aa3884c4a94b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a3956ae267ade11ec59aa3884c4a94b">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -779,25 +679,9 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
         <tr>
           <td class="memname">void SCRYPT::Initialize </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
+          <td class="paramname"><em>KeyParams</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Salt</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Info</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -807,23 +691,21 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the generator with a key, a salt array, and an information string or nonce </p>
+<p>Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Salt</td><td>The salt value used as an additional source of entropy</td></tr>
-    <tr><td class="paramname">Info</td><td>The information string or nonce used as a third source of entropy</td></tr>
+    <tr><td class="paramname">KeyParams</td><td>The symmetric key container with the generators keying material</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if the key values are not a legal size</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_kdf.html#ab5562aafa19e2f32a5f857f614a870d1">IKdf</a>.</p>
+<p>Implements <a class="el" href="class_i_kdf.html#ad68bdd14653c346a4588da2f2d7f4430">IKdf</a>.</p>
 
 </div>
 </div>
@@ -850,7 +732,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Generator is ready to produce random </p>
+<p>Read Only: Generator is initialized and ready to produce pseudo-random </p>
 
 <p>Implements <a class="el" href="class_i_kdf.html#aeb505743cba6c93fc200e3f9955e97f7">IKdf</a>.</p>
 
@@ -873,94 +755,6 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 
 <p>Read Only: Processor parallelization availability. </p>
 <p>Indicates whether parallel processing is available with this protocol. Multi-threading and SIMD parallelization can be modified through the ParallelProfile() accessor.</p>
-
-</div>
-</div>
-<a id="a9572aad55eddc5d404b39b4329677c53"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9572aad55eddc5d404b39b4329677c53">&#9670;&nbsp;</a></span>LegalKeySizes()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; SCRYPT::LegalKeySizes </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: Available Kdf Key Sizes in bytes </p>
-
-<p>Implements <a class="el" href="class_i_kdf.html#afb545f6f48d92bf2bbe8874257e9a0eb">IKdf</a>.</p>
-
-</div>
-</div>
-<a id="a89b0ada56677c02cc3e91578b174ad71"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89b0ada56677c02cc3e91578b174ad71">&#9670;&nbsp;</a></span>MinKeySize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t SCRYPT::MinKeySize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Minimum recommended initialization key size in bytes. </p>
-<p>Combined sizes of key, salt, and info should be at least this size.</p>
-
-<p>Implements <a class="el" href="class_i_kdf.html#a3fb513dea0b1329340a3e4a5a7becf15">IKdf</a>.</p>
-
-</div>
-</div>
-<a id="a2d77232318901a82046dbc1c844b87be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d77232318901a82046dbc1c844b87be">&#9670;&nbsp;</a></span>Name()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::string SCRYPT::Name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The Kdf generators class name </p>
-
-<p>Implements <a class="el" href="class_i_kdf.html#a21ad8c8b25ae0b22e547412db5058e4f">IKdf</a>.</p>
 
 </div>
 </div>
@@ -1032,48 +826,6 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 
 </div>
 </div>
-<a id="ab8e4d358664c6ed9dfb21a44a7e9f660"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab8e4d358664c6ed9dfb21a44a7e9f660">&#9670;&nbsp;</a></span>ReSeed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SCRYPT::ReSeed </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Seed</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Update the generators keying material </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Seed</td><td>The new seed value array</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the seed is not a legal seed size</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_kdf.html#ab6304bdc591f4222d1a24aa4fb10e1ce">IKdf</a>.</p>
-
-</div>
-</div>
 <a id="a19767a300b429430aab1884dd6d91933"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a19767a300b429430aab1884dd6d91933">&#9670;&nbsp;</a></span>Reset()</h2>
 
@@ -1097,7 +849,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Reset the internal state; Kdf must be re-initialized before it can be used again </p>
+<p>Reset the internal state; the generator must be re-initialized before it can be used again </p>
 
 <p>Implements <a class="el" href="class_i_kdf.html#aea4bfd8d91410fb52a51970f40250941">IKdf</a>.</p>
 

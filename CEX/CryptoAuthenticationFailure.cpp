@@ -13,4 +13,9 @@ const ExceptionTypes CryptoAuthenticationFailure::Enumeral()
 	return ExceptionTypes::CryptoAuthenticationFailure;
 }
 
+const std::string CryptoAuthenticationFailure::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

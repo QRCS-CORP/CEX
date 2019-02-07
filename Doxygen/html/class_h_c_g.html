@@ -140,10 +140,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aa15826f52a9c991b6628348bd651f5fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The estimated security strength in bits.  <a href="#aa15826f52a9c991b6628348bd651f5fe">More...</a><br /></td></tr>
 <tr class="separator:aa15826f52a9c991b6628348bd651f5fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7679e06f54695aaa3a407304babbc597"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a7679e06f54695aaa3a407304babbc597">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a7679e06f54695aaa3a407304babbc597"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo random bytes  <a href="#a7679e06f54695aaa3a407304babbc597">More...</a><br /></td></tr>
+<tr class="memdesc:a7679e06f54695aaa3a407304babbc597"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo-random bytes  <a href="#a7679e06f54695aaa3a407304babbc597">More...</a><br /></td></tr>
 <tr class="separator:a7679e06f54695aaa3a407304babbc597"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6096c3b466e866315d411873f1a7c55f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a6096c3b466e866315d411873f1a7c55f">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
-<tr class="memdesc:a6096c3b466e866315d411873f1a7c55f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo random bytes using offset and length parameters  <a href="#a6096c3b466e866315d411873f1a7c55f">More...</a><br /></td></tr>
+<tr class="memdesc:a6096c3b466e866315d411873f1a7c55f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo-random bytes using offset and length parameters  <a href="#a6096c3b466e866315d411873f1a7c55f">More...</a><br /></td></tr>
 <tr class="separator:a6096c3b466e866315d411873f1a7c55f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fd26876fccbfd4dbf9f55eb5b43ff36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a2fd26876fccbfd4dbf9f55eb5b43ff36">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam) override</td></tr>
 <tr class="memdesc:a2fd26876fccbfd4dbf9f55eb5b43ff36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string  <a href="#a2fd26876fccbfd4dbf9f55eb5b43ff36">More...</a><br /></td></tr>
@@ -176,7 +176,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of an HMAC Counter Generator DRBG </p>
-<p>Generate an array of pseudo random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_h_c_g.html">HCG</a> rnd(Digests::SHA512, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0acbc6e9792f97c17c170caeb83895c44e">Providers::CSP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">rnd.Initialize(Seed, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">rnd.Generate(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><b>Description:</b> </p>
+<p>Generate an array of pseudo-random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_h_c_g.html">HCG</a> rnd(Digests::SHA512, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0acbc6e9792f97c17c170caeb83895c44e">Providers::CSP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">rnd.Initialize(Seed, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">rnd.Generate(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><b>Description:</b> </p>
 <p><em>Legend:</em> <br />
  <b>Hm</b>=hmac_function, <b>P</b>=entropy_provider, <b>R</b>=generator_state, <b>K</b>=input_key, <b>Dk</b>=derived_key, <b>Dc</b>=distribution_code, <b>Sc</b>=state_counter, <b>Kc</b>=seed_counter, <b>Df</b>=derivation_function</p>
 <p><b>Derive:</b> <br />
@@ -338,7 +338,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if an unrecognized digest type name is used</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if an unrecognized digest type name is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -389,7 +389,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if a null digest is used</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if a null digest is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -537,7 +537,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Generate a block of pseudo random bytes </p>
+<p>Generate a block of pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
@@ -547,7 +547,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
   </table>
   </dd>
 </dl>
@@ -596,7 +596,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Generate pseudo random bytes using offset and length parameters </p>
+<p>Generate pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
@@ -608,7 +608,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
   </table>
   </dd>
 </dl>
@@ -650,7 +650,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -692,7 +692,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -745,7 +745,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -805,7 +805,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -1137,7 +1137,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is too small</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is too small</td></tr>
   </table>
   </dd>
 </dl>

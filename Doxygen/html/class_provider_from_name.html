@@ -79,15 +79,15 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ace03a10b95ce7bce3b82e07c88217fca"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_provider.html">IProvider</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_from_name.html#ace03a10b95ce7bce3b82e07c88217fca">GetInstance</a> (<a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> ProviderType)</td></tr>
-<tr class="memdesc:ace03a10b95ce7bce3b82e07c88217fca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a Seed Generator instance with default initialization parameters  <a href="#ace03a10b95ce7bce3b82e07c88217fca">More...</a><br /></td></tr>
-<tr class="separator:ace03a10b95ce7bce3b82e07c88217fca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b0440f7b92102d05aaef3f266fab2e9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_provider.html">IProvider</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_from_name.html#a5b0440f7b92102d05aaef3f266fab2e9">GetInstance</a> (<a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> ProviderType)</td></tr>
+<tr class="memdesc:a5b0440f7b92102d05aaef3f266fab2e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a Seed Generator instance with default initialization parameters  <a href="#a5b0440f7b92102d05aaef3f266fab2e9">More...</a><br /></td></tr>
+<tr class="separator:a5b0440f7b92102d05aaef3f266fab2e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get a seed generator instance from it's enumeration name </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ace03a10b95ce7bce3b82e07c88217fca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace03a10b95ce7bce3b82e07c88217fca">&#9670;&nbsp;</a></span>GetInstance()</h2>
+<a id="a5b0440f7b92102d05aaef3f266fab2e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b0440f7b92102d05aaef3f266fab2e9">&#9670;&nbsp;</a></span>GetInstance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -96,7 +96,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_provider.html">IProvider</a> * ProviderFromName::GetInstance </td>
+          <td class="memname"><a class="el" href="class_i_provider.html">IProvider</a> * ProviderFromName::GetInstance </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a>&#160;</td>
           <td class="paramname"><em>ProviderType</em></td><td>)</td>
@@ -120,7 +120,7 @@ Static Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>An initialized entropy provider</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoException</td><td>Thrown if the enumeration name is not supported</td></tr>
+    <tr><td class="paramname">CryptoException</td><td>Thrown if the entropy provider type is not supported</td></tr>
   </table>
   </dd>
 </dl>

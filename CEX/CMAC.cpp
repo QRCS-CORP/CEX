@@ -1,6 +1,5 @@
 #include "CMAC.h"
 #include "IntegerTools.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_MAC
 
@@ -8,7 +7,6 @@ using Enumeration::BlockCipherConvert;
 using Utility::IntegerTools;
 using Enumeration::MacConvert;
 using Utility::MemoryTools;
-using Cipher::SymmetricKey;
 
 class CMAC::CmacState
 {
@@ -44,8 +42,7 @@ public:
 CMAC::CMAC(BlockCiphers CipherType)
 	:
 	MacBase(
-		(CipherType != BlockCiphers::None ? BLOCK_SIZE :
-			throw CryptoMacException(std::string("CMAC"), std::string("Constructor"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam)),
+		BLOCK_SIZE,
 		Macs::CMAC,
 		(MacConvert::ToName(Macs::CMAC) + std::string("-") + BlockCipherConvert::ToName(CipherType)),
 		std::vector<SymmetricKeySize> {
@@ -60,7 +57,8 @@ CMAC::CMAC(BlockCiphers CipherType)
 		MINSALT_LENGTH,
 #endif
 		BLOCK_SIZE),
-	m_cbcMode(new CBC(CipherType)),
+	m_cbcMode(CipherType != BlockCiphers::None ? new CBC(CipherType) :
+		throw CryptoMacException(std::string("CMAC"), std::string("Constructor"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam)),
 	m_cmacState(new CmacState(BLOCK_SIZE, BLOCK_SIZE)),
 	m_isDestroyed(true),
 	m_isInitialized(false),
@@ -71,8 +69,7 @@ CMAC::CMAC(BlockCiphers CipherType)
 CMAC::CMAC(IBlockCipher* Cipher)
 	:
 	MacBase(
-		(Cipher != nullptr ? BLOCK_SIZE :
-			throw CryptoMacException(std::string("CMAC"), std::string("Constructor"), std::string("The cipher can not be null!"), ErrorCodes::IllegalOperation)),
+		BLOCK_SIZE,
 		Macs::CMAC,
 		(Cipher != nullptr ? MacConvert::ToName(Macs::CMAC) + std::string("-") + BlockCipherConvert::ToName(Cipher->Enumeral()) :
 			std::string("")),
@@ -88,7 +85,8 @@ CMAC::CMAC(IBlockCipher* Cipher)
 		MINSALT_LENGTH,
 #endif
 		BLOCK_SIZE),
-	m_cbcMode(new CBC(Cipher)),
+	m_cbcMode(Cipher != nullptr ? new CBC(Cipher) :
+		throw CryptoMacException(std::string("CMAC"), std::string("Constructor"), std::string("The cipher can not be null!"), ErrorCodes::IllegalOperation)),
 	m_cmacState(new CmacState(BLOCK_SIZE, BLOCK_SIZE)),
 	m_isDestroyed(false),
 	m_isInitialized(false),
@@ -191,17 +189,36 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
+size_t CMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+{
+	std::vector<byte> tag(TagSize());
+
+	Finalize(tag, 0);
+	Move(tag, Output, OutOffset);
+	Reset();
+
+	return TagSize();
+}
+
 void CMAC::Initialize(ISymmetricKey &KeyParams)
 {
 	std::vector<byte> k1(BLOCK_SIZE);
 	std::vector<byte> k2(BLOCK_SIZE);
 	std::vector<byte> lu(BLOCK_SIZE);
+	std::vector<byte> tmpv(BLOCK_SIZE);
 	std::vector<byte> tmpz(BLOCK_SIZE);
 
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (KeyParams.Key().size() < MinimumKeySize())
 	{
-		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Key size is invalid; must be a legal key size!"), ErrorCodes::InvalidKey);
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	if (IsInitialized())
 	{
@@ -209,15 +226,17 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 	}
 
 	// initialize the cipher
-	std::vector<byte> tmpv(BLOCK_SIZE);
 	SymmetricKey kp(KeyParams.Key(), tmpv, KeyParams.Info());
 	m_cbcMode->Initialize(true, kp);
+
 	// generate the mac keys
 	m_cbcMode->EncryptBlock(tmpz, 0, lu, 0);
 	DoubleLu(lu, k1);
 	DoubleLu(k1, k2);
-	// store them in a secure key
-	m_luKey.reset(new SymmetricSecureKey(k1, k2));
+
+	// store them in an encrypted secure-key
+	m_luKey.reset(new SymmetricKey(k1, k2));
+
 	// re-initialize the cipher
 	m_cbcMode->Initialize(true, kp);
 	m_isInitialized = true;
@@ -244,7 +263,7 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
@@ -256,6 +275,7 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 		}
 
 		const size_t RMDLEN = BLOCK_SIZE - m_cmacState->Position;
+
 		if (Length > RMDLEN)
 		{
 			MemoryTools::Copy(Input, InOffset, m_cmacState->Buffer, m_cmacState->Position, RMDLEN);
@@ -293,7 +313,7 @@ void CMAC::DoubleLu(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CMAC::Pad(std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (Length != 0 && Offset != Length)
+	if (Offset != Length)
 	{
 		Input[Offset] = 0x80;
 		++Offset;

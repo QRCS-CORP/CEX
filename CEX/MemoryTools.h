@@ -482,7 +482,7 @@ public:
 	/// <para>This is an AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Object">The object pointer to copy memory from</param>
+	/// <param name="Input">The object pointer to copy memory from</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
 	template <typename Object, typename Array>
@@ -962,12 +962,12 @@ public:
 		const size_t INPLEN = sizeof(ArrayA::value_type);
 		const size_t OUTLEN = sizeof(ArrayB::value_type);
 
-		byte* inpPtr = (byte*)Input.data() + (InOffset * INPLEN);
-		byte* outPtr = (byte*)Output.data() + (OutOffset * OUTLEN);
+		byte* inptr = (byte*)Input.data() + (InOffset * INPLEN);
+		byte* outptr = (byte*)Output.data() + (OutOffset * OUTLEN);
 
 		for (size_t i = 0; i < Length; ++i)
 		{
-			outPtr[i] ^= inpPtr[i];
+			outptr[i] ^= inptr[i];
 		}
 	}
 

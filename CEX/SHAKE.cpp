@@ -17,7 +17,7 @@ class SHAKE::ShakeState
 {
 public:
 
-	std::array<ulong, STATE_SIZE> State;
+	std::array<ulong, STATE_SIZE> State = { 0ULL };
 	size_t BlockSize;
 	size_t Counter;
 	size_t HashSize;
@@ -56,8 +56,7 @@ public:
 
 SHAKE::SHAKE(ShakeModes ShakeModeType)
 	:
-	KdfBase(ShakeModeType != ShakeModes::None ? static_cast<Kdfs>(ShakeModeType) : 
-			throw CryptoKdfException(std::string("SHAKE"), std::string("Constructor"), std::string("The shake mode type is not supported!"), ErrorCodes::InvalidParam),
+	KdfBase(static_cast<Kdfs>(ShakeModeType),
 #if defined(CEX_ENFORCE_KEYMIN)
 		(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
 			ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
@@ -104,7 +103,7 @@ SHAKE::SHAKE(ShakeModes ShakeModeType)
 					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
 					Keccak::KECCAK_MESSAGE1024_SIZE))}),
 	m_isInitialized(false),
-	m_shakeState(new ShakeState(
+	m_shakeState(ShakeModeType != ShakeModes::None ? new ShakeState(
 		ShakeModeType, 
 		((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK_RATE128_SIZE :
 			(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_RATE256_SIZE : 
@@ -113,8 +112,9 @@ SHAKE::SHAKE(ShakeModes ShakeModeType)
 		((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK_MESSAGE128_SIZE : 
 			(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_MESSAGE256_SIZE : 
 			(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK_MESSAGE512_SIZE : 
-			Keccak::KECCAK_MESSAGE1024_SIZE),
-		SHAKE_DOMAIN))
+			Keccak::KECCAK_MESSAGE1024_SIZE), 
+		SHAKE_DOMAIN) :
+		throw CryptoKdfException(std::string("SHAKE"), std::string("Constructor"), std::string("The shake mode type is not supported!"), ErrorCodes::InvalidParam))
 {
 	Reset();
 }
@@ -228,10 +228,17 @@ void SHAKE::Initialize(ISymmetricKey &KeyParam)
 
 void SHAKE::Initialize(const std::vector<byte> &Key)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (Key.size() < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	if (IsInitialized())
 	{
@@ -249,10 +256,17 @@ void SHAKE::Initialize(const SecureVector<byte> &Key)
 
 void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Length))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (Length < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	std::vector<byte> tmpk(Length);
 
@@ -262,10 +276,17 @@ void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Lengt
 
 void SHAKE::Initialize(const SecureVector<byte> &Key, size_t Offset, size_t Length)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Length))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (Length < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 16 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	std::vector<byte> tmpk(Length);
 
@@ -275,10 +296,18 @@ void SHAKE::Initialize(const SecureVector<byte> &Key, size_t Offset, size_t Leng
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (Key.size() < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
+
 	if (Customization.size() != 0 && Customization.size() < MinimumSaltSize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Customization value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
@@ -306,15 +335,22 @@ void SHAKE::Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (Key.size() < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
+
 	if (Customization.size() != 0 && Customization.size() < MinimumSaltSize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Customization value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 	}
-
 
 	if (IsInitialized())
 	{
@@ -345,8 +381,6 @@ void SHAKE::Reset()
 
 void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<ShakeState> &State)
 {
-	CEXASSERT(Customization.size() + Information.size() <= 200, "The input buffer is too large");
-
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
 	size_t offset;

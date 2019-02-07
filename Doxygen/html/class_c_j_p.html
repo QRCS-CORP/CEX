@@ -82,7 +82,8 @@ Inheritance diagram for CJP:</div>
  <div class="center">
   <img src="class_c_j_p.png" usemap="#CJP_map" alt=""/>
   <map id="CJP_map" name="CJP_map">
-<area href="class_i_provider.html" title="Entropy source collectors and concentrators interface " alt="IProvider" shape="rect" coords="0,0,64,24"/>
+<area href="class_provider_base.html" title="The entropy provider base class; this is not an operable class " alt="ProviderBase" shape="rect" coords="0,56,89,80"/>
+<area href="class_i_provider.html" title="Entropy source collectors and concentrators interface " alt="IProvider" shape="rect" coords="0,0,89,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -100,48 +101,61 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9f0f46c7ea7982b7a29e14d591e05ec1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a9f0f46c7ea7982b7a29e14d591e05ec1">~CJP</a> () override</td></tr>
 <tr class="memdesc:a9f0f46c7ea7982b7a29e14d591e05ec1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a9f0f46c7ea7982b7a29e14d591e05ec1">More...</a><br /></td></tr>
 <tr class="separator:a9f0f46c7ea7982b7a29e14d591e05ec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5854a8a526bbd6b55f8a428f008c0703"><td class="memItemLeft" align="right" valign="top">bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a5854a8a526bbd6b55f8a428f008c0703">EnableAccess</a> ()</td></tr>
-<tr class="memdesc:a5854a8a526bbd6b55f8a428f008c0703"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Enable the memory access noise source.  <a href="#a5854a8a526bbd6b55f8a428f008c0703">More...</a><br /></td></tr>
-<tr class="separator:a5854a8a526bbd6b55f8a428f008c0703"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74a3747a1f0c1d17ae3ea35ccb95f80c"><td class="memItemLeft" align="right" valign="top">bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a74a3747a1f0c1d17ae3ea35ccb95f80c">EnableDebias</a> ()</td></tr>
-<tr class="memdesc:a74a3747a1f0c1d17ae3ea35ccb95f80c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Enable the Von Neumann debiasing extractor.  <a href="#a74a3747a1f0c1d17ae3ea35ccb95f80c">More...</a><br /></td></tr>
-<tr class="separator:a74a3747a1f0c1d17ae3ea35ccb95f80c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21286d8c61cd62cd0119f82684f6faf9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a21286d8c61cd62cd0119f82684f6faf9">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a21286d8c61cd62cd0119f82684f6faf9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The providers type name  <a href="#a21286d8c61cd62cd0119f82684f6faf9">More...</a><br /></td></tr>
-<tr class="separator:a21286d8c61cd62cd0119f82684f6faf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af91d38ac06ef0ab2a9e97c6066226619"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#af91d38ac06ef0ab2a9e97c6066226619">IsAvailable</a> () override</td></tr>
-<tr class="memdesc:af91d38ac06ef0ab2a9e97c6066226619"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The entropy provider is available on this system.  <a href="#af91d38ac06ef0ab2a9e97c6066226619">More...</a><br /></td></tr>
-<tr class="separator:af91d38ac06ef0ab2a9e97c6066226619"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae196683ea0d8ee9f52c9c6d34f64a730"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#ae196683ea0d8ee9f52c9c6d34f64a730">Name</a> () override</td></tr>
-<tr class="memdesc:ae196683ea0d8ee9f52c9c6d34f64a730"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: provider class name  <a href="#ae196683ea0d8ee9f52c9c6d34f64a730">More...</a><br /></td></tr>
-<tr class="separator:ae196683ea0d8ee9f52c9c6d34f64a730"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89d88ba2fc35e4cffc014eaa32165e11"><td class="memItemLeft" align="right" valign="top">uint &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a89d88ba2fc35e4cffc014eaa32165e11">OverSampleRate</a> ()</td></tr>
-<tr class="memdesc:a89d88ba2fc35e4cffc014eaa32165e11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The number of overlapping passes through the jitter entropy collector.  <a href="#a89d88ba2fc35e4cffc014eaa32165e11">More...</a><br /></td></tr>
-<tr class="separator:a89d88ba2fc35e4cffc014eaa32165e11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a253da65870bf1a3319e4238572c0abed"><td class="memItemLeft" align="right" valign="top">size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a253da65870bf1a3319e4238572c0abed">OverSampleRate</a> ()</td></tr>
+<tr class="memdesc:a253da65870bf1a3319e4238572c0abed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The number of overlapping passes through the jitter entropy collector.  <a href="#a253da65870bf1a3319e4238572c0abed">More...</a><br /></td></tr>
+<tr class="separator:a253da65870bf1a3319e4238572c0abed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a136d1c681be018ea2a22fa9f543f76ee"><td class="memItemLeft" align="right" valign="top">bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a136d1c681be018ea2a22fa9f543f76ee">SecureCache</a> ()</td></tr>
 <tr class="memdesc:a136d1c681be018ea2a22fa9f543f76ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Populate the random cache with an unused value after each generation cycle  <a href="#a136d1c681be018ea2a22fa9f543f76ee">More...</a><br /></td></tr>
 <tr class="separator:a136d1c681be018ea2a22fa9f543f76ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a45fbe68f3f13631eaa9fd395d02dcf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a4a45fbe68f3f13631eaa9fd395d02dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#a4a45fbe68f3f13631eaa9fd395d02dcf">More...</a><br /></td></tr>
+<tr class="memdesc:a4a45fbe68f3f13631eaa9fd395d02dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#a4a45fbe68f3f13631eaa9fd395d02dcf">More...</a><br /></td></tr>
 <tr class="separator:a4a45fbe68f3f13631eaa9fd395d02dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace1f018e985d7463e06349e67fdc809b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#ace1f018e985d7463e06349e67fdc809b">Generate</a> (SecureVector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:ace1f018e985d7463e06349e67fdc809b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a SecureVector with pseudo-random bytes  <a href="#ace1f018e985d7463e06349e67fdc809b">More...</a><br /></td></tr>
+<tr class="separator:ace1f018e985d7463e06349e67fdc809b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72623809622dc786872111a79e02fcc5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a72623809622dc786872111a79e02fcc5">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:a72623809622dc786872111a79e02fcc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a72623809622dc786872111a79e02fcc5">More...</a><br /></td></tr>
+<tr class="memdesc:a72623809622dc786872111a79e02fcc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes using offset and length parameters  <a href="#a72623809622dc786872111a79e02fcc5">More...</a><br /></td></tr>
 <tr class="separator:a72623809622dc786872111a79e02fcc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a637693b5e6ab79f44c1a048e03d442f8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a637693b5e6ab79f44c1a048e03d442f8">Generate</a> (size_t Length) override</td></tr>
-<tr class="memdesc:a637693b5e6ab79f44c1a048e03d442f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#a637693b5e6ab79f44c1a048e03d442f8">More...</a><br /></td></tr>
-<tr class="separator:a637693b5e6ab79f44c1a048e03d442f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aade465b490b9462ecbe197d4c73c3a61"><td class="memItemLeft" align="right" valign="top">ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#aade465b490b9462ecbe197d4c73c3a61">NextUInt16</a> () override</td></tr>
-<tr class="memdesc:aade465b490b9462ecbe197d4c73c3a61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 16bit integer  <a href="#aade465b490b9462ecbe197d4c73c3a61">More...</a><br /></td></tr>
-<tr class="separator:aade465b490b9462ecbe197d4c73c3a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefe5f87da005fd7151a152394b6fdd36"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#aefe5f87da005fd7151a152394b6fdd36">NextUInt32</a> () override</td></tr>
-<tr class="memdesc:aefe5f87da005fd7151a152394b6fdd36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 32bit integer  <a href="#aefe5f87da005fd7151a152394b6fdd36">More...</a><br /></td></tr>
-<tr class="separator:aefe5f87da005fd7151a152394b6fdd36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8c27859ec0a55bbbd61873de8d0737e"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#aa8c27859ec0a55bbbd61873de8d0737e">NextUInt64</a> () override</td></tr>
-<tr class="memdesc:aa8c27859ec0a55bbbd61873de8d0737e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 64bit integer  <a href="#aa8c27859ec0a55bbbd61873de8d0737e">More...</a><br /></td></tr>
-<tr class="separator:aa8c27859ec0a55bbbd61873de8d0737e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c920c174e5ddc18726b1e4a3e813bf6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a2c920c174e5ddc18726b1e4a3e813bf6">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a2c920c174e5ddc18726b1e4a3e813bf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a SecureVector with pseudo-random bytes using offset and length parameters  <a href="#a2c920c174e5ddc18726b1e4a3e813bf6">More...</a><br /></td></tr>
+<tr class="separator:a2c920c174e5ddc18726b1e4a3e813bf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5b49834966cc875efd8ceab9045fa48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">Reset</a> () override</td></tr>
 <tr class="memdesc:ab5b49834966cc875efd8ceab9045fa48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#ab5b49834966cc875efd8ceab9045fa48">More...</a><br /></td></tr>
 <tr class="separator:ab5b49834966cc875efd8ceab9045fa48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_class_provider_base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_provider_base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_provider_base.html">ProviderBase</a></td></tr>
+<tr class="memitem:ac54cd8e5f62ac3af2f6fe88e47621b69 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ac54cd8e5f62ac3af2f6fe88e47621b69">ProviderBase</a> (const <a class="el" href="class_provider_base.html">ProviderBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:ac54cd8e5f62ac3af2f6fe88e47621b69 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_provider_base.html#ac54cd8e5f62ac3af2f6fe88e47621b69">More...</a><br /></td></tr>
+<tr class="separator:ac54cd8e5f62ac3af2f6fe88e47621b69 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad85e6a988e3c52fc5f0241140b6f2dff inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_provider_base.html">ProviderBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ad85e6a988e3c52fc5f0241140b6f2dff">operator=</a> (const <a class="el" href="class_provider_base.html">ProviderBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:ad85e6a988e3c52fc5f0241140b6f2dff inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="class_provider_base.html#ad85e6a988e3c52fc5f0241140b6f2dff">More...</a><br /></td></tr>
+<tr class="separator:ad85e6a988e3c52fc5f0241140b6f2dff inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c968b669ad0db52da8586bd55bd59d4 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#a8c968b669ad0db52da8586bd55bd59d4">ProviderBase</a> ()=delete</td></tr>
+<tr class="memdesc:a8c968b669ad0db52da8586bd55bd59d4 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: the default constructor is restricted, this function has been deleted  <a href="class_provider_base.html#a8c968b669ad0db52da8586bd55bd59d4">More...</a><br /></td></tr>
+<tr class="separator:a8c968b669ad0db52da8586bd55bd59d4 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc5842eafa7c1829f9f3b9f168cffe74 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#adc5842eafa7c1829f9f3b9f168cffe74">ProviderBase</a> (bool Available, <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> <a class="el" href="class_provider_base.html#aec16518068e6d8cc13143ab469f584b5">Enumeral</a>, const std::string &amp;<a class="el" href="class_provider_base.html#ab7fddd0d2b8b2014d941a8acf455190b">Name</a>)</td></tr>
+<tr class="memdesc:adc5842eafa7c1829f9f3b9f168cffe74 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class (private member)  <a href="class_provider_base.html#adc5842eafa7c1829f9f3b9f168cffe74">More...</a><br /></td></tr>
+<tr class="separator:adc5842eafa7c1829f9f3b9f168cffe74 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf46c5e8e45bb6cab7a914fdb1710b76 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#adf46c5e8e45bb6cab7a914fdb1710b76">~ProviderBase</a> ()</td></tr>
+<tr class="memdesc:adf46c5e8e45bb6cab7a914fdb1710b76 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="class_provider_base.html#adf46c5e8e45bb6cab7a914fdb1710b76">More...</a><br /></td></tr>
+<tr class="separator:adf46c5e8e45bb6cab7a914fdb1710b76 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec16518068e6d8cc13143ab469f584b5 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#aec16518068e6d8cc13143ab469f584b5">Enumeral</a> () override</td></tr>
+<tr class="memdesc:aec16518068e6d8cc13143ab469f584b5 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The providers type name  <a href="class_provider_base.html#aec16518068e6d8cc13143ab469f584b5">More...</a><br /></td></tr>
+<tr class="separator:aec16518068e6d8cc13143ab469f584b5 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add988b6306a2aec83361fd76817bb210 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#add988b6306a2aec83361fd76817bb210">IsAvailable</a> () override</td></tr>
+<tr class="memdesc:add988b6306a2aec83361fd76817bb210 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The entropy provider is available on this system  <a href="class_provider_base.html#add988b6306a2aec83361fd76817bb210">More...</a><br /></td></tr>
+<tr class="separator:add988b6306a2aec83361fd76817bb210 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7fddd0d2b8b2014d941a8acf455190b inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ab7fddd0d2b8b2014d941a8acf455190b">Name</a> () override</td></tr>
+<tr class="memdesc:ab7fddd0d2b8b2014d941a8acf455190b inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The providers class name  <a href="class_provider_base.html#ab7fddd0d2b8b2014d941a8acf455190b">More...</a><br /></td></tr>
+<tr class="separator:ab7fddd0d2b8b2014d941a8acf455190b inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2bd6005e31018512285e6e6b2a72756 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#aa2bd6005e31018512285e6e6b2a72756">NextUInt16</a> () override</td></tr>
+<tr class="memdesc:aa2bd6005e31018512285e6e6b2a72756 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo-random unsigned 16bit integer  <a href="class_provider_base.html#aa2bd6005e31018512285e6e6b2a72756">More...</a><br /></td></tr>
+<tr class="separator:aa2bd6005e31018512285e6e6b2a72756 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad809d17194181df7a69db98ff8e26141 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ad809d17194181df7a69db98ff8e26141">NextUInt32</a> () override</td></tr>
+<tr class="memdesc:ad809d17194181df7a69db98ff8e26141 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo-random unsigned 32bit integer  <a href="class_provider_base.html#ad809d17194181df7a69db98ff8e26141">More...</a><br /></td></tr>
+<tr class="separator:ad809d17194181df7a69db98ff8e26141 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10a46c047bd7ad9ebe8120d318c8da2b inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#a10a46c047bd7ad9ebe8120d318c8da2b">NextUInt64</a> () override</td></tr>
+<tr class="memdesc:a10a46c047bd7ad9ebe8120d318c8da2b inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo-random unsigned 64bit integer  <a href="class_provider_base.html#a10a46c047bd7ad9ebe8120d318c8da2b">More...</a><br /></td></tr>
+<tr class="separator:a10a46c047bd7ad9ebe8120d318c8da2b inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_provider"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_provider')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_provider.html">IProvider</a></td></tr>
 <tr class="memitem:ad1868abf540385d0f624be4e1c52dbee inherit pub_methods_class_i_provider"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#ad1868abf540385d0f624be4e1c52dbee">IProvider</a> (const <a class="el" href="class_i_provider.html">IProvider</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ad1868abf540385d0f624be4e1c52dbee inherit pub_methods_class_i_provider"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_provider.html#ad1868abf540385d0f624be4e1c52dbee">More...</a><br /></td></tr>
@@ -158,7 +172,10 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The CPU Jitter entropy Provider </p>
-<p>Example of getting a seed value: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; output(32);</div><div class="line"><a class="code" href="class_c_j_p.html">CJP</a> gen;</div><div class="line">gen.<a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(output);</div></div><!-- fragment --> <p>The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time. Because the CPU and cache memory are continuously being accessed by various operating system and application processes, small timing differences can be observed and measured using a high-resolution timestamp. Delays caused by events like external thread execution, branching, cache misses, and memory movement through the processor cache levels are measured, and these small differences are collected and concentrated to produce the providers output. The CJP provider should not be used as the sole source of entropy for secret keys, but should be combined with other sources and concentrated to produce a key.</p>
+<p>Example of getting a seed value: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; output(32);</div><div class="line"><a class="code" href="class_c_j_p.html">CJP</a> gen;</div><div class="line">gen.<a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(output);</div></div><!-- fragment --> <p>The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time. <br />
+ Because the CPU and cache memory are continuously being accessed by various operating system and application processes, small timing differences can be observed and measured using a high-resolution timestamp. <br />
+ Delays caused by events like external thread execution, branching, cache misses, and memory movement through the processor cache levels are measured, and these small differences are collected and concentrated to produce the providers output. <br />
+ The CJP provider should not be used as the sole source of entropy for secret keys, but should be combined with other sources and concentrated to produce a key, such as the auto-seed collection provider ACP.</p>
 <p>Guiding Publications:: </p><ol>
 <li>
 <a href="http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html">CPU Time Jitter</a> Based Non-Physical True Random Number Generator. </li>
@@ -245,77 +262,8 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a5854a8a526bbd6b55f8a428f008c0703"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5854a8a526bbd6b55f8a428f008c0703">&#9670;&nbsp;</a></span>EnableAccess()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool &amp; CJP::EnableAccess </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read/Write: Enable the memory access noise source. </p>
-<p>Memory access delays are injected into the random generation mechanism; enabled by default.</p>
-
-</div>
-</div>
-<a id="a74a3747a1f0c1d17ae3ea35ccb95f80c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74a3747a1f0c1d17ae3ea35ccb95f80c">&#9670;&nbsp;</a></span>EnableDebias()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool &amp; CJP::EnableDebias </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read/Write: Enable the Von Neumann debiasing extractor. </p>
-<p>The default and recommended value is true, which enables the bit debiasing extractor.</p>
-
-</div>
-</div>
-<a id="a21286d8c61cd62cd0119f82684f6faf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21286d8c61cd62cd0119f82684f6faf9">&#9670;&nbsp;</a></span>Enumeral()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Enumeration::Providers</a> CJP::Enumeral </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The providers type name </p>
-
-<p>Implements <a class="el" href="class_i_provider.html#aa563ad87e5c5aa7f341326b308fc2c1f">IProvider</a>.</p>
-
-</div>
-</div>
 <a id="a4a45fbe68f3f13631eaa9fd395d02dcf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4a45fbe68f3f13631eaa9fd395d02dcf">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a45fbe68f3f13631eaa9fd395d02dcf">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -338,16 +286,16 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 </table>
 </div><div class="memdoc">
 
-<p>Fill a buffer with pseudo-random bytes </p>
+<p>Fill a standard vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output array to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
   </table>
   </dd>
 </dl>
@@ -356,8 +304,50 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 
 </div>
 </div>
+<a id="ace1f018e985d7463e06349e67fdc809b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace1f018e985d7463e06349e67fdc809b">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CJP::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a SecureVector with pseudo-random bytes </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The destination SecureVector to fill</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#a520878816ba80d898c40c7576d8ca014">IProvider</a>.</p>
+
+</div>
+</div>
 <a id="a72623809622dc786872111a79e02fcc5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a72623809622dc786872111a79e02fcc5">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a72623809622dc786872111a79e02fcc5">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -396,18 +386,18 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 </table>
 </div><div class="memdoc">
 
-<p>Fill the buffer with pseudo-random bytes using offsets </p>
+<p>Fill a standard vector with pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output array to fill</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting position within the Output array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of bytes to write to the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to write to the destination vector</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
   </table>
   </dd>
 </dl>
@@ -416,8 +406,8 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 
 </div>
 </div>
-<a id="a637693b5e6ab79f44c1a048e03d442f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a637693b5e6ab79f44c1a048e03d442f8">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/3]</span></h2>
+<a id="a2c920c174e5ddc18726b1e4a3e813bf6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c920c174e5ddc18726b1e4a3e813bf6">&#9670;&nbsp;</a></span>Generate() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -426,11 +416,27 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; CJP::Generate </td>
+          <td class="memname">void CJP::Generate </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em></td><td>)</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -440,171 +446,23 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 </table>
 </div><div class="memdoc">
 
-<p>Return an array with pseudo-random bytes </p>
+<p>Fill a SecureVector with pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Length</td><td>The size of the expected array returned</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination SecureVector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to write to the destination vector</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An array of pseudo-random of bytes</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#ac6803538a8832d5abeee53b877367b81">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="af91d38ac06ef0ab2a9e97c6066226619"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af91d38ac06ef0ab2a9e97c6066226619">&#9670;&nbsp;</a></span>IsAvailable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const bool CJP::IsAvailable </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The entropy provider is available on this system. </p>
-<p>This value should be tested after class instantiation and before a request for data is made. If the timer resolution is too small, or the provider is otherwise unavailable, requesting data will throw an exception.</p>
-
-<p>Implements <a class="el" href="class_i_provider.html#a63d8a136654f0af8c5a29ae0b39a7799">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="ae196683ea0d8ee9f52c9c6d34f64a730"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae196683ea0d8ee9f52c9c6d34f64a730">&#9670;&nbsp;</a></span>Name()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::string CJP::Name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: provider class name </p>
-
-<p>Implements <a class="el" href="class_i_provider.html#aab058ee3c107920a7ed4a0a1c1147ef7">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="aade465b490b9462ecbe197d4c73c3a61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aade465b490b9462ecbe197d4c73c3a61">&#9670;&nbsp;</a></span>NextUInt16()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ushort CJP::NextUInt16 </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get a pseudo random unsigned 16bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>Random UInt16</dd></dl>
-
-<p>Implements <a class="el" href="class_i_provider.html#a9ace43d5ae44743fe8a517e6cae41054">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="aefe5f87da005fd7151a152394b6fdd36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefe5f87da005fd7151a152394b6fdd36">&#9670;&nbsp;</a></span>NextUInt32()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint CJP::NextUInt32 </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get a pseudo random unsigned 32bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>Random 32bit integer</dd></dl>
-
-<p>Implements <a class="el" href="class_i_provider.html#ab79ff514e55dcca60234fb81f27c2b93">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="aa8c27859ec0a55bbbd61873de8d0737e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8c27859ec0a55bbbd61873de8d0737e">&#9670;&nbsp;</a></span>NextUInt64()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ulong CJP::NextUInt64 </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get a pseudo random unsigned 64bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>Random 64bit integer</dd></dl>
-
-<p>Implements <a class="el" href="class_i_provider.html#a022543661edfbea4a44f456fd9be134f">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ab19fe5bec900c2f8ba3eddea87fc50ee">IProvider</a>.</p>
 
 </div>
 </div>
@@ -636,14 +494,14 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 
 </div>
 </div>
-<a id="a89d88ba2fc35e4cffc014eaa32165e11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89d88ba2fc35e4cffc014eaa32165e11">&#9670;&nbsp;</a></span>OverSampleRate()</h2>
+<a id="a253da65870bf1a3319e4238572c0abed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a253da65870bf1a3319e4238572c0abed">&#9670;&nbsp;</a></span>OverSampleRate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint &amp; CJP::OverSampleRate </td>
+          <td class="memname">size_t &amp; CJP::OverSampleRate </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -682,7 +540,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 <p>Reset the internal state </p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown on entropy collection failure</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown on entropy collection failure</td></tr>
   </table>
   </dd>
 </dl>

@@ -65,7 +65,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_r_d_p-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -73,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the Intel RdRand digital random number generator  
+<p>An implementation of the Intel RDRAND digital random number generator  
  <a href="class_r_d_p.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_r_d_p_8h_source.html">RDP.h</a>&gt;</code></p>
@@ -83,19 +82,11 @@ Inheritance diagram for RDP:</div>
  <div class="center">
   <img src="class_r_d_p.png" usemap="#RDP_map" alt=""/>
   <map id="RDP_map" name="RDP_map">
-<area href="class_i_provider.html" title="Entropy source collectors and concentrators interface " alt="IProvider" shape="rect" coords="0,0,64,24"/>
+<area href="class_provider_base.html" title="The entropy provider base class; this is not an operable class " alt="ProviderBase" shape="rect" coords="0,56,89,80"/>
+<area href="class_i_provider.html" title="Entropy source collectors and concentrators interface " alt="IProvider" shape="rect" coords="0,0,89,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
-Public Types</h2></td></tr>
-<tr class="memitem:a93838aea02719f0275474a4b0123cbb9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">RdEngines</a> : byte { <a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9a0adca238e71717b1c90d576166e7436d">None</a> = 0, 
-<a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9a4925ed3d5c4528f6039241992b8c5af5">RdRand</a> = 1, 
-<a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9a4356c0ae842465a2b5e5577f57dc4e0e">RdSeed</a> = 2
- }</td></tr>
-<tr class="memdesc:a93838aea02719f0275474a4b0123cbb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Intel DRNG providers engine configuration type  <a href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">More...</a><br /></td></tr>
-<tr class="separator:a93838aea02719f0275474a4b0123cbb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a24f4c53233485ec18bdc2e0af7f592f3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a24f4c53233485ec18bdc2e0af7f592f3">RDP</a> (const <a class="el" href="class_r_d_p.html">RDP</a> &amp;)=delete</td></tr>
@@ -104,42 +95,61 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a74780e80e84ca936d00193b69d3dd3de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_r_d_p.html">RDP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a74780e80e84ca936d00193b69d3dd3de">operator=</a> (const <a class="el" href="class_r_d_p.html">RDP</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a74780e80e84ca936d00193b69d3dd3de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a74780e80e84ca936d00193b69d3dd3de">More...</a><br /></td></tr>
 <tr class="separator:a74780e80e84ca936d00193b69d3dd3de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a670c982130b30b4db50aa11fee15bc2e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a670c982130b30b4db50aa11fee15bc2e">RDP</a> (<a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">RdEngines</a> RdEngineType=RdEngines::RdRand)</td></tr>
-<tr class="memdesc:a670c982130b30b4db50aa11fee15bc2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with parameters  <a href="#a670c982130b30b4db50aa11fee15bc2e">More...</a><br /></td></tr>
-<tr class="separator:a670c982130b30b4db50aa11fee15bc2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ce117b2eb890d7fe7791a7cf1f479c3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a6ce117b2eb890d7fe7791a7cf1f479c3">RDP</a> (DrandEngines DrandType=DrandEngines::RdRand)</td></tr>
+<tr class="memdesc:a6ce117b2eb890d7fe7791a7cf1f479c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with parameters  <a href="#a6ce117b2eb890d7fe7791a7cf1f479c3">More...</a><br /></td></tr>
+<tr class="separator:a6ce117b2eb890d7fe7791a7cf1f479c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dfb0f2798b94673eb2a1ee14acbc4a2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a8dfb0f2798b94673eb2a1ee14acbc4a2">~RDP</a> () override</td></tr>
 <tr class="memdesc:a8dfb0f2798b94673eb2a1ee14acbc4a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a8dfb0f2798b94673eb2a1ee14acbc4a2">More...</a><br /></td></tr>
 <tr class="separator:a8dfb0f2798b94673eb2a1ee14acbc4a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a098ce88d27d67484171442c76dbb19"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a0a098ce88d27d67484171442c76dbb19">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a0a098ce88d27d67484171442c76dbb19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The providers type name  <a href="#a0a098ce88d27d67484171442c76dbb19">More...</a><br /></td></tr>
-<tr class="separator:a0a098ce88d27d67484171442c76dbb19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35e8b55930cc3450fe3dba2de3f82b1c"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a35e8b55930cc3450fe3dba2de3f82b1c">IsAvailable</a> () override</td></tr>
-<tr class="memdesc:a35e8b55930cc3450fe3dba2de3f82b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The entropy provider is available on this system  <a href="#a35e8b55930cc3450fe3dba2de3f82b1c">More...</a><br /></td></tr>
-<tr class="separator:a35e8b55930cc3450fe3dba2de3f82b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49a2c886fd790d415f39b8aec5620c48"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a49a2c886fd790d415f39b8aec5620c48">Name</a> () override</td></tr>
-<tr class="memdesc:a49a2c886fd790d415f39b8aec5620c48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The provider class name  <a href="#a49a2c886fd790d415f39b8aec5620c48">More...</a><br /></td></tr>
-<tr class="separator:a49a2c886fd790d415f39b8aec5620c48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac061a75b41aa89dde7534d558da84885"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#ac061a75b41aa89dde7534d558da84885">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:ac061a75b41aa89dde7534d558da84885"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#ac061a75b41aa89dde7534d558da84885">More...</a><br /></td></tr>
+<tr class="memdesc:ac061a75b41aa89dde7534d558da84885"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#ac061a75b41aa89dde7534d558da84885">More...</a><br /></td></tr>
 <tr class="separator:ac061a75b41aa89dde7534d558da84885"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a277ff710cdbd9cfe577978ac9b6fc74a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a277ff710cdbd9cfe577978ac9b6fc74a">Generate</a> (SecureVector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:a277ff710cdbd9cfe577978ac9b6fc74a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a SecureVector with pseudo-random bytes  <a href="#a277ff710cdbd9cfe577978ac9b6fc74a">More...</a><br /></td></tr>
+<tr class="separator:a277ff710cdbd9cfe577978ac9b6fc74a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6292275469b6e2b0de73b438c1cb4354"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a6292275469b6e2b0de73b438c1cb4354">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:a6292275469b6e2b0de73b438c1cb4354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a6292275469b6e2b0de73b438c1cb4354">More...</a><br /></td></tr>
+<tr class="memdesc:a6292275469b6e2b0de73b438c1cb4354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes using offset and length parameters  <a href="#a6292275469b6e2b0de73b438c1cb4354">More...</a><br /></td></tr>
 <tr class="separator:a6292275469b6e2b0de73b438c1cb4354"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a414b616c94b7f8dcb0a1d96d5ec86903"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a414b616c94b7f8dcb0a1d96d5ec86903">Generate</a> (size_t Length) override</td></tr>
-<tr class="memdesc:a414b616c94b7f8dcb0a1d96d5ec86903"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#a414b616c94b7f8dcb0a1d96d5ec86903">More...</a><br /></td></tr>
-<tr class="separator:a414b616c94b7f8dcb0a1d96d5ec86903"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8cda6bc36c168df67362b84522aa739"><td class="memItemLeft" align="right" valign="top">ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#ad8cda6bc36c168df67362b84522aa739">NextUInt16</a> () override</td></tr>
-<tr class="memdesc:ad8cda6bc36c168df67362b84522aa739"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 16bit integer  <a href="#ad8cda6bc36c168df67362b84522aa739">More...</a><br /></td></tr>
-<tr class="separator:ad8cda6bc36c168df67362b84522aa739"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bc62609e18952e3861ac46caa4824d4"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a4bc62609e18952e3861ac46caa4824d4">NextUInt32</a> () override</td></tr>
-<tr class="memdesc:a4bc62609e18952e3861ac46caa4824d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 32bit integer  <a href="#a4bc62609e18952e3861ac46caa4824d4">More...</a><br /></td></tr>
-<tr class="separator:a4bc62609e18952e3861ac46caa4824d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6ec0174dc8a927b9acc5b10bc8466e5"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#aa6ec0174dc8a927b9acc5b10bc8466e5">NextUInt64</a> () override</td></tr>
-<tr class="memdesc:aa6ec0174dc8a927b9acc5b10bc8466e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 64bit integer  <a href="#aa6ec0174dc8a927b9acc5b10bc8466e5">More...</a><br /></td></tr>
-<tr class="separator:aa6ec0174dc8a927b9acc5b10bc8466e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3adb87f2d6a7f2bd2892b7010830402c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a3adb87f2d6a7f2bd2892b7010830402c">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a3adb87f2d6a7f2bd2892b7010830402c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a SecureVector with pseudo-random bytes using offset and length parameters  <a href="#a3adb87f2d6a7f2bd2892b7010830402c">More...</a><br /></td></tr>
+<tr class="separator:a3adb87f2d6a7f2bd2892b7010830402c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1afb103e3a23bae629ac197a16d12ea6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a1afb103e3a23bae629ac197a16d12ea6">Reset</a> () override</td></tr>
 <tr class="memdesc:a1afb103e3a23bae629ac197a16d12ea6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#a1afb103e3a23bae629ac197a16d12ea6">More...</a><br /></td></tr>
 <tr class="separator:a1afb103e3a23bae629ac197a16d12ea6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_class_provider_base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_provider_base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_provider_base.html">ProviderBase</a></td></tr>
+<tr class="memitem:ac54cd8e5f62ac3af2f6fe88e47621b69 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ac54cd8e5f62ac3af2f6fe88e47621b69">ProviderBase</a> (const <a class="el" href="class_provider_base.html">ProviderBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:ac54cd8e5f62ac3af2f6fe88e47621b69 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_provider_base.html#ac54cd8e5f62ac3af2f6fe88e47621b69">More...</a><br /></td></tr>
+<tr class="separator:ac54cd8e5f62ac3af2f6fe88e47621b69 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad85e6a988e3c52fc5f0241140b6f2dff inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_provider_base.html">ProviderBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ad85e6a988e3c52fc5f0241140b6f2dff">operator=</a> (const <a class="el" href="class_provider_base.html">ProviderBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:ad85e6a988e3c52fc5f0241140b6f2dff inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="class_provider_base.html#ad85e6a988e3c52fc5f0241140b6f2dff">More...</a><br /></td></tr>
+<tr class="separator:ad85e6a988e3c52fc5f0241140b6f2dff inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c968b669ad0db52da8586bd55bd59d4 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#a8c968b669ad0db52da8586bd55bd59d4">ProviderBase</a> ()=delete</td></tr>
+<tr class="memdesc:a8c968b669ad0db52da8586bd55bd59d4 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: the default constructor is restricted, this function has been deleted  <a href="class_provider_base.html#a8c968b669ad0db52da8586bd55bd59d4">More...</a><br /></td></tr>
+<tr class="separator:a8c968b669ad0db52da8586bd55bd59d4 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc5842eafa7c1829f9f3b9f168cffe74 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#adc5842eafa7c1829f9f3b9f168cffe74">ProviderBase</a> (bool Available, <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> <a class="el" href="class_provider_base.html#aec16518068e6d8cc13143ab469f584b5">Enumeral</a>, const std::string &amp;<a class="el" href="class_provider_base.html#ab7fddd0d2b8b2014d941a8acf455190b">Name</a>)</td></tr>
+<tr class="memdesc:adc5842eafa7c1829f9f3b9f168cffe74 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class (private member)  <a href="class_provider_base.html#adc5842eafa7c1829f9f3b9f168cffe74">More...</a><br /></td></tr>
+<tr class="separator:adc5842eafa7c1829f9f3b9f168cffe74 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf46c5e8e45bb6cab7a914fdb1710b76 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#adf46c5e8e45bb6cab7a914fdb1710b76">~ProviderBase</a> ()</td></tr>
+<tr class="memdesc:adf46c5e8e45bb6cab7a914fdb1710b76 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="class_provider_base.html#adf46c5e8e45bb6cab7a914fdb1710b76">More...</a><br /></td></tr>
+<tr class="separator:adf46c5e8e45bb6cab7a914fdb1710b76 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec16518068e6d8cc13143ab469f584b5 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#aec16518068e6d8cc13143ab469f584b5">Enumeral</a> () override</td></tr>
+<tr class="memdesc:aec16518068e6d8cc13143ab469f584b5 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The providers type name  <a href="class_provider_base.html#aec16518068e6d8cc13143ab469f584b5">More...</a><br /></td></tr>
+<tr class="separator:aec16518068e6d8cc13143ab469f584b5 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add988b6306a2aec83361fd76817bb210 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#add988b6306a2aec83361fd76817bb210">IsAvailable</a> () override</td></tr>
+<tr class="memdesc:add988b6306a2aec83361fd76817bb210 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The entropy provider is available on this system  <a href="class_provider_base.html#add988b6306a2aec83361fd76817bb210">More...</a><br /></td></tr>
+<tr class="separator:add988b6306a2aec83361fd76817bb210 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7fddd0d2b8b2014d941a8acf455190b inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ab7fddd0d2b8b2014d941a8acf455190b">Name</a> () override</td></tr>
+<tr class="memdesc:ab7fddd0d2b8b2014d941a8acf455190b inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The providers class name  <a href="class_provider_base.html#ab7fddd0d2b8b2014d941a8acf455190b">More...</a><br /></td></tr>
+<tr class="separator:ab7fddd0d2b8b2014d941a8acf455190b inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2bd6005e31018512285e6e6b2a72756 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#aa2bd6005e31018512285e6e6b2a72756">NextUInt16</a> () override</td></tr>
+<tr class="memdesc:aa2bd6005e31018512285e6e6b2a72756 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo-random unsigned 16bit integer  <a href="class_provider_base.html#aa2bd6005e31018512285e6e6b2a72756">More...</a><br /></td></tr>
+<tr class="separator:aa2bd6005e31018512285e6e6b2a72756 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad809d17194181df7a69db98ff8e26141 inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#ad809d17194181df7a69db98ff8e26141">NextUInt32</a> () override</td></tr>
+<tr class="memdesc:ad809d17194181df7a69db98ff8e26141 inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo-random unsigned 32bit integer  <a href="class_provider_base.html#ad809d17194181df7a69db98ff8e26141">More...</a><br /></td></tr>
+<tr class="separator:ad809d17194181df7a69db98ff8e26141 inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10a46c047bd7ad9ebe8120d318c8da2b inherit pub_methods_class_provider_base"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_provider_base.html#a10a46c047bd7ad9ebe8120d318c8da2b">NextUInt64</a> () override</td></tr>
+<tr class="memdesc:a10a46c047bd7ad9ebe8120d318c8da2b inherit pub_methods_class_provider_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo-random unsigned 64bit integer  <a href="class_provider_base.html#a10a46c047bd7ad9ebe8120d318c8da2b">More...</a><br /></td></tr>
+<tr class="separator:a10a46c047bd7ad9ebe8120d318c8da2b inherit pub_methods_class_provider_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_provider"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_provider')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_provider.html">IProvider</a></td></tr>
 <tr class="memitem:ad1868abf540385d0f624be4e1c52dbee inherit pub_methods_class_i_provider"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#ad1868abf540385d0f624be4e1c52dbee">IProvider</a> (const <a class="el" href="class_i_provider.html">IProvider</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ad1868abf540385d0f624be4e1c52dbee inherit pub_methods_class_i_provider"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_provider.html#ad1868abf540385d0f624be4e1c52dbee">More...</a><br /></td></tr>
@@ -155,12 +165,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a04d5fdb794bde25c36d1e25cb4e975ca inherit pub_methods_class_i_provider"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the Intel RdRand digital random number generator </p>
-<p>Example of getting a seed value: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; output(32);</div><div class="line"><a class="code" href="class_r_d_p.html">RDP</a> gen;</div><div class="line">gen.<a class="code" href="class_r_d_p.html#ac061a75b41aa89dde7534d558da84885">Generate</a>(output);</div></div><!-- fragment --> <p>The RdRand DRNG uses thermal noise to generate random bits that are buffered into a shift register, then fed into a CBC-MAC to condition the bytes. The output from the CBC-MAC is obtained using the RDSEED api. <br />
+<div class="textblock"><p>An implementation of the Intel RDRAND digital random number generator </p>
+<p>Example of getting a seed value: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; output(32);</div><div class="line"><a class="code" href="class_r_d_p.html">RDP</a> gen;</div><div class="line">gen.<a class="code" href="class_r_d_p.html#ac061a75b41aa89dde7534d558da84885">Generate</a>(output);</div></div><!-- fragment --> <p>The RDRAND DRNG uses thermal noise to generate random bits that are buffered into a shift register, then fed into a CBC-MAC to condition the bytes. The output from the CBC-MAC is obtained using the RDSEED api. <br />
 To accommodate large sampling, the system has a built in CTR_DRBG, (as specified in SP800-90), which is continuously reseeded with the output from RDSEED. The output from the CTR Drbg is obtained using the RDRAND api. <br />
 There is some controversy surrounding the security of this mechanism, though the design appears to be sound, and has been reviewed by external auditors, it is still a proprietary closed system. <br />
 The entropy source itself must therefore be considered to be a 'black box', a source that can not be verified directly, and so must be considered to be of low entropy value. <br />
-For this reason, the DRNG should not be used as the sole source of entropy when creating secret keys, but should be used in concert with other sources of entropy.</p>
+For this reason, the DRNG should not be used as the sole source of entropy when creating secret keys, but should be used in concert with other sources of entropy, such as the auto-seed collection provider ACP.</p>
 <p>Guiding Publications:: </p><ol>
 <li>
 Intel Digital Random Number Digital Random Number Generator: <a href="https://software.intel.com/sites/default/files/m/d/4/1/d/8/441_Intel_R__DRNG_Software_Implementation_Guide_final_Aug7.pdf">DRNG</a>. </li>
@@ -175,32 +185,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
 <li>
 A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec2015.pdf">Secure Key RNG</a>. </li>
 </ol>
-</div><h2 class="groupheader">Member Enumeration Documentation</h2>
-<a id="a93838aea02719f0275474a4b0123cbb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a93838aea02719f0275474a4b0123cbb9">&#9670;&nbsp;</a></span>RdEngines</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum <a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">RDP::RdEngines</a> : byte</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The Intel DRNG providers engine configuration type </p>
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a93838aea02719f0275474a4b0123cbb9a0adca238e71717b1c90d576166e7436d"></a>None&#160;</td><td class="fielddoc"><p>The random provider is available </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a93838aea02719f0275474a4b0123cbb9a4925ed3d5c4528f6039241992b8c5af5"></a>RdRand&#160;</td><td class="fielddoc"><p>The random number provider </p>
-</td></tr>
-<tr><td class="fieldname"><a id="a93838aea02719f0275474a4b0123cbb9a4356c0ae842465a2b5e5577f57dc4e0e"></a>RdSeed&#160;</td><td class="fielddoc"><p>The random seed generator </p>
-</td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a24f4c53233485ec18bdc2e0af7f592f3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a24f4c53233485ec18bdc2e0af7f592f3">&#9670;&nbsp;</a></span>RDP() <span class="overload">[1/2]</span></h2>
 
@@ -229,8 +214,8 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 
 </div>
 </div>
-<a id="a670c982130b30b4db50aa11fee15bc2e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a670c982130b30b4db50aa11fee15bc2e">&#9670;&nbsp;</a></span>RDP() <span class="overload">[2/2]</span></h2>
+<a id="a6ce117b2eb890d7fe7791a7cf1f479c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ce117b2eb890d7fe7791a7cf1f479c3">&#9670;&nbsp;</a></span>RDP() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -238,8 +223,8 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
         <tr>
           <td class="memname">RDP::RDP </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">RdEngines</a>&#160;</td>
-          <td class="paramname"><em>RdEngineType</em> = <code>RdEngines::RdRand</code></td><td>)</td>
+          <td class="paramtype">DrandEngines&#160;</td>
+          <td class="paramname"><em>DrandType</em> = <code>DrandEngines::RdRand</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -248,7 +233,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 <p>Constructor: instantiate this class with parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">RdEngineType</td><td>The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</td></tr>
+    <tr><td class="paramname">DrandType</td><td>The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</td></tr>
   </table>
   </dd>
 </dl>
@@ -283,37 +268,8 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a0a098ce88d27d67484171442c76dbb19"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a098ce88d27d67484171442c76dbb19">&#9670;&nbsp;</a></span>Enumeral()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Enumeration::Providers</a> RDP::Enumeral </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The providers type name </p>
-
-<p>Implements <a class="el" href="class_i_provider.html#aa563ad87e5c5aa7f341326b308fc2c1f">IProvider</a>.</p>
-
-</div>
-</div>
 <a id="ac061a75b41aa89dde7534d558da84885"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac061a75b41aa89dde7534d558da84885">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac061a75b41aa89dde7534d558da84885">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -336,16 +292,16 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 </table>
 </div><div class="memdoc">
 
-<p>Fill a buffer with pseudo-random bytes </p>
+<p>Fill a standard vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output array to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
   </table>
   </dd>
 </dl>
@@ -354,8 +310,50 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 
 </div>
 </div>
+<a id="a277ff710cdbd9cfe577978ac9b6fc74a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a277ff710cdbd9cfe577978ac9b6fc74a">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RDP::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a SecureVector with pseudo-random bytes </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The destination SecureVector to fill</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#a520878816ba80d898c40c7576d8ca014">IProvider</a>.</p>
+
+</div>
+</div>
 <a id="a6292275469b6e2b0de73b438c1cb4354"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6292275469b6e2b0de73b438c1cb4354">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6292275469b6e2b0de73b438c1cb4354">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -394,18 +392,18 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 </table>
 </div><div class="memdoc">
 
-<p>Fill the buffer with pseudo-random bytes using offsets </p>
+<p>Fill a standard vector with pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output array to fill</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting position within the Output array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of bytes to write to the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to write to the destination vector</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
   </table>
   </dd>
 </dl>
@@ -414,8 +412,8 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 
 </div>
 </div>
-<a id="a414b616c94b7f8dcb0a1d96d5ec86903"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a414b616c94b7f8dcb0a1d96d5ec86903">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/3]</span></h2>
+<a id="a3adb87f2d6a7f2bd2892b7010830402c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3adb87f2d6a7f2bd2892b7010830402c">&#9670;&nbsp;</a></span>Generate() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -424,11 +422,27 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; RDP::Generate </td>
+          <td class="memname">void RDP::Generate </td>
           <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em></td><td>)</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -438,170 +452,23 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 </table>
 </div><div class="memdoc">
 
-<p>Return an array with pseudo-random bytes </p>
+<p>Fill a SecureVector with pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Length</td><td>The size of the expected array returned</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination SecureVector to fill</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the destination vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to write to the destination vector</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An array of pseudo-random of bytes</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
+    <tr><td class="paramname">CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#ac6803538a8832d5abeee53b877367b81">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="a35e8b55930cc3450fe3dba2de3f82b1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a35e8b55930cc3450fe3dba2de3f82b1c">&#9670;&nbsp;</a></span>IsAvailable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const bool RDP::IsAvailable </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The entropy provider is available on this system </p>
-
-<p>Implements <a class="el" href="class_i_provider.html#a63d8a136654f0af8c5a29ae0b39a7799">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="a49a2c886fd790d415f39b8aec5620c48"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49a2c886fd790d415f39b8aec5620c48">&#9670;&nbsp;</a></span>Name()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::string RDP::Name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The provider class name </p>
-
-<p>Implements <a class="el" href="class_i_provider.html#aab058ee3c107920a7ed4a0a1c1147ef7">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="ad8cda6bc36c168df67362b84522aa739"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8cda6bc36c168df67362b84522aa739">&#9670;&nbsp;</a></span>NextUInt16()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ushort RDP::NextUInt16 </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get a pseudo random unsigned 16bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>Random UInt16</dd></dl>
-
-<p>Implements <a class="el" href="class_i_provider.html#a9ace43d5ae44743fe8a517e6cae41054">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="a4bc62609e18952e3861ac46caa4824d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4bc62609e18952e3861ac46caa4824d4">&#9670;&nbsp;</a></span>NextUInt32()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint RDP::NextUInt32 </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get a pseudo random unsigned 32bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>Random 32bit integer</dd></dl>
-
-<p>Implements <a class="el" href="class_i_provider.html#ab79ff514e55dcca60234fb81f27c2b93">IProvider</a>.</p>
-
-</div>
-</div>
-<a id="aa6ec0174dc8a927b9acc5b10bc8466e5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6ec0174dc8a927b9acc5b10bc8466e5">&#9670;&nbsp;</a></span>NextUInt64()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ulong RDP::NextUInt64 </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get a pseudo random unsigned 64bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>Random 64bit integer</dd></dl>
-
-<p>Implements <a class="el" href="class_i_provider.html#a022543661edfbea4a44f456fd9be134f">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ab19fe5bec900c2f8ba3eddea87fc50ee">IProvider</a>.</p>
 
 </div>
 </div>

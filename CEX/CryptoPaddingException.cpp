@@ -13,4 +13,9 @@ const ExceptionTypes CryptoPaddingException::Enumeral()
 	return ExceptionTypes::CryptoPaddingException;
 }
 
+const std::string CryptoPaddingException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

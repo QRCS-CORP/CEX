@@ -45,10 +45,9 @@ public:
 	/// <para>If a length call does not align to the page size boundary, it will return a rounded up to a multiple of the system memory page size</para>
 	/// </summary>
 	///
-	/// <param name="Pointer">The pointer to the buffer to be allocated</param>
 	/// <param name="Length">The number of bytes in the allocatation request</param>
 	/// 
-	/// <returns>The number of bytes allocated, zero for allocation failure</returns>
+	/// <returns>The a pointer to the bytes allocated, or a nullptr for allocation failure</returns>
 	///
 	/// <exception cref="CryptoException">Thrown if secure memory is not supported on this system</exception>
 	static void* Allocate(size_t Length);

@@ -13,4 +13,9 @@ const ExceptionTypes CryptoKdfException::Enumeral()
 	return ExceptionTypes::CryptoKdfException;
 }
 
+const std::string CryptoKdfException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

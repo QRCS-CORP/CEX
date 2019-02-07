@@ -13,4 +13,9 @@ const ExceptionTypes CryptoDigestException::Enumeral()
 	return ExceptionTypes::CryptoDigestException;
 }
 
+const std::string CryptoDigestException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_threefish512-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Threefish512 Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___symmetric.html">Symmetric</a> &raquo; <a class="el" href="group___stream.html">Stream</a></div></div>  </div>
+<div class="title">Threefish512 Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___stream.html">Stream</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -122,7 +122,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a64bb01a2d7f972189d5ed895a40620da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes  <a href="#a64bb01a2d7f972189d5ed895a40620da">More...</a><br /></td></tr>
 <tr class="separator:a64bb01a2d7f972189d5ed895a40620da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe5c0e3cf986d09eeeedeae6aa58782f"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish512.html#abe5c0e3cf986d09eeeedeae6aa58782f">Name</a> () override</td></tr>
-<tr class="memdesc:abe5c0e3cf986d09eeeedeae6aa58782f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers class name  <a href="#abe5c0e3cf986d09eeeedeae6aa58782f">More...</a><br /></td></tr>
+<tr class="memdesc:abe5c0e3cf986d09eeeedeae6aa58782f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers implementation name  <a href="#abe5c0e3cf986d09eeeedeae6aa58782f">More...</a><br /></td></tr>
 <tr class="separator:abe5c0e3cf986d09eeeedeae6aa58782f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99c28a2f4ecbba3d985dbbe850ab765b"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish512.html#a99c28a2f4ecbba3d985dbbe850ab765b">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:a99c28a2f4ecbba3d985dbbe850ab765b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#a99c28a2f4ecbba3d985dbbe850ab765b">More...</a><br /></td></tr>
@@ -169,7 +169,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A vectorized and optionally parallelized Threefish512 96-round stream cipher [TSX512] implementation. </p>
 <p>Uses an optional authentication mode; HMAC(SHA2) or KMAC set through the constructor to authenticate the stream.</p>
-<p>Encrypt an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish512.html">Threefish512</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// mac code is appended to the cipher-text stream in authentication mode</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Encrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish512.html">Threefish512</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish512.html">Threefish512</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"><span class="comment">// decrypt the ciphertext</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="struct_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>Encrypt an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish512.html">Threefish512</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// mac code is appended to the cipher-text stream in authentication mode</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Encrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish512.html">Threefish512</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_threefish512.html">Threefish512</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"><span class="comment">// decrypt the ciphertext</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="class_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>This cipher is a vectorized and optionally parallelized implementation of the Threefish256 cipher, used by the Skein family of hash functions. <br />
 It is capable of processing data using AVX2 or AVX512 SIMD instructions, and can also optionally employ multi-threaded parallelism. <br />
 An optional authentication component has also been added, and the cipher output can be authenticated using either an SHA2 hash based HMAC, or the Keccak based KMAC message authentication code generators. <br />
@@ -199,7 +199,7 @@ Permutation rounds are fixed at 96. </li>
 <li>
 This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to one of the HMAC or KMAC options. </li>
 <li>
-In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception. </li>
+In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text of each transform call, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception. </li>
 <li>
 In authenticated mode, the cipher-key generated by cSHAKE will be constant even with differing MAC generators; only two cipher-text outputs are possible, authenticated or non-authenticated. </li>
 <li>
@@ -302,7 +302,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if an invalid authentication method is chosen</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if an invalid authentication method is chosen</td></tr>
   </table>
   </dd>
 </dl>
@@ -508,7 +508,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if a null or invalid key is used</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if a null or invalid key is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -657,7 +657,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The stream ciphers class name </p>
+<p>Read Only: The stream ciphers implementation name </p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a2a1e6ebb86452e76be1e04424f54f71e">IStreamCipher</a>.</p>
 
@@ -753,6 +753,12 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the degree parameter is invalid</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a3ed2a086fc9e31fa7b57b4da357bbf9b">IStreamCipher</a>.</p>
 
@@ -841,7 +847,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if the cipher is not initialized</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if the cipher is not initialized</td></tr>
   </table>
   </dd>
 </dl>
@@ -974,7 +980,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAuthenticationFailure</td><td>Thrown during decryption if the the ciphertext fails authentication</td></tr>
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Thrown during decryption if the the ciphertext fails authentication</td></tr>
   </table>
   </dd>
 </dl>

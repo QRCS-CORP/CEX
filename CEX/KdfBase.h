@@ -3,10 +3,14 @@
 
 #include "IKdf.h"
 #include "Kdfs.h"
+#include "SymmetricKey.h"
+#include "SymmetricSecureKey.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Kdfs;
+using Cipher::SymmetricKey;
+using Cipher::SymmetricSecureKey;
 
 /// <summary>
 /// The KDF base class; this is not an operable class

@@ -140,7 +140,7 @@ private:
 	std::unique_ptr<CTR> m_cipherMode;
 	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
-	std::unique_ptr<Mac::GHASH> m_gcmHash;
+	std::unique_ptr<Digest::GHASH> m_gcmHash;
 	std::vector<byte> m_gcmKey;
 	std::vector<byte> m_gcmNonce;
 	std::vector<byte> m_gcmVector;

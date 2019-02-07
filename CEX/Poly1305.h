@@ -19,7 +19,8 @@
 // 
 // Implementation Details:
 // An implementation of a Stream Cipher based Message Authentication Code (Poly1305).
-// Written by John Underhill, November 4, 2017
+// Written by John Underhill, February 2, 2018
+// Updated February 6, 2018
 // Contact: develop@vtdev.com
 
 #ifndef CEX_POLY1305_H
@@ -31,16 +32,14 @@
 NAMESPACE_MAC
 
 /// <summary>
-/// An implementation of the Poly1305 Message Authentication Code generator
+/// An implementation of the Poly1305 Message Authentication Code generator: Poly1305
 /// </summary>
 /// 
 /// <example>
 /// <description>Example generating a MAC code from an Input array</description>
 /// <code>
-/// // the default constructor uses the sequential processing mode (no cipher assist, just Poly1305)
-/// Poly1305 mac(Enumeration::BlockCiphers::AES);
+/// Poly1305 mac;
 ///
-/// // Note: if key is not pre-conditioned for Poly1305-AES, it will be clamped automatically in Initialize(&ISymmetricKey)
 /// SymmetricKey kp(Key);
 /// mac.Initialize(kp);
 /// mac.Update(Input, 0, Input.size());
@@ -50,29 +49,24 @@ NAMESPACE_MAC
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>Poly1305 and the cipher assisted variant Poly1305-AES are Message Authentication Code generators that return a 16-byte authentication code for a message of any length.
-/// Both variants use a a 32-byte secret key, with the Poly1305-AES mode also requiring a 16-byte nonce (unique message number). \n
-/// This MAC generator can be used in tandem with a symmetric cipher, to generate an authentication code along with each encrypted message segment.</para>
+/// <para>Poly1305 is a Message Authentication Code generator that return a 16-byte authentication code for a message of any length.
+/// This variant uses a a 32-byte secret key to generate an authentication code along with each encrypted message segment.</para>
 /// 
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>This Mac has two modes of operation selected through the constructor; sequential, if no block cipher is selected, or cipher assisted (Poly1305-AES).</description></item>
-/// <item><description>This Mac can use any one of the supported base block ciphers: Rijndael, Serpent, or Twofish. HX extended ciphers are not supported at this time.</description></item>
-/// <item><description>With Poly1305-AES, the input Mac key is pre-conditioned to speed up multiplication by clearing required bits in the R portion of the key (first 16 bytes).</description></item>
-/// <item><description>The Initialize(&ISymmetricKey) function tests the key for pre-conditioning, and if required, will clamp the key automatically..</description></item>
+/// <item><description>The generator must be initialized with a key using the Initialize function before output can be generated.</description></item>
+/// <item><description>The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material.</description></item>
 /// <item><description>Never reuse a nonce with the Poly1305 Mac, this is insecure and strongly discouraged.</description></item>
 /// <item><description>MAC return size is 16 bytes, the array can be can be truncated by the caller.</description></item>
-/// <item><description>The Initialize() function requires a key of 32 bytes (256 bits) in length.</description></item>
-/// <item><description>After a finalizer call (Finalize or Compute), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
+/// <item><description>The Initialize function requires a fixed key-size of 32 bytes (256 bits) in length.</description></item>
+/// <item><description>The Compute(Input, Output) method wraps the Update(Input, Offset, Length) and Finalize(Output, Offset) methods and should only be used on small to medium sized data.</description>/></item>
+/// <item><description>The Update(Input, Offset, Length) processes any length of message data, and is used in conjunction with the Finalize(Output, Offset) method, which completes processing and returns the finalized MAC code.</description>/></item>
+/// <item><description>After a finalizer call the MAC must be re-initialized with a new key.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>The <a href="https://cr.yp.to/mac/poly1305-20050329.pdf">Poly1305-AES</a> message-authentication code.</description></item>
 /// <item><description>A state of the art message-authentication code: <a href="https://cr.yp.to/mac.html">Poly1305</a>.</description></item>
-/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">AES Fips 197</a>.</description></item>
-/// <item><description>Serpent: <a href="http://www.cl.cam.ac.uk/~rja14/Papers/serpent.pdf">Specification</a>.</description></item>
-/// <item><description>Twofish: <a href="https://www.schneier.com/paper-twofish-paper.pdf">Specification</a>.</description></item>
 /// </list>
 /// </remarks>
 class Poly1305 final : public MacBase
@@ -114,65 +108,77 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: Mac is ready to digest data
+	/// Read Only: The MAC generator is ready to process data
 	/// </summary>
 	const bool IsInitialized() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Process an input array and return the Mac code in the output array.
-	/// <para>After calling this function the Mac code and buffer are zeroised, but key is still loaded.</para>
+	/// Process a vector of bytes and return the MAC code
 	/// </summary>
+	///
+	/// <param name="Input">The input vector to process</param>
+	/// <param name="Output">The output vector containing the MAC code</param>
 	/// 
-	/// <param name="Input">The input data byte array</param>
-	/// <param name="Output">The output Mac code array</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized</exception>
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Process the data and return a Mac code
-	/// <para>After calling this function the Mac code and buffer are zeroised, but key is still loaded.</para>
+	/// Completes processing and returns the MAC code in a standard vector
 	/// </summary>
-	/// 
-	/// <param name="Output">The output Mac code array</param>
-	/// <param name="OutOffset">The offset in the output array</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
+	///
+	/// <param name="Output">The output standard vector receiving the MAC code</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	///
+	/// <returns>The size of the MAC code in bytes</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
-	/// Initialize the MAC generator with a symmetric key container.
-	/// <para>Uses a key, and optional info arrays to initialize the MAC.
-	/// In a Poly1305-AES configuration, the R portion of the key is tested for pre-configuration and clamped automatically.
-	/// The key size must be one of the block ciphers legal key sizes.</para>
+	/// Completes processing and returns the MAC code in a secure vector
+	/// </summary>
+	///
+	/// <param name="Output">The output secure vector receiving the MAC code</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	///
+	/// <returns>The size of the MAC code in bytes</returns>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
+	size_t Finalize(SecureVector<byte> &Output, size_t OutOffset) override;
+
+	/// <summary>
+	/// Initialize the MAC generator with an ISymmetricKey key container.
+	/// <para>Can accept either the SymmetricKey or SymmetricSecureKey container to load keying material.
+	/// Uses a key and nonce arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
 	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
+	/// <exception cref="CryptoMacException">Thrown if the key is not a legal size</exception>
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
-	/// Reset to the default state; Mac code and buffer are zeroised, but key is still loaded
+	/// Reset internal state to the pre-initialization defaults.
+	/// <para>Internal state is zeroised, and MAC generator must be reinitialized again before being used.</para>
 	/// </summary>
 	void Reset() override;
 
 	/// <summary>
-	/// Update the Mac with a block of bytes
+	/// Update the Mac with a length of bytes
 	/// </summary>
 	/// 
-	/// <param name="Input">The input data array to process</param>
-	/// <param name="InOffset">Starting position with the input array</param>
+	/// <param name="Input">The input data vector to process</param>
+	/// <param name="InOffset">The starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the input array is too small</exception>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	static void Process(const std::vector<byte> &Output, size_t OutOffset, size_t Length, bool IsFinal, std::unique_ptr<Poly1305State> &State);
+	static void Absorb(const std::vector<byte> &Output, size_t OutOffset, size_t Length, bool IsFinal, std::unique_ptr<Poly1305State> &State);
 };
 
 NAMESPACE_MACEND

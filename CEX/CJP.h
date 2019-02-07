@@ -71,7 +71,7 @@ private:
 	static const size_t MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
 	static const size_t OVRSMP_RATE_MAX = 128;
 	static const size_t OVRSMP_RATE_MIN = 1;
-	static const bool TIMER_HAS_TSC;
+	static const bool HAS_TSC;
 
 	struct JitterState;
 

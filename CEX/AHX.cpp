@@ -33,7 +33,7 @@ AHX::AHX(BlockCipherExtensions CipherExtension)
 	LoadState();
 }
 
-AHX::AHX(Kdf::IKdf* Kdf)
+AHX::AHX(IKdf* Kdf)
 	:
 	m_cprExtension(BlockCipherExtensions::Custom),
 	m_destroyEngine(false),

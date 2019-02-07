@@ -68,20 +68,23 @@ $(function() {
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_secure_memory-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">SecureMemory Class Reference</div>  </div>
+<div class="title">SecureMemory Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p> 
+<p>A secure raw memory utilities class  
  <a href="class_secure_memory.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_secure_memory_8h_source.html">SecureMemory.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ae1b0813283c51b5a0c3ea39c524f2e1e"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_memory.html#ae1b0813283c51b5a0c3ea39c524f2e1e">Allocate</a> (void *Pointer, size_t Length)</td></tr>
-<tr class="memdesc:ae1b0813283c51b5a0c3ea39c524f2e1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a set of memory pages locked to this process.  <a href="#ae1b0813283c51b5a0c3ea39c524f2e1e">More...</a><br /></td></tr>
-<tr class="separator:ae1b0813283c51b5a0c3ea39c524f2e1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae32376c3b3ba35cd497838b54f25ffea"><td class="memItemLeft" align="right" valign="top">static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_memory.html#ae32376c3b3ba35cd497838b54f25ffea">Available</a> ()</td></tr>
+<tr class="memdesc:ae32376c3b3ba35cd497838b54f25ffea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Returns true if secure memory is available on this system  <a href="#ae32376c3b3ba35cd497838b54f25ffea">More...</a><br /></td></tr>
+<tr class="separator:ae32376c3b3ba35cd497838b54f25ffea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78ee82f6e1a32a85de84f63cf7a01c47"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_memory.html#a78ee82f6e1a32a85de84f63cf7a01c47">Allocate</a> (size_t Length)</td></tr>
+<tr class="memdesc:a78ee82f6e1a32a85de84f63cf7a01c47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a set of memory pages locked to this process.  <a href="#a78ee82f6e1a32a85de84f63cf7a01c47">More...</a><br /></td></tr>
+<tr class="separator:a78ee82f6e1a32a85de84f63cf7a01c47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53c23efce2cee5212a88286f5596389f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_secure_memory.html#a53c23efce2cee5212a88286f5596389f">Erase</a> (void *Pointer, size_t Length)</td></tr>
 <tr class="memdesc:a53c23efce2cee5212a88286f5596389f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Securely erase an array of data  <a href="#a53c23efce2cee5212a88286f5596389f">More...</a><br /></td></tr>
 <tr class="separator:a53c23efce2cee5212a88286f5596389f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -96,9 +99,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a80771f27ad5ebdf29843916059a7d842"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"></div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae1b0813283c51b5a0c3ea39c524f2e1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae1b0813283c51b5a0c3ea39c524f2e1e">&#9670;&nbsp;</a></span>Allocate()</h2>
+<div class="textblock"><p>A secure raw memory utilities class </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a78ee82f6e1a32a85de84f63cf7a01c47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78ee82f6e1a32a85de84f63cf7a01c47">&#9670;&nbsp;</a></span>Allocate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -107,21 +111,11 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_COMMON size_t SecureMemory::Allocate </td>
+          <td class="memname">void * SecureMemory::Allocate </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>Pointer</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>Length</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -135,12 +129,44 @@ Static Public Member Functions</h2></td></tr>
 <p>If a length call does not align to the page size boundary, it will return a rounded up to a multiple of the system memory page size</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Pointer</td><td>The pointer to the buffer to be allocated</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes in the allocatation request</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes allocated, zero for allocation failure</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The a pointer to the bytes allocated, or a nullptr for allocation failure</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoException</td><td>Thrown if secure memory is not supported on this system</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae32376c3b3ba35cd497838b54f25ffea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae32376c3b3ba35cd497838b54f25ffea">&#9670;&nbsp;</a></span>Available()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const bool SecureMemory::Available </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Returns true if secure memory is available on this system </p>
 
 </div>
 </div>
@@ -231,6 +257,12 @@ Static Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoException</td><td>Thrown if secure memory is not supported on this system</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -291,6 +323,7 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
+<li>C:/Users/John/Documents/GitHub/CEX/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
 <li>C:/Users/John/Documents/GitHub/CEX/CEX/<a class="el" href="_secure_memory_8h_source.html">SecureMemory.h</a></li>
 <li>C:/Users/John/Documents/GitHub/CEX/CEX/SecureMemory.cpp</li>
 </ul>

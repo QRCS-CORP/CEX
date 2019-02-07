@@ -37,7 +37,7 @@ SHX::SHX(BlockCipherExtensions CipherExtension)
 	LoadState();
 }
 
-SHX::SHX(Kdf::IKdf* Kdf)
+SHX::SHX(IKdf* Kdf)
 	:
 	m_cprExtension(BlockCipherExtensions::Custom),
 	m_destroyEngine(false),

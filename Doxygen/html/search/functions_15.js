@@ -4,10 +4,10 @@ var searchData=
   ['xofr24p1600',['XOFR24P1600',['../class_keccak.html#ad96b7c75a1c27b25aaffadbb0502a49d',1,'Keccak']]],
   ['xofr48p1600',['XOFR48P1600',['../class_keccak.html#a6be226bc56dd77c96893d9ae77229da4',1,'Keccak']]],
   ['xop',['XOP',['../class_cpu_detect.html#a75f14b6fb41a0b280d175b76f1d8de19',1,'CpuDetect']]],
-  ['xor',['XOR',['../class_mem_utils.html#ab99041eeeba53c1b76bc3bfd2ed0fdc8',1,'MemUtils']]],
-  ['xor1024',['XOR1024',['../class_mem_utils.html#aa6653e6abf94c5a16a734a6d5f686524',1,'MemUtils']]],
-  ['xor128',['XOR128',['../class_mem_utils.html#a980444437c4d7c2ac2851fb83b824832',1,'MemUtils']]],
-  ['xor256',['XOR256',['../class_mem_utils.html#aa49ba3899f219e821d0becb310222b2b',1,'MemUtils']]],
-  ['xor512',['XOR512',['../class_mem_utils.html#a6d514cad626dfdc0f16274de7373d3b6',1,'MemUtils']]],
-  ['xorpartial',['XorPartial',['../class_mem_utils.html#ab4063f323ae7c01aba0290200dc7c9b6',1,'MemUtils']]]
+  ['xor',['XOR',['../class_memory_tools.html#a679d645ef3cabecc4da03291f4c714dc',1,'MemoryTools']]],
+  ['xor1024',['XOR1024',['../class_memory_tools.html#aab492cf56272534ed0d6766267a61ed6',1,'MemoryTools']]],
+  ['xor128',['XOR128',['../class_memory_tools.html#a43bce380c627bc46c255b661f843d34e',1,'MemoryTools']]],
+  ['xor256',['XOR256',['../class_memory_tools.html#a7db0d0af409e8f19a0d38887783e55a2',1,'MemoryTools']]],
+  ['xor512',['XOR512',['../class_memory_tools.html#af83d227dcad0db3bb56b9051c799ecf7',1,'MemoryTools']]],
+  ['xorpartial',['XorPartial',['../class_memory_tools.html#a82044efba0a7b7ef0ac503b8d6629452',1,'MemoryTools']]]
 ];

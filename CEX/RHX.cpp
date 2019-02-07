@@ -29,7 +29,7 @@ RHX::RHX(BlockCipherExtensions CipherExtension)
 	LoadState();
 }
 
-RHX::RHX(Kdf::IKdf* Kdf)
+RHX::RHX(IKdf* Kdf)
 	:
 	m_cprExtension(BlockCipherExtensions::Custom),
 	m_destroyEngine(false),

@@ -13,11 +13,8 @@ class SymmetricKey final : public ISymmetricKey
 {
 private:
 
-	std::vector<byte> m_info;
-	bool m_isDestroyed;
-	std::vector<byte> m_key;
-	SymmetricKeySize m_keySizes;
-	std::vector<byte> m_nonce;
+	class KeyState;
+	std::unique_ptr<KeyState> m_keyState;
 
 public:
 
@@ -69,6 +66,36 @@ public:
 	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
 
 	/// <summary>
+	/// Constructor: instantiate this class with a secure vector encryption key
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	explicit SymmetricKey(const SecureVector<byte> &Key);
+
+	/// <summary>
+	/// Constructor: instantiate this class with a secure vector encryption key, and nonce parameters
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// <param name="Nonce">The nonce or salt array</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce);
+
+	/// <summary>
+	/// Constructor: instantiate this class with a secure vector encryption key, nonce, and info parameters
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// <param name="Nonce">The nonce or counter array</param>
+	/// <param name="Info">The personalization string or additional keying material</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info);
+
+	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
 	~SymmetricKey() override;
@@ -95,6 +122,21 @@ public:
 	/// </summary>
 	const std::vector<byte> Nonce() override;
 
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy
+	/// </summary>
+	const SecureVector<byte> SecureInfo() override;
+
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the primary encryption key
+	/// </summary>
+	const SecureVector<byte> SecureKey() override;
+
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the nonce or salt value
+	/// </summary>
+	const SecureVector<byte> SecureNonce() override;
+
 	//~~~Public Functions~~~//
 
 	/// <summary>
@@ -115,16 +157,7 @@ public:
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
-	void Destroy() override;
-
-	/// <summary>
-	/// Compare this SymmetricKey instance with another
-	/// </summary>
-	/// 
-	/// <param name="Input">SymmetricKey to compare</param>
-	/// 
-	/// <returns>Returns true if equal</returns>
-	bool Equals(ISymmetricKey &Input) override;
+	void Reset() override;
 
 	/// <summary>
 	/// Serialize a SymmetricKey class.

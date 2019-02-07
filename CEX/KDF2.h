@@ -53,7 +53,10 @@ using Enumeration::SHA2Digests;
 /// <description><B>Overview:</B></description>
 /// <para>KDF2 uses a hash digest as a pseudo-random function to produce pseudo-random output in a process known as key stretching. \n
 /// Using the same input key, and optional salt and information strings, will produce the exact same output. \n
-/// It is recommended that a pseudo-random salt value is added along with the key, this mitigates some attacks against the function.</para>
+/// It is recommended that a pseudo-random salt value is added along with the key, this mitigates some attacks against the function. \n
+/// The minimum key size should align with the expected security level of the generator function. \n
+/// For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. \n
+/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Description:</B></description> \n
 /// <EM>Legend:</EM> \n
@@ -90,11 +93,6 @@ class KDF2 final : public KdfBase
 private:
 
 	static const size_t MAXGEN_REQUESTS = 255;
-#if defined(CEX_ENFORCE_KEYMIN)
-
-#else
-
-#endif
 	static const size_t MINKEY_LENGTH = 16;
 	static const size_t MINSALT_LENGTH = 4;
 
@@ -139,7 +137,7 @@ public:
 	/// <param name="Digest">The initialized message digest instance</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if a null digest is used</exception>
-	explicit KDF2(Digest::IDigest* Digest);
+	explicit KDF2(IDigest* Digest);
 
 	/// <summary>
 	/// Destructor: finalize this class

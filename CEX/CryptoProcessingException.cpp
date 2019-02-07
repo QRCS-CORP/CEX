@@ -13,4 +13,9 @@ const ExceptionTypes CryptoProcessingException::Enumeral()
 	return ExceptionTypes::CryptoProcessingException;
 }
 
+const std::string CryptoProcessingException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

@@ -140,10 +140,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aed0767df96614998c72a14f708c0fdad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The estimated security strength in bits.  <a href="#aed0767df96614998c72a14f708c0fdad">More...</a><br /></td></tr>
 <tr class="separator:aed0767df96614998c72a14f708c0fdad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f2588ea9cbe89cdd9b24f3b0b45753a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_g.html#a6f2588ea9cbe89cdd9b24f3b0b45753a">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a6f2588ea9cbe89cdd9b24f3b0b45753a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo random bytes  <a href="#a6f2588ea9cbe89cdd9b24f3b0b45753a">More...</a><br /></td></tr>
+<tr class="memdesc:a6f2588ea9cbe89cdd9b24f3b0b45753a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo-random bytes  <a href="#a6f2588ea9cbe89cdd9b24f3b0b45753a">More...</a><br /></td></tr>
 <tr class="separator:a6f2588ea9cbe89cdd9b24f3b0b45753a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f1ab82907b467f70d63a421be0876cd"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_g.html#a9f1ab82907b467f70d63a421be0876cd">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
-<tr class="memdesc:a9f1ab82907b467f70d63a421be0876cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo random bytes using offset and length parameters  <a href="#a9f1ab82907b467f70d63a421be0876cd">More...</a><br /></td></tr>
+<tr class="memdesc:a9f1ab82907b467f70d63a421be0876cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo-random bytes using offset and length parameters  <a href="#a9f1ab82907b467f70d63a421be0876cd">More...</a><br /></td></tr>
 <tr class="separator:a9f1ab82907b467f70d63a421be0876cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d09dedea4d890771dfbce25247a8ead"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_g.html#a0d09dedea4d890771dfbce25247a8ead">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam) override</td></tr>
 <tr class="memdesc:a0d09dedea4d890771dfbce25247a8ead"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string  <a href="#a0d09dedea4d890771dfbce25247a8ead">More...</a><br /></td></tr>
@@ -176,7 +176,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of an cSHAKE Generator DRBG </p>
-<p>Generate an array of pseudo random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_c_s_g.html">CSG</a> gen(<a class="code" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a>, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0acbc6e9792f97c17c170caeb83895c44e">Providers::CSP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">gen.Initialize(Seed, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">gen.<a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><em>Initialize</em> <br />
+<p>Generate an array of pseudo-random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_c_s_g.html">CSG</a> gen(<a class="code" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a>, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0acbc6e9792f97c17c170caeb83895c44e">Providers::CSP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">gen.Initialize(Seed, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">gen.<a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><em>Initialize</em> <br />
 The Initialize function can take up to 3 inputs; the generator Seed which is the primary key, a Nonce value which acts as a customization string, <br />
 and the distribution code (Info parameter) used as the Name parameter in SHAKE. <br />
 The initialization parameters determine the type of underlying generator is invoked. If only a key is used, the generator invokes a SHAKE instance. <br />
@@ -288,7 +288,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if an unrecognized digest type name is used</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if an unrecognized digest type name is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -346,7 +346,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if a null digest is used</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if a null digest is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -494,7 +494,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Generate a block of pseudo random bytes </p>
+<p>Generate a block of pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
@@ -504,7 +504,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
   </table>
   </dd>
 </dl>
@@ -553,7 +553,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </table>
 </div><div class="memdoc">
 
-<p>Generate pseudo random bytes using offset and length parameters </p>
+<p>Generate pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
@@ -565,7 +565,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
   </table>
   </dd>
 </dl>
@@ -607,7 +607,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -650,7 +650,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -704,7 +704,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -765,7 +765,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -1097,7 +1097,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoGeneratorException</td><td>Thrown if the seed is too small</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is too small</td></tr>
   </table>
   </dd>
 </dl>

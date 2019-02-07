@@ -139,10 +139,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a620be3a5ed3faa9c111afc1f0222b79e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The security strength in bits  <a href="#a620be3a5ed3faa9c111afc1f0222b79e">More...</a><br /></td></tr>
 <tr class="separator:a620be3a5ed3faa9c111afc1f0222b79e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8149cedfc65c1d7e89ff8690cad4f157"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a8149cedfc65c1d7e89ff8690cad4f157">Generate</a> (std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
-<tr class="memdesc:a8149cedfc65c1d7e89ff8690cad4f157"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo random bytes  <a href="#a8149cedfc65c1d7e89ff8690cad4f157">More...</a><br /></td></tr>
+<tr class="memdesc:a8149cedfc65c1d7e89ff8690cad4f157"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo-random bytes  <a href="#a8149cedfc65c1d7e89ff8690cad4f157">More...</a><br /></td></tr>
 <tr class="separator:a8149cedfc65c1d7e89ff8690cad4f157"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab890c39c5db4497e5c0dad8684377d59"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#ab890c39c5db4497e5c0dad8684377d59">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
-<tr class="memdesc:ab890c39c5db4497e5c0dad8684377d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo random bytes using offset and length parameters  <a href="#ab890c39c5db4497e5c0dad8684377d59">More...</a><br /></td></tr>
+<tr class="memdesc:ab890c39c5db4497e5c0dad8684377d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo-random bytes using offset and length parameters  <a href="#ab890c39c5db4497e5c0dad8684377d59">More...</a><br /></td></tr>
 <tr class="separator:ab890c39c5db4497e5c0dad8684377d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f4774cd3d6f777ac8a4434565bbb96c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a2f4774cd3d6f777ac8a4434565bbb96c">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam)=0</td></tr>
 <tr class="memdesc:a2f4774cd3d6f777ac8a4434565bbb96c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key and optional salt (Nonce) and info string (Info)  <a href="#a2f4774cd3d6f777ac8a4434565bbb96c">More...</a><br /></td></tr>
@@ -359,16 +359,21 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Generate a block of pseudo random bytes </p>
+<p>Generate a block of pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implemented in <a class="el" href="class_b_c_g.html#ab4b8402a1d7074fb413d9dc39f9f5a1c">BCG</a>, <a class="el" href="class_h_c_g.html#a7679e06f54695aaa3a407304babbc597">HCG</a>, and <a class="el" href="class_c_s_g.html#a6f2588ea9cbe89cdd9b24f3b0b45753a">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a7679e06f54695aaa3a407304babbc597">HCG</a>, <a class="el" href="class_b_c_g.html#ab4b8402a1d7074fb413d9dc39f9f5a1c">BCG</a>, and <a class="el" href="class_c_s_g.html#a6f2588ea9cbe89cdd9b24f3b0b45753a">CSG</a>.</p>
 
 </div>
 </div>
@@ -412,7 +417,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Generate pseudo random bytes using offset and length parameters </p>
+<p>Generate pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
@@ -422,6 +427,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="class_h_c_g.html#a6096c3b466e866315d411873f1a7c55f">HCG</a>, <a class="el" href="class_b_c_g.html#acbf7733acc9eda08b57b1183655473d3">BCG</a>, and <a class="el" href="class_c_s_g.html#a9f1ab82907b467f70d63a421be0876cd">CSG</a>.</p>
 
@@ -458,6 +469,12 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implemented in <a class="el" href="class_h_c_g.html#a2fd26876fccbfd4dbf9f55eb5b43ff36">HCG</a>, <a class="el" href="class_b_c_g.html#a27a0028a85ef9242435f4b7358be9913">BCG</a>, and <a class="el" href="class_c_s_g.html#a0d09dedea4d890771dfbce25247a8ead">CSG</a>.</p>
 
@@ -491,6 +508,12 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -541,8 +564,14 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#ad140f22333acfecfeb52aef49a907311">HCG</a>, <a class="el" href="class_b_c_g.html#ac5c615a061033480d4791cd700734e39">BCG</a>, and <a class="el" href="class_c_s_g.html#a91f0bc20e73c30c31f993f9791f10473">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_g.html#ac5c615a061033480d4791cd700734e39">BCG</a>, <a class="el" href="class_h_c_g.html#ad140f22333acfecfeb52aef49a907311">HCG</a>, and <a class="el" href="class_c_s_g.html#a91f0bc20e73c30c31f993f9791f10473">CSG</a>.</p>
 
 </div>
 </div>
@@ -592,6 +621,12 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
     <tr><td class="paramname">Salt</td><td>The salt value used as an additional source of entropy</td></tr>
     <tr><td class="paramname">Info</td><td>The information string or nonce used as a third source of entropy</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
   </table>
   </dd>
 </dl>
@@ -885,7 +920,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The security strength in bits </p>
 
-<p>Implemented in <a class="el" href="class_b_c_g.html#a668962a434759e4e2a30a397a04147f2">BCG</a>, <a class="el" href="class_h_c_g.html#aa15826f52a9c991b6628348bd651f5fe">HCG</a>, and <a class="el" href="class_c_s_g.html#aed0767df96614998c72a14f708c0fdad">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#aa15826f52a9c991b6628348bd651f5fe">HCG</a>, <a class="el" href="class_b_c_g.html#a668962a434759e4e2a30a397a04147f2">BCG</a>, and <a class="el" href="class_c_s_g.html#aed0767df96614998c72a14f708c0fdad">CSG</a>.</p>
 
 </div>
 </div>
@@ -917,6 +952,12 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Seed</td><td>The new seed value array</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is too small</td></tr>
   </table>
   </dd>
 </dl>

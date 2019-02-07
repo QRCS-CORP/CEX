@@ -22,7 +22,7 @@
 #include "CexDomain.h"
 #include "SimdIntegers.h"
 
-#	if defined(__AVX__)
+#if defined(__AVX__)
 #	include "Intrinsics.h"
 #endif
 

@@ -13,7 +13,7 @@ using Utility::MemoryTools;
 using Enumeration::ProviderConvert;
 using Utility::SystemTools;
 
-const bool ECP::TIMER_HAS_TSC = SystemTools::HasRdtsc();
+const bool ECP::HAS_TSC = SystemTools::HasRdtsc();
 
 //~~~Constructor~~~//
 
@@ -136,7 +136,7 @@ std::vector<byte> ECP::Collect()
 	const size_t SMPLEN = 64;
 	std::vector<byte> state(0);
 	std::vector<byte> buffer(SMPLEN);
-	ulong ts = SystemTools::TimeStamp(TIMER_HAS_TSC);
+	ulong ts = SystemTools::TimeStamp(HAS_TSC);
 
 	CSP pvd;
 	pvd.Generate(buffer);
@@ -146,21 +146,21 @@ std::vector<byte> ECP::Collect()
 	ArrayTools::AppendValue(ts, state);
 	// collect the entropy
 	ArrayTools::AppendVector(DriveInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(MemoryInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(NetworkInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(ProcessInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(ProcessorInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(SystemInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(TimeInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 	ArrayTools::AppendVector(UserInfo(), state);
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC) - ts, state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC) - ts, state);
 
 	// filter zeroes
 	Filter(state);
@@ -198,12 +198,9 @@ bool ECP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	std::vector<byte> tmp(m_pvdSelfTest.SELFTEST_LENGTH);
 	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
 
-	GetRandom(tmp, 0, tmp.size(), m_kdfGenerator);
-	MemoryTools::Copy(tmp, 0, smp, 0, smp.size());
-	MemoryTools::Clear(tmp, 0, tmp.size());
+	GetRandom(smp, 0, smp.size(), m_kdfGenerator);
 
 	if (!m_pvdSelfTest.SelfTest(smp))
 	{
@@ -411,13 +408,13 @@ std::vector<byte> ECP::ProcessInfo()
 std::vector<byte> ECP::ProcessorInfo()
 {
 	std::vector<byte> state(0);
-	CpuDetect detect;
+	CpuDetect dtc;
 
-	ArrayTools::AppendValue(detect.BusRefFrequency(), state);
-	ArrayTools::AppendValue(detect.FrequencyBase(), state);
-	ArrayTools::AppendValue(detect.FrequencyMax(), state);
-	ArrayTools::AppendValue(detect.FrequencyBase(), state);
-	ArrayTools::AppendString(detect.SerialNumber(), state);
+	ArrayTools::AppendValue(dtc.BusRefFrequency(), state);
+	ArrayTools::AppendValue(dtc.FrequencyBase(), state);
+	ArrayTools::AppendValue(dtc.FrequencyMax(), state);
+	ArrayTools::AppendValue(dtc.FrequencyBase(), state);
+	ArrayTools::AppendString(dtc.SerialNumber(), state);
 
 	return state;
 }
@@ -466,7 +463,7 @@ std::vector<byte> ECP::TimeInfo()
 {
 	std::vector<byte> state(0);
 
-	ArrayTools::AppendValue(SystemTools::TimeStamp(TIMER_HAS_TSC), state);
+	ArrayTools::AppendValue(SystemTools::TimeStamp(HAS_TSC), state);
 	ArrayTools::AppendValue(SystemTools::TimeCurrentNS(), state);
 	ArrayTools::AppendValue(SystemTools::TimeSinceBoot(), state);
 

@@ -22,6 +22,7 @@
 // Written by John Underhill, January 10, 2014
 // Updated December 20, 2016
 // Updated December 23, 2018
+// Updated February 6, 2018
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CMAC_H
@@ -30,7 +31,6 @@
 #include "MacBase.h"
 #include "BlockCiphers.h"
 #include "CBC.h"
-#include "SymmetricSecureKey.h"
 
 NAMESPACE_MAC
 
@@ -38,16 +38,16 @@ using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Cipher::Block::Mode::CBC;
 using Cipher::Block::IBlockCipher;
-using Cipher::SymmetricSecureKey;
+using Cipher::SymmetricKey;
 
 /// <summary>
-/// An implementation of a symmetric Cipher based Message Authentication Code generator
+/// An implementation of a symmetric Cipher based Message Authentication Code generator: CMAC
 /// </summary>
 /// 
 /// <example>
 /// <description>Example generating a MAC code from an Input array</description>
 /// <code>
-/// CMAC mac(Enumeration::BlockCiphers::AES);
+/// CMAC mac(BlockCiphers::AES);
 /// SymmetricKey kp(Key);
 /// mac.Initialize(kp);
 /// mac.Update(Input, 0, Input.size());
@@ -57,8 +57,8 @@ using Cipher::SymmetricSecureKey;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>Cipher-based Message Authentication Code (CMAC), sometimes known as OMAC, is a block cipher-based message authentication code algorithm. \n
-/// It can use any of the block ciphers in this library to provide assurance of message authenticity and the integrity of binary data.</para>
+/// <para>Cipher-based Message Authentication Code (CMAC), sometimes known as OMAC, is a block cipher-based message authentication code generator. \n
+/// It can use any of the block ciphers in this library as the underlying permutation function run in CBC mode, and provides assurance of message authenticity and the integrity of binary data.</para>
 /// 
 /// <description><B>Description:</B></description>
 /// <para><EM>Legend:</EM> \n 
@@ -83,11 +83,12 @@ using Cipher::SymmetricSecureKey;
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Never reuse a ciphers key for the CMAC function, this is insecure and strongly discouraged.</description></item>
-/// <item><description>MAC return size is the underlying ciphers block-size; e.g. for AES, 16 bytes, and can be truncated by the caller.</description></item>
-/// <item><description>With the Initialize(Key) method, the key must be at least the ciphers block-size plus the minimum key size in length.</description></item>
-/// <item><description>The Initialize(Key, Salt), and Initialize(Key, Salt, Info) methods, use the Key parameter as the cipher key, and the Salt as the initialization vector.</description></item>
-/// <item><description>The Initialize(Key, Salt, Info) method assigns the Info array to an HX extended ciphers DistributionCode property; used by the secure key schedule to create an encryption domain.</description></item>
-/// <item><description>After a finalizer call (Finalize or Compute), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
+/// <item><description>MAC tag return size is the underlying ciphers block-size, in this library that is always 16 bytes, this length can be truncated by the caller, but that is not recommended.</description></item>
+/// <item><description>The generator must be initialized with a key using the Initialize function before output can be generated.</description></item>
+/// <item><description>The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material.</description></item>
+/// <item><description>The Compute(Input, Output) method wraps the Update(Input, Offset, Length) and Finalize(Output, Offset) methods and should only be used on small to medium sized data.</description>/></item>
+/// <item><description>The Update(Input, Offset, Length) processes any length of message data, and is used in conjunction with the Finalize(Output, Offset) method, which completes processing and returns the finalized MAC code.</description>/></item>
+/// <item><description>After a finalizer call the MAC must be re-initialized with a new key.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -112,7 +113,7 @@ private:
 	std::unique_ptr<CmacState> m_cmacState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::unique_ptr<SymmetricSecureKey> m_luKey;
+	std::unique_ptr<SymmetricKey> m_luKey;
 
 public:
 
@@ -134,11 +135,10 @@ public:
 	CMAC() = delete;
 
 	/// <summary>
-	/// Initialize the class with the block cipher enumeration name
+	/// Initialize the class with the block cipher type enumeration name
 	/// </summary>
 	///
-	/// <param name="CipherType">The block cipher enumeration name</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
+	/// <param name="CipherType">The block cipher type enumeration name</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
 	explicit CMAC(BlockCiphers CipherType);
@@ -165,65 +165,77 @@ public:
 	const BlockCiphers CipherType();
 
 	/// <summary>
-	/// Read Only: Mac is ready to digest data
+	/// Read Only: The MAC generator is ready to process data
 	/// </summary>
 	const bool IsInitialized() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Reset the CMAC and CBC state
+	/// Reset the CMAC and internal CBC state
 	/// </summary>
 	void Clear();
 
 	/// <summary>
-	/// Process an input array and return the Mac code in the output array.
-	/// <para>After calling this function the Mac code and buffer are zeroised, but key is still loaded.</para>
+	/// Process a vector of bytes and return the MAC code
 	/// </summary>
+	///
+	/// <param name="Input">The input vector to process</param>
+	/// <param name="Output">The output vector containing the MAC code</param>
 	/// 
-	/// <param name="Input">The input data byte array</param>
-	/// <param name="Output">The output Mac code array</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized</exception>
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Process the data and return a Mac code
-	/// <para>After calling this function the Mac code and buffer are zeroised, but key is still loaded.</para>
+	/// Completes processing and returns the MAC code in a standard vector
 	/// </summary>
-	/// 
-	/// <param name="Output">The output Mac code array</param>
-	/// <param name="OutOffset">The offset in the output array</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
+	///
+	/// <param name="Output">The output standard vector receiving the MAC code</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	///
+	/// <returns>The size of the MAC code in bytes</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
 	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
-	/// Initialize the MAC generator with a symmetric key container.
-	/// <para>Uses a key, and optional info arrays to initialize the MAC.
-	/// The key size must be one of the block ciphers legal key sizes.
-	/// The Info param is processed only by an HX enabled cipher as the DistributionCode.</para>
+	/// Completes processing and returns the MAC code in a secure vector
+	/// </summary>
+	///
+	/// <param name="Output">The output secure vector receiving the MAC code</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	///
+	/// <returns>The size of the MAC code in bytes</returns>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the output array is too small</exception>
+	size_t Finalize(SecureVector<byte> &Output, size_t OutOffset) override;
+
+	/// <summary>
+	/// Initialize the MAC generator with an ISymmetricKey key container.
+	/// <para>Can accept either the SymmetricKey or SymmetricSecureKey container to load keying material.
+	/// Uses a key, salt, and info arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
 	/// 
-	/// <exception cref="CryptoKdfException">Thrown if the key is not a legal size</exception>
+	/// <exception cref="CryptoMacException">Thrown if the key is not a legal size</exception>
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
-	/// Reset to the default state; Mac code and buffer are zeroised, but key is still loaded
+	/// Reset internal state to the pre-initialization defaults.
+	/// <para>Internal state is zeroised, and MAC generator must be reinitialized again before being used.</para>
 	/// </summary>
 	void Reset() override;
 
 	/// <summary>
-	/// Update the Mac with a block of bytes
+	/// Update the Mac with a length of bytes
 	/// </summary>
 	/// 
-	/// <param name="Input">The input data array to process</param>
-	/// <param name="InOffset">Starting position with the input array</param>
+	/// <param name="Input">The input data vector to process</param>
+	/// <param name="InOffset">The starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if the mac is not initialized or the input array is too small</exception>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:

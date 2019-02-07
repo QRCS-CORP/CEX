@@ -68,11 +68,11 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_a_c_s-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">ACS Class Reference<span class="mlabels"><span class="mlabel">final</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___symmetric.html">Symmetric</a> &raquo; <a class="el" href="group___stream.html">Stream</a></div></div>  </div>
+<div class="title">ACS Class Reference<span class="mlabels"><span class="mlabel">final</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___stream.html">Stream</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>An Encrypt and Authenticate AEAD Stream cipher implementation.  
+<p>An Encrypt and Authenticate AEAD stream cipher implementation (Authenticated Cipher Stream).  
  <a href="class_a_c_s.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_a_c_s_8h_source.html">ACS.h</a>&gt;</code></p>
@@ -94,9 +94,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:add7c50175261fe02465bd62d5000b0da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_a_c_s.html">ACS</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_c_s.html#add7c50175261fe02465bd62d5000b0da">operator=</a> (const <a class="el" href="class_a_c_s.html">ACS</a> &amp;)=delete</td></tr>
 <tr class="memdesc:add7c50175261fe02465bd62d5000b0da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#add7c50175261fe02465bd62d5000b0da">More...</a><br /></td></tr>
 <tr class="separator:add7c50175261fe02465bd62d5000b0da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a804cd4baf97af3800aa40d196576b1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_c_s.html#a8a804cd4baf97af3800aa40d196576b1">ACS</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType=BlockCiphers::AHX, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::SHAKE256, <a class="el" href="group___enumeration.html#ga62629810dc7b52fdfb37d80f03d62274">StreamAuthenticators</a> AuthenticatorType=<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>)</td></tr>
-<tr class="memdesc:a8a804cd4baf97af3800aa40d196576b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name.  <a href="#a8a804cd4baf97af3800aa40d196576b1">More...</a><br /></td></tr>
-<tr class="separator:a8a804cd4baf97af3800aa40d196576b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade6f39d92a61a680087ec7fc648f9cc0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_c_s.html#ade6f39d92a61a680087ec7fc648f9cc0">ACS</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType=BlockCiphers::AES, <a class="el" href="group___enumeration.html#ga62629810dc7b52fdfb37d80f03d62274">StreamAuthenticators</a> AuthenticatorType=<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>)</td></tr>
+<tr class="memdesc:ade6f39d92a61a680087ec7fc648f9cc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name.  <a href="#ade6f39d92a61a680087ec7fc648f9cc0">More...</a><br /></td></tr>
+<tr class="separator:ade6f39d92a61a680087ec7fc648f9cc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9e39c39167620f9c1171b9b32e7f834"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_c_s.html#af9e39c39167620f9c1171b9b32e7f834">~ACS</a> () override</td></tr>
 <tr class="memdesc:af9e39c39167620f9c1171b9b32e7f834"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#af9e39c39167620f9c1171b9b32e7f834">More...</a><br /></td></tr>
 <tr class="separator:af9e39c39167620f9c1171b9b32e7f834"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,7 +122,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a4e5a7d44f20af92731572b1793696a3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes  <a href="#a4e5a7d44f20af92731572b1793696a3a">More...</a><br /></td></tr>
 <tr class="separator:a4e5a7d44f20af92731572b1793696a3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6063d1035a15c0352c55ee48ea48c3a9"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_c_s.html#a6063d1035a15c0352c55ee48ea48c3a9">Name</a> () override</td></tr>
-<tr class="memdesc:a6063d1035a15c0352c55ee48ea48c3a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers class name  <a href="#a6063d1035a15c0352c55ee48ea48c3a9">More...</a><br /></td></tr>
+<tr class="memdesc:a6063d1035a15c0352c55ee48ea48c3a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers implementation name  <a href="#a6063d1035a15c0352c55ee48ea48c3a9">More...</a><br /></td></tr>
 <tr class="separator:a6063d1035a15c0352c55ee48ea48c3a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97ac02129c2cdc34928e72cc2074be16"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_c_s.html#a97ac02129c2cdc34928e72cc2074be16">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:a97ac02129c2cdc34928e72cc2074be16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#a97ac02129c2cdc34928e72cc2074be16">More...</a><br /></td></tr>
@@ -167,14 +167,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad0d33aab27fe8dabe9160a560bc19d5b inherit pub_methods_class_i_stream_cipher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An Encrypt and Authenticate AEAD Stream cipher implementation. </p>
+<div class="textblock"><p>An Encrypt and Authenticate AEAD stream cipher implementation (Authenticated Cipher Stream). </p>
 <p>Uses an optional authentication mode; HMAC(SHA2) or KMAC set through the constructor to authenticate the stream.</p>
-<p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_a_c_s.html">ACS</a> cipher(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256, <a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>);</div><div class="line"><span class="comment">// mac code is appended to the cipher-text stream in authentication mode</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Encrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_a_c_s.html">ACS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_a_c_s.html">ACS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"><span class="comment">// decrypt the ciphertext</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="struct_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_a_c_s.html">ACS</a> cipher(BlockCiphers::AES, BlockCipherExtensions::SHAKE256, <a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>);</div><div class="line"><span class="comment">// mac code is appended to the cipher-text stream in authentication mode</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Encrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_a_c_s.html">ACS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_a_c_s.html">ACS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"><span class="comment">// decrypt the ciphertext</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="class_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>The ACS Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated stream cipher. <br />
 ACS is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. <br />
 It also has provable security, dependant on the block cipher used by the mode. <br />
 ACS first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a MAC function used for data authentication. <br />
-When encryption is completed, the MAC code is generated and appended to the output stream automatically. <br />
+When each transform call encryption is completed, the MAC code is generated and appended to the output stream automatically. <br />
 Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text. <br />
 During decryption, if the MAC codes do not match, a CryptoAuthenticationFailure exception error is thrown.</p>
 <p><b>Multi-Threading:</b> </p>
@@ -270,8 +270,8 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
 
 </div>
 </div>
-<a id="a8a804cd4baf97af3800aa40d196576b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a804cd4baf97af3800aa40d196576b1">&#9670;&nbsp;</a></span>ACS() <span class="overload">[2/2]</span></h2>
+<a id="ade6f39d92a61a680087ec7fc648f9cc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade6f39d92a61a680087ec7fc648f9cc0">&#9670;&nbsp;</a></span>ACS() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -280,13 +280,7 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
           <td class="memname">ACS::ACS </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em> = <code>BlockCiphers::AHX</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
-          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::SHAKE256</code>, </td>
+          <td class="paramname"><em>CipherType</em> = <code>BlockCiphers::AES</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -306,15 +300,14 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
 <p>The cipher instance is created and destroyed automatically.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">CipherType</td><td>The enumeration name of the underlying block cipher; the default is AHX</td></tr>
-    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF; the default is SHAKE256</td></tr>
+    <tr><td class="paramname">CipherType</td><td>The enumeration name of the underlying block cipher; the default is RHX</td></tr>
     <tr><td class="paramname">AuthenticatorType</td><td>The authentication engine, the default is KMAC256</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if an invalid block cipher type is used</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if an invalid block cipher type is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -520,7 +513,7 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if a null or invalid key is used</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if a null or invalid key is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -669,7 +662,7 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The stream ciphers class name </p>
+<p>Read Only: The stream ciphers implementation name </p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a2a1e6ebb86452e76be1e04424f54f71e">IStreamCipher</a>.</p>
 
@@ -765,6 +758,12 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the degree parameter is invalid</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a3ed2a086fc9e31fa7b57b4da357bbf9b">IStreamCipher</a>.</p>
 
@@ -853,7 +852,7 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if the cipher is not initialized</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if the cipher is not initialized</td></tr>
   </table>
   </dd>
 </dl>
@@ -986,7 +985,7 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAuthenticationFailure</td><td>Thrown during decryption if the the ciphertext fails authentication</td></tr>
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Thrown during decryption if the the ciphertext fails authentication</td></tr>
   </table>
   </dd>
 </dl>

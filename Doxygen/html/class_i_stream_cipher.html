@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_i_stream_cipher-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">IStreamCipher Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___symmetric.html">Symmetric</a> &raquo; <a class="el" href="group___stream.html">Stream</a></div></div>  </div>
+<div class="title">IStreamCipher Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___stream.html">Stream</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -82,7 +82,7 @@ Inheritance diagram for IStreamCipher:</div>
  <div class="center">
   <img src="class_i_stream_cipher.png" usemap="#IStreamCipher_map" alt=""/>
   <map id="IStreamCipher_map" name="IStreamCipher_map">
-<area href="class_a_c_s.html" title="An Encrypt and Authenticate AEAD Stream cipher implementation. " alt="ACS" shape="rect" coords="0,56,93,80"/>
+<area href="class_a_c_s.html" title="An Encrypt and Authenticate AEAD stream cipher implementation (Authenticated Cipher Stream)..." alt="ACS" shape="rect" coords="0,56,93,80"/>
 <area href="class_cha_cha256.html" title="A parallelized and vectorized ChaCha-256 20-round stream cipher [CSX256] implementation. " alt="ChaCha256" shape="rect" coords="103,56,196,80"/>
 <area href="class_cha_cha512.html" title="A parallelized and vectorized ChaCha-512 80-round stream cipher [CSX512] implementation. " alt="ChaCha512" shape="rect" coords="206,56,299,80"/>
 <area href="class_threefish1024.html" title="A vectorized and optionally parallelized Threefish1024 120-round stream cipher [TSX1024] implementati..." alt="Threefish1024" shape="rect" coords="309,56,402,80"/>
@@ -127,7 +127,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a50c9524e55e3a37bf648baf2c3933d0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes  <a href="#a50c9524e55e3a37bf648baf2c3933d0e">More...</a><br /></td></tr>
 <tr class="separator:a50c9524e55e3a37bf648baf2c3933d0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a1e6ebb86452e76be1e04424f54f71e"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_stream_cipher.html#a2a1e6ebb86452e76be1e04424f54f71e">Name</a> ()=0</td></tr>
-<tr class="memdesc:a2a1e6ebb86452e76be1e04424f54f71e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers class name  <a href="#a2a1e6ebb86452e76be1e04424f54f71e">More...</a><br /></td></tr>
+<tr class="memdesc:a2a1e6ebb86452e76be1e04424f54f71e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers implementation name  <a href="#a2a1e6ebb86452e76be1e04424f54f71e">More...</a><br /></td></tr>
 <tr class="separator:a2a1e6ebb86452e76be1e04424f54f71e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af232e69a8ad4186b8595cdd3ff51a393"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_stream_cipher.html#af232e69a8ad4186b8595cdd3ff51a393">ParallelBlockSize</a> ()=0</td></tr>
 <tr class="memdesc:af232e69a8ad4186b8595cdd3ff51a393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#af232e69a8ad4186b8595cdd3ff51a393">More...</a><br /></td></tr>
@@ -277,7 +277,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a75f746582f455c5e6669c1be0493f411">ACS</a>, <a class="el" href="class_cha_cha512.html#a8183814cb43a93ea43cb9c3c668e9653">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#aacc55fc933ceae56e9c199d19b906a0c">ChaCha256</a>, <a class="el" href="class_threefish1024.html#adb747561368c950377e360f839aa722e">Threefish1024</a>, <a class="el" href="class_threefish512.html#ab110a285fd13e764f5c8de0ea0429c55">Threefish512</a>, and <a class="el" href="class_threefish256.html#a57712b57d86ec869ee25f5cdceaa8664">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a75f746582f455c5e6669c1be0493f411">ACS</a>, <a class="el" href="class_cha_cha512.html#a8183814cb43a93ea43cb9c3c668e9653">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#aacc55fc933ceae56e9c199d19b906a0c">ChaCha256</a>, <a class="el" href="class_threefish512.html#ab110a285fd13e764f5c8de0ea0429c55">Threefish512</a>, <a class="el" href="class_threefish256.html#a57712b57d86ec869ee25f5cdceaa8664">Threefish256</a>, and <a class="el" href="class_threefish1024.html#adb747561368c950377e360f839aa722e">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -306,7 +306,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Internal block size of internal cipher in bytes. </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a1176642ee568a39535b1f003c6b111c9">ACS</a>, <a class="el" href="class_cha_cha512.html#ad6727599d9c717a4ae132e546567a573">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a26cb57f8b9f9f1e1bcbc0d284fbb1ff9">ChaCha256</a>, <a class="el" href="class_threefish1024.html#af0d87ee2455ec267d4475a894a66d9a2">Threefish1024</a>, <a class="el" href="class_threefish512.html#adae9ac6883a8d87efce38a381ece2453">Threefish512</a>, and <a class="el" href="class_threefish256.html#ac228b939bda9b16941e84646883efa7f">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a1176642ee568a39535b1f003c6b111c9">ACS</a>, <a class="el" href="class_cha_cha512.html#ad6727599d9c717a4ae132e546567a573">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a26cb57f8b9f9f1e1bcbc0d284fbb1ff9">ChaCha256</a>, <a class="el" href="class_threefish512.html#adae9ac6883a8d87efce38a381ece2453">Threefish512</a>, <a class="el" href="class_threefish256.html#ac228b939bda9b16941e84646883efa7f">Threefish256</a>, and <a class="el" href="class_threefish1024.html#af0d87ee2455ec267d4475a894a66d9a2">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -336,7 +336,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: The maximum size of the distribution code in bytes. </p>
 <p>The distribution code is set with the ISymmetricKey Info parameter; and can be used as a secondary domain key.</p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#ad04c5302b7bf4a1e67546634a5a9f3e2">ACS</a>, <a class="el" href="class_cha_cha512.html#ae082efe7cf52f57a4c0bf87cc0ec82c6">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a9fcac5c3defc5dd5f1be5a342df84829">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a5272d32271614ba89b0df351d46b8cb7">Threefish1024</a>, <a class="el" href="class_threefish512.html#a8a31dec96f343fdc943468ffcdf00ceb">Threefish512</a>, and <a class="el" href="class_threefish256.html#aa87997e3aedb1811cb3d0a4cd98decb4">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#ad04c5302b7bf4a1e67546634a5a9f3e2">ACS</a>, <a class="el" href="class_cha_cha512.html#ae082efe7cf52f57a4c0bf87cc0ec82c6">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a9fcac5c3defc5dd5f1be5a342df84829">ChaCha256</a>, <a class="el" href="class_threefish512.html#a8a31dec96f343fdc943468ffcdf00ceb">Threefish512</a>, <a class="el" href="class_threefish256.html#aa87997e3aedb1811cb3d0a4cd98decb4">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a5272d32271614ba89b0df351d46b8cb7">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -365,7 +365,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The stream ciphers type name </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a7e52df0647436d4776e72f50ce1d0225">ACS</a>, <a class="el" href="class_cha_cha512.html#a7f18492eaccc5bb47747b05b69de6f04">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a2fa80c1d35efb2ee9d4f4727f588c5ed">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a272fc07b9bbe5ec9d7b5532f1936f832">Threefish1024</a>, <a class="el" href="class_threefish512.html#af333435d8523b979febb441babdfb2b4">Threefish512</a>, and <a class="el" href="class_threefish256.html#a529590450d154f1de9e64c5268f38e7d">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a7e52df0647436d4776e72f50ce1d0225">ACS</a>, <a class="el" href="class_cha_cha512.html#a7f18492eaccc5bb47747b05b69de6f04">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a2fa80c1d35efb2ee9d4f4727f588c5ed">ChaCha256</a>, <a class="el" href="class_threefish512.html#af333435d8523b979febb441babdfb2b4">Threefish512</a>, <a class="el" href="class_threefish256.html#a529590450d154f1de9e64c5268f38e7d">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a272fc07b9bbe5ec9d7b5532f1936f832">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -412,8 +412,14 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if a null or invalid key is used</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a9bcf651a6b629b6413b64af35e6ab96d">ACS</a>, <a class="el" href="class_cha_cha512.html#af2eea433cb3dd7de8a96e1965416ffb1">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#ace72e209f2aa4128eb82d10594e5ff9b">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a3f388c6b56b0fb0537981174ebd52b8d">Threefish1024</a>, <a class="el" href="class_threefish512.html#a45143049d7575e628b11aee4cf73cda2">Threefish512</a>, and <a class="el" href="class_threefish256.html#ade877839bf148c17f577678828c22d01">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a9bcf651a6b629b6413b64af35e6ab96d">ACS</a>, <a class="el" href="class_cha_cha512.html#af2eea433cb3dd7de8a96e1965416ffb1">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#ace72e209f2aa4128eb82d10594e5ff9b">ChaCha256</a>, <a class="el" href="class_threefish512.html#a45143049d7575e628b11aee4cf73cda2">Threefish512</a>, <a class="el" href="class_threefish256.html#ade877839bf148c17f577678828c22d01">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a3f388c6b56b0fb0537981174ebd52b8d">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -442,7 +448,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Cipher has authentication enabled </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a5e39c3eae3b603b2125cb2c6970262b1">ACS</a>, <a class="el" href="class_cha_cha512.html#a8433fc39ad69cd0045a3f8f77aef1228">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a714ae943aa6c8f4d0aa050bc8aa15d2a">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a4f5888c8783fed2b169927e2d45322a5">Threefish1024</a>, <a class="el" href="class_threefish512.html#a4e109de94b49b69823bc2c2eb281c376">Threefish512</a>, and <a class="el" href="class_threefish256.html#aa9354e83f25403f746d632401c3b6369">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a5e39c3eae3b603b2125cb2c6970262b1">ACS</a>, <a class="el" href="class_cha_cha512.html#a8433fc39ad69cd0045a3f8f77aef1228">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a714ae943aa6c8f4d0aa050bc8aa15d2a">ChaCha256</a>, <a class="el" href="class_threefish512.html#a4e109de94b49b69823bc2c2eb281c376">Threefish512</a>, <a class="el" href="class_threefish256.html#aa9354e83f25403f746d632401c3b6369">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a4f5888c8783fed2b169927e2d45322a5">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -471,7 +477,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Cipher is ready to transform data </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a3a079424acc9ff6c425711e147b4f09a">ACS</a>, <a class="el" href="class_cha_cha512.html#ae3db9bba2aad7475ae444351cb622952">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#ac89659922c078f0ce11188a60561a7f2">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a32b1e5ecbf8eeea27930f96c9c5980f7">Threefish1024</a>, <a class="el" href="class_threefish512.html#a5dbcb3d53983b98522da30fb7fb866c6">Threefish512</a>, and <a class="el" href="class_threefish256.html#a903f88bf4d5b54208d1e7703e72e04f4">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a3a079424acc9ff6c425711e147b4f09a">ACS</a>, <a class="el" href="class_cha_cha512.html#ae3db9bba2aad7475ae444351cb622952">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#ac89659922c078f0ce11188a60561a7f2">ChaCha256</a>, <a class="el" href="class_threefish512.html#a5dbcb3d53983b98522da30fb7fb866c6">Threefish512</a>, <a class="el" href="class_threefish256.html#a903f88bf4d5b54208d1e7703e72e04f4">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a32b1e5ecbf8eeea27930f96c9c5980f7">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -501,7 +507,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: Processor parallelization availability. </p>
 <p>Indicates whether parallel processing is available with this mode. If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a6bce29c181dcc63893c5d17747cc5ee8">ACS</a>, <a class="el" href="class_cha_cha512.html#a85ae6d8cfb0761089ec700f94e07314c">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a140757777729c87e6f17699dc337ac93">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a8bc931deb80bc72ba40463291456f63e">Threefish1024</a>, <a class="el" href="class_threefish512.html#a69b5982a9636354bac031c0d4d0545ea">Threefish512</a>, and <a class="el" href="class_threefish256.html#a090770d2dfc74390a825e5e16e0ce05c">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a6bce29c181dcc63893c5d17747cc5ee8">ACS</a>, <a class="el" href="class_cha_cha512.html#a85ae6d8cfb0761089ec700f94e07314c">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a140757777729c87e6f17699dc337ac93">ChaCha256</a>, <a class="el" href="class_threefish512.html#a69b5982a9636354bac031c0d4d0545ea">Threefish512</a>, <a class="el" href="class_threefish256.html#a090770d2dfc74390a825e5e16e0ce05c">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a8bc931deb80bc72ba40463291456f63e">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -530,7 +536,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a4e5a7d44f20af92731572b1793696a3a">ACS</a>, <a class="el" href="class_cha_cha512.html#ab0d0e28fa16e8f2316ada7e8645edd21">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a602cfe60b6f2bed5588630eab26b500d">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a6209079c00dfe52e2ebe48aa68de2ab6">Threefish1024</a>, <a class="el" href="class_threefish512.html#a64bb01a2d7f972189d5ed895a40620da">Threefish512</a>, and <a class="el" href="class_threefish256.html#a1e17f5adc9ac75e695f52ca50799729f">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a4e5a7d44f20af92731572b1793696a3a">ACS</a>, <a class="el" href="class_cha_cha512.html#ab0d0e28fa16e8f2316ada7e8645edd21">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a602cfe60b6f2bed5588630eab26b500d">ChaCha256</a>, <a class="el" href="class_threefish512.html#a64bb01a2d7f972189d5ed895a40620da">Threefish512</a>, <a class="el" href="class_threefish256.html#a1e17f5adc9ac75e695f52ca50799729f">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a6209079c00dfe52e2ebe48aa68de2ab6">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -557,9 +563,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The stream ciphers class name </p>
+<p>Read Only: The stream ciphers implementation name </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a6063d1035a15c0352c55ee48ea48c3a9">ACS</a>, <a class="el" href="class_cha_cha512.html#a258cf706e7e7457f309cc54d135bc621">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a66167dd53d62a19a192501e096fa0541">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a6485116b1cf42556edc711ee3ba3c682">Threefish1024</a>, <a class="el" href="class_threefish512.html#abe5c0e3cf986d09eeeedeae6aa58782f">Threefish512</a>, and <a class="el" href="class_threefish256.html#a480162ca19d4e4e672d6b88af15fc83c">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a6063d1035a15c0352c55ee48ea48c3a9">ACS</a>, <a class="el" href="class_cha_cha512.html#a258cf706e7e7457f309cc54d135bc621">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a66167dd53d62a19a192501e096fa0541">ChaCha256</a>, <a class="el" href="class_threefish512.html#abe5c0e3cf986d09eeeedeae6aa58782f">Threefish512</a>, <a class="el" href="class_threefish256.html#a480162ca19d4e4e672d6b88af15fc83c">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a6485116b1cf42556edc711ee3ba3c682">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -617,7 +623,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing. </p>
 <p>This value can be changed through the ParallelProfile class.</p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a97ac02129c2cdc34928e72cc2074be16">ACS</a>, <a class="el" href="class_cha_cha512.html#afe9ffdd4860119f9a991bcc598b5d2a2">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#afee3abde2571cb3f482e334a5455d917">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a355dd36a68a6dfacc86c93a28b254a68">Threefish1024</a>, <a class="el" href="class_threefish512.html#a99c28a2f4ecbba3d985dbbe850ab765b">Threefish512</a>, and <a class="el" href="class_threefish256.html#a882e785843ec2fd5260355827836111c">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a97ac02129c2cdc34928e72cc2074be16">ACS</a>, <a class="el" href="class_cha_cha512.html#afe9ffdd4860119f9a991bcc598b5d2a2">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#afee3abde2571cb3f482e334a5455d917">ChaCha256</a>, <a class="el" href="class_threefish512.html#a99c28a2f4ecbba3d985dbbe850ab765b">Threefish512</a>, <a class="el" href="class_threefish256.html#a882e785843ec2fd5260355827836111c">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a355dd36a68a6dfacc86c93a28b254a68">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -655,12 +661,12 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if an invalid degree setting is used</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if an invalid degree setting is used</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a19b57c241848823aad21d9f92adead21">ACS</a>, <a class="el" href="class_cha_cha512.html#a29f4f8b4a6df3bc1c09580fdf65a0f94">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#ae826a30f72c7a5f70b344a90a8a0dfd3">ChaCha256</a>, <a class="el" href="class_threefish1024.html#ad82ff732e908473f1b1ffcffe4f2b183">Threefish1024</a>, <a class="el" href="class_threefish512.html#a97c5495f49fda5ba0e5d558824ea3518">Threefish512</a>, and <a class="el" href="class_threefish256.html#af810333f22c302eaa72babcd8b101ee7">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a19b57c241848823aad21d9f92adead21">ACS</a>, <a class="el" href="class_cha_cha512.html#a29f4f8b4a6df3bc1c09580fdf65a0f94">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#ae826a30f72c7a5f70b344a90a8a0dfd3">ChaCha256</a>, <a class="el" href="class_threefish512.html#a97c5495f49fda5ba0e5d558824ea3518">Threefish512</a>, <a class="el" href="class_threefish256.html#af810333f22c302eaa72babcd8b101ee7">Threefish256</a>, and <a class="el" href="class_threefish1024.html#ad82ff732e908473f1b1ffcffe4f2b183">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -690,7 +696,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Parallel and SIMD capability flags and sizes </p>
 <p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(bool, ISymmetricKey) function is called.</p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a88368933d044894cb440c0493859fad2">ACS</a>, <a class="el" href="class_cha_cha512.html#a46d67ccd1f273cd207327091046829db">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a59c2257207079356f4cdfee03592719e">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a4ef7941be25331997727ec6b1051a853">Threefish1024</a>, <a class="el" href="class_threefish512.html#a3643ce223875b82ac29db9c25743638e">Threefish512</a>, and <a class="el" href="class_threefish256.html#aa458a2138889c3ea8ad6f2781069a9bd">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a88368933d044894cb440c0493859fad2">ACS</a>, <a class="el" href="class_cha_cha512.html#a46d67ccd1f273cd207327091046829db">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a59c2257207079356f4cdfee03592719e">ChaCha256</a>, <a class="el" href="class_threefish512.html#a3643ce223875b82ac29db9c25743638e">Threefish512</a>, <a class="el" href="class_threefish256.html#aa458a2138889c3ea8ad6f2781069a9bd">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a4ef7941be25331997727ec6b1051a853">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -747,12 +753,12 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoSymmetricCipherException</td><td>Thrown if state has been processed</td></tr>
+    <tr><td class="paramname">CryptoSymmetricCipherException</td><td>Thrown if state has been processed</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#ad84519cb9625d6ca10e551922ec507f2">ACS</a>, <a class="el" href="class_cha_cha512.html#a96775b3ff2e2f4c89e9a42e548c325ac">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#affc6c42c435bd4cd516ec48d1d4951a7">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a8f12feae7a066f3a6ddc7a0ffd9a395d">Threefish1024</a>, <a class="el" href="class_threefish512.html#accf7bfc31796f25b58fa9da3442e604e">Threefish512</a>, and <a class="el" href="class_threefish256.html#adfc7a3654fc1e776dcccfb671148d749">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#ad84519cb9625d6ca10e551922ec507f2">ACS</a>, <a class="el" href="class_cha_cha512.html#a96775b3ff2e2f4c89e9a42e548c325ac">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#affc6c42c435bd4cd516ec48d1d4951a7">ChaCha256</a>, <a class="el" href="class_threefish512.html#accf7bfc31796f25b58fa9da3442e604e">Threefish512</a>, <a class="el" href="class_threefish256.html#adfc7a3654fc1e776dcccfb671148d749">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a8f12feae7a066f3a6ddc7a0ffd9a395d">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -781,7 +787,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The current MAC tag value </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a04c76d0a57d6814c75309cc269174f55">ACS</a>, <a class="el" href="class_cha_cha512.html#aab0bf851ca96c8b8bdd9faba9dca1fcb">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#af8e24990953a6714ff01c187727119f2">ChaCha256</a>, <a class="el" href="class_threefish1024.html#ad816970e88c7f5ab8f731579dfa3c02c">Threefish1024</a>, <a class="el" href="class_threefish512.html#a6c7c0b88ef08fa32e41871c6d5965896">Threefish512</a>, and <a class="el" href="class_threefish256.html#a2fc74f288c848b12e66a5d247393a70e">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a04c76d0a57d6814c75309cc269174f55">ACS</a>, <a class="el" href="class_cha_cha512.html#aab0bf851ca96c8b8bdd9faba9dca1fcb">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#af8e24990953a6714ff01c187727119f2">ChaCha256</a>, <a class="el" href="class_threefish512.html#a6c7c0b88ef08fa32e41871c6d5965896">Threefish512</a>, <a class="el" href="class_threefish256.html#a2fc74f288c848b12e66a5d247393a70e">Threefish256</a>, and <a class="el" href="class_threefish1024.html#ad816970e88c7f5ab8f731579dfa3c02c">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -810,7 +816,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The legal tag length in bytes </p>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#a059f15659fd29e05616a2c90b1413b92">ACS</a>, <a class="el" href="class_cha_cha512.html#a38cbf5d8aa29405e72278bb1f9a7b675">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a3c4111ce6c69419cf345746af6df4cb8">ChaCha256</a>, <a class="el" href="class_threefish1024.html#a28a2d949060cb55d83d940738f70398b">Threefish1024</a>, <a class="el" href="class_threefish512.html#a581a5f1e5bef020023fdec12f0bfb683">Threefish512</a>, and <a class="el" href="class_threefish256.html#a19fb3214716d5be4968404bd9eeac8f8">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#a059f15659fd29e05616a2c90b1413b92">ACS</a>, <a class="el" href="class_cha_cha512.html#a38cbf5d8aa29405e72278bb1f9a7b675">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a3c4111ce6c69419cf345746af6df4cb8">ChaCha256</a>, <a class="el" href="class_threefish512.html#a581a5f1e5bef020023fdec12f0bfb683">Threefish512</a>, <a class="el" href="class_threefish256.html#a19fb3214716d5be4968404bd9eeac8f8">Threefish256</a>, and <a class="el" href="class_threefish1024.html#a28a2d949060cb55d83d940738f70398b">Threefish1024</a>.</p>
 
 </div>
 </div>
@@ -879,7 +885,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_a_c_s.html#ad0fa7d963454edd0cadfd6075895adb4">ACS</a>, <a class="el" href="class_cha_cha512.html#a0ab3bc42bc3e88a62258aa0269a27b22">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a58d913fe0bf0bc9d35b39ad38647469f">ChaCha256</a>, <a class="el" href="class_threefish1024.html#aac309c8d3ddde0e899793ccc33eb732c">Threefish1024</a>, <a class="el" href="class_threefish512.html#abed662667c27b9f9a5c6e85535f76770">Threefish512</a>, and <a class="el" href="class_threefish256.html#a87274f0765e22d353de3253c1467a80b">Threefish256</a>.</p>
+<p>Implemented in <a class="el" href="class_a_c_s.html#ad0fa7d963454edd0cadfd6075895adb4">ACS</a>, <a class="el" href="class_cha_cha512.html#a0ab3bc42bc3e88a62258aa0269a27b22">ChaCha512</a>, <a class="el" href="class_cha_cha256.html#a58d913fe0bf0bc9d35b39ad38647469f">ChaCha256</a>, <a class="el" href="class_threefish512.html#abed662667c27b9f9a5c6e85535f76770">Threefish512</a>, <a class="el" href="class_threefish256.html#a87274f0765e22d353de3253c1467a80b">Threefish256</a>, and <a class="el" href="class_threefish1024.html#aac309c8d3ddde0e899793ccc33eb732c">Threefish1024</a>.</p>
 
 </div>
 </div>

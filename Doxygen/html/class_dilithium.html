@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_dilithium-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Dilithium Class Reference<span class="mlabels"><span class="mlabel">final</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___asymmetric.html">Asymmetric</a> &raquo; <a class="el" href="group___asymmetric_sign.html">AsymmetricSign</a> &raquo; <a class="el" href="group___dilithium.html">Dilithium</a></div></div>  </div>
+<div class="title">Dilithium Class Reference<span class="mlabels"><span class="mlabel">final</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___asymmetric.html">Asymmetric</a> &raquo; <a class="el" href="group___sign.html">Sign</a> &raquo; <a class="el" href="group___dilithium.html">Dilithium</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -149,7 +149,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Dilithium asymmetric signature scheme </p>
-<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line"><a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">DilithiumPrivateKey* prik = (DilithiumPrivateKey*)kp-&gt;<a class="code" href="class_i_asymmetric_key_pair.html#abe10c0eb64561c576b3419bf07895deb">PrivateKey</a>();</div><div class="line">std::vector&lt;byte&gt; pk = prik-&gt;<a class="code" href="class_i_asymmetric_key.html#a2d0d4cd2c927774996427d78d0f1ad72">ToBytes</a>();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    <span class="comment">// if authentication fails, this will throw</span></div><div class="line">    sgn.Verify(Signature, msg);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code" href="struct_crypto_authentication_failure.html">CryptoAuthenticationFailure</a> &amp;ex)</div><div class="line">{</div><div class="line">    <span class="comment">// handle the authentication failure</span></div><div class="line">}</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line"><a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">DilithiumPrivateKey* prik = (DilithiumPrivateKey*)kp-&gt;<a class="code" href="class_i_asymmetric_key_pair.html#abe10c0eb64561c576b3419bf07895deb">PrivateKey</a>();</div><div class="line">std::vector&lt;byte&gt; pk = prik-&gt;<a class="code" href="class_i_asymmetric_key.html#a2d0d4cd2c927774996427d78d0f1ad72">ToBytes</a>();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><span class="comment">// if authentication fails, do something</span></div><div class="line">status = sgn.Verify(Signature, msg);</div></div><!-- fragment --> <p>Implementation Notes: </p>
 <p>Dilithium is a digital signature scheme that is strongly secure under chosen message attacks based on the hardness of lattice problems over module lattices. <br />
 The security notion means that an adversary having access to a signing oracle cannot produce a signature of a message whose signature he hasn't yet seen. <br />
 Nor produce a different signature of a message that he already saw signed. </p>
@@ -268,7 +268,7 @@ Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Thrown if an invalid prng, or parameter set is specified</td></tr>
+    <tr><td class="paramname">CryptoAsymmetricException</td><td>Thrown if an invalid prng, or parameter set is specified</td></tr>
   </table>
   </dd>
 </dl>
@@ -359,7 +359,7 @@ Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </
 <dl class="section return"><dt>Returns</dt><dd>A public/private key pair</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Thrown if the key generation call fails</td></tr>
+    <tr><td class="paramname">CryptoAsymmetricException</td><td>Thrown if the key generation call fails</td></tr>
   </table>
   </dd>
 </dl>
@@ -396,6 +396,12 @@ Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The <a class="el" href="class_asymmetric_key.html" title="An Asymmetric cipher key container ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoAsymmetricException</td><td>Throws on invalid key or configuration error</td></tr>
   </table>
   </dd>
 </dl>

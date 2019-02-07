@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_x923-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">X923 Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___symmetric.html">Symmetric</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___padding.html">Padding</a></div></div>  </div>
+<div class="title">X923 Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___padding.html">Padding</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -106,15 +106,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad42be8684058ebaa65c28061527c2711"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_x923.html#ad42be8684058ebaa65c28061527c2711">Name</a> () override</td></tr>
 <tr class="memdesc:ad42be8684058ebaa65c28061527c2711"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The padding modes class name  <a href="#ad42be8684058ebaa65c28061527c2711">More...</a><br /></td></tr>
 <tr class="separator:ad42be8684058ebaa65c28061527c2711"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a232715464bce22d56622436bda47afa6"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_x923.html#a232715464bce22d56622436bda47afa6">AddPadding</a> (std::vector&lt; byte &gt; &amp;Input, size_t Offset) override</td></tr>
-<tr class="memdesc:a232715464bce22d56622436bda47afa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add padding to input array  <a href="#a232715464bce22d56622436bda47afa6">More...</a><br /></td></tr>
-<tr class="separator:a232715464bce22d56622436bda47afa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12e8f363684d8dd8b54429755bd6bd36"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_x923.html#a12e8f363684d8dd8b54429755bd6bd36">GetPaddingLength</a> (const std::vector&lt; byte &gt; &amp;Input) override</td></tr>
-<tr class="memdesc:a12e8f363684d8dd8b54429755bd6bd36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array  <a href="#a12e8f363684d8dd8b54429755bd6bd36">More...</a><br /></td></tr>
-<tr class="separator:a12e8f363684d8dd8b54429755bd6bd36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae418f6ba67313f9a089748da7b97e014"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_x923.html#ae418f6ba67313f9a089748da7b97e014">GetPaddingLength</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset) override</td></tr>
-<tr class="memdesc:ae418f6ba67313f9a089748da7b97e014"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array  <a href="#ae418f6ba67313f9a089748da7b97e014">More...</a><br /></td></tr>
-<tr class="separator:ae418f6ba67313f9a089748da7b97e014"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af71b889e7d72f39ff1006bad8ad52203"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_x923.html#af71b889e7d72f39ff1006bad8ad52203">AddPadding</a> (std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:af71b889e7d72f39ff1006bad8ad52203"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add padding to an input array  <a href="#af71b889e7d72f39ff1006bad8ad52203">More...</a><br /></td></tr>
+<tr class="separator:af71b889e7d72f39ff1006bad8ad52203"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f323b6c9d38cfd1578ee88034369512"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_x923.html#a2f323b6c9d38cfd1578ee88034369512">GetBlockLength</a> (const std::vector&lt; byte &gt; &amp;Input) override</td></tr>
+<tr class="memdesc:a2f323b6c9d38cfd1578ee88034369512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array  <a href="#a2f323b6c9d38cfd1578ee88034369512">More...</a><br /></td></tr>
+<tr class="separator:a2f323b6c9d38cfd1578ee88034369512"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfaaf337e5a7f3a46060782afcb1f336"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_x923.html#abfaaf337e5a7f3a46060782afcb1f336">GetBlockLength</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:abfaaf337e5a7f3a46060782afcb1f336"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array using offset and length  <a href="#abfaaf337e5a7f3a46060782afcb1f336">More...</a><br /></td></tr>
+<tr class="separator:abfaaf337e5a7f3a46060782afcb1f336"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_padding"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_padding')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_padding.html">IPadding</a></td></tr>
 <tr class="memitem:af1804f789fc3ffa8c78bccf7b9acfa3a inherit pub_methods_class_i_padding"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#af1804f789fc3ffa8c78bccf7b9acfa3a">IPadding</a> (const <a class="el" href="class_i_padding.html">IPadding</a> &amp;)=delete</td></tr>
 <tr class="memdesc:af1804f789fc3ffa8c78bccf7b9acfa3a inherit pub_methods_class_i_padding"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_padding.html#af1804f789fc3ffa8c78bccf7b9acfa3a">More...</a><br /></td></tr>
@@ -207,8 +207,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a232715464bce22d56622436bda47afa6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a232715464bce22d56622436bda47afa6">&#9670;&nbsp;</a></span>AddPadding()</h2>
+<a id="af71b889e7d72f39ff1006bad8ad52203"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af71b889e7d72f39ff1006bad8ad52203">&#9670;&nbsp;</a></span>AddPadding()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -217,7 +217,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t X923::AddPadding </td>
+          <td class="memname">void X923::AddPadding </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -226,7 +226,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -241,23 +247,23 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Add padding to input array </p>
+<p>Add padding to an input array </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Array to modify</td></tr>
-    <tr><td class="paramname">Offset</td><td>Offset into array</td></tr>
+    <tr><td class="paramname">Input</td><td>The array to modify</td></tr>
+    <tr><td class="paramname">Offset</td><td>The Starting offset in the array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to pad</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Length of padding</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoPaddingException</td><td>Thrown if the padding offset value is longer than the array length</td></tr>
+    <tr><td class="paramname">CryptoPaddingException</td><td>Thrown if the padding length is longer than the array length</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_padding.html#ae7d0464d40c3909fcfad7bafc03fab13">IPadding</a>.</p>
+<p>Implements <a class="el" href="class_i_padding.html#ad9e5bafa810005ceb81cd3ef210fc198">IPadding</a>.</p>
 
 </div>
 </div>
@@ -290,8 +296,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a12e8f363684d8dd8b54429755bd6bd36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12e8f363684d8dd8b54429755bd6bd36">&#9670;&nbsp;</a></span>GetPaddingLength() <span class="overload">[1/2]</span></h2>
+<a id="a2f323b6c9d38cfd1578ee88034369512"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f323b6c9d38cfd1578ee88034369512">&#9670;&nbsp;</a></span>GetBlockLength() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,7 +306,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t X923::GetPaddingLength </td>
+          <td class="memname">size_t X923::GetBlockLength </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Input</em></td><td>)</td>
@@ -317,18 +323,18 @@ Public Member Functions</h2></td></tr>
 <p>Get the length of padding in an array </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Padded array of bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The padded array of bytes</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Length of padding</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns the length of padding in bytes</dd></dl>
 
-<p>Implements <a class="el" href="class_i_padding.html#a3fdd6842b8360bef4031667d1570ee58">IPadding</a>.</p>
+<p>Implements <a class="el" href="class_i_padding.html#ac9bd911dda03fb26b8dc785b2d40fe80">IPadding</a>.</p>
 
 </div>
 </div>
-<a id="ae418f6ba67313f9a089748da7b97e014"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae418f6ba67313f9a089748da7b97e014">&#9670;&nbsp;</a></span>GetPaddingLength() <span class="overload">[2/2]</span></h2>
+<a id="abfaaf337e5a7f3a46060782afcb1f336"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfaaf337e5a7f3a46060782afcb1f336">&#9670;&nbsp;</a></span>GetBlockLength() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -337,7 +343,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t X923::GetPaddingLength </td>
+          <td class="memname">size_t X923::GetBlockLength </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -346,7 +352,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -361,17 +373,24 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Get the length of padding in an array </p>
+<p>Get the length of padding in an array using offset and length </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Padded array of bytes</td></tr>
-    <tr><td class="paramname">Offset</td><td>Offset into array</td></tr>
+    <tr><td class="paramname">Input</td><td>The padded array of bytes</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset in the array</td></tr>
+    <tr><td class="paramname">Length</td><td>The upper bound of bytes to check</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Length of padding</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns the length of padding in bytes</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoPaddingException</td><td>Thrown if the length is longer than the array length</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implements <a class="el" href="class_i_padding.html#a3549ebc944f38f5cdbcb6f833485665e">IPadding</a>.</p>
+<p>Implements <a class="el" href="class_i_padding.html#a7febeba3d677cfb7e18f2b3098060a13">IPadding</a>.</p>
 
 </div>
 </div>

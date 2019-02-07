@@ -98,7 +98,7 @@ public:
 	/// Constructor: instantiate this class with parameters
 	/// </summary>
 	///
-	/// <param name="RdEngineType">The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</param>
+	/// <param name="DrandType">The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</param>
 	RDP(DrandEngines DrandType = DrandEngines::RdRand);
 
 	/// <summary>

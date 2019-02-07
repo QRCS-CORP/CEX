@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_i_padding-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">IPadding Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___symmetric.html">Symmetric</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___padding.html">Padding</a></div></div>  </div>
+<div class="title">IPadding Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___padding.html">Padding</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -82,11 +82,10 @@ Inheritance diagram for IPadding:</div>
  <div class="center">
   <img src="class_i_padding.png" usemap="#IPadding_map" alt=""/>
   <map id="IPadding_map" name="IPadding_map">
-<area href="class_i_s_o7816.html" title="The ISO7816 Padding Scheme " alt="ISO7816" shape="rect" coords="0,56,62,80"/>
-<area href="class_p_k_c_s7.html" title="The PKCS7 Padding Scheme " alt="PKCS7" shape="rect" coords="72,56,134,80"/>
-<area href="class_t_b_c.html" title="The Trailing Bit Compliment Padding Scheme " alt="TBC" shape="rect" coords="144,56,206,80"/>
-<area href="class_x923.html" title="The X.923 Padding Scheme " alt="X923" shape="rect" coords="216,56,278,80"/>
-<area href="class_zero_pad.html" title="The Zero Padding Scheme (Not Recommended). " alt="ZeroPad" shape="rect" coords="288,56,350,80"/>
+<area href="class_e_s_p.html" title="The ESP Padding Scheme " alt="ESP" shape="rect" coords="0,56,64,80"/>
+<area href="class_p_k_c_s7.html" title="The PKCS7 Padding Scheme " alt="PKCS7" shape="rect" coords="74,56,138,80"/>
+<area href="class_x923.html" title="The X.923 Padding Scheme " alt="X923" shape="rect" coords="148,56,212,80"/>
+<area href="class_zero_one.html" title="The Zero Padding Scheme (Not Recommended). " alt="ZeroOne" shape="rect" coords="222,56,286,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -110,15 +109,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a09506fb711d5457b9619fa5dad57ebee"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#a09506fb711d5457b9619fa5dad57ebee">Name</a> ()=0</td></tr>
 <tr class="memdesc:a09506fb711d5457b9619fa5dad57ebee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The padding modes class name  <a href="#a09506fb711d5457b9619fa5dad57ebee">More...</a><br /></td></tr>
 <tr class="separator:a09506fb711d5457b9619fa5dad57ebee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7d0464d40c3909fcfad7bafc03fab13"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#ae7d0464d40c3909fcfad7bafc03fab13">AddPadding</a> (std::vector&lt; byte &gt; &amp;Input, size_t Offset)=0</td></tr>
-<tr class="memdesc:ae7d0464d40c3909fcfad7bafc03fab13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add padding to input array  <a href="#ae7d0464d40c3909fcfad7bafc03fab13">More...</a><br /></td></tr>
-<tr class="separator:ae7d0464d40c3909fcfad7bafc03fab13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fdd6842b8360bef4031667d1570ee58"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#a3fdd6842b8360bef4031667d1570ee58">GetPaddingLength</a> (const std::vector&lt; byte &gt; &amp;Input)=0</td></tr>
-<tr class="memdesc:a3fdd6842b8360bef4031667d1570ee58"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array  <a href="#a3fdd6842b8360bef4031667d1570ee58">More...</a><br /></td></tr>
-<tr class="separator:a3fdd6842b8360bef4031667d1570ee58"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3549ebc944f38f5cdbcb6f833485665e"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#a3549ebc944f38f5cdbcb6f833485665e">GetPaddingLength</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset)=0</td></tr>
-<tr class="memdesc:a3549ebc944f38f5cdbcb6f833485665e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array  <a href="#a3549ebc944f38f5cdbcb6f833485665e">More...</a><br /></td></tr>
-<tr class="separator:a3549ebc944f38f5cdbcb6f833485665e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9e5bafa810005ceb81cd3ef210fc198"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#ad9e5bafa810005ceb81cd3ef210fc198">AddPadding</a> (std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:ad9e5bafa810005ceb81cd3ef210fc198"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add padding to an input array  <a href="#ad9e5bafa810005ceb81cd3ef210fc198">More...</a><br /></td></tr>
+<tr class="separator:ad9e5bafa810005ceb81cd3ef210fc198"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9bd911dda03fb26b8dc785b2d40fe80"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#ac9bd911dda03fb26b8dc785b2d40fe80">GetBlockLength</a> (const std::vector&lt; byte &gt; &amp;Input)=0</td></tr>
+<tr class="memdesc:ac9bd911dda03fb26b8dc785b2d40fe80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array  <a href="#ac9bd911dda03fb26b8dc785b2d40fe80">More...</a><br /></td></tr>
+<tr class="separator:ac9bd911dda03fb26b8dc785b2d40fe80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7febeba3d677cfb7e18f2b3098060a13"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_padding.html#a7febeba3d677cfb7e18f2b3098060a13">GetBlockLength</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:a7febeba3d677cfb7e18f2b3098060a13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of padding in an array using offset and length  <a href="#a7febeba3d677cfb7e18f2b3098060a13">More...</a><br /></td></tr>
+<tr class="separator:a7febeba3d677cfb7e18f2b3098060a13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Padding Mode Interface </p>
@@ -206,8 +205,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ae7d0464d40c3909fcfad7bafc03fab13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7d0464d40c3909fcfad7bafc03fab13">&#9670;&nbsp;</a></span>AddPadding()</h2>
+<a id="ad9e5bafa810005ceb81cd3ef210fc198"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9e5bafa810005ceb81cd3ef210fc198">&#9670;&nbsp;</a></span>AddPadding()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -216,7 +215,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual size_t IPadding::AddPadding </td>
+          <td class="memname">virtual void IPadding::AddPadding </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -225,7 +224,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -240,17 +245,23 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Add padding to input array </p>
+<p>Add padding to an input array </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Array to modify</td></tr>
-    <tr><td class="paramname">Offset</td><td>Offset into array</td></tr>
+    <tr><td class="paramname">Input</td><td>The array to modify</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset in the array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to pad</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Length of padding</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoPaddingException</td><td>Thrown if the padding length is longer than the array length</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implemented in <a class="el" href="class_i_s_o7816.html#a2f1e51811a7190d4aa2bee8edeea6c2f">ISO7816</a>, <a class="el" href="class_p_k_c_s7.html#a86a11befeb3d8e23e033cbd5bad27da4">PKCS7</a>, <a class="el" href="class_t_b_c.html#a0a7acc84cdca140b142f1f898fdc0754">TBC</a>, <a class="el" href="class_x923.html#a232715464bce22d56622436bda47afa6">X923</a>, and <a class="el" href="class_zero_pad.html#adb1f131bc463a414d0a0c129e55cc941">ZeroPad</a>.</p>
+<p>Implemented in <a class="el" href="class_p_k_c_s7.html#a7aba567a3450e0bf2ffa5646d60fa411">PKCS7</a>, <a class="el" href="class_e_s_p.html#a79050faacdda65323143bd7d06d2a5c9">ESP</a>, <a class="el" href="class_x923.html#af71b889e7d72f39ff1006bad8ad52203">X923</a>, and <a class="el" href="class_zero_one.html#afc4f89dee853a48d55e6a9ea064b168d">ZeroOne</a>.</p>
 
 </div>
 </div>
@@ -279,12 +290,12 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The padding modes type name </p>
 
-<p>Implemented in <a class="el" href="class_i_s_o7816.html#a8477c9c448dcf621a7d44114a43b5289">ISO7816</a>, <a class="el" href="class_p_k_c_s7.html#a81e92a7e047f29c0eaf94005eea5afc3">PKCS7</a>, <a class="el" href="class_t_b_c.html#a61367ea8e71d307e82f47b2ddf70af38">TBC</a>, <a class="el" href="class_x923.html#aa47531e11d9c1a188057f1466e6142ab">X923</a>, and <a class="el" href="class_zero_pad.html#af9101d15160330768b38d941780595e3">ZeroPad</a>.</p>
+<p>Implemented in <a class="el" href="class_p_k_c_s7.html#a81e92a7e047f29c0eaf94005eea5afc3">PKCS7</a>, <a class="el" href="class_e_s_p.html#a6df1692e924f2a1504e059dbe691ccf9">ESP</a>, <a class="el" href="class_x923.html#aa47531e11d9c1a188057f1466e6142ab">X923</a>, and <a class="el" href="class_zero_one.html#aa74d1b0059df5361686e0468750e850b">ZeroOne</a>.</p>
 
 </div>
 </div>
-<a id="a3fdd6842b8360bef4031667d1570ee58"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fdd6842b8360bef4031667d1570ee58">&#9670;&nbsp;</a></span>GetPaddingLength() <span class="overload">[1/2]</span></h2>
+<a id="ac9bd911dda03fb26b8dc785b2d40fe80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9bd911dda03fb26b8dc785b2d40fe80">&#9670;&nbsp;</a></span>GetBlockLength() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -293,7 +304,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual size_t IPadding::GetPaddingLength </td>
+          <td class="memname">virtual size_t IPadding::GetBlockLength </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Input</em></td><td>)</td>
@@ -310,18 +321,18 @@ Public Member Functions</h2></td></tr>
 <p>Get the length of padding in an array </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Padded array of bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The padded array of bytes</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Length of padding</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns the length of padding in bytes</dd></dl>
 
-<p>Implemented in <a class="el" href="class_i_s_o7816.html#a0c6fcd235973fc92454d954b054bc8f3">ISO7816</a>, <a class="el" href="class_p_k_c_s7.html#a053a9c856ef20c0ff0502d1f1ef73ba8">PKCS7</a>, <a class="el" href="class_t_b_c.html#a7a688ff8841e69ddd3c6867069d52a23">TBC</a>, <a class="el" href="class_x923.html#a12e8f363684d8dd8b54429755bd6bd36">X923</a>, and <a class="el" href="class_zero_pad.html#ab17239a2eec07b494f725937f0e0fcc7">ZeroPad</a>.</p>
+<p>Implemented in <a class="el" href="class_p_k_c_s7.html#a67aff9098207a45a743c4fa18aa8f64c">PKCS7</a>, <a class="el" href="class_e_s_p.html#a97b20d5baa74c063d4234dd23c68d95a">ESP</a>, <a class="el" href="class_x923.html#a2f323b6c9d38cfd1578ee88034369512">X923</a>, and <a class="el" href="class_zero_one.html#aaeb1061c1bb72a3812f0eb5d130ec262">ZeroOne</a>.</p>
 
 </div>
 </div>
-<a id="a3549ebc944f38f5cdbcb6f833485665e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3549ebc944f38f5cdbcb6f833485665e">&#9670;&nbsp;</a></span>GetPaddingLength() <span class="overload">[2/2]</span></h2>
+<a id="a7febeba3d677cfb7e18f2b3098060a13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7febeba3d677cfb7e18f2b3098060a13">&#9670;&nbsp;</a></span>GetBlockLength() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -330,7 +341,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual size_t IPadding::GetPaddingLength </td>
+          <td class="memname">virtual size_t IPadding::GetBlockLength </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -339,7 +350,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -354,17 +371,24 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Get the length of padding in an array </p>
+<p>Get the length of padding in an array using offset and length </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Padded array of bytes</td></tr>
-    <tr><td class="paramname">Offset</td><td>Offset into array</td></tr>
+    <tr><td class="paramname">Input</td><td>The padded array of bytes</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset in the array</td></tr>
+    <tr><td class="paramname">Length</td><td>The upper bound of bytes to check</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Length of padding</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns the length of padding in bytes</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoPaddingException</td><td>Thrown if the length is longer than the array length</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implemented in <a class="el" href="class_i_s_o7816.html#a4e80786724ebe724076bd1f5830b8828">ISO7816</a>, <a class="el" href="class_p_k_c_s7.html#a6d1048e35ed967f74789407f5f4d7d3f">PKCS7</a>, <a class="el" href="class_t_b_c.html#a1aeae3615f125e3b92957e7b31cc42e1">TBC</a>, <a class="el" href="class_x923.html#ae418f6ba67313f9a089748da7b97e014">X923</a>, and <a class="el" href="class_zero_pad.html#af77cf9f7355b5589846e232d93e59d78">ZeroPad</a>.</p>
+<p>Implemented in <a class="el" href="class_p_k_c_s7.html#ac77f18bc51fabd7988a495ee4d2f1576">PKCS7</a>, <a class="el" href="class_e_s_p.html#a7a0e3052f62c6e6d3a2f20933831326b">ESP</a>, <a class="el" href="class_x923.html#abfaaf337e5a7f3a46060782afcb1f336">X923</a>, and <a class="el" href="class_zero_one.html#ab0ab8f8baac96e2adf79099759db983f">ZeroOne</a>.</p>
 
 </div>
 </div>
@@ -393,7 +417,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The padding modes class name </p>
 
-<p>Implemented in <a class="el" href="class_i_s_o7816.html#a0f9481798bc50b4dce4c89f5855defe1">ISO7816</a>, <a class="el" href="class_p_k_c_s7.html#a00981b7b10a011e45faa2cd4bbce22f7">PKCS7</a>, <a class="el" href="class_t_b_c.html#a838fc902fa39dcdb6f6ef977f6bdd86d">TBC</a>, <a class="el" href="class_x923.html#ad42be8684058ebaa65c28061527c2711">X923</a>, and <a class="el" href="class_zero_pad.html#a99d0abb4724589c201ffab087a849283">ZeroPad</a>.</p>
+<p>Implemented in <a class="el" href="class_p_k_c_s7.html#a00981b7b10a011e45faa2cd4bbce22f7">PKCS7</a>, <a class="el" href="class_e_s_p.html#a2454d522b40d00c56498452af9266932">ESP</a>, <a class="el" href="class_x923.html#ad42be8684058ebaa65c28061527c2711">X923</a>, and <a class="el" href="class_zero_one.html#a41ec04d7d1723c60ab6d6a5cd3d960c0">ZeroOne</a>.</p>
 
 </div>
 </div>

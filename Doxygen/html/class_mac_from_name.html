@@ -79,9 +79,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a2ce184f6d202d4f7a99621fa45af7bfd"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_mac.html">IMac</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_from_name.html#a2ce184f6d202d4f7a99621fa45af7bfd">GetInstance</a> (<a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> MacType)</td></tr>
-<tr class="memdesc:a2ce184f6d202d4f7a99621fa45af7bfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate an uninitialized MAC generator from its Macs enumeration type name  <a href="#a2ce184f6d202d4f7a99621fa45af7bfd">More...</a><br /></td></tr>
-<tr class="separator:a2ce184f6d202d4f7a99621fa45af7bfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6cb46e02c05fc4e69412638d606156b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_mac.html">IMac</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_from_name.html#ab6cb46e02c05fc4e69412638d606156b">GetInstance</a> (<a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> MacType)</td></tr>
+<tr class="memdesc:ab6cb46e02c05fc4e69412638d606156b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate an uninitialized MAC generator from its Macs enumeration type name  <a href="#ab6cb46e02c05fc4e69412638d606156b">More...</a><br /></td></tr>
+<tr class="separator:ab6cb46e02c05fc4e69412638d606156b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa90adf5522493140fd2e344442e5451d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_mac.html">IMac</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mac_from_name.html#aa90adf5522493140fd2e344442e5451d">GetInstance</a> (<a class="el" href="group___enumeration.html#ga62629810dc7b52fdfb37d80f03d62274">StreamAuthenticators</a> AuthenticatorType)</td></tr>
 <tr class="memdesc:aa90adf5522493140fd2e344442e5451d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate an uninitialized MAC generator from its StreamAuthenticators enumeration type name  <a href="#aa90adf5522493140fd2e344442e5451d">More...</a><br /></td></tr>
 <tr class="separator:aa90adf5522493140fd2e344442e5451d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -90,8 +90,8 @@ Static Public Member Functions</h2></td></tr>
 <div class="textblock"><p>Get an uninitialized MAC function Function from a type name. </p>
 <p>The MACs Initialize function must be called before Generate can be called.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a2ce184f6d202d4f7a99621fa45af7bfd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ce184f6d202d4f7a99621fa45af7bfd">&#9670;&nbsp;</a></span>GetInstance() <span class="overload">[1/2]</span></h2>
+<a id="ab6cb46e02c05fc4e69412638d606156b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6cb46e02c05fc4e69412638d606156b">&#9670;&nbsp;</a></span>GetInstance() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -100,7 +100,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_mac.html">IMac</a> * MacFromName::GetInstance </td>
+          <td class="memname"><a class="el" href="class_i_mac.html">IMac</a> * MacFromName::GetInstance </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a>&#160;</td>
           <td class="paramname"><em>MacType</em></td><td>)</td>
@@ -124,7 +124,7 @@ Static Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>An uninitialized MAC generator</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if the MAC is not supported</td></tr>
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if the MAC type is not supported</td></tr>
   </table>
   </dd>
 </dl>
@@ -165,7 +165,7 @@ Static Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>An uninitialized MAC generator</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if the MAC is not supported</td></tr>
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if the MAC authenticator type is not supported</td></tr>
   </table>
   </dd>
 </dl>

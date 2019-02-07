@@ -79,15 +79,15 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a16d5d3d86f7959d96c082956d2c6a651"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_block_cipher_from_name.html#a16d5d3d86f7959d96c082956d2c6a651">GetInstance</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::None)</td></tr>
-<tr class="memdesc:a16d5d3d86f7959d96c082956d2c6a651"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a symmetric block cipher instance.  <a href="#a16d5d3d86f7959d96c082956d2c6a651">More...</a><br /></td></tr>
-<tr class="separator:a16d5d3d86f7959d96c082956d2c6a651"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4528ed6bf7acb14ebbb6712821b1bc2"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_block_cipher_from_name.html#ac4528ed6bf7acb14ebbb6712821b1bc2">GetInstance</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType)</td></tr>
+<tr class="memdesc:ac4528ed6bf7acb14ebbb6712821b1bc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a symmetric block cipher instance.  <a href="#ac4528ed6bf7acb14ebbb6712821b1bc2">More...</a><br /></td></tr>
+<tr class="separator:ac4528ed6bf7acb14ebbb6712821b1bc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get a Block Cipher instance from it's enumeration name. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a16d5d3d86f7959d96c082956d2c6a651"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a16d5d3d86f7959d96c082956d2c6a651">&#9670;&nbsp;</a></span>GetInstance()</h2>
+<a id="ac4528ed6bf7acb14ebbb6712821b1bc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4528ed6bf7acb14ebbb6712821b1bc2">&#9670;&nbsp;</a></span>GetInstance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -96,21 +96,11 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> * BlockCipherFromName::GetInstance </td>
+          <td class="memname"><a class="el" href="class_i_block_cipher.html">IBlockCipher</a> * BlockCipherFromName::GetInstance </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>CipherType</em></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
-          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::None</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -121,18 +111,17 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get a symmetric block cipher instance. </p>
-<p>If an extended (AHX/RHX or SHX) block cipher type is selected, the default key-schedule hash engine is None which involes the standard cipher.</p>
+<p>If an extended (RHX or SHX) block cipher type is selected, the default key-schedule hash engine is None which invokes the standard cipher.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherType</td><td>The block cipher enumeration name</td></tr>
-    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A symmetric block cipher instance</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoException</td><td>Thrown if the enumeration name is not supported</td></tr>
+    <tr><td class="paramname">CryptoException</td><td>Thrown if the block cipher type is not supported</td></tr>
   </table>
   </dd>
 </dl>

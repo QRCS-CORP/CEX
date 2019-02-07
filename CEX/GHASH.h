@@ -2,11 +2,14 @@
 #define CEX_GHASH_H
 
 #include "CexDomain.h"
+#include "CMUL.h"
 
-NAMESPACE_MAC
+NAMESPACE_DIGEST
+
+using Numeric::CMUL;
 
 /// 
-/// internal
+/// TODO: make this into a proper digest.. optimize
 /// 
 
 /// <summary>
@@ -16,13 +19,11 @@ class GHASH
 {
 private:
 
-	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
+	static const bool HAS_CMUL;
 
-	std::vector<ulong> m_ghashKey;
-	bool m_hasCMul;
-	std::vector<byte> m_msgBuffer;
-	size_t m_msgOffset;
+	class GhashState;
+	std::unique_ptr<GhashState> m_ghashState;
 
 public:
 
@@ -48,23 +49,21 @@ public:
 	/// </summary>
 	~GHASH();
 
-	//~~~Accessors~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// 128bit SIMD instructions are available on this system
+	/// Clear the message buffer but retain the key state
 	/// </summary>
-	bool HasSimd128();
-
-	//~~~Public Functions~~~//
+	void Clear();
 
 	/// <summary>
 	/// Finalize the GHASH block
 	/// </summary>
 	///
 	/// <param name="Output">The destination array</param>
-	/// <param name="AdSize">The size of the AD</param>
-	/// <param name="TextSize">The plain text size</param>
-	void FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextSize);
+	/// <param name="Counter">The size of the AD</param>
+	/// <param name="Length">The plain text size</param>
+	void Finalize(std::vector<byte> &Output, size_t Counter, size_t Length);
 
 	/// <summary>
 	/// Initialize the hash key
@@ -74,30 +73,18 @@ public:
 	void Initialize(const std::vector<ulong> &Key);
 
 	/// <summary>
-	/// Process a block of plaintext
-	/// </summary>
-	///
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">The offset within the source array</param>
-	/// <param name="Output">The output array</param>
-	void ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output);
-
-	/// <summary>
 	/// Process one segment of data
 	/// </summary>
 	///
 	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The output array</param>
-	/// <param name="Length">The number of bytes to process</param>
-	void ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length);
+	/// <param name="Length">The number of input bytes to process</param>
+	void Multiply(const std::vector<byte> &Input, std::vector<byte> &Output, size_t Length);
 
 	/// <summary>
 	/// Reset the hash function
 	/// </summary>
-	///
-	/// <param name="Erase">Erase the state</param>
-	void Reset(bool Erase = false);
+	void Reset();
 
 	/// <summary>
 	/// Update the hash function
@@ -111,11 +98,9 @@ public:
 
 private:
 
-	void Detect();
-	void GcmMultiply(std::vector<byte> &X);
-	void Multiply(const std::vector<ulong> &H, std::vector<byte> &X);
-	void MultiplyW(const std::vector<ulong> &H, std::vector<byte> &X);
+	static void Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::vector<byte> &Output);
+	static bool HasGmul();
 };
 
-NAMESPACE_MACEND
+NAMESPACE_DIGESTEND
 #endif

@@ -289,16 +289,16 @@ void ParallelOptions::SetMaxDegree(size_t MaxDegree)
 
 void ParallelOptions::Detect()
 {
-	CpuDetect detect;
+	CpuDetect dtc;
 
-	m_hasPrefetch = detect.PREFETCH();
-	m_hasSHA2 = detect.SHA();
-	m_hasSimd128 = detect.AVX();
-	m_hasSimd256 = detect.AVX2();
-	m_hasSimd512 = detect.AVX512F();
-	m_physicalCores = detect.PhysicalCores();
+	m_hasPrefetch = dtc.PREFETCH();
+	m_hasSHA2 = dtc.SHA();
+	m_hasSimd128 = dtc.AVX();
+	m_hasSimd256 = dtc.AVX2();
+	m_hasSimd512 = dtc.AVX512F();
+	m_physicalCores = dtc.PhysicalCores();
 	m_simdDetected = (m_hasSimd256) ? SimdProfiles::Simd256 : (m_hasSimd128) ? SimdProfiles::Simd128 : SimdProfiles::None;
-	m_virtualCores = detect.VirtualCores();
+	m_virtualCores = dtc.VirtualCores();
 	m_processorCount = (m_virtualCores > m_physicalCores) ? m_virtualCores : m_physicalCores;
 
 	if (m_processorCount > 1 && m_processorCount % 2 != 0)
@@ -312,7 +312,7 @@ void ParallelOptions::Detect()
 	}
 
 	m_isParallel = (m_processorCount > 1);
-	m_l1DataCacheTotal = detect.L1DataCacheTotal();
+	m_l1DataCacheTotal = dtc.L1DataCacheTotal();
 }
 
 void ParallelOptions::StoreDefaults()

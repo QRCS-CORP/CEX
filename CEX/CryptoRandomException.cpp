@@ -13,4 +13,9 @@ const ExceptionTypes CryptoRandomException::Enumeral()
 	return ExceptionTypes::CryptoRandomException;
 }
 
+const std::string CryptoRandomException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

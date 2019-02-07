@@ -240,16 +240,10 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </div><div class="memdoc">
 
 <p>Initialize the class with either the Parallel or Sequential hashing engine. </p>
-<p>Initialize as parallel instantiates tree hashing, if false uses the standard SHA-3 256bit hashing instance.</p>
+<p>Initialize as parallel instantiates tree hashing, if false uses the standard SHA-3 256bit hashing instance. Note: this constructor will revert to sequential processing when set to parallel on a system that does not support parallel processing</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Parallel</td><td>Setting the Parallel flag to true, instantiates the multi-threaded SHA-3 variant.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoDigestException</td><td>Thrown if an invalid parallel parameters are used</td></tr>
   </table>
   </dd>
 </dl>
@@ -659,6 +653,12 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the degree parameter is invalid</td></tr>
   </table>
   </dd>
 </dl>

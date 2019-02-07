@@ -162,7 +162,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Blake2B and Blake2BP digests with a 512 bit digest output size </p>
 <p>Example using the Compute method: </p>
-<p>Use the Compute method for small to medium data sizes</p>
+<p>Use the Compute method for small to medium data sizes.</p>
 <div class="fragment"><div class="line"><a class="code" href="class_blake512.html">Blake512</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(dgt.<a class="code" href="class_blake512.html#adbb4f2d1310388f20d85d4205c53eaf6">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_blake512.html#ae3a21c5dff05cfc03813dbbf3d8c5502">Compute</a>(input, hash);</div></div><!-- fragment --> <p>Use the Update method for large data sizes: </p><div class="fragment"><div class="line"><a class="code" href="class_blake512.html">Blake512</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(dgt.<a class="code" href="class_blake512.html#adbb4f2d1310388f20d85d4205c53eaf6">DigestSize</a>(), 0);</div><div class="line">int64_t len = (int64_t)input.size();</div><div class="line"></div><div class="line"><span class="comment">// update blocks</span></div><div class="line"><span class="keywordflow">while</span> (len &gt; dgt.<a class="code" href="class_blake512.html#adbb4f2d1310388f20d85d4205c53eaf6">DigestSize</a>())</div><div class="line">{</div><div class="line">    dgt.<a class="code" href="class_blake512.html#adc6122cf7a01abd5060b5fc7f905d267">Update</a>(input, offset, len);</div><div class="line">    offset += dgt.<a class="code" href="class_blake512.html#adbb4f2d1310388f20d85d4205c53eaf6">DigestSize</a>();</div><div class="line">    len -= dgt.<a class="code" href="class_blake512.html#adbb4f2d1310388f20d85d4205c53eaf6">DigestSize</a>();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (len &gt; 0)</div><div class="line">    dgt.<a class="code" href="class_blake512.html#adc6122cf7a01abd5060b5fc7f905d267">Update</a>(input, offset, len);</div><div class="line"></div><div class="line">dgt.<a class="code" href="class_blake512.html#a71a0bde9d01644bba518671bcbc516ef">Finalize</a>(hash, 0);</div></div><!-- fragment --> <p>Implementation Notes: </p><ul>
 <li>
 Algorithm is selected through the constructor (2B or 2BP), parallel version is selected through either the Parallel flag, or via the BlakeParams ThreadCount() configuration parameter. </li>
@@ -255,16 +255,10 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </div><div class="memdoc">
 
 <p>Initialize the class as either the 2B or 2BP. </p>
-<p>Initialize as either the parallel version Blake2BP, or sequential Blake2B.</p>
+<p>Initialize as either the parallel version Blake2BP, or sequential Blake2B. Note: this constructor will revert to sequential processing when set to parallel on a system that does not support parallel processing</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Parallel</td><td>Setting the Parallel flag to true, instantiates the Blake2BP variant.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoDigestException</td><td>Thrown if an invalid parallel parameters are used</td></tr>
   </table>
   </dd>
 </dl>
@@ -305,7 +299,7 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoDigestException</td><td>Thrown if an invalid configuration parameters are used</td></tr>
+    <tr><td class="paramname">CryptoDigestException</td><td>Thrown if an invalid configuration parameters are used</td></tr>
   </table>
   </dd>
 </dl>
@@ -554,7 +548,7 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 <p>The input Key must be a maximum size of 32 bytes, and a minimum size of 16 bytes. If either the Salt or Info parameters are used, their size must be 8 bytes. The maximum combined size of Key, Salt, and Info, must be 64 bytes or less.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoDigestException</td><td>Thrown if an invalid key size is used</td></tr>
+    <tr><td class="paramname">CryptoDigestException</td><td>Thrown if an invalid key size is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -707,6 +701,12 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the degree parameter is invalid</td></tr>
   </table>
   </dd>
 </dl>

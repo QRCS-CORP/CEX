@@ -4,6 +4,7 @@
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"
 #include "MemoryStream.h"
+#include "SecureVector.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_CIPHER
@@ -67,21 +68,27 @@ public:
 	/// </summary>
 	virtual const std::vector<byte> Info() = 0;
 
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy
+	/// </summary>
+	virtual const SecureVector<byte> SecureInfo() = 0;
+
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the primary encryption key
+	/// </summary>
+	virtual const SecureVector<byte> SecureKey() = 0;
+
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the nonce or salt value
+	/// </summary>
+	virtual const SecureVector<byte> SecureNonce() = 0;
+
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
-	virtual void Destroy() = 0;
-
-	/// <summary>
-	/// Compare this Key instance with another
-	/// </summary>
-	/// 
-	/// <param name="Input">Key to compare</param>
-	/// 
-	/// <returns>Returns true if equal</returns>
-	virtual bool Equals(ISymmetricKey &Input) = 0;
+	virtual void Reset() = 0;
 };
 
 NAMESPACE_CIPHEREND

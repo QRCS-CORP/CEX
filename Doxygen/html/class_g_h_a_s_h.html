@@ -91,31 +91,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae7f63a587adf1aa1ffcdc0a6e20584fd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#ae7f63a587adf1aa1ffcdc0a6e20584fd">~GHASH</a> ()</td></tr>
 <tr class="memdesc:ae7f63a587adf1aa1ffcdc0a6e20584fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#ae7f63a587adf1aa1ffcdc0a6e20584fd">More...</a><br /></td></tr>
 <tr class="separator:ae7f63a587adf1aa1ffcdc0a6e20584fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae97a477e50ec1b0b304001e59b455fcf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#ae97a477e50ec1b0b304001e59b455fcf">HasSimd128</a> ()</td></tr>
-<tr class="memdesc:ae97a477e50ec1b0b304001e59b455fcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">128bit SIMD instructions are available on this system  <a href="#ae97a477e50ec1b0b304001e59b455fcf">More...</a><br /></td></tr>
-<tr class="separator:ae97a477e50ec1b0b304001e59b455fcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b64cda53fa77993591d8bb71f69e29e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#a9b64cda53fa77993591d8bb71f69e29e">FinalizeBlock</a> (std::vector&lt; byte &gt; &amp;Output, size_t AdSize, size_t TextSize)</td></tr>
-<tr class="memdesc:a9b64cda53fa77993591d8bb71f69e29e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize the GHASH block  <a href="#a9b64cda53fa77993591d8bb71f69e29e">More...</a><br /></td></tr>
-<tr class="separator:a9b64cda53fa77993591d8bb71f69e29e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ada29348aef9dc2155582bd7e074579"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#a4ada29348aef9dc2155582bd7e074579">Clear</a> ()</td></tr>
+<tr class="memdesc:a4ada29348aef9dc2155582bd7e074579"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the message buffer but retain the key state  <a href="#a4ada29348aef9dc2155582bd7e074579">More...</a><br /></td></tr>
+<tr class="separator:a4ada29348aef9dc2155582bd7e074579"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed55c5e26b9ea0907bec4e482f6d3392"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#aed55c5e26b9ea0907bec4e482f6d3392">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t Counter, size_t Length)</td></tr>
+<tr class="memdesc:aed55c5e26b9ea0907bec4e482f6d3392"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize the GHASH block  <a href="#aed55c5e26b9ea0907bec4e482f6d3392">More...</a><br /></td></tr>
+<tr class="separator:aed55c5e26b9ea0907bec4e482f6d3392"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb166ac9af8ae8951faf6bde33e6ad9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#aeb166ac9af8ae8951faf6bde33e6ad9f">Initialize</a> (const std::vector&lt; ulong &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)</td></tr>
 <tr class="memdesc:aeb166ac9af8ae8951faf6bde33e6ad9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the hash key  <a href="#aeb166ac9af8ae8951faf6bde33e6ad9f">More...</a><br /></td></tr>
 <tr class="separator:aeb166ac9af8ae8951faf6bde33e6ad9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81b050d9afbc8a9dcdd3082456ff493c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#a81b050d9afbc8a9dcdd3082456ff493c">ProcessBlock</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output)</td></tr>
-<tr class="memdesc:a81b050d9afbc8a9dcdd3082456ff493c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process a block of plaintext  <a href="#a81b050d9afbc8a9dcdd3082456ff493c">More...</a><br /></td></tr>
-<tr class="separator:a81b050d9afbc8a9dcdd3082456ff493c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3bb22d55b7f67480531ecffc6a22bd4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#ad3bb22d55b7f67480531ecffc6a22bd4">ProcessSegment</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t Length)</td></tr>
-<tr class="memdesc:ad3bb22d55b7f67480531ecffc6a22bd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process one segment of data  <a href="#ad3bb22d55b7f67480531ecffc6a22bd4">More...</a><br /></td></tr>
-<tr class="separator:ad3bb22d55b7f67480531ecffc6a22bd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3cce2d0b753289e6e58d6c29622210f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#ae3cce2d0b753289e6e58d6c29622210f">Reset</a> (bool Erase=false)</td></tr>
-<tr class="memdesc:ae3cce2d0b753289e6e58d6c29622210f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the hash function  <a href="#ae3cce2d0b753289e6e58d6c29622210f">More...</a><br /></td></tr>
-<tr class="separator:ae3cce2d0b753289e6e58d6c29622210f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad595de13a5318b6ffb45dbc1d82a9ed2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#ad595de13a5318b6ffb45dbc1d82a9ed2">Multiply</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output, size_t Length)</td></tr>
+<tr class="memdesc:ad595de13a5318b6ffb45dbc1d82a9ed2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process one segment of data  <a href="#ad595de13a5318b6ffb45dbc1d82a9ed2">More...</a><br /></td></tr>
+<tr class="separator:ad595de13a5318b6ffb45dbc1d82a9ed2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaee9055c797fbc3d705b7cb6c4ea7639"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#aaee9055c797fbc3d705b7cb6c4ea7639">Reset</a> ()</td></tr>
+<tr class="memdesc:aaee9055c797fbc3d705b7cb6c4ea7639"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the hash function  <a href="#aaee9055c797fbc3d705b7cb6c4ea7639">More...</a><br /></td></tr>
+<tr class="separator:aaee9055c797fbc3d705b7cb6c4ea7639"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af35383ed2ce5b00172555a7326b72b35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#af35383ed2ce5b00172555a7326b72b35">Update</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t Length)</td></tr>
 <tr class="memdesc:af35383ed2ce5b00172555a7326b72b35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the hash function  <a href="#af35383ed2ce5b00172555a7326b72b35">More...</a><br /></td></tr>
 <tr class="separator:af35383ed2ce5b00172555a7326b72b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Instantiate the GHASH class; this is an <em>internal class</em> used by GMAC and GCM mode </p>
-<p>internal </p>
+<p>TODO: make this into a proper digest.. optimize </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a3b85856d24b606e8c112da9f3a4ba02b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3b85856d24b606e8c112da9f3a4ba02b">&#9670;&nbsp;</a></span>GHASH() <span class="overload">[1/2]</span></h2>
@@ -184,14 +181,33 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a9b64cda53fa77993591d8bb71f69e29e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b64cda53fa77993591d8bb71f69e29e">&#9670;&nbsp;</a></span>FinalizeBlock()</h2>
+<a id="a4ada29348aef9dc2155582bd7e074579"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ada29348aef9dc2155582bd7e074579">&#9670;&nbsp;</a></span>Clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void GHASH::FinalizeBlock </td>
+          <td class="memname">void GHASH::Clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clear the message buffer but retain the key state </p>
+
+</div>
+</div>
+<a id="aed55c5e26b9ea0907bec4e482f6d3392"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed55c5e26b9ea0907bec4e482f6d3392">&#9670;&nbsp;</a></span>Finalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GHASH::Finalize </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -200,13 +216,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>AdSize</em>, </td>
+          <td class="paramname"><em>Counter</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>TextSize</em>&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -220,30 +236,11 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>The destination array</td></tr>
-    <tr><td class="paramname">AdSize</td><td>The size of the AD</td></tr>
-    <tr><td class="paramname">TextSize</td><td>The plain text size</td></tr>
+    <tr><td class="paramname">Counter</td><td>The size of the AD</td></tr>
+    <tr><td class="paramname">Length</td><td>The plain text size</td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="ae97a477e50ec1b0b304001e59b455fcf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae97a477e50ec1b0b304001e59b455fcf">&#9670;&nbsp;</a></span>HasSimd128()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool GHASH::HasSimd128 </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>128bit SIMD instructions are available on this system </p>
 
 </div>
 </div>
@@ -267,6 +264,50 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The ghash key</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad595de13a5318b6ffb45dbc1d82a9ed2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad595de13a5318b6ffb45dbc1d82a9ed2">&#9670;&nbsp;</a></span>Multiply()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GHASH::Multiply </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Process one segment of data </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The source array</td></tr>
+    <tr><td class="paramname">Output</td><td>The output array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of input bytes to process</td></tr>
   </table>
   </dd>
 </dl>
@@ -301,103 +342,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a81b050d9afbc8a9dcdd3082456ff493c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a81b050d9afbc8a9dcdd3082456ff493c">&#9670;&nbsp;</a></span>ProcessBlock()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GHASH::ProcessBlock </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>InOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Process a block of plaintext </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>The source array</td></tr>
-    <tr><td class="paramname">InOffset</td><td>The offset within the source array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array</td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ad3bb22d55b7f67480531ecffc6a22bd4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad3bb22d55b7f67480531ecffc6a22bd4">&#9670;&nbsp;</a></span>ProcessSegment()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void GHASH::ProcessSegment </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>InOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Process one segment of data </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>The source array</td></tr>
-    <tr><td class="paramname">InOffset</td><td>The offset within the source array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of bytes to process</td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ae3cce2d0b753289e6e58d6c29622210f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3cce2d0b753289e6e58d6c29622210f">&#9670;&nbsp;</a></span>Reset()</h2>
+<a id="aaee9055c797fbc3d705b7cb6c4ea7639"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaee9055c797fbc3d705b7cb6c4ea7639">&#9670;&nbsp;</a></span>Reset()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -405,20 +351,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void GHASH::Reset </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>Erase</em> = <code>false</code></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Reset the hash function </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Erase</td><td>Erase the state</td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>

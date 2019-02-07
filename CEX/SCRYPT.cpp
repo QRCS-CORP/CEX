@@ -57,24 +57,25 @@ public:
 SCRYPT::SCRYPT(SHA2Digests DigestType, size_t CpuCost, size_t Parallelization)
 	:
 	KdfBase(
-		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::SCRYPT256 : Kdfs::SCRYPT512) : 
-			throw CryptoKdfException(std::string("SCRYPT"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
+		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::SCRYPT256 : Kdfs::SCRYPT512) : Kdfs::None),
 #if defined(CEX_ENFORCE_KEYMIN)
-		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
-		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
+		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
+		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 #else
 		MINKEY_LENGTH, 
 		MINSALT_LENGTH, 
 #endif
-		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::SCRYPT256) : KdfConvert::ToName(Kdfs::SCRYPT512)),
-		std::vector<SymmetricKeySize> {
+		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::SCRYPT256) : DigestType == SHA2Digests::SHA512 ? KdfConvert::ToName(Kdfs::SCRYPT512) : std::string("")),
+		(DigestType != SHA2Digests::None ? std::vector<SymmetricKeySize> {
 			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 32 : 64), 0, 0),
 			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), 0, (DigestType == SHA2Digests::SHA256 ? 32 : 64)),
-			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))}),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))} :
+			std::vector<SymmetricKeySize>(0))),
 	m_isDestroyed(true),
 	m_isInitialized(false),
 	m_parallelProfile(64, true, 2048, true),
-	m_scryptGenerator(Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType))),
+	m_scryptGenerator(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType)) :
+		throw CryptoKdfException(std::string("SCRYPT"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
 	m_scryptState(new ScryptState(0, 0, CpuCost, Parallelization))
 {
 	if (CpuCost < 1024 || CpuCost % 1024 != 0)
@@ -264,10 +265,17 @@ void SCRYPT::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Lengt
 
 void SCRYPT::Initialize(ISymmetricKey &KeyParams)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (KeyParams.Key().size() < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 6 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	if (IsInitialized())
 	{

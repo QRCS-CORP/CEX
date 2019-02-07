@@ -310,7 +310,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert an array of T to a hexadecimal string
+	/// Convert an array or vector of T to a hexadecimal string
 	/// </summary>
 	/// 
 	/// <param name="Input">The array of T to convert</param>
@@ -318,8 +318,8 @@ public:
 	/// <param name="Length">The number of T values to convert</param>
 	/// 
 	/// <returns>The hex string representation</returns>
-	template <typename T>
-	inline static std::string ToHex(std::vector<T> &Input, size_t Offset, size_t Length)
+	template <typename Array>
+	inline static std::string ToHex(Array &Input, size_t Offset, size_t Length)
 	{
 		std::stringstream ss;
 		ss << std::hex << std::uppercase << std::setfill('0');
@@ -363,7 +363,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert an array of T to a string
+	/// Convert an array or vector of T to a string
 	/// </summary>
 	/// 
 	/// <param name="Input">The integer array to convert</param>
@@ -371,8 +371,8 @@ public:
 	/// <param name="Length">The number of T values to convert</param>
 	/// 
 	/// <returns>The string representation</returns>
-	template <typename T>
-	inline static std::string ToString(std::vector<T> &Input, size_t Offset, size_t Length)
+	template <typename Array>
+	inline static std::string ToString(Array &Input, size_t Offset, size_t Length)
 	{
 		std::stringstream ss;
 
@@ -1522,7 +1522,10 @@ public:
 	template<typename T>
 	inline static T ExpandMask(T X)
 	{
-		T r = X;
+		T r;
+
+		r = X;
+
 		// fold r down to a single bit
 		for (size_t i = 1; i != sizeof(T) * 8; i *= 2)
 		{

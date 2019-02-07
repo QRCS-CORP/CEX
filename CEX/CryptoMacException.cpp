@@ -13,4 +13,9 @@ const ExceptionTypes CryptoMacException::Enumeral()
 	return ExceptionTypes::CryptoMacException;
 }
 
+const std::string CryptoMacException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

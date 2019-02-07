@@ -49,23 +49,24 @@ public:
 PBKDF2::PBKDF2(SHA2Digests DigestType, uint Iterations)
 	:
 	KdfBase(
-		DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::PBKDF2256 : Kdfs::PBKDF2512) :
-			throw CryptoKdfException(std::string("PBKDF2"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam),
+		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::PBKDF2256 : Kdfs::PBKDF2512) : Kdfs::None),
 #if defined(CEX_ENFORCE_KEYMIN)
-		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
-		(DigestType == SHA2Digests::SHA256 ? 32 : 64),
+		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
+		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 #else
 		MINKEY_LENGTH, 
 		MINSALT_LENGTH, 
 #endif
-		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::PBKDF2256) : KdfConvert::ToName(Kdfs::PBKDF2512)),
-		std::vector<SymmetricKeySize> {
+		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::PBKDF2256) : DigestType == SHA2Digests::SHA512 ? KdfConvert::ToName(Kdfs::PBKDF2512) : std::string("")),
+		(DigestType != SHA2Digests::None ? std::vector<SymmetricKeySize> {
 			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 32 : 64), 0, 0),
 			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), 0, (DigestType == SHA2Digests::SHA256 ? 32 : 64)),
-			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))}),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))} :
+			std::vector<SymmetricKeySize>(0))),
 	m_isDestroyed(true),
 	m_isInitialized(false),
-	m_pbkdf2Generator(new HMAC(DigestType)),
+	m_pbkdf2Generator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
+		throw CryptoKdfException(std::string("PBKDF2"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
 	m_pbkdf2State(new Pbkdf2State(0, 0, Iterations))
 {
 }
@@ -199,10 +200,17 @@ void PBKDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Lengt
 
 void PBKDF2::Initialize(ISymmetricKey &KeyParams)
 {
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (KeyParams.Key().size() < MinimumKeySize())
 	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Key value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
 	if (IsInitialized())
 	{

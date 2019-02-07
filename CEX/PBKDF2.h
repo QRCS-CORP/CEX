@@ -55,7 +55,10 @@ using Enumeration::SHA2Digests;
 /// <description><B>Overview:</B></description>
 /// <para>PBKDF2 uses an HMAC as a pseudo-random function to process a passphrase in a time-complexity loop, producing pseudo-random output in a process known as key stretching. \n
 /// By increasing the number of iterations in which the internal hashing function is applied, the amount of time required to derive the key becomes more computationally expensive. \n
-/// A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase.</para>
+/// A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase. \n
+/// The minimum key size should align with the expected security level of the generator function. \n
+/// For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. \n
+/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Description:</B></description> \n
 /// <EM>Legend:</EM> \n

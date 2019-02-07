@@ -4,7 +4,6 @@
 #include "ISymmetricKey.h"
 #include "CryptoAuthenticationFailure.h"
 #include "IStreamCipher.h"
-#include "SecureVector.h"
 #include "SecurityPolicy.h"
 #include "SymmetricKey.h"
 
@@ -37,11 +36,8 @@ private:
 	static const std::string CLASS_NAME;
 	static const std::vector<byte> SIGMA_INFO;
 
-	bool m_isDestroyed;
-	SecureVector<byte> m_keySalt;
-	SymmetricKeySize m_keySizes;
-	SecureVector<byte> m_keyState;
-	SecurityPolicy m_secPolicy;
+	class SecureKeyState;
+	std::unique_ptr<SecureKeyState> m_secureState;
 
 public:
 
@@ -63,78 +59,6 @@ public:
 	SymmetricSecureKey() = delete;
 
 	/// <summary>
-	/// Constructor: instantiate this class with a SecureVector encryption key.
-	/// <para>This default constructor uses only system and process specific values to generate an encryption key.</para>
-	/// </summary>
-	///
-	/// <param name="Key">The primary encryption key</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
-	SymmetricSecureKey(const SecureVector<byte> &Key);
-
-	/// <summary>
-	/// Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters.
-	/// <para>This default constructor uses only system and process specific values to generate an encryption key.</para>
-	/// </summary>
-	///
-	/// <param name="Key">The primary encryption key</param>
-	/// <param name="Nonce">The nonce or salt array</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
-	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce);
-
-	/// <summary>
-	/// Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters.
-	/// <para>This default constructor uses only system and process specific values to generate an encryption key.</para>
-	/// </summary>
-	///
-	/// <param name="Key">The primary encryption key</param>
-	/// <param name="Nonce">The nonce or counter array</param>
-	/// <param name="Info">The personalization string or additional keying material</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
-	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info);
-
-	/// <summary>
-	/// Constructor: instantiate this class with a SecureVector encryption key.
-	/// <para>The salt value is added to system and process information to create seed material used by the internal encryption key generator.</para>
-	/// </summary>
-	///
-	/// <param name="Key">The primary encryption key</param>
-	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
-	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
-	SymmetricSecureKey(const SecureVector<byte> &Key, SecurityPolicy Policy, const SecureVector<byte> &Salt);
-
-	/// <summary>
-	/// Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters.
-	/// <para>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</para>
-	/// </summary>
-	///
-	/// <param name="Key">The primary encryption key</param>
-	/// <param name="Nonce">The nonce or salt array</param>
-	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
-	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
-	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, SecurityPolicy Policy, const SecureVector<byte> &Salt);
-
-	/// <summary>
-	/// Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters.
-	/// <para>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</para>
-	/// </summary>
-	///
-	/// <param name="Key">The primary encryption key</param>
-	/// <param name="Nonce">The nonce or salt array</param>
-	/// <param name="Info">The personalization string or additional keying material</param>
-	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
-	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
-	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info, SecurityPolicy Policy, const SecureVector<byte> &Salt);
-
-	/// <summary>
 	/// Constructor: instantiate this class with an encryption key.
 	/// <para>This default constructor uses only system and process specific values to generate an encryption key.</para>
 	/// </summary>
@@ -142,7 +66,7 @@ public:
 	/// <param name="Key">The primary encryption key</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
-	SymmetricSecureKey(const std::vector<byte> &Key);
+	explicit SymmetricSecureKey(const std::vector<byte> &Key);
 
 	/// <summary>
 	/// Constructor: instantiate this class with an encryption key, and nonce parameters.
@@ -207,6 +131,78 @@ public:
 	SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, SecurityPolicy Policy, const std::vector<byte> &Salt);
 
 	/// <summary>
+	/// Constructor: instantiate this class with a SecureVector encryption key.
+	/// <para>This default constructor uses only system and process specific values to generate an encryption key.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	explicit SymmetricSecureKey(const SecureVector<byte> &Key);
+
+	/// <summary>
+	/// Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters.
+	/// <para>This default constructor uses only system and process specific values to generate an encryption key.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// <param name="Nonce">The nonce or salt array</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce);
+
+	/// <summary>
+	/// Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters.
+	/// <para>This default constructor uses only system and process specific values to generate an encryption key.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// <param name="Nonce">The nonce or counter array</param>
+	/// <param name="Info">The personalization string or additional keying material</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info);
+
+	/// <summary>
+	/// Constructor: instantiate this class with a SecureVector encryption key.
+	/// <para>The salt value is added to system and process information to create seed material used by the internal encryption key generator.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
+	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricSecureKey(const SecureVector<byte> &Key, SecurityPolicy Policy, const SecureVector<byte> &Salt);
+
+	/// <summary>
+	/// Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters.
+	/// <para>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// <param name="Nonce">The nonce or salt array</param>
+	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
+	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, SecurityPolicy Policy, const SecureVector<byte> &Salt);
+
+	/// <summary>
+	/// Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters.
+	/// <para>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The primary encryption key</param>
+	/// <param name="Nonce">The nonce or salt array</param>
+	/// <param name="Info">The personalization string or additional keying material</param>
+	/// <param name="Policy">The security policy; determines the level of cryptographic security used internally</param>
+	/// <param name="Salt">The secret salt array used as an in internal encryption key; the size of the salt should correspond to the SecurityPolicys cryptographic strength</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info, SecurityPolicy Policy, const SecureVector<byte> &Salt);
+
+	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
 	~SymmetricSecureKey() override;
@@ -233,6 +229,21 @@ public:
 	/// </summary>
 	const std::vector<byte> Nonce() override;
 
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy
+	/// </summary>
+	const SecureVector<byte> SecureInfo();
+
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the primary encryption key
+	/// </summary>
+	const SecureVector<byte> SecureKey();
+
+	/// <summary>
+	/// Read Only: Return a secure vector copy of the nonce or salt value
+	/// </summary>
+	const SecureVector<byte> SecureNonce();
+
 	//~~~Public Functions~~~//
 
 	/// <summary>
@@ -251,17 +262,8 @@ public:
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy() override;
-
-	/// <summary>
-	/// Compare this SymmetricSecureKey instance with another
-	/// </summary>
-	/// 
-	/// <param name="Input">Key to compare</param>
-	/// 
-	/// <returns>Returns true if equal</returns>
-	bool Equals(ISymmetricKey &Input) override;
+	/// </summary> 
+	void Reset() override;
 
 	/// <summary>
 	/// Decrypt a SymmetricSecureKey and serialize it as a SymmetricKey stream
@@ -274,9 +276,8 @@ public:
 
 private:
 
-	static void Encipher(SecurityPolicy Policy, const SecureVector<byte> &Salt, SecureVector<byte> &State);
-	static void Encipher(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, SecurityPolicy Policy, const SecureVector<byte> &Salt, SecureVector<byte> &State);
-	static void Extract(const SecureVector<byte> &State, size_t StateOffset, SecurityPolicy Policy, const SecureVector<byte> &Salt, std::vector<byte> &Output, size_t Length);
+	static void Encipher(std::unique_ptr<SecureKeyState> &State);
+	static void Extract(std::unique_ptr<SecureKeyState> &State, size_t StateOffset, SecureVector<byte> &Output, size_t Length);
 	static IStreamCipher* GetStreamCipher(SecurityPolicy Policy);
 	static void GetSystemKey(SecurityPolicy Policy, const SecureVector<byte> &Salt, std::vector<byte> &Output);
 };

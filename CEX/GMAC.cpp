@@ -1,5 +1,6 @@
 #include "GMAC.h"
 #include "BlockCipherFromName.h"
+#include "CpuDetect.h"
 #include "IntegerTools.h"
 #include "MemoryTools.h"
 
@@ -10,19 +11,22 @@ using Utility::IntegerTools;
 using Enumeration::MacConvert;
 using Utility::MemoryTools;
 
+const bool GMAC::HAS_CMUL = HasCMUL();
+
 class GMAC::GmacState
 {
 public:
 
-	std::vector<byte> Buffer;
-	std::vector<byte> State;
+	std::array<byte, CMUL::CMUL_BLOCK_SIZE> Buffer = { 0x00 };
+	std::array<ulong, CMUL::CMUL_STATE_SIZE> Hash = { 0ULL };
+	std::array<byte, CMUL::CMUL_BLOCK_SIZE> State = { 0x00 };
+	std::vector<byte> Nonce;
 	size_t Counter;
 	size_t Position;
 
-	GmacState(size_t StateSize, size_t BufferSize)
+	GmacState()
 		:
-		Buffer(BufferSize),
-		State(StateSize),
+		Nonce(0),
 		Counter(0),
 		Position(0)
 	{
@@ -38,6 +42,8 @@ public:
 		Counter = 0;
 		Position = 0;
 		MemoryTools::Clear(Buffer, 0, Buffer.size());
+		MemoryTools::Clear(Hash, 0, Hash.size() * sizeof(ulong));
+		MemoryTools::Clear(Nonce, 0, Nonce.size());
 		MemoryTools::Clear(State, 0, State.size());
 	}
 };
@@ -47,25 +53,24 @@ public:
 GMAC::GMAC(BlockCiphers CipherType)
 	:
 	MacBase(
-		(CipherType != BlockCiphers::None ? BLOCK_SIZE :
-			throw CryptoMacException(std::string("GMAC"), std::string("Constructor"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam)),
+		CMUL::CMUL_BLOCK_SIZE,
 		Macs::GMAC,
 		MacConvert::ToName(Macs::GMAC) + std::string("-") + BlockCipherConvert::ToName(CipherType),
 		std::vector<SymmetricKeySize> { 
-			SymmetricKeySize(16, 16, 0),
-			SymmetricKeySize(16, 32, 0),
-			SymmetricKeySize(16, 64, 0)},
+			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, CMUL::CMUL_BLOCK_SIZE, 0),
+			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 32, 0),
+			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 64, 0)},
 #if defined(CEX_ENFORCE_KEYMIN)
-		16,
-		16,
+		CMUL::CMUL_BLOCK_SIZE,
+		CMUL::CMUL_BLOCK_SIZE,
 #else
 		MINKEY_LENGTH,
 		MINSALT_LENGTH,
 #endif
-		BLOCK_SIZE),
-	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType)),
-	m_gmacHash(new Mac::GHASH()),
-	m_gmacState(new GmacState(BLOCK_SIZE, BLOCK_SIZE)),
+				CMUL::CMUL_BLOCK_SIZE),
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+		throw CryptoMacException(std::string("GMAC"), std::string("Constructor"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam)),
+	m_gmacState(new GmacState()),
 	m_isDestroyed(true),
 	m_isInitialized(false)
 {
@@ -74,26 +79,25 @@ GMAC::GMAC(BlockCiphers CipherType)
 GMAC::GMAC(IBlockCipher* Cipher)
 	:
 	MacBase(
-		(Cipher != nullptr ? BLOCK_SIZE :
-			throw CryptoMacException(std::string("GMAC"), std::string("Constructor"), std::string("The cipher can not be null!"), ErrorCodes::IllegalOperation)),
+		CMUL::CMUL_BLOCK_SIZE,
 		Macs::GMAC,
 		(Cipher != nullptr ? MacConvert::ToName(Macs::GMAC) + std::string("-") + BlockCipherConvert::ToName(Cipher->Enumeral()) : 
 			std::string("")),
 		std::vector<SymmetricKeySize> {
-			SymmetricKeySize(16, 16, 0),
-			SymmetricKeySize(16, 32, 0),
-			SymmetricKeySize(16, 64, 0)},
+			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, CMUL::CMUL_BLOCK_SIZE, 0),
+			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 32, 0),
+			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 64, 0)},
 #if defined(CEX_ENFORCE_KEYMIN)
-		16,
-		16,
+		CMUL::CMUL_BLOCK_SIZE,
+		CMUL::CMUL_BLOCK_SIZE,
 #else
 		MINKEY_LENGTH,
 		MINSALT_LENGTH,
 #endif
-		BLOCK_SIZE),
-	m_blockCipher(Cipher),
-	m_gmacHash(new Mac::GHASH()),
-	m_gmacState(new GmacState(BLOCK_SIZE, BLOCK_SIZE)),
+		CMUL::CMUL_BLOCK_SIZE),
+	m_blockCipher(Cipher != nullptr ? Cipher :
+		throw CryptoMacException(std::string("GMAC"), std::string("Constructor"), std::string("The cipher can not be null!"), ErrorCodes::IllegalOperation)),
+	m_gmacState(new GmacState()),
 	m_isDestroyed(false),
 	m_isInitialized(false)
 {
@@ -107,11 +111,6 @@ GMAC::~GMAC()
 	{
 		m_gmacState->Reset();
 		m_gmacState.reset(nullptr);
-	}
-	if (m_gmacHash != nullptr)
-	{
-		m_gmacHash->Reset();
-		m_gmacHash.reset(nullptr);
 	}
 
 	if (m_blockCipher != nullptr)
@@ -168,9 +167,20 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The Output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
-	m_gmacHash->FinalizeBlock(m_gmacState->State, m_gmacState->Counter, 0);
-	MemoryTools::XOR(m_gmacState->Buffer, 0, m_gmacState->State, 0, BLOCK_SIZE);
-	MemoryTools::Copy(m_gmacState->State, 0, Output, OutOffset, BLOCK_SIZE);
+	PreCompute(m_gmacState, m_gmacState->State, m_gmacState->Counter, 0);
+	MemoryTools::XOR(m_gmacState->Nonce, 0, m_gmacState->State, 0, CMUL::CMUL_BLOCK_SIZE);
+	MemoryTools::Copy(m_gmacState->State, 0, Output, OutOffset, CMUL::CMUL_BLOCK_SIZE);
+	Reset();
+
+	return TagSize();
+}
+
+size_t GMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+{
+	std::vector<byte> tag(TagSize());
+
+	Finalize(tag, 0);
+	Move(tag, Output, OutOffset);
 
 	return TagSize();
 }
@@ -179,16 +189,24 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 {
 	std::vector<ulong> tmpk;
 
+#if defined(CEX_ENFORCE_KEYMIN)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key or salt size, the key and salt lengths must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
 	if (KeyParams.Key().size() < MinimumKeySize())
 	{
-		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Key size is invalid; must be a legal key size!"), ErrorCodes::InvalidKey);
+		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
+#endif
+
 	if (KeyParams.Nonce().size() < MinimumSaltSize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
 	}
 
-	if (m_isInitialized)
+	if (IsInitialized())
 	{
 		Reset();
 	}
@@ -197,8 +215,8 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 	{
 		// key the cipher and generate H
 		m_blockCipher->Initialize(true, KeyParams);
-		std::vector<byte> tmph(BLOCK_SIZE);
-		const std::vector<byte> ZEROES(BLOCK_SIZE);
+		std::vector<byte> tmph(CMUL::CMUL_BLOCK_SIZE);
+		const std::vector<byte> ZEROES(CMUL::CMUL_BLOCK_SIZE, 0x00);
 		m_blockCipher->Transform(ZEROES, 0, tmph, 0);
 
 		tmpk =
@@ -207,33 +225,44 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 			IntegerTools::BeBytesTo64(tmph, 8)
 		};
 
-		m_gmacHash->Initialize(tmpk);
+		MemoryTools::Copy(tmpk, 0, m_gmacState->Hash, 0, tmpk.size() * sizeof(ulong));
 	}
 
 	// initialize the nonce
-	m_gmacState->Buffer = KeyParams.Nonce();
+	m_gmacState->Nonce.resize(KeyParams.Nonce().size());
+	MemoryTools::Copy(KeyParams.Nonce(), 0, m_gmacState->Nonce, 0, m_gmacState->Nonce.size());
 
-	if (m_gmacState->Buffer.size() == 12)
+	if (m_gmacState->Nonce.size() == 12)
 	{
-		m_gmacState->Buffer.resize(16);
-		m_gmacState->Buffer[15] = 1;
+		m_gmacState->Nonce.resize(CMUL::CMUL_BLOCK_SIZE);
+		m_gmacState->Nonce[15] = 0x01;
 	}
 	else
 	{
-		std::vector<byte> y0(BLOCK_SIZE);
-		m_gmacHash->ProcessSegment(m_gmacState->Buffer, 0, y0, m_gmacState->Buffer.size());
-		m_gmacHash->FinalizeBlock(y0, 0, m_gmacState->Buffer.size());
-		m_gmacState->Buffer = y0;
+		std::array<byte, CMUL::CMUL_BLOCK_SIZE> y0 = { 0x00 };
+		Multiply(m_gmacState, y0);
+		PreCompute(m_gmacState, y0, 0, m_gmacState->Nonce.size());
+
+		if (m_gmacState->Nonce.size() != CMUL::CMUL_BLOCK_SIZE)
+		{
+			if (m_gmacState->Nonce.size() > CMUL::CMUL_BLOCK_SIZE)
+			{
+				MemoryTools::Clear(m_gmacState->Nonce, CMUL::CMUL_BLOCK_SIZE, m_gmacState->Nonce.size() - CMUL::CMUL_BLOCK_SIZE);
+			}
+
+			m_gmacState->Nonce.resize(CMUL::CMUL_BLOCK_SIZE);
+		}
+
+		MemoryTools::Copy(y0, 0, m_gmacState->Nonce, 0, CMUL::CMUL_BLOCK_SIZE);
 	}
 
-	m_blockCipher->Transform(m_gmacState->Buffer, m_gmacState->Buffer);
+	m_blockCipher->Transform(m_gmacState->Nonce, m_gmacState->Nonce);
 	m_isInitialized = true;
 }
 
 void GMAC::Reset()
 {
 	m_gmacState->Reset();
-	m_gmacHash->Reset();
 }
 
 void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
@@ -244,14 +273,117 @@ void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	}
 	if ((Input.size() - InOffset) < Length)
 	{
-		throw CryptoMacException(Name(), std::string("Update"), std::string("The Intput buffer is too short!"), ErrorCodes::InvalidSize);
+		throw CryptoMacException(Name(), std::string("Update"), std::string("The Input buffer is too short!"), ErrorCodes::InvalidSize);
 	}
 
 	if (Length != 0)
 	{
-		m_gmacHash->Update(Input, InOffset, m_gmacState->State, Length);
+		Absorb(Input, InOffset, Length, m_gmacState);
 		m_gmacState->Counter += Length;
 	}
+}
+
+//~~~Private Functions~~~//
+
+void GMAC::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<GmacState> &State)
+{
+	if (Length != 0)
+	{
+		if (State->Position == CMUL::CMUL_BLOCK_SIZE)
+		{
+			MemoryTools::XOR128(State->Buffer, 0, State->State, 0);
+			Permute(State->Hash, State->State);
+			State->Position = 0;
+		}
+
+		const size_t RMDLEN = CMUL::CMUL_BLOCK_SIZE - State->Position;
+
+		if (Length > RMDLEN)
+		{
+			MemoryTools::Copy(Input, InOffset, State->Buffer, State->Position, RMDLEN);
+			MemoryTools::XOR128(State->Buffer, 0, State->State, 0);
+			Permute(State->Hash, State->State);
+			State->Position = 0;
+			Length -= RMDLEN;
+			InOffset += RMDLEN;
+
+			while (Length > CMUL::CMUL_BLOCK_SIZE)
+			{
+				MemoryTools::XOR128(Input, InOffset, State->State, 0);
+				Permute(State->Hash, State->State);
+				Length -= CMUL::CMUL_BLOCK_SIZE;
+				InOffset += CMUL::CMUL_BLOCK_SIZE;
+			}
+		}
+
+		if (Length > 0)
+		{
+			MemoryTools::Copy(Input, InOffset, State->Buffer, State->Position, Length);
+			State->Position += Length;
+		}
+	}
+}
+
+bool GMAC::HasCMUL()
+{
+	CpuDetect dtc;
+
+	return dtc.CMUL() && dtc.AVX();
+}
+
+void GMAC::Multiply(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output)
+{
+	size_t blen;
+	size_t boff;
+
+	blen = State->Nonce.size();
+	boff = 0;
+
+	while (blen != 0)
+	{
+		const size_t RMDLEN = IntegerTools::Min(blen, CMUL::CMUL_BLOCK_SIZE);
+		MemoryTools::XOR(State->Nonce, boff, Output, 0, RMDLEN);
+		Permute(State->Hash, Output);
+		boff += RMDLEN;
+		blen -= RMDLEN;
+	}
+}
+
+void GMAC::Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output)
+{
+	if (HAS_CMUL)
+	{
+		CMUL::PermuteR128P128V(State, Output);
+	}
+	else
+	{
+#if defined(CEX_DIGEST_COMPACT)
+		CMUL::PermuteR128P128C(State, Output);
+#else
+		CMUL::PermuteR128P128U(State, Output);
+#endif
+	}
+}
+
+void GMAC::PreCompute(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output, size_t Counter, size_t Length)
+{
+	if (State->Position != 0)
+	{
+		if (State->Position != CMUL::CMUL_BLOCK_SIZE)
+		{
+			MemoryTools::Clear(State->Buffer, State->Position, State->Buffer.size() - State->Position);
+		}
+
+		MemoryTools::XOR(State->Buffer, 0, Output, 0, State->Position);
+		Permute(State->Hash, Output);
+	}
+
+	std::vector<byte> tmpb(CMUL::CMUL_BLOCK_SIZE);
+	IntegerTools::Be64ToBytes(static_cast<ulong>(Counter) * 8, tmpb, 0);
+	IntegerTools::Be64ToBytes(static_cast<ulong>(Length) * 8, tmpb, sizeof(ulong));
+	MemoryTools::XOR128(tmpb, 0, Output, 0);
+
+	Permute(State->Hash, Output);
 }
 
 NAMESPACE_MACEND

@@ -274,7 +274,7 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A public/private key pair</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Thrown if the key generation call fails</td></tr>
+    <tr><td class="paramname">CryptoAsymmetricException</td><td>Thrown if the key generation call fails</td></tr>
   </table>
   </dd>
 </dl>
@@ -311,6 +311,12 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">AsymmetricKey</td><td>The <a class="el" href="class_asymmetric_key.html" title="An Asymmetric cipher key container ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoAsymmetricException</td><td>Throws on invalid key or configuration error</td></tr>
   </table>
   </dd>
 </dl>

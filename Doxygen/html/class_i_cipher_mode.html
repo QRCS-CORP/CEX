@@ -68,7 +68,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_i_cipher_mode-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">ICipherMode Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___symmetric.html">Symmetric</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___mode.html">Mode</a></div></div>  </div>
+<div class="title">ICipherMode Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___block.html">Block</a> &raquo; <a class="el" href="group___mode.html">Mode</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -89,9 +89,8 @@ Inheritance diagram for ICipherMode:</div>
 <area href="class_i_aead_mode.html" title="An AEAD Cipher Mode virtual interface class. " alt="IAeadMode" shape="rect" coords="380,56,465,80"/>
 <area href="class_i_c_m.html" title="An implementation of a Little-Endian Integer Counter Mode " alt="ICM" shape="rect" coords="475,56,560,80"/>
 <area href="class_o_f_b.html" title="An implementation of a Output FeedBack Mode " alt="OFB" shape="rect" coords="570,56,655,80"/>
-<area href="class_e_a_x.html" title="An Encrypt and Authenticate AEAD Block Cipher Mode " alt="EAX" shape="rect" coords="285,112,370,136"/>
-<area href="class_g_c_m.html" title="A Galois/Counter Authenticated Block Cipher Mode " alt="GCM" shape="rect" coords="380,112,465,136"/>
-<area href="class_o_c_b.html" title="An Offset CodeBook Authenticated Block Cipher Mode " alt="OCB" shape="rect" coords="475,112,560,136"/>
+<area href="class_e_a_x.html" title="An Encrypt and Authenticate AEAD Block Cipher Mode " alt="EAX" shape="rect" coords="332,112,417,136"/>
+<area href="class_g_c_m.html" title="A Galois/Counter Authenticated Block Cipher Mode " alt="GCM" shape="rect" coords="427,112,512,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -134,7 +133,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a530595c8040b12a19a21d14f840547ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of allowed cipher input key byte-sizes  <a href="#a530595c8040b12a19a21d14f840547ab">More...</a><br /></td></tr>
 <tr class="separator:a530595c8040b12a19a21d14f840547ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af060eb48e27685b266b7526be3e5db9e"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">Name</a> ()=0</td></tr>
-<tr class="memdesc:af060eb48e27685b266b7526be3e5db9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher mode name  <a href="#af060eb48e27685b266b7526be3e5db9e">More...</a><br /></td></tr>
+<tr class="memdesc:af060eb48e27685b266b7526be3e5db9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The mode and cipher name  <a href="#af060eb48e27685b266b7526be3e5db9e">More...</a><br /></td></tr>
 <tr class="separator:af060eb48e27685b266b7526be3e5db9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae39d8aaa19ad006669bfbc593b904c15"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#ae39d8aaa19ad006669bfbc593b904c15">ParallelBlockSize</a> ()=0</td></tr>
 <tr class="memdesc:ae39d8aaa19ad006669bfbc593b904c15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#ae39d8aaa19ad006669bfbc593b904c15">More...</a><br /></td></tr>
@@ -276,7 +275,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Block size of internal cipher in bytes </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aa574f1f1eab2021479b2969f4330dea4">GCM</a>, <a class="el" href="class_o_c_b.html#ae395c7e893e5e3a1e174fe456a02656c">OCB</a>, <a class="el" href="class_e_a_x.html#aa51b7c945cd2963f73d71f97d12d51b3">EAX</a>, <a class="el" href="class_c_f_b.html#a63e6c8971ceea7542c1fcd246c7f164d">CFB</a>, <a class="el" href="class_i_c_m.html#a9ca8f0b7fbc7d97721ef08849036dd46">ICM</a>, <a class="el" href="class_c_t_r.html#a2c571e5023cc36b28b95a536c4f5a430">CTR</a>, <a class="el" href="class_e_c_b.html#aa4997990dde74c726bbe2979e735377e">ECB</a>, <a class="el" href="class_c_b_c.html#ac41a15222ff6756f3683b9b99bb230ab">CBC</a>, and <a class="el" href="class_o_f_b.html#a53ee534934e13467ccc30c3c327a4de3">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aa574f1f1eab2021479b2969f4330dea4">GCM</a>, <a class="el" href="class_e_a_x.html#aa51b7c945cd2963f73d71f97d12d51b3">EAX</a>, <a class="el" href="class_c_f_b.html#a63e6c8971ceea7542c1fcd246c7f164d">CFB</a>, <a class="el" href="class_i_c_m.html#a9ca8f0b7fbc7d97721ef08849036dd46">ICM</a>, <a class="el" href="class_c_t_r.html#a2c571e5023cc36b28b95a536c4f5a430">CTR</a>, <a class="el" href="class_e_c_b.html#aa4997990dde74c726bbe2979e735377e">ECB</a>, <a class="el" href="class_c_b_c.html#ac41a15222ff6756f3683b9b99bb230ab">CBC</a>, and <a class="el" href="class_o_f_b.html#a53ee534934e13467ccc30c3c327a4de3">OFB</a>.</p>
 
 </div>
 </div>
@@ -305,7 +304,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The block ciphers formal type name </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a55575bab59f504bff61044b7a2c07ab0">GCM</a>, <a class="el" href="class_o_c_b.html#afd829803c32eb77aee606ad892081794">OCB</a>, <a class="el" href="class_e_a_x.html#a910698a7c7814208cb702171ecb2d9eb">EAX</a>, <a class="el" href="class_c_f_b.html#ad3ffaffa19bc64cb897d0944866c8017">CFB</a>, <a class="el" href="class_i_c_m.html#a29a17fa70f52f2f5a9ecf2605ce1a74f">ICM</a>, <a class="el" href="class_c_t_r.html#a9791ea0b1a5f7625605cb6bce57683a3">CTR</a>, <a class="el" href="class_e_c_b.html#a8ae1eed8f68e705ea364b047d5734224">ECB</a>, <a class="el" href="class_c_b_c.html#a647d15a6bb420fa6413c695c47c470ed">CBC</a>, and <a class="el" href="class_o_f_b.html#a145e723ece45fd4c753864f42a6df67a">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a55575bab59f504bff61044b7a2c07ab0">GCM</a>, <a class="el" href="class_e_a_x.html#a910698a7c7814208cb702171ecb2d9eb">EAX</a>, <a class="el" href="class_c_f_b.html#ad3ffaffa19bc64cb897d0944866c8017">CFB</a>, <a class="el" href="class_i_c_m.html#a29a17fa70f52f2f5a9ecf2605ce1a74f">ICM</a>, <a class="el" href="class_c_t_r.html#a9791ea0b1a5f7625605cb6bce57683a3">CTR</a>, <a class="el" href="class_e_c_b.html#a8ae1eed8f68e705ea364b047d5734224">ECB</a>, <a class="el" href="class_c_b_c.html#a647d15a6bb420fa6413c695c47c470ed">CBC</a>, and <a class="el" href="class_o_f_b.html#a145e723ece45fd4c753864f42a6df67a">OFB</a>.</p>
 
 </div>
 </div>
@@ -353,7 +352,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a2d26b4d5ae167313b422a212f8583e45">GCM</a>, <a class="el" href="class_o_c_b.html#a678efdf36202c3ec42c8190afdf5eec7">OCB</a>, <a class="el" href="class_e_a_x.html#a0379845160e92db232961d5358f93ad0">EAX</a>, <a class="el" href="class_c_f_b.html#a969c9eae91acbc91eac4d5172c49161f">CFB</a>, <a class="el" href="class_c_t_r.html#a0f897e974eeef0b89083a1772206b081">CTR</a>, <a class="el" href="class_i_c_m.html#ae119bf84364320da64cd5e542878baba">ICM</a>, <a class="el" href="class_e_c_b.html#a9e8d0c45935435a91c7e65513394cc1c">ECB</a>, <a class="el" href="class_c_b_c.html#a968418178b289a47b7dfc881d9b7d971">CBC</a>, and <a class="el" href="class_o_f_b.html#a0a5d041b81de570ef13c578730106bbd">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a2d26b4d5ae167313b422a212f8583e45">GCM</a>, <a class="el" href="class_e_a_x.html#a0379845160e92db232961d5358f93ad0">EAX</a>, <a class="el" href="class_c_f_b.html#a969c9eae91acbc91eac4d5172c49161f">CFB</a>, <a class="el" href="class_c_t_r.html#a0f897e974eeef0b89083a1772206b081">CTR</a>, <a class="el" href="class_i_c_m.html#ae119bf84364320da64cd5e542878baba">ICM</a>, <a class="el" href="class_e_c_b.html#a9e8d0c45935435a91c7e65513394cc1c">ECB</a>, <a class="el" href="class_c_b_c.html#a968418178b289a47b7dfc881d9b7d971">CBC</a>, and <a class="el" href="class_o_f_b.html#a0a5d041b81de570ef13c578730106bbd">OFB</a>.</p>
 
 </div>
 </div>
@@ -415,7 +414,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ac978904a322b454996c9a05d5b5668e2">GCM</a>, <a class="el" href="class_o_c_b.html#a161e0fb6814b78435959e97558a5119b">OCB</a>, <a class="el" href="class_e_a_x.html#aefc10c26f120e8765026453d5534f0fa">EAX</a>, <a class="el" href="class_c_f_b.html#a3ef2e81b431efbc9a9da373f17f08e6d">CFB</a>, <a class="el" href="class_c_t_r.html#ae79cfe8150c94630d56fc94fc9bf3330">CTR</a>, <a class="el" href="class_i_c_m.html#a2800c4bacfb46b359c4a58ed8b841112">ICM</a>, <a class="el" href="class_e_c_b.html#a77dee750a4da1d383c9a152e84cefa3e">ECB</a>, <a class="el" href="class_c_b_c.html#ac395ff4a1c887643a4c0a0a763e0e80a">CBC</a>, and <a class="el" href="class_o_f_b.html#a0a2a47b085c6deb7e7b7d09a33878235">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ac978904a322b454996c9a05d5b5668e2">GCM</a>, <a class="el" href="class_e_a_x.html#aefc10c26f120e8765026453d5534f0fa">EAX</a>, <a class="el" href="class_c_f_b.html#a3ef2e81b431efbc9a9da373f17f08e6d">CFB</a>, <a class="el" href="class_c_t_r.html#ae79cfe8150c94630d56fc94fc9bf3330">CTR</a>, <a class="el" href="class_i_c_m.html#a2800c4bacfb46b359c4a58ed8b841112">ICM</a>, <a class="el" href="class_e_c_b.html#a77dee750a4da1d383c9a152e84cefa3e">ECB</a>, <a class="el" href="class_c_b_c.html#ac395ff4a1c887643a4c0a0a763e0e80a">CBC</a>, and <a class="el" href="class_o_f_b.html#a0a2a47b085c6deb7e7b7d09a33878235">OFB</a>.</p>
 
 </div>
 </div>
@@ -463,7 +462,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a58b03a90d605882304157acc9931b39d">GCM</a>, <a class="el" href="class_o_c_b.html#a2d3eb0bd7c41ce21317044454b2b1f48">OCB</a>, <a class="el" href="class_e_a_x.html#a20a5b2674f494add4dc5797e9bc839d9">EAX</a>, <a class="el" href="class_c_f_b.html#a53e20b069cf2f8fb51ab76ea19d88341">CFB</a>, <a class="el" href="class_c_t_r.html#a57118f1cfe667430b7ca5f9148acfb8e">CTR</a>, <a class="el" href="class_i_c_m.html#a4fd9cc6cba1847bf6c7d04d3c1934399">ICM</a>, <a class="el" href="class_e_c_b.html#a0d7928004e020ca594340c367b3c8d65">ECB</a>, <a class="el" href="class_c_b_c.html#a2e30ecfead122a3a8c789edccaaf612f">CBC</a>, and <a class="el" href="class_o_f_b.html#a2e5cbc9012605df7df293d573eb9f339">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a58b03a90d605882304157acc9931b39d">GCM</a>, <a class="el" href="class_e_a_x.html#a20a5b2674f494add4dc5797e9bc839d9">EAX</a>, <a class="el" href="class_c_f_b.html#a53e20b069cf2f8fb51ab76ea19d88341">CFB</a>, <a class="el" href="class_c_t_r.html#a57118f1cfe667430b7ca5f9148acfb8e">CTR</a>, <a class="el" href="class_i_c_m.html#a4fd9cc6cba1847bf6c7d04d3c1934399">ICM</a>, <a class="el" href="class_e_c_b.html#a0d7928004e020ca594340c367b3c8d65">ECB</a>, <a class="el" href="class_c_b_c.html#a2e30ecfead122a3a8c789edccaaf612f">CBC</a>, and <a class="el" href="class_o_f_b.html#a2e5cbc9012605df7df293d573eb9f339">OFB</a>.</p>
 
 </div>
 </div>
@@ -525,7 +524,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a209869874aaf0da5f4e40a1ceba1fd34">GCM</a>, <a class="el" href="class_o_c_b.html#ae9252f54700cb1975dfb07014eb8c8fe">OCB</a>, <a class="el" href="class_e_a_x.html#a54d5555ecc39f163be47e54f63cff6f7">EAX</a>, <a class="el" href="class_c_f_b.html#abaffdd770c6ce0819c857feb8fdf8bac">CFB</a>, <a class="el" href="class_c_t_r.html#ae36630a2841a3733781b8a17f60daae1">CTR</a>, <a class="el" href="class_i_c_m.html#a0a8740e195e641c80b60ba486a582b95">ICM</a>, <a class="el" href="class_e_c_b.html#aba791a7dc1cf97e276b956989971467b">ECB</a>, <a class="el" href="class_c_b_c.html#ad6372779e9e4ceddee647acdcb5b4286">CBC</a>, and <a class="el" href="class_o_f_b.html#a930e86d1af91462f30fbe3e2f711ed18">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a209869874aaf0da5f4e40a1ceba1fd34">GCM</a>, <a class="el" href="class_e_a_x.html#a54d5555ecc39f163be47e54f63cff6f7">EAX</a>, <a class="el" href="class_c_f_b.html#abaffdd770c6ce0819c857feb8fdf8bac">CFB</a>, <a class="el" href="class_c_t_r.html#ae36630a2841a3733781b8a17f60daae1">CTR</a>, <a class="el" href="class_i_c_m.html#a0a8740e195e641c80b60ba486a582b95">ICM</a>, <a class="el" href="class_e_c_b.html#aba791a7dc1cf97e276b956989971467b">ECB</a>, <a class="el" href="class_c_b_c.html#ad6372779e9e4ceddee647acdcb5b4286">CBC</a>, and <a class="el" href="class_o_f_b.html#a930e86d1af91462f30fbe3e2f711ed18">OFB</a>.</p>
 
 </div>
 </div>
@@ -554,7 +553,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The underlying Block Cipher instance </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a009a5075e3eb6115668b5ed21c232e58">GCM</a>, <a class="el" href="class_o_c_b.html#ab66326a91ecc996cdf8b7ef2cc49d46f">OCB</a>, <a class="el" href="class_e_a_x.html#ae9f38e23e24374972b925a59daf3a566">EAX</a>, <a class="el" href="class_c_f_b.html#a14b3f192a8f9f28697c0c2f42f1160ba">CFB</a>, <a class="el" href="class_i_c_m.html#a11c51a9d528021bec018e3c258ca6776">ICM</a>, <a class="el" href="class_c_t_r.html#aa0babd765ccdfb082cbff68d0d9056b2">CTR</a>, <a class="el" href="class_e_c_b.html#a5bafdbe36f0fba3929eea14082c731f0">ECB</a>, <a class="el" href="class_c_b_c.html#aec8812227b9bf4bb8cc09b997a21709a">CBC</a>, and <a class="el" href="class_o_f_b.html#a47b577b146e217f82998a7d2f8935665">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a009a5075e3eb6115668b5ed21c232e58">GCM</a>, <a class="el" href="class_e_a_x.html#ae9f38e23e24374972b925a59daf3a566">EAX</a>, <a class="el" href="class_c_f_b.html#a14b3f192a8f9f28697c0c2f42f1160ba">CFB</a>, <a class="el" href="class_i_c_m.html#a11c51a9d528021bec018e3c258ca6776">ICM</a>, <a class="el" href="class_c_t_r.html#aa0babd765ccdfb082cbff68d0d9056b2">CTR</a>, <a class="el" href="class_e_c_b.html#a5bafdbe36f0fba3929eea14082c731f0">ECB</a>, <a class="el" href="class_c_b_c.html#aec8812227b9bf4bb8cc09b997a21709a">CBC</a>, and <a class="el" href="class_o_f_b.html#a47b577b146e217f82998a7d2f8935665">OFB</a>.</p>
 
 </div>
 </div>
@@ -583,7 +582,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The Cipher Modes enumeration type name </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a8a97bd93ad54ecea7ba5b66feba6b999">GCM</a>, <a class="el" href="class_o_c_b.html#a755b6da31aa40852e950fcc848c66ab5">OCB</a>, <a class="el" href="class_e_a_x.html#aab9d1183f44b6c02e6cb92cb4c14f5a1">EAX</a>, <a class="el" href="class_c_f_b.html#a2b5016638804813b3633afd1ba1d0205">CFB</a>, <a class="el" href="class_i_c_m.html#a0adf33969af58397f33962784f12699f">ICM</a>, <a class="el" href="class_c_t_r.html#af832e8284b5ae14952d4d18944a0b06d">CTR</a>, <a class="el" href="class_e_c_b.html#af962c24893f7906cbe94490b6931e6d2">ECB</a>, <a class="el" href="class_c_b_c.html#a865b2a7d1f312219ae3aa7985929e06e">CBC</a>, and <a class="el" href="class_o_f_b.html#a139493759d72085683e79291ffb34325">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a8a97bd93ad54ecea7ba5b66feba6b999">GCM</a>, <a class="el" href="class_e_a_x.html#aab9d1183f44b6c02e6cb92cb4c14f5a1">EAX</a>, <a class="el" href="class_c_f_b.html#a2b5016638804813b3633afd1ba1d0205">CFB</a>, <a class="el" href="class_i_c_m.html#a0adf33969af58397f33962784f12699f">ICM</a>, <a class="el" href="class_c_t_r.html#af832e8284b5ae14952d4d18944a0b06d">CTR</a>, <a class="el" href="class_e_c_b.html#af962c24893f7906cbe94490b6931e6d2">ECB</a>, <a class="el" href="class_c_b_c.html#a865b2a7d1f312219ae3aa7985929e06e">CBC</a>, and <a class="el" href="class_o_f_b.html#a139493759d72085683e79291ffb34325">OFB</a>.</p>
 
 </div>
 </div>
@@ -629,8 +628,14 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if an invalid key or nonce is used</td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ab0b0377a7d4c7bb0646d38390842ed9e">GCM</a>, <a class="el" href="class_o_c_b.html#a8140cac3aa9f34c0fd6ffecb35319e08">OCB</a>, <a class="el" href="class_e_a_x.html#a91e271dfec115889af0388f95dc244f7">EAX</a>, <a class="el" href="class_c_f_b.html#a29c5a75faeb96f2293a9d6df43f63ac9">CFB</a>, <a class="el" href="class_c_t_r.html#a35b93ff43d48520c697f63d4ca99ed6a">CTR</a>, <a class="el" href="class_i_c_m.html#ad89250242bc276d5285580e13c5966e4">ICM</a>, <a class="el" href="class_e_c_b.html#ac1917142eff7d016a86935a2ab659093">ECB</a>, <a class="el" href="class_c_b_c.html#a0eb2de35506c96b703e4c61788841bfc">CBC</a>, and <a class="el" href="class_o_f_b.html#a35dd942911d0c1b786347e503221d5bb">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ab0b0377a7d4c7bb0646d38390842ed9e">GCM</a>, <a class="el" href="class_e_a_x.html#a91e271dfec115889af0388f95dc244f7">EAX</a>, <a class="el" href="class_c_f_b.html#a29c5a75faeb96f2293a9d6df43f63ac9">CFB</a>, <a class="el" href="class_c_t_r.html#a35b93ff43d48520c697f63d4ca99ed6a">CTR</a>, <a class="el" href="class_i_c_m.html#ad89250242bc276d5285580e13c5966e4">ICM</a>, <a class="el" href="class_e_c_b.html#ac1917142eff7d016a86935a2ab659093">ECB</a>, <a class="el" href="class_c_b_c.html#a0eb2de35506c96b703e4c61788841bfc">CBC</a>, and <a class="el" href="class_o_f_b.html#a35dd942911d0c1b786347e503221d5bb">OFB</a>.</p>
 
 </div>
 </div>
@@ -659,7 +664,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: True if initialized for encryption, False for decryption </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aa141b66ec79ba0056dfa98c18982720c">GCM</a>, <a class="el" href="class_o_c_b.html#a7a1dcfb0ee25a1e21b9dedcee5e5a3d8">OCB</a>, <a class="el" href="class_e_a_x.html#a35193525ccf3f7391a20dd8042d3cf80">EAX</a>, <a class="el" href="class_c_f_b.html#ae085e952b196bc125609c606c98a9ea6">CFB</a>, <a class="el" href="class_i_c_m.html#a721407c09a8fb966b67823879202e8b1">ICM</a>, <a class="el" href="class_c_t_r.html#aeaf57a0939cb270c920f707122c79f21">CTR</a>, <a class="el" href="class_e_c_b.html#ab33dbc090fe1beeee8f70875dc9b8664">ECB</a>, <a class="el" href="class_c_b_c.html#ae0c55ef1463edcfc85d561ab724ee2c0">CBC</a>, and <a class="el" href="class_o_f_b.html#a6e5ed25ccbe10b7dde0e61a305b4369a">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aa141b66ec79ba0056dfa98c18982720c">GCM</a>, <a class="el" href="class_e_a_x.html#a35193525ccf3f7391a20dd8042d3cf80">EAX</a>, <a class="el" href="class_c_f_b.html#ae085e952b196bc125609c606c98a9ea6">CFB</a>, <a class="el" href="class_i_c_m.html#a721407c09a8fb966b67823879202e8b1">ICM</a>, <a class="el" href="class_c_t_r.html#aeaf57a0939cb270c920f707122c79f21">CTR</a>, <a class="el" href="class_e_c_b.html#ab33dbc090fe1beeee8f70875dc9b8664">ECB</a>, <a class="el" href="class_c_b_c.html#ae0c55ef1463edcfc85d561ab724ee2c0">CBC</a>, and <a class="el" href="class_o_f_b.html#a6e5ed25ccbe10b7dde0e61a305b4369a">OFB</a>.</p>
 
 </div>
 </div>
@@ -688,7 +693,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The Block Cipher is ready to transform data </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a3ab23973cd53a46f48b9586602c6ca50">GCM</a>, <a class="el" href="class_o_c_b.html#ac054ef51c8dae24d1c9c12e8f8e3d042">OCB</a>, <a class="el" href="class_e_a_x.html#aa49e2ce5863bacb0e6fde7308639b1c7">EAX</a>, <a class="el" href="class_c_f_b.html#a2f9ecf5de43883fe9620b06395cc4ee2">CFB</a>, <a class="el" href="class_i_c_m.html#afc458f9c6eb6bd3ed18bef6d8db215c9">ICM</a>, <a class="el" href="class_c_t_r.html#a3d406bc5af55b3b6a3a799e2154faa38">CTR</a>, <a class="el" href="class_e_c_b.html#ad3b9540d9c955a4483ba16a092ecc0c6">ECB</a>, <a class="el" href="class_c_b_c.html#a5821a133abfccbf6343fec617210b73a">CBC</a>, and <a class="el" href="class_o_f_b.html#a5a251feb550c172aa058250169ab922c">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a3ab23973cd53a46f48b9586602c6ca50">GCM</a>, <a class="el" href="class_e_a_x.html#aa49e2ce5863bacb0e6fde7308639b1c7">EAX</a>, <a class="el" href="class_c_f_b.html#a2f9ecf5de43883fe9620b06395cc4ee2">CFB</a>, <a class="el" href="class_i_c_m.html#afc458f9c6eb6bd3ed18bef6d8db215c9">ICM</a>, <a class="el" href="class_c_t_r.html#a3d406bc5af55b3b6a3a799e2154faa38">CTR</a>, <a class="el" href="class_e_c_b.html#ad3b9540d9c955a4483ba16a092ecc0c6">ECB</a>, <a class="el" href="class_c_b_c.html#a5821a133abfccbf6343fec617210b73a">CBC</a>, and <a class="el" href="class_o_f_b.html#a5a251feb550c172aa058250169ab922c">OFB</a>.</p>
 
 </div>
 </div>
@@ -718,7 +723,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: Processor parallelization availability. </p>
 <p>Indicates whether parallel processing is available with this mode. If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aac6b00e3ee7d9b9a0f3ce481f5cc733d">GCM</a>, <a class="el" href="class_o_c_b.html#add2b86580a1b14267e90bbf6c6d9c152">OCB</a>, <a class="el" href="class_e_a_x.html#af0eac838a6259cefde491ea09f512d25">EAX</a>, <a class="el" href="class_c_f_b.html#a04b9ac2bf73c617b480793e0b1190490">CFB</a>, <a class="el" href="class_i_c_m.html#a5fba59f675c20b5611b3adec3be2a86a">ICM</a>, <a class="el" href="class_c_t_r.html#a09a9e71be5f16be2e0d4b8fa2e6901fb">CTR</a>, <a class="el" href="class_e_c_b.html#a1c2bbd99072b5e58a178cb2858aab620">ECB</a>, <a class="el" href="class_c_b_c.html#a8f59ce1e14ed0fb4d352c7ca4030f6a9">CBC</a>, and <a class="el" href="class_o_f_b.html#a49b26c86db2fb020a2dc4b29f203e327">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aac6b00e3ee7d9b9a0f3ce481f5cc733d">GCM</a>, <a class="el" href="class_e_a_x.html#af0eac838a6259cefde491ea09f512d25">EAX</a>, <a class="el" href="class_c_f_b.html#a04b9ac2bf73c617b480793e0b1190490">CFB</a>, <a class="el" href="class_i_c_m.html#a5fba59f675c20b5611b3adec3be2a86a">ICM</a>, <a class="el" href="class_c_t_r.html#a09a9e71be5f16be2e0d4b8fa2e6901fb">CTR</a>, <a class="el" href="class_e_c_b.html#a1c2bbd99072b5e58a178cb2858aab620">ECB</a>, <a class="el" href="class_c_b_c.html#a8f59ce1e14ed0fb4d352c7ca4030f6a9">CBC</a>, and <a class="el" href="class_o_f_b.html#a49b26c86db2fb020a2dc4b29f203e327">OFB</a>.</p>
 
 </div>
 </div>
@@ -747,7 +752,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Array of allowed cipher input key byte-sizes </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ac17ad19a4888fc8305135c1bb805038d">GCM</a>, <a class="el" href="class_o_c_b.html#a6ea33c836608d1d17b1d373c82c44711">OCB</a>, <a class="el" href="class_e_a_x.html#a00049094838d16b23e1dfede4b079c73">EAX</a>, <a class="el" href="class_c_f_b.html#ab102367a488336475492423599b586b5">CFB</a>, <a class="el" href="class_i_c_m.html#aca83e2356c7f565f96f79dbfe2311696">ICM</a>, <a class="el" href="class_c_t_r.html#aa325332ea243cc0e0c0beb8081ff9970">CTR</a>, <a class="el" href="class_e_c_b.html#a002341c7ab716854a6a54a651d4710ef">ECB</a>, <a class="el" href="class_c_b_c.html#a78d807a7a4581e18ac7ac5fb24d9416f">CBC</a>, and <a class="el" href="class_o_f_b.html#a0eac533e077a6a0d149d85dd333115d4">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ac17ad19a4888fc8305135c1bb805038d">GCM</a>, <a class="el" href="class_e_a_x.html#a00049094838d16b23e1dfede4b079c73">EAX</a>, <a class="el" href="class_c_f_b.html#ab102367a488336475492423599b586b5">CFB</a>, <a class="el" href="class_i_c_m.html#aca83e2356c7f565f96f79dbfe2311696">ICM</a>, <a class="el" href="class_c_t_r.html#aa325332ea243cc0e0c0beb8081ff9970">CTR</a>, <a class="el" href="class_e_c_b.html#a002341c7ab716854a6a54a651d4710ef">ECB</a>, <a class="el" href="class_c_b_c.html#a78d807a7a4581e18ac7ac5fb24d9416f">CBC</a>, and <a class="el" href="class_o_f_b.html#a0eac533e077a6a0d149d85dd333115d4">OFB</a>.</p>
 
 </div>
 </div>
@@ -774,9 +779,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The cipher mode name </p>
+<p>Read Only: The mode and cipher name </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#afd9c3c9f3981a7663c7d197374475c8b">GCM</a>, <a class="el" href="class_o_c_b.html#a544148125a612f6e7256f77dda442a83">OCB</a>, <a class="el" href="class_e_a_x.html#a92611f77e5f49a85b5701de6324259f2">EAX</a>, <a class="el" href="class_c_f_b.html#ad49df6844524ca15b7dc4cc58289b18f">CFB</a>, <a class="el" href="class_i_c_m.html#a0f7a80f583ab1fcc4e4f9671dfbae1ff">ICM</a>, <a class="el" href="class_c_t_r.html#afb36a778b93e9de39f12b2ef61a59012">CTR</a>, <a class="el" href="class_e_c_b.html#a2d616ac1b075e187d93a9c0635db7756">ECB</a>, <a class="el" href="class_c_b_c.html#a1e86326a819ff2252fe0c494a1b1b059">CBC</a>, and <a class="el" href="class_o_f_b.html#aea5a2a2b15fdc046c30ae85e86440e3c">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#afd9c3c9f3981a7663c7d197374475c8b">GCM</a>, <a class="el" href="class_e_a_x.html#a92611f77e5f49a85b5701de6324259f2">EAX</a>, <a class="el" href="class_c_f_b.html#ad49df6844524ca15b7dc4cc58289b18f">CFB</a>, <a class="el" href="class_i_c_m.html#a0f7a80f583ab1fcc4e4f9671dfbae1ff">ICM</a>, <a class="el" href="class_c_t_r.html#afb36a778b93e9de39f12b2ef61a59012">CTR</a>, <a class="el" href="class_e_c_b.html#a2d616ac1b075e187d93a9c0635db7756">ECB</a>, <a class="el" href="class_c_b_c.html#a1e86326a819ff2252fe0c494a1b1b059">CBC</a>, and <a class="el" href="class_o_f_b.html#aea5a2a2b15fdc046c30ae85e86440e3c">OFB</a>.</p>
 
 </div>
 </div>
@@ -834,7 +839,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing. </p>
 <p>This value can be changed through the ParallelProfile class.</p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ae98e34b751e3a34436e5a0cdb65903e7">GCM</a>, <a class="el" href="class_o_c_b.html#a64238d7750cee7890c9535159496b609">OCB</a>, <a class="el" href="class_e_a_x.html#acfb297a645c68dac17398f0ddfad676f">EAX</a>, <a class="el" href="class_c_f_b.html#a532efbf6eb3c7742ef07f36a934f1071">CFB</a>, <a class="el" href="class_c_t_r.html#ab54c0017386c419b67b75bf9db511bbc">CTR</a>, <a class="el" href="class_i_c_m.html#a49e6525cd7ae48e861a55fba3b6f40e6">ICM</a>, <a class="el" href="class_e_c_b.html#ab8d46bef1bb54a92b01431040c15eb86">ECB</a>, <a class="el" href="class_c_b_c.html#a29aca94489c5e135efda1327b2b16e75">CBC</a>, and <a class="el" href="class_o_f_b.html#a1e6577d17bdd088be81aae58a118e649">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ae98e34b751e3a34436e5a0cdb65903e7">GCM</a>, <a class="el" href="class_e_a_x.html#acfb297a645c68dac17398f0ddfad676f">EAX</a>, <a class="el" href="class_c_f_b.html#a532efbf6eb3c7742ef07f36a934f1071">CFB</a>, <a class="el" href="class_c_t_r.html#ab54c0017386c419b67b75bf9db511bbc">CTR</a>, <a class="el" href="class_i_c_m.html#a49e6525cd7ae48e861a55fba3b6f40e6">ICM</a>, <a class="el" href="class_e_c_b.html#ab8d46bef1bb54a92b01431040c15eb86">ECB</a>, <a class="el" href="class_c_b_c.html#a29aca94489c5e135efda1327b2b16e75">CBC</a>, and <a class="el" href="class_o_f_b.html#a1e6577d17bdd088be81aae58a118e649">OFB</a>.</p>
 
 </div>
 </div>
@@ -872,12 +877,12 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Exception::CryptoCipherModeException</td><td>Thrown if an invalid degree setting is used</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if an invalid degree setting is used</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a030de6a56f54d48aadfc84d4f76e4112">GCM</a>, <a class="el" href="class_o_c_b.html#a79a0789889cb956c3638784b3f8cd596">OCB</a>, <a class="el" href="class_e_a_x.html#aa6ed3a56f0f453cd4c3f3b4a4c7557e7">EAX</a>, <a class="el" href="class_c_f_b.html#ac0df58723e2207b9ba97372d21c028d2">CFB</a>, <a class="el" href="class_c_t_r.html#ad16f16910c84ba171740be1129ed28cd">CTR</a>, <a class="el" href="class_i_c_m.html#ad76adc2aff776ecfdf82121653008e54">ICM</a>, <a class="el" href="class_e_c_b.html#ad48fd64cc9bda226985ed9d27c4368f6">ECB</a>, <a class="el" href="class_c_b_c.html#a7a4717eba955ef9c47670fd0b8b78a96">CBC</a>, and <a class="el" href="class_o_f_b.html#a37fac679458833beeb1b3da67f5a63d4">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a030de6a56f54d48aadfc84d4f76e4112">GCM</a>, <a class="el" href="class_e_a_x.html#aa6ed3a56f0f453cd4c3f3b4a4c7557e7">EAX</a>, <a class="el" href="class_c_f_b.html#ac0df58723e2207b9ba97372d21c028d2">CFB</a>, <a class="el" href="class_c_t_r.html#ad16f16910c84ba171740be1129ed28cd">CTR</a>, <a class="el" href="class_i_c_m.html#ad76adc2aff776ecfdf82121653008e54">ICM</a>, <a class="el" href="class_e_c_b.html#ad48fd64cc9bda226985ed9d27c4368f6">ECB</a>, <a class="el" href="class_c_b_c.html#a7a4717eba955ef9c47670fd0b8b78a96">CBC</a>, and <a class="el" href="class_o_f_b.html#a37fac679458833beeb1b3da67f5a63d4">OFB</a>.</p>
 
 </div>
 </div>
@@ -907,7 +912,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Parallel and SIMD capability flags and sizes </p>
 <p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(SymmetricKey) function is called.</p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a509d08e97f7066920e6a4b8f603edad0">GCM</a>, <a class="el" href="class_o_c_b.html#ae146062c1088efe0bc8657f89d44f5e2">OCB</a>, <a class="el" href="class_e_a_x.html#abfa34be3f7a2d4d49088741173954756">EAX</a>, <a class="el" href="class_c_f_b.html#a4890e3891199fd19e6d8e2004355a518">CFB</a>, <a class="el" href="class_c_t_r.html#a19723813741800df03b3d68b238d3a7c">CTR</a>, <a class="el" href="class_i_c_m.html#a72e0736f5b45f1d81b56a9c58f4c390d">ICM</a>, <a class="el" href="class_e_c_b.html#af4749cc5949f316de491ba5a7bf4c414">ECB</a>, <a class="el" href="class_c_b_c.html#abdb8a7693bf5d56380cf5388a0d7866a">CBC</a>, and <a class="el" href="class_o_f_b.html#a832ff7e24daf8b96f3d90fe0cdda00f3">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a509d08e97f7066920e6a4b8f603edad0">GCM</a>, <a class="el" href="class_e_a_x.html#abfa34be3f7a2d4d49088741173954756">EAX</a>, <a class="el" href="class_c_f_b.html#a4890e3891199fd19e6d8e2004355a518">CFB</a>, <a class="el" href="class_c_t_r.html#a19723813741800df03b3d68b238d3a7c">CTR</a>, <a class="el" href="class_i_c_m.html#a72e0736f5b45f1d81b56a9c58f4c390d">ICM</a>, <a class="el" href="class_e_c_b.html#af4749cc5949f316de491ba5a7bf4c414">ECB</a>, <a class="el" href="class_c_b_c.html#abdb8a7693bf5d56380cf5388a0d7866a">CBC</a>, and <a class="el" href="class_o_f_b.html#a832ff7e24daf8b96f3d90fe0cdda00f3">OFB</a>.</p>
 
 </div>
 </div>
@@ -976,7 +981,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a7c9ef8e01cf01c4e13bd39b167feecd1">GCM</a>, <a class="el" href="class_o_c_b.html#ae27021f2aaba536f1e9f639f532d91c7">OCB</a>, <a class="el" href="class_e_a_x.html#a57929a80df2c614dffc2d5f6dcc2ddd8">EAX</a>, <a class="el" href="class_c_f_b.html#a56c676f8ec93c5cdaa0829c77cad654c">CFB</a>, <a class="el" href="class_c_t_r.html#a334c530be41b3e72af85af70faa5e3b3">CTR</a>, <a class="el" href="class_i_c_m.html#a541db3c1050a101816e3ffef63a382c1">ICM</a>, <a class="el" href="class_e_c_b.html#a1f688e88b2ee79c3db90a7084acd97e5">ECB</a>, <a class="el" href="class_c_b_c.html#aa2add0f41020c81070877f4fcff6852a">CBC</a>, and <a class="el" href="class_o_f_b.html#a9c56128649a805a148e8b99b3f03de97">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a7c9ef8e01cf01c4e13bd39b167feecd1">GCM</a>, <a class="el" href="class_e_a_x.html#a57929a80df2c614dffc2d5f6dcc2ddd8">EAX</a>, <a class="el" href="class_c_f_b.html#a56c676f8ec93c5cdaa0829c77cad654c">CFB</a>, <a class="el" href="class_c_t_r.html#a334c530be41b3e72af85af70faa5e3b3">CTR</a>, <a class="el" href="class_i_c_m.html#a541db3c1050a101816e3ffef63a382c1">ICM</a>, <a class="el" href="class_e_c_b.html#a1f688e88b2ee79c3db90a7084acd97e5">ECB</a>, <a class="el" href="class_c_b_c.html#aa2add0f41020c81070877f4fcff6852a">CBC</a>, and <a class="el" href="class_o_f_b.html#a9c56128649a805a148e8b99b3f03de97">OFB</a>.</p>
 
 </div>
 </div>

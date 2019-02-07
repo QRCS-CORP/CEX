@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['kdfs',['Kdfs',['../group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d',1,'Documentation.h']]],
-  ['keysizes',['KeySizes',['../group___enumeration.html#gad5a44f29b2761cedc42be229ee8709ad',1,'Documentation.h']]]
+  ['macs',['Macs',['../group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3',1,'Documentation.h']]],
+  ['mlweparameters',['MLWEParameters',['../group___enumeration.html#ga49fb964c989e25839109cb3b370c50fd',1,'Documentation.h']]],
+  ['mpkcparameters',['MPKCParameters',['../group___enumeration.html#gac135819acdea6758fc6b361a25ceabf3',1,'Documentation.h']]]
 ];

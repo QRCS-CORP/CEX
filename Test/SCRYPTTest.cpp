@@ -59,7 +59,7 @@ namespace Test
 			Kat(gen1, m_key[1], m_salt[1], m_expected[1], 16384, 1);
 			// long test
 #if !defined(_DEBUG)
-//			Kat(gen1, m_key[1], m_salt[1], m_expected[2], 1048576, 1);
+			Kat(gen1, m_key[1], m_salt[1], m_expected[2], 1048576, 1);
 #endif
 			OnProgress(std::string("SCRYPTTest: Passed SCRYPT SHA256 KAT vector tests.."));
 
@@ -93,6 +93,14 @@ namespace Test
 		catch (TestException const &ex)
 		{
 			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
+		}
+		catch (CryptoKdfException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
+		}
+		catch (CryptoException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
 		}
 		catch (std::exception const &ex)
 		{
@@ -291,6 +299,10 @@ namespace Test
 				Generator->Initialize(kp);
 				Generator->Generate(otp, 0, OTPLEN);
 				Generator->Reset();
+			}
+			catch (CryptoException&)
+			{
+				throw;
 			}
 			catch (const std::exception&)
 			{

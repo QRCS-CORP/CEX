@@ -108,5 +108,19 @@ enum class ErrorCodes : byte
 	UnKnown = 23
 };
 
+class ErrorCodeConvert
+{
+public:
+
+	/// <summary>
+	/// Get the brief description for a type of error code
+	/// </summary>
+	/// 
+	/// <param name="Enumeral">The ErrorCode enumeration member</param>
+	///
+	/// <returns>The error types description string</returns>
+	static std::string Description(ErrorCodes Enumeral);
+};
+
 NAMESPACE_ENUMERATIONEND
 #endif

@@ -13,4 +13,9 @@ const ExceptionTypes CryptoCipherModeException::Enumeral()
 	return ExceptionTypes::CryptoCipherModeException;
 }
 
+const std::string CryptoCipherModeException::Name()
+{
+	return Enumeration::ExceptionTypeConvert::ToName(Enumeral());
+}
+
 NAMESPACE_EXCEPTIONEND

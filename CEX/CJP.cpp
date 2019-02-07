@@ -10,7 +10,7 @@ using Utility::MemoryTools;
 using Enumeration::ProviderConvert;
 using Utility::SystemTools;
 
-const bool CJP::TIMER_HAS_TSC = SystemTools::HasRdtsc();
+const bool CJP::HAS_TSC = SystemTools::HasRdtsc();
 
 struct CJP::JitterState
 {
@@ -56,7 +56,7 @@ CJP::CJP()
 #if defined(CEX_FIPS140_ENABLED)
 	m_pvdSelfTest(),
 #endif
-	ProviderBase(TIMER_HAS_TSC, Providers::CJP, ProviderConvert::ToName(Providers::CJP)),
+	ProviderBase(HAS_TSC, Providers::CJP, ProviderConvert::ToName(Providers::CJP)),
 	m_pvdState(Prime())
 {
 	if (!TimerCheck(m_pvdState))
@@ -278,7 +278,7 @@ void CJP::GetRandom(std::unique_ptr<JitterState> &State, byte* Output, size_t Le
 
 ulong CJP::GetTime()
 {
-	return SystemTools::TimeStamp(TIMER_HAS_TSC);
+	return SystemTools::TimeStamp(HAS_TSC);
 }
 
 bool CJP::MeasureJitter(std::unique_ptr<JitterState> &State)
@@ -336,12 +336,12 @@ std::unique_ptr<CJP::JitterState> CJP::Prime()
 	state->RandomState = 0;
 	state->SecureCache = true;
 
-	CpuDetect detect;
+	CpuDetect dtc;
 
-	if (detect.L1CacheTotal() != 0)
+	if (dtc.L1CacheTotal() != 0)
 	{
-		state->MemoryBlockSize = static_cast<uint>(detect.L1CacheLineSize());
-		state->MemoryBlocks = (detect.L1CacheTotal() / detect.VirtualCores() / state->MemoryBlockSize);
+		state->MemoryBlockSize = static_cast<uint>(dtc.L1CacheLineSize());
+		state->MemoryBlocks = (dtc.L1CacheTotal() / dtc.VirtualCores() / state->MemoryBlockSize);
 		state->MemoryTotalSize = state->MemoryBlocks * state->MemoryBlockSize;
 		state->MemoryIterations = (state->MemoryTotalSize / state->MemoryBlockSize) * 2;
 	}
@@ -436,9 +436,9 @@ bool CJP::TimerCheck(std::unique_ptr<JitterState> &State)
 	for (size_t i = 0; (LOOP_TEST_COUNT + CLEARCACHE) > i; i++)
 	{
 		delta = 0;
-		time = SystemTools::TimeStamp(TIMER_HAS_TSC);
+		time = SystemTools::TimeStamp(HAS_TSC);
 		FoldTime(State, time);
-		time2 = SystemTools::TimeStamp(TIMER_HAS_TSC);
+		time2 = SystemTools::TimeStamp(HAS_TSC);
 
 		// test whether timer works
 		if (time == 0 || time2 == 0)

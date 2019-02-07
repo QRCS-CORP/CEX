@@ -108,6 +108,14 @@ namespace Test
 		{
 			throw TestException(CLASSNAME, ex.Function(), ex.Origin(), ex.Message());
 		}
+		catch (CryptoMacException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
+		}
+		catch (CryptoException &ex)
+		{
+			throw TestException(CLASSNAME, ex.Location() + std::string("::") + ex.Origin(), ex.Name(), ex.Message());
+		}
 		catch (std::exception const &ex)
 		{
 			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
@@ -278,6 +286,7 @@ namespace Test
 			// generate the mac
 			Generator->Initialize(kp);
 			Generator->Compute(msg, otp1);
+			Generator->Reset();
 			Generator->Initialize(kp);
 			Generator->Compute(msg, otp2);
 
@@ -312,6 +321,10 @@ namespace Test
 				// generate with the kdf
 				Generator->Initialize(kp);
 				Generator->Compute(msg, otp);
+			}
+			catch (CryptoException&)
+			{
+				throw;
 			}
 			catch (std::exception const&)
 			{

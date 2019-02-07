@@ -6,6 +6,7 @@
 #include "ErrorCodes.h"
 #include "ISymmetricKey.h"
 #include "Macs.h"
+#include "SecureVector.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_MAC
@@ -15,6 +16,7 @@ using Enumeration::ErrorCodes;
 using Cipher::ISymmetricKey;
 using Enumeration::Macs;
 using Cipher::SymmetricKeySize;
+
 
 /// <summary>
 /// Message Authentication Code (MAC) Interface
@@ -56,79 +58,91 @@ public:
 	virtual const Macs Enumeral() = 0;
 
 	/// <summary>
-	/// Read Only: The Digests internal blocksize in bytes
+	/// Read Only: The MACs internal blocksize in bytes
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Read Only: Mac is ready to digest data
+	/// Read Only: The MAC generator is ready to process data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
+	/// Read Only: Recommended MAC key sizes in a SymmetricKeySize array
 	/// </summary>
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
 	/// <summary>
-	/// Read Only: Minimum recommended initialization key size in bytes
+	/// Read Only: Minimum allowed initialization key-size in bytes
 	/// </summary>
 	virtual const size_t MinimumKeySize() = 0;
 
 	/// <summary>
-	/// Read Only: Minimum recommended initialization salt size in bytes
+	/// Read Only: Minimum allowed initialization salt-size in bytes
 	/// </summary>
 	virtual const size_t MinimumSaltSize() = 0;
 
 	/// <summary>
-	/// Read Only: Mac generators class name
+	/// Read Only: MAC generators formal class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Read Only: Size of returned mac in bytes
+	/// Read Only: The size of the output MAC code in bytes
 	/// </summary>
 	virtual const size_t TagSize() = 0;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Get the MAC value
+	/// Process a vector of bytes and return the MAC code
 	/// </summary>
 	///
-	/// <param name="Input">Input data</param>
-	/// <param name="Output">The output Mac code</param>
+	/// <param name="Input">The input vector to process</param>
+	/// <param name="Output">The output vector containing the MAC code</param>
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Completes processing and returns the HMAC code
+	/// Completes processing and returns the MAC code in a standard vector
 	/// </summary>
 	///
-	/// <param name="Output">Output array that receives the hash code</param>
-	/// <param name="OutOffset">Offset within Output array</param>
+	/// <param name="Output">The output standard vector receiving the MAC code</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
 	///
-	/// <returns>The number of bytes processed</returns>
+	/// <returns>The size of the MAC code in bytes</returns>
 	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
-	/// Initialize the MAC generator with a SymmetricKey key container.
-	/// <para>Uses a key and optional salt and info arrays to initialize the MAC.</para>
+	/// Completes processing and returns the MAC code in a secure vector
+	/// </summary>
+	///
+	/// <param name="Output">The output secure vector receiving the MAC code</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	///
+	/// <returns>The size of the MAC code in bytes</returns>
+	virtual size_t Finalize(SecureVector<byte> &Output, size_t OutOffset) = 0;
+
+	/// <summary>
+	/// Initialize the MAC generator with an ISymmetricKey key container.
+	/// <para>Can accept either the SymmetricKey or SymmetricSecureKey container to load keying material.
+	/// Uses a key, and optional salt and info arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
 	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
-	/// Reset to the default state; Mac code and buffer are zeroised, but key is still loaded
+	/// Reset internal state to the pre-initialization defaults.
+	/// <para>Internal state is zeroised, and MAC generator must be reinitialized again before being used.</para>
 	/// </summary>
 	virtual void Reset() = 0;
 
 	/// <summary>
-	/// Update the Mac with a block of bytes
+	/// Update the Mac with a length of bytes
 	/// </summary>
 	/// 
-	/// <param name="Input">The input data array to process</param>
-	/// <param name="InOffset">Starting position with the input array</param>
+	/// <param name="Input">The input data vector to process</param>
+	/// <param name="InOffset">The starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
 	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
 };

@@ -58,8 +58,7 @@ public:
 	///
 	/// <param name="Input">Array to modify</param>
 	/// <param name="Offset">Offset into array</param>
-	///
-	/// <returns>Length of padding</returns>
+	/// <param name="Length">The number of bytes to pad</param>
 	///
 	/// <exception cref="CryptoPaddingException">Thrown if the padding length is longer than the array length</exception>
 	void AddPadding(std::vector<byte> &Input, size_t Offset, size_t Length) override;

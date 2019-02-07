@@ -56,7 +56,10 @@ using Enumeration::SHA2Digests;
 /// SCRYPT uses a combination of an underlying message digest and the Salsa stream cipher permutation function to make it costly to perform large-scale hardware attacks by requiring large amounts of memory
 /// to generate an output key. \n
 /// Using the same input key, and optional salt, will produce the exact same output. \n
-/// It is recommended that a salt value is added along with the key, this strongly mitigates rainbow-table based attacks on the passphrase.</para>
+/// It is recommended that a salt value is added along with the key, this strongly mitigates rainbow-table based attacks on the passphrase. \n
+/// The minimum key size should align with the expected security level of the generator function. \n
+/// For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. \n
+/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Description:</B></description> \n
 /// <EM>Legend:</EM> \n
