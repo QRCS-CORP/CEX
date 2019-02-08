@@ -109,7 +109,7 @@ Reset the internal state; the generator must be re-initialized before it can be 
 
 ## Links
 
-* ISO18033-2: [Chapter 6.2.3 KDF2](http://www.shoup.net/iso/std6.pdf)
+* [ISO18033-2](http://www.shoup.net/iso/std6.pdf): Chapter 6.2.3 KDF2
 * [RFC 6070](https://tools.ietf.org/html/rfc6070): KDF2 Test vectors
 * [NIST SP80056A](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf): Recommendation for Pair-Wise Key Establishment Schemes
    
