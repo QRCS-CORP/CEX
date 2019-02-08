@@ -53,12 +53,12 @@ Default constructor: default is restricted, this function has been deleted
 ```cpp 
 SCRYPT(SHA2Digests DigestType, size_t CpuCost=16384, size_t Parallelization=1)
 ```
-Instantiates an KDF2 generator using a message digest type name
+Instantiates an SCRYPT generator using a message digest type name
 
 ```cpp 
 SCRYPT(IDigest *Digest, size_t CpuCost=16384, size_t Parallelization=1)
 ```
-Instantiates an KDF2 generator using a message digest instance
+Instantiates an SCRYPT generator using a message digest instance
  
  ```cpp 
 ~SCRYPT() override
