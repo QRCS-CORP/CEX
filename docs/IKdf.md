@@ -46,7 +46,7 @@ virtual const size_t MinimumSaltSize()=0
 Read Only: Minimum recommended salt size in bytes
 
 ```cpp 
-virtual std::vector<SymmetricKeySize> LegalKeySizes() const =0
+virtual std::vector<SymmetricKeySize> LegalKeySizes() const=0
 ```
 Read Only: Available KDF Key Sizes in SymmetricKeySize containers
 
