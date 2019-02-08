@@ -15,6 +15,15 @@ For example, when using SHA2-256 as the underlying hash function, the generator 
 
 This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.
 
+## Implementation Notes: 
+* This implementation only supports the SHA2-256 and SHA2-512 message digests. 
+* The generator must be initialized with a key using the Initialize() functions before output can be generated. 
+* The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material. 
+* Initializing with a salt parameter will call the HKDF Extract function, this is not recommended. 
+* The Info parameter can be set via a property, and can be used as an additional source of entropy. 
+* The recommended key and salt size is the digests block-size in bytes, the info size should be the HMAC output-size, less 1 byte of counter and any padding added by the digests finalizer. 
+* The minimum recommended key size is the underlying digests output-size in bytes. 
+
 ## Example
 ```cpp
 
