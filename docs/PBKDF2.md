@@ -57,12 +57,12 @@ PBKDF2(SHA2Digests DigestType, uint Iterations = 10000)
 Instantiates an PBKDF2 generator using a message digest type name
 
 ```cpp 
-KDF2(IDigest *Digest)
+PBKDF2(IDigest *Digest)
 ```
 Instantiates an PBKDF2 generator using a message digest instance
  
  ```cpp 
-~KDF2() override
+~PBKDF2() override
  ```
 Destructor: finalize this class
 
