@@ -36,7 +36,7 @@ kdf.Generate(Output, [Offset], [Size]);
 ## Public Member Functions
 
 ```cpp 
-SCRYPT(const KDF2&)=delete 
+SCRYPT(const SCRYPT&)=delete 
 ```
 Copy constructor: copy is restricted, this function has been deleted
 
