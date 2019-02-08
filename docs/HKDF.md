@@ -3,12 +3,16 @@
 ## Description:
 HKDF uses an HMAC as a mixing function to produce pseudo-random output in a process known as key stretching. 
 HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-processes the input key, and optional salt and info parameters into an HMAC key. 
+
 The Extract step is called if the KKDF is initialized with the salt parameter, this compresses the input material to a key used by HMAC. 
 For best possible security, the Extract step should be skipped, and HKDF initialized with a key equal in size to the desired security level, and optimally to the HMAC functions internal block-size, with the Info parameter used as a secondary source of pseudo-random key input. 
+
 If used in this configuration, ideally the Info parameter should be sized to the hash output-size, less one byte of counter and any padding added by the hash functions finalizer. 
+
 Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle without the need to call additional permutation compressions, and the underlying hash function processes only full blocks of input. 
 The minimum key size should align with the expected security level of the generator function. 
 For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. 
+
 This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.
 
 ## Example
