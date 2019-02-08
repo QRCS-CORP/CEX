@@ -1,0 +1,45 @@
+p {
+	text-align: justify;
+}
+
+p img {
+	max-width: 100%;
+}
+
+.header-full-title {
+    padding-left: 100px;
+   }
+
+p.caption {
+    font-size: smaller;
+    font-weight: bold;
+}
+
+.black-header {
+z-index: 1;
+overflow: hidden;
+color: #000;
+margin: 30px 0;
+}
+
+
+.sc {
+    font-variant: small-caps;
+}
+
+.nav-right-button {
+    background-color: #0099da;
+}
+
+.right {
+    text-align: right;
+}
+
+.center {
+    text-align: center;
+}
+
+.margincenter {
+	margin-left: auto;
+	margin-right: auto;
+}

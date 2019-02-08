@@ -1,5 +1,5 @@
-.tabs, .tabs2, .tabs3 {
-    background-image: url('tab_b.png');
+﻿.tabs, .tabs2, .tabs3 {
+    color: #2c2c2c;     
     width: 100%;
     z-index: 101;
     font-size: 13px;
@@ -19,10 +19,10 @@
     display: table;
 }
 
-.tablist li {
+.tablist li { 
     float: left;
     display: table-cell;
-    background-image: url('tab_b.png');
+    color: #2c2c2c;    
     line-height: 36px;
     list-style: none;
 }
@@ -31,11 +31,8 @@
     display: block;
     padding: 0 20px;
     font-weight: bold;
-    background-image:url('tab_s.png');
-    background-repeat:no-repeat;
-    background-position:right;
-    color: #292929;
-    text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
+    color: #2c2c2c;     
+    text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9); 
     text-decoration: none;
     outline: none;
 }
@@ -45,16 +42,12 @@
 }
 
 .tablist a:hover {
-    background-image: url('tab_h.png');
-    background-repeat:repeat-x;
-    color: #fff;
+    color: #4c4c4c;     
     text-shadow: 0px 1px 1px rgba(0, 0, 0, 1.0);
     text-decoration: none;
 }
 
 .tablist li.current a {
-    background-image: url('tab_a.png');
-    background-repeat:repeat-x;
-    color: #fff;
+    color: #5c5c5c;    
     text-shadow: 0px 1px 1px rgba(0, 0, 0, 1.0);
 }

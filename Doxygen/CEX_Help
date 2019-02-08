@@ -51,7 +51,7 @@ PROJECT_BRIEF          = "The CEX Cryptographic Library in C++"
 # pixels and the maximum width should not exceed 200 pixels. Doxygen will copy
 # the logo to the output directory.
 
-PROJECT_LOGO           = Doxygen/html/cexlogo.png
+PROJECT_LOGO           = C:/Users/John/Documents/GitHub/CEX/Doxygen/assets/img/dragon13sm.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -1219,7 +1219,6 @@ HTML_EXTRA_FILES       = Doxygen/html/arrowdown.png \
                          Doxygen/html/cexlogo.png \
                          Doxygen/html/closed.png \
                          Doxygen/html/doc.png \
-                         Doxygen/html/doxygen.png \
                          Doxygen/html/dynsections.js \
                          Doxygen/html/folderclosed.png \
                          Doxygen/html/folderopen.png \
@@ -1231,10 +1230,15 @@ HTML_EXTRA_FILES       = Doxygen/html/arrowdown.png \
                          Doxygen/html/splitbar.png \
                          Doxygen/html/sync_off.png \
                          Doxygen/html/sync_on.png \
-                         Doxygen/html/tab_a.png \
-                         Doxygen/html/tab_b.png \
-                         Doxygen/html/tab_h.png \
-                         Doxygen/html/tab_s.png
+                         assets/js/app.js \
+                         assets/js/DropdownHover.js \
+                         assets/js/holder.js \
+                         assets/js/home_info.js \
+                         assets/js/html5shiv.min.js \
+                         images/tab_a.png \
+                         images/tab_b.png \
+                         images/tab_h.png \
+                         images/tab_s.png
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
