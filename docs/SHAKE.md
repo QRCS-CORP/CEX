@@ -52,14 +52,9 @@ SHAKE()=delete
 Default constructor: default is restricted, this function has been deleted
 
 ```cpp 
-SHAKE(SHA2Digests DigestType)
+SHAKE(ShakeModes ShakeModeType = ShakeModes::SHAKE256)
 ```
 Instantiates an SHAKE generator using a message digest type name
-
-```cpp 
-SHAKE(IDigest *Digest)
-```
-Instantiates an SHAKE generator using a message digest instance
  
  ```cpp 
 ~SHAKE() override
