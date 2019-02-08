@@ -66,11 +66,6 @@ Instantiates an KDF2 generator using a message digest instance
 Destructor: finalize this class
 
 ```cpp 
-std::vector<byte> &Info()
-```
-Read/Write: Sets the Info value in the SCRYPT initialization parameters.
- 
-```cpp 
 const bool IsInitialized() override
 ```
 Read Only: Generator is initialized and ready to produce pseudo-random
