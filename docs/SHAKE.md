@@ -92,42 +92,42 @@ void Initialize(ISymmetricKey &KeyParams) override
 Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 
 ```cpp 
-void Initialize (const std::vector<byte> &Key)
+void Initialize(const std::vector<byte> &Key)
 ```
 Initialize the SHAKE generator with a standard vector key
 
 ```cpp 
-void Initialize (const SecureVector<byte> &Key)
+void Initialize(const SecureVector<byte> &Key)
 ```
 Initialize the SHAKE generator with a secure vector key
 
 ```cpp 
-void Initialize (const std::vector<byte> &Key, size_t Offset, size_t Length)
+void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 ```
 Initialize the SHAKE generator with a standard vector key, using length and offset parameters
 
 ```cpp 
-void Initialize (const SecureVector<byte> &Key, size_t Offset, size_t Length)
+void Initialize(const SecureVector<byte> &Key, size_t Offset, size_t Length)
 ```
 Initialize the SHAKE generator with a secure vector key, using length and offset parameters
 
 ```cpp 
-void Initialize (const std::vector<byte> &Key, const std::vector<byte> &Customization)
+void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization)
 ```
 Initialize the SHAKE generator with standard vector key and customization arrays
 
 ```cpp 
-void Initialize (const SecureVector<byte> &Key, const SecureVector<byte> &Customization)
+void Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization)
 ```
 Initialize the SHAKE generator with secure vector key and customization arrays
 
 ```cpp 
-void Initialize (const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information)
+void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information)
 ```
 Initialize the cSHAKE generator with key, customization, and name standard vectors
 
 ```cpp 
-void Initialize (const SecureVector<byte> &Key, const SecureVector< byte > &Customization, const SecureVector<byte> &Information)
+void Initialize(const SecureVector<byte> &Key, const SecureVector< byte > &Customization, const SecureVector<byte> &Information)
 ```
 Initialize the cSHAKE generator with key, customization, and information secure vectors
 
