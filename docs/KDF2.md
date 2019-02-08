@@ -1,4 +1,4 @@
-# HKDF 
+# KDF2
 
 ## Description:
 KDF2 uses a hash digest as a pseudo-random function to produce pseudo-random output in a process known as key stretching. 
