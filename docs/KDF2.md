@@ -55,12 +55,12 @@ Default constructor: default is restricted, this function has been deleted
 ```cpp 
 KDF2(SHA2Digests DigestType)
 ```
-Instantiates an HKDF generator using a message digest type name
+Instantiates an KDF2 generator using a message digest type name
 
 ```cpp 
 KDF2(IDigest *Digest)
 ```
-Instantiates an HKDF generator using a message digest instance
+Instantiates an KDF2 generator using a message digest instance
  
  ```cpp 
 ~KDF2() override
