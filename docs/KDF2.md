@@ -38,72 +38,72 @@ kdf.Generate(Output, [Offset], [Size]);
 ## Public Member Functions
 
 ```cpp 
-KDF2 (const KDF2 &)=delete 
+KDF2(const KDF2&)=delete 
 ```
 Copy constructor: copy is restricted, this function has been deleted
 
 ```cpp 
-KDF2& operator= (const KDF2 &)=delete 
+KDF2& operator=(const KDF2&)=delete 
 ```
 Copy operator: copy is restricted, this function has been deleted
 
 ```cpp 
-KDF2 ()=delete 
+KDF2()=delete 
 ```
 Default constructor: default is restricted, this function has been deleted
 
 ```cpp 
-KDF2 (SHA2Digests DigestType)
+KDF2(SHA2Digests DigestType)
 ```
 Instantiates an HKDF generator using a message digest type name
 
 ```cpp 
-KDF2 (IDigest *Digest)
+KDF2(IDigest *Digest)
 ```
 Instantiates an HKDF generator using a message digest instance
  
  ```cpp 
-~KDF2 () override
+~KDF2() override
  ```
 Destructor: finalize this class
 
 ```cpp 
-std::vector<byte> &Info ()
+std::vector<byte> &Info()
 ```
 Read/Write: Sets the Info value in the HKDF initialization parameters.
  
 ```cpp 
-const bool IsInitialized () override
+const bool IsInitialized() override
 ```
 Read Only: Generator is initialized and ready to produce pseudo-random
 
 ```cpp
-void Generate (std::vector<byte> &Output) override
+void Generate(std::vector<byte> &Output) override
 ```
 Fill a standard vector with pseudo-random bytes
  
 ```cpp 
-void Generate (SecureVector<byte> &Output) override
+void Generate(SecureVector<byte> &Output) override
 ```
 Fill a secure vector with pseudo-random bytes
  
 ```cpp 
-void Generate (std::vector<byte> &Output, size_t Offset, size_t Length) override
+void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override
 ```
 Fill an array with pseudo-random bytes, using offset and length parameters
 
 ```cpp 
-void Generate (SecureVector<byte> &Output, size_t Offset, size_t Length) override
+void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override
 ```
 Fill a secure vector with pseudo-random bytes, using offset and length parameters
 
 ```cpp 
-void Initialize (ISymmetricKey &KeyParams) override
+void Initialize(ISymmetricKey &KeyParams) override
 ```
 Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 
 ```cpp 
-void Reset () override
+void Reset() override
 ```
 Reset the internal state; the generator must be re-initialized before it can be used again   
 
