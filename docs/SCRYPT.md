@@ -56,7 +56,7 @@ SCRYPT(SHA2Digests DigestType, size_t CpuCost=16384, size_t Parallelization=1)
 Instantiates an KDF2 generator using a message digest type name
 
 ```cpp 
-SCRYPT(IDigest *Digest)
+SCRYPT(IDigest *Digest, size_t CpuCost=16384, size_t Parallelization=1)
 ```
 Instantiates an KDF2 generator using a message digest instance
  
