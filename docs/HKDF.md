@@ -97,11 +97,8 @@ void Reset () override
 Reset the internal state; the generator must be re-initialized before it can be used again   
 
 ## Links
-Cryptographic Extraction and Key Derivation: [The HKDF Scheme](http://eprint.iacr.org/2010/264.pdf)
-[RFC 2104](http://tools.ietf.org/html/rfc2104): HMAC: Keyed-Hashing for Message Authentication. 
-[RFC 5869](http://tools.ietf.org/html/rfc5869): HMAC-based Extract-and-Expand Key Derivation Function. 
-       
-       
-       
-       
-       
+
+* Cryptographic Extraction and Key Derivation: [The HKDF Scheme](http://eprint.iacr.org/2010/264.pdf)
+* [RFC 2104](http://tools.ietf.org/html/rfc2104): HMAC: Keyed-Hashing for Message Authentication
+* [RFC 5869](http://tools.ietf.org/html/rfc5869): HMAC-based Extract-and-Expand Key Derivation Function
+   
