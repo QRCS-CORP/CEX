@@ -54,7 +54,7 @@ Default constructor: default is restricted, this function has been deleted
 ```cpp 
 SHAKE(ShakeModes ShakeModeType = ShakeModes::SHAKE256)
 ```
-Instantiates an SHAKE generator using a message digest type name
+Instantiates an SHAKE generator using a SHAKE mode type name
  
  ```cpp 
 ~SHAKE() override
