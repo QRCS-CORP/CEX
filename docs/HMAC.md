@@ -53,12 +53,12 @@ Default constructor: default is restricted, this function has been deleted
 ```cpp 
 HMAC(SHA2Digests DigestType, bool Parallel=false)
 ```
-Initialize the class with the block cipher type enumeration name
+Initialize the class with the digest type enumeration name
  
 ```cpp 
 HMAC(IDigest *Digest)
 ```
-Initialize this class with a block cipher instance
+Initialize this class with a message digest instance
  
 ```cpp
 ~HMAC() override
