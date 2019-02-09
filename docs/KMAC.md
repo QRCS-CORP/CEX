@@ -50,7 +50,7 @@ Default constructor: default is restricted, this function has been deleted
 ```cpp 
 KMAC(KmacModes KmacModeType=KmacModes::KMAC256)
 ```
-Initialize the class with the block cipher type enumeration name
+Initialize the class with the block KMAC mode enumeration name
 
 ```cpp
 ~KMAC() override
