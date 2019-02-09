@@ -98,7 +98,7 @@ void Reset() override
 Reset internal state to the pre-initialization defaults
 
 ```cpp
-void Update (const std::vector< byte > &Input, size_t InOffset, size_t Length) override
+void Update(const std::vector< byte > &Input, size_t InOffset, size_t Length) override
 ```
 Update the Mac with a length of bytes
 
