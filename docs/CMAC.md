@@ -79,7 +79,7 @@ Process a vector of bytes and return the MAC code
 
 ```cpp
 size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override
- 
+```
 Completes processing and returns the MAC code in a standard vector
 
 ```cpp
