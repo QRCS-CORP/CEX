@@ -1,4 +1,4 @@
-# The CPU Jitter entropy Provider : CJP
+# The CPU Jitter entropy Provider: CJP
 
 ## Description:
 The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time. 
