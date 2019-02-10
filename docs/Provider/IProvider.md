@@ -13,7 +13,7 @@ Copy operator: copy is restricted, this function has been deleted
  
 ```cpp
 IProvider()
-```cpp
+```
 Constructor: Instantiate this class
 
 ```cpp
