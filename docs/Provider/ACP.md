@@ -66,4 +66,6 @@ Reset the internal state More...
 * [SHA3](http://keccak.noekeon.org/Keccak-submission-3.pdf): The Keccak digest: 
 * [NIST SP800-90B](http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf): Recommendation for the Entropy Sources Used for Random Bit Generation.
 * [NIST Fips 140-2](http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf): Security Requirments For Cryptographic Modules
+* [FIPS 202](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf): Permutation Based Hash and Extendable Output Functions 
+* [NIST SP800-185](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf): SHA-3 Derived Functions
    
