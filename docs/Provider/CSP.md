@@ -1,4 +1,4 @@
-# An implementation of an entropy source provider using the system secure random generator: CSP
+# The system secure random generator: CSP
 
 ## Description:
 On a windows system, the RNGCryptoServiceProvider CryptGenRandom() function is used to generate output. On Android, the arc4random() function is used. All other systems (Linux, Unix), use dev/random.
