@@ -1,4 +1,4 @@
-# An implementation of an HMAC Counter PRNG: HCR
+# HMAC Counter PRNG: HCR
 
 ## Description:
 An implementation of a HMAC based Counter generator PRNG. 
