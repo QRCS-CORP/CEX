@@ -1,4 +1,4 @@
-# Block cipher Counter Random generator: BCR
+# Block cipher Counter generator: BCR
 
 ## Description:
 An implementation of a Block cipher Counter mode PRNG. 
