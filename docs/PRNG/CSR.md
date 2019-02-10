@@ -1,4 +1,4 @@
-# cSHAKE based Random generator: CSR
+# cSHAKE based PRNG: CSR
 
 ## Description:
 An implementation of an cSHAKE based PRNG. 
