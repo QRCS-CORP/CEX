@@ -71,6 +71,5 @@ Reset the generator instance
 
 * [NIST SP800-90B](http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf): Recommendation for the Entropy Sources Used for Random Bit Generation.
 * [NIST Fips 140-2](http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf): Security Requirments For Cryptographic Modules
-* [NIST SP800-22 1a](http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf): A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications
 * [NIST Security Bounds](http://eprint.iacr.org/2006/379.pdf):  for the Codebook-based: Deterministic Random Bit Generator
    
