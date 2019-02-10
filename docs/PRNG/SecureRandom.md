@@ -1,4 +1,4 @@
-# An implementation of a cryptographically secure pseudo-random number generator.
+# SecureRandom
 
 ## Description:
 An implementation of a cryptographically secure pseudo-random number generator. 
