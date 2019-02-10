@@ -1,4 +1,4 @@
-# The Intel RDRAND digital random number generator: RDP
+# The Intel RDRAND digital random Provider: RDP
 
 ## Description:
 The RDRAND DRNG uses thermal noise to generate random bits that are buffered into a shift register, then fed into a CBC-MAC to condition the bytes. The output from the CBC-MAC is obtained using the RDSEED api. 
