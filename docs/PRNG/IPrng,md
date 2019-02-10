@@ -1,0 +1,70 @@
+# The Psuedo Random Number Generator interface
+  
+## Public Member Functions
+```cpp
+IPrng (const IPrng&)=delete
+Copy constructor: copy is restricted, this function has been deleted
+
+```cpp
+IPrng& operator= (const IPrng&)=delete
+ ```
+Copy operator: copy is restricted, this function has been deleted
+
+```cpp
+IPrng()
+```
+Initialize this class
+
+```cpp
+virtual ~IPrng() noexcept
+```
+Destructor: finalize this class
+
+```cpp
+virtual const Prngs Enumeral()=0
+```
+Read Only: The random generators type name
+
+```cpp
+virtual const std::string Name()=0
+```
+Read Only: The random generators class name
+
+```cpp
+virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length)=0
+```
+Fill a standard vector with pseudo-random bytes using offset and length parameters
+
+```cpp
+virtual void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)=0
+```
+Fill a SecureVector array with pseudo-random bytes using offset and length parameters
+
+```cpp
+virtual void Generate(std::vector<byte> &Output)=0
+```
+Fill a standard vector with pseudo-random bytes
+
+```cpp
+virtual void Generate(SecureVector<byte> &Output)=0
+```
+Fill a SecureVector array with pseudo-random bytes
+
+```cpp
+virtual ushort NextUInt16()=0
+```
+Get a pseudo-random unsigned 16bit integer
+```cpp
+virtual uint NextUInt32()=0
+```
+Get a pseudo-random unsigned 32bit integer
+
+```cpp
+virtual ulong NextUInt64()=0
+```
+Get a pseudo-random unsigned 64bit integer
+
+```cpp
+virtual void Reset()=0
+```
+Reset the generator instance
