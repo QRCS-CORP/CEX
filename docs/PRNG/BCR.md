@@ -1,117 +1,76 @@
-# HKDF 
+# Block cipher Counter Random generator: BCR
 
 ## Description:
-HKDF uses an HMAC as a mixing function to produce pseudo-random output in a process known as key stretching. 
-HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-processes the input key, and optional salt and info parameters into an HMAC key. 
-
-The Extract step is called if the KKDF is initialized with the salt parameter, this compresses the input material to a key used by HMAC. 
-For best possible security, the Extract step should be skipped, and HKDF initialized with a key equal in size to the desired security level, and optimally to the HMAC functions internal block-size, with the Info parameter used as a secondary source of pseudo-random key input. 
-
-If used in this configuration, ideally the Info parameter should be sized to the hash output-size, less one byte of counter and any padding added by the hash functions finalizer. 
-
-Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle without the need to call additional permutation compressions, and the underlying hash function processes only full blocks of input. 
-The minimum key size should align with the expected security level of the generator function. 
-For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. 
-
-This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.
+An implementation of a Block cipher Counter mode PRNG. 
+Uses a keyed block cipher run in counter mode (BCG Generator) to generate pseudo-random output.
+This random generator is seeded automatically with an etropy provider.
+Both the entropy provider and the block cipher can be selected through the constructors parameters.
 
 ## Implementation Notes: 
-* This implementation only supports the SHA2-256 and SHA2-512 message digests. 
-* The generator must be initialized with a key using the Initialize() functions before output can be generated. 
-* The Initialize(ISymmetricKey) function can use a SymmetricKey or a SymmetricSecureKey key container class containing the generators keying material. 
-* Initializing with a salt parameter will call the HKDF Extract function, this is not recommended. 
-* The Info parameter can be set via a property, and can be used as an additional source of entropy. 
-* The recommended key and salt size is the digests block-size in bytes, the info size should be the HMAC output-size, less 1 byte of counter and any padding added by the digests finalizer. 
-* The minimum recommended key size is the underlying digests output-size in bytes. 
+* Wraps the Counter Mode Generator (BCG) DRBG implementation. 
+* Can be initialized with any of the implemented block-ciphers run in CTR mode. 
+* Uses an internal entropy provider to seed the underlying DRBG. 
+* The underlying DRBG instance can be optionally multi-threaded through the constructors Parallel parameter.
 
 ## Example
 ```cpp
+#include "BCR.h"
 
-#include "HKDF.h"
-
-// use the enumeration constructor
-HKDF kdf(Enumeration::Digests::SHA256);
-// initialize
-kdf.Initialize(Key, [Salt], [Info]);
-// generate bytes
-kdf.Generate(Output, [Offset], [Size]);
+BCR rnd([BlockCiphers], [Providers]);
+// get random int
+int num = rnd.NextUInt32([Minimum], [Maximum]);
 ```
        
 ## Public Member Functions
-
-```cpp 
-HKDF(const HKDF &)=delete 
+```cpp
+BCR(const BCR&)=delete
 ```
 Copy constructor: copy is restricted, this function has been deleted
 
-```cpp 
-HKDF& operator= (const HKDF&)=delete 
+```cpp
+BCR& operator= (const BCR&)=delete
 ```
 Copy operator: copy is restricted, this function has been deleted
-
-```cpp 
-HKDF()=delete 
-```
-Default constructor: default is restricted, this function has been deleted
-
-```cpp 
-HKDF(SHA2Digests DigestType)
-```
-Instantiates an HKDF generator using a message digest type name
-
-```cpp 
-HKDF(IDigest *Digest)
-```
-Instantiates an HKDF generator using a message digest instance
  
- ```cpp 
-~HKDF() override
- ```
+```cpp
+BCR(BlockCiphers CipherType=BlockCiphers::AES, Providers ProviderType=Providers::ACP, bool Parallel=false)
+```
+Initialize this class with parameters
+ 
+```cpp
+~BCR() override
+```
 Destructor: finalize this class
-
-```cpp 
-std::vector<byte> &Info()
-```
-Read/Write: Sets the Info value in the HKDF initialization parameters.
- 
-```cpp 
-const bool IsInitialized() override
-```
-Read Only: Generator is initialized and ready to produce pseudo-random
 
 ```cpp
 void Generate(std::vector<byte> &Output) override
 ```
 Fill a standard vector with pseudo-random bytes
- 
-```cpp 
+
+```cpp
 void Generate(SecureVector<byte> &Output) override
 ```
-Fill a secure vector with pseudo-random bytes
- 
-```cpp 
+Fill a SecureVector with pseudo-random bytes
+
+```cpp
 void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override
 ```
-Fill an array with pseudo-random bytes, using offset and length parameters
+Fill a standard vector with pseudo-random bytes using offset and length parameters
 
-```cpp 
+```cpp
 void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) override
 ```
-Fill a secure vector with pseudo-random bytes, using offset and length parameters
+Fill a SecureVector with pseudo-random bytes using offset and length parameters
 
-```cpp 
-void Initialize(ISymmetricKey &KeyParams) override
-```
-Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
-
-```cpp 
+```cpp
 void Reset() override
 ```
-Reset the internal state; the generator must be re-initialized before it can be used again   
+Reset the generator instance 
 
 ## Links
 
-* Cryptographic Extraction and Key Derivation: [The HKDF Scheme](http://eprint.iacr.org/2010/264.pdf)
-* [RFC 2104](http://tools.ietf.org/html/rfc2104): HMAC: Keyed-Hashing for Message Authentication
-* [RFC 5869](http://tools.ietf.org/html/rfc5869): HMAC-based Extract-and-Expand Key Derivation Function
+* [NIST SP800-90B](http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf): Recommendation for the Entropy Sources Used for Random Bit Generation.
+* [NIST Fips 140-2](http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf): Security Requirments For Cryptographic Modules
+* [NIST SP800-22 1a](http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf): A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications
+* [NIST Security Bounds](http://eprint.iacr.org/2006/379.pdf):  for the Codebook-based: Deterministic Random Bit Generator
    
