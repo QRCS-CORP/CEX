@@ -1,4 +1,4 @@
-# Block cipher Counter Random generator: CSR
+# cSHAKE based Random generator: CSR
 
 ## Description:
 An implementation of an cSHAKE based PRNG. 
