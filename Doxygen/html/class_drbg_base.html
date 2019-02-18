@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -83,9 +82,9 @@ Inheritance diagram for DrbgBase:</div>
   <img src="class_drbg_base.png" usemap="#DrbgBase_map" alt=""/>
   <map id="DrbgBase_map" name="DrbgBase_map">
 <area href="class_i_drbg.html" title="Deterministic Random Byte Generator (DRBG) interface class " alt="IDrbg" shape="rect" coords="78,0,146,24"/>
-<area href="class_b_c_g.html" title="An implementation of a Block cipher Counter mode Generator DRBG " alt="BCG" shape="rect" coords="0,112,68,136"/>
-<area href="class_c_s_g.html" title="An implementation of an cSHAKE Generator DRBG " alt="CSG" shape="rect" coords="78,112,146,136"/>
-<area href="class_h_c_g.html" title="An implementation of an HMAC Counter Generator DRBG " alt="HCG" shape="rect" coords="156,112,224,136"/>
+<area href="class_b_c_g.html" title="An implementation of a Block cipher Counter mode Generator DRBG: BCG " alt="BCG" shape="rect" coords="0,112,68,136"/>
+<area href="class_c_s_g.html" title="An implementation of an cSHAKE Generator DRBG: CSG " alt="CSG" shape="rect" coords="78,112,146,136"/>
+<area href="class_h_c_g.html" title="An implementation of an HMAC Counter Generator DRBG: HCG " alt="HCG" shape="rect" coords="156,112,224,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -140,9 +139,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:adbff51f7009375e91073451b2acbb4fd inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#adbff51f7009375e91073451b2acbb4fd">IsInitialized</a> ()=0</td></tr>
 <tr class="memdesc:adbff51f7009375e91073451b2acbb4fd inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Generator is ready to produce random  <a href="class_i_drbg.html#adbff51f7009375e91073451b2acbb4fd">More...</a><br /></td></tr>
 <tr class="separator:adbff51f7009375e91073451b2acbb4fd inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa09c6f5d57f335e4466854c73ef1cb37 inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual const size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#aa09c6f5d57f335e4466854c73ef1cb37">ReseedThreshold</a> ()=0</td></tr>
-<tr class="memdesc:aa09c6f5d57f335e4466854c73ef1cb37 inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The maximum output generated between seed recycling  <a href="class_i_drbg.html#aa09c6f5d57f335e4466854c73ef1cb37">More...</a><br /></td></tr>
-<tr class="separator:aa09c6f5d57f335e4466854c73ef1cb37 inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd2c3ac5a25f6abedc68c69f53374c24 inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#abd2c3ac5a25f6abedc68c69f53374c24">ReseedThreshold</a> ()=0</td></tr>
+<tr class="memdesc:abd2c3ac5a25f6abedc68c69f53374c24 inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The maximum output generated between auto-seed generation when using an entropy provider  <a href="class_i_drbg.html#abd2c3ac5a25f6abedc68c69f53374c24">More...</a><br /></td></tr>
+<tr class="separator:abd2c3ac5a25f6abedc68c69f53374c24 inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a620be3a5ed3faa9c111afc1f0222b79e inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a620be3a5ed3faa9c111afc1f0222b79e">SecurityStrength</a> ()=0</td></tr>
 <tr class="memdesc:a620be3a5ed3faa9c111afc1f0222b79e inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The security strength in bits  <a href="class_i_drbg.html#a620be3a5ed3faa9c111afc1f0222b79e">More...</a><br /></td></tr>
 <tr class="separator:a620be3a5ed3faa9c111afc1f0222b79e inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,12 +157,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a92ec2c9f208e752769ef1fa26885a537 inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a92ec2c9f208e752769ef1fa26885a537">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
 <tr class="memdesc:a92ec2c9f208e752769ef1fa26885a537 inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes using offset and length parameters  <a href="class_i_drbg.html#a92ec2c9f208e752769ef1fa26885a537">More...</a><br /></td></tr>
 <tr class="separator:a92ec2c9f208e752769ef1fa26885a537 inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f4774cd3d6f777ac8a4434565bbb96c inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a2f4774cd3d6f777ac8a4434565bbb96c">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam)=0</td></tr>
-<tr class="memdesc:a2f4774cd3d6f777ac8a4434565bbb96c inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key and optional salt (Nonce) and info string (Info)  <a href="class_i_drbg.html#a2f4774cd3d6f777ac8a4434565bbb96c">More...</a><br /></td></tr>
-<tr class="separator:a2f4774cd3d6f777ac8a4434565bbb96c inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae885c048fed0e972930070bb392a3018 inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#ae885c048fed0e972930070bb392a3018">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters)=0</td></tr>
+<tr class="memdesc:ae885c048fed0e972930070bb392a3018 inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key and optional salt (Nonce) and info string (Info)  <a href="class_i_drbg.html#ae885c048fed0e972930070bb392a3018">More...</a><br /></td></tr>
+<tr class="separator:ae885c048fed0e972930070bb392a3018 inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c2ae576f76fc6f10d067b5dee50852b inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a7c2ae576f76fc6f10d067b5dee50852b">Update</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)=0</td></tr>
 <tr class="memdesc:a7c2ae576f76fc6f10d067b5dee50852b inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material  <a href="class_i_drbg.html#a7c2ae576f76fc6f10d067b5dee50852b">More...</a><br /></td></tr>
 <tr class="separator:a7c2ae576f76fc6f10d067b5dee50852b inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95fb27b0fde630a368b4033161fae9f3 inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a95fb27b0fde630a368b4033161fae9f3">Update</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)=0</td></tr>
+<tr class="memdesc:a95fb27b0fde630a368b4033161fae9f3 inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material with a secure vector key  <a href="class_i_drbg.html#a95fb27b0fde630a368b4033161fae9f3">More...</a><br /></td></tr>
+<tr class="separator:a95fb27b0fde630a368b4033161fae9f3 inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The KDF base class; this is not an operable class </p>

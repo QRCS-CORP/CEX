@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -139,9 +138,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab110a285fd13e764f5c8de0ea0429c55"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish512.html#ab110a285fd13e764f5c8de0ea0429c55">Authenticator</a> (<a class="el" href="group___enumeration.html#ga62629810dc7b52fdfb37d80f03d62274">StreamAuthenticators</a> AuthenticatorType) override</td></tr>
 <tr class="memdesc:ab110a285fd13e764f5c8de0ea0429c55"><td class="mdescLeft">&#160;</td><td class="mdescRight">The stream ciphers authentication MAC generator type.  <a href="#ab110a285fd13e764f5c8de0ea0429c55">More...</a><br /></td></tr>
 <tr class="separator:ab110a285fd13e764f5c8de0ea0429c55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45143049d7575e628b11aee4cf73cda2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish512.html#a45143049d7575e628b11aee4cf73cda2">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:a45143049d7575e628b11aee4cf73cda2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher with an ISymmetricKey key container.  <a href="#a45143049d7575e628b11aee4cf73cda2">More...</a><br /></td></tr>
-<tr class="separator:a45143049d7575e628b11aee4cf73cda2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbf57466ad78a181f4f40e0d070455a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish512.html#abbf57466ad78a181f4f40e0d070455a8">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
+<tr class="memdesc:abbf57466ad78a181f4f40e0d070455a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher with an ISymmetricKey key container.  <a href="#abbf57466ad78a181f4f40e0d070455a8">More...</a><br /></td></tr>
+<tr class="separator:abbf57466ad78a181f4f40e0d070455a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97c5495f49fda5ba0e5d558824ea3518"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_threefish512.html#a97c5495f49fda5ba0e5d558824ea3518">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:a97c5495f49fda5ba0e5d558824ea3518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#a97c5495f49fda5ba0e5d558824ea3518">More...</a><br /></td></tr>
 <tr class="separator:a97c5495f49fda5ba0e5d558824ea3518"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -463,8 +462,8 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 
 </div>
 </div>
-<a id="a45143049d7575e628b11aee4cf73cda2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45143049d7575e628b11aee4cf73cda2">&#9670;&nbsp;</a></span>Initialize()</h2>
+<a id="abbf57466ad78a181f4f40e0d070455a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbf57466ad78a181f4f40e0d070455a8">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -482,7 +481,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyParams</em>&#160;</td>
+          <td class="paramname"><em>Parameters</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -502,7 +501,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Encryption</td><td>Using Encryption or Decryption mode</td></tr>
-    <tr><td class="paramname">KeyParams</td><td>Cipher key structure, containing cipher key, nonce, and optional info array</td></tr>
+    <tr><td class="paramname">Parameters</td><td>Cipher key structure, containing cipher key, nonce, and optional info array</td></tr>
   </table>
   </dd>
 </dl>
@@ -513,7 +512,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_stream_cipher.html#af8a12c0e2af8b9c60d3278306c95d620">IStreamCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_stream_cipher.html#a5e7082b23cc1f65eb7b702a70136fd47">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -749,7 +748,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <p>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. Thread count must be an even number, and not exceed the number of processor [virtual] cores.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
+    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>

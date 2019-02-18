@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -151,9 +150,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aba791a7dc1cf97e276b956989971467b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_b.html#aba791a7dc1cf97e276b956989971467b">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset) override</td></tr>
 <tr class="memdesc:aba791a7dc1cf97e276b956989971467b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="#aba791a7dc1cf97e276b956989971467b">More...</a><br /></td></tr>
 <tr class="separator:aba791a7dc1cf97e276b956989971467b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1917142eff7d016a86935a2ab659093"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_b.html#ac1917142eff7d016a86935a2ab659093">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:ac1917142eff7d016a86935a2ab659093"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance  <a href="#ac1917142eff7d016a86935a2ab659093">More...</a><br /></td></tr>
-<tr class="separator:ac1917142eff7d016a86935a2ab659093"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc167bddda5fa3cec22845cee43bd130"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_b.html#acc167bddda5fa3cec22845cee43bd130">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
+<tr class="memdesc:acc167bddda5fa3cec22845cee43bd130"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance  <a href="#acc167bddda5fa3cec22845cee43bd130">More...</a><br /></td></tr>
+<tr class="separator:acc167bddda5fa3cec22845cee43bd130"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad48fd64cc9bda226985ed9d27c4368f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_b.html#ad48fd64cc9bda226985ed9d27c4368f6">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:ad48fd64cc9bda226985ed9d27c4368f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#ad48fd64cc9bda226985ed9d27c4368f6">More...</a><br /></td></tr>
 <tr class="separator:ad48fd64cc9bda226985ed9d27c4368f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -710,8 +709,8 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 
 </div>
 </div>
-<a id="ac1917142eff7d016a86935a2ab659093"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1917142eff7d016a86935a2ab659093">&#9670;&nbsp;</a></span>Initialize()</h2>
+<a id="acc167bddda5fa3cec22845cee43bd130"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc167bddda5fa3cec22845cee43bd130">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -729,7 +728,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyParams</em>&#160;</td>
+          <td class="paramname"><em>Parameters</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -748,7 +747,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Encryption</td><td>True if cipher is used for encryption, False to decrypt</td></tr>
-    <tr><td class="paramname">KeyParams</td><td>SymmetricKey containing the encryption Key</td></tr>
+    <tr><td class="paramname">Parameters</td><td>SymmetricKey containing the encryption Key</td></tr>
   </table>
   </dd>
 </dl>
@@ -759,7 +758,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_cipher_mode.html#a03d0f798bf5001564d6d53df1ca4f5fb">ICipherMode</a>.</p>
+<p>Implements <a class="el" href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">ICipherMode</a>.</p>
 
 </div>
 </div>
@@ -995,7 +994,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>When set to zero, thread count is set automatically. If set to 1, runs in sequential mode. Thread count must be an even number, and not exceed the number of processor cores.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
+    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>

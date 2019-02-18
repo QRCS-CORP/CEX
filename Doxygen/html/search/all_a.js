@@ -9,6 +9,7 @@ var searchData=
   ['l2associative',['L2Associative',['../class_cpu_detect.html#ac3f2c0c2c90cb05f82baaa86ce3a6bd8',1,'CpuDetect']]],
   ['l2cachesize',['L2CacheSize',['../class_cpu_detect.html#a22e45f5947541de77429462fbea2f000',1,'CpuDetect']]],
   ['l2cachetotal',['L2CacheTotal',['../class_cpu_detect.html#ab0172e3dace9c64384bd9a8e279c05fe',1,'CpuDetect']]],
+  ['lanecount',['LaneCount',['../class_c_s_g.html#a7404067a16230f0577d9a1442e77ab00',1,'CSG']]],
   ['le16tobytes',['Le16ToBytes',['../class_integer_tools.html#a7249fb306c5e0026e6c89de16c368043',1,'IntegerTools::Le16ToBytes(const ushort Value, Array &amp;Output, size_t OutOffset)'],['../class_integer_tools.html#ad382a4dfa4f938f6fa4ff71269d778ab',1,'IntegerTools::Le16ToBytes(ushort Value)']]],
   ['le32tobytes',['Le32ToBytes',['../class_integer_tools.html#accd748e5ef3903138be56d14d7125007',1,'IntegerTools::Le32ToBytes(const uint Value, Array &amp;Output, size_t OutOffset)'],['../class_integer_tools.html#a343340b883de7897eedd67856656d8ea',1,'IntegerTools::Le32ToBytes(uint Value)']]],
   ['le64tobytes',['Le64ToBytes',['../class_integer_tools.html#a60d37067d2401a24ea9fce6fc5d3f9e7',1,'IntegerTools::Le64ToBytes(const ulong Value, Array &amp;Output, size_t OutOffset)'],['../class_integer_tools.html#a2da4d41dce0a2b466dbb8e5b7a8ac1c1',1,'IntegerTools::Le64ToBytes(ulong Value)']]],

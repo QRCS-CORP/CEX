@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -119,9 +118,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2a558a2039f3f3e2266531c2b0a00ca6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a2a558a2039f3f3e2266531c2b0a00ca6">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
 <tr class="memdesc:a2a558a2039f3f3e2266531c2b0a00ca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes, using offset and length parameters  <a href="#a2a558a2039f3f3e2266531c2b0a00ca6">More...</a><br /></td></tr>
 <tr class="separator:a2a558a2039f3f3e2266531c2b0a00ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fd2fc9ab83a1461491a6542b1dc20fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a8fd2fc9ab83a1461491a6542b1dc20fb">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:a8fd2fc9ab83a1461491a6542b1dc20fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional customization, and information strings  <a href="#a8fd2fc9ab83a1461491a6542b1dc20fb">More...</a><br /></td></tr>
-<tr class="separator:a8fd2fc9ab83a1461491a6542b1dc20fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab21477f14b7068b54baeaaf3274fa495"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#ab21477f14b7068b54baeaaf3274fa495">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
+<tr class="memdesc:ab21477f14b7068b54baeaaf3274fa495"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional customization, and information strings  <a href="#ab21477f14b7068b54baeaaf3274fa495">More...</a><br /></td></tr>
+<tr class="separator:ab21477f14b7068b54baeaaf3274fa495"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4863dd7a2470045ca4e64999e693495f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a4863dd7a2470045ca4e64999e693495f">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)</td></tr>
 <tr class="memdesc:a4863dd7a2470045ca4e64999e693495f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the SHAKE generator with a standard vector key  <a href="#a4863dd7a2470045ca4e64999e693495f">More...</a><br /></td></tr>
 <tr class="separator:a4863dd7a2470045ca4e64999e693495f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -535,8 +534,8 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 
 </div>
 </div>
-<a id="a8fd2fc9ab83a1461491a6542b1dc20fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8fd2fc9ab83a1461491a6542b1dc20fb">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[1/9]</span></h2>
+<a id="ab21477f14b7068b54baeaaf3274fa495"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab21477f14b7068b54baeaaf3274fa495">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[1/9]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -548,7 +547,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
           <td class="memname">void SHAKE::Initialize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyParams</em></td><td>)</td>
+          <td class="paramname"><em>Parameters</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -562,7 +561,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <p>Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional customization, and information strings </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeyParams</td><td>The symmetric key container containing the generators keying material</td></tr>
+    <tr><td class="paramname">Parameters</td><td>The symmetric key container containing the generators keying material</td></tr>
   </table>
   </dd>
 </dl>
@@ -573,7 +572,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_kdf.html#ad68bdd14653c346a4588da2f2d7f4430">IKdf</a>.</p>
+<p>Implements <a class="el" href="class_i_kdf.html#aec1378a98d9aac69027f23593ac85401">IKdf</a>.</p>
 
 </div>
 </div>

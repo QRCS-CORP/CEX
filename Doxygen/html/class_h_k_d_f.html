@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -125,9 +124,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad3d5761007cb787ca265130111fda41a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_k_d_f.html#ad3d5761007cb787ca265130111fda41a">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
 <tr class="memdesc:ad3d5761007cb787ca265130111fda41a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes, using offset and length parameters  <a href="#ad3d5761007cb787ca265130111fda41a">More...</a><br /></td></tr>
 <tr class="separator:ad3d5761007cb787ca265130111fda41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12c1f6ec77293a0c2925c442c14f3a76"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_k_d_f.html#a12c1f6ec77293a0c2925c442c14f3a76">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:a12c1f6ec77293a0c2925c442c14f3a76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string  <a href="#a12c1f6ec77293a0c2925c442c14f3a76">More...</a><br /></td></tr>
-<tr class="separator:a12c1f6ec77293a0c2925c442c14f3a76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9171b6c01b82b3334c6245e70f6dd3e8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_k_d_f.html#a9171b6c01b82b3334c6245e70f6dd3e8">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
+<tr class="memdesc:a9171b6c01b82b3334c6245e70f6dd3e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string  <a href="#a9171b6c01b82b3334c6245e70f6dd3e8">More...</a><br /></td></tr>
+<tr class="separator:a9171b6c01b82b3334c6245e70f6dd3e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6e99c5f13c561722f3e21740b40dfd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_k_d_f.html#af6e99c5f13c561722f3e21740b40dfd6">Reset</a> () override</td></tr>
 <tr class="memdesc:af6e99c5f13c561722f3e21740b40dfd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state; the generator must be re-initialized before it can be used again  <a href="#af6e99c5f13c561722f3e21740b40dfd6">More...</a><br /></td></tr>
 <tr class="separator:af6e99c5f13c561722f3e21740b40dfd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -619,8 +618,8 @@ Cryptographic Extraction and Key Derivation: <a href="http://eprint.iacr.org/201
 
 </div>
 </div>
-<a id="a12c1f6ec77293a0c2925c442c14f3a76"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12c1f6ec77293a0c2925c442c14f3a76">&#9670;&nbsp;</a></span>Initialize()</h2>
+<a id="a9171b6c01b82b3334c6245e70f6dd3e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9171b6c01b82b3334c6245e70f6dd3e8">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -632,7 +631,7 @@ Cryptographic Extraction and Key Derivation: <a href="http://eprint.iacr.org/201
           <td class="memname">void HKDF::Initialize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyParams</em></td><td>)</td>
+          <td class="paramname"><em>Parameters</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -646,7 +645,7 @@ Cryptographic Extraction and Key Derivation: <a href="http://eprint.iacr.org/201
 <p>Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeyParams</td><td>The symmetric key container with the generators keying material</td></tr>
+    <tr><td class="paramname">Parameters</td><td>The symmetric key container with the generators keying material</td></tr>
   </table>
   </dd>
 </dl>
@@ -657,7 +656,7 @@ Cryptographic Extraction and Key Derivation: <a href="http://eprint.iacr.org/201
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_kdf.html#ad68bdd14653c346a4588da2f2d7f4430">IKdf</a>.</p>
+<p>Implements <a class="el" href="class_i_kdf.html#aec1378a98d9aac69027f23593ac85401">IKdf</a>.</p>
 
 </div>
 </div>

@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -148,9 +147,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a672a14ac763b22da1576437ef6b6f001"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a672a14ac763b22da1576437ef6b6f001">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset) override</td></tr>
 <tr class="memdesc:a672a14ac763b22da1576437ef6b6f001"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes with offset parameters.  <a href="#a672a14ac763b22da1576437ef6b6f001">More...</a><br /></td></tr>
 <tr class="separator:a672a14ac763b22da1576437ef6b6f001"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a200342d4785831f4866c5b9ed6e60c3c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a200342d4785831f4866c5b9ed6e60c3c">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:a200342d4785831f4866c5b9ed6e60c3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher with a populated SymmetricKey or SymmetricSecureKey container  <a href="#a200342d4785831f4866c5b9ed6e60c3c">More...</a><br /></td></tr>
-<tr class="separator:a200342d4785831f4866c5b9ed6e60c3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ac922d8245d46a7061cba477eaa21a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a54ac922d8245d46a7061cba477eaa21a">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
+<tr class="memdesc:a54ac922d8245d46a7061cba477eaa21a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher with a populated SymmetricKey or SymmetricSecureKey container  <a href="#a54ac922d8245d46a7061cba477eaa21a">More...</a><br /></td></tr>
+<tr class="separator:a54ac922d8245d46a7061cba477eaa21a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a890b3f2705e4bc5f7e740a51e20b013e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a890b3f2705e4bc5f7e740a51e20b013e">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:a890b3f2705e4bc5f7e740a51e20b013e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a block of bytes.  <a href="#a890b3f2705e4bc5f7e740a51e20b013e">More...</a><br /></td></tr>
 <tr class="separator:a890b3f2705e4bc5f7e740a51e20b013e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -727,8 +726,8 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 
 </div>
 </div>
-<a id="a200342d4785831f4866c5b9ed6e60c3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a200342d4785831f4866c5b9ed6e60c3c">&#9670;&nbsp;</a></span>Initialize()</h2>
+<a id="a54ac922d8245d46a7061cba477eaa21a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54ac922d8245d46a7061cba477eaa21a">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -746,7 +745,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyParams</em>&#160;</td>
+          <td class="paramname"><em>Parameters</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -765,7 +764,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Encryption</td><td>Using Encryption or Decryption mode</td></tr>
-    <tr><td class="paramname">KeyParams</td><td>Cipher key container. </td></tr>
+    <tr><td class="paramname">Parameters</td><td>Cipher key container. </td></tr>
   </table>
   </dd>
 </dl>
@@ -777,7 +776,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_block_cipher.html#a291ee6dc9febd2c60252ae40874647ee">IBlockCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_block_cipher.html#a4bfc2c7a5f000feb3be6c3a8c79fcff1">IBlockCipher</a>.</p>
 
 </div>
 </div>

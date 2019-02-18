@@ -1099,7 +1099,7 @@ dl.section dd {
 	color: #dddddd;
 	font: 240% Palatino Linotype,Roboto,sans-serif;
 	margin: 0px;
-	padding: 2px 0px;
+	padding: 4px;
   	font-weight: bold;
 }
     
@@ -1108,7 +1108,10 @@ dl.section dd {
 	color: #eeeeee;
 	font: 100% Roboto,sans-serif;
 	margin: 0px;
-	padding: 0px;
+	padding-bottom: 8px;
+	padding-left: 8px;
+	padding-right: 4px;
+	padding-top: 0px; 
 	font-weight:bolder;
 }
 

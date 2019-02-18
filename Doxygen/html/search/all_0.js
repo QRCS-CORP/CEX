@@ -18,6 +18,7 @@ var searchData=
   ['aeadmodefromname',['AeadModeFromName',['../class_aead_mode_from_name.html',1,'']]],
   ['aeadmodes',['AeadModes',['../group___enumeration.html#ga69ec43083306f45cbe77033dfe17cbba',1,'Documentation.h']]],
   ['aes',['AES',['../group___enumeration.html#ggaa7f8226ec43fe26b57b18e6821c90ffda76b7593457e2ab50befe2dcd63cf388f',1,'AES():&#160;Documentation.h'],['../group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a76b7593457e2ab50befe2dcd63cf388f',1,'AES():&#160;Documentation.h']]],
+  ['aes128',['AES128',['../class_a_e_s128.html',1,'']]],
   ['aesni',['AESNI',['../class_cpu_detect.html#a81e2c4474a7ec4f8f8ef6fca2ab040d7',1,'CpuDetect']]],
   ['allocate',['Allocate',['../class_memory_pool.html#a66a06a91ececd0317816657f287c867e',1,'MemoryPool::Allocate()'],['../class_secure_memory.html#a78ee82f6e1a32a85de84f63cf7a01c47',1,'SecureMemory::Allocate()']]],
   ['appendobject',['AppendObject',['../class_array_tools.html#a7ddd021d8bb258e75b5d1db98883fb8b',1,'ArrayTools']]],

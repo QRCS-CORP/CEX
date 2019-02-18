@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -72,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of a Block cipher Counter mode Generator DRBG  
+<p>An implementation of a Block cipher Counter mode Generator DRBG: BCG  
  <a href="class_b_c_g.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_b_c_g_8h_source.html">BCG.h</a>&gt;</code></p>
@@ -95,11 +94,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa1f54c233e2973574100786381aeaeb3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_b_c_g.html">BCG</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#aa1f54c233e2973574100786381aeaeb3">operator=</a> (const <a class="el" href="class_b_c_g.html">BCG</a> &amp;)=delete</td></tr>
 <tr class="memdesc:aa1f54c233e2973574100786381aeaeb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#aa1f54c233e2973574100786381aeaeb3">More...</a><br /></td></tr>
 <tr class="separator:aa1f54c233e2973574100786381aeaeb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27609a237f77349c4ffd99410abc46aa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a27609a237f77349c4ffd99410abc46aa">BCG</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType=BlockCiphers::AES, <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> ProviderType=<a class="el" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a6adf97f83acf6453d4a6a4b1070f3754">Providers::None</a>, bool Parallel=false)</td></tr>
-<tr class="memdesc:a27609a237f77349c4ffd99410abc46aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the class using a block cipher type-name, an optional entropy source type, and optional kdf hash-engine  <a href="#a27609a237f77349c4ffd99410abc46aa">More...</a><br /></td></tr>
-<tr class="separator:a27609a237f77349c4ffd99410abc46aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25ceb257253792e34c098aec1871ce6c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a25ceb257253792e34c098aec1871ce6c">BCG</a> ()=delete</td></tr>
+<tr class="memdesc:a25ceb257253792e34c098aec1871ce6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default constructor is restricted, this function has been deleted  <a href="#a25ceb257253792e34c098aec1871ce6c">More...</a><br /></td></tr>
+<tr class="separator:a25ceb257253792e34c098aec1871ce6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace6aacb086308e161995f303d00708b7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#ace6aacb086308e161995f303d00708b7">BCG</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType, <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> ProviderType=<a class="el" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a6adf97f83acf6453d4a6a4b1070f3754">Providers::None</a>, bool Parallel=false)</td></tr>
+<tr class="memdesc:ace6aacb086308e161995f303d00708b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the generator using a block-cipher type name, an optional entropy source type, and the parallel processing option  <a href="#ace6aacb086308e161995f303d00708b7">More...</a><br /></td></tr>
+<tr class="separator:ace6aacb086308e161995f303d00708b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2ca52d80afc0b0da610edae3a625d1c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#ad2ca52d80afc0b0da610edae3a625d1c">BCG</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher, <a class="el" href="class_i_provider.html">IProvider</a> *Provider=nullptr, bool Parallel=false)</td></tr>
-<tr class="memdesc:ad2ca52d80afc0b0da610edae3a625d1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the class using a block cipher instance and an optional entropy source  <a href="#ad2ca52d80afc0b0da610edae3a625d1c">More...</a><br /></td></tr>
+<tr class="memdesc:ad2ca52d80afc0b0da610edae3a625d1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the generator using a block cipher instance, an optional entropy source, and the parallel processing option  <a href="#ad2ca52d80afc0b0da610edae3a625d1c">More...</a><br /></td></tr>
 <tr class="separator:ad2ca52d80afc0b0da610edae3a625d1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a157e4235d9bf823bc82f7ba4ce8e0b7c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a157e4235d9bf823bc82f7ba4ce8e0b7c">~BCG</a> () override</td></tr>
 <tr class="memdesc:a157e4235d9bf823bc82f7ba4ce8e0b7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a157e4235d9bf823bc82f7ba4ce8e0b7c">More...</a><br /></td></tr>
@@ -108,7 +110,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a92c4faf37476728b4d8f1b530d8afd29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum size of the distribution code in bytes.  <a href="#a92c4faf37476728b4d8f1b530d8afd29">More...</a><br /></td></tr>
 <tr class="separator:a92c4faf37476728b4d8f1b530d8afd29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9ce1a986bf78705d34c264b387ab79e"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#ab9ce1a986bf78705d34c264b387ab79e">IsInitialized</a> () override</td></tr>
-<tr class="memdesc:ab9ce1a986bf78705d34c264b387ab79e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Generator is ready to produce random  <a href="#ab9ce1a986bf78705d34c264b387ab79e">More...</a><br /></td></tr>
+<tr class="memdesc:ab9ce1a986bf78705d34c264b387ab79e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The generator is ready to produce pseudo-random  <a href="#ab9ce1a986bf78705d34c264b387ab79e">More...</a><br /></td></tr>
 <tr class="separator:ab9ce1a986bf78705d34c264b387ab79e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc01c357c7dca150b4923147700cd29a"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#adc01c357c7dca150b4923147700cd29a">IsParallel</a> ()</td></tr>
 <tr class="memdesc:adc01c357c7dca150b4923147700cd29a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#adc01c357c7dca150b4923147700cd29a">More...</a><br /></td></tr>
@@ -119,11 +121,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af778714a15e399de72765ecb84e5b375"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_parallel_options.html">ParallelOptions</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#af778714a15e399de72765ecb84e5b375">ParallelProfile</a> ()</td></tr>
 <tr class="memdesc:af778714a15e399de72765ecb84e5b375"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Parallel and SIMD capability flags and sizes  <a href="#af778714a15e399de72765ecb84e5b375">More...</a><br /></td></tr>
 <tr class="separator:af778714a15e399de72765ecb84e5b375"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbe43c4053a53f2babae478906cb9367"><td class="memItemLeft" align="right" valign="top">const size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#abbe43c4053a53f2babae478906cb9367">ReseedThreshold</a> () override</td></tr>
-<tr class="memdesc:abbe43c4053a53f2babae478906cb9367"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The maximum output generated between automatic internal seed generation  <a href="#abbe43c4053a53f2babae478906cb9367">More...</a><br /></td></tr>
-<tr class="separator:abbe43c4053a53f2babae478906cb9367"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac04f934fb7c792f758ddee26a0195546"><td class="memItemLeft" align="right" valign="top">size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#ac04f934fb7c792f758ddee26a0195546">ReseedThreshold</a> () override</td></tr>
+<tr class="memdesc:ac04f934fb7c792f758ddee26a0195546"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The maximum output generated before automatic auto-seed generation when using an entropy provider  <a href="#ac04f934fb7c792f758ddee26a0195546">More...</a><br /></td></tr>
+<tr class="separator:ac04f934fb7c792f758ddee26a0195546"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a668962a434759e4e2a30a397a04147f2"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a668962a434759e4e2a30a397a04147f2">SecurityStrength</a> () override</td></tr>
-<tr class="memdesc:a668962a434759e4e2a30a397a04147f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The security strength in bits  <a href="#a668962a434759e4e2a30a397a04147f2">More...</a><br /></td></tr>
+<tr class="memdesc:a668962a434759e4e2a30a397a04147f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The estimated classical security strength in bits  <a href="#a668962a434759e4e2a30a397a04147f2">More...</a><br /></td></tr>
 <tr class="separator:a668962a434759e4e2a30a397a04147f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fa4cdd8a6f6d9d4843a7d179c73c476"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a2fa4cdd8a6f6d9d4843a7d179c73c476">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:a2fa4cdd8a6f6d9d4843a7d179c73c476"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#a2fa4cdd8a6f6d9d4843a7d179c73c476">More...</a><br /></td></tr>
@@ -137,24 +139,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2ccbb3b7eb133d9652ed83d9eb98beee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a2ccbb3b7eb133d9652ed83d9eb98beee">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
 <tr class="memdesc:a2ccbb3b7eb133d9652ed83d9eb98beee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes using offset and length parameters  <a href="#a2ccbb3b7eb133d9652ed83d9eb98beee">More...</a><br /></td></tr>
 <tr class="separator:a2ccbb3b7eb133d9652ed83d9eb98beee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01113115b3afd7ee9ee8486c16a0f733"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a01113115b3afd7ee9ee8486c16a0f733">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:a01113115b3afd7ee9ee8486c16a0f733"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string.  <a href="#a01113115b3afd7ee9ee8486c16a0f733">More...</a><br /></td></tr>
-<tr class="separator:a01113115b3afd7ee9ee8486c16a0f733"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14a059b32655cfbb8720f77927f3ae06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a14a059b32655cfbb8720f77927f3ae06">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)</td></tr>
-<tr class="memdesc:a14a059b32655cfbb8720f77927f3ae06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key.  <a href="#a14a059b32655cfbb8720f77927f3ae06">More...</a><br /></td></tr>
-<tr class="separator:a14a059b32655cfbb8720f77927f3ae06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada6562f1cbceabf18db54f3ef12efe3e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#ada6562f1cbceabf18db54f3ef12efe3e">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>)</td></tr>
-<tr class="memdesc:ada6562f1cbceabf18db54f3ef12efe3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and nonce arrays.  <a href="#ada6562f1cbceabf18db54f3ef12efe3e">More...</a><br /></td></tr>
-<tr class="separator:ada6562f1cbceabf18db54f3ef12efe3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a409176c7dd4d5ddd3b172c5293a43db6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a409176c7dd4d5ddd3b172c5293a43db6">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>, const std::vector&lt; byte &gt; &amp;Info)</td></tr>
-<tr class="memdesc:a409176c7dd4d5ddd3b172c5293a43db6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, a nonce array, and an information string.  <a href="#a409176c7dd4d5ddd3b172c5293a43db6">More...</a><br /></td></tr>
-<tr class="separator:a409176c7dd4d5ddd3b172c5293a43db6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2d48558a2e8985fe9a91fb55faed023"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#ac2d48558a2e8985fe9a91fb55faed023">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
+<tr class="memdesc:ac2d48558a2e8985fe9a91fb55faed023"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with an ISymmetricKey container, containing the key and nonce, and optional info string.  <a href="#ac2d48558a2e8985fe9a91fb55faed023">More...</a><br /></td></tr>
+<tr class="separator:ac2d48558a2e8985fe9a91fb55faed023"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44dc8e0545ff7351e8a7bfa97df35713"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a44dc8e0545ff7351e8a7bfa97df35713">ParallelMaxDegree</a> (size_t Degree)</td></tr>
 <tr class="memdesc:a44dc8e0545ff7351e8a7bfa97df35713"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#a44dc8e0545ff7351e8a7bfa97df35713">More...</a><br /></td></tr>
 <tr class="separator:a44dc8e0545ff7351e8a7bfa97df35713"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4cfbf45c3c3c3ec7147c9cb23b3f1df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#ae4cfbf45c3c3c3ec7147c9cb23b3f1df">Update</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
 <tr class="memdesc:ae4cfbf45c3c3c3ec7147c9cb23b3f1df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators seed value.  <a href="#ae4cfbf45c3c3c3ec7147c9cb23b3f1df">More...</a><br /></td></tr>
 <tr class="separator:ae4cfbf45c3c3c3ec7147c9cb23b3f1df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d4475d061a40924589e3aadf37c0f2c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_b_c_g.html#a9d4475d061a40924589e3aadf37c0f2c">Update</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
+<tr class="memdesc:a9d4475d061a40924589e3aadf37c0f2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material with a secure vector key  <a href="#a9d4475d061a40924589e3aadf37c0f2c">More...</a><br /></td></tr>
+<tr class="separator:a9d4475d061a40924589e3aadf37c0f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_drbg_base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_drbg_base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_drbg_base.html">DrbgBase</a></td></tr>
 <tr class="memitem:a87e053da7226d2789afd5d043c3df719 inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a87e053da7226d2789afd5d043c3df719">DrbgBase</a> (const <a class="el" href="class_drbg_base.html">DrbgBase</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a87e053da7226d2789afd5d043c3df719 inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_drbg_base.html#a87e053da7226d2789afd5d043c3df719">More...</a><br /></td></tr>
@@ -204,11 +200,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa779f47ba55bd738b9702fb434ac8d34 inherit pub_methods_class_i_drbg"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of a Block cipher Counter mode Generator DRBG </p>
-<p>Generate an array of pseudo-random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_b_c_g.html">BCG</a> rng(BlockCiphers::AES, Digests::SHA512, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0acbc6e9792f97c17c170caeb83895c44e">Providers::CSP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">rng.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">rng.Generate(Output, [Offset], [Length]);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
-<p>The Counter mode generates a key-stream by encrypting successive values of an incrementing Big Endian ordered 128bit counter array (nonce). <br />
-In parallel mode, the generators counter is increased by a number factored from the number of input blocks, allowing for a multi-threaded operation. <br />
-The implementation is further parallelized by constructing a larger 'staggered' counter array, and processing large blocks using 128 or 256 SIMD instructions.</p>
+<div class="textblock"><p>An implementation of a Block cipher Counter mode Generator DRBG: BCG </p>
+<p>Generate an array of pseudo-random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_b_c_g.html">BCG</a> rng(BlockCiphers::AES, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a036578329f4509e4a7be59eb39666009">Providers::ACP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">rng.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">rng.Generate(Output, [Offset], [Length]);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>The Block cipher Counter Generator creates a key-stream by encrypting an incrementing Big Endian ordered 128bit monotonic counter (nonce). <br />
+In parallel mode, the generators counter is divided into staggered counter arrays, allowing for multi-threaded operation. <br />
+The implementation is further parallelized by constructing a larger staggered-parallel counter array, and processing large blocks using 128, 256, or 512 bit SIMD instructions. <br />
+Both of these enhancements still produce the identical output to a sequential counter mode generator, and are the equivalent output to a CTR block-cipher mode encrypting and array of zeroes.</p>
 <p><b>Description:</b> </p>
 <p><em>Legend:</em> <br />
  <b>C</b>=pseudo-random, <b>K</b>=seed, <b>E</b>=encrypt <br />
@@ -216,53 +213,51 @@ The implementation is further parallelized by constructing a larger 'staggered' 
 R0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj), C+1.</p>
 <p><br />
  <b>Initialization and Update:</b> </p>
-<p>The Initialize functions have three different parameter options: the Key which is the primary key, the Nonce used to initialize the internal counter, and the Info which is used in the Generate function. <br />
-The Key value must be one of the LegalKeySizes() in length, and must be a secret and random value. <br />
-The supported seed-sizes are calculated based on the block ciphers functions internal block size, and can vary depending on which cipher is used to instantiate the generator. <br />
-The 16 byte (NonceSize) Nonce value is another secret value, used to initialize the counter to a non-zero random value. <br />
+<p>The Initialize functions have three different parameter options: the Key which is the primary key, the Nonce used to initialize the internal counter, and the optional Info array which is used if the underlying block-cipher is running in extended mode. <br />
+The Key value must be one of the LegalKeySizes in length, and must be a secret and random value. <br />
+The supported nonce size is the block cipher functions internal block-size, in this library, that is always 128 bits (16 bytes). <br />
+The 16 byte Nonce value should also be a secret value, used to initialize the counter to a non-zero random value. <br />
 The Info parameter maps to the DistributionCode() property of an extended HX cipher, but is ignored when a standard cipher implementation is used. <br />
-The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property <br />
- The Update function uses the seed value to re-key the cipher via the internal key derivation function. <br />
-The update functions Key parameter, must be a random seed value equal in length to the seed used to initialize the generator.</p>
+The extended cipher modes, and the DistributionCode are recommended, and for best security, the distribution code should be secret, random, and equal in length to the DistributionCodeMax() property <br />
+ The Update function uses the seed value to re-key the cipher via the internal key derivation function (cSHAKE). <br />
+The update functions Key parameter, must be a random key value which is added to the existing key state, if a random provider has been specified it is mixed with new entropy, and permuted by a cSHAKE instance to generate the new generator key. <br />
+ When using a random provider, the generator can be automatically re-seeded after a specified number of bytes have been generated, using the ReseedThreshold accessor property. <br />
+ The nonce and distribution code are retained and reused after the key re-generation operation.</p>
 <p><b>Multi-Threading:</b> </p>
-<p>The transformation function in a CTR generator is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded. <br />
-Output from the parallelized functions aligns with the output from a standard sequential CTR implementation processing an all zeroes input array. <br />
+<p>The transformation function in a CTR generator is not limited by a dependency chain, this mode can be both SIMD pipelined and multi-threaded. <br />
+Output from the parallelized functions aligns with the output from a standard sequential CTR implementationa output key-stream. <br />
 Parallelism is achieved by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads. <br />
- The key stream generated by encrypting the counter array(s), is output as the source of pseudo-random.</p>
+ The key-stream generated by encrypting the counter array(s), is output as the source of pseudo-random.</p>
 <p><b>Predictive Resistance:</b> </p>
 <p>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator. <br />
-The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through a KDF2 generator along with the current state, the output is used to reseed the generator. <br />
-The interval at which this reseeding occurs is 1mb by default, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, the seed is regenerated. <br />
- Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</p>
+The optional resistance mechanism uses an entropy provider to add seed material to the generator at periodic intervals, this new seed material is passed through a cSHAKE generator along with the current state, and the SHAKE permutations pseudo-random output is used to reseed the generator. <br />
+The interval at which this reseeding occurs is 100MB by default, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, the seed is automatically regenerated. <br />
+ Predictive resistance is strongly recommended when producing large amounts of pseudo-random (100MB or greater).</p>
 <p>Implementation Notes: </p><ul>
 <li>
-The class constructor can either be initialized with a block cipher instance, or using the block ciphers enumeration name. </li>
+The class constructor can either be initialized using a block cipher instance, or using the block ciphers enumeration name. </li>
 <li>
 A block cipher or entropy provider instance created using the enumeration constructor, is automatically deleted when the class is destroyed. </li>
 <li>
-An entropy provider can be specified through the constructor, which provides a continues stream of entropy to the reseed and generate functions, this is stronly recommended with large (+10kb) outputs. </li>
+An entropy provider can be specified through the constructor, which provides a continues stream of entropy to the reseed function, this is strongly recommended with large (+100MB) outputs. </li>
 <li>
-The generator can be initialized with either a SymmetricKey key container class, or with a Key and optional inputs of Nonce and Info. </li>
+The generator can be initialized with either a SymmetricKey or SymmetricSecure key container class, this class must provide a legally sized key and nonce. </li>
 <li>
-The LegalKeySizes() property contains a list of supported seed sizes. </li>
-<li>
-The LegalKeySizes() property contains a list of the supported seed sizes; note that if using the Nonce parameter of the Initialize function the combined (Key + Nonce) must equal a legal size. </li>
+The LegalKeySizes() property contains a list of supported nonce and key and sizes. </li>
 <li>
 There are three LegalKeySizes, minimum, recommended, and maximum, with BCG, the middle value is the recommended seed length for best security; i.e. LegalKeySizes()[1]. </li>
 <li>
-The Generate() methods can not be used until an Initialize() function has been called, and the generator is seeded. </li>
+The Generate() methods can not be used until the Initialize() function has been called, and the generator has been keyed and is ready to generate pseudo-random output. </li>
 <li>
-In a block cipher counter based generator, the encryption function can be both pipelined (SSE3-128 or AVX-256), and multi-threaded. </li>
+This implementation has been both pipelined (AVX128, AVX256, or AVX512), and can also be multi-threaded, using any even number of threads. </li>
 <li>
-If the system supports Parallel processing, IsParallel() is set to true; passing an output block of ParallelBlockSize() to the Generate function. </li>
+If the system supports Parallel processing, IsParallel() is set to true; passing an output block of ParallelBlockSize() or greater to the Generate function will trigger multi-threaded processing. </li>
 <li>
-The ParallelThreadsMax() property is the thread count in the parallel loop (pre-configured automatically); this must be either 1 (IsParallel=false), or an even number no greater than the number of processer cores on the system. </li>
+The ParallelThreadsMax() property is the thread count in the parallel loop (pre-configured automatically); this must be either 1 (IsParallel=false), or an even number no greater than the number of processer cores on the system (including hyperthreads). </li>
 <li>
 ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize(). </li>
 <li>
-The ParallelBlockSize() can be changed through the ParallelProfile() property </li>
-<li>
-Parallel block calculation ex. <code>ParallelBlockSize = N - (N % .ParallelMinimumSize);</code> </li>
+The ParallelBlockSize() and other properties can be changed through the ParallelProfile() accessor function, but there default values are recommended. </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -276,7 +271,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </ol>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab02d1ba865322337634440c5788b49bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab02d1ba865322337634440c5788b49bb">&#9670;&nbsp;</a></span>BCG() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab02d1ba865322337634440c5788b49bb">&#9670;&nbsp;</a></span>BCG() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -303,8 +298,35 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 
 </div>
 </div>
-<a id="a27609a237f77349c4ffd99410abc46aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27609a237f77349c4ffd99410abc46aa">&#9670;&nbsp;</a></span>BCG() <span class="overload">[2/3]</span></h2>
+<a id="a25ceb257253792e34c098aec1871ce6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25ceb257253792e34c098aec1871ce6c">&#9670;&nbsp;</a></span>BCG() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">BCG::BCG </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Default constructor: default constructor is restricted, this function has been deleted </p>
+
+</div>
+</div>
+<a id="ace6aacb086308e161995f303d00708b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace6aacb086308e161995f303d00708b7">&#9670;&nbsp;</a></span>BCG() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -316,7 +338,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
           <td class="memname">BCG::BCG </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em> = <code>BlockCiphers::AES</code>, </td>
+          <td class="paramname"><em>CipherType</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -343,28 +365,15 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Instantiate the class using a block cipher type-name, an optional entropy source type, and optional kdf hash-engine </p>
+<p>Instantiate the generator using a block-cipher type name, an optional entropy source type, and the parallel processing option </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">CipherType</td><td>The block cipher type to instantiate as the primary generator. </td></tr>
+    <tr><td class="paramname">CipherType</td><td>The block cipher type to instantiate as the primary pseudo-random generator</td></tr>
+    <tr><td class="paramname">ProviderType</td><td>The random provider-type, used to instantiate the entropy source, the default is none</td></tr>
+    <tr><td class="paramname">Parallel</td><td>Enable/disable the multi-threading engine, the default is false</td></tr>
   </table>
   </dd>
 </dl>
-<p>The primary pseudo-random function, the default is AES.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">ProviderType</td><td>The random provider-type, used to instantiate the entropy source. </td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Adding a random provider enables predictive resistance, and is recommended for large data (&gt;= 1MB).</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Parallel</td><td>Enable/disable the multi-threading engine; default is false. </td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if an unrecognized block cipher type name is used</td></tr>
@@ -375,7 +384,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div>
 </div>
 <a id="ad2ca52d80afc0b0da610edae3a625d1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad2ca52d80afc0b0da610edae3a625d1c">&#9670;&nbsp;</a></span>BCG() <span class="overload">[3/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2ca52d80afc0b0da610edae3a625d1c">&#9670;&nbsp;</a></span>BCG() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -414,22 +423,21 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Instantiate the class using a block cipher instance and an optional entropy source </p>
+<p>Instantiate the generator using a block cipher instance, an optional entropy source, and the parallel processing option </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Cipher</td><td>The block cipher instance, acting as the primary pseudo-random function</td></tr>
-    <tr><td class="paramname">Provider</td><td>The [optional] entropy source, enabling predictive resistance; can be set to nullptr. </td></tr>
+    <tr><td class="paramname">Cipher</td><td>The block cipher instance, this is the primary pseudo-random function</td></tr>
+    <tr><td class="paramname">Provider</td><td>The optional entropy source, enabling predictive resistance; can be set to nullptr. </td></tr>
   </table>
   </dd>
 </dl>
 <p>Adding a random provider enables predictive resistance, and is strongly recommended.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Parallel</td><td>Enable/disable the multi-threading engine; default is false. </td></tr>
+    <tr><td class="paramname">Parallel</td><td>Enable/disable the multi-threading engine, the default is false</td></tr>
   </table>
   </dd>
 </dl>
-<p>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if a null block cipher is used</td></tr>
@@ -483,7 +491,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div><div class="memdoc">
 
 <p>Read Only: The maximum size of the distribution code in bytes. </p>
-<p>The distribution code can be used as a secondary source of entropy (secret) in an HX ciphers HKDF key expansion function. For best security, the distribution code should be random, secret, and equal in size to this value.</p>
+<p>The distribution code can be used as a secondary source of entropy (secret) in an HX ciphers key expansion function. For best security, the distribution code should be random, secret, and equal in size to this value.</p>
 
 </div>
 </div>
@@ -615,7 +623,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>The output standard vector to fill with random bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting position within the output array</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting position within the output vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
   </dd>
@@ -675,7 +683,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>The output secure vector to fill with random bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting position within the output array</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting position within the output vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
   </dd>
@@ -691,8 +699,8 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 
 </div>
 </div>
-<a id="a01113115b3afd7ee9ee8486c16a0f733"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a01113115b3afd7ee9ee8486c16a0f733">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[1/4]</span></h2>
+<a id="ac2d48558a2e8985fe9a91fb55faed023"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2d48558a2e8985fe9a91fb55faed023">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -704,7 +712,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
           <td class="memname">void BCG::Initialize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyParams</em></td><td>)</td>
+          <td class="paramname"><em>Parameters</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -715,148 +723,21 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string. </p>
+<p>Initialize the generator with an ISymmetricKey container, containing the key and nonce, and optional info string. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeyParams</td><td>The SymmetricKey containing the generators keying material</td></tr>
+    <tr><td class="paramname">Parameters</td><td>The ISymmetricKey key container with the generators keying material</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the key is not a legal-key size</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_drbg.html#a2f4774cd3d6f777ac8a4434565bbb96c">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a14a059b32655cfbb8720f77927f3ae06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14a059b32655cfbb8720f77927f3ae06">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[2/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void BCG::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with a key. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ada6562f1cbceabf18db54f3ef12efe3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada6562f1cbceabf18db54f3ef12efe3e">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[3/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void BCG::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Nonce</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with key and nonce arrays. </p>
-<p>The combined Key and Nonce length must equal a LegalSeedSize.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Nonce</td><td>The nonce value containing an additional source of entropy</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a409176c7dd4d5ddd3b172c5293a43db6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a409176c7dd4d5ddd3b172c5293a43db6">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[4/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void BCG::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Nonce</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Info</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with a key, a nonce array, and an information string. </p>
-<p>The combined Key and Nonce length must equal a LegalSeedSize. The Info parameter maps to an extended HX cipher DistributionCode property. For best security this value should be secret, random and DistributionCodeMax in length. If a standard cipher is used, the Info parameter is ignored.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Nonce</td><td>The nonce value used as an additional source of entropy</td></tr>
-    <tr><td class="paramname">Info</td><td>The information string or nonce used to create a unique distribution or as a third source of entropy</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the key is not a legal size</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Implements <a class="el" href="class_i_drbg.html#ae885c048fed0e972930070bb392a3018">IDrbg</a>.</p>
 
 </div>
 </div>
@@ -883,7 +764,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Generator is ready to produce random </p>
+<p>Read Only: The generator is ready to produce pseudo-random </p>
 
 <p>Implements <a class="el" href="class_i_drbg.html#adbff51f7009375e91073451b2acbb4fd">IDrbg</a>.</p>
 
@@ -905,7 +786,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div><div class="memdoc">
 
 <p>Read Only: Processor parallelization availability. </p>
-<p>Indicates whether parallel processing is available on this system. If parallel capable, the internal buffer is generated using multiple parallel streams.</p>
+<p>Indicates whether parallel processing is available on this system. If parallel capable, the encrypted state is generated using multiple parallel streams.</p>
 
 </div>
 </div>
@@ -953,7 +834,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div><div class="memdoc">
 
 <p>Read Only: Parallel block size; the byte-size of the requested output data array passed from the Generate function that triggers parallel processing. </p>
-<p>This value can be changed through the ParallelProfile class.</p>
+<p>This value can be changed through the ParallelProfile class. IsParallel must be set to true, and generation requests must be of at least this size to trigger multi-threaded generation.</p>
 
 </div>
 </div>
@@ -977,7 +858,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 <p>When set to zero, thread count is set automatically. If set to 1, runs in sequential mode. Thread count must be an even number, and not exceed the number of processor cores (times 2 for hyperthreading).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
+    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>
@@ -1006,12 +887,12 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div><div class="memdoc">
 
 <p>Read/Write: Parallel and SIMD capability flags and sizes </p>
-<p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(SymmetricKey) function is called.</p>
+<p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; this value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(ISymmetricKey) function is called.</p>
 
 </div>
 </div>
-<a id="abbe43c4053a53f2babae478906cb9367"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbe43c4053a53f2babae478906cb9367">&#9670;&nbsp;</a></span>ReseedThreshold()</h2>
+<a id="ac04f934fb7c792f758ddee26a0195546"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac04f934fb7c792f758ddee26a0195546">&#9670;&nbsp;</a></span>ReseedThreshold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1020,7 +901,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t &amp; BCG::ReseedThreshold </td>
+          <td class="memname">size_t &amp; BCG::ReseedThreshold </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -1033,9 +914,9 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Read/Write: The maximum output generated between automatic internal seed generation </p>
+<p>Read/Write: The maximum output generated before automatic auto-seed generation when using an entropy provider </p>
 
-<p>Implements <a class="el" href="class_i_drbg.html#aa09c6f5d57f335e4466854c73ef1cb37">IDrbg</a>.</p>
+<p>Implements <a class="el" href="class_i_drbg.html#abd2c3ac5a25f6abedc68c69f53374c24">IDrbg</a>.</p>
 
 </div>
 </div>
@@ -1062,14 +943,14 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The security strength in bits </p>
+<p>Read Only: The estimated classical security strength in bits </p>
 
 <p>Implements <a class="el" href="class_i_drbg.html#a620be3a5ed3faa9c111afc1f0222b79e">IDrbg</a>.</p>
 
 </div>
 </div>
 <a id="ae4cfbf45c3c3c3ec7147c9cb23b3f1df"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae4cfbf45c3c3c3ec7147c9cb23b3f1df">&#9670;&nbsp;</a></span>Update()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4cfbf45c3c3c3ec7147c9cb23b3f1df">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1093,10 +974,10 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div><div class="memdoc">
 
 <p>Update the generators seed value. </p>
-<p>Triggers a reseed with the new seed. The seed value must be equal in size to the seed used to initialize the generator</p>
+<p>Triggers a reseed with the new seed. The seed value must be at least equal in size to the seed used to initialize the generator</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Key</td><td>The secret seed array</td></tr>
+    <tr><td class="paramname">Key</td><td>The standard vector containing the new key material</td></tr>
   </table>
   </dd>
 </dl>
@@ -1108,6 +989,48 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </dl>
 
 <p>Implements <a class="el" href="class_i_drbg.html#a7c2ae576f76fc6f10d067b5dee50852b">IDrbg</a>.</p>
+
+</div>
+</div>
+<a id="a9d4475d061a40924589e3aadf37c0f2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d4475d061a40924589e3aadf37c0f2c">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BCG::Update </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the generators keying material with a secure vector key </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The secure vector containing the new key material</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the key is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_drbg.html#a95fb27b0fde630a368b4033161fae9f3">IDrbg</a>.</p>
 
 </div>
 </div>

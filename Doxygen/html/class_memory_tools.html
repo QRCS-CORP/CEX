@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -79,14 +78,14 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a9621bf1bab8cd0950d2051bb9d289ac7"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:a9621bf1bab8cd0950d2051bb9d289ac7"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_memory_tools.html#a9621bf1bab8cd0950d2051bb9d289ac7">Clear</a> (Array &amp;Output, size_t Offset, size_t Length)</td></tr>
-<tr class="memdesc:a9621bf1bab8cd0950d2051bb9d289ac7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear bytes from an integer array.  <a href="#a9621bf1bab8cd0950d2051bb9d289ac7">More...</a><br /></td></tr>
-<tr class="separator:a9621bf1bab8cd0950d2051bb9d289ac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7491e85824d04ff296d16a80aefd30cc"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:a7491e85824d04ff296d16a80aefd30cc"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_memory_tools.html#a7491e85824d04ff296d16a80aefd30cc">CLEAR128</a> (Array &amp;Output, size_t Offset)</td></tr>
-<tr class="memdesc:a7491e85824d04ff296d16a80aefd30cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear 128 bits from an integer array.  <a href="#a7491e85824d04ff296d16a80aefd30cc">More...</a><br /></td></tr>
-<tr class="separator:a7491e85824d04ff296d16a80aefd30cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe19412f0fb38b6fc3baa49cc190e2c6"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:afe19412f0fb38b6fc3baa49cc190e2c6"><td class="memTemplItemLeft" align="right" valign="top">static CEX_OPTIMIZE_IGNORE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_memory_tools.html#afe19412f0fb38b6fc3baa49cc190e2c6">Clear</a> (Array &amp;Output, size_t Offset, size_t Length)</td></tr>
+<tr class="memdesc:afe19412f0fb38b6fc3baa49cc190e2c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">cond PRIVATE  <a href="#afe19412f0fb38b6fc3baa49cc190e2c6">More...</a><br /></td></tr>
+<tr class="separator:afe19412f0fb38b6fc3baa49cc190e2c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9d9144c37036072e1d063299b426a3f"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:ad9d9144c37036072e1d063299b426a3f"><td class="memTemplItemLeft" align="right" valign="top">static CEX_OPTIMIZE_RESUME void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_memory_tools.html#ad9d9144c37036072e1d063299b426a3f">CLEAR128</a> (Array &amp;Output, size_t Offset)</td></tr>
+<tr class="memdesc:ad9d9144c37036072e1d063299b426a3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">cond PRIVATE  <a href="#ad9d9144c37036072e1d063299b426a3f">More...</a><br /></td></tr>
+<tr class="separator:ad9d9144c37036072e1d063299b426a3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d14e1c2a95fee98a41d031eb0c6d61e"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
 <tr class="memitem:a9d14e1c2a95fee98a41d031eb0c6d61e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_memory_tools.html#a9d14e1c2a95fee98a41d031eb0c6d61e">CLEAR256</a> (Array &amp;Output, size_t Offset)</td></tr>
 <tr class="memdesc:a9d14e1c2a95fee98a41d031eb0c6d61e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear 256 bits from an integer array.  <a href="#a9d14e1c2a95fee98a41d031eb0c6d61e">More...</a><br /></td></tr>
@@ -209,8 +208,8 @@ Static Public Member Functions</h2></td></tr>
 <p>Functions that are defined in all caps, i.e. COPY128(...) are inlined and can optionally use intrinsics directly to vectorize an operation.</p>
 <p>The inlined intrinsics functions use arrays of at least the size indicated by their suffix, i.e. COPY256, expects an array of at least 256 bits in length. All functions have sequential fallbacks, and the SIMD instruction set will default to the highest available on the compiling system (AVX/AVX2/AVX512). The size of an operation relates to the size of the intrinsic function: a 128 copy, clear, set or xor function will use AVX, 256 will process 256 bits with AVX2, and the 512/1024 bit functions can use an experimental AVX512 implementation. The minimum intrinsics set is AVX, AVX2 is available, and an experimental implementation of AVX512 (not tested yet!) has been added for future compatability. The standard functions Copy, Clear, SetValue, and XOR, use intrinsics calls when the input/output size to that function is at least the size of the minimum available SIMD instruction set. For example, XOR will loop through an array, and process with the largest available instruction set first. If the input/output size is a multiple of 32 bytes, the blocks will be processed by AVX2 until the remainder is less than a complete block, then it will fall back to AVX or sequential processing.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a9621bf1bab8cd0950d2051bb9d289ac7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9621bf1bab8cd0950d2051bb9d289ac7">&#9670;&nbsp;</a></span>Clear()</h2>
+<a id="afe19412f0fb38b6fc3baa49cc190e2c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe19412f0fb38b6fc3baa49cc190e2c6">&#9670;&nbsp;</a></span>Clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -221,7 +220,7 @@ template&lt;typename Array &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void MemoryTools::Clear </td>
+          <td class="memname">static CEX_OPTIMIZE_IGNORE void MemoryTools::Clear </td>
           <td>(</td>
           <td class="paramtype">Array &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -251,6 +250,8 @@ template&lt;typename Array &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>cond PRIVATE </p>
+<p>endcond </p>
 <p>Clear bytes from an integer array. </p>
 <p>The Length is the number of <em>bytes</em> (8 bit integers) to Clear. If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64/128=AVX512), the operation is vectorized, otherwise this is a sequential clear operation.</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -264,8 +265,8 @@ template&lt;typename Array &gt; </div>
 
 </div>
 </div>
-<a id="a7491e85824d04ff296d16a80aefd30cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7491e85824d04ff296d16a80aefd30cc">&#9670;&nbsp;</a></span>CLEAR128()</h2>
+<a id="ad9d9144c37036072e1d063299b426a3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9d9144c37036072e1d063299b426a3f">&#9670;&nbsp;</a></span>CLEAR128()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -276,7 +277,7 @@ template&lt;typename Array &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void MemoryTools::CLEAR128 </td>
+          <td class="memname">static CEX_OPTIMIZE_RESUME void MemoryTools::CLEAR128 </td>
           <td>(</td>
           <td class="paramtype">Array &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -300,6 +301,8 @@ template&lt;typename Array &gt; </div>
 </table>
 </div><div class="memdoc">
 
+<p>cond PRIVATE </p>
+<p>endcond </p>
 <p>Clear 128 bits from an integer array. </p>
 <p>This is an AVX vectorized function.</p>
 <dl class="params"><dt>Parameters</dt><dd>

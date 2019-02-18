@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -78,7 +77,7 @@ $(function() {
   <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#a92ec2c9f208e752769ef1fa26885a537">Generate</a>(SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="class_i_drbg.html#ab3a970f0af96f788b1e65a1426fa19d6">IDrbg</a>(const IDrbg &amp;)=delete</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#ac503c35c2cf1f5d2c224f7fe18e802f5">IDrbg</a>()</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="class_i_drbg.html#a2f4774cd3d6f777ac8a4434565bbb96c">Initialize</a>(ISymmetricKey &amp;GenParam)=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_i_drbg.html#ae885c048fed0e972930070bb392a3018">Initialize</a>(ISymmetricKey &amp;Parameters)=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#adbff51f7009375e91073451b2acbb4fd">IsInitialized</a>()=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="class_i_drbg.html#a3bc10dafa3c84f2447ab04c85e1c3d32">LegalKeySizes</a>() const =0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#aa1f45f9c66f6f991dc2d3ee85cd9a829">MaxOutputSize</a>()=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
@@ -86,10 +85,11 @@ $(function() {
   <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#a7f49fa3076791f999d8aabe5acde8326">MaxReseedCount</a>()=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="class_i_drbg.html#a4a1572086749484e4b52c1dcdab90601">Name</a>()=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#a7eb908205abf9118566fcab276992b13">operator=</a>(const IDrbg &amp;)=delete</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="class_i_drbg.html#aa09c6f5d57f335e4466854c73ef1cb37">ReseedThreshold</a>()=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_i_drbg.html#abd2c3ac5a25f6abedc68c69f53374c24">ReseedThreshold</a>()=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#a620be3a5ed3faa9c111afc1f0222b79e">SecurityStrength</a>()=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="class_i_drbg.html#a7c2ae576f76fc6f10d067b5dee50852b">Update</a>(const std::vector&lt; byte &gt; &amp;Key)=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#aa779f47ba55bd738b9702fb434ac8d34">~IDrbg</a>() noexcept</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="class_i_drbg.html#a95fb27b0fde630a368b4033161fae9f3">Update</a>(const SecureVector&lt; byte &gt; &amp;Key)=0</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="class_i_drbg.html#aa779f47ba55bd738b9702fb434ac8d34">~IDrbg</a>() noexcept</td><td class="entry"><a class="el" href="class_i_drbg.html">IDrbg</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">virtual</span></td></tr>
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

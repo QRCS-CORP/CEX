@@ -20,7 +20,6 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
    &#160;<span id="projectnumber">1.0.0.7</span>
@@ -170,9 +169,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab46ad50a71cafcbabbe9d48c8f33d0df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#ab46ad50a71cafcbabbe9d48c8f33d0df">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length) override</td></tr>
 <tr class="memdesc:ab46ad50a71cafcbabbe9d48c8f33d0df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output array.  <a href="#ab46ad50a71cafcbabbe9d48c8f33d0df">More...</a><br /></td></tr>
 <tr class="separator:ab46ad50a71cafcbabbe9d48c8f33d0df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0b0377a7d4c7bb0646d38390842ed9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#ab0b0377a7d4c7bb0646d38390842ed9e">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) override</td></tr>
-<tr class="memdesc:ab0b0377a7d4c7bb0646d38390842ed9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance.  <a href="#ab0b0377a7d4c7bb0646d38390842ed9e">More...</a><br /></td></tr>
-<tr class="separator:ab0b0377a7d4c7bb0646d38390842ed9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92b1bf2af48d75d828b53584b64ef7c2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#a92b1bf2af48d75d828b53584b64ef7c2">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
+<tr class="memdesc:a92b1bf2af48d75d828b53584b64ef7c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance.  <a href="#a92b1bf2af48d75d828b53584b64ef7c2">More...</a><br /></td></tr>
+<tr class="separator:a92b1bf2af48d75d828b53584b64ef7c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a030de6a56f54d48aadfc84d4f76e4112"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#a030de6a56f54d48aadfc84d4f76e4112">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:a030de6a56f54d48aadfc84d4f76e4112"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#a030de6a56f54d48aadfc84d4f76e4112">More...</a><br /></td></tr>
 <tr class="separator:a030de6a56f54d48aadfc84d4f76e4112"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -865,8 +864,8 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 
 </div>
 </div>
-<a id="ab0b0377a7d4c7bb0646d38390842ed9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab0b0377a7d4c7bb0646d38390842ed9e">&#9670;&nbsp;</a></span>Initialize()</h2>
+<a id="a92b1bf2af48d75d828b53584b64ef7c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92b1bf2af48d75d828b53584b64ef7c2">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -884,7 +883,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyParams</em>&#160;</td>
+          <td class="paramname"><em>Parameters</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -904,7 +903,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Encryption</td><td>True if cipher is used for encryption, false to decrypt</td></tr>
-    <tr><td class="paramname">KeyParams</td><td>SymmetricKey containing the encryption Key and Nonce</td></tr>
+    <tr><td class="paramname">Parameters</td><td>SymmetricKey containing the encryption Key and Nonce</td></tr>
   </table>
   </dd>
 </dl>
@@ -915,7 +914,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_cipher_mode.html#a03d0f798bf5001564d6d53df1ca4f5fb">ICipherMode</a>.</p>
+<p>Implements <a class="el" href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">ICipherMode</a>.</p>
 
 </div>
 </div>
@@ -1209,7 +1208,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 <p>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. Thread count must be an even number, and not exceed the number of processor cores.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads</td></tr>
+    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>
