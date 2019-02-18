@@ -115,9 +115,9 @@ ParallelOptions &CipherStream::ParallelProfile()
 
 //~~~Public Functions~~~//
 
-void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void CipherStream::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoProcessingException(CLASS_NAME, std::string("Initialize"), std::string("The cipher key length is invalid!"), ErrorCodes::InvalidKey);
 	}
@@ -125,7 +125,7 @@ void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	try
 	{
 		m_cipherEngine->ParallelProfile().IsParallel() = m_isParallel;
-		m_cipherEngine->Initialize(Encryption, KeyParams);
+		m_cipherEngine->Initialize(Encryption, Parameters);
 
 		m_isEncryption = Encryption;
 		m_isInitialized = true;

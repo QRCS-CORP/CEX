@@ -68,7 +68,6 @@ Keccak512::~Keccak512()
 	{
 		m_isDestroyed = true;
 		m_msgLength = 0;
-		m_parallelProfile.Reset();
 
 		if (m_treeDestroy)
 		{

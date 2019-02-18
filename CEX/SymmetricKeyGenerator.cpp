@@ -14,6 +14,7 @@ const std::vector<byte> SymmetricKeyGenerator::SIGMA_INFO = { 0x53, 0x79, 0x6D, 
 
 //~~~Constructor~~~//
 
+// TODO: seamless migrate to secure-vectors
 SymmetricKeyGenerator::SymmetricKeyGenerator(SecurityPolicy Policy, Providers ProviderType)
 	:
 	m_isDestroyed(false),
@@ -52,53 +53,7 @@ const std::string SymmetricKeyGenerator::Name()
 {
 	std::string name;
 
-	switch (m_secPolicy)
-	{
-		case SecurityPolicy::SPL256:
-		case SecurityPolicy::SPL256AE:
-		{
-			name = "SHAKE256";
-			break;
-		}
-		case SecurityPolicy::SPL512:
-		case SecurityPolicy::SPL512AE:
-		{
-			name = "SHAKE512";
-			break;
-		}
-		default:
-		{
-			name = "SHAKE1024";
-		}
-	}
-
-	switch (m_pvdType)
-	{
-		case Providers::ACP:
-		{
-			name += "-ACP";
-			break;
-		}
-		case Providers::CSP:
-		{
-			name += "-CSP";
-			break;
-		}
-		case Providers::ECP:
-		{
-			name += "-ECP";
-			break;
-		}
-		case Providers::RDP:
-		{
-			name += "-RDP";
-			break;
-		}
-		default:
-		{
-			name += "-CJP";
-		}
-	}
+	name = Enumeration::SecurityPolicyConvert::ToName(m_secPolicy) + std::string("-") + Enumeration::ProviderConvert::ToName(m_pvdType);
 
 	return name;
 }

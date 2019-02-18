@@ -231,9 +231,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("// * CEX++ Version 1.0.0.7: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("// *                                             *");
-	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7i (A7)                   *");
+	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7j (A7)                   *");
 	ConsoleUtils::WriteLine("// * License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("// * Date:      February 7, 2018                 *");
+	ConsoleUtils::WriteLine("// * Date:      February 18, 2019                *");
 	ConsoleUtils::WriteLine("// * Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -245,7 +245,7 @@ void CloseApp()
 	GetResponse();
 	exit(0);
 }
- 
+
 void RunTest(ITest* Test)
 {
 	try
@@ -468,7 +468,7 @@ int main()
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new BCGTest());
 			RunTest(new CSGTest());
-			RunTest(new HCGTest());
+			//RunTest(new HCGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
 			RunTest(new SymmetricKeyGeneratorTest());
 			RunTest(new SecureStreamTest());

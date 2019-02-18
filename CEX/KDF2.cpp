@@ -46,7 +46,7 @@ KDF2::KDF2(SHA2Digests DigestType)
 	:
 	KdfBase(
 		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::KDF2256 : Kdfs::KDF2512) : Kdfs::None),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 #else
@@ -71,7 +71,7 @@ KDF2::KDF2(IDigest* Digest)
 	:
 	KdfBase(
 		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::KDF2256 : Kdfs::KDF2512) : Kdfs::None),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 #else
@@ -188,15 +188,15 @@ void KDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 	Expand(Output, OutOffset, Length, m_kdf2State, m_kdf2Generator);
 }
 
-void KDF2::Initialize(ISymmetricKey &KeyParams)
+void KDF2::Initialize(ISymmetricKey &Parameters)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -207,52 +207,52 @@ void KDF2::Initialize(ISymmetricKey &KeyParams)
 		Reset();
 	}
 
-	if (KeyParams.Nonce().size() != 0)
+	if (Parameters.Nonce().size() != 0)
 	{
-		if (KeyParams.Nonce().size() + KeyParams.Info().size() < MinimumSaltSize())
+		if (Parameters.Nonce().size() + Parameters.Info().size() < MinimumSaltSize())
 		{
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
 		// add the key to state
-		m_kdf2State->State.resize(KeyParams.Key().size());
-		MemoryTools::Copy(KeyParams.Key(), 0, m_kdf2State->State, 0, m_kdf2State->State.size());
+		m_kdf2State->State.resize(Parameters.Key().size());
+		MemoryTools::Copy(Parameters.Key(), 0, m_kdf2State->State, 0, m_kdf2State->State.size());
 
 		// resize the salt
-		m_kdf2State->Salt.resize(KeyParams.Nonce().size() + KeyParams.Info().size());
+		m_kdf2State->Salt.resize(Parameters.Nonce().size() + Parameters.Info().size());
 
 		// add nonce param to salt
-		MemoryTools::Copy(KeyParams.Nonce(), 0, m_kdf2State->Salt, 0, m_kdf2State->Salt.size());
+		MemoryTools::Copy(Parameters.Nonce(), 0, m_kdf2State->Salt, 0, m_kdf2State->Salt.size());
 
 		// add info as extension of salt
-		if (KeyParams.Info().size() > 0)
+		if (Parameters.Info().size() > 0)
 		{
-			MemoryTools::Copy(KeyParams.Info(), 0, m_kdf2State->Salt, KeyParams.Nonce().size(), KeyParams.Info().size());
+			MemoryTools::Copy(Parameters.Info(), 0, m_kdf2State->Salt, Parameters.Nonce().size(), Parameters.Info().size());
 		}
 	}
 	else
 	{
 		// equal or less than a full block, interpret as ISO18033
-		if (KeyParams.Key().size() <= m_kdf2Generator->BlockSize())
+		if (Parameters.Key().size() <= m_kdf2Generator->BlockSize())
 		{
 			// pad the key to one block
 			m_kdf2State->State.resize(m_kdf2Generator->BlockSize());
-			MemoryTools::Copy(KeyParams.Key(), 0, m_kdf2State->State, 0, KeyParams.Key().size());
+			MemoryTools::Copy(Parameters.Key(), 0, m_kdf2State->State, 0, Parameters.Key().size());
 		}
 		else
 		{
 			// split the key between state key and salt
 			m_kdf2State->State.resize(m_kdf2Generator->BlockSize());
-			MemoryTools::Copy(KeyParams.Key(), 0, m_kdf2State->State, 0, m_kdf2Generator->BlockSize());
-			m_kdf2State->Salt.resize(KeyParams.Key().size() - m_kdf2Generator->BlockSize());
-			MemoryTools::Copy(KeyParams.Key(), m_kdf2Generator->BlockSize(), m_kdf2State->Salt, 0, m_kdf2State->Salt.size());
+			MemoryTools::Copy(Parameters.Key(), 0, m_kdf2State->State, 0, m_kdf2Generator->BlockSize());
+			m_kdf2State->Salt.resize(Parameters.Key().size() - m_kdf2Generator->BlockSize());
+			MemoryTools::Copy(Parameters.Key(), m_kdf2Generator->BlockSize(), m_kdf2State->Salt, 0, m_kdf2State->Salt.size());
 
 			// add info as extension of salt
-			if (KeyParams.Info().size() > 0)
+			if (Parameters.Info().size() > 0)
 			{
 				const size_t SLTLEN = m_kdf2State->Salt.size();
-				m_kdf2State->Salt.resize(SLTLEN + KeyParams.Info().size());
-				MemoryTools::Copy(KeyParams.Info(), 0, m_kdf2State->Salt, SLTLEN, KeyParams.Info().size());
+				m_kdf2State->Salt.resize(SLTLEN + Parameters.Info().size());
+				MemoryTools::Copy(Parameters.Info(), 0, m_kdf2State->Salt, SLTLEN, Parameters.Info().size());
 			}
 		}
 	}

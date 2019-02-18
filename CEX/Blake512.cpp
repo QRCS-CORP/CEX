@@ -95,7 +95,6 @@ Blake512::~Blake512()
 		m_msgLength = 0;
 
 		IntegerTools::Clear(m_msgBuffer);
-		m_parallelProfile.Reset();
 
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{

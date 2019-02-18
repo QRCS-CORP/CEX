@@ -23,11 +23,14 @@ namespace Test
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 65536;
 		static const size_t MINM_ALLOC = 1024;
-		static const size_t SAMPLE_SIZE = 1024000;
+		// 2MB sample, should be 100MB or more for accuracy
+		// Note: the sample size must be evenly divisible by 8.
+		static const size_t SAMPLE_SIZE = 248000;
 		static const size_t TEST_CYCLES = 100;
 
 		std::vector<byte> m_custom;
 		std::vector<std::vector<byte>> m_expected;
+		std::vector < std::vector<byte>> m_info;
 		std::vector<std::vector<byte>> m_key;
 		TestEventHandler m_progressEvent;
 
@@ -78,6 +81,22 @@ namespace Test
 		/// <param name="Key">The input key</param>
 		/// <param name="Expected">The expected output</param>
 		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected);
+
+		/// <summary>
+		/// Compare known answer test vectors to DRBG output
+		/// </summary>
+		/// 
+		/// <param name="Rng">The DRBG instance</param>
+		/// <param name="Key">The input key</param>
+		/// <param name="Custom">The customization string</param>
+		/// <param name="Info">The information string</param>
+		/// <param name="Expected">The expected output</param>
+		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Custom, std::vector<byte> &Info, std::vector<byte> &Expected);
+
+		/// <summary>
+		/// Test the auto re-seeding mechanism
+		/// </summary>
+		void Reseed();
 
 		/// <summary>
 		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data

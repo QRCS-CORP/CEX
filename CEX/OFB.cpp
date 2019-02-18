@@ -54,7 +54,6 @@ OFB::~OFB()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_isParallel = false;
-		m_parallelProfile.Reset();
 
 		Utility::IntegerTools::Clear(m_ofbVector);
 		Utility::IntegerTools::Clear(m_ofbBuffer);
@@ -162,19 +161,19 @@ void OFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void OFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void OFB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (KeyParams.Nonce().size() < 1 || KeyParams.Nonce().size() > m_blockCipher->BlockSize())
+	if (Parameters.Nonce().size() < 1 || Parameters.Nonce().size() > m_blockCipher->BlockSize())
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of nonce, and no larger than the block size!"), ErrorCodes::InvalidNonce);
 	}
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}
 
-	std::vector<byte> tmpIv = KeyParams.Nonce();
-	m_blockCipher->Initialize(true, KeyParams);
+	std::vector<byte> tmpIv = Parameters.Nonce();
+	m_blockCipher->Initialize(true, Parameters);
 
 	if (tmpIv.size() < m_ofbVector.size())
 	{

@@ -16,13 +16,13 @@ namespace Test
 	private:
 
 		// maximum meaningful z value
-		const static double Z_MAX;
+		static const double Z_MAX;
 		// log (sqrt (pi))
-		const static double LOG_SQRT_PI;
+		static const double LOG_SQRT_PI;
 		// 1 / sqrt (pi)
-		const static double I_SQRT_PI;
+		static const double I_SQRT_PI;
 		// max value to represent exp (x)
-		const static double BIGX;
+		static const double BIGX;
 
 	public:
 

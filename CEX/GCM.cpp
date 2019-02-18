@@ -82,7 +82,6 @@ GCM::~GCM()
 		m_isFinalized = false;
 		m_isInitialized = false;
 		m_msgSize = 0;
-		m_parallelProfile.Reset();
 
 		IntegerTools::Clear(m_aadData);
 		IntegerTools::Clear(m_gcmKey);
@@ -232,11 +231,11 @@ void GCM::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 	Utility::MemoryTools::Copy(m_msgTag, 0, Output, OutOffset, Length);
 }
 
-void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
 	Reset();
 
-	if (KeyParams.Nonce().size() < 8)
+	if (Parameters.Nonce().size() < 8)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a nonce of minimum 10 bytes in length!"), ErrorCodes::InvalidNonce);
 	}
@@ -253,9 +252,9 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		}
 	}
 
-	if (KeyParams.Key().size() == 0)
+	if (Parameters.Key().size() == 0)
 	{
-		if (KeyParams.Nonce() == m_gcmNonce)
+		if (Parameters.Nonce() == m_gcmNonce)
 		{
 			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The nonce can not be zeroised or repeating!"), ErrorCodes::InvalidNonce);
 		}
@@ -266,13 +265,13 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 	else
 	{
-		if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+		if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 		{
 			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 		}
 
 		// key the cipher and generate the hash key
-		m_cipherMode->Engine()->Initialize(true, KeyParams);
+		m_cipherMode->Engine()->Initialize(true, Parameters);
 		std::vector<byte> tmpH(BLOCK_SIZE);
 		const std::vector<byte> ZEROES(BLOCK_SIZE);
 		m_cipherMode->Engine()->Transform(ZEROES, 0, tmpH, 0);
@@ -284,11 +283,11 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		};
 
 		m_gcmHash->Initialize(gKey);
-		m_gcmKey = KeyParams.Key();
+		m_gcmKey = Parameters.Key();
 	}
 
 	m_isEncryption = Encryption;
-	m_gcmNonce = KeyParams.Nonce();
+	m_gcmNonce = Parameters.Nonce();
 	m_gcmVector = m_gcmNonce;
 
 	if (m_gcmVector.size() == 12)

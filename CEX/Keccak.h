@@ -86,20 +86,25 @@ private:
 
 public:
 
-	const static size_t KECCAK_STATE_SIZE = 25;
-	const static size_t KECCAK_RATE128_SIZE = 168;
-	const static size_t KECCAK_RATE256_SIZE = 136;
-	const static size_t KECCAK_RATE512_SIZE = 72;
+	static const byte KECCAK_CSHAKE_DOMAIN = 0x04;
+	static const byte KECCAK_SHAKE_DOMAIN = 0x1F;
+	static const byte KECCAK_CSHAKEW4_DOMAIN = 0x21;
+	static const byte KECCAK_CSHAKEW8_DOMAIN = 0x22;
+
+	static const size_t KECCAK_MESSAGE128_SIZE = 16;
+	static const size_t KECCAK_MESSAGE256_SIZE = 32;
+	static const size_t KECCAK_MESSAGE512_SIZE = 64;
+	static const size_t KECCAK_MESSAGE1024_SIZE = 128;
+	static const size_t KECCAK_RATE128_SIZE = 168;
+	static const size_t KECCAK_RATE256_SIZE = 136;
+	static const size_t KECCAK_RATE512_SIZE = 72;
 #if defined CEX_KECCAK_STRONG
-	const static size_t KECCAK_RATE1024_SIZE = 36;
+	static const size_t KECCAK_RATE1024_SIZE = 36;
 #else
-	const static size_t KECCAK_RATE1024_SIZE = 72;
+	static const size_t KECCAK_RATE1024_SIZE = 72;
 #endif
 
-	const static size_t KECCAK_MESSAGE128_SIZE = 16;
-	const static size_t KECCAK_MESSAGE256_SIZE = 32;
-	const static size_t KECCAK_MESSAGE512_SIZE = 64;
-	const static size_t KECCAK_MESSAGE1024_SIZE = 128;
+	static const size_t KECCAK_STATE_SIZE = 25;
 
 	/// <summary>
 	/// The Keccak absorb function; copy bytes from a byte array to the state array.
@@ -212,6 +217,7 @@ public:
 	{
 		std::array<byte, 200> msg = { 0 };
 		std::array<ulong, 25> state = { 0 };
+		size_t blkcnt;
 		size_t i;
 
 		while (InLength >= Rate)
@@ -240,7 +246,7 @@ public:
 		}
 #endif
 
-		size_t blkcnt = OutLength / Rate;
+		blkcnt = OutLength / Rate;
 		Keccak::SqueezeR24(state, Output, OutOffset, blkcnt, Rate);
 		OutOffset += blkcnt * Rate;
 		OutLength -= blkcnt * Rate;
@@ -281,6 +287,7 @@ public:
 	{
 		std::array<byte, 200> msg = { 0 };
 		std::array<ulong, 25> state = { 0 };
+		size_t blkcnt;
 		size_t i;
 
 		while (InLength >= Rate)
@@ -309,7 +316,7 @@ public:
 		}
 #endif
 
-		size_t blkcnt = OutLength / Rate;
+		blkcnt = OutLength / Rate;
 		Keccak::SqueezeR48(state, Output, OutOffset, blkcnt, Rate);
 		OutOffset += blkcnt * Rate;
 		OutLength -= blkcnt * Rate;

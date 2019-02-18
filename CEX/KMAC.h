@@ -55,7 +55,7 @@ using Enumeration::KmacModes;
 /// The cryptographic strength of KMAC depends upon the strength of the rate setting of the underlying permutation function, the size of its hash output, and on the size and quality of the key. \n
 /// The minimum key size should align with the expected security level of the generator function. \n
 /// For example, KMAC256 should be keyed with at least 256 bits (32 bytes) of random key. \n
-/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
+/// This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -178,10 +178,10 @@ public:
 	/// Uses a key, salt, and info arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
+	/// <param name="Parameters">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the key is not a legal size</exception>
-	void Initialize(ISymmetricKey &KeyParams) override;
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Reset internal state to the pre-initialization defaults.

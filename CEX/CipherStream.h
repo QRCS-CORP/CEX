@@ -232,10 +232,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">The cipher is initialized for encryption</param>
-	/// <param name="KeyParams">The ISymmetricKey containing the cipher key and initialization vector</param>
+	/// <param name="Parameters">The ISymmetricKey containing the cipher key and initialization vector</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are used</exception>
-	void Initialize(bool Encryption, ISymmetricKey &KeyParams);
+	void Initialize(bool Encryption, ISymmetricKey &Parameters);
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -243,7 +243,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if invalid degree value is used</exception>
 	void ParallelMaxDegree(size_t Degree);

@@ -6,5 +6,6 @@ var searchData=
   ['dilithium',['Dilithium',['../class_dilithium.html',1,'']]],
   ['dlmn256q8380417',['DLMN256Q8380417',['../class_d_l_m_n256_q8380417.html',1,'']]],
   ['donna128',['Donna128',['../class_donna128.html',1,'']]],
+  ['drbgbase',['DrbgBase',['../class_drbg_base.html',1,'']]],
   ['drbgfromname',['DrbgFromName',['../class_drbg_from_name.html',1,'']]]
 ];

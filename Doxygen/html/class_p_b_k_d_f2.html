@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.6</span>
+   &#160;<span id="projectnumber">1.0.0.7</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -184,7 +184,7 @@ By increasing the number of iterations in which the internal hashing function is
 A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase. <br />
 The minimum key size should align with the expected security level of the generator function. <br />
 For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. <br />
-This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
+This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
 <p><b>Description:</b> <br />
 <em>Legend:</em> <br />
 <b>DK</b>=derived-key, <b>c</b>=iterations, <b>hlen</b>=digest-length, <b>dkLen</b>=output-length <br />

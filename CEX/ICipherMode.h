@@ -187,10 +187,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
-	/// <param name="KeyParams">The SymmetricKey containing key and vector</param>
+	/// <param name="Parameters">The SymmetricKey containing key and vector</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if an invalid key or nonce is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
+	virtual void Initialize(bool Encryption, ISymmetricKey &Parameters) = 0;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -198,7 +198,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;

@@ -191,15 +191,15 @@ size_t Poly1305::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-void Poly1305::Initialize(ISymmetricKey &KeyParams)
+void Poly1305::Initialize(ISymmetricKey &Parameters)
 {
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
 
-	const ulong T0 = IntegerTools::LeBytesTo64(KeyParams.Key(), 0);
-	const ulong T1 = IntegerTools::LeBytesTo64(KeyParams.Key(), sizeof(ulong));
+	const ulong T0 = IntegerTools::LeBytesTo64(Parameters.Key(), 0);
+	const ulong T1 = IntegerTools::LeBytesTo64(Parameters.Key(), sizeof(ulong));
 
 	if (IsInitialized())
 	{
@@ -214,8 +214,8 @@ void Poly1305::Initialize(ISymmetricKey &KeyParams)
 	m_poly1305State->State[4] = 0;
 	m_poly1305State->State[5] = 0;
 	// store pad
-	m_poly1305State->State[6] = IntegerTools::LeBytesTo64(KeyParams.Key(), 2 * sizeof(ulong));
-	m_poly1305State->State[7] = IntegerTools::LeBytesTo64(KeyParams.Key(), 3 * sizeof(ulong));
+	m_poly1305State->State[6] = IntegerTools::LeBytesTo64(Parameters.Key(), 2 * sizeof(ulong));
+	m_poly1305State->State[7] = IntegerTools::LeBytesTo64(Parameters.Key(), 3 * sizeof(ulong));
 
 	m_isInitialized = true;
 }

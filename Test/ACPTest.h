@@ -20,6 +20,8 @@ namespace Test
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 65536;
 		static const size_t MINM_ALLOC = 1024;
+		// 64KB sample, should be 100MB or more for accuracy
+		// Note: the sample size must be evenly divisible by 8.
 		static const size_t SAMPLE_SIZE = 65536;
 		static const size_t TEST_CYCLES = 10;
 

@@ -5,6 +5,7 @@
 
 NAMESPACE_PROVIDER
 
+using Utility::IntegerTools;
 using Enumeration::ProviderConvert;
 
 //~~~Constructor~~~//
@@ -191,7 +192,7 @@ void RDP::GetRandom(byte* Output, size_t Length, DrandEngines DrandType)
 
 		if (res == RDR_SUCCESS)
 		{
-			const size_t RMDLEN = Utility::IntegerTools::Min(sizeof(ulong), Length);
+			const size_t RMDLEN = IntegerTools::Min(sizeof(ulong), Length);
 
 			for (i = 0; i < RMDLEN; ++i)
 			{
@@ -214,6 +215,7 @@ void RDP::GetRandom(byte* Output, size_t Length, DrandEngines DrandType)
 	}
 
 #	else
+
 	uint rnd32;
 
 	while (Length != 0)
@@ -231,7 +233,7 @@ void RDP::GetRandom(byte* Output, size_t Length, DrandEngines DrandType)
 
 		if (res == RDR_SUCCESS)
 		{
-			const size_t RMDLEN = Utility::IntegerTools::Min(sizeof(uint), Length);
+			const size_t RMDLEN = IntegerTools::Min(sizeof(uint), Length);
 
 			for (i = 0; i < RMDLEN; ++i)
 			{

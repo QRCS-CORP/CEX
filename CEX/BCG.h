@@ -22,13 +22,13 @@
 // Written by John Underhill, November 21, 2015
 // Updated October 23, 2016
 // Updated April 18, 2017
+// Updated February 14, 2019
 // Contact: develop@vtdev.com
-
 
 #ifndef CEX_BCG_H
 #define CEX_BCG_H
 
-#include "IDrbg.h"
+#include "DrbgBase.h"
 #include "BlockCipherExtensions.h"
 #include "BlockCiphers.h"
 #include "Digests.h"
@@ -44,15 +44,15 @@ using Cipher::Block::IBlockCipher;
 using Kdf::IKdf;
 
 /// <summary>
-/// An implementation of a Block cipher Counter mode Generator DRBG
+/// An implementation of a Block cipher Counter mode Generator DRBG: BCG
 /// </summary> 
 /// 
 /// <example>
 /// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
-/// BCG rng(BlockCiphers::AES, Digests::SHA512, [Providers::CSP]);
+/// BCG rng(BlockCiphers::AES, [Providers::ACP]);
 /// // initialize
-/// rng.Initialize(Seed, [Nonce], [Info]);
+/// rng.Initialize(Key, [Nonce], [Info]);
 /// // generate bytes
 /// rng.Generate(Output, [Offset], [Length]);
 /// </code>
@@ -60,9 +60,10 @@ using Kdf::IKdf;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The Counter mode generates a key-stream by encrypting successive values of an incrementing Big Endian ordered 128bit counter array (nonce). \n
-/// In parallel mode, the generators counter is increased by a number factored from the number of input blocks, allowing for a multi-threaded operation. \n
-/// The implementation is further parallelized by constructing a larger 'staggered' counter array, and processing large blocks using 128 or 256 SIMD instructions.</para>
+/// <para>The Block cipher Counter Generator creates a key-stream by encrypting an incrementing Big Endian ordered 128bit monotonic counter (nonce). \n
+/// In parallel mode, the generators counter is divided into staggered counter arrays, allowing for multi-threaded operation. \n
+/// The implementation is further parallelized by constructing a larger staggered-parallel counter array, and processing large blocks using 128, 256, or 512 bit SIMD instructions. \n
+/// Both of these enhancements still produce the identical output to a sequential counter mode generator, and are the equivalent output to a CTR block-cipher mode encrypting and array of zeroes.</para>
 /// 
 /// <description><B>Description:</B></description>
 /// <para><EM>Legend:</EM> \n 
@@ -71,45 +72,46 @@ using Kdf::IKdf;
 /// R0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj), C+1.</para> \n
 ///
 /// <description><B>Initialization and Update:</B></description>
-/// <para>The Initialize functions have three different parameter options: the Seed which is the primary key, 
-/// the Nonce used to initialize the internal counter, and the Info which is used in the Generate function. \n
-/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value. \n
-/// The supported seed-sizes are calculated based on the block ciphers functions internal block size, and can vary depending on which cipher is used to instantiate the generator. \n
-/// The 16 byte (NonceSize) Nonce value is another secret value, used to initialize the counter to a non-zero random value. \n
+/// <para>The Initialize functions have three different parameter options: the Key which is the primary key, 
+/// the Nonce used to initialize the internal counter, and the optional Info array which is used if the underlying block-cipher is running in extended mode. \n
+/// The Key value must be one of the LegalKeySizes in length, and must be a secret and random value. \n
+/// The supported nonce size is the block cipher functions internal block-size, in this library, that is always 128 bits (16 bytes). \n
+/// The 16 byte Nonce value should also be a secret value, used to initialize the counter to a non-zero random value. \n
 /// The Info parameter maps to the DistributionCode() property of an extended HX cipher, but is ignored when a standard cipher implementation is used. \n
-/// The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property \n 
-/// The Update function uses the seed value to re-key the cipher via the internal key derivation function. \n
-/// The update functions Seed parameter, must be a random seed value equal in length to the seed used to initialize the generator.</para>
+/// The extended cipher modes, and the DistributionCode are recommended, and for best security, the distribution code should be secret, random, and equal in length to the DistributionCodeMax() property \n 
+/// The Update function uses the seed value to re-key the cipher via the internal key derivation function (cSHAKE). \n
+/// The update functions Key parameter, must be a random key value which is added to the existing key state, if a random provider has been specified it is mixed with new entropy, 
+/// and permuted by a cSHAKE instance to generate the new generator key. \n 
+/// When using a random provider, the generator can be automatically re-seeded after a specified number of bytes have been generated, using the ReseedThreshold accessor property. \n 
+/// The nonce and distribution code are retained and reused after the key re-generation operation.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The transformation function in a CTR generator is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded. \n
-/// Output from the parallelized functions aligns with the output from a standard sequential CTR implementation processing an all zeroes input array. \n
+/// <para>The transformation function in a CTR generator is not limited by a dependency chain, this mode can be both SIMD pipelined and multi-threaded. \n
+/// Output from the parallelized functions aligns with the output from a standard sequential CTR implementationa output key-stream. \n
 /// Parallelism is achieved by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads. \n 
-/// The key stream generated by encrypting the counter array(s), is output as the source of pseudo-random.</para>
+/// The key-stream generated by encrypting the counter array(s), is output as the source of pseudo-random.</para>
 ///
 /// <description><B>Predictive Resistance:</B></description>
 /// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator. \n
-/// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through a KDF2 generator along with the current state, 
-/// the output is used to reseed the generator. \n
-/// The interval at which this reseeding occurs is 1mb by default, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, the seed is regenerated. \n 
-/// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</para>
+/// The optional resistance mechanism uses an entropy provider to add seed material to the generator at  periodic intervals, this new seed material is passed through a cSHAKE generator along with the current state, 
+/// and the SHAKE permutations pseudo-random output is used to reseed the generator. \n
+/// The interval at which this reseeding occurs is 100MB by default, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, the seed is automatically regenerated. \n 
+/// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (100MB or greater).</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>The class constructor can either be initialized with a block cipher instance, or using the block ciphers enumeration name.</description></item>
+/// <item><description>The class constructor can either be initialized using a block cipher instance, or using the block ciphers enumeration name.</description></item>
 /// <item><description>A block cipher or entropy provider instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
-/// <item><description>An entropy provider can be specified through the constructor, which provides a continues stream of entropy to the reseed and generate functions, this is stronly recommended with large (+10kb) outputs.</description></item>
-/// <item><description>The generator can be initialized with either a SymmetricKey key container class, or with a Seed and optional inputs of Nonce and Info.</description></item>
-/// <item><description>The LegalKeySizes() property contains a list of supported seed sizes.</description></item>
-/// <item><description>The LegalKeySizes() property contains a list of the supported seed sizes; note that if using the Nonce parameter of the Initialize function the combined (Seed + Nonce) must equal a legal size.</description></item>
+/// <item><description>An entropy provider can be specified through the constructor, which provides a continues stream of entropy to the reseed function, this is strongly recommended with large (+100MB) outputs.</description></item>
+/// <item><description>The generator can be initialized with either a SymmetricKey or SymmetricSecure key container class, this class must provide a legally sized key and nonce.</description></item>
+/// <item><description>The LegalKeySizes() property contains a list of supported nonce and key and sizes.</description></item>
 /// <item><description>There are three LegalKeySizes, minimum, recommended, and maximum, with BCG, the middle value is the recommended seed length for best security; i.e. LegalKeySizes()[1].</description></item>
-/// <item><description>The Generate() methods can not be used until an Initialize() function has been called, and the generator is seeded.</description></item>
-/// <item><description>In a block cipher counter based generator, the encryption function can be both pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
-/// <item><description>If the system supports Parallel processing, IsParallel() is set to true; passing an output block of ParallelBlockSize() to the Generate function.</description></item>
-/// <item><description>The ParallelThreadsMax() property is the thread count in the parallel loop (pre-configured automatically); this must be either 1 (IsParallel=false), or an even number no greater than the number of processer cores on the system.</description></item>
+/// <item><description>The Generate() methods can not be used until the Initialize() function has been called, and the generator has been keyed and is ready to generate pseudo-random output.</description></item>
+/// <item><description>This implementation has been both pipelined (AVX128, AVX256, or AVX512), and can also be multi-threaded, using any even number of threads.</description></item>
+/// <item><description>If the system supports Parallel processing, IsParallel() is set to true; passing an output block of ParallelBlockSize() or greater to the Generate function will trigger multi-threaded processing.</description></item>
+/// <item><description>The ParallelThreadsMax() property is the thread count in the parallel loop (pre-configured automatically); this must be either 1 (IsParallel=false), or an even number no greater than the number of processer cores on the system (including hyperthreads).</description></item>
 /// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
-/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % .ParallelMinimumSize);</c></description></item>
+/// <item><description>The ParallelBlockSize() and other properties can be changed through the ParallelProfile() accessor function, but there default values are recommended.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -120,40 +122,30 @@ using Kdf::IKdf;
 /// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
-class BCG final : public IDrbg
+class BCG final : public DrbgBase
 {
 private:
 
+	// generators internal block size
 	static const size_t BLOCK_SIZE = 16;
-	static const std::string CLASS_NAME;
-	static const size_t COUNTER_SIZE = 16;
-	static const size_t DEF_CYCTHRESH = 1024 * 1000;
-	static const ulong MAX_OUTPUT = 35184372088832;
-	static const size_t MAX_PRLALLOC = 100000000;
+	// 100mb: default before reseeded internally
+	static const size_t DEF_RESEED = 102400000;
+	// 10gb: maximum before rekey is required
+	static const ulong MAX_OUTPUT = 10240000000;
+	// 100mb: maximum size of a single request
 	static const size_t MAX_REQUEST = 102400000;
-	static const size_t MAX_RESEED = 536870912;
-	static const size_t PRC_DATACACHE = 1024 * 16;
+	// 1024: maximum reseed calls before exception
+	static const size_t MAX_THRESHOLD = 1024;
+	// the minimum key length that will initialize the generator
+	static const size_t MINKEY_LENGTH = 16;
 
-	std::unique_ptr<IBlockCipher> m_blockCipher;
-	BlockCiphers m_cipherType;
-	std::vector<byte> m_ctrVector;
-	bool m_destroyEngine;
-	std::vector<byte> m_distCode;
-	size_t m_distCodeMax;
+	class BcgState;
+	std::unique_ptr<IBlockCipher> m_bcgCipher;
+	std::unique_ptr<IProvider> m_bcgProvider;
+	std::unique_ptr<BcgState> m_bcgState;
 	bool m_isDestroyed;
-	bool m_isEncryption;
 	bool m_isInitialized;
-	std::unique_ptr<IKdf> m_kdfEngine;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
 	ParallelOptions m_parallelProfile;
-	bool m_prdResistant;
-	std::unique_ptr<IProvider> m_providerSource;
-	Providers m_providerType;
-	size_t m_reseedCounter;
-	size_t m_reseedRequests;
-	size_t m_reseedThreshold;
-	size_t m_secStrength;
-	size_t m_seedSize;
 
 public:
 
@@ -170,33 +162,32 @@ public:
 	BCG& operator=(const BCG&) = delete;
 
 	/// <summary>
-	/// Instantiate the class using a block cipher type-name, an optional entropy source type, and optional kdf hash-engine
+	/// Default constructor: default constructor is restricted, this function has been deleted
 	/// </summary>
-	///
-	/// <param name="CipherType">The block cipher type to instantiate as the primary generator.
-	/// <para>The primary pseudo-random function, the default is AES.</para></param>
-	/// <param name="ProviderType">The random provider-type, used to instantiate the entropy source. 
-	/// <para>Adding a random provider enables predictive resistance, and is recommended for large data (>= 1MB).</para></param>
-	/// <param name="Parallel">Enable/disable the multi-threading engine; default is false.
-	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
-	///
-	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
-	explicit BCG(BlockCiphers CipherType = BlockCiphers::AES, Providers ProviderType = Providers::None, bool Parallel = false);
+	BCG() = delete;
 
 	/// <summary>
-	/// Instantiate the class using a block cipher instance and an optional entropy source
+	/// Instantiate the generator using a block-cipher type name, an optional entropy source type, and the parallel processing option
+	/// </summary>
+	///
+	/// <param name="CipherType">The block cipher type to instantiate as the primary pseudo-random generator</param>
+	/// <param name="ProviderType">The random provider-type, used to instantiate the entropy source, the default is none</param>
+	/// <param name="Parallel">Enable/disable the multi-threading engine, the default is false</param>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
+	explicit BCG(BlockCiphers CipherType, Providers ProviderType = Providers::None, bool Parallel = false);
+
+	/// <summary>
+	/// Instantiate the generator using a block cipher instance, an optional entropy source, and the parallel processing option
 	/// </summary>
 	/// 
-	/// <param name="Cipher">The block cipher instance, acting as the primary pseudo-random function</param>
-	/// <param name="Kdf">The [optional] KDF instance used by the key extraction function.
-	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
-	/// <param name="Provider">The [optional] entropy source, enabling predictive resistance; can be set to nullptr.
+	/// <param name="Cipher">The block cipher instance, this is the primary pseudo-random function</param>
+	/// <param name="Provider">The optional entropy source, enabling predictive resistance; can be set to nullptr.
 	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
-	/// <param name="Parallel">Enable/disable the multi-threading engine; default is false.
-	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
+	/// <param name="Parallel">Enable/disable the multi-threading engine, the default is false</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if a null block cipher is used</exception>
-	explicit BCG(IBlockCipher* Cipher, IKdf* Kdf = nullptr, IProvider* Provider = nullptr, bool Parallel = false);
+	explicit BCG(IBlockCipher* Cipher, IProvider* Provider = nullptr, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -206,163 +197,103 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
-	/// Changing this code will create a unique distribution of the generator.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
-	/// </summary>
-	std::vector<byte> &DistributionCode() override;
-
-	/// <summary>
 	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary source of entropy (secret) in an HX ciphers HKDF key expansion function.
+	/// <para>The distribution code can be used as a secondary source of entropy (secret) in an HX ciphers key expansion function.
 	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
 	/// </summary>
-	const size_t DistributionCodeMax() override;
+	const size_t DistributionCodeMax();
 
 	/// <summary>
-	/// Read Only: The Drbg generators type name
-	/// </summary>
-	const Drbgs Enumeral() override;
-
-	/// <summary>
-	/// Read Only: Generator is ready to produce random
+	/// Read Only: The generator is ready to produce pseudo-random
 	/// </summary>
 	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on this system.
-	/// If parallel capable, the internal buffer is generated using multiple parallel streams.</para>
+	/// If parallel capable, the encrypted state is generated using multiple parallel streams.</para>
 	/// </summary>
 	const bool IsParallel();
 
 	/// <summary>
-	/// Read Only: Available Encryption Key Sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Read Only: The maximum number of bytes that can be generated with a generator instance
-	/// </summary>
-	const ulong MaxOutputSize() override;
-
-	/// <summary>
-	/// Read Only: The maximum number of bytes that can be generated in a single request
-	/// </summary>
-	const size_t MaxRequestSize() override;
-
-	/// <summary>
-	/// Read Only: The maximum number of times the generator can be reseeded
-	/// </summary>
-	const size_t MaxReseedCount() override;
-
-	/// <summary>
-	/// Read Only: The Drbg generators class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Read Only: The size of the nonce counter value in bytes
-	/// </summary>
-	const size_t NonceSize() override;
-
-	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the requested output data array passed from the Generate function that triggers parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.</para>
+	/// <para>This value can be changed through the ParallelProfile class.
+	/// IsParallel must be set to true, and generation requests must be of at least this size to trigger multi-threaded generation.</para>
 	/// </summary>
 	const size_t ParallelBlockSize();
 
 	/// <summary>
 	/// Read/Write: Parallel and SIMD capability flags and sizes 
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
-	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; this value must be evenly divisible by ParallelMinimumSize().
+	/// Changes to these values must be made before the <see cref="Initialize(ISymmetricKey)"/> function is called.</para>
 	/// </summary>
 	ParallelOptions &ParallelProfile();
 
 	/// <summary>
-	/// Read/Write: Generating this amount or greater, triggers seed regeneration
+	/// Read/Write: The maximum output generated before automatic auto-seed generation when using an entropy provider
 	/// </summary>
 	size_t &ReseedThreshold() override;
 
 	/// <summary>
-	/// Read Only: The security strength in bits
+	/// Read Only: The estimated classical security strength in bits
 	/// </summary>
 	const size_t SecurityStrength() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo-random bytes
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <param name="Output">The output standard vector to fill with random bytes</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	size_t Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo-random bytes using offset and length parameters
+	/// Fill a secure vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// <param name="OutOffset">The starting position within the Output array</param>
+	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
+	void Generate(SecureVector<byte> &Output) override;
+
+	/// <summary>
+	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	/// <param name="OutOffset">The starting position within the output vector</param>
 	/// <param name="Length">The number of bytes to generate</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
-	/// Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string.
+	/// Fill a secure vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	void Initialize(ISymmetricKey &GenParam) override;
+	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	/// <param name="OutOffset">The starting position within the output vector</param>
+	/// <param name="Length">The number of bytes to generate</param>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
+	void Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
-	/// Initialize the generator with a key.
+	/// Initialize the generator with an ISymmetricKey container, containing the key and nonce, and optional info string.
 	/// </summary>
 	/// 
-	/// <param name="Seed">The primary key array used to seed the generator</param>
+	/// <param name="Parameters">The ISymmetricKey key container with the generators keying material</param>
 	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	void Initialize(const std::vector<byte> &Seed) override;
-
-	/// <summary>
-	/// Initialize the generator with key and nonce arrays.
-	/// <para>The combined Seed and Nonce length must equal a LegalSeedSize.</para>
-	/// </summary>
-	/// 
-	/// <param name="Seed">The primary key array used to seed the generator</param>
-	/// <param name="Nonce">The nonce value containing an additional source of entropy</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce) override;
-
-	/// <summary>
-	/// Initialize the generator with a key, a nonce array, and an information string.
-	/// <para>The combined Seed and Nonce length must equal a LegalSeedSize.
-	/// The Info parameter maps to an extended HX cipher DistributionCode property. 
-	/// For best security this value should be secret, random and DistributionCodeMax in length.
-	/// If a standard cipher is used, the Info parameter is ignored.</para>
-	/// </summary>
-	/// 
-	/// <param name="Seed">The primary key array used to seed the generator</param>
-	/// <param name="Nonce">The nonce value used as an additional source of entropy</param>
-	/// <param name="Info">The information string or nonce used to create a unique distribution or as a third source of entropy</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the key is not a legal size</exception>
-	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info) override;
+	/// <exception cref="CryptoGeneratorException">Thrown if the key is not a legal-key size</exception>
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -370,26 +301,36 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor cores (times 2 for hyperthreading).</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
 	/// Update the generators seed value.
-	/// <para>Triggers a reseed with the new seed. The seed value must be equal in size to the seed used to initialize the generator</para>
+	/// <para>Triggers a reseed with the new seed. 
+	/// The seed value must be at least equal in size to the seed used to initialize the generator</para>
 	/// </summary>
 	/// 
-	/// <param name="Seed">The secret seed array</param>
+	/// <param name="Key">The standard vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
-	void Update(const std::vector<byte> &Seed) override;
+	void Update(const std::vector<byte> &Key) override;
+
+	/// <summary>
+	/// Update the generators keying material with a secure vector key
+	/// </summary>
+	///
+	/// <param name="Key">The secure vector containing the new key material</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
+	void Update(const SecureVector<byte> &Key) override;
 
 private:
 
-	void Derive(std::vector<byte> &Seed);
-	void GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void Transform(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter);
+	static void Derive(std::vector<byte> &Key, std::unique_ptr<BcgState> &State, std::unique_ptr<IProvider> &Provider);
+	void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	static void Permute(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter, std::unique_ptr<IBlockCipher> &Cipher);
 };
 
 NAMESPACE_DRBGEND

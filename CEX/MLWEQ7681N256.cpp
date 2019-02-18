@@ -181,19 +181,12 @@ void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 	std::vector<std::array<ushort, MLWE_N>> e(K);
 	std::vector<std::array<ushort, MLWE_N>> pkpv(K);
 	std::vector<std::array<ushort, MLWE_N>> skpv(K);
-	std::vector<byte> noise(MLWE_SEED_SIZE);
 	std::vector<byte> seed(MLWE_SEED_SIZE);
 	size_t eta;
 	size_t i;
 
 	Rng->Generate(seed);
-	Rng->Generate(noise);
-
 	GenerateMatrix(a, seed, false);
-
-	Drbg::BCG* gen = new Drbg::BCG(Enumeration::BlockCiphers::AES);
-	gen->Initialize(noise);
-	std::unique_ptr<Drbg::BCG> genP(gen);
 	eta = (K == 3) ? 4 : (K == 4) ? 3 : 5;
 
 	for (i = 0; i < K; i++)

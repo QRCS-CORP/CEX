@@ -154,10 +154,10 @@ public:
 	/// Uses a key and nonce arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
+	/// <param name="Parameters">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the key is not a legal size</exception>
-	void Initialize(ISymmetricKey &KeyParams) override;
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Reset internal state to the pre-initialization defaults.

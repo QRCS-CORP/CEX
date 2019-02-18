@@ -66,7 +66,7 @@ HMAC::HMAC(SHA2Digests DigestType, bool Parallel)
 				(DigestType == SHA2Digests::SHA256 ? SHA2::SHA2_RATE256_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA2_RATE512_SIZE : 0),
 				0,
 				(DigestType == SHA2Digests::SHA256 ? SHA2::SHA2_RATE256_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA2_RATE512_SIZE : 0))},
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(DigestType == SHA2Digests::SHA256 ? SHA2::SHA2_RATE256_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA2_RATE512_SIZE : 0),
 		(DigestType == SHA2Digests::SHA256 ? SHA2::SHA2_RATE256_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA2_RATE512_SIZE : 0),
 #else
@@ -102,7 +102,7 @@ HMAC::HMAC(IDigest* Digest)
 				0,
 				(Digest != nullptr ? Digest->BlockSize() : 0))} :
 			std::vector<SymmetricKeySize>(0)),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 #else
@@ -212,17 +212,17 @@ size_t HMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-void HMAC::Initialize(ISymmetricKey &KeyParams)
+void HMAC::Initialize(ISymmetricKey &Parameters)
 {
 	size_t klen;
 
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -233,17 +233,17 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 		Reset();
 	}
 
-	klen = KeyParams.Key().size();
+	klen = Parameters.Key().size();
 
 	if (klen > m_hmacGenerator->BlockSize())
 	{
-		m_hmacGenerator->Update(KeyParams.Key(), 0, KeyParams.Key().size());
+		m_hmacGenerator->Update(Parameters.Key(), 0, Parameters.Key().size());
 		m_hmacGenerator->Finalize(m_hmacState->InputPad, 0);
 		klen = m_hmacGenerator->DigestSize();
 	}
 	else
 	{
-		MemoryTools::Copy(KeyParams.Key(), 0, m_hmacState->InputPad, 0, klen);
+		MemoryTools::Copy(Parameters.Key(), 0, m_hmacState->InputPad, 0, klen);
 	}
 
 	if (m_hmacGenerator->BlockSize() > klen)

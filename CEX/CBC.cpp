@@ -48,7 +48,6 @@ CBC::~CBC()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_isLoaded = false;
-		m_parallelProfile.Reset();
 
 		Utility::IntegerTools::Clear(m_cbcVector);
 
@@ -155,13 +154,13 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void CBC::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void CBC::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (KeyParams.Nonce().size() != BLOCK_SIZE)
+	if (Parameters.Nonce().size() != BLOCK_SIZE)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid nonce size; nonce must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidNonce);
 	}
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}
@@ -179,8 +178,8 @@ void CBC::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 
 	Scope();
-	m_blockCipher->Initialize(Encryption, KeyParams);
-	m_cbcVector = KeyParams.Nonce();
+	m_blockCipher->Initialize(Encryption, Parameters);
+	m_cbcVector = Parameters.Nonce();
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }

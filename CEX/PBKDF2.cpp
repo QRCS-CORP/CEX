@@ -50,7 +50,7 @@ PBKDF2::PBKDF2(SHA2Digests DigestType, uint Iterations)
 	:
 	KdfBase(
 		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::PBKDF2256 : Kdfs::PBKDF2512) : Kdfs::None),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 #else
@@ -76,7 +76,7 @@ PBKDF2::PBKDF2(IDigest* Digest, uint Iterations)
 	KdfBase(
 		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::PBKDF2256 : Kdfs::PBKDF2512) :
 			throw CryptoKdfException(std::string("PBKDF2"), std::string("Constructor"), std::string("The digest instance is not supported!"), ErrorCodes::IllegalOperation)),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 #else
@@ -198,15 +198,15 @@ void PBKDF2::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Lengt
 	return Expand(Output, OutOffset, Length, m_pbkdf2State, m_pbkdf2Generator);
 }
 
-void PBKDF2::Initialize(ISymmetricKey &KeyParams)
+void PBKDF2::Initialize(ISymmetricKey &Parameters)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -218,29 +218,29 @@ void PBKDF2::Initialize(ISymmetricKey &KeyParams)
 	}
 
 	// add the key to the state
-	m_pbkdf2State->State.resize(KeyParams.Key().size());
-	MemoryTools::Copy(KeyParams.Key(), 0, m_pbkdf2State->State, 0, m_pbkdf2State->State.size());
+	m_pbkdf2State->State.resize(Parameters.Key().size());
+	MemoryTools::Copy(Parameters.Key(), 0, m_pbkdf2State->State, 0, m_pbkdf2State->State.size());
 
-	if (KeyParams.Nonce().size() + KeyParams.Info().size() != 0)
+	if (Parameters.Nonce().size() + Parameters.Info().size() != 0)
 	{
-		if (KeyParams.Nonce().size() + KeyParams.Info().size() < MinimumSaltSize())
+		if (Parameters.Nonce().size() + Parameters.Info().size() < MinimumSaltSize())
 		{
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
 		// resize the salt
-		m_pbkdf2State->Salt.resize(KeyParams.Nonce().size() + KeyParams.Info().size());
+		m_pbkdf2State->Salt.resize(Parameters.Nonce().size() + Parameters.Info().size());
 
 		// add the nonce param
-		if (KeyParams.Nonce().size() != 0)
+		if (Parameters.Nonce().size() != 0)
 		{
-			MemoryTools::Copy(KeyParams.Nonce(), 0, m_pbkdf2State->Salt, 0, m_pbkdf2State->Salt.size());
+			MemoryTools::Copy(Parameters.Nonce(), 0, m_pbkdf2State->Salt, 0, m_pbkdf2State->Salt.size());
 		}
 
 		// add info as extension of salt
-		if (KeyParams.Info().size() > 0)
+		if (Parameters.Info().size() > 0)
 		{
-			MemoryTools::Copy(KeyParams.Info(), 0, m_pbkdf2State->Salt, KeyParams.Nonce().size(), KeyParams.Info().size());
+			MemoryTools::Copy(Parameters.Info(), 0, m_pbkdf2State->Salt, Parameters.Nonce().size(), Parameters.Info().size());
 		}
 	}
 

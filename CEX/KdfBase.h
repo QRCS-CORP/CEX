@@ -2,13 +2,11 @@
 #define CEX_KDFBASE_H
 
 #include "IKdf.h"
-#include "Kdfs.h"
 #include "SymmetricKey.h"
 #include "SymmetricSecureKey.h"
 
 NAMESPACE_KDF
 
-using Enumeration::Kdfs;
 using Cipher::SymmetricKey;
 using Cipher::SymmetricSecureKey;
 

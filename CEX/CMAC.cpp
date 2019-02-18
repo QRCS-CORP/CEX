@@ -49,7 +49,7 @@ CMAC::CMAC(BlockCiphers CipherType)
 			SymmetricKeySize(32, 0, 32),
 			SymmetricKeySize(64, 0, 64),
 			SymmetricKeySize(128, 0, 128)},
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		32,
 		32,
 #else
@@ -77,7 +77,7 @@ CMAC::CMAC(IBlockCipher* Cipher)
 			SymmetricKeySize(32, 0, 32),
 			SymmetricKeySize(64, 0, 64),
 			SymmetricKeySize(128, 0, 128)},
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		32,
 		32,
 #else
@@ -200,7 +200,7 @@ size_t CMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-void CMAC::Initialize(ISymmetricKey &KeyParams)
+void CMAC::Initialize(ISymmetricKey &Parameters)
 {
 	std::vector<byte> k1(BLOCK_SIZE);
 	std::vector<byte> k2(BLOCK_SIZE);
@@ -208,13 +208,13 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 	std::vector<byte> tmpv(BLOCK_SIZE);
 	std::vector<byte> tmpz(BLOCK_SIZE);
 
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -226,7 +226,7 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 	}
 
 	// initialize the cipher
-	SymmetricKey kp(KeyParams.Key(), tmpv, KeyParams.Info());
+	SymmetricKey kp(Parameters.Key(), tmpv, Parameters.Info());
 	m_cbcMode->Initialize(true, kp);
 
 	// generate the mac keys
@@ -234,7 +234,7 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 	DoubleLu(lu, k1);
 	DoubleLu(k1, k2);
 
-	// store them in an encrypted secure-key
+	// store them in a symmetric-key
 	m_luKey.reset(new SymmetricKey(k1, k2));
 
 	// re-initialize the cipher
@@ -315,7 +315,7 @@ void CMAC::Pad(std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (Offset != Length)
 	{
-		Input[Offset] = 0x80;
+		Input[Offset] = CMAC_FINAL;
 		++Offset;
 
 		while (Offset < Length)
@@ -328,6 +328,7 @@ void CMAC::Pad(std::vector<byte> &Input, size_t Offset, size_t Length)
 
 uint CMAC::ShiftLeft(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
+	// TODO: worth vectorizing in IntegerTools?
 	size_t ctr;
 	uint bit;
 	uint tmpb;

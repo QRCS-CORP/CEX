@@ -59,7 +59,7 @@ using Enumeration::SHA2Digests;
 /// Only the SHA2-256 AND SHA2-512 hash functions are supported by this implementation. 
 /// The cryptographic strength of the HMAC depends upon the strength of the underlying hash function, the size of its hash output, and on the size and quality of the key. \n
 /// For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. \n
-/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
+/// This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Description:</B></description>
 /// <para><EM>Legend:</EM> \n 
@@ -221,10 +221,10 @@ public:
 	/// Uses a key, salt, and info arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
+	/// <param name="Parameters">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the key is not a legal size</exception>
-	void Initialize(ISymmetricKey &KeyParams) override;
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing.
@@ -232,7 +232,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.6</span>
+   &#160;<span id="projectnumber">1.0.0.7</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -82,7 +82,8 @@ Inheritance diagram for HCG:</div>
  <div class="center">
   <img src="class_h_c_g.png" usemap="#HCG_map" alt=""/>
   <map id="HCG_map" name="HCG_map">
-<area href="class_i_drbg.html" title="Deterministic Random Byte Generator (DRBG) interface class " alt="IDrbg" shape="rect" coords="0,0,43,24"/>
+<area href="class_drbg_base.html" title="The KDF base class; this is not an operable class " alt="DrbgBase" shape="rect" coords="0,56,68,80"/>
+<area href="class_i_drbg.html" title="Deterministic Random Byte Generator (DRBG) interface class " alt="IDrbg" shape="rect" coords="0,0,68,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -103,63 +104,76 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa23b56aa189b636d3cfe73b9de38ee03"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aa23b56aa189b636d3cfe73b9de38ee03">~HCG</a> () override</td></tr>
 <tr class="memdesc:aa23b56aa189b636d3cfe73b9de38ee03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#aa23b56aa189b636d3cfe73b9de38ee03">More...</a><br /></td></tr>
 <tr class="separator:aa23b56aa189b636d3cfe73b9de38ee03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3ed79900da0b8e70a011a7c475608d4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#ac3ed79900da0b8e70a011a7c475608d4">DistributionCode</a> () override</td></tr>
-<tr class="memdesc:ac3ed79900da0b8e70a011a7c475608d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.  <a href="#ac3ed79900da0b8e70a011a7c475608d4">More...</a><br /></td></tr>
-<tr class="separator:ac3ed79900da0b8e70a011a7c475608d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9209933dfea7d1b73a866cc5ed4f5852"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a9209933dfea7d1b73a866cc5ed4f5852">DistributionCodeMax</a> () override</td></tr>
-<tr class="memdesc:a9209933dfea7d1b73a866cc5ed4f5852"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum size of the distribution code in bytes.  <a href="#a9209933dfea7d1b73a866cc5ed4f5852">More...</a><br /></td></tr>
-<tr class="separator:a9209933dfea7d1b73a866cc5ed4f5852"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5db71c7ad66838a208f713cb5f16afc6"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga8889084a5726d1d32ee6b0a6066cdaae">Drbgs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a5db71c7ad66838a208f713cb5f16afc6">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a5db71c7ad66838a208f713cb5f16afc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Drbg generators type name  <a href="#a5db71c7ad66838a208f713cb5f16afc6">More...</a><br /></td></tr>
-<tr class="separator:a5db71c7ad66838a208f713cb5f16afc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b2791a3f33ef2724b35fab1a91b5232"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a3b2791a3f33ef2724b35fab1a91b5232">IsInitialized</a> () override</td></tr>
 <tr class="memdesc:a3b2791a3f33ef2724b35fab1a91b5232"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Generator is ready to produce random  <a href="#a3b2791a3f33ef2724b35fab1a91b5232">More...</a><br /></td></tr>
 <tr class="separator:a3b2791a3f33ef2724b35fab1a91b5232"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a136714e25b6094e19ff5a07a60ed7c24"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a136714e25b6094e19ff5a07a60ed7c24">LegalKeySizes</a> () const override</td></tr>
-<tr class="memdesc:a136714e25b6094e19ff5a07a60ed7c24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The legal input seed sizes in bytes  <a href="#a136714e25b6094e19ff5a07a60ed7c24">More...</a><br /></td></tr>
-<tr class="separator:a136714e25b6094e19ff5a07a60ed7c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbce042e2e273d37aff7e4c1dd831e4a"><td class="memItemLeft" align="right" valign="top">const ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#abbce042e2e273d37aff7e4c1dd831e4a">MaxOutputSize</a> () override</td></tr>
-<tr class="memdesc:abbce042e2e273d37aff7e4c1dd831e4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum number of bytes that can be generated with a generator instance  <a href="#abbce042e2e273d37aff7e4c1dd831e4a">More...</a><br /></td></tr>
-<tr class="separator:abbce042e2e273d37aff7e4c1dd831e4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b78dbe55ff531cc2717f0e54b18cec1"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a3b78dbe55ff531cc2717f0e54b18cec1">MaxRequestSize</a> () override</td></tr>
-<tr class="memdesc:a3b78dbe55ff531cc2717f0e54b18cec1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum number of bytes that can be generated in a single request  <a href="#a3b78dbe55ff531cc2717f0e54b18cec1">More...</a><br /></td></tr>
-<tr class="separator:a3b78dbe55ff531cc2717f0e54b18cec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89b315b1b7a31743e6efd7b6cefa5a31"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a89b315b1b7a31743e6efd7b6cefa5a31">MaxReseedCount</a> () override</td></tr>
-<tr class="memdesc:a89b315b1b7a31743e6efd7b6cefa5a31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum number of times the generator can be reseeded  <a href="#a89b315b1b7a31743e6efd7b6cefa5a31">More...</a><br /></td></tr>
-<tr class="separator:a89b315b1b7a31743e6efd7b6cefa5a31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ba84de2fbf39e146197db4d7ed42458"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a5ba84de2fbf39e146197db4d7ed42458">Name</a> () override</td></tr>
-<tr class="memdesc:a5ba84de2fbf39e146197db4d7ed42458"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Drbg generators class name  <a href="#a5ba84de2fbf39e146197db4d7ed42458">More...</a><br /></td></tr>
-<tr class="separator:a5ba84de2fbf39e146197db4d7ed42458"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a481d211d575a0cfed45bfc19dc3e3386"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a481d211d575a0cfed45bfc19dc3e3386">NonceSize</a> () override</td></tr>
-<tr class="memdesc:a481d211d575a0cfed45bfc19dc3e3386"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The size of the nonce counter value in bytes  <a href="#a481d211d575a0cfed45bfc19dc3e3386">More...</a><br /></td></tr>
-<tr class="separator:a481d211d575a0cfed45bfc19dc3e3386"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73d80a05fdc6923db4f0755acbb62392"><td class="memItemLeft" align="right" valign="top">size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a73d80a05fdc6923db4f0755acbb62392">ReseedThreshold</a> () override</td></tr>
-<tr class="memdesc:a73d80a05fdc6923db4f0755acbb62392"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Generating this amount or greater, triggers a re-seed  <a href="#a73d80a05fdc6923db4f0755acbb62392">More...</a><br /></td></tr>
-<tr class="separator:a73d80a05fdc6923db4f0755acbb62392"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefc5099924952d3b59f56616caf67837"><td class="memItemLeft" align="right" valign="top">const size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aefc5099924952d3b59f56616caf67837">ReseedThreshold</a> () override</td></tr>
+<tr class="memdesc:aefc5099924952d3b59f56616caf67837"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The maximum output generated between automatic internal seed generation  <a href="#aefc5099924952d3b59f56616caf67837">More...</a><br /></td></tr>
+<tr class="separator:aefc5099924952d3b59f56616caf67837"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa15826f52a9c991b6628348bd651f5fe"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aa15826f52a9c991b6628348bd651f5fe">SecurityStrength</a> () override</td></tr>
 <tr class="memdesc:aa15826f52a9c991b6628348bd651f5fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The estimated security strength in bits.  <a href="#aa15826f52a9c991b6628348bd651f5fe">More...</a><br /></td></tr>
 <tr class="separator:aa15826f52a9c991b6628348bd651f5fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7679e06f54695aaa3a407304babbc597"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a7679e06f54695aaa3a407304babbc597">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a7679e06f54695aaa3a407304babbc597"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo-random bytes  <a href="#a7679e06f54695aaa3a407304babbc597">More...</a><br /></td></tr>
-<tr class="separator:a7679e06f54695aaa3a407304babbc597"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6096c3b466e866315d411873f1a7c55f"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a6096c3b466e866315d411873f1a7c55f">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
-<tr class="memdesc:a6096c3b466e866315d411873f1a7c55f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo-random bytes using offset and length parameters  <a href="#a6096c3b466e866315d411873f1a7c55f">More...</a><br /></td></tr>
-<tr class="separator:a6096c3b466e866315d411873f1a7c55f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac290c36b5c445e8a1a4b79db54099657"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#ac290c36b5c445e8a1a4b79db54099657">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:ac290c36b5c445e8a1a4b79db54099657"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#ac290c36b5c445e8a1a4b79db54099657">More...</a><br /></td></tr>
+<tr class="separator:ac290c36b5c445e8a1a4b79db54099657"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cd32cf203484e6bd156c59278d1f817"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a2cd32cf203484e6bd156c59278d1f817">Generate</a> (SecureVector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:a2cd32cf203484e6bd156c59278d1f817"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes  <a href="#a2cd32cf203484e6bd156c59278d1f817">More...</a><br /></td></tr>
+<tr class="separator:a2cd32cf203484e6bd156c59278d1f817"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c30f7f6c929b339073b072df8fc5a41"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a7c30f7f6c929b339073b072df8fc5a41">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
+<tr class="memdesc:a7c30f7f6c929b339073b072df8fc5a41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes using offset and length parameters  <a href="#a7c30f7f6c929b339073b072df8fc5a41">More...</a><br /></td></tr>
+<tr class="separator:a7c30f7f6c929b339073b072df8fc5a41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19f4e5cd390c64cf62d2efa9b5fafdb4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a19f4e5cd390c64cf62d2efa9b5fafdb4">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
+<tr class="memdesc:a19f4e5cd390c64cf62d2efa9b5fafdb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes using offset and length parameters  <a href="#a19f4e5cd390c64cf62d2efa9b5fafdb4">More...</a><br /></td></tr>
+<tr class="separator:a19f4e5cd390c64cf62d2efa9b5fafdb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fd26876fccbfd4dbf9f55eb5b43ff36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a2fd26876fccbfd4dbf9f55eb5b43ff36">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam) override</td></tr>
 <tr class="memdesc:a2fd26876fccbfd4dbf9f55eb5b43ff36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string  <a href="#a2fd26876fccbfd4dbf9f55eb5b43ff36">More...</a><br /></td></tr>
 <tr class="separator:a2fd26876fccbfd4dbf9f55eb5b43ff36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea34d96e4fd6af3fb02d9f5c026e7999"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aea34d96e4fd6af3fb02d9f5c026e7999">Initialize</a> (const std::vector&lt; byte &gt; &amp;Seed) override</td></tr>
-<tr class="memdesc:aea34d96e4fd6af3fb02d9f5c026e7999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a seed key  <a href="#aea34d96e4fd6af3fb02d9f5c026e7999">More...</a><br /></td></tr>
-<tr class="separator:aea34d96e4fd6af3fb02d9f5c026e7999"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad140f22333acfecfeb52aef49a907311"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#ad140f22333acfecfeb52aef49a907311">Initialize</a> (const std::vector&lt; byte &gt; &amp;Seed, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>) override</td></tr>
-<tr class="memdesc:ad140f22333acfecfeb52aef49a907311"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with the seed and nonce arrays  <a href="#ad140f22333acfecfeb52aef49a907311">More...</a><br /></td></tr>
-<tr class="separator:ad140f22333acfecfeb52aef49a907311"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e88de3578969c6e77a6ef9b4ea0ac7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a1e88de3578969c6e77a6ef9b4ea0ac7e">Initialize</a> (const std::vector&lt; byte &gt; &amp;Seed, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>, const std::vector&lt; byte &gt; &amp;Info) override</td></tr>
-<tr class="memdesc:a1e88de3578969c6e77a6ef9b4ea0ac7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, a nonce array, and an information string or nonce  <a href="#a1e88de3578969c6e77a6ef9b4ea0ac7e">More...</a><br /></td></tr>
-<tr class="separator:a1e88de3578969c6e77a6ef9b4ea0ac7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2aa30ee3c58b54b6048cc8ab0dd4dd7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#af2aa30ee3c58b54b6048cc8ab0dd4dd7">Update</a> (const std::vector&lt; byte &gt; &amp;Seed) override</td></tr>
-<tr class="memdesc:af2aa30ee3c58b54b6048cc8ab0dd4dd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material, used to refresh the state  <a href="#af2aa30ee3c58b54b6048cc8ab0dd4dd7">More...</a><br /></td></tr>
-<tr class="separator:af2aa30ee3c58b54b6048cc8ab0dd4dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a7ec0bed49f04c6123082f87e708a0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a6a7ec0bed49f04c6123082f87e708a0f">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)</td></tr>
+<tr class="memdesc:a6a7ec0bed49f04c6123082f87e708a0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a seed key  <a href="#a6a7ec0bed49f04c6123082f87e708a0f">More...</a><br /></td></tr>
+<tr class="separator:a6a7ec0bed49f04c6123082f87e708a0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4784701e6bbfcc780d555bc1365adeff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a4784701e6bbfcc780d555bc1365adeff">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>)</td></tr>
+<tr class="memdesc:a4784701e6bbfcc780d555bc1365adeff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with the seed and nonce arrays  <a href="#a4784701e6bbfcc780d555bc1365adeff">More...</a><br /></td></tr>
+<tr class="separator:a4784701e6bbfcc780d555bc1365adeff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6498a5b5541b99b4b7b800e676e7dfd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aa6498a5b5541b99b4b7b800e676e7dfd">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>, const std::vector&lt; byte &gt; &amp;Info)</td></tr>
+<tr class="memdesc:aa6498a5b5541b99b4b7b800e676e7dfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, a nonce array, and an information string or nonce  <a href="#aa6498a5b5541b99b4b7b800e676e7dfd">More...</a><br /></td></tr>
+<tr class="separator:aa6498a5b5541b99b4b7b800e676e7dfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed045e88f8a2a708abe5ea77dd82ff25"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aed045e88f8a2a708abe5ea77dd82ff25">Update</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
+<tr class="memdesc:aed045e88f8a2a708abe5ea77dd82ff25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material, used to refresh the state  <a href="#aed045e88f8a2a708abe5ea77dd82ff25">More...</a><br /></td></tr>
+<tr class="separator:aed045e88f8a2a708abe5ea77dd82ff25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_class_drbg_base"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_drbg_base')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_drbg_base.html">DrbgBase</a></td></tr>
+<tr class="memitem:a87e053da7226d2789afd5d043c3df719 inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a87e053da7226d2789afd5d043c3df719">DrbgBase</a> (const <a class="el" href="class_drbg_base.html">DrbgBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a87e053da7226d2789afd5d043c3df719 inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_drbg_base.html#a87e053da7226d2789afd5d043c3df719">More...</a><br /></td></tr>
+<tr class="separator:a87e053da7226d2789afd5d043c3df719 inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af181a5b777b0835df26230403ce333f0 inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_drbg_base.html">DrbgBase</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#af181a5b777b0835df26230403ce333f0">operator=</a> (const <a class="el" href="class_drbg_base.html">DrbgBase</a> &amp;)=delete</td></tr>
+<tr class="memdesc:af181a5b777b0835df26230403ce333f0 inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="class_drbg_base.html#af181a5b777b0835df26230403ce333f0">More...</a><br /></td></tr>
+<tr class="separator:af181a5b777b0835df26230403ce333f0 inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8fbd4e92ee069c424409f095780c71e inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#ae8fbd4e92ee069c424409f095780c71e">DrbgBase</a> ()=delete</td></tr>
+<tr class="memdesc:ae8fbd4e92ee069c424409f095780c71e inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: the default constructor is restricted, this function has been deleted  <a href="class_drbg_base.html#ae8fbd4e92ee069c424409f095780c71e">More...</a><br /></td></tr>
+<tr class="separator:ae8fbd4e92ee069c424409f095780c71e inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b3cd62ec0984f430500e13724fb0561 inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a8b3cd62ec0984f430500e13724fb0561">DrbgBase</a> (<a class="el" href="group___enumeration.html#ga8889084a5726d1d32ee6b0a6066cdaae">Drbgs</a> <a class="el" href="class_drbg_base.html#a6e70e47f63286b4d088aad61a9777ffa">Enumeral</a>, std::string &amp;<a class="el" href="class_drbg_base.html#ab738f0a3709ffe54d16c5bc9ff64914f">Name</a>, std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;KeySizes, ulong MaxOutput, size_t MaxRequest, size_t MaxReseed)</td></tr>
+<tr class="memdesc:a8b3cd62ec0984f430500e13724fb0561 inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class (private member)  <a href="class_drbg_base.html#a8b3cd62ec0984f430500e13724fb0561">More...</a><br /></td></tr>
+<tr class="separator:a8b3cd62ec0984f430500e13724fb0561 inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a318d9b55d09206b3a8081038eff47fbd inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a318d9b55d09206b3a8081038eff47fbd">~DrbgBase</a> ()</td></tr>
+<tr class="memdesc:a318d9b55d09206b3a8081038eff47fbd inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="class_drbg_base.html#a318d9b55d09206b3a8081038eff47fbd">More...</a><br /></td></tr>
+<tr class="separator:a318d9b55d09206b3a8081038eff47fbd inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e70e47f63286b4d088aad61a9777ffa inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga8889084a5726d1d32ee6b0a6066cdaae">Drbgs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a6e70e47f63286b4d088aad61a9777ffa">Enumeral</a> () override</td></tr>
+<tr class="memdesc:a6e70e47f63286b4d088aad61a9777ffa inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The prngs type name  <a href="class_drbg_base.html#a6e70e47f63286b4d088aad61a9777ffa">More...</a><br /></td></tr>
+<tr class="separator:a6e70e47f63286b4d088aad61a9777ffa inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4300ef8d2b1d53a4a25e6d4536fc6ab3 inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a4300ef8d2b1d53a4a25e6d4536fc6ab3">LegalKeySizes</a> () const override</td></tr>
+<tr class="memdesc:a4300ef8d2b1d53a4a25e6d4536fc6ab3 inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Available KDF Key Sizes in SymmetricKeySize containers  <a href="class_drbg_base.html#a4300ef8d2b1d53a4a25e6d4536fc6ab3">More...</a><br /></td></tr>
+<tr class="separator:a4300ef8d2b1d53a4a25e6d4536fc6ab3 inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91dd8c5b533f536198d96a8819ed9c7e inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">const ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a91dd8c5b533f536198d96a8819ed9c7e">MaxOutputSize</a> () override</td></tr>
+<tr class="memdesc:a91dd8c5b533f536198d96a8819ed9c7e inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum number of bytes that can be generated with a generator instance  <a href="class_drbg_base.html#a91dd8c5b533f536198d96a8819ed9c7e">More...</a><br /></td></tr>
+<tr class="separator:a91dd8c5b533f536198d96a8819ed9c7e inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc735bf3b0f131a1c3ffe25ebff448da inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#abc735bf3b0f131a1c3ffe25ebff448da">MaxRequestSize</a> () override</td></tr>
+<tr class="memdesc:abc735bf3b0f131a1c3ffe25ebff448da inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum number of bytes that can be generated in a single request  <a href="class_drbg_base.html#abc735bf3b0f131a1c3ffe25ebff448da">More...</a><br /></td></tr>
+<tr class="separator:abc735bf3b0f131a1c3ffe25ebff448da inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae750bd31b66bd0ecbe439ff5d5b0322f inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#ae750bd31b66bd0ecbe439ff5d5b0322f">MaxReseedCount</a> () override</td></tr>
+<tr class="memdesc:ae750bd31b66bd0ecbe439ff5d5b0322f inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum number of times the generator can be reseeded  <a href="class_drbg_base.html#ae750bd31b66bd0ecbe439ff5d5b0322f">More...</a><br /></td></tr>
+<tr class="separator:ae750bd31b66bd0ecbe439ff5d5b0322f inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab738f0a3709ffe54d16c5bc9ff64914f inherit pub_methods_class_drbg_base"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#ab738f0a3709ffe54d16c5bc9ff64914f">Name</a> () override</td></tr>
+<tr class="memdesc:ab738f0a3709ffe54d16c5bc9ff64914f inherit pub_methods_class_drbg_base"><td class="mdescLeft">&#160;</td><td class="mdescRight">The KDF generators formal class name  <a href="class_drbg_base.html#ab738f0a3709ffe54d16c5bc9ff64914f">More...</a><br /></td></tr>
+<tr class="separator:ab738f0a3709ffe54d16c5bc9ff64914f inherit pub_methods_class_drbg_base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_drbg"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_drbg')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_drbg.html">IDrbg</a></td></tr>
 <tr class="memitem:ab3a970f0af96f788b1e65a1426fa19d6 inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#ab3a970f0af96f788b1e65a1426fa19d6">IDrbg</a> (const <a class="el" href="class_i_drbg.html">IDrbg</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ab3a970f0af96f788b1e65a1426fa19d6 inherit pub_methods_class_i_drbg"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_drbg.html#ab3a970f0af96f788b1e65a1426fa19d6">More...</a><br /></td></tr>
@@ -176,7 +190,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of an HMAC Counter Generator DRBG </p>
-<p>Generate an array of pseudo-random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_h_c_g.html">HCG</a> rnd(Digests::SHA512, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0acbc6e9792f97c17c170caeb83895c44e">Providers::CSP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">rnd.Initialize(Seed, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">rnd.Generate(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><b>Description:</b> </p>
+<p>Generate an array of pseudo-random bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_h_c_g.html">HCG</a> rnd(Digests::SHA512, [<a class="code" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0acbc6e9792f97c17c170caeb83895c44e">Providers::CSP</a>]);</div><div class="line"><span class="comment">// initialize</span></div><div class="line">rnd.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, [<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>], [Info]);</div><div class="line"><span class="comment">// generate bytes</span></div><div class="line">rnd.Generate(Output, [Offset], [Size]);</div></div><!-- fragment --> <p><b>Description:</b> </p>
 <p><em>Legend:</em> <br />
  <b>Hm</b>=hmac_function, <b>P</b>=entropy_provider, <b>R</b>=generator_state, <b>K</b>=input_key, <b>Dk</b>=derived_key, <b>Dc</b>=distribution_code, <b>Sc</b>=state_counter, <b>Kc</b>=seed_counter, <b>Df</b>=derivation_function</p>
 <p><b>Derive:</b> <br />
@@ -186,7 +200,7 @@ LeIncrement the seed counter by the bytes required for the iteration, and mac th
 2) Hm(Dk). -re-initialize the HMAC with the derived key. <br />
 3) R = P(statelen). -generate the initial state using the entropy provider. </p>
 <p><em>Initialize</em> <br />
-The Initialize function can take up to 3 inputs; the generator Seed which is the primary key, a Nonce value of 8 bytes used to initialize the state counter, and the distribution code used in the Generate function. <br />
+The Initialize function can take up to 3 inputs; the generator Key which is the primary key, a Nonce value of 8 bytes used to initialize the state counter, and the distribution code used in the Generate function. <br />
  <br />
 1) Hm(K). -pre-key the HMAC. <br />
 2) if (Nonce) Sc = Nonce. -set the state counter to a non-zero secret value (optional, but recommended). <br />
@@ -214,14 +228,14 @@ The state counter can be initialized by the Nonce parameter of the Initialize fu
 The reseed-requests counter is incremented by the number of bytes processed by a generation call, if this value exceeds the ReseedThreshold value (10 * the MAC output size by default), the generator transforms the state to an internal array, (not added to output), and uses that state, along with the reseed counter and entropy provider, to buid a new HMAC key. <br />
 The HMAC is then re-keyed, the reseed-requests counter is reset, and a new initial state is generated by the entropy provider for the next generation cycle. </p>
 <p><b>Initialization and Update:</b> </p>
-<p>The Initialize functions have three different parameter options: the Seed which is the primary key, the Nonce used to initialize the internal state-counter, and the Info which is used in the Generate function. <br />
-The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value. <br />
+<p>The Initialize functions have three different parameter options: the Key which is the primary key, the Nonce used to initialize the internal state-counter, and the Info which is used in the Generate function. <br />
+The Key value must be one of the LegalKeySizes() in length, and must be a secret and random value. <br />
 The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator. <br />
 The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value. <br />
 The Info parameter maps to the DistributionCode() property, and is used as message state when generating the pseudo-random output. <br />
 The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property <br />
  The Update function uses the seed value to re-key the HMAC via the internal key derivation function. <br />
-The update functions Seed parameter, must be a random seed value equal in length to the seed used to initialize the generator.</p>
+The update functions Key parameter, must be a random seed value equal in length to the seed used to initialize the generator.</p>
 <p><b>Predictive Resistance:</b> </p>
 <p>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator. <br />
 The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through the derivation function along with the current state, the output hash is used to reseed the generator. <br />
@@ -235,7 +249,7 @@ The class constructor can either be initialized with message digest and entropy 
 <li>
 Digest and provider instances created using the enumeration constructor, are automatically deleted when the class is destroyed. </li>
 <li>
-The generator can be initialized with either a SymmetricKey key container class, or with a Seed and optional inputs of Nonce and Info. </li>
+The generator can be initialized with either a SymmetricKey key container class, or with a Key and optional inputs of Nonce and Info. </li>
 <li>
 The LegalKeySizes() property contains a list of the supported seed input sizes. </li>
 <li>
@@ -247,7 +261,7 @@ The Info value (DistributionCode) is also recommended; for best security, this v
 <li>
 The Generate() methods can not be used until an Initialize() function has been called, and the generator is seeded. </li>
 <li>
-The Update() method requires a Seed of length equal to the seed used to initialize the generator. </li>
+The Update() method requires a Key of length equal to the seed used to initialize the generator. </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -424,8 +438,8 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ac3ed79900da0b8e70a011a7c475608d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3ed79900da0b8e70a011a7c475608d4">&#9670;&nbsp;</a></span>DistributionCode()</h2>
+<a id="ac290c36b5c445e8a1a4b79db54099657"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac290c36b5c445e8a1a4b79db54099657">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -434,96 +448,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; &amp; HCG::DistributionCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters. </p>
-<p>Must be set before Initialize(ISymmetricKey) is called. Changing this code will create a unique distribution of the generator. Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size. For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#a87302531f591a7a91c2511b5f5c84e56">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a9209933dfea7d1b73a866cc5ed4f5852"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9209933dfea7d1b73a866cc5ed4f5852">&#9670;&nbsp;</a></span>DistributionCodeMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t HCG::DistributionCodeMax </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The maximum size of the distribution code in bytes. </p>
-<p>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase. For best security, the distribution code should be random, secret, and equal in size to this value.</p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#a493b1e468746ec913ad3eb9c4c5359ea">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a5db71c7ad66838a208f713cb5f16afc6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5db71c7ad66838a208f713cb5f16afc6">&#9670;&nbsp;</a></span>Enumeral()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga8889084a5726d1d32ee6b0a6066cdaae">Drbgs</a> HCG::Enumeral </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The Drbg generators type name </p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#a380dcc67575d1d365a7b67d952c743f3">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a7679e06f54695aaa3a407304babbc597"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7679e06f54695aaa3a407304babbc597">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t HCG::Generate </td>
+          <td class="memname">void HCG::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -537,14 +462,13 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Generate a block of pseudo-random bytes </p>
+<p>Fill a standard vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output standard vector to fill with random bytes</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
@@ -552,12 +476,12 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_drbg.html#a8149cedfc65c1d7e89ff8690cad4f157">IDrbg</a>.</p>
+<p>Implements <a class="el" href="class_i_drbg.html#a871fd18ab7bdf5dd177dde83432d2696">IDrbg</a>.</p>
 
 </div>
 </div>
-<a id="a6096c3b466e866315d411873f1a7c55f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6096c3b466e866315d411873f1a7c55f">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/2]</span></h2>
+<a id="a2cd32cf203484e6bd156c59278d1f817"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cd32cf203484e6bd156c59278d1f817">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -566,7 +490,49 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t HCG::Generate </td>
+          <td class="memname">void HCG::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector with pseudo-random bytes </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output secure vector to fill with random bytes</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_drbg.html#a20b97d7d1c9d3e3e478d0d55fe8190ec">IDrbg</a>.</p>
+
+</div>
+</div>
+<a id="a7c30f7f6c929b339073b072df8fc5a41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c30f7f6c929b339073b072df8fc5a41">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void HCG::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -596,16 +562,15 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Generate pseudo-random bytes using offset and length parameters </p>
+<p>Fill a standard vector with pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting position within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The output standard vector to fill with random bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting position within the output array</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
@@ -613,7 +578,67 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_drbg.html#ab890c39c5db4497e5c0dad8684377d59">IDrbg</a>.</p>
+<p>Implements <a class="el" href="class_i_drbg.html#a7d423af67ac8967741b1843b43971f5e">IDrbg</a>.</p>
+
+</div>
+</div>
+<a id="a19f4e5cd390c64cf62d2efa9b5fafdb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19f4e5cd390c64cf62d2efa9b5fafdb4">&#9670;&nbsp;</a></span>Generate() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void HCG::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector with pseudo-random bytes using offset and length parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output secure vector to fill with random bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting position within the output array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_drbg.html#a92ec2c9f208e752769ef1fa26885a537">IDrbg</a>.</p>
 
 </div>
 </div>
@@ -659,34 +684,26 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 
 </div>
 </div>
-<a id="aea34d96e4fd6af3fb02d9f5c026e7999"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea34d96e4fd6af3fb02d9f5c026e7999">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[2/4]</span></h2>
+<a id="a6a7ec0bed49f04c6123082f87e708a0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a7ec0bed49f04c6123082f87e708a0f">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void HCG::Initialize </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Seed</em></td><td>)</td>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Initialize the generator with a seed key </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Seed</td><td>The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</td></tr>
+    <tr><td class="paramname">Key</td><td>The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</td></tr>
   </table>
   </dd>
 </dl>
@@ -697,24 +714,19 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_drbg.html#a08564f87d3d4280c6d07489a2d3d34fb">IDrbg</a>.</p>
-
 </div>
 </div>
-<a id="ad140f22333acfecfeb52aef49a907311"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad140f22333acfecfeb52aef49a907311">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[3/4]</span></h2>
+<a id="a4784701e6bbfcc780d555bc1365adeff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4784701e6bbfcc780d555bc1365adeff">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void HCG::Initialize </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Seed</em>, </td>
+          <td class="paramname"><em>Key</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -728,17 +740,12 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Initialize the generator with the seed and nonce arrays </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Seed</td><td>The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</td></tr>
+    <tr><td class="paramname">Key</td><td>The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</td></tr>
     <tr><td class="paramname">Nonce</td><td>The secret nonce value used to initialize the state counter; value must be NonceSize() bytes in length</td></tr>
   </table>
   </dd>
@@ -750,24 +757,19 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_drbg.html#acccdc6df488c192d2fb46faedb686d4f">IDrbg</a>.</p>
-
 </div>
 </div>
-<a id="a1e88de3578969c6e77a6ef9b4ea0ac7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e88de3578969c6e77a6ef9b4ea0ac7e">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[4/4]</span></h2>
+<a id="aa6498a5b5541b99b4b7b800e676e7dfd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6498a5b5541b99b4b7b800e676e7dfd">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void HCG::Initialize </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Seed</em>, </td>
+          <td class="paramname"><em>Key</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -787,17 +789,12 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Initialize the generator with a key, a nonce array, and an information string or nonce </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Seed</td><td>The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</td></tr>
+    <tr><td class="paramname">Key</td><td>The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</td></tr>
     <tr><td class="paramname">Nonce</td><td>The secret nonce value used to initialize the state counter; value must be NonceSize() bytes in length</td></tr>
     <tr><td class="paramname">Info</td><td>The info parameter can be used as a secret salt, or as a distribution code; for best security it should be secret, random, and DistributionCodeMax in length</td></tr>
   </table>
@@ -809,8 +806,6 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   </table>
   </dd>
 </dl>
-
-<p>Implements <a class="el" href="class_i_drbg.html#a65a3770b3c68cac0c93eea7247393f36">IDrbg</a>.</p>
 
 </div>
 </div>
@@ -843,180 +838,6 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 
 </div>
 </div>
-<a id="a136714e25b6094e19ff5a07a60ed7c24"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a136714e25b6094e19ff5a07a60ed7c24">&#9670;&nbsp;</a></span>LegalKeySizes()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; HCG::LegalKeySizes </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The legal input seed sizes in bytes </p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#a3bc10dafa3c84f2447ab04c85e1c3d32">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="abbce042e2e273d37aff7e4c1dd831e4a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbce042e2e273d37aff7e4c1dd831e4a">&#9670;&nbsp;</a></span>MaxOutputSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const ulong HCG::MaxOutputSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The maximum number of bytes that can be generated with a generator instance </p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#aa1f45f9c66f6f991dc2d3ee85cd9a829">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a3b78dbe55ff531cc2717f0e54b18cec1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b78dbe55ff531cc2717f0e54b18cec1">&#9670;&nbsp;</a></span>MaxRequestSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t HCG::MaxRequestSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The maximum number of bytes that can be generated in a single request </p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#aa3c17073d3e0598150311a40a4534cdd">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a89b315b1b7a31743e6efd7b6cefa5a31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89b315b1b7a31743e6efd7b6cefa5a31">&#9670;&nbsp;</a></span>MaxReseedCount()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t HCG::MaxReseedCount </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The maximum number of times the generator can be reseeded </p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#a7f49fa3076791f999d8aabe5acde8326">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a5ba84de2fbf39e146197db4d7ed42458"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ba84de2fbf39e146197db4d7ed42458">&#9670;&nbsp;</a></span>Name()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::string HCG::Name </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The Drbg generators class name </p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#a4a1572086749484e4b52c1dcdab90601">IDrbg</a>.</p>
-
-</div>
-</div>
-<a id="a481d211d575a0cfed45bfc19dc3e3386"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a481d211d575a0cfed45bfc19dc3e3386">&#9670;&nbsp;</a></span>NonceSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t HCG::NonceSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The size of the nonce counter value in bytes </p>
-
-<p>Implements <a class="el" href="class_i_drbg.html#ab2b70de3e99388e38b5b6bc5165a0664">IDrbg</a>.</p>
-
-</div>
-</div>
 <a id="ad7cacd72a744f718105c01dc2309c871"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad7cacd72a744f718105c01dc2309c871">&#9670;&nbsp;</a></span>operator=()</h2>
 
@@ -1045,8 +866,8 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 
 </div>
 </div>
-<a id="a73d80a05fdc6923db4f0755acbb62392"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73d80a05fdc6923db4f0755acbb62392">&#9670;&nbsp;</a></span>ReseedThreshold()</h2>
+<a id="aefc5099924952d3b59f56616caf67837"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefc5099924952d3b59f56616caf67837">&#9670;&nbsp;</a></span>ReseedThreshold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1055,7 +876,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t &amp; HCG::ReseedThreshold </td>
+          <td class="memname">const size_t &amp; HCG::ReseedThreshold </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -1068,9 +889,9 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </table>
 </div><div class="memdoc">
 
-<p>Read/Write: Generating this amount or greater, triggers a re-seed </p>
+<p>Read/Write: The maximum output generated between automatic internal seed generation </p>
 
-<p>Implements <a class="el" href="class_i_drbg.html#abd2c3ac5a25f6abedc68c69f53374c24">IDrbg</a>.</p>
+<p>Implements <a class="el" href="class_i_drbg.html#aa09c6f5d57f335e4466854c73ef1cb37">IDrbg</a>.</p>
 
 </div>
 </div>
@@ -1104,8 +925,8 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 
 </div>
 </div>
-<a id="af2aa30ee3c58b54b6048cc8ab0dd4dd7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2aa30ee3c58b54b6048cc8ab0dd4dd7">&#9670;&nbsp;</a></span>Update()</h2>
+<a id="aed045e88f8a2a708abe5ea77dd82ff25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed045e88f8a2a708abe5ea77dd82ff25">&#9670;&nbsp;</a></span>Update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1117,7 +938,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
           <td class="memname">void HCG::Update </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Seed</em></td><td>)</td>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1131,7 +952,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 <p>Update the generators keying material, used to refresh the state </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Seed</td><td>The new seed value array</td></tr>
+    <tr><td class="paramname">Key</td><td>The new seed value array</td></tr>
   </table>
   </dd>
 </dl>
@@ -1142,7 +963,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_drbg.html#a7282024d32890705711a3030dd53983e">IDrbg</a>.</p>
+<p>Implements <a class="el" href="class_i_drbg.html#a7c2ae576f76fc6f10d067b5dee50852b">IDrbg</a>.</p>
 
 </div>
 </div>

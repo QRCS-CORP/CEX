@@ -2,14 +2,11 @@
 #define CEX_PROVIDERBASE_H
 
 #include "IProvider.h"
-#include "Providers.h"
 #if defined(CEX_FIPS140_ENABLED)
 #	include "ProviderSelfTest.h"
 #endif
 
 NAMESPACE_PROVIDER
-
-using Enumeration::Providers;
 
 /// <summary>
 /// The entropy provider base class; this is not an operable class

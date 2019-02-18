@@ -36,7 +36,7 @@ const Kdfs KdfBase::Enumeral()
 std::vector<SymmetricKeySize> KdfBase::LegalKeySizes() const
 {
 	return m_legalKeySizes;
-};
+}
 
 const size_t KdfBase::MinimumKeySize()
 {

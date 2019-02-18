@@ -1,6 +1,7 @@
 var searchData=
 [
   ['half',['Half',['../group___enumeration.html#gga0723717e3a79eed5c042d2059894ba5eac48615a1bc4197056d522af276aa5a85',1,'Documentation.h']]],
+  ['hasmultilane',['HasMultiLane',['../class_c_s_g.html#a70ae6cdea81f594affabcda4957b90c6',1,'CSG']]],
   ['hasprefetch',['HasPrefetch',['../class_parallel_options.html#afca50e00e32b9e5f850c966ca41bd01e',1,'ParallelOptions']]],
   ['hasrdrand',['HasRdRand',['../class_system_tools.html#a01d8395001214fa533ad3fd1ee66fed4',1,'SystemTools']]],
   ['hasrdtsc',['HasRdtsc',['../class_system_tools.html#a48f62886577bd09d281aee6962c618c2',1,'SystemTools']]],

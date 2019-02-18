@@ -349,10 +349,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
-	/// <param name="KeyParams">SymmetricKey containing the encryption Key and Nonce</param>
+	/// <param name="Parameters">SymmetricKey containing the encryption Key and Nonce</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a null or invalid Key/Nonce is used</exception>
-	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
+	void Initialize(bool Encryption, ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -360,7 +360,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;

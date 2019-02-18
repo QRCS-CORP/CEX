@@ -93,7 +93,7 @@ KMAC::KMAC(KmacModes KmacModeType)
 					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
 					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
 					Keccak::KECCAK_MESSAGE1024_SIZE))},
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
 			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
 			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
@@ -208,21 +208,21 @@ size_t KMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-void KMAC::Initialize(ISymmetricKey &KeyParams)
+void KMAC::Initialize(ISymmetricKey &Parameters)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
 #endif
 
-	if (KeyParams.Nonce().size() != 0 && KeyParams.Nonce().size() < MinimumSaltSize())
+	if (Parameters.Nonce().size() != 0 && Parameters.Nonce().size() < MinimumSaltSize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
 	}
@@ -232,17 +232,17 @@ void KMAC::Initialize(ISymmetricKey &KeyParams)
 		Reset();
 	}
 
-	if (KeyParams.Info().size() > 0)
+	if (Parameters.Info().size() > 0)
 	{
-		Customize(KeyParams.Nonce(), KeyParams.Info(), m_kmacState);
+		Customize(Parameters.Nonce(), Parameters.Info(), m_kmacState);
 	}
 	else
 	{
 		std::vector<byte> dcode{ 0x4B, 0x4D, 0x41, 0x43 };
-		Customize(KeyParams.Nonce(), dcode, m_kmacState);
+		Customize(Parameters.Nonce(), dcode, m_kmacState);
 	}
 
-	LoadKey(KeyParams.Key(), m_kmacState);
+	LoadKey(Parameters.Key(), m_kmacState);
 
 	m_isInitialized = true;
 }

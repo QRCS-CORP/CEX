@@ -1,7 +1,6 @@
 #include "SHAKE.h"
 #include "ArrayTools.h"
 #include "IntegerTools.h"
-#include "Keccak.h"
 #include "MemoryTools.h"
 #include "SymmetricKey.h"
 
@@ -9,37 +8,33 @@ NAMESPACE_KDF
 
 using Utility::ArrayTools;
 using Utility::IntegerTools;
-using Enumeration::ShakeModeConvert;
-using Digest::Keccak;
 using Utility::MemoryTools;
+using Enumeration::ShakeModeConvert;
 
 class SHAKE::ShakeState
 {
 public:
 
-	std::array<ulong, STATE_SIZE> State = { 0ULL };
-	size_t BlockSize;
+	std::array<ulong, Keccak::KECCAK_STATE_SIZE> State = { 0ULL };
 	size_t Counter;
-	size_t HashSize;
-	byte DomainCode;
+	size_t Rate;
+	byte Domain;
 	ShakeModes ShakeMode;
 
-	ShakeState(ShakeModes ShakeModeType, size_t Block, size_t Hash, byte Domain)
+	ShakeState(ShakeModes ShakeModeType, size_t BlockSize, byte DomainCode)
 		:
-		BlockSize(Block),
 		Counter(0),
-		HashSize(Hash),
-		DomainCode(Domain),
+		Rate(BlockSize),
+		Domain(DomainCode),
 		ShakeMode(ShakeModeType)
 	{
 	}
 
 	~ShakeState()
 	{
-		BlockSize = 0;
+		Rate = 0;
 		Counter = 0;
-		DomainCode = 0;
-		HashSize = 0;
+		Domain = 0;
 		ShakeMode = ShakeModes::None;
 		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
 	}
@@ -47,7 +42,7 @@ public:
 	void Reset()
 	{
 		Counter = 0;
-		DomainCode = SHAKE_DOMAIN;
+		Domain = Keccak::KECCAK_SHAKE_DOMAIN;
 		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
 	}
 };
@@ -57,7 +52,7 @@ public:
 SHAKE::SHAKE(ShakeModes ShakeModeType)
 	:
 	KdfBase(static_cast<Kdfs>(ShakeModeType),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
 			ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
 			ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
@@ -80,24 +75,24 @@ SHAKE::SHAKE(ShakeModes ShakeModeType)
 				0, 
 				0),
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_RATE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_RATE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_RATE512_SIZE :
-					Keccak::KECCAK_RATE1024_SIZE),
-				0, 
 				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
 					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
 					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE)),
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				0),
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_RATE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_RATE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_RATE512_SIZE :
-					Keccak::KECCAK_RATE1024_SIZE), 
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_RATE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_RATE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_RATE512_SIZE :
-					Keccak::KECCAK_RATE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
 				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
 					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
 					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
@@ -109,12 +104,8 @@ SHAKE::SHAKE(ShakeModes ShakeModeType)
 			(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_RATE256_SIZE : 
 			(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK_RATE512_SIZE :
 			Keccak::KECCAK_RATE1024_SIZE),
-		((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK_MESSAGE128_SIZE : 
-			(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_MESSAGE256_SIZE : 
-			(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK_MESSAGE512_SIZE : 
-			Keccak::KECCAK_MESSAGE1024_SIZE), 
-		SHAKE_DOMAIN) :
-		throw CryptoKdfException(std::string("SHAKE"), std::string("Constructor"), std::string("The shake mode type is not supported!"), ErrorCodes::InvalidParam))
+		Keccak::KECCAK_SHAKE_DOMAIN) :
+			throw CryptoKdfException(std::string("SHAKE"), std::string("Constructor"), std::string("The shake mode type is not supported!"), ErrorCodes::InvalidParam))
 {
 	Reset();
 }
@@ -138,7 +129,7 @@ const bool SHAKE::IsInitialized()
 
 const size_t SHAKE::SecurityLevel()
 {
-	return m_shakeState->HashSize * 8;
+	return ((BUFFER_SIZE - m_shakeState->Rate) / 2) * 8;
 }
 
 //~~~Public Functions~~~//
@@ -149,7 +140,7 @@ void SHAKE::Generate(std::vector<byte> &Output)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
-	if (m_shakeState->Counter + (Output.size() / m_shakeState->HashSize) > MAXGEN_REQUESTS)
+	if (m_shakeState->Counter + (Output.size() / m_shakeState->Rate) > MAXGEN_REQUESTS)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
 	}
@@ -163,7 +154,7 @@ void SHAKE::Generate(SecureVector<byte> &Output)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
-	if (m_shakeState->Counter + (Output.size() / m_shakeState->HashSize) > MAXGEN_REQUESTS)
+	if (m_shakeState->Counter + (Output.size() / m_shakeState->Rate) > MAXGEN_REQUESTS)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
 	}
@@ -181,7 +172,7 @@ void SHAKE::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
-	if (m_shakeState->Counter + (Length / m_shakeState->HashSize) > MAXGEN_REQUESTS)
+	if (m_shakeState->Counter + (Length / m_shakeState->Rate) > MAXGEN_REQUESTS)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
 	}
@@ -199,7 +190,7 @@ void SHAKE::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The output buffer is too short!"), ErrorCodes::InvalidSize);
 	}
-	if (m_shakeState->Counter + (Length / m_shakeState->HashSize) > MAXGEN_REQUESTS)
+	if (m_shakeState->Counter + (Length / m_shakeState->Rate) > MAXGEN_REQUESTS)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("Request exceeds maximum allowed output!"), ErrorCodes::MaxExceeded);
 	}
@@ -207,28 +198,28 @@ void SHAKE::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length
 	Expand(Output, OutOffset, Length, m_shakeState);
 }
 
-void SHAKE::Initialize(ISymmetricKey &KeyParam)
+void SHAKE::Initialize(ISymmetricKey &Parameters)
 {
-	if (KeyParam.Nonce().size() != 0)
+	if (Parameters.Nonce().size() != 0)
 	{
-		if (KeyParam.Info().size() != 0)
+		if (Parameters.Info().size() != 0)
 		{
-			Initialize(KeyParam.Key(), KeyParam.Nonce(), KeyParam.Info());
+			Initialize(Parameters.Key(), Parameters.Nonce(), Parameters.Info());
 		}
 		else
 		{
-			Initialize(KeyParam.Key(), KeyParam.Nonce());
+			Initialize(Parameters.Key(), Parameters.Nonce());
 		}
 	}
 	else
 	{
-		Initialize(KeyParam.Key());
+		Initialize(Parameters.Key());
 	}
 }
 
 void SHAKE::Initialize(const std::vector<byte> &Key)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
@@ -256,7 +247,7 @@ void SHAKE::Initialize(const SecureVector<byte> &Key)
 
 void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Length))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
@@ -276,7 +267,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Lengt
 
 void SHAKE::Initialize(const SecureVector<byte> &Key, size_t Offset, size_t Length)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Length))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
@@ -296,7 +287,7 @@ void SHAKE::Initialize(const SecureVector<byte> &Key, size_t Offset, size_t Leng
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
@@ -335,7 +326,7 @@ void SHAKE::Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
@@ -386,18 +377,18 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 	size_t offset;
 
 	MemoryTools::Clear(pad, 0, pad.size());
-	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
+	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
 	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Information.size() * 8));
 
-	State->DomainCode = CSHAKE_DOMAIN;
+	State->Domain = Keccak::KECCAK_CSHAKE_DOMAIN;
 
 	if (Information.size() != 0)
 	{
 		for (i = 0; i < Information.size(); ++i)
 		{
-			if (offset == State->BlockSize)
+			if (offset == State->Rate)
 			{
-				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Keccak::Absorb(pad, 0, State->Rate, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -413,9 +404,9 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 	{
 		for (i = 0; i < Customization.size(); ++i)
 		{
-			if (offset == State->BlockSize)
+			if (offset == State->Rate)
 			{
-				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Keccak::Absorb(pad, 0, State->Rate, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -435,21 +426,21 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 
 void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ShakeState> &State)
 {
-	if (Length >= State->BlockSize)
+	if (Length >= State->Rate)
 	{
-		const size_t BLKCNT = Length / State->BlockSize;
+		const size_t BLKCNT = Length / State->Rate;
 
 		if (State->ShakeMode != ShakeModes::SHAKE1024)
 		{
-			Keccak::SqueezeR24(State->State, Output, OutOffset, BLKCNT, State->BlockSize);
-			const size_t BLKOFF = BLKCNT * State->BlockSize;
+			Keccak::SqueezeR24(State->State, Output, OutOffset, BLKCNT, State->Rate);
+			const size_t BLKOFF = BLKCNT * State->Rate;
 			Length -= BLKOFF;
 			OutOffset += BLKOFF;
 		}
 		else
 		{
-			Keccak::SqueezeR48(State->State, Output, OutOffset, BLKCNT, State->BlockSize);
-			const size_t BLKOFF = BLKCNT * State->BlockSize;
+			Keccak::SqueezeR48(State->State, Output, OutOffset, BLKCNT, State->Rate);
+			const size_t BLKOFF = BLKCNT * State->Rate;
 			Length -= BLKOFF;
 			OutOffset += BLKOFF;
 		}
@@ -464,21 +455,21 @@ void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 void SHAKE::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ShakeState> &State)
 {
-	if (Length >= State->BlockSize)
+	if (Length >= State->Rate)
 	{
-		const size_t BLKCNT = Length / State->BlockSize;
+		const size_t BLKCNT = Length / State->Rate;
 
 		if (State->ShakeMode != ShakeModes::SHAKE1024)
 		{
-			Keccak::SqueezeR24(State->State, Output, OutOffset, BLKCNT, State->BlockSize);
-			const size_t BLKOFF = BLKCNT * State->BlockSize;
+			Keccak::SqueezeR24(State->State, Output, OutOffset, BLKCNT, State->Rate);
+			const size_t BLKOFF = BLKCNT * State->Rate;
 			Length -= BLKOFF;
 			OutOffset += BLKOFF;
 		}
 		else
 		{
-			Keccak::SqueezeR48(State->State, Output, OutOffset, BLKCNT, State->BlockSize);
-			const size_t BLKOFF = BLKCNT * State->BlockSize;
+			Keccak::SqueezeR48(State->State, Output, OutOffset, BLKCNT, State->Rate);
+			const size_t BLKOFF = BLKCNT * State->Rate;
 			Length -= BLKOFF;
 			OutOffset += BLKOFF;
 		}
@@ -500,12 +491,12 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 	if (Length != 0)
 	{
 		// sequential loop through blocks
-		while (Length >= State->BlockSize)
+		while (Length >= State->Rate)
 		{
-			Keccak::Absorb(Input, InOffset, State->BlockSize, State->State);
+			Keccak::Absorb(Input, InOffset, State->Rate, State->State);
 			Permute(State);
-			InOffset += State->BlockSize;
-			Length -= State->BlockSize;
+			InOffset += State->Rate;
+			Length -= State->Rate;
 		}
 
 		// store unaligned bytes
@@ -514,12 +505,12 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 			MemoryTools::Copy(Input, InOffset, msg, 0, Length);
 		}
 
-		msg[Length] = State->DomainCode;
+		msg[Length] = State->Domain;
 		++Length;
 
-		MemoryTools::Clear(msg, Length, State->BlockSize - Length);
-		msg[State->BlockSize - 1] |= 0x80;
-		Keccak::Absorb(msg, 0, State->BlockSize, State->State);
+		MemoryTools::Clear(msg, Length, State->Rate - Length);
+		msg[State->Rate - 1] |= 0x80;
+		Keccak::Absorb(msg, 0, State->Rate, State->State);
 	}
 }
 

@@ -58,7 +58,7 @@ using Enumeration::SHA2Digests;
 /// A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase. \n
 /// The minimum key size should align with the expected security level of the generator function. \n
 /// For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. \n
-/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
+/// This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Description:</B></description> \n
 /// <EM>Legend:</EM> \n
@@ -99,7 +99,7 @@ private:
 
 	static const size_t DEFAULT_ITERATIONS = 10000;
 	static const size_t MAXGEN_REQUESTS = 1024000;
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 
 #else
 
@@ -215,10 +215,10 @@ public:
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">The symmetric key container with the generators keying material</param>
+	/// <param name="Parameters">The symmetric key container with the generators keying material</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the key values are not a legal size</exception>
-	void Initialize(ISymmetricKey &KeyParams) override;
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Reset the internal state; the generator must be re-initialized before it can be used again

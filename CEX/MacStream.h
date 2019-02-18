@@ -154,10 +154,10 @@ public:
 	/// The key size should be one of the LegalKeySizes.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// <param name="Parameters">A SymmetricKey key container class</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are used</exception>
-	void Initialize(ISymmetricKey &KeyParams);
+	void Initialize(ISymmetricKey &Parameters);
 
 private:
 

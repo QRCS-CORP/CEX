@@ -256,6 +256,7 @@
     <ClInclude Include="..\..\CEX\DLMN256Q8380417.h" />
     <ClInclude Include="..\..\CEX\Documentation.h" />
     <ClInclude Include="..\..\CEX\Donna128.h" />
+    <ClInclude Include="..\..\CEX\DrbgBase.h" />
     <ClInclude Include="..\..\CEX\DrbgFromName.h" />
     <ClInclude Include="..\..\CEX\ECB.h" />
     <ClInclude Include="..\..\CEX\ECP.h" />
@@ -463,6 +464,7 @@
     <ClCompile Include="..\..\CEX\Dilithium.cpp" />
     <ClCompile Include="..\..\CEX\DilithiumParameters.cpp" />
     <ClCompile Include="..\..\CEX\DLMN256Q8380417.cpp" />
+    <ClCompile Include="..\..\CEX\DrbgBase.cpp" />
     <ClCompile Include="..\..\CEX\DrbgFromName.cpp" />
     <ClCompile Include="..\..\CEX\Drbgs.cpp" />
     <ClCompile Include="..\..\CEX\EAX.cpp" />

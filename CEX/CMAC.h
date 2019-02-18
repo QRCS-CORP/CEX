@@ -103,6 +103,7 @@ class CMAC final : public MacBase
 private:
 
 	static const size_t BLOCK_SIZE = 16;
+	static const byte CMAC_FINAL = 0x80;
 	static const size_t MINKEY_LENGTH = 16;
 	static const size_t MINSALT_LENGTH = 16;
 	static const byte MIX_C128 = 0x87;
@@ -216,10 +217,10 @@ public:
 	/// Uses a key, salt, and info arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
+	/// <param name="Parameters">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if the key is not a legal size</exception>
-	void Initialize(ISymmetricKey &KeyParams) override;
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Reset internal state to the pre-initialization defaults.

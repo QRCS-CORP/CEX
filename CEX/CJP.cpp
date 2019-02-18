@@ -252,27 +252,29 @@ void CJP::GetRandom(std::unique_ptr<JitterState> &State, byte* Output, size_t Le
 	size_t i;
 	size_t poff;
 
-	poff = 0;
-
-	do
+	if (Length != 0)
 	{
-		GetRandom(State);
+		poff = 0;
 
-		const size_t RMDLEN = (Length > sizeof(ulong)) ? sizeof(ulong) : Length;
-
-		for (i = 0; i < RMDLEN; ++i)
+		do
 		{
-			Output[poff + i] = static_cast<byte>(State->RandomState >> (i * 8));
+			GetRandom(State);
+
+			const size_t RMDLEN = (Length > sizeof(ulong)) ? sizeof(ulong) : Length;
+
+			for (i = 0; i < RMDLEN; ++i)
+			{
+				Output[poff + i] = static_cast<byte>(State->RandomState >> (i * 8));
+			}
+
+			Length -= RMDLEN;
+			poff += RMDLEN;
+		} while (Length != 0);
+
+		if (State->SecureCache)
+		{
+			GetRandom(State);
 		}
-
-		Length -= RMDLEN;
-		poff += RMDLEN;
-	} 
-	while (Length != 0);
-
-	if (State->SecureCache)
-	{
-		GetRandom(State);
 	}
 }
 

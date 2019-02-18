@@ -62,7 +62,7 @@ using Enumeration::SHA2Digests;
 /// Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle without the need to call additional permutation compressions, and the underlying hash function processes only full blocks of input. \n
 /// The minimum key size should align with the expected security level of the generator function. \n
 /// For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. \n
-/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
+/// This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Description:</B></description> \n
 /// <EM>Legend:</EM> \n
@@ -217,10 +217,10 @@ public:
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">The symmetric key container with the generators keying material</param>
+	/// <param name="Parameters">The symmetric key container with the generators keying material</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the key values are not a legal size</exception>
-	void Initialize(ISymmetricKey &KeyParams) override;
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Reset the internal state; the generator must be re-initialized before it can be used again

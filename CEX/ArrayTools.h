@@ -91,19 +91,13 @@ public:
 	{
 		const size_t STRLEN = Value.size();
 		const size_t ELMLEN = sizeof(Array::value_type);
+		const size_t OTPLEN = Output.size();
 
-		std::vector<byte> tmp(0);
-		std::transform(std::begin(Value), std::end(Value), std::back_inserter(tmp), [](char c)
+		Output.resize(OTPLEN + (STRLEN / ELMLEN));
+
+		if (STRLEN != 0)
 		{
-			return c - '0';
-		});
-
-		size_t pos = Output.size();
-		Output.resize(pos + (tmp.size() / ELMLEN));
-
-		if (tmp.size() != 0)
-		{
-			std::memcpy(&Output[pos], &tmp[0], tmp.size());
+			std::memcpy(&Output[OTPLEN], Value.c_str(), STRLEN);
 		}
 
 		return STRLEN;

@@ -2,13 +2,11 @@
 #define CEX_MACBASE_H
 
 #include "IMac.h"
-#include "Macs.h"
 #include "SymmetricKey.h"
 #include "SymmetricSecureKey.h"
 
 NAMESPACE_MAC
 
-using Enumeration::Macs;
 using Cipher::SymmetricKey;
 using Cipher::SymmetricSecureKey;
 

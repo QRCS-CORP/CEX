@@ -95,7 +95,6 @@ Blake256::~Blake256()
 		m_isDestroyed = true;
 		IntegerTools::Clear(m_msgBuffer);
 		m_msgLength = 0;
-		m_parallelProfile.Reset();
 
 		if (m_treeDestroy)
 		{

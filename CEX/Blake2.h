@@ -110,10 +110,10 @@ private:
 
 public:
 
-	const static size_t BLAKE2_RATE256_SIZE = 64;
-	const static size_t BLAKE2_RATE512_SIZE = 128;
-	const static size_t BLAKE2_MESSAGE256_SIZE = 32;
-	const static size_t BLAKE2_MESSAGE512_SIZE = 64;
+	static const size_t BLAKE2_RATE256_SIZE = 64;
+	static const size_t BLAKE2_RATE512_SIZE = 128;
+	static const size_t BLAKE2_MESSAGE256_SIZE = 32;
+	static const size_t BLAKE2_MESSAGE512_SIZE = 64;
 
 	static const std::vector<uint> IV256;
 	static const std::vector<ulong> IV512;

@@ -260,7 +260,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;

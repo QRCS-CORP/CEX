@@ -52,7 +52,7 @@ Threefish1024::Threefish1024(StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
 	m_cipherState(new Threefish1024State),
-	m_cShakeCustom(0),
+	m_shakeCustom(0),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
 	m_isInitialized(false),
@@ -76,7 +76,6 @@ Threefish1024::~Threefish1024()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_macCounter = 0;
-		m_parallelProfile.Reset();
 
 		if (m_cipherState != nullptr)
 		{
@@ -88,7 +87,7 @@ Threefish1024::~Threefish1024()
 			m_macAuthenticator.reset(nullptr);
 		}
 
-		IntegerTools::Clear(m_cShakeCustom);
+		IntegerTools::Clear(m_shakeCustom);
 		IntegerTools::Clear(m_legalKeySizes);
 		IntegerTools::Clear(m_macKey);
 		IntegerTools::Clear(m_macTag);
@@ -209,17 +208,17 @@ const size_t Threefish1024::TagSize()
 
 //~~~Public Functions~~~//
 
-void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void Threefish1024::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (KeyParams.Key().size() != KEY_SIZE)
+	if (Parameters.Key().size() != KEY_SIZE)
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
-	if (KeyParams.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
+	if (Parameters.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidNonce);
 	}
-	if (KeyParams.Info().size() > 0 && KeyParams.Info().size() > INFO_SIZE)
+	if (Parameters.Info().size() > 0 && Parameters.Info().size() > INFO_SIZE)
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Info must be no more than 16 bytes!"), ErrorCodes::InvalidInfo);
 	}
@@ -240,14 +239,14 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	Reset();
 
 	// copy nonce
-	m_cipherState->C[0] = IntegerTools::LeBytesTo64(KeyParams.Nonce(), 0);
-	m_cipherState->C[1] = IntegerTools::LeBytesTo64(KeyParams.Nonce(), 8);
+	m_cipherState->C[0] = IntegerTools::LeBytesTo64(Parameters.Nonce(), 0);
+	m_cipherState->C[1] = IntegerTools::LeBytesTo64(Parameters.Nonce(), 8);
 
-	if (KeyParams.Info().size() != 0)
+	if (Parameters.Info().size() != 0)
 	{
 		// custom code
-		m_cipherState->T[0] = IntegerTools::LeBytesTo64(KeyParams.Info(), 0);
-		m_cipherState->T[1] = IntegerTools::LeBytesTo64(KeyParams.Info(), 8);
+		m_cipherState->T[0] = IntegerTools::LeBytesTo64(Parameters.Info(), 0);
+		m_cipherState->T[1] = IntegerTools::LeBytesTo64(Parameters.Info(), 8);
 	}
 	else
 	{
@@ -258,22 +257,22 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
-		m_cipherState->K[0] = IntegerTools::LeBytesTo64(KeyParams.Key(), 0);
-		m_cipherState->K[1] = IntegerTools::LeBytesTo64(KeyParams.Key(), 8);
-		m_cipherState->K[2] = IntegerTools::LeBytesTo64(KeyParams.Key(), 16);
-		m_cipherState->K[3] = IntegerTools::LeBytesTo64(KeyParams.Key(), 24);
-		m_cipherState->K[4] = IntegerTools::LeBytesTo64(KeyParams.Key(), 32);
-		m_cipherState->K[5] = IntegerTools::LeBytesTo64(KeyParams.Key(), 40);
-		m_cipherState->K[6] = IntegerTools::LeBytesTo64(KeyParams.Key(), 48);
-		m_cipherState->K[7] = IntegerTools::LeBytesTo64(KeyParams.Key(), 56);
-		m_cipherState->K[8] = IntegerTools::LeBytesTo64(KeyParams.Key(), 64);
-		m_cipherState->K[9] = IntegerTools::LeBytesTo64(KeyParams.Key(), 72);
-		m_cipherState->K[10] = IntegerTools::LeBytesTo64(KeyParams.Key(), 80);
-		m_cipherState->K[11] = IntegerTools::LeBytesTo64(KeyParams.Key(), 88);
-		m_cipherState->K[12] = IntegerTools::LeBytesTo64(KeyParams.Key(), 96);
-		m_cipherState->K[13] = IntegerTools::LeBytesTo64(KeyParams.Key(), 104);
-		m_cipherState->K[14] = IntegerTools::LeBytesTo64(KeyParams.Key(), 112);
-		m_cipherState->K[15] = IntegerTools::LeBytesTo64(KeyParams.Key(), 120);
+		m_cipherState->K[0] = IntegerTools::LeBytesTo64(Parameters.Key(), 0);
+		m_cipherState->K[1] = IntegerTools::LeBytesTo64(Parameters.Key(), 8);
+		m_cipherState->K[2] = IntegerTools::LeBytesTo64(Parameters.Key(), 16);
+		m_cipherState->K[3] = IntegerTools::LeBytesTo64(Parameters.Key(), 24);
+		m_cipherState->K[4] = IntegerTools::LeBytesTo64(Parameters.Key(), 32);
+		m_cipherState->K[5] = IntegerTools::LeBytesTo64(Parameters.Key(), 40);
+		m_cipherState->K[6] = IntegerTools::LeBytesTo64(Parameters.Key(), 48);
+		m_cipherState->K[7] = IntegerTools::LeBytesTo64(Parameters.Key(), 56);
+		m_cipherState->K[8] = IntegerTools::LeBytesTo64(Parameters.Key(), 64);
+		m_cipherState->K[9] = IntegerTools::LeBytesTo64(Parameters.Key(), 72);
+		m_cipherState->K[10] = IntegerTools::LeBytesTo64(Parameters.Key(), 80);
+		m_cipherState->K[11] = IntegerTools::LeBytesTo64(Parameters.Key(), 88);
+		m_cipherState->K[12] = IntegerTools::LeBytesTo64(Parameters.Key(), 96);
+		m_cipherState->K[13] = IntegerTools::LeBytesTo64(Parameters.Key(), 104);
+		m_cipherState->K[14] = IntegerTools::LeBytesTo64(Parameters.Key(), 112);
+		m_cipherState->K[15] = IntegerTools::LeBytesTo64(Parameters.Key(), 120);
 	}
 	else
 	{
@@ -281,14 +280,14 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_macCounter = 1;
 
 		// create the cSHAKE customization string
-		m_cShakeCustom.resize(sizeof(ulong) + Name().size());
+		m_shakeCustom.resize(sizeof(ulong) + Name().size());
 		// add mac counter and algorithm name to customization string
-		IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
-		MemoryTools::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
+		IntegerTools::Le64ToBytes(m_macCounter, m_shakeCustom, 0);
+		MemoryTools::Copy(Name(), 0, m_shakeCustom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE1024);
-		gen.Initialize(KeyParams.Key(), m_cShakeCustom);
+		gen.Initialize(Parameters.Key(), m_shakeCustom);
 
 		// generate the new cipher key
 		std::vector<byte> ck(KEY_SIZE);
@@ -422,12 +421,12 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 	m_macAuthenticator->Finalize(code, 0);
 	MemoryTools::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
-	// customization string is: mac counter + algorithm name
-	IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+	// customization string is: mac counter + algorithm formal name
+	IntegerTools::Le64ToBytes(m_macCounter, m_shakeCustom, 0);
 
 	// extract the new mac key
 	Kdf::SHAKE gen(ShakeModes::SHAKE1024);
-	gen.Initialize(UnlockClear(m_macKey), m_cShakeCustom);
+	gen.Initialize(UnlockClear(m_macKey), m_shakeCustom);
 	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	gen.Generate(mack);
 	// reset the generator with the new key

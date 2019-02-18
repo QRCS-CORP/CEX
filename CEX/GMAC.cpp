@@ -60,7 +60,7 @@ GMAC::GMAC(BlockCiphers CipherType)
 			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, CMUL::CMUL_BLOCK_SIZE, 0),
 			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 32, 0),
 			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 64, 0)},
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		CMUL::CMUL_BLOCK_SIZE,
 		CMUL::CMUL_BLOCK_SIZE,
 #else
@@ -87,7 +87,7 @@ GMAC::GMAC(IBlockCipher* Cipher)
 			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, CMUL::CMUL_BLOCK_SIZE, 0),
 			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 32, 0),
 			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 64, 0)},
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		CMUL::CMUL_BLOCK_SIZE,
 		CMUL::CMUL_BLOCK_SIZE,
 #else
@@ -185,23 +185,23 @@ size_t GMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	return TagSize();
 }
 
-void GMAC::Initialize(ISymmetricKey &KeyParams)
+void GMAC::Initialize(ISymmetricKey &Parameters)
 {
 	std::vector<ulong> tmpk;
 
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key or salt size, the key and salt lengths must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
 #endif
 
-	if (KeyParams.Nonce().size() < MinimumSaltSize())
+	if (Parameters.Nonce().size() < MinimumSaltSize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
 	}
@@ -211,10 +211,10 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 		Reset();
 	}
 
-	if (KeyParams.Key().size() != 0)
+	if (Parameters.Key().size() != 0)
 	{
 		// key the cipher and generate H
-		m_blockCipher->Initialize(true, KeyParams);
+		m_blockCipher->Initialize(true, Parameters);
 		std::vector<byte> tmph(CMUL::CMUL_BLOCK_SIZE);
 		const std::vector<byte> ZEROES(CMUL::CMUL_BLOCK_SIZE, 0x00);
 		m_blockCipher->Transform(ZEROES, 0, tmph, 0);
@@ -229,8 +229,8 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 	}
 
 	// initialize the nonce
-	m_gmacState->Nonce.resize(KeyParams.Nonce().size());
-	MemoryTools::Copy(KeyParams.Nonce(), 0, m_gmacState->Nonce, 0, m_gmacState->Nonce.size());
+	m_gmacState->Nonce.resize(Parameters.Nonce().size());
+	MemoryTools::Copy(Parameters.Nonce(), 0, m_gmacState->Nonce, 0, m_gmacState->Nonce.size());
 
 	if (m_gmacState->Nonce.size() == 12)
 	{

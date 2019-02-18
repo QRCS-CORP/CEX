@@ -46,7 +46,6 @@ ECB::~ECB()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_isLoaded = false;
-		m_parallelProfile.Reset();
 
 		if (m_destroyEngine)
 		{
@@ -146,9 +145,9 @@ void ECB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void ECB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void ECB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}
@@ -167,7 +166,7 @@ void ECB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	Scope();
 
-	m_blockCipher->Initialize(Encryption, KeyParams);
+	m_blockCipher->Initialize(Encryption, Parameters);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }

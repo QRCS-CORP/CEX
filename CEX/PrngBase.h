@@ -2,11 +2,8 @@
 #define CEX_PRNGBASE_H
 
 #include "IPrng.h"
-#include "Prngs.h"
 
 NAMESPACE_PRNG
-
-using Enumeration::Prngs;
 
 /// <summary>
 /// The PRNG base class; this is not an operable class

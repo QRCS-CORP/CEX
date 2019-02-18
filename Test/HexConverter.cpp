@@ -1,10 +1,14 @@
 #include "HexConverter.h"
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <stdio.h>
 #include <string>
 #include <vector>
 
 namespace Test
 {
-	const byte HexConverter::ENCODING_TABLE[16] =
+	const byte HexConverter::ENCODING_TABLE[16] = 
 	{
 		(byte)'0', (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5', (byte)'6', (byte)'7',
 		(byte)'8', (byte)'9', (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f'
@@ -106,6 +110,72 @@ namespace Test
 	bool HexConverter::Ignore(char Value)
 	{
 		return (Value == '\n' || Value == '\r' || Value == '\t' || Value == ' ');
+	}
+
+	void HexConverter::Print(const std::string &Input, size_t Length)
+	{
+		std::string tmp;
+		size_t pos;
+
+		pos = 0;
+		tmp.resize(128);
+
+		for (size_t i = 0; i < Input.size(); ++i)
+		{
+			if (i != 0 && i % Length == 0)
+			{
+				std::memcpy((void*)tmp.c_str(), Input.c_str() + pos, Length);
+				std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+				std::cout << tmp <<  std::endl;
+				pos += Length;
+			}
+		}
+
+		const size_t RMDLEN = Input.size() - pos;
+
+		if (RMDLEN != 0)
+		{
+			tmp.resize(RMDLEN);
+			std::memcpy((void*)tmp.c_str(), Input.c_str() + pos, RMDLEN);
+			std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+			std::cout << tmp << std::endl;
+		}
+
+		std::cout << std::endl;
+	}
+
+	void HexConverter::Print(const std::vector<byte> &Input, size_t Length)
+	{
+		std::string inp;
+		std::string tmp;
+		size_t pos;
+
+		pos = 0;
+		inp = ToString(Input);
+		tmp.resize(128);
+
+		for (size_t i = 0; i < inp.size(); ++i)
+		{
+			if (i != 0 && i % Length == 0)
+			{
+				std::memcpy((void*)tmp.c_str(), inp.c_str() + pos, Length);
+				std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+				std::cout << tmp << std::endl;
+				pos += Length;
+			}
+		}
+
+		const size_t RMDLEN = inp.size() - pos;
+
+		if (RMDLEN != 0)
+		{
+			tmp.resize(RMDLEN);
+			std::memcpy((void*)tmp.c_str(), inp.c_str() + pos, RMDLEN);
+			std::transform(tmp.begin(), tmp.end(), tmp.begin(), std::ptr_fun<int, int>(toupper));
+			std::cout << tmp << std::endl;
+		}
+
+		std::cout << std::endl;
 	}
 
 	std::string HexConverter::ToString(const std::vector<byte> &Input)

@@ -98,7 +98,6 @@ Skein512::~Skein512()
 		m_isDestroyed = true;
 		m_isInitialized = false;
 		m_msgLength = 0;
-		m_parallelProfile.Reset();
 
 		if (m_treeDestroy)
 		{

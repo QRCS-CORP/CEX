@@ -53,7 +53,6 @@ CFB::~CFB()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_isLoaded = false;
-		m_parallelProfile.Reset();
 
 		Utility::IntegerTools::Clear(m_cfbVector);
 
@@ -155,13 +154,13 @@ void CFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void CFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void CFB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (KeyParams.Nonce().size() < 1)
+	if (Parameters.Nonce().size() < 1)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of Nonce!"), ErrorCodes::InvalidNonce);
 	}
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}
@@ -179,11 +178,11 @@ void CFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 
 	Scope();
-	std::vector<byte> iv = KeyParams.Nonce();
+	std::vector<byte> iv = Parameters.Nonce();
 	size_t diff = m_cfbVector.size() - iv.size();
 	Utility::MemoryTools::Copy(iv, 0, m_cfbVector, diff, iv.size());
 	Utility::MemoryTools::Clear(m_cfbVector, 0, diff);
-	m_blockCipher->Initialize(true, KeyParams);
+	m_blockCipher->Initialize(true, Parameters);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }

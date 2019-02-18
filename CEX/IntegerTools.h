@@ -1396,7 +1396,7 @@ public:
 	//~~~Constant Time~~~//
 
 	/// <summary>
-	/// Constant time return the larger value of the two integers
+	/// Constant time: return the larger value of the two integers
 	/// </summary>
 	/// 
 	/// <param name="A">The first value to compare</param>
@@ -1410,7 +1410,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time conditional move
+	/// Constant time: conditional move
 	/// </summary>
 	/// 
 	/// <param name="R">The destination array</param>
@@ -1433,7 +1433,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time return the lesser value of the two integers
+	/// Constant time: return the lesser value of the two integers
 	/// </summary>
 	/// 
 	/// <param name="A">The first value to compare</param>
@@ -1443,11 +1443,12 @@ public:
 	template<typename T>
 	inline static T CMin(T A, T B)
 	{
+		// TODO: test this..
 		return Select<T>(ExpandTopBit<T>(B), B, A);
 	}
 
 	/// <summary>
-	/// Constant time comparison of two arrays segments with offset and length parameters
+	/// Constant time: comparison of two arrays segments with offset and length parameters
 	/// </summary>
 	/// 
 	/// <param name="A">The first array to compare</param>
@@ -1474,7 +1475,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time conditional bit copy
+	/// Constant time: conditional bit copy
 	/// </summary>
 	/// 
 	/// <param name="Value">The destination mask</param>
@@ -1494,7 +1495,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time conditional bit erase
+	/// Constant time: conditional bit erase
 	/// </summary>
 	/// 
 	/// <param name="Condition">The condition</param>
@@ -1513,7 +1514,7 @@ public:
 	}
 
 	/// <summary>
-	/// Expand an integer mask in constant time
+	/// Constant time: expand an integer mask in constant time
 	/// </summary>
 	/// 
 	/// <param name="X">The N bit word</param>
@@ -1539,7 +1540,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time last bit expansion
+	/// Constant time: last bit expansion
 	/// </summary>
 	/// 
 	/// <param name="A">The value to expand</param>
@@ -1552,7 +1553,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time comparison of two integers for equality
+	/// Constant time: comparison of two integers for equality
 	/// </summary>
 	/// 
 	/// <param name="X">The first value to test</param>
@@ -1566,7 +1567,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time test if X is less than Y
+	/// Constant time: test if X is less than Y
 	/// </summary>
 	/// 
 	/// <param name="X">The first value to test</param>
@@ -1580,7 +1581,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time test if X less or equal to Y
+	/// Constant time: test if X is less or equal to Y
 	/// </summary>
 	/// 
 	/// <param name="X">The first value to test</param>
@@ -1594,7 +1595,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time zero value check
+	/// Constant time: zero value check
 	/// </summary>
 	/// 
 	/// <param name="X">The value to test</param>
@@ -1607,7 +1608,7 @@ public:
 	}
 
 	/// <summary>
-	/// Combine the bits from two integers filtered by a mask value
+	/// Constant time: combine the bits from two integers filtered by a mask value
 	/// </summary>
 	/// 
 	/// <param name="Mask">The mask value</param>
@@ -1622,7 +1623,7 @@ public:
 	}
 
 	/// <summary>
-	/// Left shift an array of integers
+	/// Constant time: left shift an array of integers
 	/// </summary>
 	/// 
 	/// <param name="Input">The value array to shift</param>
@@ -1651,7 +1652,7 @@ public:
 	}
 
 	/// <summary>
-	/// Select an integer based on a mask
+	/// Constant time: select an integer based on a mask
 	/// </summary>
 	/// 
 	/// <param name="Pred">The mask value</param>

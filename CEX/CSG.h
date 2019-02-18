@@ -20,13 +20,14 @@
 // Implementation Details:
 // An implementation of a cSHAKE Generator (CSG)
 // Written by John Underhill, February 23, 2018
-// Updated: May 13, 2018
+// Updated: May 14, 2018
+// Updated: February 9, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CSG_H
 #define CEX_CSG_H
 
-#include "IDrbg.h"
+#include "DrbgBase.h"
 #include "IProvider.h"
 #include "Keccak.h"
 #include "SHAKE.h"
@@ -34,21 +35,22 @@
 
 NAMESPACE_DRBG
 
-using Enumeration::ShakeModes;
-using Kdf::SHAKE;
+using Digest::Keccak;
 using Provider::IProvider;
 using Enumeration::Providers;
+using Kdf::SHAKE;
+using Enumeration::ShakeModes;
 
 /// <summary>
-/// An implementation of an cSHAKE Generator DRBG
+/// An implementation of an cSHAKE Generator DRBG: CSG
 /// </summary> 
 /// 
 /// <example>
 /// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
-/// CSG gen(ShakeModes::SHAKE256, [Providers::CSP]);
+/// CSG gen(ShakeModes::SHAKE256, [Providers::ACP]);
 /// // initialize
-/// gen.Initialize(Seed, [Nonce], [Info]);
+/// gen.Initialize(Key, [Nonce], [Info]);
 /// // generate bytes
 /// gen.Generate(Output, [Offset], [Size]);
 /// </code>
@@ -56,82 +58,68 @@ using Enumeration::Providers;
 /// 
 /// <remarks>
 /// <para><EM>Initialize</EM> \n
-/// The Initialize function can take up to 3 inputs; the generator Seed which is the primary key, a Nonce value which acts as a customization string, \n
-/// and the distribution code (Info parameter) used as the Name parameter in SHAKE. \n
-/// The initialization parameters determine the type of underlying generator is invoked. If only a key is used, the generator invokes a SHAKE instance. \n
-/// if both the Key and Nonce parameter are used to seed the generator, and instance of simple-cSHAKE is invoked, and if all three parameters contain keying material \n
-/// (Key, Nonce, and Info), an instance of cSHAKE is invoked.
+/// The Initialize function can take up to 3 inputs; the generator Key which is the primary key, a Nonce value which acts as a customization string, 
+/// and the distribution code (Info parameter) used as the Name parameter in cSHAKE. \n
+/// The initialization parameters determine the type of underlying generator which is invoked. If only a key is used, the generator invokes a SHAKE instance. \n
+/// if both the Key and Nonce parameter are used to seed the generator, or if all three parameters contain keying material (Key, Nonce, and Info), an instance of cSHAKE is created.
 /// </para>
 ///
 /// <para><EM>Generate</EM> \n
-/// The generate function employs a state counter, that will automatically trigger a re-seed of the cSHAKE instance after a user defined maximum threshold has been exceeded. \n
-/// Use the ReseedThreshold parameter to tune the auto re-seed interval.
+/// If an entropy provider is specified, the generate function employs a state counter, that will automatically trigger the addition of new seeding material to the cSHAKE instance after a user defined maximum threshold has been exceeded. \n
+/// Use the ReseedThreshold parameter to tune the auto re-seed interval. \n
+/// If the Parallel option is set through the constructor parameters, an SIMD parallel instance is created, this generator uses SIMD instructions to generate pseudo-random output. \n
+/// If AVX2 instructions are available on the compiling machine then the generator processes four SHAKE streams simultaneously, if AVX512 instructions are available, the generator processes eight streams.
 /// </para>
 ///
 /// <description><B>Predictive Resistance:</B></description>
 /// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator. \n
-/// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through the derivation function along with the current state, 
-/// the output hash is used to reseed the generator. \n
-/// The default interval at which this reseeding occurs is 1000 times the digest output size in bytes, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, 
-/// the seed is regenerated. \n 
-/// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</para>
+/// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is added to the current state. \n
+/// The default interval at which this reseeding occurs is once for every megabyte of output generated, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, 
+/// new seed material is added to the generator. \n 
+/// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (100MB or greater).</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>The class constructor can either be initialized with a SHAKE instance type, and entropy provider instances, or using the ShakeModes and Providers enumeration names.</description></item>
+/// <item><description>The class constructor can either be initialized with a SHAKE mode enumeration type and entropy provider instance, or using the ShakeModes and Providers enumeration names.</description></item>
 /// <item><description>The provider instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
-/// <item><description>The generator can be initialized with either a SymmetricKey key container class, or with a Seed and optional inputs of Nonce and Info.</description></item>
-/// <item><description>The LegalKeySizes() property contains a list of the recommended seed input sizes.</description></item>
-/// <item><description>There are three legal seed sizes; the first (smallest) is the minimum required key size, the second the recommended size, and the third is maximum security.</description></item>
-/// <item><description>Initializing with a Nonce is recommended; the nonce value must be random, secret, and 8 bytes in length.</description></item>
-/// <item><description>The Info value (DistributionCode) is also recommended; for best security, this value should be secret, random, and DistributionCodeMax() in length.</description></item>
-/// <item><description>The Generate() methods can not be used until an Initialize() function has been called, and the generator is seeded.</description></item>
-/// <item><description>The Update() method requires a Seed of length equal to the seed used to initialize the generator.</description></item>
+/// <item><description>The generator can be initialized with either a SymmetricKey or SymmetricSecureKey key container class, or with a Key and optional inputs of Nonce and Info.</description></item>
+/// <item><description>The LegalKeySizes property contains a list of the recommended key input sizes.</description></item>
+/// <item><description>Initializing with the Nonce and Info values is recommended because this pre-initializes the SHAKE state, creating an instance of cSHAKE</description></item>
+/// <item><description>The Generate methods can not be used until an Initialize function has been called and the generator is seeded.</description></item>
+/// <item><description>The Update method adds new seeding material to the SHAKE state, this can be done automatically by specifying a random provider, or manually through this function.</description></item>
+/// <item><description>The maximum amount of pseudo-random data that can be requested from the generator in a single call is fixed at 100 megabytes.</description></item>
+/// <item><description>The maximum output from a generator instance before it must be re-initialized with a new key is fixed at 10 Gigabytes.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>Fips-202: The <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">SHA-3 Standard</a></description>.</item>
 /// <item><description>SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a></description></item>
+/// <item><description>Team Keccak <a href="https://keccak.team/index.html">Homepage</a>.</description></item>
 /// </list>
 /// </remarks>
-class CSG final : public IDrbg
+class CSG final : public DrbgBase
 {
 private:
 
-	static const size_t BUFFER_SIZE = 168;
-	static const byte CSHAKE_DOMAIN = 0x04;
-	static const std::string CLASS_NAME;
-	static const ulong MAX_OUTPUT = 35184372088832;
-	static const size_t MAX_REQUEST = 65536;
-	static const size_t MAX_RESEED = 536870912;
-	static const size_t MINKEY_LENGTH = 4;
-	static const size_t STATE_SIZE = 25;
-	static const byte SHAKE_DOMAIN = 0x1F;
+	// the buffer size in bytes
+	static const size_t BUFFER_SIZE = Keccak::KECCAK_STATE_SIZE * sizeof(ulong);
+	// 100mb: default before reseeded internally
+	static const size_t DEF_RESEED = 102400000;
+	// 10gb: maximum before rekey is required
+	static const ulong MAX_OUTPUT = 10240000000;
+	// 100mb: maximum size of a single request
+	static const size_t MAX_REQUEST = 102400000;
+	// 1024: maximum reseed calls before exception
+	static const size_t MAX_THRESHOLD = 1024;
+	// the minimum key length that will initialize the generator
+	static const size_t MINKEY_LENGTH = 16;
 
-	bool m_avxEnabled;
-	size_t m_blockSize;
-	size_t m_bufferIndex;
-	std::vector<byte> m_customNonce;
-	bool m_destroyEngine;
-	std::vector<byte> m_distCode;
-	size_t m_distCodeMax;
-	byte m_domainCode;
-	std::vector<byte> m_drbgBuffer;
-	std::vector<std::array<ulong, STATE_SIZE>> m_drbgState;
+	class CsgState;
+	std::unique_ptr<IProvider> m_csgProvider;
+	std::unique_ptr<CsgState> m_csgState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
-	bool m_prdResistant;
-	std::unique_ptr<IProvider> m_providerSource;
-	Providers m_providerType;
-	size_t m_reseedCounter;
-	size_t m_reseedRequests;
-	size_t m_reseedThreshold;
-	size_t m_secStrength;
-	size_t m_seedSize;
-	ShakeModes m_shakeMode;
-	size_t m_stateSize;
 
 public:
 
@@ -148,26 +136,31 @@ public:
 	CSG& operator=(const CSG&) = delete;
 
 	/// <summary>
-	/// Instantiate the class using a block cipher type name, and an optional entropy source type
+	/// Default constructor: default constructor is restricted, this function has been deleted
+	/// </summary>
+	CSG() = delete;
+
+	/// <summary>
+	/// Instantiate the class using a SHAKE mode, and an optional entropy source type names
 	/// </summary>
 	///
-	/// <param name="ShakeModeType">The underlying SHAKE implementation mode</param>
-	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
+	/// <param name="ShakeModeType">The underlying SHAKE implementation mode type</param>
+	/// <param name="ProviderType">The enumeration type name of an entropy source enabling predictive resistance, the default is ACP</param>
 	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
-	CSG(ShakeModes ShakeModeType = ShakeModes::SHAKE256, Providers ProviderType = Providers::ACP, bool Parallel = false);
+	explicit CSG(ShakeModes ShakeModeType, Providers ProviderType = Providers::ACP, bool Parallel = false);
 
 	/// <summary>
-	/// Instantiate the class using a digest instance, and an optional entropy source 
+	/// Instantiate the class using a SHAKE mode type, and an optional instance pointer to an entropy source 
 	/// </summary>
 	/// 
-	/// <param name="ShakeModeType">The underlying shake implementation mode</param>
-	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
+	/// <param name="ShakeModeType">The underlying shake implementation mode type</param>
+	/// <param name="Provider">Provides an entropy source enabling predictive resistance, can be null</param>
 	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit CSG(ShakeModes ShakeModeType, IProvider* Provider = 0, bool Parallel = false);
+	CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -177,25 +170,9 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
-	/// Changing this code will create a unique distribution of the generator.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
+	/// Read Only: The generator has AVX2 or AVX512 instructions and can process in multi-lane generation mode
 	/// </summary>
-	std::vector<byte> &DistributionCode() override;
-
-	/// <summary>
-	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase.
-	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
-	/// </summary>
-	const size_t DistributionCodeMax() override;
-
-	/// <summary>
-	/// Read Only: The Drbg generators type name
-	/// </summary>
-	const Drbgs Enumeral() override;
+	static const bool HasMultiLane();
 
 	/// <summary>
 	/// Read Only: Generator is ready to produce random
@@ -203,169 +180,103 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: The legal input seed sizes in bytes
+	/// Read Only: The number of available SIMD lanes
 	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+	static const size_t LaneCount();
 
 	/// <summary>
-	/// Read Only: The maximum number of bytes that can be generated with a generator instance
-	/// </summary>
-	const ulong MaxOutputSize() override;
-
-	/// <summary>
-	/// Read Only: The maximum number of bytes that can be generated in a single request
-	/// </summary>
-	const size_t MaxRequestSize() override;
-
-	/// <summary>
-	/// Read Only: The maximum number of times the generator can be reseeded
-	/// </summary>
-	const size_t MaxReseedCount() override;
-
-	/// <summary>
-	/// Read Only: The Drbg generators class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Read Only: The recommended size of the nonce counter value in bytes
-	/// </summary>
-	const size_t NonceSize() override;
-
-	/// <summary>
-	/// Read/Write: Generating this amount or greater, triggers a re-seed
+	/// Read/Write: The maximum output generated between auto-seed generation when using an entropy provider
 	/// </summary>
 	size_t &ReseedThreshold() override;
 
 	/// <summary>
-	/// Read Only: The estimated security strength in bits.
-	/// <para>This value depends both on the hash function output size, and the number of bits used to seed the generator.</para>
+	/// Read Only: The estimated classical security strength in bits
 	/// </summary>
 	const size_t SecurityStrength() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo-random bytes
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
-	/// 
+	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	size_t Generate(std::vector<byte> &Output) override;
+	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Generate pseudo-random bytes using offset and length parameters
+	/// Fill a secure vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// <param name="OutOffset">The starting position within the Output array</param>
-	/// <param name="Length">The number of bytes to generate</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
-	/// 
+	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+	void Generate(SecureVector<byte> &Output) override;
+
+	/// <summary>
+	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	/// <param name="OutOffset">The starting position within the output vector</param>
+	/// <param name="Length">The number of bytes to generate</param>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
+	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
+
+	/// <summary>
+	/// Fill a secure vector with pseudo-random bytes using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	/// <param name="OutOffset">The starting position within the output vector</param>
+	/// <param name="Length">The number of bytes to generate</param>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
+	void Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string
 	/// </summary>
 	/// 
-	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// <param name="Parameters">The ISymmetricKey key container with the generators keying material</param>
 	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	void Initialize(ISymmetricKey &GenParam) override;
+	/// <exception cref="CryptoGeneratorException">Thrown if the key is not a legal-key size</exception>
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
-	/// Initialize the generator with a seed key.
-	/// <para>Initializaes the genertor as a SHAKE instance</para>
-	/// </summary>
-	/// 
-	/// <param name="Seed">The secret primary key array used to seed the generator; this initialization call creates a SHAKE implementation</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	void Initialize(const std::vector<byte> &Seed) override;
-
-	/// <summary>
-	/// Initialize the generator with the seed and nonce arrays.
-	/// <para>Initializaes the genertor as a simple cSHAKE instance</para>
-	/// </summary>
-	/// 
-	/// <param name="Seed">The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</param>
-	/// <param name="Nonce">The secret nonce value used as the customization string to initialize a simple cSHAKE variant</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce) override;
-
-	/// <summary>
-	/// Initialize the generator with a key, a nonce array, and an information string or nonce.
-	/// <para>Initializaes the genertor as a cSHAKE instance</para>
-	/// </summary>
-	/// 
-	/// <param name="Seed">The secret primary key array used to seed the generator; see the LegalKeySizes property for accepted sizes</param>
-	/// <param name="Nonce">The secret nonce value used as the customization string to initialize a cSHAKE instance</param>
-	/// <param name="Info">The info parameter used as a finction name or secret salt to initialize a cSHAKE instance</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info) override;
-
-	/// <summary>
-	/// Update the generators keying material, used to refresh the state
+	/// Update the generators keying material with a standard vector key
 	/// </summary>
 	///
-	/// <param name="Seed">The new seed value array</param>
+	/// <param name="Key">The standard vector containing the new key material</param>
 	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
-	void Update(const std::vector<byte> &Seed) override;
+	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
+	void Update(const std::vector<byte> &Key) override;
+
+	/// <summary>
+	/// Update the generators keying material with a secure vector key
+	/// </summary>
+	///
+	/// <param name="Key">The secure vector containing the new key material</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
+	void Update(const SecureVector<byte> &Key) override;
 
 private:
 
-	template<typename ArrayA, typename ArrayB>
-	static void AbsorbBlock(const ArrayA &Input, size_t InOffset, size_t Length, ArrayB &State)
-	{
-		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
-		{
-			State[i] ^= static_cast<ulong>(IntegerTools::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
-		}
-	}
-
-	template<typename Array>
-	static size_t LeftEncode(Array &Buffer, size_t Offset, size_t Value)
-	{
-		size_t i;
-		size_t n;
-		size_t v;
-
-		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
-
-		if (n == 0)
-		{
-			n = 1;
-		}
-
-		for (i = 1; i <= n; ++i)
-		{
-			Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
-		}
-
-		Buffer[Offset] = (uint8_t)n;
-
-		return (n + 1);
-	}
-
-	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::array<ulong, STATE_SIZE> &State);
-	void Derive();
-	void Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::array<ulong, STATE_SIZE> &State);
-	void Fill();
-	void Permute(std::array<ulong, STATE_SIZE> &State);
-	void PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State);
-	void Reset();
-	void Scope();
+	static void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<CsgState> &State);
+	static void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::unique_ptr<CsgState> &State);
+	static void Derive(std::unique_ptr<IProvider> &Provider, std::unique_ptr<CsgState> &State);
+	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<CsgState> &State);
+	static void Fill(std::unique_ptr<CsgState> &State);
+	static void Permute(std::unique_ptr<CsgState> &State);
+	static void PermuteW(std::unique_ptr<CsgState> &State);
+	static void Reset(std::unique_ptr<CsgState> &State);
 };
 
 NAMESPACE_DRBGEND

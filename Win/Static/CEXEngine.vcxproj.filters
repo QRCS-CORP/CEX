@@ -319,6 +319,12 @@
     <Filter Include="Source Files\Mac\Base">
       <UniqueIdentifier>{11a1e194-c395-4542-bf1d-374001e5c995}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Drbg\Base">
+      <UniqueIdentifier>{d3dddabb-f43f-43e5-bef6-2e2ce715e93e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drbg\Base">
+      <UniqueIdentifier>{c436046b-bfa6-4e80-947b-b6800d95c1df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -957,6 +963,9 @@
     <ClInclude Include="..\..\CEX\GMAC.h">
       <Filter>Header Files\Mac</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\DrbgBase.h">
+      <Filter>Header Files\Drbg\Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1447,6 +1456,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\ErrorCodes.cpp">
       <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DrbgBase.cpp">
+      <Filter>Source Files\Drbg\Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

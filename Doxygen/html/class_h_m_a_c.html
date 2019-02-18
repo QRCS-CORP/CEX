@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.6</span>
+   &#160;<span id="projectnumber">1.0.0.7</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -197,7 +197,7 @@ Public Member Functions</h2></td></tr>
 <p>A keyed Hash Message Authentication Code (HMAC) uses a cryptographic hash function with a secret key to verify data integrity and authenticate a message. <br />
 Only the SHA2-256 AND SHA2-512 hash functions are supported by this implementation. The cryptographic strength of the HMAC depends upon the strength of the underlying hash function, the size of its hash output, and on the size and quality of the key. <br />
 For example, when using SHA2-256 as the underlying hash function, the generator should be keyed with at least 256 bits (32 bytes) of random key. <br />
-This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
+This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
 <p><b>Description:</b> </p>
 <p><em>Legend:</em> <br />
  <b>H</b>=hash-function, <b>K</b>=key, <b>K'</b>=derived-key, <b>m</b>=message, <b>^</b>=XOR, <b>||</b>=concatonate <br />

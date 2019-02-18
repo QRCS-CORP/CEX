@@ -127,10 +127,10 @@ public:
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">The symmetric key container with the generators keying material</param>
+	/// <param name="Parameters">The symmetric key container with the generators keying material</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the key values are not a legal size</exception>
-	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
+	virtual void Initialize(ISymmetricKey &Parameters) = 0;
 
 	/// <summary>
 	/// Reset the internal state; the generator must be re-initialized before it can be used again

@@ -1,0 +1,1586 @@
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<title>
+          Analysis Results for project Test</title>
+<style>
+          body             { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #000080; }
+          h1               { font-size: 14pt; font-weight: bold; }
+          table            { font-size: 8pt; }
+          .table_caption   { text-align: left; font-size: 10pt; font-weight: bold; }
+          .caption         { text-align: center; font-size: 10pt; font-weight: bold; text-decoration:none; }
+          .count           { font-size: 8pt; font-style: italic; color: #0000ff; }
+          td.pagetitle     { border-top: blue thin ridge; background: lightblue; border-bottom: blue thin ridge; }
+          p.footer         { font-size: 7pt; }
+        </style><script language="JavaScript">
+
+          function collapsenode(item)
+          {
+          if (item.style.display == '')
+          {
+          item.style.display = 'none';
+          }
+          else
+          {
+          item.style.display = '';
+          }
+          }
+        </script><script language="JavaScript">
+          //
+
+//-----------------------------------------------------------------------------
+// sortTable(id, col, rev)
+//
+//  id  - ID of the TABLE, TBODY, THEAD or TFOOT element to be sorted.
+//  col - Index of the column to sort, 0 = first column, 1 = second column,
+//        etc.
+//  rev - If true, the column is sorted in reverse (descending) order
+//        initially.
+//
+// Note: the first column (index 0) is used as a secondary sort column and
+// always sorted in ascending order.
+//-----------------------------------------------------------------------------
+
+function sortTable(id, col, rev) {
+
+  // Get the table or table section to sort.
+  var tblEl = document.getElementById(id);
+
+  // The first time this function is called for a given table, set up an
+  // array of reverse sort flags.
+  if (tblEl.reverseSort == null) {
+
+    tblEl.reverseSort = new Array();
+
+    // Also, assume the team name column is initially sorted.
+    tblEl.lastColumn = 0;
+  }
+
+  // If this column has not been sorted before, set the initial sort direction.
+  if (tblEl.reverseSort[col] == null)
+    tblEl.reverseSort[col] = rev;
+
+  // If this column was the last one sorted, reverse its sort direction.
+  if (col == tblEl.lastColumn)
+    tblEl.reverseSort[col] = !tblEl.reverseSort[col];
+
+  // Remember this column as the last one sorted.
+  tblEl.lastColumn = col;
+
+  // Set the table display style to "none" - necessary for Netscape 6 browsers.
+
+  var oldDsply = tblEl.style.display;
+  tblEl.style.display = "none";
+
+  // Sort the rows based on the content of the specified column using a
+  // selection sort.
+
+  var tmpEl;
+  var i, j;
+  var minVal, minIdx;
+  var testVal;
+  var cmp;
+
+  for (i = 0; i < tblEl.rows.length - 1; i++) {
+
+    // Assume the current row has the minimum value.
+    minIdx = i;
+    minVal = getTextValue(tblEl.rows[i].cells[col]);
+
+    // Search the rows that follow the current one for a smaller value.
+    for (j = i + 1; j < tblEl.rows.length; j++)
+	{
+      testVal = getTextValue(tblEl.rows[j].cells[col]);
+      cmp = compareValues(minVal, testVal);
+
+      // Negate the comparison result if the reverse sort flag is set.
+
+      if (tblEl.reverseSort[col])
+        cmp = -cmp;
+
+      // Sort by the second column if those values are equal.
+      if (cmp == 0 && col != 0)
+
+        cmp = compareValues(getTextValue(tblEl.rows[minIdx].cells[1]),
+                            getTextValue(tblEl.rows[j].cells[1]));
+
+      // If this row has a smaller value than the current minimum, remember its
+      // position and update the current minimum value.
+
+      if (cmp > 0)
+	  {
+        minIdx = j;
+        minVal = testVal;
+      }
+    }
+
+    // By now, we have the row with the smallest value. Remove it from the
+    // table and insert it before the current row.
+    if (minIdx > i)
+	{
+      tmpEl = tblEl.removeChild(tblEl.rows[minIdx]);
+      tblEl.insertBefore(tmpEl, tblEl.rows[i]);
+    }
+  }
+
+  // Make it look pretty.
+//  makePretty(tblEl, col);
+
+  // Set rankings.
+  setRanks(tblEl, col, rev);
+
+  // Restore the table's display style.
+  tblEl.style.display = oldDsply;
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+// Functions to get and compare values during a sort.
+//-----------------------------------------------------------------------------
+
+// This code is necessary for browsers that don't reflect the DOM constants
+// (like IE).
+if (document.ELEMENT_NODE == null)
+{
+  document.ELEMENT_NODE = 1;
+  document.TEXT_NODE = 3;
+}
+
+function getTextValue(el)
+{
+  var i;
+  var s;
+
+  // Find and concatenate the values of all text nodes contained within the element.
+  s = "";
+
+  for (i = 0; i < el.childNodes.length; i++)
+    if (el.childNodes[i].nodeType == document.TEXT_NODE)
+      s += el.childNodes[i].nodeValue;
+    else if (el.childNodes[i].nodeType == document.ELEMENT_NODE &&
+             el.childNodes[i].tagName == "BR")
+      s += " ";
+    else
+      // Use recursion to get text within sub-elements.
+      s += getTextValue(el.childNodes[i]);
+
+  return normalizeString(s);
+}
+
+function compareValues(v1, v2)
+{
+  var f1, f2;
+
+  // If the values are numeric, convert them to floats.
+  f1 = parseFloat(v1);
+  f2 = parseFloat(v2);
+  if (!isNaN(f1) && !isNaN(f2))
+  {
+    v1 = f1;
+    v2 = f2;
+  }
+
+  // Compare the two values.
+  if (v1 == v2)
+    return 0;
+
+  if (v1 > v2)
+    return 1
+
+  return -1;
+}
+
+// Regular expressions for normalizing white space.
+var whtSpEnds = new RegExp("^\\s*|\\s*$", "g");
+var whtSpMult = new RegExp("\\s\\s+", "g");
+
+function normalizeString(s)
+{
+  s = s.replace(whtSpMult, " ");  // Collapse any multiple whites space.
+  s = s.replace(whtSpEnds, "");   // Remove leading or trailing white space.
+
+  return s;
+}
+
+//-----------------------------------------------------------------------------
+// Functions to update the table appearance after a sort.
+//-----------------------------------------------------------------------------
+
+// Style class names.
+var rowClsNm = "alternateRow";
+var colClsNm = "sortedColumn";
+
+// Regular expressions for setting class names.
+var rowTest = new RegExp(rowClsNm, "gi");
+var colTest = new RegExp(colClsNm, "gi");
+
+function setRanks(tblEl, col, rev)
+{
+  // Determine whether to start at the top row of the table and go down or
+  // at the bottom row and work up. This is based on the current sort
+  // direction of the column and its reversed flag.
+  var i    = 0;
+  var incr = 1;
+
+  if (tblEl.reverseSort[col])
+    rev = !rev;
+
+  if (rev)
+  {
+    incr = -1;
+    i = tblEl.rows.length - 1;
+  }
+
+  // Now go through each row in that direction and assign it a rank by
+  // counting 1, 2, 3...
+  var count   = 1;
+  var rank    = count;
+  var curVal;
+  var lastVal = null;
+
+  // Note that this loop is skipped if the table was sorted on the name
+  // column.
+
+  while (col > 0 && i >= 0 && i < tblEl.rows.length)
+  {
+    // Get the value of the sort column in this row.
+    curVal = getTextValue(tblEl.rows[i].cells[col]);
+
+    // On rows after the first, compare the sort value of this row to the
+    // previous one. If they differ, update the rank to match the current row
+    // count. (If they are the same, this row will get the same rank as the
+    // previous one.)
+
+    if (lastVal != null && compareValues(curVal, lastVal) != 0)
+        rank = count;
+
+    // Set the rank for this row.
+    tblEl.rows[i].rank = rank;
+
+    // Save the sort value of the current row for the next time around and bump
+    // the row counter and index.
+
+    lastVal = curVal;
+    count++;
+    i += incr;
+  }
+
+  
+  // Now go through each row (from top to bottom) and display its rank. Note
+  // that when two or more rows are tied, the rank is shown on the first of
+  // those rows only.
+  var rowEl, cellEl;
+  var lastRank = 0;
+
+  // Go through the rows from top to bottom.
+  for (i = 0; i < tblEl.rows.length; i++)
+  {
+    rowEl = tblEl.rows[i];
+    cellEl = rowEl.cells[0];
+  }
+}
+//</script></head>
+<body>
+<table width="100%" border="0">
+<tr>
+<td class="pagetitle" colSpan="2"><br><h1 align="center">
+                Analysis Results for project Test</h1>
+</td>
+</tr>
+</table><br><br><p>
+<font class="table_caption"><a id="DynMessLink" name="summary" href="#" onclick="collapsenode(summary_h1);">Summary</a></font>
+</p>
+<ul id="summary_h1">
+<table border="0">
+<tr>
+<th align="left">Project:</th>
+<td>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Test.vcxproj [configuration: Release|x64]
+              </td>
+</tr>
+<tr>
+<th align="left">Solution:</th>
+<td>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\CEXTest.sln [configuration: Release|x64]
+                </td>
+</tr>
+<tr>
+<th align="left">Analysis Tool</th>
+<td>PC-lint for C/C++ (NT) Vers. 9.00L, Copyright Gimpel Software 1985-2014</td>
+</tr>
+<tr>
+<th align="left">Analysis Status:</th>
+<td>Complete</td>
+</tr>
+<tr>
+<th align="left">Last Analysed:</th>
+<td>Monday, February 19, 2018, 15:44:24</td>
+</tr>
+<tr>
+<th align="left">Total Issues:</th>
+<td>7<br></td>
+</tr>
+<tr>
+<th align="left">
+                      Elective Notes:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Informational:
+                </th>
+<td>7 (100.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Warnings:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Errors:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Internal Errors:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Fatal Errors:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">User:</th>
+<td>John</td>
+</tr>
+<tr>
+<th align="left">Computer:</th>
+<td>DCN</td>
+</tr>
+</table>
+</ul>
+<p>
+<font class="table_caption"><a id="DynMessLink" name="issue_counts_by_file" href="#" onclick="collapsenode(issue_counts_by_file_h1);">Issue Count by File</a></font>
+</p>
+<ul id="issue_counts_by_file_h1">
+<table border="0" cellpadding="3" cellspacing="0">
+<thead>
+<tr>
+<th align="left"><a href="" onclick="this.blur(); return sortTable('FilesBody', 0, false);" title="FileName">FileName</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 1, false);" title="Status">Status</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 2, false);" title="Issue count">Total Issues</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 3, false);" title="Elective Note issue count
+                      ">Elective Notes</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 4, false);" title="Information issue count
+                      ">Informational</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 5, false);" title="Warning issue count
+                      ">Warnings</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 6, false);" title="Error issue count
+                      ">Errors</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 7, false);" title="Internal Error issue count
+                      ">Internal Errors</a></th>
+<th align="center"><a href="" onclick="this.blur(); return sortTable('FilesBody', 8, false);" title="Fatal Error issue count
+                      ">Fatal Errors</a></th>
+</tr>
+</thead>
+<tbody id="FilesBody">
+<tr>
+<td><a href="SHAKETest.cpp.html">SHAKETest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="red">4</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="red">4</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="Test.cpp.html">Test.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="red">2</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="red">2</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="MemUtilsTest.cpp.html">MemUtilsTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="red">1</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="red">1</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="AEADTest.cpp.html">AEADTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="AesAvsTest.cpp.html">AesAvsTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="AesFipsTest.cpp.html">AesFipsTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="AsymmetricSpeedTest.cpp.html">AsymmetricSpeedTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="Blake2Test.cpp.html">Blake2Test.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="ChaChaTest.cpp.html">ChaChaTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="CipherModeTest.cpp.html">CipherModeTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="CipherSpeedTest.cpp.html">CipherSpeedTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="CipherStreamTest.cpp.html">CipherStreamTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="CMACTest.cpp.html">CMACTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="CMGTest.cpp.html">CMGTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="ConsoleUtils.cpp.html">ConsoleUtils.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="DCGTest.cpp.html">DCGTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="DigestSpeedTest.cpp.html">DigestSpeedTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="DigestStreamTest.cpp.html">DigestStreamTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="GMACTest.cpp.html">GMACTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="HexConverter.cpp.html">HexConverter.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="HKDFTest.cpp.html">HKDFTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="HMACTest.cpp.html">HMACTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="HMGTest.cpp.html">HMGTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="HXCipherTest.cpp.html">HXCipherTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="KDF2Test.cpp.html">KDF2Test.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="KeccakTest.cpp.html">KeccakTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="MacStreamTest.cpp.html">MacStreamTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="McElieceTest.cpp.html">McElieceTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="ModuleLWETest.cpp.html">ModuleLWETest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="PaddingTest.cpp.html">PaddingTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="ParallelModeTest.cpp.html">ParallelModeTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="PBKDF2Test.cpp.html">PBKDF2Test.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="Poly1305Test.cpp.html">Poly1305Test.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="PrngTest.cpp.html">PrngTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="RandomOutputTest.cpp.html">RandomOutputTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="RijndaelTest.cpp.html">RijndaelTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="RingLWETest.cpp.html">RingLWETest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SalsaTest.cpp.html">SalsaTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SCRYPTTest.cpp.html">SCRYPTTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SecureStreamTest.cpp.html">SecureStreamTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SerpentTest.cpp.html">SerpentTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="Sha2Test.cpp.html">Sha2Test.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SimdSpeedTest.cpp.html">SimdSpeedTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SimdWrapperTest.cpp.html">SimdWrapperTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SkeinTest.cpp.html">SkeinTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SymmetricKeyGeneratorTest.cpp.html">SymmetricKeyGeneratorTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="SymmetricKeyTest.cpp.html">SymmetricKeyTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="TestUtils.cpp.html">TestUtils.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="TwofishTest.cpp.html">TwofishTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+<tr>
+<td><a href="UtilityTest.cpp.html">UtilityTest.cpp</a></td>
+<td align="center">Complete</td>
+<td align="center"><b><font color="darkgreen">0</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td><br><br></td>
+</tr>
+<tr>
+<td><b>
+                    Totals<br></b></td>
+<td></td>
+<td align="center"><b><font color="red">7</font></b></td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="red">7</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+<td align="center">
+<font color="darkgreen">0</font>
+</td>
+</tr>
+</tfoot>
+</table>
+</ul><br><hr>
+<p class="footer">
+          Report produced by <b>Visual Lint Standard Edition</b>, version 6.0.7.289<br>
+            Software licenced to: John Underhill (1 user licence)<br><br><a href="http://www.riverblade.co.uk/products/visual_lint" target="_blank">http://www.riverblade.co.uk/products/visual_lint</a></p>
+</body>
+</html>

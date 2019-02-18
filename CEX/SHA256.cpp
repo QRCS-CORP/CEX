@@ -71,7 +71,6 @@ SHA256::~SHA256()
 	{
 		m_isDestroyed = true;
 		m_msgLength = 0;
-		m_parallelProfile.Reset();
 
 		if (m_treeDestroy)
 		{

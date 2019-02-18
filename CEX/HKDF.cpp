@@ -41,7 +41,7 @@ HKDF::HKDF(SHA2Digests DigestType)
 	:
 	KdfBase(
 		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 #else
@@ -67,7 +67,7 @@ HKDF::HKDF(IDigest* Digest)
 	:
 	KdfBase(
 		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 #else
@@ -189,15 +189,15 @@ void HKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 	Expand(Output, OutOffset, Length, m_hkdfState, m_hkdfGenerator);
 }
 
-void HKDF::Initialize(ISymmetricKey &KeyParams)
+void HKDF::Initialize(ISymmetricKey &Parameters)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -208,27 +208,27 @@ void HKDF::Initialize(ISymmetricKey &KeyParams)
 		Reset();
 	}
 
-	if (KeyParams.Info().size() != 0)
+	if (Parameters.Info().size() != 0)
 	{
-		m_hkdfState->Info.resize(KeyParams.Info().size());
-		MemoryTools::Copy(KeyParams.Info(), 0, m_hkdfState->Info, 0, m_hkdfState->Info.size());
+		m_hkdfState->Info.resize(Parameters.Info().size());
+		MemoryTools::Copy(Parameters.Info(), 0, m_hkdfState->Info, 0, m_hkdfState->Info.size());
 	}
 
-	if (KeyParams.Nonce().size() != 0)
+	if (Parameters.Nonce().size() != 0)
 	{
-		if (KeyParams.Nonce().size() + KeyParams.Info().size() < MinimumSaltSize())
+		if (Parameters.Nonce().size() + Parameters.Info().size() < MinimumSaltSize())
 		{
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
 		std::vector<byte> prk(m_hkdfGenerator->TagSize());
-		Extract(KeyParams.Key(), KeyParams.Nonce(), prk, m_hkdfState, m_hkdfGenerator);
-		Cipher::SymmetricKey kp(prk);
+		Extract(Parameters.Key(), Parameters.Nonce(), prk, m_hkdfState, m_hkdfGenerator);
+		SymmetricKey kp(prk);
 		m_hkdfGenerator->Initialize(kp);
 	}
 	else
 	{
-		m_hkdfGenerator->Initialize(KeyParams);
+		m_hkdfGenerator->Initialize(Parameters);
 	}
 
 	m_isInitialized = true;
@@ -283,17 +283,17 @@ void HKDF::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, s
 
 void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)
 {
-	Cipher::SymmetricKey kp(Key);
+	SymmetricKey kp(Key);
 	Generator->Initialize(kp);
 
 	if (Salt.size() != 0)
 	{
-		Cipher::SymmetricKey kps(Salt);
+		SymmetricKey kps(Salt);
 		Generator->Initialize(kps);
 	}
 	else
 	{
-		Cipher::SymmetricKey kps(std::vector<byte>(Generator->TagSize(), 0));
+		SymmetricKey kps(std::vector<byte>(Generator->TagSize(), 0));
 		Generator->Initialize(kps);
 	}
 

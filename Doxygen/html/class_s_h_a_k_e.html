@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.6</span>
+   &#160;<span id="projectnumber">1.0.0.7</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -202,7 +202,7 @@ Typically SHAKE has been implemented as a message digest function, as an alterna
 The cSHAKE/SHAKE 128 and 256 bit modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental. <br />
 The minimum key size should align with the expected security level of the generator function. <br />
 For example, SHAKE256 should be keyed with at least 256 bits (32 bytes) of random key. <br />
-This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
+This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
 <p><b>Implementation Notes:</b> </p><ul>
 <li>
 The SHAKE512 and SHAKE1024 versions are unofficial variants, and should be considered as only for experimental use. </li>

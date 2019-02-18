@@ -84,7 +84,9 @@ void HCR::Reset()
 	std::vector<byte> key(m_rngGenerator->LegalKeySizes()[1].KeySize());
 	pvd->Generate(key);
 	delete pvd;
-	m_rngGenerator->Initialize(key);
+
+	Cipher::SymmetricKey kp(key);
+	m_rngGenerator->Initialize(kp);
 	Clear(key);
 }
 

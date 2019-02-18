@@ -22,7 +22,7 @@ ACS::ACS(BlockCiphers CipherType, StreamAuthenticators AuthenticatorType)
 	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
 		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
-	m_cShakeCustom(0),
+	m_shakeCustom(0),
 	m_expansionMode(ShakeModes::SHAKE512),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
@@ -51,7 +51,6 @@ ACS::~ACS()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_macCounter = 0;
-		m_parallelProfile.Reset();
 
 		if (m_cipherMode != nullptr)
 		{
@@ -62,7 +61,7 @@ ACS::~ACS()
 			m_macAuthenticator.reset(nullptr);
 		}
 
-		IntegerTools::Clear(m_cShakeCustom);
+		IntegerTools::Clear(m_shakeCustom);
 		IntegerTools::Clear(m_legalKeySizes);
 		IntegerTools::Clear(m_macKey);
 		IntegerTools::Clear(m_macTag);
@@ -179,17 +178,17 @@ void ACS::Authenticator(StreamAuthenticators AuthenticatorType)
 	m_authenticatorType = AuthenticatorType;
 }
 
-void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	if (KeyParams.Nonce().size() != m_cipherMode->BlockSize())
+	if (Parameters.Nonce().size() != m_cipherMode->BlockSize())
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}
-	if (KeyParams.Info().size() != 0 && KeyParams.Info().size() != INFO_SIZE)
+	if (Parameters.Info().size() != 0 && Parameters.Info().size() != INFO_SIZE)
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The info parameter size is invalid, must be 16 bytes!"), ErrorCodes::InvalidInfo);
 	}
@@ -211,10 +210,10 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	std::vector<byte> code(INFO_SIZE);
 
-	if (KeyParams.Info().size() != 0)
+	if (Parameters.Info().size() != 0)
 	{
 		// custom code
-		MemoryTools::Copy(KeyParams.Info(), 0, code, 0, code.size());
+		MemoryTools::Copy(Parameters.Info(), 0, code, 0, code.size());
 	}
 	else
 	{
@@ -225,7 +224,7 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
 		// key the cipher directly
-		Cipher::SymmetricKey kp(KeyParams.Key(), KeyParams.Nonce(), code);
+		Cipher::SymmetricKey kp(Parameters.Key(), Parameters.Nonce(), code);
 		m_cipherMode->Initialize(true, kp);
 	}
 	else
@@ -234,22 +233,22 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_macCounter = 1;
 
 		// create the cSHAKE customization string
-		m_cShakeCustom.resize(sizeof(ulong) + Name().size());
+		m_shakeCustom.resize(sizeof(ulong) + Name().size());
 		// add mac counter and algorithm name to customization string
-		IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
-		MemoryTools::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
+		IntegerTools::Le64ToBytes(m_macCounter, m_shakeCustom, 0);
+		MemoryTools::Copy(Name(), 0, m_shakeCustom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE with k,c
-		m_expansionMode = (KeyParams.Key().size() == 64) ? ShakeModes::SHAKE512 : (KeyParams.Key().size() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
+		m_expansionMode = (Parameters.Key().size() == 64) ? ShakeModes::SHAKE512 : (Parameters.Key().size() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
 		Kdf::SHAKE gen(m_expansionMode);
-		gen.Initialize(KeyParams.Key(), m_cShakeCustom);
+		gen.Initialize(Parameters.Key(), m_shakeCustom);
 
 		// generate the cipher key
-		std::vector<byte> cprk(KeyParams.Key().size());
+		std::vector<byte> cprk(Parameters.Key().size());
 		gen.Generate(cprk);
 
 		// initialize the cipher
-		Cipher::SymmetricKey kp(cprk, KeyParams.Nonce(), code);
+		Cipher::SymmetricKey kp(cprk, Parameters.Nonce(), code);
 		m_cipherMode->Initialize(true, kp);
 
 		// generate the mac key
@@ -364,11 +363,11 @@ void ACS::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 	MemoryTools::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
 	// customization string is: mac counter + algorithm name
-	IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+	IntegerTools::Le64ToBytes(m_macCounter, m_shakeCustom, 0);
 
 	// extract the new mac key
 	Kdf::SHAKE gen(m_expansionMode);
-	gen.Initialize(UnlockClear(m_macKey), m_cShakeCustom);
+	gen.Initialize(UnlockClear(m_macKey), m_shakeCustom);
 	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	gen.Generate(mack);
 	// reset the generator with the new key

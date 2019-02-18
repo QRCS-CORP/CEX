@@ -25,6 +25,7 @@ var searchData=
   ['_7ectr',['~CTR',['../class_c_t_r.html#a0e745571e184c191d6d047fba43e8d20',1,'CTR']]],
   ['_7edigeststream',['~DigestStream',['../class_digest_stream.html#aeca0655689fdd2aa876e100169d9797d',1,'DigestStream']]],
   ['_7edilithium',['~Dilithium',['../class_dilithium.html#ae74f506f012cd426ac176b1b293095ad',1,'Dilithium']]],
+  ['_7edrbgbase',['~DrbgBase',['../class_drbg_base.html#a318d9b55d09206b3a8081038eff47fbd',1,'DrbgBase']]],
   ['_7eeax',['~EAX',['../class_e_a_x.html#aa73ec2c59e85030df93035a0f4372636',1,'EAX']]],
   ['_7eecb',['~ECB',['../class_e_c_b.html#a83efcebbd48b4eff14a6dd4432a606ac',1,'ECB']]],
   ['_7eecp',['~ECP',['../class_e_c_p.html#ae02eeada7d542abf64622b855727edef',1,'ECP']]],

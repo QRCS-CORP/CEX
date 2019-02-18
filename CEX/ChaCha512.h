@@ -156,7 +156,7 @@ private:
 
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<ChaCha512State> m_cipherState;
-	std::vector<byte> m_cShakeCustom;
+	std::vector<byte> m_shakeCustom;
 	bool m_isAuthenticated;
 	bool m_isDestroyed;
 	bool m_isEncryption;
@@ -288,10 +288,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParams">Cipher key structure, containing cipher key, nonce, and optional info array</param>
+	/// <param name="Parameters">Cipher key structure, containing cipher key, nonce, and optional info array</param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
+	void Initialize(bool Encryption, ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -299,7 +299,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor [virtual] cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;

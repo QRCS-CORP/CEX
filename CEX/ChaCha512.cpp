@@ -51,7 +51,7 @@ ChaCha512::ChaCha512(StreamAuthenticators AuthenticatorType)
 	m_authenticatorType(AuthenticatorType != StreamAuthenticators::KMAC1024 ? AuthenticatorType : 
 		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The authenticator must be a 256 or 512-bit MAC function!"), ErrorCodes::IllegalOperation)),
 	m_cipherState(new ChaCha512State),
-	m_cShakeCustom(0),
+	m_shakeCustom(0),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -76,7 +76,6 @@ ChaCha512::~ChaCha512()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_macCounter = 0;
-		m_parallelProfile.Reset();
 
 		if (m_cipherState != nullptr)
 		{
@@ -88,7 +87,7 @@ ChaCha512::~ChaCha512()
 			m_macAuthenticator.reset(nullptr);
 		}
 
-		IntegerTools::Clear(m_cShakeCustom);
+		IntegerTools::Clear(m_shakeCustom);
 		IntegerTools::Clear(m_legalKeySizes);
 		IntegerTools::Clear(m_macKey);
 		IntegerTools::Clear(m_macTag);
@@ -211,17 +210,17 @@ void ChaCha512::Authenticator(StreamAuthenticators AuthenticatorType)
 	m_authenticatorType = AuthenticatorType;
 }
 
-void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void ChaCha512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (KeyParams.Key().size() != KEY_SIZE)
+	if (Parameters.Key().size() != KEY_SIZE)
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
-	if (KeyParams.Nonce().size() != 0)
+	if (Parameters.Nonce().size() != 0)
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The nonce is not required with ChaCha512!"), ErrorCodes::InvalidNonce);
 	}
-	if (KeyParams.Info().size() > 0 && KeyParams.Info().size() != INFO_SIZE)
+	if (Parameters.Info().size() > 0 && Parameters.Info().size() != INFO_SIZE)
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The distribution code must be no larger than DistributionCodeMax!"), ErrorCodes::InvalidInfo);
 	}
@@ -243,10 +242,10 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	std::vector<byte> code(INFO_SIZE);
 
-	if (KeyParams.Info().size() != 0)
+	if (Parameters.Info().size() != 0)
 	{
 		// custom code
-		MemoryTools::Copy(KeyParams.Info(), 0, code, 0, KeyParams.Info().size());
+		MemoryTools::Copy(Parameters.Info(), 0, code, 0, Parameters.Info().size());
 	}
 	else
 	{
@@ -257,7 +256,7 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	if (m_authenticatorType == StreamAuthenticators::None)
 	{
 		// add key and nonce to state
-		Expand(KeyParams.Key(), code);
+		Expand(Parameters.Key(), code);
 	}
 	else
 	{
@@ -265,14 +264,14 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_macCounter = 1;
 
 		// create the cSHAKE customization string
-		m_cShakeCustom.resize(sizeof(ulong) + Name().size());
+		m_shakeCustom.resize(sizeof(ulong) + Name().size());
 		// add mac counter and algorithm name to customization string
-		IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
-		MemoryTools::Copy(Name(), 0, m_cShakeCustom, sizeof(ulong), Name().size());
+		IntegerTools::Le64ToBytes(m_macCounter, m_shakeCustom, 0);
+		MemoryTools::Copy(Name(), 0, m_shakeCustom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE512);
-		gen.Initialize(KeyParams.Key(), m_cShakeCustom);
+		gen.Initialize(Parameters.Key(), m_shakeCustom);
 
 		// generate the new cipher key
 		std::vector<byte> ck(KEY_SIZE);
@@ -422,11 +421,11 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	MemoryTools::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
 	// customization string is: mac counter + algorithm name
-	IntegerTools::Le64ToBytes(m_macCounter, m_cShakeCustom, 0);
+	IntegerTools::Le64ToBytes(m_macCounter, m_shakeCustom, 0);
 
 	// extract the new mac key
 	Kdf::SHAKE gen(ShakeModes::SHAKE512);
-	gen.Initialize(UnlockClear(m_macKey), m_cShakeCustom);
+	gen.Initialize(UnlockClear(m_macKey), m_shakeCustom);
 	std::vector<byte> mack(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 	gen.Generate(mack);
 	// reset the generator with the new key

@@ -16,6 +16,7 @@
 
 NAMESPACE_PROVIDER
 
+using Utility::IntegerTools;
 using Enumeration::ProviderConvert;
 
 #if defined(CEX_OS_WINDOWS)
@@ -122,86 +123,93 @@ void CSP::GetRandom(byte* Output, size_t Length)
 
 #if defined(CEX_OS_WINDOWS)
 
-	HCRYPTPROV hprov = NULL;
-
-	if (!CryptAcquireContextW(&hprov, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
+	if (Length != 0)
 	{
-		throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
-	}
+		HCRYPTPROV hprov = NULL;
 
-	if (hprov != NULL)
-	{
-		if (!::CryptGenRandom(hprov, static_cast<DWORD>(Length), static_cast<BYTE*>(Output)))
+		if (!CryptAcquireContextW(&hprov, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
+		{
+			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
+		}
+
+		if (hprov != NULL)
+		{
+			if (!::CryptGenRandom(hprov, static_cast<DWORD>(Length), static_cast<BYTE*>(Output)))
+			{
+				CryptReleaseContext(hprov, 0);
+				hprov = NULL;
+				throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
+			}
+		}
+
+		if (hprov != NULL)
 		{
 			CryptReleaseContext(hprov, 0);
 			hprov = NULL;
-			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
 		}
-	}
-
-	if (hprov != NULL)
-	{
-		CryptReleaseContext(hprov, 0);
-		hprov = NULL;
 	}
 
 #elif defined(CEX_OS_ANDROID)
 
-	try
+	if (Length != 0)
 	{
-		do
+		try
 		{
-			const size_t PRCRMD = Utility::IntegerTools::Min(sizeof(uint), Length);
-			uint rnd = arc4random();
-			Utility::MemoryTools::Copy(rnd, Output, poff, PRCRMD);
-			poff += PRCRMD;
-			Length -= PRCRMD;
-		} 
-		while (Length != 0)
-	}
-	catch (std::exception&)
-	{
-		throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string(ex.what()), ErrorCodes::UnKnown);
+			do
+			{
+				const size_t PRCRMD = IntegerTools::Min(sizeof(uint), Length);
+				uint rnd = arc4random();
+				Utility::MemoryTools::Copy(rnd, Output, poff, PRCRMD);
+				poff += PRCRMD;
+				Length -= PRCRMD;
+			} while (Length != 0)
+		}
+		catch (std::exception&)
+		{
+			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string(ex.what()), ErrorCodes::UnKnown);
+		}
 	}
 
 #elif defined(CEX_OS_POSIX)
 
-	int fdhandle = ::open(CEX_SYSTEM_RNG_DEVICE, O_RDONLY | O_NOCTTY);
-
-	if (fdhandle <= 0)
+	if (Length != 0)
 	{
-		throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG failed to open RNG device!"), ErrorCodes::NotFound);
-	}
+		int fdhandle = ::open(CEX_SYSTEM_RNG_DEVICE, O_RDONLY | O_NOCTTY);
 
-	do
-	{
-		int rlen = ::read(fdhandle, Output + poff, Length);
-
-		if (rlen < 0)
+		if (fdhandle <= 0)
 		{
-			if (errno == EINTR)
+			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG failed to open RNG device!"), ErrorCodes::NotFound);
+		}
+
+		do
+		{
+			int rlen = ::read(fdhandle, Output + poff, Length);
+
+			if (rlen < 0)
 			{
-				continue;
+				if (errno == EINTR)
+				{
+					continue;
+				}
+				else
+				{
+					throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
+				}
 			}
-			else
+			else if (rlen == 0)
 			{
 				throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
 			}
-		}
-		else if (rlen == 0)
-		{
-			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("System RNG read failed error!"), ErrorCodes::BadRead);
-		}
 
-		poff += rlen;
-		Length -= rlen;
-	} 
-	while (Length != 0)
+			poff += rlen;
+			Length -= rlen;
+		} while (Length != 0)
 
-	if (fdhandle > 0)
-	{
-		::close(fdhandle);
-		fdhandle = 0;
+			if (fdhandle > 0)
+			{
+				::close(fdhandle);
+				fdhandle = 0;
+			}
 	}
 
 #else

@@ -53,7 +53,7 @@
 	-webkit-overflow-scrolling: touch;
 }
 .sm-dox {
-	background-image: url("tab_b.png");
+	background-color: #444444;
 }
 .sm-dox a, .sm-dox a:focus, .sm-dox a:hover, .sm-dox a:active {
 	padding: 0 12px;
@@ -63,13 +63,12 @@
 	font-weight: bold;
 	line-height: 36px;
 	text-decoration: none;
-	color: #283a5d;
+	color: white;
 	outline: 0;
 }
 .sm-dox a:hover {
-	background-image: url("tab_a.png");
-	background-repeat: repeat-x;
-	color: white;
+	background-color:green;
+	color: 0099da;
 }
 .sm-dox a.current {
 	color: #d23600;
@@ -113,9 +112,7 @@
 	background-image: none;
 }
 .sm-dox ul a:hover {
-	background-image: url("tab_a.png");
-	background-repeat: repeat-x;
-	color: white;
+	background-color red;
 	text-shadow: 0 1px 1px black;
 }
 .sm-dox ul ul a, .sm-dox ul ul a:hover, .sm-dox ul ul a:focus, .sm-dox ul ul a:active {
@@ -153,7 +150,7 @@
 .sm-dox .sm-nowrap>li>a,.sm-dox .sm-nowrap>li>:not(ul) a{white-space:nowrap}
 .sm-dox {
 	padding: 0 10px;
-	background-image: url("tab_b.png");
+	background-color green;
 	line-height: 36px;
 }
 .sm-dox a span.sub-arrow {
@@ -172,17 +169,11 @@
 }
 .sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a:hover, .sm-dox a.highlighted {
 	padding: 0 12px;
-	background-image: url("tab_s.png");
-	background-repeat: no-repeat;
-	background-position: right;
-	-moz-border-radius: 0!important;
-	-webkit-border-radius: 0;
-	border-radius: 0!important;
+	background-color: #444444;
 }
 .sm-dox a:hover {
-	background-image: url("tab_a.png");
-	background-repeat: repeat-x;
-	color: white;
+	background-color: #555555;
+	color: #0099da;
 }
 .sm-dox a:hover span.sub-arrow {
 	border-color: white transparent transparent transparent;
@@ -237,8 +228,7 @@
 	background-image: none;
 }
 .sm-dox ul a:hover {
-	background-image: url("tab_a.png");
-	background-repeat: repeat-x;
+	background-color: purple;
 	color: white;
 	text-shadow: 0 1px 1px black;
 }
@@ -326,7 +316,8 @@
 	background: #fff;
 }
 .sm-dox.sm-vertical a.disabled {
-	background-image: url("tab_b.png");
+	background-color: yellow;
+
 }
 .sm-dox.sm-vertical a span.sub-arrow {
 	right: 8px;

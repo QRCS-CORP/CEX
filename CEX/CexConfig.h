@@ -30,6 +30,13 @@
 // Settings in this section can not be modified		//
 //////////////////////////////////////////////////////
 
+// the libraries formal name 'C,E,X'
+static const std::vector<char> CEX_LIBRARY_NAME = { 0x43, 0x45, 0x58 };
+// the libraries prefix 'C,E,X,-'
+static const std::vector<char> CEX_LIBRARY_PREFIX = { 0x43, 0x45, 0x58, 0x2D };
+// the libraries version number: Major, Minor, Patch, and Release
+static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
+
 // compiler types; not all will be supported (targets are msvc, mingw, gcc, intel, and clang)
 #if defined(_MSC_VER)
 #	define CEX_COMPILER_MSC
@@ -471,7 +478,7 @@ typedef unsigned char byte;
 //////////////////////////////////////////////////
 
 // enable the legal-key-size exception set on all primitives
-//#define CEX_ENFORCE_KEYMIN
+//#define CEX_ENFORCE_LEGALKEY
 
 // enable FIPS 140.2 entropy provider wellness test
 #define CEX_FIPS140_ENABLED

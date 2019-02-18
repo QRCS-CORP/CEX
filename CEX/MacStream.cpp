@@ -63,16 +63,16 @@ std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOf
 	return Process(Input, InOffset, Length);
 }
 
-void MacStream::Initialize(ISymmetricKey &KeyParams)
+void MacStream::Initialize(ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoProcessingException(CLASS_NAME, std::string("Initialize"), std::string("Mac Key has invalid length!"), ErrorCodes::InvalidKey);
 	}
 
 	try
 	{
-		m_macEngine->Initialize(KeyParams);
+		m_macEngine->Initialize(Parameters);
 		m_isInitialized = true;
 	}
 	catch (CryptoMacException &ex)

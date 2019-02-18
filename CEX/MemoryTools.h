@@ -76,6 +76,9 @@ public:
 
 #endif
 
+	/// cond PRIVATE
+	CEX_OPTIMIZE_IGNORE
+	/// endcond
 	/// <summary>
 	/// Clear bytes from an integer array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Clear.
@@ -130,6 +133,9 @@ public:
 			}
 		}
 	}
+	/// cond PRIVATE
+	CEX_OPTIMIZE_RESUME
+	/// endcond
 
 	/// <summary>
 	/// Clear 128 bits from an integer array.

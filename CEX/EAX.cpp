@@ -82,7 +82,6 @@ EAX::~EAX()
 		m_isInitialized = false;
 		m_isLoaded = false;
 		m_macSize = 0;
-		m_parallelProfile.Reset();
 
 		Utility::IntegerTools::Clear(m_aadData);
 		Utility::IntegerTools::Clear(m_cipherKey);
@@ -230,14 +229,14 @@ void EAX::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 	Utility::MemoryTools::Copy(m_msgTag, 0, Output, OutOffset, Length);
 }
 
-void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void EAX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
 	// recheck params
 	Reset();
 
-	if (KeyParams.Key().size() == 0)
+	if (Parameters.Key().size() == 0)
 	{
-		if (KeyParams.Nonce() == m_eaxVector)
+		if (Parameters.Nonce() == m_eaxVector)
 		{
 			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The nonce can not be zeroised or repeating!"), ErrorCodes::InvalidNonce);
 		}
@@ -248,16 +247,16 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 	else
 	{
-		if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+		if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 		{
 			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 		}
 
 		// TODO: change to secure key and review
-		m_cipherKey = KeyParams.Key();
+		m_cipherKey = Parameters.Key();
 	}
 
-	if (KeyParams.Nonce().size() != m_cipherMode->BlockSize())
+	if (Parameters.Nonce().size() != m_cipherMode->BlockSize())
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}
@@ -275,14 +274,14 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 
 	m_isEncryption = Encryption;
-	m_eaxNonce = KeyParams.Nonce();
+	m_eaxNonce = Parameters.Nonce();
 	Cipher::SymmetricKey kp(m_cipherKey);
 	m_macGenerator->Initialize(kp);
 
 	UpdateTag(0, m_eaxNonce);
 	m_macGenerator->Finalize(m_eaxVector, 0);
 	m_macGenerator->Initialize(kp);
-	m_cipherMode->Initialize(Encryption, Cipher::SymmetricKey(m_cipherKey, m_eaxVector, KeyParams.Info()));
+	m_cipherMode->Initialize(Encryption, Cipher::SymmetricKey(m_cipherKey, m_eaxVector, Parameters.Info()));
 
 	if (m_isFinalized)
 	{

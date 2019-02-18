@@ -58,7 +58,7 @@ SCRYPT::SCRYPT(SHA2Digests DigestType, size_t CpuCost, size_t Parallelization)
 	:
 	KdfBase(
 		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::SCRYPT256 : Kdfs::SCRYPT512) : Kdfs::None),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
 #else
@@ -104,7 +104,7 @@ SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t Parallelization)
 	KdfBase(
 		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::SCRYPT256 : Kdfs::SCRYPT512) :
 			throw CryptoKdfException(std::string("SCRYPT"), std::string("Constructor"), std::string("The digest instance can not be null!"), ErrorCodes::IllegalOperation)),
-#if defined(CEX_ENFORCE_KEYMIN)
+#if defined(CEX_ENFORCE_LEGALKEY)
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 #else
@@ -263,15 +263,15 @@ void SCRYPT::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Lengt
 	Expand(Output, OutOffset, Length, m_scryptState, m_parallelProfile, m_scryptGenerator);
 }
 
-void SCRYPT::Initialize(ISymmetricKey &KeyParams)
+void SCRYPT::Initialize(ISymmetricKey &Parameters)
 {
-#if defined(CEX_ENFORCE_KEYMIN)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (KeyParams.Key().size() < MinimumKeySize())
+	if (Parameters.Key().size() < MinimumKeySize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -283,28 +283,28 @@ void SCRYPT::Initialize(ISymmetricKey &KeyParams)
 	}
 
 	// add the key to the state
-	m_scryptState->State.resize(KeyParams.Key().size());
-	MemoryTools::Copy(KeyParams.Key(), 0, m_scryptState->State, 0, m_scryptState->State.size());
+	m_scryptState->State.resize(Parameters.Key().size());
+	MemoryTools::Copy(Parameters.Key(), 0, m_scryptState->State, 0, m_scryptState->State.size());
 
-	if (KeyParams.Nonce().size() + KeyParams.Info().size() != 0)
+	if (Parameters.Nonce().size() + Parameters.Info().size() != 0)
 	{
-		if (KeyParams.Nonce().size() + KeyParams.Info().size() < MinimumSaltSize())
+		if (Parameters.Nonce().size() + Parameters.Info().size() < MinimumSaltSize())
 		{
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
-		m_scryptState->Salt.resize(KeyParams.Nonce().size() + KeyParams.Info().size());
+		m_scryptState->Salt.resize(Parameters.Nonce().size() + Parameters.Info().size());
 
 		// add the nonce param to salt
-		if (KeyParams.Nonce().size() > 0)
+		if (Parameters.Nonce().size() > 0)
 		{
-			MemoryTools::Copy(KeyParams.Nonce(), 0, m_scryptState->Salt, 0, m_scryptState->Salt.size());
+			MemoryTools::Copy(Parameters.Nonce(), 0, m_scryptState->Salt, 0, m_scryptState->Salt.size());
 		}
 
 		// add info as extension of salt
-		if (KeyParams.Info().size() > 0)
+		if (Parameters.Info().size() > 0)
 		{
-			MemoryTools::Copy(KeyParams.Info(), 0, m_scryptState->Salt, KeyParams.Nonce().size(), KeyParams.Info().size());
+			MemoryTools::Copy(Parameters.Info(), 0, m_scryptState->Salt, Parameters.Nonce().size(), Parameters.Info().size());
 		}
 	}
 

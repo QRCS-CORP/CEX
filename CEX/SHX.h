@@ -287,11 +287,11 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParams">Cipher key container.
+	/// <param name="Parameters">Cipher key container.
 	/// <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
+	void Initialize(bool Encryption, ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Transform a block of bytes.

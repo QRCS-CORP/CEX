@@ -25,12 +25,14 @@
 #include "Digests.h"
 #include "IDigest.h"
 #include "KdfBase.h"
+#include "Keccak.h"
 #include "ShakeModes.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
 using Digest::IDigest;
+using Digest::Keccak;
 using Enumeration::ShakeModes;
 
 /// <summary>
@@ -56,7 +58,7 @@ using Enumeration::ShakeModes;
 /// The cSHAKE/SHAKE 128 and 256 bit modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental. \n
 /// The minimum key size should align with the expected security level of the generator function. \n
 /// For example, SHAKE256 should be keyed with at least 256 bits (32 bytes) of random key. \n
-/// This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
+/// This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</para>
 /// 
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
@@ -84,17 +86,9 @@ class SHAKE final : public KdfBase
 private:
 
 	static const size_t BUFFER_SIZE = 200;
-	static const byte CSHAKE_DOMAIN = 0x04;
 	static const size_t MAXGEN_REQUESTS = 1024000;
-#if defined(CEX_ENFORCE_KEYMIN)
-
-#else
-
-#endif
 	static const size_t MINKEY_LENGTH = 4;
 	static const size_t MINSALT_LENGTH = 4;
-	static const byte SHAKE_DOMAIN = 0x1F;
-	static const size_t STATE_SIZE = 25;
 
 	class ShakeState;
 	bool m_isInitialized;
@@ -187,10 +181,10 @@ public:
 	/// Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional customization, and information strings
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">The symmetric key container containing the generators keying material</param>
+	/// <param name="Parameters">The symmetric key container containing the generators keying material</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the key values are not a legal size</exception>
-	void Initialize(ISymmetricKey &KeyParams) override;
+	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
 	/// Initialize the SHAKE generator with a standard vector key

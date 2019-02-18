@@ -72,11 +72,19 @@ namespace Test
 		/// </summary>
 		/// 
 		/// <param name="Generator">The kdf generator instance</param>
-		/// <param name="Salt">The salt array</param>
 		/// <param name="Key">The input key</param>
-		/// <param name="Info">The info array</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected, bool Custom = false);
+		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected);
+
+		/// <summary>
+		/// Compare known answer test vectors to kdf output
+		/// </summary>
+		/// 
+		/// <param name="Generator">The kdf generator instance</param>
+		/// <param name="Key">The input key</param>
+		/// <param name="Custom">The customization string</param>
+		/// <param name="Expected">The expected output</param>
+		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Custom, std::vector<byte> &Expected);
 
 		/// <summary>
 		/// Test the different constructor initialization options

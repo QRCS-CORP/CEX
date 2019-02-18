@@ -15,7 +15,14 @@ namespace Test
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
+		static const std::string FOLDER;
 
+		// set this to true test the slower cpu jitter provider
+		const bool ENABLE_CJPTEST = false;
+		// 10MB: the sample file output size
+		const size_t SAMPLE_SIZE = 1024 * 1000 * 10;
+
+		std::string m_outputFolder;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -23,7 +30,7 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CMAC vectors for equality
 		/// </summary>
-		RandomOutputTest();
+		RandomOutputTest(const std::string &OutputFolder);
 
 		/// <summary>
 		/// Destructor
@@ -47,13 +54,23 @@ namespace Test
 
 	private:
 
-		void CMGGenerateFile(std::string FilePath, size_t FileSize);
-		void DCGGenerateFile(std::string FilePath, size_t FileSize);
-		void HMGGenerateFile(std::string FilePath, size_t FileSize);
+		// entropy providers
+		void ACPGenerateFile(std::string FilePath, size_t FileSize);
 		void CJPGenerateFile(std::string FilePath, size_t FileSize);
 		void CSPGenerateFile(std::string FilePath, size_t FileSize);
 		void ECPGenerateFile(std::string FilePath, size_t FileSize);
 		void RDPGenerateFile(std::string FilePath, size_t FileSize);
+		// drbgs
+		void BCGGenerateFile(std::string FilePath, size_t FileSize, bool Parallel);
+		void CSGGenerateFile(std::string FilePath, size_t FileSize, bool Parallel);
+		void HCGGenerateFile(std::string FilePath, size_t FileSize);
+		// prngs
+		void CSRGenerateFile(std::string FilePath, size_t FileSize);
+		void BCRGenerateFile(std::string FilePath, size_t FileSize);
+		void HCRGenerateFile(std::string FilePath, size_t FileSize);
+		// kdfs
+		void SHAKEGenerateFile(std::string FilePath, size_t FileSize);
+
 		void OnProgress(const std::string &Data);
 	};
 }

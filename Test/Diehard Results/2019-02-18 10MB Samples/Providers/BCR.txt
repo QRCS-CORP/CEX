@@ -1,0 +1,943 @@
+       NOTE: Most of the tests in DIEHARD return a p-value, which               
+       should be uniform on [0,1) if the input file contains truly              
+       independent random bits.   Those p-values are obtained by                
+       p=F(X), where F is the assumed distribution of the sample                
+       random variable X---often normal. But that assumed F is just             
+       an asymptotic approximation, for which the fit will be worst             
+       in the tails. Thus you should not be surprised with                      
+       occasional p-values near 0 or 1, such as .0012 or .9983.                 
+       When a bit stream really FAILS BIG, you will get p's of 0 or             
+       1 to six or more places.  By all means, do not, as a                     
+       Statistician might, think that a p < .025 or p> .975 means               
+       that the RNG has "failed the test at the .05 level".  Such               
+       p's happen among the hundreds that DIEHARD produces, even                
+       with good RNG's.  So keep in mind that " p happens".                     
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::            This is the BIRTHDAY SPACINGS TEST                 ::        
+     :: Choose m birthdays in a year of n days.  List the spacings    ::        
+     :: between the birthdays.  If j is the number of values that     ::        
+     :: occur more than once in that list, then j is asymptotically   ::        
+     :: Poisson distributed with mean m^3/(4n).  Experience shows n   ::        
+     :: must be quite large, say n>=2^18, for comparing the results   ::        
+     :: to the Poisson distribution with that mean.  This test uses   ::        
+     :: n=2^24 and m=2^9,  so that the underlying distribution for j  ::        
+     :: is taken to be Poisson with lambda=2^27/(2^26)=2.  A sample   ::        
+     :: of 500 j's is taken, and a chi-square goodness of fit test    ::        
+     :: provides a p value.  The first test uses bits 1-24 (counting  ::        
+     :: from the left) from integers in the specified file.           ::        
+     ::   Then the file is closed and reopened. Next, bits 2-25 are   ::        
+     :: used to provide birthdays, then 3-26 and so on to bits 9-32.  ::        
+     :: Each set of bits provides a p-value, and the nine p-values    ::        
+     :: provide a sample for a KSTEST.                                ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+ BIRTHDAY SPACINGS TEST, M= 512 N=2**24 LAMBDA=  2.0000
+           Results for bcr_10mb.txt   
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  1 to 24   1.932
+  duplicate       number       number 
+  spacings       observed     expected
+        0          85.       67.668
+        1         115.      135.335
+        2         148.      135.335
+        3          88.       90.224
+        4          36.       45.112
+        5          21.       18.045
+  6 to INF          7.        8.282
+ Chisquare with  6 d.o.f. =    11.26 p-value=  .919273
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  2 to 25   2.076
+  duplicate       number       number 
+  spacings       observed     expected
+        0          58.       67.668
+        1         149.      135.335
+        2         120.      135.335
+        3          96.       90.224
+        4          47.       45.112
+        5          15.       18.045
+  6 to INF         15.        8.282
+ Chisquare with  6 d.o.f. =    10.91 p-value=  .908834
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  3 to 26   1.968
+  duplicate       number       number 
+  spacings       observed     expected
+        0          71.       67.668
+        1         134.      135.335
+        2         131.      135.335
+        3          97.       90.224
+        4          42.       45.112
+        5          21.       18.045
+  6 to INF          4.        8.282
+ Chisquare with  6 d.o.f. =     3.74 p-value=  .287854
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  4 to 27   1.912
+  duplicate       number       number 
+  spacings       observed     expected
+        0          58.       67.668
+        1         158.      135.335
+        2         142.      135.335
+        3          78.       90.224
+        4          45.       45.112
+        5          14.       18.045
+  6 to INF          5.        8.282
+ Chisquare with  6 d.o.f. =     9.37 p-value=  .846111
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  5 to 28   1.938
+  duplicate       number       number 
+  spacings       observed     expected
+        0          73.       67.668
+        1         150.      135.335
+        2         118.      135.335
+        3          86.       90.224
+        4          50.       45.112
+        5          13.       18.045
+  6 to INF         10.        8.282
+ Chisquare with  6 d.o.f. =     6.72 p-value=  .652867
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  6 to 29   2.048
+  duplicate       number       number 
+  spacings       observed     expected
+        0          77.       67.668
+        1         118.      135.335
+        2         128.      135.335
+        3          94.       90.224
+        4          57.       45.112
+        5          18.       18.045
+  6 to INF          8.        8.282
+ Chisquare with  6 d.o.f. =     7.21 p-value=  .697767
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  7 to 30   1.894
+  duplicate       number       number 
+  spacings       observed     expected
+        0          70.       67.668
+        1         142.      135.335
+        2         136.      135.335
+        3          88.       90.224
+        4          53.       45.112
+        5           9.       18.045
+  6 to INF          2.        8.282
+ Chisquare with  6 d.o.f. =    11.14 p-value=  .915984
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  8 to 31   1.926
+  duplicate       number       number 
+  spacings       observed     expected
+        0          67.       67.668
+        1         148.      135.335
+        2         141.      135.335
+        3          75.       90.224
+        4          44.       45.112
+        5          19.       18.045
+  6 to INF          6.        8.282
+ Chisquare with  6 d.o.f. =     4.70 p-value=  .417729
+  :::::::::::::::::::::::::::::::::::::::::
+                   For a sample of size 500:     mean   
+           bcr_10mb.txt    using bits  9 to 32   1.976
+  duplicate       number       number 
+  spacings       observed     expected
+        0          67.       67.668
+        1         134.      135.335
+        2         141.      135.335
+        3          96.       90.224
+        4          42.       45.112
+        5          12.       18.045
+  6 to INF          8.        8.282
+ Chisquare with  6 d.o.f. =     2.88 p-value=  .175737
+  :::::::::::::::::::::::::::::::::::::::::
+   The 9 p-values were
+        .919273   .908834   .287854   .846111   .652867
+        .697767   .915984   .417729   .175737
+  A KSTEST for the 9 p-values yields  .829624
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::            THE OVERLAPPING 5-PERMUTATION TEST                 ::        
+     :: This is the OPERM5 test.  It looks at a sequence of one mill- ::        
+     :: ion 32-bit random integers.  Each set of five consecutive     ::        
+     :: integers can be in one of 120 states, for the 5! possible or- ::        
+     :: derings of five numbers.  Thus the 5th, 6th, 7th,...numbers   ::        
+     :: each provide a state. As many thousands of state transitions  ::        
+     :: are observed,  cumulative counts are made of the number of    ::        
+     :: occurences of each state.  Then the quadratic form in the     ::        
+     :: weak inverse of the 120x120 covariance matrix yields a test   ::        
+     :: equivalent to the likelihood ratio test that the 120 cell     ::        
+     :: counts came from the specified (asymptotically) normal dis-   ::        
+     :: tribution with the specified 120x120 covariance matrix (with  ::        
+     :: rank 99).  This version uses 1,000,000 integers, twice.       ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+           OPERM5 test for file bcr_10mb.txt   
+     For a sample of 1,000,000 consecutive 5-tuples,
+ chisquare for 99 degrees of freedom=102.852; p-value= .624628
+           OPERM5 test for file bcr_10mb.txt   
+     For a sample of 1,000,000 consecutive 5-tuples,
+ chisquare for 99 degrees of freedom= 90.119; p-value= .273040
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     :: This is the BINARY RANK TEST for 31x31 matrices. The leftmost ::        
+     :: 31 bits of 31 random integers from the test sequence are used ::        
+     :: to form a 31x31 binary matrix over the field {0,1}. The rank  ::        
+     :: is determined. That rank can be from 0 to 31, but ranks< 28   ::        
+     :: are rare, and their counts are pooled with those for rank 28. ::        
+     :: Ranks are found for 40,000 such random matrices and a chisqua-::        
+     :: re test is performed on counts for ranks 31,30,29 and <=28.   ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+    Binary rank test for bcr_10mb.txt   
+         Rank test for 31x31 binary matrices:
+        rows from leftmost 31 bits of each 32-bit integer
+      rank   observed  expected (o-e)^2/e  sum
+        28       218     211.4   .204914     .205
+        29      5134    5134.0   .000000     .205
+        30     23042   23103.0   .161309     .366
+        31     11606   11551.5   .256900     .623
+  chisquare=  .623 for 3 d. of f.; p-value= .323826
+--------------------------------------------------------------
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     :: This is the BINARY RANK TEST for 32x32 matrices. A random 32x ::        
+     :: 32 binary matrix is formed, each row a 32-bit random integer. ::        
+     :: The rank is determined. That rank can be from 0 to 32, ranks  ::        
+     :: less than 29 are rare, and their counts are pooled with those ::        
+     :: for rank 29.  Ranks are found for 40,000 such random matrices ::        
+     :: and a chisquare test is performed on counts for ranks  32,31, ::        
+     :: 30 and <=29.                                                  ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+    Binary rank test for bcr_10mb.txt   
+         Rank test for 32x32 binary matrices:
+        rows from leftmost 32 bits of each 32-bit integer
+      rank   observed  expected (o-e)^2/e  sum
+        29       201     211.4   .513367     .513
+        30      5163    5134.0   .163694     .677
+        31     23113   23103.0   .004288     .681
+        32     11523   11551.5   .070436     .752
+  chisquare=  .752 for 3 d. of f.; p-value= .331995
+--------------------------------------------------------------
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     :: This is the BINARY RANK TEST for 6x8 matrices.  From each of  ::        
+     :: six random 32-bit integers from the generator under test, a   ::        
+     :: specified byte is chosen, and the resulting six bytes form a  ::        
+     :: 6x8 binary matrix whose rank is determined.  That rank can be ::        
+     :: from 0 to 6, but ranks 0,1,2,3 are rare; their counts are     ::        
+     :: pooled with those for rank 4. Ranks are found for 100,000     ::        
+     :: random matrices, and a chi-square test is performed on        ::        
+     :: counts for ranks 6,5 and <=4.                                 ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+         Binary Rank Test for bcr_10mb.txt   
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  1 to  8
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          931       944.3        .187        .187
+          r =5        21715     21743.9        .038        .226
+          r =6        77354     77311.8        .023        .249
+                        p=1-exp(-SUM/2)= .11697
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  2 to  9
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          933       944.3        .135        .135
+          r =5        21660     21743.9        .324        .459
+          r =6        77407     77311.8        .117        .576
+                        p=1-exp(-SUM/2)= .25031
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  3 to 10
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          948       944.3        .014        .014
+          r =5        21579     21743.9       1.251       1.265
+          r =6        77473     77311.8        .336       1.601
+                        p=1-exp(-SUM/2)= .55093
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  4 to 11
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          868       944.3       6.165       6.165
+          r =5        21655     21743.9        .363       6.529
+          r =6        77477     77311.8        .353       6.882
+                        p=1-exp(-SUM/2)= .96796
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  5 to 12
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          908       944.3       1.396       1.396
+          r =5        21629     21743.9        .607       2.003
+          r =6        77463     77311.8        .296       2.298
+                        p=1-exp(-SUM/2)= .68310
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  6 to 13
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          903       944.3       1.806       1.806
+          r =5        21582     21743.9       1.205       3.012
+          r =6        77515     77311.8        .534       3.546
+                        p=1-exp(-SUM/2)= .83017
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  7 to 14
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          909       944.3       1.320       1.320
+          r =5        21615     21743.9        .764       2.084
+          r =6        77476     77311.8        .349       2.433
+                        p=1-exp(-SUM/2)= .70367
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  8 to 15
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          929       944.3        .248        .248
+          r =5        21719     21743.9        .029        .276
+          r =6        77352     77311.8        .021        .297
+                        p=1-exp(-SUM/2)= .13815
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits  9 to 16
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          972       944.3        .812        .812
+          r =5        21687     21743.9        .149        .961
+          r =6        77341     77311.8        .011        .972
+                        p=1-exp(-SUM/2)= .38504
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 10 to 17
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          928       944.3        .281        .281
+          r =5        21793     21743.9        .111        .392
+          r =6        77279     77311.8        .014        .406
+                        p=1-exp(-SUM/2)= .18380
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 11 to 18
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          941       944.3        .012        .012
+          r =5        21678     21743.9        .200        .211
+          r =6        77381     77311.8        .062        .273
+                        p=1-exp(-SUM/2)= .12768
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 12 to 19
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          939       944.3        .030        .030
+          r =5        21780     21743.9        .060        .090
+          r =6        77281     77311.8        .012        .102
+                        p=1-exp(-SUM/2)= .04971
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 13 to 20
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          930       944.3        .217        .217
+          r =5        21694     21743.9        .115        .331
+          r =6        77376     77311.8        .053        .384
+                        p=1-exp(-SUM/2)= .17486
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 14 to 21
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          937       944.3        .056        .056
+          r =5        21726     21743.9        .015        .071
+          r =6        77337     77311.8        .008        .079
+                        p=1-exp(-SUM/2)= .03892
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 15 to 22
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          959       944.3        .229        .229
+          r =5        21613     21743.9        .788       1.017
+          r =6        77428     77311.8        .175       1.191
+                        p=1-exp(-SUM/2)= .44884
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 16 to 23
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          947       944.3        .008        .008
+          r =5        21541     21743.9       1.893       1.901
+          r =6        77512     77311.8        .518       2.419
+                        p=1-exp(-SUM/2)= .70172
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 17 to 24
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          902       944.3       1.895       1.895
+          r =5        21893     21743.9       1.022       2.917
+          r =6        77205     77311.8        .148       3.065
+                        p=1-exp(-SUM/2)= .78399
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 18 to 25
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          918       944.3        .733        .733
+          r =5        21658     21743.9        .339       1.072
+          r =6        77424     77311.8        .163       1.235
+                        p=1-exp(-SUM/2)= .46064
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 19 to 26
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          919       944.3        .678        .678
+          r =5        21530     21743.9       2.104       2.782
+          r =6        77551     77311.8        .740       3.522
+                        p=1-exp(-SUM/2)= .82814
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 20 to 27
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          915       944.3        .909        .909
+          r =5        21789     21743.9        .094       1.003
+          r =6        77296     77311.8        .003       1.006
+                        p=1-exp(-SUM/2)= .39528
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 21 to 28
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          936       944.3        .073        .073
+          r =5        21844     21743.9        .461        .534
+          r =6        77220     77311.8        .109        .643
+                        p=1-exp(-SUM/2)= .27487
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 22 to 29
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          971       944.3        .755        .755
+          r =5        21770     21743.9        .031        .786
+          r =6        77259     77311.8        .036        .822
+                        p=1-exp(-SUM/2)= .33710
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 23 to 30
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4         1002       944.3       3.526       3.526
+          r =5        21655     21743.9        .363       3.889
+          r =6        77343     77311.8        .013       3.902
+                        p=1-exp(-SUM/2)= .85784
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 24 to 31
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          932       944.3        .160        .160
+          r =5        21615     21743.9        .764        .924
+          r =6        77453     77311.8        .258       1.182
+                        p=1-exp(-SUM/2)= .44630
+        Rank of a 6x8 binary matrix,
+     rows formed from eight bits of the RNG bcr_10mb.txt   
+     b-rank test for bits 25 to 32
+                     OBSERVED   EXPECTED     (O-E)^2/E      SUM
+          r<=4          896       944.3       2.471       2.471
+          r =5        21706     21743.9        .066       2.537
+          r =6        77398     77311.8        .096       2.633
+                        p=1-exp(-SUM/2)= .73190
+   TEST SUMMARY, 25 tests on 100,000 random 6x8 matrices
+ These should be 25 uniform [0,1] random variables:
+     .116974     .250315     .550928     .967963     .683103
+     .830172     .703667     .138152     .385041     .183802
+     .127681     .049706     .174863     .038922     .448841
+     .701720     .783992     .460637     .828140     .395280
+     .274869     .337100     .857837     .446296     .731899
+   brank test summary for bcr_10mb.txt   
+       The KS test for those 25 supposed UNI's yields
+                    KS p-value= .203997
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::                   THE BITSTREAM TEST                          ::        
+     :: The file under test is viewed as a stream of bits. Call them  ::        
+     :: b1,b2,... .  Consider an alphabet with two "letters", 0 and 1 ::        
+     :: and think of the stream of bits as a succession of 20-letter  ::        
+     :: "words", overlapping.  Thus the first word is b1b2...b20, the ::        
+     :: second is b2b3...b21, and so on.  The bitstream test counts   ::        
+     :: the number of missing 20-letter (20-bit) words in a string of ::        
+     :: 2^21 overlapping 20-letter words.  There are 2^20 possible 20 ::        
+     :: letter words.  For a truly random string of 2^21+19 bits, the ::        
+     :: number of missing words j should be (very close to) normally  ::        
+     :: distributed with mean 141,909 and sigma 428.  Thus            ::        
+     ::  (j-141909)/428 should be a standard normal variate (z score) ::        
+     :: that leads to a uniform [0,1) p value.  The test is repeated  ::        
+     :: twenty times.                                                 ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+ THE OVERLAPPING 20-tuples BITSTREAM  TEST, 20 BITS PER WORD, N words
+   This test uses N=2^21 and samples the bitstream 20 times.
+  No. missing words should average  141909. with sigma=428.
+---------------------------------------------------------
+ tst no  1:  141356 missing words,   -1.29 sigmas from mean, p-value= .09804
+ tst no  2:  142528 missing words,    1.45 sigmas from mean, p-value= .92584
+ tst no  3:  142285 missing words,     .88 sigmas from mean, p-value= .80996
+ tst no  4:  141807 missing words,    -.24 sigmas from mean, p-value= .40552
+ tst no  5:  142190 missing words,     .66 sigmas from mean, p-value= .74402
+ tst no  6:  142658 missing words,    1.75 sigmas from mean, p-value= .95987
+ tst no  7:  141458 missing words,   -1.05 sigmas from mean, p-value= .14583
+ tst no  8:  141978 missing words,     .16 sigmas from mean, p-value= .56374
+ tst no  9:  142398 missing words,    1.14 sigmas from mean, p-value= .87322
+ tst no 10:  141586 missing words,    -.76 sigmas from mean, p-value= .22499
+ tst no 11:  142139 missing words,     .54 sigmas from mean, p-value= .70423
+ tst no 12:  141788 missing words,    -.28 sigmas from mean, p-value= .38841
+ tst no 13:  142638 missing words,    1.70 sigmas from mean, p-value= .95567
+ tst no 14:  142492 missing words,    1.36 sigmas from mean, p-value= .91330
+ tst no 15:  141920 missing words,     .02 sigmas from mean, p-value= .50995
+ tst no 16:  142185 missing words,     .64 sigmas from mean, p-value= .74024
+ tst no 17:  141545 missing words,    -.85 sigmas from mean, p-value= .19732
+ tst no 18:  142722 missing words,    1.90 sigmas from mean, p-value= .97120
+ tst no 19:  141785 missing words,    -.29 sigmas from mean, p-value= .38572
+ tst no 20:  142436 missing words,    1.23 sigmas from mean, p-value= .89075
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::             The tests OPSO, OQSO and DNA                      ::        
+     ::         OPSO means Overlapping-Pairs-Sparse-Occupancy         ::        
+     :: The OPSO test considers 2-letter words from an alphabet of    ::        
+     :: 1024 letters.  Each letter is determined by a specified ten   ::        
+     :: bits from a 32-bit integer in the sequence to be tested. OPSO ::        
+     :: generates  2^21 (overlapping) 2-letter words  (from 2^21+1    ::        
+     :: "keystrokes")  and counts the number of missing words---that  ::        
+     :: is 2-letter words which do not appear in the entire sequence. ::        
+     :: That count should be very close to normally distributed with  ::        
+     :: mean 141,909, sigma 290. Thus (missingwrds-141909)/290 should ::        
+     :: be a standard normal variable. The OPSO test takes 32 bits at ::        
+     :: a time from the test file and uses a designated set of ten    ::        
+     :: consecutive bits. It then restarts the file for the next de-  ::        
+     :: signated 10 bits, and so on.                                  ::        
+     ::                                                               ::        
+     ::     OQSO means Overlapping-Quadruples-Sparse-Occupancy        ::        
+     ::   The test OQSO is similar, except that it considers 4-letter ::        
+     :: words from an alphabet of 32 letters, each letter determined  ::        
+     :: by a designated string of 5 consecutive bits from the test    ::        
+     :: file, elements of which are assumed 32-bit random integers.   ::        
+     :: The mean number of missing words in a sequence of 2^21 four-  ::        
+     :: letter words,  (2^21+3 "keystrokes"), is again 141909, with   ::        
+     :: sigma = 295.  The mean is based on theory; sigma comes from   ::        
+     :: extensive simulation.                                         ::        
+     ::                                                               ::        
+     ::    The DNA test considers an alphabet of 4 letters::  C,G,A,T,::        
+     :: determined by two designated bits in the sequence of random   ::        
+     :: integers being tested.  It considers 10-letter words, so that ::        
+     :: as in OPSO and OQSO, there are 2^20 possible words, and the   ::        
+     :: mean number of missing words from a string of 2^21  (over-    ::        
+     :: lapping)  10-letter  words (2^21+9 "keystrokes") is 141909.   ::        
+     :: The standard deviation sigma=339 was determined as for OQSO   ::        
+     :: by simulation.  (Sigma for OPSO, 290, is the true value (to   ::        
+     :: three places), not determined by simulation.                  ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+ OPSO test for generator bcr_10mb.txt   
+  Output: No. missing words (mw), equiv normal variate (z), p-value (p)
+                                                           mw     z     p
+    OPSO for bcr_10mb.txt    using bits 23 to 32        142340  1.485  .9312
+    OPSO for bcr_10mb.txt    using bits 22 to 31        141598 -1.074  .1415
+    OPSO for bcr_10mb.txt    using bits 21 to 30        141607 -1.043  .1486
+    OPSO for bcr_10mb.txt    using bits 20 to 29        142074   .568  .7149
+    OPSO for bcr_10mb.txt    using bits 19 to 28        141587 -1.111  .1332
+    OPSO for bcr_10mb.txt    using bits 18 to 27        142515  2.089  .9816
+    OPSO for bcr_10mb.txt    using bits 17 to 26        141942   .113  .5449
+    OPSO for bcr_10mb.txt    using bits 16 to 25        142298  1.340  .9099
+    OPSO for bcr_10mb.txt    using bits 15 to 24        141907  -.008  .4968
+    OPSO for bcr_10mb.txt    using bits 14 to 23        142413  1.737  .9588
+    OPSO for bcr_10mb.txt    using bits 13 to 22        141622  -.991  .1609
+    OPSO for bcr_10mb.txt    using bits 12 to 21        142521  2.109  .9825
+    OPSO for bcr_10mb.txt    using bits 11 to 20        141646  -.908  .1819
+    OPSO for bcr_10mb.txt    using bits 10 to 19        141799  -.380  .3518
+    OPSO for bcr_10mb.txt    using bits  9 to 18        142409  1.723  .9576
+    OPSO for bcr_10mb.txt    using bits  8 to 17        141695  -.739  .2299
+    OPSO for bcr_10mb.txt    using bits  7 to 16        142400  1.692  .9547
+    OPSO for bcr_10mb.txt    using bits  6 to 15        141786  -.425  .3353
+    OPSO for bcr_10mb.txt    using bits  5 to 14        140712 -4.129  .0000
+    OPSO for bcr_10mb.txt    using bits  4 to 13        140738 -4.039  .0000
+    OPSO for bcr_10mb.txt    using bits  3 to 12        141861  -.167  .4338
+    OPSO for bcr_10mb.txt    using bits  2 to 11        140994 -3.156  .0008
+    OPSO for bcr_10mb.txt    using bits  1 to 10        141547 -1.249  .1058
+ OQSO test for generator bcr_10mb.txt   
+  Output: No. missing words (mw), equiv normal variate (z), p-value (p)
+                                                           mw     z     p
+    OQSO for bcr_10mb.txt    using bits 28 to 32        141902  -.025  .4901
+    OQSO for bcr_10mb.txt    using bits 27 to 31        142630  2.443  .9927
+    OQSO for bcr_10mb.txt    using bits 26 to 30        142102   .653  .7432
+    OQSO for bcr_10mb.txt    using bits 25 to 29        141440 -1.591  .0558
+    OQSO for bcr_10mb.txt    using bits 24 to 28        142261  1.192  .8834
+    OQSO for bcr_10mb.txt    using bits 23 to 27        141488 -1.428  .0766
+    OQSO for bcr_10mb.txt    using bits 22 to 26        142298  1.318  .9062
+    OQSO for bcr_10mb.txt    using bits 21 to 25        141748  -.547  .2922
+    OQSO for bcr_10mb.txt    using bits 20 to 24        141840  -.235  .4071
+    OQSO for bcr_10mb.txt    using bits 19 to 23        141422 -1.652  .0493
+    OQSO for bcr_10mb.txt    using bits 18 to 22        141594 -1.069  .1426
+    OQSO for bcr_10mb.txt    using bits 17 to 21        142038   .436  .6686
+    OQSO for bcr_10mb.txt    using bits 16 to 20        141752  -.533  .2969
+    OQSO for bcr_10mb.txt    using bits 15 to 19        141476 -1.469  .0709
+    OQSO for bcr_10mb.txt    using bits 14 to 18        141527 -1.296  .0975
+    OQSO for bcr_10mb.txt    using bits 13 to 17        141535 -1.269  .1022
+    OQSO for bcr_10mb.txt    using bits 12 to 16        141675  -.794  .2135
+    OQSO for bcr_10mb.txt    using bits 11 to 15        142003   .318  .6246
+    OQSO for bcr_10mb.txt    using bits 10 to 14        142204   .999  .8411
+    OQSO for bcr_10mb.txt    using bits  9 to 13        142335  1.443  .9255
+    OQSO for bcr_10mb.txt    using bits  8 to 12        141999   .304  .6194
+    OQSO for bcr_10mb.txt    using bits  7 to 11        142160   .850  .8023
+    OQSO for bcr_10mb.txt    using bits  6 to 10        141883  -.089  .4644
+    OQSO for bcr_10mb.txt    using bits  5 to  9        141859  -.171  .4323
+    OQSO for bcr_10mb.txt    using bits  4 to  8        141468 -1.496  .0673
+    OQSO for bcr_10mb.txt    using bits  3 to  7        141903  -.021  .4914
+    OQSO for bcr_10mb.txt    using bits  2 to  6        141819  -.306  .3797
+    OQSO for bcr_10mb.txt    using bits  1 to  5        141508 -1.360  .0868
+  DNA test for generator bcr_10mb.txt   
+  Output: No. missing words (mw), equiv normal variate (z), p-value (p)
+                                                           mw     z     p
+     DNA for bcr_10mb.txt    using bits 31 to 32        141690  -.647  .2588
+     DNA for bcr_10mb.txt    using bits 30 to 31        142425  1.521  .9359
+     DNA for bcr_10mb.txt    using bits 29 to 30        141721  -.556  .2893
+     DNA for bcr_10mb.txt    using bits 28 to 29        141966   .167  .5664
+     DNA for bcr_10mb.txt    using bits 27 to 28        141804  -.311  .3780
+     DNA for bcr_10mb.txt    using bits 26 to 27        142211   .890  .8132
+     DNA for bcr_10mb.txt    using bits 25 to 26        142180   .798  .7877
+     DNA for bcr_10mb.txt    using bits 24 to 25        142710  2.362  .9909
+     DNA for bcr_10mb.txt    using bits 23 to 24        142082   .509  .6947
+     DNA for bcr_10mb.txt    using bits 22 to 23        141905  -.013  .4949
+     DNA for bcr_10mb.txt    using bits 21 to 22        141715  -.573  .2832
+     DNA for bcr_10mb.txt    using bits 20 to 21        141308 -1.774  .0380
+     DNA for bcr_10mb.txt    using bits 19 to 20        141654  -.753  .2257
+     DNA for bcr_10mb.txt    using bits 18 to 19        141711  -.585  .2793
+     DNA for bcr_10mb.txt    using bits 17 to 18        141321 -1.735  .0413
+     DNA for bcr_10mb.txt    using bits 16 to 17        141904  -.016  .4937
+     DNA for bcr_10mb.txt    using bits 15 to 16        141516 -1.160  .1230
+     DNA for bcr_10mb.txt    using bits 14 to 15        142210   .887  .8124
+     DNA for bcr_10mb.txt    using bits 13 to 14        142124   .633  .7367
+     DNA for bcr_10mb.txt    using bits 12 to 13        141580  -.971  .1657
+     DNA for bcr_10mb.txt    using bits 11 to 12        141563 -1.022  .1535
+     DNA for bcr_10mb.txt    using bits 10 to 11        141553 -1.051  .1466
+     DNA for bcr_10mb.txt    using bits  9 to 10        142144   .692  .7556
+     DNA for bcr_10mb.txt    using bits  8 to  9        142053   .424  .6641
+     DNA for bcr_10mb.txt    using bits  7 to  8        141816  -.275  .3915
+     DNA for bcr_10mb.txt    using bits  6 to  7        142071   .477  .6833
+     DNA for bcr_10mb.txt    using bits  5 to  6        141742  -.494  .3108
+     DNA for bcr_10mb.txt    using bits  4 to  5        141920   .031  .5126
+     DNA for bcr_10mb.txt    using bits  3 to  4        141232 -1.998  .0229
+     DNA for bcr_10mb.txt    using bits  2 to  3        141938   .085  .5337
+     DNA for bcr_10mb.txt    using bits  1 to  2        141945   .105  .5419
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::     This is the COUNT-THE-1's TEST on a stream of bytes.      ::        
+     :: Consider the file under test as a stream of bytes (four per   ::        
+     :: 32 bit integer).  Each byte can contain from 0 to 8 1's,      ::        
+     :: with probabilities 1,8,28,56,70,56,28,8,1 over 256.  Now let  ::        
+     :: the stream of bytes provide a string of overlapping  5-letter ::        
+     :: words, each "letter" taking values A,B,C,D,E. The letters are ::        
+     :: determined by the number of 1's in a byte::  0,1,or 2 yield A,::        
+     :: 3 yields B, 4 yields C, 5 yields D and 6,7 or 8 yield E. Thus ::        
+     :: we have a monkey at a typewriter hitting five keys with vari- ::        
+     :: ous probabilities (37,56,70,56,37 over 256).  There are 5^5   ::        
+     :: possible 5-letter words, and from a string of 256,000 (over-  ::        
+     :: lapping) 5-letter words, counts are made on the frequencies   ::        
+     :: for each word.   The quadratic form in the weak inverse of    ::        
+     :: the covariance matrix of the cell counts provides a chisquare ::        
+     :: test::  Q5-Q4, the difference of the naive Pearson sums of    ::        
+     :: (OBS-EXP)^2/EXP on counts for 5- and 4-letter cell counts.    ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+   Test results for bcr_10mb.txt   
+ Chi-square with 5^5-5^4=2500 d.of f. for sample size:2560000
+                               chisquare  equiv normal  p-value
+  Results fo COUNT-THE-1's in successive bytes:
+ byte stream for bcr_10mb.txt     2437.48      -.884      .188308
+ byte stream for bcr_10mb.txt     2457.13      -.606      .272184
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::     This is the COUNT-THE-1's TEST for specific bytes.        ::        
+     :: Consider the file under test as a stream of 32-bit integers.  ::        
+     :: From each integer, a specific byte is chosen , say the left-  ::        
+     :: most::  bits 1 to 8. Each byte can contain from 0 to 8 1's,   ::        
+     :: with probabilitie 1,8,28,56,70,56,28,8,1 over 256.  Now let   ::        
+     :: the specified bytes from successive integers provide a string ::        
+     :: of (overlapping) 5-letter words, each "letter" taking values  ::        
+     :: A,B,C,D,E. The letters are determined  by the number of 1's,  ::        
+     :: in that byte::  0,1,or 2 ---> A, 3 ---> B, 4 ---> C, 5 ---> D,::        
+     :: and  6,7 or 8 ---> E.  Thus we have a monkey at a typewriter  ::        
+     :: hitting five keys with with various probabilities::  37,56,70,::        
+     :: 56,37 over 256. There are 5^5 possible 5-letter words, and    ::        
+     :: from a string of 256,000 (overlapping) 5-letter words, counts ::        
+     :: are made on the frequencies for each word. The quadratic form ::        
+     :: in the weak inverse of the covariance matrix of the cell      ::        
+     :: counts provides a chisquare test::  Q5-Q4, the difference of  ::        
+     :: the naive Pearson  sums of (OBS-EXP)^2/EXP on counts for 5-   ::        
+     :: and 4-letter cell counts.                                     ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+ Chi-square with 5^5-5^4=2500 d.of f. for sample size: 256000
+                      chisquare  equiv normal  p value
+  Results for COUNT-THE-1's in specified bytes:
+           bits  1 to  8  2538.32       .542      .706088
+           bits  2 to  9  2597.37      1.377      .915741
+           bits  3 to 10  2556.13       .794      .786354
+           bits  4 to 11  2544.43       .628      .735085
+           bits  5 to 12  2509.32       .132      .552456
+           bits  6 to 13  2475.08      -.352      .362274
+           bits  7 to 14  2567.93       .961      .831657
+           bits  8 to 15  2492.44      -.107      .457436
+           bits  9 to 16  2502.40       .034      .513565
+           bits 10 to 17  2575.01      1.061      .855613
+           bits 11 to 18  2550.27       .711      .761438
+           bits 12 to 19  2462.79      -.526      .299351
+           bits 13 to 20  2645.35      2.056      .980086
+           bits 14 to 21  2555.94       .791      .785561
+           bits 15 to 22  2503.70       .052      .520871
+           bits 16 to 23  2515.82       .224      .588527
+           bits 17 to 24  2562.49       .884      .811600
+           bits 18 to 25  2497.17      -.040      .484014
+           bits 19 to 26  2459.96      -.566      .285596
+           bits 20 to 27  2403.69     -1.362      .086584
+           bits 21 to 28  2488.52      -.162      .435519
+           bits 22 to 29  2444.34      -.787      .215582
+           bits 23 to 30  2484.64      -.217      .414006
+           bits 24 to 31  2438.56      -.869      .192435
+           bits 25 to 32  2565.25       .923      .821928
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::               THIS IS A PARKING LOT TEST                      ::        
+     :: In a square of side 100, randomly "park" a car---a circle of  ::        
+     :: radius 1.   Then try to park a 2nd, a 3rd, and so on, each    ::        
+     :: time parking "by ear".  That is, if an attempt to park a car  ::        
+     :: causes a crash with one already parked, try again at a new    ::        
+     :: random location. (To avoid path problems, consider parking    ::        
+     :: helicopters rather than cars.)   Each attempt leads to either ::        
+     :: a crash or a success, the latter followed by an increment to  ::        
+     :: the list of cars already parked. If we plot n:  the number of ::        
+     :: attempts, versus k::  the number successfully parked, we get a::        
+     :: curve that should be similar to those provided by a perfect   ::        
+     :: random number generator.  Theory for the behavior of such a   ::        
+     :: random curve seems beyond reach, and as graphics displays are ::        
+     :: not available for this battery of tests, a simple characteriz ::        
+     :: ation of the random experiment is used: k, the number of cars ::        
+     :: successfully parked after n=12,000 attempts. Simulation shows ::        
+     :: that k should average 3523 with sigma 21.9 and is very close  ::        
+     :: to normally distributed.  Thus (k-3523)/21.9 should be a st-  ::        
+     :: andard normal variable, which, converted to a uniform varia-  ::        
+     :: ble, provides input to a KSTEST based on a sample of 10.      ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+           CDPARK: result of ten tests on file bcr_10mb.txt   
+            Of 12,000 tries, the average no. of successes
+                 should be 3523 with sigma=21.9
+            Successes: 3534    z-score:   .502 p-value: .692266
+            Successes: 3526    z-score:   .137 p-value: .554479
+            Successes: 3575    z-score:  2.374 p-value: .991212
+            Successes: 3519    z-score:  -.183 p-value: .427537
+            Successes: 3523    z-score:   .000 p-value: .500000
+            Successes: 3541    z-score:   .822 p-value: .794438
+            Successes: 3496    z-score: -1.233 p-value: .108811
+            Successes: 3510    z-score:  -.594 p-value: .276387
+            Successes: 3547    z-score:  1.096 p-value: .863437
+            Successes: 3563    z-score:  1.826 p-value: .966111
+ 
+           square size   avg. no.  parked   sample sigma
+             100.            3533.400       22.725
+            KSTEST for the above 10: p=  .689557
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::               THE MINIMUM DISTANCE TEST                       ::        
+     :: It does this 100 times::   choose n=8000 random points in a   ::        
+     :: square of side 10000.  Find d, the minimum distance between   ::        
+     :: the (n^2-n)/2 pairs of points.  If the points are truly inde- ::        
+     :: pendent uniform, then d^2, the square of the minimum distance ::        
+     :: should be (very close to) exponentially distributed with mean ::        
+     :: .995 .  Thus 1-exp(-d^2/.995) should be uniform on [0,1) and  ::        
+     :: a KSTEST on the resulting 100 values serves as a test of uni- ::        
+     :: formity for random points in the square. Test numbers=0 mod 5 ::        
+     :: are printed but the KSTEST is based on the full set of 100    ::        
+     :: random choices of 8000 points in the 10000x10000 square.      ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+               This is the MINIMUM DISTANCE test
+              for random integers in the file bcr_10mb.txt   
+     Sample no.    d^2     avg     equiv uni            
+           5     .2717   1.2848     .238981
+          10     .0784    .8753     .075756
+          15    1.2456    .8913     .714034
+          20    1.4729    .9863     .772442
+          25    3.4552   1.1673     .968961
+          30     .5740   1.0775     .438366
+          35     .9572   1.0332     .617889
+          40     .7682   1.1334     .537950
+          45     .1216   1.0836     .115044
+          50    2.7298   1.0868     .935657
+          55    3.0848   1.0803     .954966
+          60    2.6130   1.1683     .927640
+          65     .4088   1.1314     .336887
+          70     .2351   1.0938     .210471
+          75    1.1481   1.0916     .684574
+          80     .6815   1.0754     .495874
+          85    1.0006   1.0677     .634193
+          90    1.4481   1.1020     .766697
+          95     .2043   1.0706     .185649
+         100    3.7703   1.0853     .977388
+     MINIMUM DISTANCE TEST for bcr_10mb.txt   
+          Result of KS test on 20 transformed mindist^2's:
+                                  p-value= .732340
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ 
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::              THE 3DSPHERES TEST                               ::        
+     :: Choose  4000 random points in a cube of edge 1000.  At each   ::        
+     :: point, center a sphere large enough to reach the next closest ::        
+     :: point. Then the volume of the smallest such sphere is (very   ::        
+     :: close to) exponentially distributed with mean 120pi/3.  Thus  ::        
+     :: the radius cubed is exponential with mean 30. (The mean is    ::        
+     :: obtained by extensive simulation).  The 3DSPHERES test gener- ::        
+     :: ates 4000 such spheres 20 times.  Each min radius cubed leads ::        
+     :: to a uniform variable by means of 1-exp(-r^3/30.), then a     ::        
+     ::  KSTEST is done on the 20 p-values.                           ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+               The 3DSPHERES test for file bcr_10mb.txt   
+ sample no:  1     r^3=  22.605     p-value= .52928
+ sample no:  2     r^3=  66.870     p-value= .89236
+ sample no:  3     r^3=  10.867     p-value= .30387
+ sample no:  4     r^3=  17.994     p-value= .45108
+ sample no:  5     r^3=   8.838     p-value= .25518
+ sample no:  6     r^3=  25.015     p-value= .56562
+ sample no:  7     r^3=  28.474     p-value= .61292
+ sample no:  8     r^3=  12.312     p-value= .33663
+ sample no:  9     r^3=  39.204     p-value= .72931
+ sample no: 10     r^3=   6.040     p-value= .18237
+ sample no: 11     r^3=  17.668     p-value= .44508
+ sample no: 12     r^3=  13.542     p-value= .36326
+ sample no: 13     r^3=  38.974     p-value= .72723
+ sample no: 14     r^3=  15.132     p-value= .39613
+ sample no: 15     r^3=  20.244     p-value= .49074
+ sample no: 16     r^3=  18.705     p-value= .46394
+ sample no: 17     r^3=   2.313     p-value= .07420
+ sample no: 18     r^3=  22.702     p-value= .53081
+ sample no: 19     r^3=  81.332     p-value= .93353
+ sample no: 20     r^3=   4.749     p-value= .14641
+  A KS test is applied to those 20 p-values.
+---------------------------------------------------------
+       3DSPHERES test for file bcr_10mb.txt         p-value= .574473
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::      This is the SQEEZE test                                  ::        
+     ::  Random integers are floated to get uniforms on [0,1). Start- ::        
+     ::  ing with k=2^31=2147483647, the test finds j, the number of  ::        
+     ::  iterations necessary to reduce k to 1, using the reduction   ::        
+     ::  k=ceiling(k*U), with U provided by floating integers from    ::        
+     ::  the file being tested.  Such j's are found 100,000 times,    ::        
+     ::  then counts for the number of times j was <=6,7,...,47,>=48  ::        
+     ::  are used to provide a chi-square test for cell frequencies.  ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+            RESULTS OF SQUEEZE TEST FOR bcr_10mb.txt   
+         Table of standardized frequency counts
+     ( (obs-exp)/sqrt(exp) )^2
+        for j taking values <=6,7,8,...,47,>=48:
+     -.8      .1      .8     -.4     1.1    -1.2
+      .0      .0      .8     2.7      .4    -1.1
+      .9     -.8    -1.1      .9     -.1      .1
+     -.5     -.4     1.2      .1      .0    -1.4
+     1.7     -.3    -1.0     -.4    -2.7      .4
+      .1      .0      .6      .3      .8     1.0
+     -.5      .5     -.4     -.7      .1      .0
+    -1.1
+           Chi-square with 42 degrees of freedom: 36.349
+              z-score=  -.617  p-value= .283058
+______________________________________________________________
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::             The  OVERLAPPING SUMS test                        ::        
+     :: Integers are floated to get a sequence U(1),U(2),... of uni-  ::        
+     :: form [0,1) variables.  Then overlapping sums,                 ::        
+     ::   S(1)=U(1)+...+U(100), S2=U(2)+...+U(101),... are formed.    ::        
+     :: The S's are virtually normal with a certain covariance mat-   ::        
+     :: rix.  A linear transformation of the S's converts them to a   ::        
+     :: sequence of independent standard normals, which are converted ::        
+     :: to uniform variables for a KSTEST. The  p-values from ten     ::        
+     :: KSTESTs are given still another KSTEST.                       ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+                Test no.  1      p-value  .525567
+                Test no.  2      p-value  .162391
+                Test no.  3      p-value  .115967
+                Test no.  4      p-value  .368593
+                Test no.  5      p-value  .124749
+                Test no.  6      p-value  .575910
+                Test no.  7      p-value  .245419
+                Test no.  8      p-value  .149266
+                Test no.  9      p-value  .099098
+                Test no. 10      p-value  .752960
+   Results of the OSUM test for bcr_10mb.txt   
+        KSTEST on the above 10 p-values:  .952129
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     ::     This is the RUNS test.  It counts runs up, and runs down, ::        
+     :: in a sequence of uniform [0,1) variables, obtained by float-  ::        
+     :: ing the 32-bit integers in the specified file. This example   ::        
+     :: shows how runs are counted:  .123,.357,.789,.425,.224,.416,.95::        
+     :: contains an up-run of length 3, a down-run of length 2 and an ::        
+     :: up-run of (at least) 2, depending on the next values.  The    ::        
+     :: covariance matrices for the runs-up and runs-down are well    ::        
+     :: known, leading to chisquare tests for quadratic forms in the  ::        
+     :: weak inverses of the covariance matrices.  Runs are counted   ::        
+     :: for sequences of length 10,000.  This is done ten times. Then ::        
+     :: repeated.                                                     ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+           The RUNS test for file bcr_10mb.txt   
+     Up and down runs in a sample of 10000
+_________________________________________________ 
+                 Run test for bcr_10mb.txt   :
+       runs up; ks test for 10 p's: .386290
+     runs down; ks test for 10 p's: .949672
+                 Run test for bcr_10mb.txt   :
+       runs up; ks test for 10 p's: .278177
+     runs down; ks test for 10 p's: .906895
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+     :: This is the CRAPS TEST. It plays 200,000 games of craps, finds::        
+     :: the number of wins and the number of throws necessary to end  ::        
+     :: each game.  The number of wins should be (very close to) a    ::        
+     :: normal with mean 200000p and variance 200000p(1-p), with      ::        
+     :: p=244/495.  Throws necessary to complete the game can vary    ::        
+     :: from 1 to infinity, but counts for all>21 are lumped with 21. ::        
+     :: A chi-square test is made on the no.-of-throws cell counts.   ::        
+     :: Each 32-bit integer from the test file provides the value for ::        
+     :: the throw of a die, by floating to [0,1), multiplying by 6    ::        
+     :: and taking 1 plus the integer part of the result.             ::        
+     :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::        
+                Results of craps test for bcr_10mb.txt   
+  No. of wins:  Observed Expected
+                                98086    98585.86
+                  98086= No. of wins, z-score=-2.236 pvalue= .01269
+   Analysis of Throws-per-Game:
+ Chisq=  18.78 for 20 degrees of freedom, p=  .46363
+               Throws Observed Expected  Chisq     Sum
+                  1    66580    66666.7    .113     .113
+                  2    38003    37654.3   3.229    3.341
+                  3    26780    26954.7   1.133    4.474
+                  4    19215    19313.5    .502    4.976
+                  5    13898    13851.4    .157    5.133
+                  6     9868     9943.5    .574    5.707
+                  7     7251     7145.0   1.572    7.278
+                  8     5160     5139.1    .085    7.364
+                  9     3594     3699.9   3.029   10.393
+                 10     2658     2666.3    .026   10.419
+                 11     1923     1923.3    .000   10.419
+                 12     1393     1388.7    .013   10.432
+                 13     1007     1003.7    .011   10.442
+                 14      748      726.1    .658   11.100
+                 15      523      525.8    .015   11.116
+                 16      384      381.2    .021   11.137
+                 17      293      276.5    .980   12.117
+                 18      169      200.8   5.045   17.162
+                 19      140      146.0    .245   17.407
+                 20      117      106.2   1.095   18.502
+                 21      296      287.1    .275   18.777
+            SUMMARY  FOR bcr_10mb.txt   
+                p-value for no. of wins: .012687
+                p-value for throws/game: .463634
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+ Results of DIEHARD battery of tests sent to file resbcr.txt     

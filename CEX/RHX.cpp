@@ -86,7 +86,7 @@ const size_t RHX::BlockSize()
 	return BLOCK_SIZE;
 }
 
-const BlockCipherExtensions RHX::CipherExtension()
+const BlockCipherExtensions RHX::CipherExtension() // TODO: get rid of this, use the cipher enumeral
 {
 	return m_cprExtension;
 }
@@ -103,7 +103,42 @@ const size_t RHX::DistributionCodeMax()
 
 const BlockCiphers RHX::Enumeral()
 {
-	return BlockCiphers::AES;
+	BlockCiphers name;
+
+	switch (m_cprExtension)
+	{
+		case BlockCipherExtensions::HKDF256:
+		{
+			name = BlockCiphers::RHXH256;
+			break;
+		}
+		case BlockCipherExtensions::HKDF512:
+		{
+			name = BlockCiphers::RHXH512;
+			break;
+		}
+		case BlockCipherExtensions::SHAKE256:
+		{
+			name = BlockCiphers::RHXS256;
+			break;
+		}
+		case BlockCipherExtensions::SHAKE512:
+		{
+			name = BlockCiphers::RHXS512;
+			break;
+		}
+		case BlockCipherExtensions::SHAKE1024:
+		{
+			name = BlockCiphers::RHXS1024;
+			break;
+		}
+		default:
+		{
+			name = BlockCiphers::AES;
+		}
+	}
+
+	return name;
 }
 
 const bool RHX::IsEncryption()
@@ -123,30 +158,11 @@ const std::vector<SymmetricKeySize> &RHX::LegalKeySizes()
 
 const std::string RHX::Name()
 {
-	std::string txtName = "";
+	std::string name;
 
-	if (m_cprExtension == BlockCipherExtensions::SHAKE256)
-	{
-		txtName = CIPHER_NAME + std::string("-SHAKE256");
-	}
-	else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
-	{
-		txtName = CLASS_NAME + std::string("-SHAKE512");
-	}
-	else if (m_cprExtension == BlockCipherExtensions::HKDF256)
-	{
-		txtName = CLASS_NAME + std::string("-HKDF-SHA256");
-	}
-	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
-	{
-		txtName = CLASS_NAME + std::string("-HKDF-SHA512");
-	}
-	else
-	{
-		txtName = CIPHER_NAME;
-	}
+	name = Enumeration::BlockCipherConvert::ToName(Enumeral());
 
-	return txtName;
+	return name;
 }
 
 const size_t RHX::Rounds()
@@ -181,26 +197,26 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void RHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
+void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.Key().size()))
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_distCodeMax)
+	if (m_cprExtension != BlockCipherExtensions::None && Parameters.Info().size() > m_distCodeMax)
 	{
 		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid info size; info parameter must be no longer than DistributionCodeMax size."), ErrorCodes::InvalidSize);
 	}
 
-	if (KeyParams.Info().size() > 0)
+	if (Parameters.Info().size() > 0)
 	{
-		m_distCode = KeyParams.Info();
+		m_distCode = Parameters.Info();
 	}
 
 	m_isEncryption = Encryption;
 
 	// expand the key
-	ExpandKey(Encryption, KeyParams.Key());
+	ExpandKey(Encryption, Parameters.Key());
 
 #if defined(CEX_PREFETCH_RHX_TABLES)
 	Prefetch();

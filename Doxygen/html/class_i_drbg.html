@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.6</span>
+   &#160;<span id="projectnumber">1.0.0.7</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -82,9 +82,10 @@ Inheritance diagram for IDrbg:</div>
  <div class="center">
   <img src="class_i_drbg.png" usemap="#IDrbg_map" alt=""/>
   <map id="IDrbg_map" name="IDrbg_map">
-<area href="class_b_c_g.html" title="An implementation of a Block cipher Counter mode Generator DRBG " alt="BCG" shape="rect" coords="0,56,43,80"/>
-<area href="class_c_s_g.html" title="An implementation of an cSHAKE Generator DRBG " alt="CSG" shape="rect" coords="53,56,96,80"/>
-<area href="class_h_c_g.html" title="An implementation of an HMAC Counter Generator DRBG " alt="HCG" shape="rect" coords="106,56,149,80"/>
+<area href="class_drbg_base.html" title="The KDF base class; this is not an operable class " alt="DrbgBase" shape="rect" coords="78,56,146,80"/>
+<area href="class_b_c_g.html" title="An implementation of a Block cipher Counter mode Generator DRBG " alt="BCG" shape="rect" coords="0,112,68,136"/>
+<area href="class_c_s_g.html" title="An implementation of an cSHAKE Generator DRBG " alt="CSG" shape="rect" coords="78,112,146,136"/>
+<area href="class_h_c_g.html" title="An implementation of an HMAC Counter Generator DRBG " alt="HCG" shape="rect" coords="156,112,224,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -102,12 +103,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa779f47ba55bd738b9702fb434ac8d34"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#aa779f47ba55bd738b9702fb434ac8d34">~IDrbg</a> () noexcept</td></tr>
 <tr class="memdesc:aa779f47ba55bd738b9702fb434ac8d34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#aa779f47ba55bd738b9702fb434ac8d34">More...</a><br /></td></tr>
 <tr class="separator:aa779f47ba55bd738b9702fb434ac8d34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a87302531f591a7a91c2511b5f5c84e56"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a87302531f591a7a91c2511b5f5c84e56">DistributionCode</a> ()=0</td></tr>
-<tr class="memdesc:a87302531f591a7a91c2511b5f5c84e56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.  <a href="#a87302531f591a7a91c2511b5f5c84e56">More...</a><br /></td></tr>
-<tr class="separator:a87302531f591a7a91c2511b5f5c84e56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a493b1e468746ec913ad3eb9c4c5359ea"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a493b1e468746ec913ad3eb9c4c5359ea">DistributionCodeMax</a> ()=0</td></tr>
-<tr class="memdesc:a493b1e468746ec913ad3eb9c4c5359ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum size of the distribution code in bytes.  <a href="#a493b1e468746ec913ad3eb9c4c5359ea">More...</a><br /></td></tr>
-<tr class="separator:a493b1e468746ec913ad3eb9c4c5359ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a380dcc67575d1d365a7b67d952c743f3"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#ga8889084a5726d1d32ee6b0a6066cdaae">Drbgs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a380dcc67575d1d365a7b67d952c743f3">Enumeral</a> ()=0</td></tr>
 <tr class="memdesc:a380dcc67575d1d365a7b67d952c743f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Drbg generators type name  <a href="#a380dcc67575d1d365a7b67d952c743f3">More...</a><br /></td></tr>
 <tr class="separator:a380dcc67575d1d365a7b67d952c743f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -129,36 +124,30 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4a1572086749484e4b52c1dcdab90601"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a4a1572086749484e4b52c1dcdab90601">Name</a> ()=0</td></tr>
 <tr class="memdesc:a4a1572086749484e4b52c1dcdab90601"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Drbg generators class name  <a href="#a4a1572086749484e4b52c1dcdab90601">More...</a><br /></td></tr>
 <tr class="separator:a4a1572086749484e4b52c1dcdab90601"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2b70de3e99388e38b5b6bc5165a0664"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#ab2b70de3e99388e38b5b6bc5165a0664">NonceSize</a> ()=0</td></tr>
-<tr class="memdesc:ab2b70de3e99388e38b5b6bc5165a0664"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The size of the nonce counter value in bytes  <a href="#ab2b70de3e99388e38b5b6bc5165a0664">More...</a><br /></td></tr>
-<tr class="separator:ab2b70de3e99388e38b5b6bc5165a0664"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd2c3ac5a25f6abedc68c69f53374c24"><td class="memItemLeft" align="right" valign="top">virtual size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#abd2c3ac5a25f6abedc68c69f53374c24">ReseedThreshold</a> ()=0</td></tr>
-<tr class="memdesc:abd2c3ac5a25f6abedc68c69f53374c24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The maximum output generated between seed recycling  <a href="#abd2c3ac5a25f6abedc68c69f53374c24">More...</a><br /></td></tr>
-<tr class="separator:abd2c3ac5a25f6abedc68c69f53374c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa09c6f5d57f335e4466854c73ef1cb37"><td class="memItemLeft" align="right" valign="top">virtual const size_t &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#aa09c6f5d57f335e4466854c73ef1cb37">ReseedThreshold</a> ()=0</td></tr>
+<tr class="memdesc:aa09c6f5d57f335e4466854c73ef1cb37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The maximum output generated between seed recycling  <a href="#aa09c6f5d57f335e4466854c73ef1cb37">More...</a><br /></td></tr>
+<tr class="separator:aa09c6f5d57f335e4466854c73ef1cb37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a620be3a5ed3faa9c111afc1f0222b79e"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a620be3a5ed3faa9c111afc1f0222b79e">SecurityStrength</a> ()=0</td></tr>
 <tr class="memdesc:a620be3a5ed3faa9c111afc1f0222b79e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The security strength in bits  <a href="#a620be3a5ed3faa9c111afc1f0222b79e">More...</a><br /></td></tr>
 <tr class="separator:a620be3a5ed3faa9c111afc1f0222b79e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8149cedfc65c1d7e89ff8690cad4f157"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a8149cedfc65c1d7e89ff8690cad4f157">Generate</a> (std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
-<tr class="memdesc:a8149cedfc65c1d7e89ff8690cad4f157"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo-random bytes  <a href="#a8149cedfc65c1d7e89ff8690cad4f157">More...</a><br /></td></tr>
-<tr class="separator:a8149cedfc65c1d7e89ff8690cad4f157"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab890c39c5db4497e5c0dad8684377d59"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#ab890c39c5db4497e5c0dad8684377d59">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
-<tr class="memdesc:ab890c39c5db4497e5c0dad8684377d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate pseudo-random bytes using offset and length parameters  <a href="#ab890c39c5db4497e5c0dad8684377d59">More...</a><br /></td></tr>
-<tr class="separator:ab890c39c5db4497e5c0dad8684377d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a871fd18ab7bdf5dd177dde83432d2696"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a871fd18ab7bdf5dd177dde83432d2696">Generate</a> (std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
+<tr class="memdesc:a871fd18ab7bdf5dd177dde83432d2696"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#a871fd18ab7bdf5dd177dde83432d2696">More...</a><br /></td></tr>
+<tr class="separator:a871fd18ab7bdf5dd177dde83432d2696"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20b97d7d1c9d3e3e478d0d55fe8190ec"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a20b97d7d1c9d3e3e478d0d55fe8190ec">Generate</a> (SecureVector&lt; byte &gt; &amp;Output)=0</td></tr>
+<tr class="memdesc:a20b97d7d1c9d3e3e478d0d55fe8190ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes  <a href="#a20b97d7d1c9d3e3e478d0d55fe8190ec">More...</a><br /></td></tr>
+<tr class="separator:a20b97d7d1c9d3e3e478d0d55fe8190ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d423af67ac8967741b1843b43971f5e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a7d423af67ac8967741b1843b43971f5e">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
+<tr class="memdesc:a7d423af67ac8967741b1843b43971f5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes using offset and length parameters  <a href="#a7d423af67ac8967741b1843b43971f5e">More...</a><br /></td></tr>
+<tr class="separator:a7d423af67ac8967741b1843b43971f5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92ec2c9f208e752769ef1fa26885a537"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a92ec2c9f208e752769ef1fa26885a537">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
+<tr class="memdesc:a92ec2c9f208e752769ef1fa26885a537"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes using offset and length parameters  <a href="#a92ec2c9f208e752769ef1fa26885a537">More...</a><br /></td></tr>
+<tr class="separator:a92ec2c9f208e752769ef1fa26885a537"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f4774cd3d6f777ac8a4434565bbb96c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a2f4774cd3d6f777ac8a4434565bbb96c">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam)=0</td></tr>
 <tr class="memdesc:a2f4774cd3d6f777ac8a4434565bbb96c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key and optional salt (Nonce) and info string (Info)  <a href="#a2f4774cd3d6f777ac8a4434565bbb96c">More...</a><br /></td></tr>
 <tr class="separator:a2f4774cd3d6f777ac8a4434565bbb96c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08564f87d3d4280c6d07489a2d3d34fb"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a08564f87d3d4280c6d07489a2d3d34fb">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)=0</td></tr>
-<tr class="memdesc:a08564f87d3d4280c6d07489a2d3d34fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key  <a href="#a08564f87d3d4280c6d07489a2d3d34fb">More...</a><br /></td></tr>
-<tr class="separator:a08564f87d3d4280c6d07489a2d3d34fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acccdc6df488c192d2fb46faedb686d4f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#acccdc6df488c192d2fb46faedb686d4f">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt)=0</td></tr>
-<tr class="memdesc:acccdc6df488c192d2fb46faedb686d4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays  <a href="#acccdc6df488c192d2fb46faedb686d4f">More...</a><br /></td></tr>
-<tr class="separator:acccdc6df488c192d2fb46faedb686d4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65a3770b3c68cac0c93eea7247393f36"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a65a3770b3c68cac0c93eea7247393f36">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt, const std::vector&lt; byte &gt; &amp;Info)=0</td></tr>
-<tr class="memdesc:a65a3770b3c68cac0c93eea7247393f36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, a salt array, and an information string or nonce  <a href="#a65a3770b3c68cac0c93eea7247393f36">More...</a><br /></td></tr>
-<tr class="separator:a65a3770b3c68cac0c93eea7247393f36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7282024d32890705711a3030dd53983e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a7282024d32890705711a3030dd53983e">Update</a> (const std::vector&lt; byte &gt; &amp;Seed)=0</td></tr>
-<tr class="memdesc:a7282024d32890705711a3030dd53983e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material  <a href="#a7282024d32890705711a3030dd53983e">More...</a><br /></td></tr>
-<tr class="separator:a7282024d32890705711a3030dd53983e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c2ae576f76fc6f10d067b5dee50852b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#a7c2ae576f76fc6f10d067b5dee50852b">Update</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)=0</td></tr>
+<tr class="memdesc:a7c2ae576f76fc6f10d067b5dee50852b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material  <a href="#a7c2ae576f76fc6f10d067b5dee50852b">More...</a><br /></td></tr>
+<tr class="separator:a7c2ae576f76fc6f10d067b5dee50852b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Deterministic Random Byte Generator (DRBG) interface class </p>
@@ -246,66 +235,6 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a87302531f591a7a91c2511b5f5c84e56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a87302531f591a7a91c2511b5f5c84e56">&#9670;&nbsp;</a></span>DistributionCode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::vector&lt;byte&gt;&amp; IDrbg::DistributionCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters. </p>
-<p>Must be set before Initialize(ISymmetricKey) is called. Changing this code will create a unique distribution of the generator. Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size. For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</p>
-
-<p>Implemented in <a class="el" href="class_h_c_g.html#ac3ed79900da0b8e70a011a7c475608d4">HCG</a>, <a class="el" href="class_b_c_g.html#aa19356b045fd0b80202c17d1c37e0051">BCG</a>, and <a class="el" href="class_c_s_g.html#ad934a92f8abdaa0fd501a87e0a11ef8f">CSG</a>.</p>
-
-</div>
-</div>
-<a id="a493b1e468746ec913ad3eb9c4c5359ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a493b1e468746ec913ad3eb9c4c5359ea">&#9670;&nbsp;</a></span>DistributionCodeMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual const size_t IDrbg::DistributionCodeMax </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The maximum size of the distribution code in bytes. </p>
-<p>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase. For best security, the distribution code should be random, secret, and equal in size to this value.</p>
-
-<p>Implemented in <a class="el" href="class_h_c_g.html#a9209933dfea7d1b73a866cc5ed4f5852">HCG</a>, <a class="el" href="class_b_c_g.html#a84683455a705ff8535e6fd87bd555266">BCG</a>, and <a class="el" href="class_c_s_g.html#a3f034874640c065973c5264d8cb40913">CSG</a>.</p>
-
-</div>
-</div>
 <a id="a380dcc67575d1d365a7b67d952c743f3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a380dcc67575d1d365a7b67d952c743f3">&#9670;&nbsp;</a></span>Enumeral()</h2>
 
@@ -331,12 +260,12 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The Drbg generators type name </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a5db71c7ad66838a208f713cb5f16afc6">HCG</a>, <a class="el" href="class_b_c_g.html#ac8b1b6417d79539914e9cdac8b71da62">BCG</a>, and <a class="el" href="class_c_s_g.html#a0810fef95925643e2d81a09aacf7b5d3">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_drbg_base.html#a6e70e47f63286b4d088aad61a9777ffa">DrbgBase</a>.</p>
 
 </div>
 </div>
-<a id="a8149cedfc65c1d7e89ff8690cad4f157"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8149cedfc65c1d7e89ff8690cad4f157">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/2]</span></h2>
+<a id="a871fd18ab7bdf5dd177dde83432d2696"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a871fd18ab7bdf5dd177dde83432d2696">&#9670;&nbsp;</a></span>Generate() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -345,7 +274,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual size_t IDrbg::Generate </td>
+          <td class="memname">virtual void IDrbg::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -359,10 +288,10 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Generate a block of pseudo-random bytes </p>
+<p>Fill a standard vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output standard vector to fill with random bytes</td></tr>
   </table>
   </dd>
 </dl>
@@ -373,12 +302,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a7679e06f54695aaa3a407304babbc597">HCG</a>, <a class="el" href="class_b_c_g.html#ab4b8402a1d7074fb413d9dc39f9f5a1c">BCG</a>, and <a class="el" href="class_c_s_g.html#a6f2588ea9cbe89cdd9b24f3b0b45753a">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#ac290c36b5c445e8a1a4b79db54099657">HCG</a>, <a class="el" href="class_b_c_g.html#a2fa4cdd8a6f6d9d4843a7d179c73c476">BCG</a>, and <a class="el" href="class_c_s_g.html#a72c4b21b9d4d99fda0f0f9e934b9a1fe">CSG</a>.</p>
 
 </div>
 </div>
-<a id="ab890c39c5db4497e5c0dad8684377d59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab890c39c5db4497e5c0dad8684377d59">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/2]</span></h2>
+<a id="a20b97d7d1c9d3e3e478d0d55fe8190ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20b97d7d1c9d3e3e478d0d55fe8190ec">&#9670;&nbsp;</a></span>Generate() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -387,7 +316,49 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual size_t IDrbg::Generate </td>
+          <td class="memname">virtual void IDrbg::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector with pseudo-random bytes </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output secure vector to fill with random bytes</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_h_c_g.html#a2cd32cf203484e6bd156c59278d1f817">HCG</a>, <a class="el" href="class_b_c_g.html#aa37fc9bcde42b7de43f178bdb9276352">BCG</a>, and <a class="el" href="class_c_s_g.html#a85301f62a5975dea35063f12875ba9e9">CSG</a>.</p>
+
+</div>
+</div>
+<a id="a7d423af67ac8967741b1843b43971f5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d423af67ac8967741b1843b43971f5e">&#9670;&nbsp;</a></span>Generate() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void IDrbg::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -417,16 +388,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Generate pseudo-random bytes using offset and length parameters </p>
+<p>Fill a standard vector with pseudo-random bytes using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>Output array filled with random bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting position within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The output standard vector to fill with random bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting position within the output array</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
@@ -434,12 +404,72 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a6096c3b466e866315d411873f1a7c55f">HCG</a>, <a class="el" href="class_b_c_g.html#acbf7733acc9eda08b57b1183655473d3">BCG</a>, and <a class="el" href="class_c_s_g.html#a9f1ab82907b467f70d63a421be0876cd">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a7c30f7f6c929b339073b072df8fc5a41">HCG</a>, <a class="el" href="class_b_c_g.html#ab8b5644b28ffc75608a0a1b417973182">BCG</a>, and <a class="el" href="class_c_s_g.html#a12aab20c8a702ffe152e5cb6fac47a17">CSG</a>.</p>
+
+</div>
+</div>
+<a id="a92ec2c9f208e752769ef1fa26885a537"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92ec2c9f208e752769ef1fa26885a537">&#9670;&nbsp;</a></span>Generate() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void IDrbg::Generate </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a secure vector with pseudo-random bytes using offset and length parameters </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output secure vector to fill with random bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting position within the output array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the generator is not initialized, the output size is misaligned, the maximum request size is exceeded, or if the maximum reseed requests are exceeded</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_h_c_g.html#a19f4e5cd390c64cf62d2efa9b5fafdb4">HCG</a>, <a class="el" href="class_b_c_g.html#a2ccbb3b7eb133d9652ed83d9eb98beee">BCG</a>, and <a class="el" href="class_c_s_g.html#a6c7f159cb581dd916216f749b4367c07">CSG</a>.</p>
 
 </div>
 </div>
 <a id="a2f4774cd3d6f777ac8a4434565bbb96c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f4774cd3d6f777ac8a4434565bbb96c">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[1/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f4774cd3d6f777ac8a4434565bbb96c">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -476,162 +506,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a2fd26876fccbfd4dbf9f55eb5b43ff36">HCG</a>, <a class="el" href="class_b_c_g.html#a27a0028a85ef9242435f4b7358be9913">BCG</a>, and <a class="el" href="class_c_s_g.html#a0d09dedea4d890771dfbce25247a8ead">CSG</a>.</p>
-
-</div>
-</div>
-<a id="a08564f87d3d4280c6d07489a2d3d34fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08564f87d3d4280c6d07489a2d3d34fb">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[2/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void IDrbg::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with a key </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_h_c_g.html#aea34d96e4fd6af3fb02d9f5c026e7999">HCG</a>, <a class="el" href="class_b_c_g.html#af1b0813b84fe782553043d8ee0998c86">BCG</a>, and <a class="el" href="class_c_s_g.html#afcbad0c5e86f83b47c8eafe9b2ed5b28">CSG</a>.</p>
-
-</div>
-</div>
-<a id="acccdc6df488c192d2fb46faedb686d4f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acccdc6df488c192d2fb46faedb686d4f">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[3/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void IDrbg::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Salt</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with key and salt arrays </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Salt</td><td>The salt value containing an additional source of entropy</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_b_c_g.html#ac5c615a061033480d4791cd700734e39">BCG</a>, <a class="el" href="class_h_c_g.html#ad140f22333acfecfeb52aef49a907311">HCG</a>, and <a class="el" href="class_c_s_g.html#a91f0bc20e73c30c31f993f9791f10473">CSG</a>.</p>
-
-</div>
-</div>
-<a id="a65a3770b3c68cac0c93eea7247393f36"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65a3770b3c68cac0c93eea7247393f36">&#9670;&nbsp;</a></span>Initialize() <span class="overload">[4/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void IDrbg::Initialize </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Salt</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Info</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialize the generator with a key, a salt array, and an information string or nonce </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Salt</td><td>The salt value used as an additional source of entropy</td></tr>
-    <tr><td class="paramname">Info</td><td>The information string or nonce used as a third source of entropy</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoGeneratorException</td><td>Thrown if the seed is not a legal seed size</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_b_c_g.html#a199c22aa6dd078e3e381444b63e1c9b0">BCG</a>, <a class="el" href="class_h_c_g.html#a1e88de3578969c6e77a6ef9b4ea0ac7e">HCG</a>, and <a class="el" href="class_c_s_g.html#ac4cb7ae47cb8eeb414680b5225ecaada">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a2fd26876fccbfd4dbf9f55eb5b43ff36">HCG</a>, <a class="el" href="class_b_c_g.html#a01113115b3afd7ee9ee8486c16a0f733">BCG</a>, and <a class="el" href="class_c_s_g.html#a0d09dedea4d890771dfbce25247a8ead">CSG</a>.</p>
 
 </div>
 </div>
@@ -689,7 +564,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: List of available legal key sizes </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a136714e25b6094e19ff5a07a60ed7c24">HCG</a>, <a class="el" href="class_b_c_g.html#adbf9ea291f7841e4f375ef2cb8ef28d2">BCG</a>, and <a class="el" href="class_c_s_g.html#afc5f7363de36a5501c0e0e60b2dfb585">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_drbg_base.html#a4300ef8d2b1d53a4a25e6d4536fc6ab3">DrbgBase</a>.</p>
 
 </div>
 </div>
@@ -718,7 +593,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The maximum number of bytes that can be generated with a generator instance </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#abbce042e2e273d37aff7e4c1dd831e4a">HCG</a>, <a class="el" href="class_b_c_g.html#a951d5dfab9aab716a95ba874de3d9d65">BCG</a>, and <a class="el" href="class_c_s_g.html#aae62f743107bb1b48071653a3636bd06">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_drbg_base.html#a91dd8c5b533f536198d96a8819ed9c7e">DrbgBase</a>.</p>
 
 </div>
 </div>
@@ -747,7 +622,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The maximum number of bytes that can be generated in a single request </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a3b78dbe55ff531cc2717f0e54b18cec1">HCG</a>, <a class="el" href="class_b_c_g.html#abdfc9eee9b9276d67b20e697ad9b04f0">BCG</a>, and <a class="el" href="class_c_s_g.html#a7bf2e146ffc9b1d752333093dc177cc4">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_drbg_base.html#abc735bf3b0f131a1c3ffe25ebff448da">DrbgBase</a>.</p>
 
 </div>
 </div>
@@ -776,7 +651,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The maximum number of times the generator can be reseeded </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a89b315b1b7a31743e6efd7b6cefa5a31">HCG</a>, <a class="el" href="class_b_c_g.html#a53ff8cfd7e65a8d1875ad85f84b815fe">BCG</a>, and <a class="el" href="class_c_s_g.html#a93d817a5f1309678d8995b7cd56e0851">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_drbg_base.html#ae750bd31b66bd0ecbe439ff5d5b0322f">DrbgBase</a>.</p>
 
 </div>
 </div>
@@ -805,36 +680,7 @@ Public Member Functions</h2></td></tr>
 
 <p>The Drbg generators class name </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a5ba84de2fbf39e146197db4d7ed42458">HCG</a>, <a class="el" href="class_b_c_g.html#a2f5139fb9e5ef0ab20daf3ae70b53d49">BCG</a>, and <a class="el" href="class_c_s_g.html#a6cf1f9572a3a2c5e50993b3533053565">CSG</a>.</p>
-
-</div>
-</div>
-<a id="ab2b70de3e99388e38b5b6bc5165a0664"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab2b70de3e99388e38b5b6bc5165a0664">&#9670;&nbsp;</a></span>NonceSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual const size_t IDrbg::NonceSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The size of the nonce counter value in bytes </p>
-
-<p>Implemented in <a class="el" href="class_h_c_g.html#a481d211d575a0cfed45bfc19dc3e3386">HCG</a>, <a class="el" href="class_b_c_g.html#aacac515a419c94695c0f73e5fe365b27">BCG</a>, and <a class="el" href="class_c_s_g.html#aae673e286baae3cb496c3dec19db1468">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_drbg_base.html#ab738f0a3709ffe54d16c5bc9ff64914f">DrbgBase</a>.</p>
 
 </div>
 </div>
@@ -866,8 +712,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="abd2c3ac5a25f6abedc68c69f53374c24"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd2c3ac5a25f6abedc68c69f53374c24">&#9670;&nbsp;</a></span>ReseedThreshold()</h2>
+<a id="aa09c6f5d57f335e4466854c73ef1cb37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa09c6f5d57f335e4466854c73ef1cb37">&#9670;&nbsp;</a></span>ReseedThreshold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -876,7 +722,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual size_t&amp; IDrbg::ReseedThreshold </td>
+          <td class="memname">virtual const size_t&amp; IDrbg::ReseedThreshold </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -891,7 +737,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read/Write: The maximum output generated between seed recycling </p>
 
-<p>Implemented in <a class="el" href="class_b_c_g.html#ac04f934fb7c792f758ddee26a0195546">BCG</a>, <a class="el" href="class_h_c_g.html#a73d80a05fdc6923db4f0755acbb62392">HCG</a>, and <a class="el" href="class_c_s_g.html#a11d758c403896a184e272f077d7a451b">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#aefc5099924952d3b59f56616caf67837">HCG</a>, <a class="el" href="class_b_c_g.html#abbe43c4053a53f2babae478906cb9367">BCG</a>, and <a class="el" href="class_c_s_g.html#abdbccd7566ebbe233e8341e20d0d4168">CSG</a>.</p>
 
 </div>
 </div>
@@ -924,8 +770,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a7282024d32890705711a3030dd53983e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7282024d32890705711a3030dd53983e">&#9670;&nbsp;</a></span>Update()</h2>
+<a id="a7c2ae576f76fc6f10d067b5dee50852b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c2ae576f76fc6f10d067b5dee50852b">&#9670;&nbsp;</a></span>Update()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -937,7 +783,7 @@ Public Member Functions</h2></td></tr>
           <td class="memname">virtual void IDrbg::Update </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Seed</em></td><td>)</td>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -951,7 +797,7 @@ Public Member Functions</h2></td></tr>
 <p>Update the generators keying material </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Seed</td><td>The new seed value array</td></tr>
+    <tr><td class="paramname">Key</td><td>The new seed value array</td></tr>
   </table>
   </dd>
 </dl>
@@ -962,7 +808,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_b_c_g.html#a0bdc41d7400fb371414ac14b4be01120">BCG</a>, <a class="el" href="class_h_c_g.html#af2aa30ee3c58b54b6048cc8ab0dd4dd7">HCG</a>, and <a class="el" href="class_c_s_g.html#ad810921127280d5db5a108efae8e1e61">CSG</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_g.html#ae4cfbf45c3c3c3ec7147c9cb23b3f1df">BCG</a>, <a class="el" href="class_h_c_g.html#aed045e88f8a2a708abe5ea77dd82ff25">HCG</a>, and <a class="el" href="class_c_s_g.html#a91eb2a57f1f8d1c829b63f2d22223cc2">CSG</a>.</p>
 
 </div>
 </div>

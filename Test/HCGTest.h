@@ -21,7 +21,9 @@ namespace Test
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 65536;
 		static const size_t MINM_ALLOC = 1024;
-		static const size_t SAMPLE_SIZE = 1024000;
+		// 2MB sample, should be 100MB or more for accuracy
+		// Note: the sample size must be evenly divisible by 8.
+		static const size_t SAMPLE_SIZE = 2048000;
 		static const size_t TEST_CYCLES = 10;
 
 		std::vector<std::vector<byte>> m_expected;
@@ -77,6 +79,11 @@ namespace Test
 		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected);
 
 		/// <summary>
+		/// Test the auto re-seeding mechanism
+		/// </summary>
+		void Reseed();
+
+		/// <summary>
 		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data
 		/// </summary>
 		void Stress();
@@ -85,7 +92,6 @@ namespace Test
 
 		void Initialize();
 		void OnProgress(const std::string &Data);
-		bool OrderedRuns(const std::vector<byte> &Input);
 	};
 }
 

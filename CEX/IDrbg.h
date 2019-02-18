@@ -7,6 +7,7 @@
 #include "IProvider.h"
 #include "ISymmetricKey.h"
 #include "Providers.h"
+#include "SecureVector.h"
 #include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
 #include "SymmetricSecureKey.h"
@@ -59,22 +60,6 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
-	/// Changing this code will create a unique distribution of the generator.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
-	/// </summary>
-	virtual std::vector<byte> &DistributionCode() = 0;
-
-	/// <summary>
-	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase.
-	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
-	/// </summary>
-	virtual const size_t DistributionCodeMax() = 0;
-
-	/// <summary>
 	/// Read Only: The Drbg generators type name
 	/// </summary>
 	virtual const Drbgs Enumeral() = 0;
@@ -110,12 +95,7 @@ public:
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Read Only: The size of the nonce counter value in bytes
-	/// </summary>
-	virtual const size_t NonceSize() = 0;
-
-	/// <summary>
-	/// Read/Write: The maximum output generated between seed recycling
+	/// Read/Write: The maximum output generated between auto-seed generation when using an entropy provider
 	/// </summary>
 	virtual size_t &ReseedThreshold() = 0;
 
@@ -127,76 +107,76 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Generate a block of pseudo-random bytes
+	/// Fill a standard vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
+	/// <param name="Output">The output standard vector to fill with random bytes</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	virtual size_t Generate(std::vector<byte> &Output) = 0;
+	virtual void Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Generate pseudo-random bytes using offset and length parameters
+	/// Fill a secure vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">Output array filled with random bytes</param>
-	/// <param name="OutOffset">The starting position within the Output array</param>
-	/// <param name="Length">The number of bytes to generate</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
+	/// <param name="Output">The output secure vector to fill with random bytes</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
-	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
+	virtual void Generate(SecureVector<byte> &Output) = 0;
+
+	/// <summary>
+	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	/// <param name="OutOffset">The starting position within the output vector</param>
+	/// <param name="Length">The number of bytes to generate</param>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
+	virtual void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
+
+	/// <summary>
+	/// Fill a secure vector with pseudo-random bytes using offset and length parameters
+	/// </summary>
+	/// 
+	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	/// <param name="OutOffset">The starting position within the output vector</param>
+	/// <param name="Length">The number of bytes to generate</param>
+	///
+	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
+	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
+	virtual void Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey structure containing the key and optional salt (Nonce) and info string (Info)
 	/// </summary>
 	/// 
-	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// <param name="Parameters">The SymmetricKey containing the generators keying material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	virtual void Initialize(ISymmetricKey &GenParam) = 0;
-
-	/// <summary>
-	/// Initialize the generator with a key
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	virtual void Initialize(const std::vector<byte> &Key) = 0;
-
-	/// <summary>
-	/// Initialize the generator with key and salt arrays
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value containing an additional source of entropy</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) = 0;
-
-	/// <summary>
-	/// Initialize the generator with a key, a salt array, and an information string or nonce
-	/// </summary>
-	/// 
-	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value used as an additional source of entropy</param>
-	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
-	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
-	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) = 0;
+	virtual void Initialize(ISymmetricKey &Parameters) = 0;
 
 	/// <summary>
 	/// Update the generators keying material
 	/// </summary>
 	///
-	/// <param name="Seed">The new seed value array</param>
+	/// <param name="Key">The new seed value array</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the seed is too small</exception>
-	virtual void Update(const std::vector<byte> &Seed) = 0;
+	virtual void Update(const std::vector<byte> &Key) = 0;
+
+	/// <summary>
+	/// Update the generators keying material with a secure vector key
+	/// </summary>
+	///
+	/// <param name="Key">The secure vector containing the new key material</param>
+	/// 
+	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
+	virtual void Update(const SecureVector<byte> &Key) = 0;
+
 };
 
 NAMESPACE_DRBGEND

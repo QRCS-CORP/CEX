@@ -128,8 +128,8 @@ public:
 	/// Uses a key, and optional salt and info arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
-	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
+	/// <param name="Parameters">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>
+	virtual void Initialize(ISymmetricKey &Parameters) = 0;
 
 	/// <summary>
 	/// Reset internal state to the pre-initialization defaults.

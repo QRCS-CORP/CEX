@@ -160,11 +160,11 @@ public:
 	/// If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</para>
 	/// </summary>
 	/// 
-	/// <param name="KeyParams">Cipher key container. The LegalKeySizes property contains valid sizes</param>
+	/// <param name="Parameters">Cipher key container. The LegalKeySizes property contains valid sizes</param>
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
+	virtual void Initialize(bool Encryption, ISymmetricKey &Parameters) = 0;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -172,7 +172,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor [virtual] cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads</param>
+	/// <param name="Degree">The desired number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;

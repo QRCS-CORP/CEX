@@ -15,6 +15,7 @@ using Enumeration::BlockCiphers;
 using Exception::CryptoGeneratorException;
 using Enumeration::ErrorCodes;
 
+// TODO: Name and enumeral properties in helpers?
 const std::string DrbgFromName::CLASS_NAME("DrbgFromName");
 
 IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
@@ -31,17 +32,17 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 		{
 			case Drbgs::BCG:
 			{
-				dptr = new BCG();
+				dptr = new BCG(BlockCiphers::AES);
 				break;
 			}
 			case Drbgs::CSG:
 			{
-				dptr = new CSG();
+				dptr = new CSG(ShakeModes::SHAKE256);
 				break;
 			}
 			case Drbgs::HCG:
 			{
-				dptr = new HCG();
+				dptr = new HCG(SHA2Digests::SHA512);
 				break;
 			}
 			default:
@@ -94,6 +95,11 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 				else if (DigestType == Digests::SHAKE512)
 				{
 					dptr = new BCG(BlockCiphers::RHXS512, ProviderType);
+					break;
+				}
+				else if (DigestType == Digests::SHAKE1024)
+				{
+					dptr = new BCG(BlockCiphers::RHXS1024, ProviderType);
 					break;
 				}
 				else

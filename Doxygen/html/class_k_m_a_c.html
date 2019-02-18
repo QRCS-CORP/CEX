@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="dragon13sm.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.6</span>
+   &#160;<span id="projectnumber">1.0.0.7</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -186,7 +186,7 @@ Public Member Functions</h2></td></tr>
 The cryptographic strength of KMAC depends upon the strength of the rate setting of the underlying permutation function, the size of its hash output, and on the size and quality of the key. <br />
 The minimum key size should align with the expected security level of the generator function. <br />
 For example, KMAC256 should be keyed with at least 256 bits (32 bytes) of random key. <br />
-This functionality can be enforced by enabling the CEX_ENFORCE_KEYMIN definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
+This functionality can be enforced by enabling the CEX_ENFORCE_LEGALKEY definition in the CexConfig file, or by adding that flag to the libraries compilers directives.</p>
 <p>Implementation Notes: </p><ul>
 <li>
 The MAC tag size is variable; changing the KmacMode will change the size of the MAC output, the selected length is stored in the TagSize accessor property. </li>

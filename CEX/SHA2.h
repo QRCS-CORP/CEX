@@ -104,10 +104,10 @@ private:
 
 public:
 
-	const static size_t SHA2_RATE256_SIZE = 64;
-	const static size_t SHA2_RATE512_SIZE = 128;
-	const static size_t SHA2_MESSAGE256_SIZE = 32;
-	const static size_t SHA2_MESSAGE512_SIZE = 64;
+	static const size_t SHA2_RATE256_SIZE = 64;
+	static const size_t SHA2_RATE512_SIZE = 128;
+	static const size_t SHA2_MESSAGE256_SIZE = 32;
+	static const size_t SHA2_MESSAGE512_SIZE = 64;
 
 	//~~~SHA2-256~~~//
 

@@ -1,156 +1,240 @@
 #include "CSG.h"
+#include "ArrayTools.h"
 #include "CpuDetect.h"
 #include "IntegerTools.h"
-#include "ParallelTools.h"
+#include "MemoryTools.h"
 #include "ProviderFromName.h"
-#include "SymmetricKey.h"
-
-#include "ULong256.h"
+#if defined(__AVX2__)
+#	include "ULong256.h"
+#endif
+#if defined(__AVX512__)
+#	include "ULong512.h"
+#endif
 
 NAMESPACE_DRBG
 
+using Utility::ArrayTools;
+using Enumeration::DrbgConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
+using Enumeration::ProviderConvert;
+using Enumeration::ShakeModeConvert;
+#if defined(__AVX2__)
 using Numeric::ULong256;
+#endif
+#if defined(__AVX512__)
+using Numeric::ULong512;
+#endif
 
-const std::string CSG::CLASS_NAME("CSG");
+class CSG::CsgState
+{
+public:
+
+	std::vector<std::array<ulong, Keccak::KECCAK_STATE_SIZE>> State;
+	SecureVector<byte> Buffer;
+	size_t Cached;
+	size_t Counter;
+	size_t Index;
+	size_t Rate;
+	size_t Reseed;
+	size_t Threshold;
+	ShakeModes ShakeMode;
+	byte Domain;
+	bool IsParallel;
+
+	CsgState(ShakeModes ShakeModeType, size_t RateSize, size_t ReseedMax, bool Parallel)
+		:
+		State(1),
+		Buffer(RateSize),
+		Cached(0),
+		Counter(0),
+		Index(0),
+		Rate(RateSize),
+		Reseed(0),
+		Threshold(ReseedMax),
+		ShakeMode(ShakeModeType),
+		Domain(0),
+		IsParallel(Parallel)
+	{
+	}
+
+	~CsgState()
+	{
+		Cached = 0;
+		Counter = 0;
+		Domain = 0;
+		Index = 0;
+		Rate = 0;
+		Reseed = 0;
+		Threshold = 0;
+		ShakeMode = ShakeModes::None;
+		IsParallel = false;
+
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+
+		for (size_t i = 0; i < State.size(); ++i) 
+		{
+			MemoryTools::Clear(State[i], 0, Keccak::KECCAK_STATE_SIZE * sizeof(ulong));
+		}
+	}
+
+	void Reset()
+	{
+		Cached = 0;
+		Counter = 0;
+		Reseed = 0;
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+
+		for (size_t i = 0; i < State.size(); ++i)
+		{
+			MemoryTools::Clear(State[i], 0, Keccak::KECCAK_STATE_SIZE * sizeof(ulong));
+		}
+	}
+};
 
 //~~~Constructor~~~//
 
 CSG::CSG(ShakeModes ShakeModeType, Providers ProviderType, bool Parallel)
 	:
-#if !defined(__AVX2__) && !defined(__AVX512__)
-	m_avxEnabled(false),
-#else
-	m_avxEnabled(Parallel),
-#endif
-	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
-	m_bufferIndex(0),
-	m_customNonce(0),
-	m_destroyEngine(true),
-	m_distCode(0),
-	m_distCodeMax(0),
-	m_domainCode(SHAKE_DOMAIN),
-	m_drbgBuffer(m_blockSize),
-	m_drbgState(1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_prdResistant(ProviderType != Providers::None),
-	m_providerSource(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
-	m_providerType(ProviderType),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(m_blockSize * 10000),
-	m_secStrength((ShakeModeType == ShakeModes::SHAKE128) ? 128 : (ShakeModeType == ShakeModes::SHAKE256) ? 256 : (ShakeModeType == ShakeModes::SHAKE512) ? 512 : 1024),
-	m_seedSize(0),
-	m_shakeMode(ShakeModeType == ShakeModes::SHAKE128 || ShakeModeType == ShakeModes::SHAKE256 || ShakeModeType == ShakeModes::SHAKE512 || ShakeModeType == ShakeModes::SHAKE1024 ? ShakeModeType :
-		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type is invalid!"), ErrorCodes::InvalidParam)),
-	m_stateSize(STATE_SIZE)
+	DrbgBase(
+		Drbgs::CSG,
+		(ShakeModeType != ShakeModes::None ? DrbgConvert::ToName(Drbgs::CSG) + std::string("-") + ShakeModeConvert::ToName(ShakeModeType) + std::string("-") + ProviderConvert::ToName(ProviderType) :
+			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::CSG), std::string("Constructor"), std::string("The SHAKE mode can not be none!"), ErrorCodes::InvalidParam)),
+		std::vector<SymmetricKeySize> {
+			SymmetricKeySize(
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				0,
+				0),
+			SymmetricKeySize(
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				0),
+			SymmetricKeySize(
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE))},
+		MAX_OUTPUT,
+		MAX_REQUEST,
+		MAX_THRESHOLD),
+	m_csgProvider(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_csgState(new CsgState(
+		ShakeModeType,
+		((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK_RATE128_SIZE :
+			(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_RATE256_SIZE :
+			(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK_RATE512_SIZE :
+			Keccak::KECCAK_RATE1024_SIZE), 
+		DEF_RESEED, 
+		Parallel && HasMultiLane())),
+	m_isDestroyed(true),
+	m_isInitialized(false)
 {
-	Scope();
 }
 
 CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 	:
-#if !defined(__AVX2__) && !defined(__AVX512__)
-	m_avxEnabled(false),
-#else
-	m_avxEnabled(Parallel),
-#endif
-	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
-	m_bufferIndex(0),
-	m_customNonce(0),
-	m_destroyEngine(false),
-	m_distCode(0),
-	m_distCodeMax(0),
-	m_domainCode(SHAKE_DOMAIN),
-	m_drbgBuffer(m_blockSize),
-	m_drbgState(1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_prdResistant(Provider != nullptr),
-	m_providerSource(Provider != nullptr ? Provider : 
-		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The provider can not be null!"), ErrorCodes::IllegalOperation)),
-	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(m_blockSize * 10000),
-	m_secStrength((ShakeModeType == ShakeModes::SHAKE128) ? 128 : (ShakeModeType == ShakeModes::SHAKE256) ? 256 : 512),
-	m_seedSize(0),
-	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
-		throw CryptoGeneratorException(CLASS_NAME, std::string("Constructor"), std::string("The SHAKE mode type is invalid!"), ErrorCodes::InvalidParam)),
-	m_stateSize(STATE_SIZE)
+	DrbgBase(
+		Drbgs::CSG,
+		(ShakeModeType != ShakeModes::None ? DrbgConvert::ToName(Drbgs::CSG) + std::string("-") + ShakeModeConvert::ToName(ShakeModeType) + std::string("-") + (Provider != nullptr ? Provider->Name() : std::string("None")) :
+			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::CSG), std::string("Constructor"), std::string("The SHAKE mode can not be none!"), ErrorCodes::InvalidParam)),
+		std::vector<SymmetricKeySize> {
+			SymmetricKeySize(
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				0,
+				0),
+			SymmetricKeySize(
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				0,
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE)),
+			SymmetricKeySize(
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
+					Keccak::KECCAK_MESSAGE1024_SIZE))},
+		MAX_OUTPUT,
+		MAX_REQUEST,
+		MAX_THRESHOLD),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_csgProvider(Provider != nullptr ? Provider :
+			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::CSG), std::string("Constructor"), std::string("The provider can not be null!"), ErrorCodes::IllegalOperation)),
+		m_csgState(new CsgState(
+			ShakeModeType,
+			((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK_RATE128_SIZE :
+				(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_RATE256_SIZE :
+				(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK_RATE512_SIZE :
+				Keccak::KECCAK_RATE1024_SIZE), 
+			DEF_RESEED, 
+			Parallel && HasMultiLane()))
 {
-	Scope();
 }
 
 CSG::~CSG()
 {
-	if (!m_isDestroyed)
+	m_isInitialized = false;
+
+	if (m_isDestroyed)
 	{
-		m_isDestroyed = true;
-		m_avxEnabled = false;
-		m_blockSize = 0;
-		m_bufferIndex = 0;
-		m_distCodeMax = 0;
-		m_isInitialized = false;
-		m_prdResistant = false;
-		m_providerType = Providers::None;
-		m_reseedCounter = 0;
-		m_reseedRequests = 0;
-		m_reseedThreshold = 0;
-		m_secStrength = 0;
-		m_seedSize = 0;
-		m_shakeMode = ShakeModes::None;
-		m_stateSize = 0;
+		m_isDestroyed = false;
 
-		for (size_t i = 0; i < m_drbgState.size(); ++i)
+		if (m_csgProvider != nullptr)
 		{
-			IntegerTools::Clear(m_drbgState[i]);
+			m_csgProvider.reset(nullptr);
 		}
-
-		IntegerTools::Clear(m_drbgBuffer);
-		IntegerTools::Clear(m_drbgState);
-		IntegerTools::Clear(m_customNonce);
-		IntegerTools::Clear(m_distCode);
-		IntegerTools::Clear(m_legalKeySizes);
-
-		if (m_destroyEngine)
+	}
+	else
+	{
+		if (m_csgProvider != nullptr)
 		{
-			m_destroyEngine = false;
-
-			if (m_providerSource != nullptr)
-			{
-				m_providerSource.reset(nullptr);
-			}
-		}
-		else
-		{
-			if (m_providerSource != nullptr)
-			{
-				m_providerSource.release();
-			}
+			m_csgProvider.release();
 		}
 	}
 }
 
 //~~~Accessors~~~//
 
-std::vector<byte> &CSG::DistributionCode()
+const bool CSG::HasMultiLane()
 {
-	return m_distCode;
-}
+	CpuDetect dtc;
+	bool ret;
 
-const size_t CSG::DistributionCodeMax()
-{
-	return m_distCodeMax;
-}
+	ret = (dtc.AVX2() || dtc.AVX512F()) ? true : false;
 
-const Drbgs CSG::Enumeral()
-{
-	return Drbgs::CSG;
+	return ret;
 }
 
 const bool CSG::IsInitialized()
@@ -158,56 +242,55 @@ const bool CSG::IsInitialized()
 	return m_isInitialized;
 }
 
-std::vector<SymmetricKeySize> CSG::LegalKeySizes() const
+const size_t CSG::LaneCount()
 {
-	return m_legalKeySizes;
-}
+	CpuDetect dtc;
+	size_t lanes;
 
-const ulong CSG::MaxOutputSize()
-{
-	return MAX_OUTPUT;
-}
+	if (dtc.AVX512F())
+	{
+		lanes = 8;
+	}
+	else if (dtc.AVX2())
+	{
+		lanes = 4;
+	}
+	else
+	{
+		lanes = 1;
+	}
 
-const size_t CSG::MaxRequestSize()
-{
-	return MAX_REQUEST;
-}
-
-const size_t CSG::MaxReseedCount()
-{
-	return MAX_RESEED;
-}
-
-const std::string CSG::Name()
-{
-	return CLASS_NAME + "-" + IntegerTools::ToString(m_secStrength);
-}
-
-const size_t CSG::NonceSize()
-{
-	return m_distCodeMax / 2;
+	return lanes;
 }
 
 size_t &CSG::ReseedThreshold()
 {
-	return m_reseedThreshold;
+	return m_csgState->Threshold;
 }
 
 const size_t CSG::SecurityStrength()
 {
-	return m_secStrength;
+	return (m_csgState->ShakeMode == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
+		(m_csgState->ShakeMode == ShakeModes::SHAKE256) ? Keccak::KECCAK_MESSAGE256_SIZE :
+		(m_csgState->ShakeMode == ShakeModes::SHAKE512) ? Keccak::KECCAK_MESSAGE512_SIZE : 
+		Keccak::KECCAK_MESSAGE1024_SIZE);
 }
 
 //~~~Public Functions~~~//
 
-size_t CSG::Generate(std::vector<byte> &Output)
+void CSG::Generate(std::vector<byte> &Output)
 {
-	return Generate(Output, 0, Output.size());
+	Generate(Output, 0, Output.size());
 }
 
-size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CSG::Generate(SecureVector<byte> &Output)
 {
-	if (!m_isInitialized)
+	Generate(Output, 0, Output.size());
+}
+
+void CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+{
+	if (!IsInitialized())
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::NotInitialized);
 	}
@@ -215,191 +298,312 @@ size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
-	if (Length > MAX_REQUEST)
+	if (Length > MaxRequestSize())
 	{
-		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too large, max request is 64KB!"), ErrorCodes::MaxExceeded);
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output length is too large!"), ErrorCodes::MaxExceeded);
 	}
 
-	Extract(Output, OutOffset, Length);
+	Expand(Output, OutOffset, Length, m_csgState);
 
-	if (m_prdResistant)
+	if (m_csgProvider != nullptr)
 	{
-		m_reseedCounter += Length;
+		m_csgState->Counter += Length;
 
-		if (m_reseedCounter >= m_reseedThreshold)
+		if (m_csgState->Counter >= ReseedThreshold())
 		{
-			++m_reseedRequests;
+			++m_csgState->Reseed;
 
-			if (m_reseedRequests > MAX_RESEED)
+			if (m_csgState->Reseed > MaxReseedCount())
 			{
 				throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::MaxExceeded);
 			}
 
-			Derive();
-			m_reseedCounter = 0;
+			Derive(m_csgProvider, m_csgState);
+			m_csgState->Counter = 0;
 		}
-	}
-
-	return Length;
-}
-
-void CSG::Initialize(ISymmetricKey &GenParam)
-{
-	if (GenParam.Nonce().size() != 0)
-	{
-		if (GenParam.Info().size() != 0)
-		{
-			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
-		}
-		else
-		{
-			Initialize(GenParam.Key(), GenParam.Nonce());
-		}
-	}
-	else
-	{
-		Initialize(GenParam.Key());
 	}
 }
 
-void CSG::Initialize(const std::vector<byte> &Seed)
+void CSG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (Seed.size() < MINKEY_LENGTH)
+	std::vector<byte> tmpr(Length);
+	Generate(tmpr, 0, Length);
+	Move(tmpr, Output, OutOffset);
+}
+
+void CSG::Initialize(ISymmetricKey &Parameters)
+{
+	std::vector<byte> tmpi(0);
+	size_t i;
+
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
+	{
+		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
+	if (Parameters.Key().size() < MINKEY_LENGTH)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidKey);
 	}
+#endif
 
-	if (m_isInitialized)
-	{
-		Reset();
-	}
+	Reset(m_csgState);
 
-	if (!m_avxEnabled)
+	if (!m_csgState->IsParallel)
 	{
-		Customize(m_customNonce, m_distCode, m_drbgState[0]);
-		Permute(m_drbgState[0]);
-		FastAbsorb(Seed, 0, Seed.size(), m_drbgState[0]);
-		Fill();
+		if (Parameters.Nonce().size() != 0 || Parameters.Info().size() != 0)
+		{
+			// standard cSHAKE invocation
+			m_csgState->Domain = Keccak::KECCAK_CSHAKE_DOMAIN;
+			m_csgState->Index = 0;
+			// customize the state
+			Customize(Parameters.Nonce(), Parameters.Info(), m_csgState);
+			// absorb the key into state
+			Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+		}
+		else
+		{
+			// standard SHAKE invocation
+			m_csgState->Domain = Keccak::KECCAK_SHAKE_DOMAIN;
+			m_csgState->Index = 0;
+			// absorb the key
+			Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+		}
 	}
 	else
 	{
-		// count block bits
-		const size_t CTRIVL = m_blockSize * 8;
-		const size_t CSTLEN = m_customNonce.size() + sizeof(ushort);
-		std::vector<byte> ctr(CSTLEN);
+		// resize the state
+		const size_t LNECNT = LaneCount();
+		m_csgState->State.resize(LNECNT);
+		m_csgState->Buffer.resize(LNECNT * m_csgState->Rate);
 
-		// add customization string to start of counter
-		MemoryTools::Copy(m_customNonce, 0, ctr, 0, m_customNonce.size());
+		// customization count is in increments of rate-size increments
+		std::vector<byte> tmpi(0);
 
-		// loop through state members, initializing each to a unique set of values
-		for (size_t i = 0; i < m_drbgState.size(); ++i)
+		// assign the custom domain wide-x4 or wide-x8
+		m_csgState->Domain = m_csgState->State.size() == 4 ? Keccak::KECCAK_CSHAKEW4_DOMAIN : Keccak::KECCAK_CSHAKEW8_DOMAIN;
+
+		if (Parameters.Nonce().size() != 0 || Parameters.Info().size() != 0)
 		{
-			IntegerTools::BeIncrease8(ctr, CTRIVL * (i + 1));
-			Customize(ctr, m_distCode, m_drbgState[i]);
+			// nonce is minimum 8 bytes wide
+			const size_t CSTLEN = Parameters.Nonce().size() + sizeof(uint);
+			std::vector<byte> tmpc(CSTLEN);
+			// add custom nonce to end of the cSHAKE customization parameter
+			MemoryTools::Copy(Parameters.Nonce(), 0, tmpc, 0, Parameters.Nonce().size());
+			// add the library prefix to cSHAKE name parameter
+			ArrayTools::AppendVector(CEX_LIBRARY_PREFIX, tmpi);
+			// add the DRBGs formal class name to the cSHAKE name parameter
+			ArrayTools::AppendString(Name(), tmpi);
+			// append the optional info array to name
+			ArrayTools::AppendVector(Parameters.Info(), tmpi);
+
+			// loop through state members, initializing each to a unique set of values
+			for (i = 0; i < m_csgState->State.size(); ++i)
+			{
+				// clear the state array
+				MemoryTools::Clear(m_csgState->State[i], 0, m_csgState->State[i].size() * sizeof(ulong));
+				// synchronize the state index
+				m_csgState->Index = i;
+				// increase the customization counter by multiples of the rate
+				IntegerTools::BeIncrease8(tmpc, m_csgState->Rate);
+				// cSHAKE: absorb and permute the customizations, initializing each array of keccak states to unique starting values
+				Customize(tmpc, tmpi, m_csgState);
+				// absorb the key into each state member
+				Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+			}
 		}
-
-		// permute customizations
-		PermuteW(m_drbgState);
-
-		// add the seed
-		for (size_t i = 0; i < m_drbgState.size(); ++i)
+		else
 		{
-			FastAbsorb(Seed, 0, Seed.size(), m_drbgState[i]);
-		}
+			// add the library prefix to the cSHAKE name parameter
+			ArrayTools::AppendVector(CEX_LIBRARY_PREFIX, tmpi);
+			// add the formal class name to the cSHAKE name parameter
+			ArrayTools::AppendString(Name(), tmpi);
+			// the default nonce is zero initialized
+			std::vector<byte> tmpc(8);
 
-		// seed permutation, then fill the buffer
-		Fill();
+			// loop through state members with an incrementing customization string
+			for (i = 0; i < m_csgState->State.size(); ++i)
+			{
+				// increase counter by the byte rate
+				IntegerTools::BeIncrease8(tmpc, m_csgState->Rate);
+				m_csgState->Index = i;
+				Customize(tmpc, tmpi, m_csgState);
+				Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+			}
+		}
 	}
 
-	m_seedSize = Seed.size();
 	m_isInitialized = true;
 }
 
-void CSG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
+void CSG::Reset(std::unique_ptr<CsgState> &State)
 {
-	if (m_isInitialized)
+#if defined(__AVX512__)
+	if (State->IsParallel && State->State.size() != 8)
 	{
-		Reset();
+		State->State.resize(8);
+		State->Buffer.resize(State->Rate * 8);
 	}
+#elif defined(__AVX2__)
+	if (State->IsParallel && State->State.size() != 4)
+	{
+		State->State.resize(4);
+		State->Buffer.resize(State->Rate * 4);
+	}
+#endif
 
-	m_customNonce = Nonce;
-
-	Initialize(Seed);
+	State->Reset();
 }
 
-void CSG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
+void CSG::Update(const std::vector<byte> &Key)
 {
-	if (m_isInitialized)
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
 	{
-		Reset();
+		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
+	if (Key.size() < MINKEY_LENGTH)
+	{
+		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidKey);
+	}
+#endif
+
+	// increment the reseed count
+	++m_csgState->Reseed;
+
+	// if re-seeded more than legal maximum, throw an exception
+	if (m_csgState->Reseed > MaxReseedCount())
+	{
+		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::MaxExceeded);
 	}
 
-	m_customNonce = Nonce;
-	m_distCode = Info;
+	// add new entropy to the key state with the random provider
+	if (m_csgProvider != nullptr)
+	{
+		Derive(m_csgProvider, m_csgState);
+	}
 
-	Initialize(Seed);
+	// add key to the state
+	for (size_t i = 0; i < m_csgState->State.size(); ++i)
+	{
+		m_csgState->Index = i;
+		Absorb(Key, 0, Key.size(), m_csgState);
+	}
+
+	Fill(m_csgState);
 }
 
-void CSG::Update(const std::vector<byte> &Seed)
+void CSG::Update(const SecureVector<byte> &Key)
 {
-	// add new entropy equal to original key size to the state
-	for (size_t i = 0; i < m_drbgState.size(); ++i)
+#if defined(CEX_ENFORCE_LEGALKEY)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
 	{
-		FastAbsorb(Seed, 0, Seed.size(), m_drbgState[i]);
+		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+	}
+#else
+	if (Key.size() < MINKEY_LENGTH)
+	{
+		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidKey);
+	}
+#endif
+
+	// increment the reseed count
+	++m_csgState->Reseed;
+
+	// if re-seeded more than legal maximum, throw an exception
+	if (m_csgState->Reseed > MaxReseedCount())
+	{
+		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::MaxExceeded);
 	}
 
-	Fill();
+	// add new entropy to the key state with the random provider
+	if (m_csgProvider != nullptr)
+	{
+		Derive(m_csgProvider, m_csgState);
+	}
+
+	std::vector<byte> tmpk = Unlock(Key);
+
+	// add new entropy equal to the state
+	for (size_t i = 0; i < m_csgState->State.size(); ++i)
+	{
+		m_csgState->Index = i;
+		Absorb(tmpk, 0, Key.size(), m_csgState);
+	}
+
+	Clear(tmpk);
+	Fill(m_csgState);
 }
 
 //~~~Private Functions~~~//
 
-void CSG::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::array<ulong, STATE_SIZE> &State)
+void CSG::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<CsgState> &State)
 {
-	CEXASSERT(Customization.size() + Name.size() <= 196, "The input buffer is too large");
+	std::array<byte, BUFFER_SIZE> msg;
 
+	// sequential loop through blocks
+	while (Length >= State->Rate)
+	{
+		Keccak::Absorb(Input, InOffset, State->Rate, State->State[State->Index]);
+		Permute(State);
+		InOffset += State->Rate;
+		Length -= State->Rate;
+	}
+
+	// store unaligned bytes
+	if (Length != 0)
+	{
+		MemoryTools::Copy(Input, InOffset, msg, 0, Length);
+	}
+
+	// finalize and absorb
+	msg[Length] = State->Domain;
+	++Length;
+	MemoryTools::Clear(msg, Length, State->Rate - Length);
+	msg[State->Rate - 1] |= 0x80;
+	Keccak::Absorb(msg, 0, State->Rate, State->State[State->Index]);
+}
+
+void CSG::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<CsgState> &State)
+{
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
 	size_t offset;
 
-	offset = 0;
-	offset = LeftEncode(pad, 0, m_blockSize);
-	offset += LeftEncode(pad, offset, Name.size() * 8);
+	// encode the buffer
+	MemoryTools::Clear(pad, 0, pad.size());
+	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
+	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Information.size() * 8));
 
-	m_domainCode = CSHAKE_DOMAIN;
-
-	if (Name.size() != 0)
+	if (Information.size() != 0)
 	{
-		for (i = 0; i < Name.size(); i++)
+		for (i = 0; i < Information.size(); ++i)
 		{
-			if (offset == m_blockSize)
+			// absorb and permute full blocks
+			if (offset == State->Rate)
 			{
-				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
-				{
-					State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
-				}
-
+				Keccak::Absorb(pad, 0, State->Rate, State->State[State->Index]);
 				Permute(State);
 				offset = 0;
 			}
 
-			pad[offset] = Name[i];
+			pad[offset] = Information[i];
 			++offset;
 		}
 	}
 
-	offset += LeftEncode(pad, offset, Customization.size() * 8);
+	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
 
 	if (Customization.size() != 0)
 	{
-		for (i = 0; i < Customization.size(); i++)
+		for (i = 0; i < Customization.size(); ++i)
 		{
-			if (offset == m_blockSize)
+			// absorb and permute the block
+			if (offset == State->Rate)
 			{
-				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
-				{
-					State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
-				}
-
+				Keccak::Absorb(pad, 0, State->Rate, State->State[State->Index]);
 				Permute(State);
 				offset = 0;
 			}
@@ -409,238 +613,176 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 		}
 	}
 
+	// finalize and permute the state
 	MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
 	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
-
-	for (size_t i = 0; i < offset; i += 8)
-	{
-		State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
-	}
+	MemoryTools::XOR(pad, 0, State->State[State->Index], 0, offset);
+	Permute(State);
 }
 
-void CSG::Derive()
+void CSG::Derive(std::unique_ptr<IProvider> &Provider, std::unique_ptr<CsgState> &State)
 {
-	std::vector<byte> seed(m_seedSize);
+	std::vector<byte> tmpk((BUFFER_SIZE - State->Rate) / 2);
+	size_t i;
 
-	// add new entropy equal to original key size to the state
-	for (size_t i = 0; i < m_drbgState.size(); ++i)
+	// generate a new random key
+	Provider->Generate(tmpk);
+
+	// add to entropy to the state
+	for (i = 0; i < State->State.size(); ++i)
 	{
-		m_providerSource->Generate(seed);
-		FastAbsorb(seed, 0, seed.size(), m_drbgState[i]);
+		State->Index = i;
+		Absorb(tmpk, 0, tmpk.size(), State);
 	}
 
-	Fill();
+	// re-fill the buffer
+	Fill(State);
 }
 
-void CSG::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void CSG::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<CsgState> &State)
 {
-	CEXASSERT(Output.size() != 0, "Output size must be at least 1 in length");
-
-	if (m_drbgBuffer.size() - m_bufferIndex < Length)
+	if (State->Cached < Length)
 	{
-		size_t bufPos = m_drbgBuffer.size() - m_bufferIndex;
-
-		// copy remaining bytes
-		if (bufPos != 0)
+		// copy remaining bytes from the cache
+		if (State->Cached != 0)
 		{
-			Utility::MemoryTools::Copy(m_drbgBuffer, m_bufferIndex, Output, OutOffset, bufPos);
+			// empty the state buffer
+			const size_t BUFPOS = State->Buffer.size() - State->Cached;
+			MemoryTools::Copy(State->Buffer, BUFPOS, Output, OutOffset, State->Cached);
+			OutOffset += State->Cached;
+			Length -= State->Cached;
+			State->Cached = 0;
 		}
 
-		size_t prcLen = Length - bufPos;
-
-		while (prcLen > 0)
+		// loop through the remainder
+		while (Length != 0)
 		{
-			// re-fill the buffer
-			Fill();
+			// fill the buffer
+			Fill(State);
+			// copy to output
+			const size_t RMDLEN = IntegerTools::Min(State->Buffer.size(), Length);
+			MemoryTools::Copy(State->Buffer, 0, Output, OutOffset, RMDLEN);
+			State->Cached -= RMDLEN;
+			OutOffset += RMDLEN;
+			Length -= RMDLEN;
+		}
 
-			if (prcLen > m_drbgBuffer.size())
-			{
-				Utility::MemoryTools::Copy(m_drbgBuffer, 0, Output, OutOffset + bufPos, m_drbgBuffer.size());
-				bufPos += m_drbgBuffer.size();
-				prcLen -= m_drbgBuffer.size();
-			}
-			else
-			{
-				Utility::MemoryTools::Copy(m_drbgBuffer, 0, Output, OutOffset + bufPos, prcLen);
-				m_bufferIndex = prcLen;
-				prcLen = 0;
-			}
+		if (State->Cached != 0)
+		{
+			const size_t BUFPOS = State->Buffer.size() - State->Cached;
+			// clear copied bytes from cache
+			MemoryTools::Clear(State->Buffer, 0, BUFPOS);
 		}
 	}
 	else
 	{
-		Utility::MemoryTools::Copy(m_drbgBuffer, m_bufferIndex, Output, OutOffset, Length);
-		m_bufferIndex += Length;
+		// copy from the state buffer to output
+		const size_t BUFPOS = State->Buffer.size() - State->Cached;
+		MemoryTools::Copy(State->Buffer, BUFPOS, Output, OutOffset, Length);
+		State->Cached -= Length;
 	}
 }
 
-void CSG::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::array<ulong, STATE_SIZE> &State)
+void CSG::Fill(std::unique_ptr<CsgState> &State)
 {
-	std::array<byte, BUFFER_SIZE> msg;
-
-	CEXASSERT(Input.size() - InOffset >= Length, "The Output buffer is too short!");
-
-	if (Length != 0)
+	if (!State->IsParallel)
 	{
-		// sequential loop through blocks
-		while (Length >= m_blockSize)
-		{
-			AbsorbBlock(Input, InOffset, m_blockSize, State);
-			Permute(State);
-			InOffset += m_blockSize;
-			Length -= m_blockSize;
-		}
-
-		// store unaligned bytes
-		if (Length != 0)
-		{
-			MemoryTools::Copy(Input, InOffset, msg, 0, Length);
-		}
-
-		msg[Length] = m_domainCode;
-		++Length;
-		MemoryTools::Clear(msg, Length, m_blockSize - Length);
-		msg[m_blockSize - 1] |= 0x80;
-
-		AbsorbBlock(msg, 0, m_blockSize, State);
-	}
-}
-
-void CSG::Fill()
-{
-	if (!m_avxEnabled)
-	{
-		Permute(m_drbgState[0]);
-		MemoryTools::Copy(m_drbgState[0], 0, m_drbgBuffer, 0, m_blockSize);
+		Permute(State);
+		MemoryTools::Copy(State->State[0], 0, State->Buffer, 0, State->Rate);
 	}
 	else
 	{
-		PermuteW(m_drbgState);
+		PermuteW(State);
 
-		for (size_t i = 0; i < m_drbgState.size(); ++i)
+		for (size_t i = 0; i < State->State.size(); ++i)
 		{
-			MemoryTools::Copy(m_drbgState[i], 0, m_drbgBuffer, i * m_blockSize, m_blockSize);
+			MemoryTools::Copy(State->State[i], 0, State->Buffer, i * State->Rate, State->Rate);
 		}
 	}
 
-	m_bufferIndex = 0;
+	State->Cached = State->Buffer.size();
 }
 
-void CSG::Permute(std::array<ulong, STATE_SIZE> &State)
+void CSG::Permute(std::unique_ptr<CsgState> &State)
 {
-	if (m_shakeMode != ShakeModes::SHAKE1024)
+	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
-		// rng uses the unrolled timing-neutral permutation
-		Digest::Keccak::PermuteR24P1600U(State);
-	}
-	else
-	{
-		Digest::Keccak::PermuteR48P1600U(State);
-	}
-}
-
-void CSG::PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State)
-{
-	if (m_shakeMode != ShakeModes::SHAKE1024)
-	{
-#if defined(__AVX512__)
-		std::vector<ULong512> tmpW(25);
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
-		}
-
-		Digest::Keccak::PermuteR24P8x1600H(tmpW);
-
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
-		}
-
-#elif defined(__AVX2__)
-		std::vector<ULong256> tmpW(25);
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
-		}
-
-		Digest::Keccak::PermuteR24P4x1600H(tmpW);
-
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
-		}
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR24P1600C(State->State[State->Index]);
+#else
+		Keccak::PermuteR24P1600U(State->State[State->Index]);
 #endif
 	}
 	else
 	{
-#if defined(__AVX512__)
-		std::vector<ULong512> tmpW(25);
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
-		}
-
-		Digest::Keccak::PermuteR48P8x1600H(tmpW);
-
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
-		}
-
-#elif defined(__AVX2__)
-		std::vector<ULong256> tmpW(25);
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
-		}
-
-		Digest::Keccak::PermuteR48P4x1600H(tmpW);
-
-		for (size_t i = 0; i < 25; ++i)
-		{
-			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
-		}
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600C(State->State[State->Index]);
+#else
+		Keccak::PermuteR48P1600U(State->State[State->Index]);
 #endif
 	}
 }
 
-void CSG::Reset()
+void CSG::PermuteW(std::unique_ptr<CsgState> &State)
 {
-	MemoryTools::Clear(m_drbgBuffer, 0, m_blockSize);
+	size_t i;
 
-	for (size_t i = 0; i < m_drbgState.size(); ++i)
-	{
-		MemoryTools::Clear(m_drbgState[i], 0, STATE_SIZE * sizeof(ulong));
-	}
-
-	m_bufferIndex = 0;
-	m_isInitialized = false;
-}
-
-void CSG::Scope()
-{
-	if (m_avxEnabled)
-	{
 #if defined(__AVX512__)
-		m_drbgState.resize(8);
-		m_drbgBuffer.resize(m_blockSize * 8);
-#elif defined(__AVX2__)
-		m_drbgState.resize(4);
-		m_drbgBuffer.resize(m_blockSize * 4);
-#endif
+
+	for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+	{
+		tmpW[i].Load(State->State[0][i], State->State[1][i], State->State[2][i], State->State[3][i], State->State[4][i], State->State[5][i], State->State[6][i], State->State[7][i]);
 	}
 
-	Reset();
+	if (State->ShakeMode != ShakeModes::SHAKE1024)
+	{
+		Keccak::PermuteR24P8x1600H(tmpW);
+	}
+	else
+	{
+		Keccak::PermuteR48P8x1600H(tmpW);
+	}
 
-	m_distCodeMax = m_blockSize;
-	m_legalKeySizes.resize(3);
-	// minimum seed size
-	m_legalKeySizes[0] = SymmetricKeySize(32, 0, 0);
-	// recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(64, m_distCodeMax / 2, m_distCodeMax / 2);
-	// maximum security
-	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, m_distCodeMax / 2, m_distCodeMax / 2);
+	for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+	{
+		tmpW[i].Store(State->State[7][i], State->State[6][i], State->State[5][i], State->State[4][i], State->State[3][i], State->State[2][i], State->State[1][i], State->State[0][i]);
+	}
+
+#elif defined(__AVX__)
+
+	std::vector<ULong256> tmpW(Keccak::KECCAK_STATE_SIZE);
+
+	for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+	{
+		tmpW[i].Load(State->State[0][i], State->State[1][i], State->State[2][i], State->State[3][i]);
+	}
+
+	if (State->ShakeMode != ShakeModes::SHAKE1024)
+	{
+		Keccak::PermuteR24P4x1600H(tmpW);
+	}
+	else
+	{
+		Keccak::PermuteR48P4x1600H(tmpW);
+	}
+
+	for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
+	{
+		tmpW[i].Store(State->State[3][i], State->State[2][i], State->State[1][i], State->State[0][i]);
+	}
+
+#else
+
+	// sequential fallback -not used, internal testing only
+	for (i = 0; i < State->State.size(); ++i)
+	{
+		State->Index = i;
+		Permute(State);
+	}
+
+	State->Index = 0;
+
+#endif
 }
 
 NAMESPACE_DRBGEND
