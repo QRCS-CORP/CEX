@@ -1,5 +1,10 @@
 # An implementation of an cSHAKE Generator DRBG: CSG
 
+## Overview
+A DGBG based on a custom SHAKE (cSHAKE) XOF pseudo-random generaton function. This generator uses a customized SHAKE implementation along with an entropy provider to create a pseudo-random genertor with predictive resistance capabilities.
+All modes of SHAKE are supported, including SHAKE-128, SHAKE-256, and the experimental SHAKE-512 and SHAKE-1024 variants.
+
+
 ## Initialize 
 The Initialize function can take up to 3 inputs; the generator Key which is the primary key, a Nonce value which acts as a customization string, and the distribution code (Info parameter) used as the Name parameter in cSHAKE. 
 The initialization parameters determine the type of underlying generator which is invoked. If only a key is used, the generator invokes a SHAKE instance. 
