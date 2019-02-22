@@ -202,7 +202,7 @@
     <ClInclude Include="..\..\CEX\AES128.h" />
     <ClInclude Include="..\..\CEX\AHX.h" />
     <ClInclude Include="..\..\CEX\ArrayTools.h" />
-    <ClInclude Include="..\..\CEX\AsymmetricEngines.h" />
+    <ClInclude Include="..\..\CEX\AsymmetricPrimitives.h" />
     <ClInclude Include="..\..\CEX\AsymmetricKey.h" />
     <ClInclude Include="..\..\CEX\AsymmetricKeyPair.h" />
     <ClInclude Include="..\..\CEX\AsymmetricKeyTypes.h" />
@@ -242,7 +242,7 @@
     <ClInclude Include="..\..\CEX\CryptoPaddingException.h" />
     <ClInclude Include="..\..\CEX\CryptoProcessingException.h" />
     <ClInclude Include="..\..\CEX\CryptoRandomException.h" />
-    <ClInclude Include="..\..\CEX\CryptoSymmetricCipherException.h" />
+    <ClInclude Include="..\..\CEX\CryptoSymmetricException.h" />
     <ClInclude Include="..\..\CEX\CSG.h" />
     <ClInclude Include="..\..\CEX\CSP.h" />
     <ClInclude Include="..\..\CEX\CSR.h" />
@@ -296,7 +296,6 @@
     <ClInclude Include="..\..\CEX\IAeadMode.h" />
     <ClInclude Include="..\..\CEX\IAsymmetricCipher.h" />
     <ClInclude Include="..\..\CEX\IAsymmetricKey.h" />
-    <ClInclude Include="..\..\CEX\IAsymmetricKeyPair.h" />
     <ClInclude Include="..\..\CEX\IAsymmetricSign.h" />
     <ClInclude Include="..\..\CEX\IBlockCipher.h" />
     <ClInclude Include="..\..\CEX\IByteStream.h" />
@@ -416,7 +415,7 @@
     <ClCompile Include="..\..\CEX\AeadModes.cpp" />
     <ClCompile Include="..\..\CEX\AHX.cpp" />
     <ClCompile Include="..\..\CEX\ArrayTools.cpp" />
-    <ClCompile Include="..\..\CEX\AsymmetricEngines.cpp" />
+    <ClCompile Include="..\..\CEX\AsymmetricPrimitives.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricKey.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricKeyPair.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricSecureKey.cpp" />
@@ -452,7 +451,7 @@
     <ClCompile Include="..\..\CEX\CryptoPaddingException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoProcessingException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoRandomException.cpp" />
-    <ClCompile Include="..\..\CEX\CryptoSymmetricCipherException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoSymmetricException.cpp" />
     <ClCompile Include="..\..\CEX\CSG.cpp" />
     <ClCompile Include="..\..\CEX\CSP.cpp" />
     <ClCompile Include="..\..\CEX\CSR.cpp" />

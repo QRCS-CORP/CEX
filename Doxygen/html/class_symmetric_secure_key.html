@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An encrypted symmetric key container class.  
+<p>An encrypted and authenticated Symmetric key container.  
  <a href="class_symmetric_secure_key.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_symmetric_secure_key_8h_source.html">SymmetricSecureKey.h</a>&gt;</code></p>
@@ -137,26 +137,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:afd370139eefc0d14a74275a53e7e44c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#afd370139eefc0d14a74275a53e7e44c3">More...</a><br /></td></tr>
 <tr class="separator:afd370139eefc0d14a74275a53e7e44c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c9e64cee3f37f092b720964e5809fa0"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a3c9e64cee3f37f092b720964e5809fa0">Info</a> () override</td></tr>
-<tr class="memdesc:a3c9e64cee3f37f092b720964e5809fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a copy of the personalization string; can used as an optional source of entropy  <a href="#a3c9e64cee3f37f092b720964e5809fa0">More...</a><br /></td></tr>
+<tr class="memdesc:a3c9e64cee3f37f092b720964e5809fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Return a standard-vector copy of the personalization string; can also used as an additional source of entropy in some constructions  <a href="#a3c9e64cee3f37f092b720964e5809fa0">More...</a><br /></td></tr>
 <tr class="separator:a3c9e64cee3f37f092b720964e5809fa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5182dcd3c29d8f4cf9b7906e0e0f42f"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a> () override</td></tr>
-<tr class="memdesc:ac5182dcd3c29d8f4cf9b7906e0e0f42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a copy of the primary key  <a href="#ac5182dcd3c29d8f4cf9b7906e0e0f42f">More...</a><br /></td></tr>
+<tr class="memdesc:ac5182dcd3c29d8f4cf9b7906e0e0f42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a standard-vector copy of the primary key  <a href="#ac5182dcd3c29d8f4cf9b7906e0e0f42f">More...</a><br /></td></tr>
 <tr class="separator:ac5182dcd3c29d8f4cf9b7906e0e0f42f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4cd30b00dd22bf7103bf208cbd94678"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#aa4cd30b00dd22bf7103bf208cbd94678">KeySizes</a> () override</td></tr>
 <tr class="memdesc:aa4cd30b00dd22bf7103bf208cbd94678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members  <a href="#aa4cd30b00dd22bf7103bf208cbd94678">More...</a><br /></td></tr>
 <tr class="separator:aa4cd30b00dd22bf7103bf208cbd94678"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39c4b042b02d69d9ea636f6e66eb7970"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a> () override</td></tr>
-<tr class="memdesc:a39c4b042b02d69d9ea636f6e66eb7970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a copy of the nonce  <a href="#a39c4b042b02d69d9ea636f6e66eb7970">More...</a><br /></td></tr>
+<tr class="memdesc:a39c4b042b02d69d9ea636f6e66eb7970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv  <a href="#a39c4b042b02d69d9ea636f6e66eb7970">More...</a><br /></td></tr>
 <tr class="separator:a39c4b042b02d69d9ea636f6e66eb7970"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab996b41cae495c7469195ac2985c8b32"><td class="memItemLeft" align="right" valign="top">const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ab996b41cae495c7469195ac2985c8b32">SecureInfo</a> ()</td></tr>
-<tr class="memdesc:ab996b41cae495c7469195ac2985c8b32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy  <a href="#ab996b41cae495c7469195ac2985c8b32">More...</a><br /></td></tr>
-<tr class="separator:ab996b41cae495c7469195ac2985c8b32"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d39aa09b5e6de5121893571c604876b"><td class="memItemLeft" align="right" valign="top">const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a4d39aa09b5e6de5121893571c604876b">SecureKey</a> ()</td></tr>
-<tr class="memdesc:a4d39aa09b5e6de5121893571c604876b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure vector copy of the primary encryption key  <a href="#a4d39aa09b5e6de5121893571c604876b">More...</a><br /></td></tr>
-<tr class="separator:a4d39aa09b5e6de5121893571c604876b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a008f3504a8eb7599c1ca390b892c646e"><td class="memItemLeft" align="right" valign="top">const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a008f3504a8eb7599c1ca390b892c646e">SecureNonce</a> ()</td></tr>
-<tr class="memdesc:a008f3504a8eb7599c1ca390b892c646e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure vector copy of the nonce or salt value  <a href="#a008f3504a8eb7599c1ca390b892c646e">More...</a><br /></td></tr>
-<tr class="separator:a008f3504a8eb7599c1ca390b892c646e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48a61dc9d1060edba0e1e5ad1870116e"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a48a61dc9d1060edba0e1e5ad1870116e">SecureInfo</a> (SecureVector&lt; byte &gt; &amp;Output)</td></tr>
+<tr class="memdesc:a48a61dc9d1060edba0e1e5ad1870116e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a secure-vector copy of the personalization string; can also used as an additional source of entropy in some constructions  <a href="#a48a61dc9d1060edba0e1e5ad1870116e">More...</a><br /></td></tr>
+<tr class="separator:a48a61dc9d1060edba0e1e5ad1870116e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7de35fde5c29e200d4ddef462597192b"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a7de35fde5c29e200d4ddef462597192b">SecureKey</a> (SecureVector&lt; byte &gt; &amp;Output)</td></tr>
+<tr class="memdesc:a7de35fde5c29e200d4ddef462597192b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a secure-vector copy of the primary encryption key  <a href="#a7de35fde5c29e200d4ddef462597192b">More...</a><br /></td></tr>
+<tr class="separator:a7de35fde5c29e200d4ddef462597192b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9fccf5b255cfaef1249d11bf55949f9"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ac9fccf5b255cfaef1249d11bf55949f9">SecureNonce</a> (SecureVector&lt; byte &gt; &amp;Output)</td></tr>
+<tr class="memdesc:ac9fccf5b255cfaef1249d11bf55949f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a secure-vector copy of the nonce; can also be used as the salt or iv  <a href="#ac9fccf5b255cfaef1249d11bf55949f9">More...</a><br /></td></tr>
+<tr class="separator:ac9fccf5b255cfaef1249d11bf55949f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a022749c18861b40c9c93d254ed9d15bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a022749c18861b40c9c93d254ed9d15bd">Clone</a> ()</td></tr>
 <tr class="memdesc:a022749c18861b40c9c93d254ed9d15bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a copy of this SymmetricSecureKey class  <a href="#a022749c18861b40c9c93d254ed9d15bd">More...</a><br /></td></tr>
 <tr class="separator:a022749c18861b40c9c93d254ed9d15bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,29 +179,34 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ac641fc5609b21e835d28f585f14e2125"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_symmetric_key.html">SymmetricKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ac641fc5609b21e835d28f585f14e2125">DeSerialize</a> (<a class="el" href="class_memory_stream.html">MemoryStream</a> &amp;KeyStream)</td></tr>
-<tr class="memdesc:ac641fc5609b21e835d28f585f14e2125"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserialize a SymmetricKey stream and return a SymmetricSecureKey  <a href="#ac641fc5609b21e835d28f585f14e2125">More...</a><br /></td></tr>
-<tr class="separator:ac641fc5609b21e835d28f585f14e2125"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8783f8e3e5729673219b337ef5ee4b8a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_memory_stream.html">MemoryStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a8783f8e3e5729673219b337ef5ee4b8a">Serialize</a> (<a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> &amp;KeyObj)</td></tr>
-<tr class="memdesc:a8783f8e3e5729673219b337ef5ee4b8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a SymmetricSecureKey and serialize it as a SymmetricKey stream  <a href="#a8783f8e3e5729673219b337ef5ee4b8a">More...</a><br /></td></tr>
-<tr class="separator:a8783f8e3e5729673219b337ef5ee4b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a4640baadf7b173010d6b7538dc3827"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_symmetric_key.html">SymmetricKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a9a4640baadf7b173010d6b7538dc3827">DeSerialize</a> (SecureVector&lt; byte &gt; &amp;KeyStream)</td></tr>
+<tr class="memdesc:a9a4640baadf7b173010d6b7538dc3827"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserialize a SymmetricKey stream and return a pointer to a SymmetricKey  <a href="#a9a4640baadf7b173010d6b7538dc3827">More...</a><br /></td></tr>
+<tr class="separator:a9a4640baadf7b173010d6b7538dc3827"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bb27f1bbf02fce6bd169afd7f0ff3b5"><td class="memItemLeft" align="right" valign="top">static SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a5bb27f1bbf02fce6bd169afd7f0ff3b5">Serialize</a> (<a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> &amp;KeyParams)</td></tr>
+<tr class="memdesc:a5bb27f1bbf02fce6bd169afd7f0ff3b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a SymmetricSecureKey to a SymmetricKey and serialize it as a SymmetricKey key-stream  <a href="#a5bb27f1bbf02fce6bd169afd7f0ff3b5">More...</a><br /></td></tr>
+<tr class="separator:a5bb27f1bbf02fce6bd169afd7f0ff3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An encrypted symmetric key container class. </p>
-<p>Contains encrypted keying material used for initialization of symmetric ciphers, Macs, Rngs, and Drbgs.</p>
+<div class="textblock"><p>An encrypted and authenticated Symmetric key container. </p>
+<p>Contains the internally encrypted, and optionally authenticated secure-vector Key, Nonce, and Info parameters. Internal parameter storage uses a secure-vector encrypted with an optionally authenticated threefish cipher instance. <br />
+The authentication option, and the ciphers strength (256/512/1024), are set through the SecurityPolicy enumeration in the class constructors. <br />
+The cipher key is derived from system information and various process handles along with a salt value, this is processed by an instance of cSHAKE to produce the cipher key. <br />
+The vectors containing the symmetric keying material can be accessed through a secure-vector copy using SecureKey, SecureNonce or SecureInfo accessors, or return a standard-vector copy using the Key, Nonce and Info accessors.</p>
 <p>Implementation Notes: </p><ul>
 <li>
-Key arrays are encrypted when the class is instantiated with data, and decrypted when accessed through the data arrays getter property functions (Key, Nonce, and Info) </li>
+Key arrays are encrypted when the class is instantiated with data, and decrypted when accessed through the data arrays getter property functions (Key, Nonce, and Info, or, SecureKey, SecureNonce and SecureInfo) </li>
 <li>
-The key material access is limited to the initializing process, user, and computer; it is not transferrable across process, machine, or domain boundaries </li>
+The key material access is limited to the initializing process, user, and computer; it is not transferrable across processes, machine, or domain boundaries </li>
 <li>
 Accessing the property functions from another process, user, or computer, will change the encryption key and return invalid data </li>
 <li>
-Serializing a SymmetricSecureKey returns a decrypted SymmetricKey stream, deserializing a SymmetricKey stream returns an initialized SymmetricSecureKey </li>
+Serializing a SymmetricSecureKey returns a decrypted SymmetricKey stream, deserializing a SymmetricKey stream returns an initialized SymmetricKey </li>
 <li>
-An optional 64bit KeySalt can be added through the constructors, this adds the salt value to system and process specific state to derive the internal encryption key </li>
+An optional KeySalt can be added through the constructors, this adds the salt value to system and process specific state to derive the internal encryption key </li>
 <li>
-The internal key is extracted using SHA512, and the internal state is encrypted with AES256 in CTR mode </li>
+The internal key is extracted using cSHAKE, and the internal state is encrypted using a Threefish cipher instance </li>
+<li>
+Authentication options and cipher strength are defined by the constructors SecurityPolicy enumeration, the default is non-authenticated Threefish-256 </li>
 </ul>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a98180c3826ed86354148ebd6286370da"></a>
@@ -284,7 +289,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with an encryption key. </p>
-<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<p>This default constructor uses only system specific values to generate the internal ciphers encryption key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -293,7 +298,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -327,7 +332,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with an encryption key, and nonce parameters. </p>
-<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<p>This default constructor uses only system specific values to generate the internal ciphers encryption key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -337,7 +342,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -377,7 +382,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with an encryption key, nonce, and info parameters. </p>
-<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<p>This default constructor uses only system specific values to generate the internal ciphers encryption key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -388,7 +393,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -428,7 +433,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with an encryption key. </p>
-<p>The salt value is added to system and process information to create seed material used by the internal encryption key generator.</p>
+<p>The salt value is added to system and process information to create seed material used by the internal cipher-key generator.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -439,7 +444,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -485,7 +490,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with an encryption key, and nonce parameters. </p>
-<p>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</p>
+<p>The salt value is added to system and process information to create seed material used by the internal cipher-key generator.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -497,7 +502,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -549,7 +554,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with an encryption key, nonce, and info parameters. </p>
-<p>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</p>
+<p>The salt value is added to system and process information to create seed material used by the internal cipher-key generator.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -562,7 +567,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -594,7 +599,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with a SecureVector encryption key. </p>
-<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<p>This default constructor uses only system specific values to generate the internal ciphers encryption key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -603,7 +608,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -637,7 +642,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters. </p>
-<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<p>This default constructor uses only system specific values to generate the internal ciphers encryption key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -647,7 +652,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -687,7 +692,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters. </p>
-<p>This default constructor uses only system and process specific values to generate an encryption key.</p>
+<p>This default constructor uses only system specific values to generate the internal ciphers encryption key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -698,7 +703,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -738,7 +743,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with a SecureVector encryption key. </p>
-<p>The salt value is added to system and process information to create seed material used by the internal encryption key generator.</p>
+<p>The salt value is added to system and process information to create seed material used by the internal cipher-key generator.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -749,7 +754,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -795,7 +800,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with a SecureVector encryption key, and nonce parameters. </p>
-<p>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</p>
+<p>The salt value is added to system and process information to create seed material used by the internal cipher-key generator.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -807,7 +812,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -859,7 +864,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </div><div class="memdoc">
 
 <p>Constructor: instantiate this class with a SecureVector encryption key, nonce, and info parameters. </p>
-<p>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</p>
+<p>The salt value is added to system and process information to create seed material used by the internal cipher-key generator.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary encryption key</td></tr>
@@ -872,7 +877,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if an input array size is zero length</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an input array size is zero length</td></tr>
   </table>
   </dd>
 </dl>
@@ -926,8 +931,8 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 
 </div>
 </div>
-<a id="ac641fc5609b21e835d28f585f14e2125"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac641fc5609b21e835d28f585f14e2125">&#9670;&nbsp;</a></span>DeSerialize()</h2>
+<a id="a9a4640baadf7b173010d6b7538dc3827"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a4640baadf7b173010d6b7538dc3827">&#9670;&nbsp;</a></span>DeSerialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -938,7 +943,7 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
         <tr>
           <td class="memname"><a class="el" href="class_symmetric_key.html">SymmetricKey</a> * SymmetricSecureKey::DeSerialize </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_memory_stream.html">MemoryStream</a> &amp;&#160;</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>KeyStream</em></td><td>)</td>
           <td></td>
         </tr>
@@ -950,14 +955,14 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </table>
 </div><div class="memdoc">
 
-<p>Deserialize a SymmetricKey stream and return a SymmetricSecureKey </p>
+<p>Deserialize a SymmetricKey stream and return a pointer to a SymmetricKey </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">KeyStream</td><td>Stream containing the SymmetricKey data</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A populated SymmetricSecureKey container</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to a SymmetricSecureKey container</dd></dl>
 
 </div>
 </div>
@@ -984,7 +989,13 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Return a copy of the personalization string; can used as an optional source of entropy </p>
+<p>Read/Write: Return a standard-vector copy of the personalization string; can also used as an additional source of entropy in some constructions </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Throws an authentication failure exception if the internal decryption has failed</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="class_i_symmetric_key.html#afa0a3d7146fd61a811ac6922a4febb98">ISymmetricKey</a>.</p>
 
@@ -1013,7 +1024,13 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Return a copy of the primary key </p>
+<p>Read Only: Return a standard-vector copy of the primary key </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Throws an authentication failure exception if the internal decryption has failed</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="class_i_symmetric_key.html#aa3e476a692092672045ef533588683df">ISymmetricKey</a>.</p>
 
@@ -1071,7 +1088,13 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Return a copy of the nonce </p>
+<p>Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Throws an authentication failure exception if the internal decryption has failed</td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Implements <a class="el" href="class_i_symmetric_key.html#a2c791f59a23f510b4963103acd22c537">ISymmetricKey</a>.</p>
 
@@ -1134,95 +1157,89 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 
 </div>
 </div>
-<a id="ab996b41cae495c7469195ac2985c8b32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab996b41cae495c7469195ac2985c8b32">&#9670;&nbsp;</a></span>SecureInfo()</h2>
+<a id="a48a61dc9d1060edba0e1e5ad1870116e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48a61dc9d1060edba0e1e5ad1870116e">&#9670;&nbsp;</a></span>SecureInfo()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const SecureVector&lt; byte &gt; SymmetricSecureKey::SecureInfo </td>
+          <td class="memname">const void SymmetricSecureKey::SecureInfo </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy </p>
-
-<p>Implements <a class="el" href="class_i_symmetric_key.html#ac8c58d69f7602116c82652dee46c7462">ISymmetricKey</a>.</p>
+<p>Create a secure-vector copy of the personalization string; can also used as an additional source of entropy in some constructions </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Throws if the output vector is too small</td></tr>
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Throws an authentication failure exception if the internal decryption has failed</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a id="a4d39aa09b5e6de5121893571c604876b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d39aa09b5e6de5121893571c604876b">&#9670;&nbsp;</a></span>SecureKey()</h2>
+<a id="a7de35fde5c29e200d4ddef462597192b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7de35fde5c29e200d4ddef462597192b">&#9670;&nbsp;</a></span>SecureKey()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const SecureVector&lt; byte &gt; SymmetricSecureKey::SecureKey </td>
+          <td class="memname">const void SymmetricSecureKey::SecureKey </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read Only: Return a secure vector copy of the primary encryption key </p>
-
-<p>Implements <a class="el" href="class_i_symmetric_key.html#a57e4d339d66f63cabd0cb690e2ef7e29">ISymmetricKey</a>.</p>
+<p>Create a secure-vector copy of the primary encryption key </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Throws if the output vector is too small</td></tr>
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Throws an authentication failure exception if the internal decryption has failed</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a id="a008f3504a8eb7599c1ca390b892c646e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a008f3504a8eb7599c1ca390b892c646e">&#9670;&nbsp;</a></span>SecureNonce()</h2>
+<a id="ac9fccf5b255cfaef1249d11bf55949f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9fccf5b255cfaef1249d11bf55949f9">&#9670;&nbsp;</a></span>SecureNonce()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const SecureVector&lt; byte &gt; SymmetricSecureKey::SecureNonce </td>
+          <td class="memname">const void SymmetricSecureKey::SecureNonce </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read Only: Return a secure vector copy of the nonce or salt value </p>
-
-<p>Implements <a class="el" href="class_i_symmetric_key.html#a685d0c9724e0961ac6ace74ead22071b">ISymmetricKey</a>.</p>
+<p>Create a secure-vector copy of the nonce; can also be used as the salt or iv </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Throws if the output vector is too small</td></tr>
+    <tr><td class="paramname">CryptoAuthenticationFailure</td><td>Throws an authentication failure exception if the internal decryption has failed</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a id="a8783f8e3e5729673219b337ef5ee4b8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8783f8e3e5729673219b337ef5ee4b8a">&#9670;&nbsp;</a></span>Serialize()</h2>
+<a id="a5bb27f1bbf02fce6bd169afd7f0ff3b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bb27f1bbf02fce6bd169afd7f0ff3b5">&#9670;&nbsp;</a></span>Serialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1231,10 +1248,10 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_memory_stream.html">MemoryStream</a> * SymmetricSecureKey::Serialize </td>
+          <td class="memname">SecureVector&lt; byte &gt; SymmetricSecureKey::Serialize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_symmetric_secure_key.html">SymmetricSecureKey</a> &amp;&#160;</td>
-          <td class="paramname"><em>KeyObj</em></td><td>)</td>
+          <td class="paramname"><em>KeyParams</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1245,14 +1262,14 @@ The internal key is extracted using SHA512, and the internal state is encrypted 
 </table>
 </div><div class="memdoc">
 
-<p>Decrypt a SymmetricSecureKey and serialize it as a SymmetricKey stream </p>
+<p>Convert a SymmetricSecureKey to a SymmetricKey and serialize it as a SymmetricKey key-stream </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeyObj</td><td>A SymmetricSecureKey container</td></tr>
+    <tr><td class="paramname">KeyParams</td><td>A SymmetricSecureKey container</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A stream containing the serialized SymmetricKey data</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A secure-vector containing the serialized SymmetricKey data</dd></dl>
 
 </div>
 </div>

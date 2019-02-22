@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['p',['P',['../class_asymmetric_key.html#a2a265d197e161c7a9cd7f562f6a112f9',1,'AsymmetricKey::P()'],['../class_asymmetric_secure_key.html#a1ab6fef7a9fa9b7b33ec2f760d1601f4',1,'AsymmetricSecureKey::P()'],['../class_i_asymmetric_key.html#a647e54e73664a9178771dde8db9eab7b',1,'IAsymmetricKey::P()']]],
   ['padding',['Padding',['../group___padding.html',1,'']]],
   ['paddingfromname',['PaddingFromName',['../class_padding_from_name.html',1,'']]],
   ['paddingmodes',['PaddingModes',['../group___enumeration.html#ga2da315b4e41c3a75fd478a5d60c4d685',1,'Documentation.h']]],
@@ -49,12 +48,14 @@ var searchData=
   ['pkcs7',['PKCS7',['../class_p_k_c_s7.html',1,'PKCS7'],['../class_p_k_c_s7.html#a7d4afca98cff9a10b13c795e95322fdf',1,'PKCS7::PKCS7(const PKCS7 &amp;)=delete'],['../class_p_k_c_s7.html#a18ec8a44607dcbdca2cd7310310f1082',1,'PKCS7::PKCS7()'],['../group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685a0ee2623db2098d20cc248a0c42970a56',1,'PKCS7():&#160;Documentation.h']]],
   ['poly1305',['Poly1305',['../class_poly1305.html',1,'Poly1305'],['../class_poly1305.html#aac2af68da1a0b86663bd2099fe796106',1,'Poly1305::Poly1305(const Poly1305 &amp;)=delete'],['../class_poly1305.html#a7d62e7cd2d67f1c72142580036066fa2',1,'Poly1305::Poly1305()'],['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ab6fd733868a97b1057243c9e9e381074',1,'Poly1305():&#160;Documentation.h']]],
   ['polymath',['PolyMath',['../class_poly_math.html',1,'']]],
+  ['polynomial',['Polynomial',['../class_asymmetric_key.html#a944fe76470f50d8c5a86fd386ea3e2c5',1,'AsymmetricKey::Polynomial()'],['../class_asymmetric_secure_key.html#af64d2662e529382b7b6a08b1c05b7af3',1,'AsymmetricSecureKey::Polynomial()'],['../class_i_asymmetric_key.html#a3912d92d6dfe653fb53b67b3568e1afc',1,'IAsymmetricKey::Polynomial()']]],
   ['position',['Position',['../class_file_stream.html#a1871b0f8599c44ba3ba0a6a758fcd522',1,'FileStream::Position()'],['../class_i_byte_stream.html#a288c5117be3f56b795905e7f14d90ab0',1,'IByteStream::Position()'],['../class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4',1,'MemoryStream::Position()'],['../class_secure_stream.html#a2cc7b912fb79d7bf60a983c88b9df792',1,'SecureStream::Position()'],['../class_stream_reader.html#a9912177b86fcb8ad778aa58605103ddb',1,'StreamReader::Position()'],['../class_stream_writer.html#aa9cad1dd9aad40ad181be2b1a7b1e378',1,'StreamWriter::Position()']]],
   ['pqe',['PQE',['../class_cpu_detect.html#ad473ed0f1a5792c15afa9a38e28ec382',1,'CpuDetect']]],
   ['pqm',['PQM',['../class_cpu_detect.html#a73b74cc81c34fc41c89fc75594745256',1,'CpuDetect']]],
   ['prefetch',['PREFETCH',['../class_cpu_detect.html#a72843802081519801e66b71936597c1d',1,'CpuDetect']]],
   ['preservead',['PreserveAD',['../class_e_a_x.html#ada22f030127e5c3bc0f8fc6d8a600956',1,'EAX::PreserveAD()'],['../class_g_c_m.html#ac2a23fd6a442332eea4d31e3c3b68b70',1,'GCM::PreserveAD()'],['../class_i_aead_mode.html#a99fa6d52d3cb43703d3c0bc0f9adb6c1',1,'IAeadMode::PreserveAD()']]],
-  ['privatekey',['PrivateKey',['../class_asymmetric_key_pair.html#a5d1db63fb18b50ff4d924cda000682b1',1,'AsymmetricKeyPair::PrivateKey()'],['../class_i_asymmetric_key_pair.html#abe10c0eb64561c576b3419bf07895deb',1,'IAsymmetricKeyPair::PrivateKey()']]],
+  ['primitivetype',['PrimitiveType',['../class_asymmetric_key.html#a7a357f266bf550ebfce55936d6b79844',1,'AsymmetricKey::PrimitiveType()'],['../class_asymmetric_secure_key.html#a783d115c2d86e8f2321d28597dbb8b78',1,'AsymmetricSecureKey::PrimitiveType()'],['../class_i_asymmetric_key.html#ad052f267bc75298d6d4892f417cdaf8e',1,'IAsymmetricKey::PrimitiveType()']]],
+  ['privatekey',['PrivateKey',['../class_asymmetric_key_pair.html#a5d1db63fb18b50ff4d924cda000682b1',1,'AsymmetricKeyPair']]],
   ['privatekeysize',['PrivateKeySize',['../class_dilithium.html#a9e374ef7058b87bd76989fd093cb0f2a',1,'Dilithium::PrivateKeySize()'],['../class_i_asymmetric_parameters.html#a664c2cd9dbfb23b48b72db64d9f86d65',1,'IAsymmetricParameters::PrivateKeySize()'],['../class_i_asymmetric_sign.html#a37029c2531087e3ee90ef1c57a2f0838',1,'IAsymmetricSign::PrivateKeySize()'],['../class_sphincs.html#a08985c961919894c9b69b4388c707a7a',1,'Sphincs::PrivateKeySize()']]],
   ['prng',['Prng',['../group___prng.html',1,'']]],
   ['prngbase',['PrngBase',['../class_prng_base.html',1,'PrngBase'],['../class_prng_base.html#a4492c0cffb2333c2c5ead18a1457eda1',1,'PrngBase::PrngBase(const PrngBase &amp;)=delete'],['../class_prng_base.html#aa37b2adcdb5354ce09870611f233db69',1,'PrngBase::PrngBase()=delete'],['../class_prng_base.html#a8c36fc2c5075d85353fbe77c3e0a85f6',1,'PrngBase::PrngBase(Prngs Enumeral, std::string &amp;Name)']]],
@@ -70,6 +71,6 @@ var searchData=
   ['providerfromname',['ProviderFromName',['../class_provider_from_name.html',1,'']]],
   ['providers',['Providers',['../group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0',1,'Documentation.h']]],
   ['providerselftest',['ProviderSelfTest',['../class_provider_self_test.html',1,'']]],
-  ['publickey',['PublicKey',['../class_asymmetric_key_pair.html#a94598941e85724db5d43ff1a3eee61dd',1,'AsymmetricKeyPair::PublicKey()'],['../class_i_asymmetric_key_pair.html#a51aa55d084611cd2d695eb4ea4bbfdb4',1,'IAsymmetricKeyPair::PublicKey()'],['../group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18',1,'PublicKey():&#160;Documentation.h']]],
+  ['publickey',['PublicKey',['../class_asymmetric_key_pair.html#a94598941e85724db5d43ff1a3eee61dd',1,'AsymmetricKeyPair::PublicKey()'],['../group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18',1,'PublicKey():&#160;Documentation.h']]],
   ['publickeysize',['PublicKeySize',['../class_dilithium.html#aa625f481f6b09af524694fdb839c9f13',1,'Dilithium::PublicKeySize()'],['../class_i_asymmetric_parameters.html#acc58f589d30db7766197a4a8d7263fa3',1,'IAsymmetricParameters::PublicKeySize()'],['../class_i_asymmetric_sign.html#a95d9971467e4cef79b51f960c4c64575',1,'IAsymmetricSign::PublicKeySize()'],['../class_sphincs.html#a384523c49d175414091494c466abc087',1,'Sphincs::PublicKeySize()']]]
 ];

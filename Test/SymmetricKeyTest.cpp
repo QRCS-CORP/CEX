@@ -1,12 +1,11 @@
 #include "SymmetricKeyTest.h"
 #include "../CEX/SecureRandom.h"
-#include "../CEX/MemoryStream.h"
+#include "../CEX/SecureVector.h"
 #include "../CEX/SymmetricKeyGenerator.h"
 
 namespace Test
 {
-	using namespace IO;
-	using Exception::CryptoProcessingException;
+	using Exception::CryptoSymmetricException;
 	using Prng::SecureRandom;
 	using Enumeration::SecurityPolicy;
 	using Cipher::SymmetricKey;
@@ -15,7 +14,7 @@ namespace Test
 	using Cipher::SymmetricKeyGenerator;
 
 	const std::string SymmetricKeyTest::CLASSNAME = "SymmetricKeyTest";
-	const std::string SymmetricKeyTest::DESCRIPTION = "SymmetricKey test; checks constructors, access, and serialization.";
+	const std::string SymmetricKeyTest::DESCRIPTION = "SymmetricKey test; checks constructors, exceptions, access, and serialization of SymmetricKey and SymmetricSecureKey.";
 	const std::string SymmetricKeyTest::SUCCESS = "SUCCESS! All SymmetricKey tests have executed succesfully.";
 
 	SymmetricKeyTest::SymmetricKeyTest()
@@ -77,7 +76,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE1"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -94,7 +93,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE2"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -112,7 +111,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE3"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -128,7 +127,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE1"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -145,7 +144,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE2"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -163,7 +162,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricKey"), std::string("Exception handling failure! -SE3"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -179,7 +178,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE4"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -196,7 +195,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE5"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -214,7 +213,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE6"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -231,7 +230,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE7"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -249,7 +248,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE8"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -268,7 +267,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE9"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -284,7 +283,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE4"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -301,7 +300,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE5"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -319,7 +318,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE6"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -336,7 +335,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE7"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -354,7 +353,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE8"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -373,7 +372,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE9"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -390,7 +389,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE10"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -408,7 +407,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE11"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -427,7 +426,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), std::string("SymmetricSecureKey"), std::string("Exception handling failure! -SE12"));
 		}
-		catch (CryptoProcessingException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -761,8 +760,8 @@ namespace Test
 
 		// test symmetric key serialization
 		SymmetricKey* kp1 = keyGen.GetSymmetricKey(keySize);
-		MemoryStream* ks1 = SymmetricKey::Serialize(*kp1);
-		SymmetricKey* kp2 = SymmetricKey::DeSerialize(*ks1);
+		SecureVector<byte> ks1 = SymmetricKey::Serialize(*kp1);
+		SymmetricKey* kp2 = SymmetricKey::DeSerialize(ks1);
 
 		if (kp1->Key() != kp2->Key() || kp1->Nonce() != kp2->Nonce() || kp1->Info() != kp2->Info())
 		{
@@ -771,8 +770,8 @@ namespace Test
 
 		// test secure key serialization
 		SymmetricSecureKey* sk1 = keyGen.GetSecureKey(keySize);
-		MemoryStream* ks2 = SymmetricSecureKey::Serialize(*sk1);
-		SymmetricKey* sk2 = SymmetricSecureKey::DeSerialize(*ks2);
+		SecureVector<byte> ks2 = SymmetricSecureKey::Serialize(*sk1);
+		SymmetricKey* sk2 = SymmetricSecureKey::DeSerialize(ks2);
 
 		if (sk1->Key() != sk2->Key() || sk1->Nonce() != sk2->Nonce() || sk1->Info() != sk2->Info())
 		{

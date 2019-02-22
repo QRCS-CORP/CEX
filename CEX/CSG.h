@@ -57,11 +57,10 @@ using Enumeration::ShakeModes;
 /// </example>
 /// 
 /// <remarks>
-/// <para><EM>Initialize</EM> \n
-/// The Initialize function can take up to 3 inputs; the generator Key which is the primary key, a Nonce value which acts as a customization string, 
-/// and the distribution code (Info parameter) used as the Name parameter in cSHAKE. \n
-/// The initialization parameters determine the type of underlying generator which is invoked. If only a key is used, the generator invokes a SHAKE instance. \n
-/// if both the Key and Nonce parameter are used to seed the generator, or if all three parameters contain keying material (Key, Nonce, and Info), an instance of cSHAKE is created.
+/// <para><EM>Overview</EM> \n
+/// A DRBG using the customized SHAKE XOF function cSHAKE as the primary pseudo-random generation function. \n
+/// This DRBG uses an optional entropy provider to implement predictive resistance, and can optionally run in SIMD parallel mode, processing 4 or 8 blocks simutaneously using AVX2 or AVX512 instructions.
+/// CSG can use any of the implemented SHAKE modes, SHAKE-128, SHAKE-256, or the experimental SHAKE-512, and SHAKE-1024 modes.
 /// </para>
 ///
 /// <para><EM>Generate</EM> \n
@@ -197,30 +196,30 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes
+	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	/// <param name="Output">The output standard-vector to fill with random bytes</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes
+	/// Fill a secure-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	/// <param name="Output">The output secure-vector to fill with random bytes</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
+	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	/// <param name="Output">The output standard-vector to fill with random bytes</param>
 	/// <param name="OutOffset">The starting position within the output vector</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	///
@@ -229,10 +228,10 @@ public:
 	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes using offset and length parameters
+	/// Fill a secure-vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	/// <param name="Output">The output secure-vector to fill with random bytes</param>
 	/// <param name="OutOffset">The starting position within the output vector</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	///
@@ -250,19 +249,19 @@ public:
 	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
-	/// Update the generators keying material with a standard vector key
+	/// Update the generators keying material with a standard-vector key
 	/// </summary>
 	///
-	/// <param name="Key">The standard vector containing the new key material</param>
+	/// <param name="Key">The standard-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
 	void Update(const std::vector<byte> &Key) override;
 
 	/// <summary>
-	/// Update the generators keying material with a secure vector key
+	/// Update the generators keying material with a secure-vector key
 	/// </summary>
 	///
-	/// <param name="Key">The secure vector containing the new key material</param>
+	/// <param name="Key">The secure-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
 	void Update(const SecureVector<byte> &Key) override;

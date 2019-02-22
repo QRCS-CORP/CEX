@@ -182,7 +182,7 @@ public:
 	/// 
 	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid authentication method is chosen</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid authentication method is chosen</exception>
 	explicit Threefish256(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
@@ -280,7 +280,7 @@ public:
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="Parameters">Cipher key structure, containing cipher key, nonce, and optional info array</param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &Parameters) override;
 
 	/// <summary>
@@ -303,7 +303,7 @@ public:
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if the cipher is not initialized</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if the cipher is not initialized</exception>
 	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 	/// <summary>

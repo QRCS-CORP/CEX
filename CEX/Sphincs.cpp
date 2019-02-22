@@ -75,9 +75,9 @@ Sphincs::~Sphincs()
 	}
 }
 
-const AsymmetricEngines Sphincs::Enumeral()
+const AsymmetricPrimitives Sphincs::Enumeral()
 {
-	return AsymmetricEngines::Sphincs;
+	return AsymmetricPrimitives::Sphincs;
 }
 
 const bool Sphincs::IsInitialized()
@@ -122,24 +122,24 @@ AsymmetricKeyPair* Sphincs::Generate()
 	std::vector<byte> sk(SPXF256::SPHINCS_SECRETKEY_SIZE);
 
 	SPXF256::Generate(pk, sk, m_rndGenerator, m_spxParameters);
-	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_spxParameters), pk);
-	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_spxParameters), sk);
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_spxParameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_spxParameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
 
 const void Sphincs::Initialize(AsymmetricKey* Key)
 {
-	if (Key->CipherType() != AsymmetricEngines::Sphincs)
+	if (Key->PrimitiveType() != AsymmetricPrimitives::Sphincs)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
-	if (Key->KeyType() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyType() != AsymmetricKeyTypes::SignaturePrivateKey)
+	if (Key->KeyClass() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyClass() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
 
-	if (Key->KeyType() == AsymmetricKeyTypes::SignaturePublicKey)
+	if (Key->KeyClass() == AsymmetricKeyTypes::SignaturePublicKey)
 	{
 		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
 		m_spxParameters = static_cast<SphincsParameters>(m_publicKey->Parameters());
@@ -172,7 +172,7 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 
 	size_t sgnlen;
 
-	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->P(), m_rndGenerator, m_spxParameters);
+	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_spxParameters);
 
 	return sgnlen;
 }
@@ -190,7 +190,7 @@ bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Mess
 
 	uint result;
 
-	result = SPXF256::Verify(Message, Signature, m_publicKey->P(), m_spxParameters);
+	result = SPXF256::Verify(Message, Signature, m_publicKey->Polynomial(), m_spxParameters);
 
 	return (result == 1);
 }

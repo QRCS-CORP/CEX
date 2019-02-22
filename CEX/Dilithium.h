@@ -146,7 +146,7 @@ public:
 	/// <summary>
 	/// Read Only: The signature schemes type-name
 	/// </summary>
-	const AsymmetricEngines Enumeral() override;
+	const AsymmetricPrimitives Enumeral() override;
 
 	/// <summary>
 	/// Read Only: The signature scheme has been initialized with a key

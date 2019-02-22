@@ -171,7 +171,7 @@ public:
 	/// <param name="CipherModeType">The cipher mode enumeration name</param>
 	/// <param name="PaddingType">The padding mode enumeration name</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are passed</exception>
 	CipherStream(BlockCiphers CipherType = BlockCiphers::AES, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, CipherModes CipherModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
 
 	/// <summary>
@@ -234,7 +234,7 @@ public:
 	/// <param name="Encryption">The cipher is initialized for encryption</param>
 	/// <param name="Parameters">The ISymmetricKey containing the cipher key and initialization vector</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are passed</exception>
 	void Initialize(bool Encryption, ISymmetricKey &Parameters);
 
 	/// <summary>

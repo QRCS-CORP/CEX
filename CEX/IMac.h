@@ -103,20 +103,20 @@ public:
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Completes processing and returns the MAC code in a standard vector
+	/// Completes processing and returns the MAC code in a standard-vector
 	/// </summary>
 	///
-	/// <param name="Output">The output standard vector receiving the MAC code</param>
+	/// <param name="Output">The output standard-vector receiving the MAC code</param>
 	/// <param name="OutOffset">The starting offset within the output array</param>
 	///
 	/// <returns>The size of the MAC code in bytes</returns>
 	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
-	/// Completes processing and returns the MAC code in a secure vector
+	/// Completes processing and returns the MAC code in a secure-vector
 	/// </summary>
 	///
-	/// <param name="Output">The output secure vector receiving the MAC code</param>
+	/// <param name="Output">The output secure-vector receiving the MAC code</param>
 	/// <param name="OutOffset">The starting offset within the output array</param>
 	///
 	/// <returns>The size of the MAC code in bytes</returns>

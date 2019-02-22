@@ -152,7 +152,7 @@ public:
 	/// <param name="CipherExtensionType">Sets the optional Key Schedule key-expansion engine; valid options are cSHAKE, HKDF, or None for standard mode. 
 	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a the custom cipher extension enumeral is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if a the custom cipher extension enumeral is used</exception>
 	AHX(BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
@@ -162,7 +162,7 @@ public:
 	///
 	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null kdf is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if a null kdf is used</exception>
 	AHX(IKdf* Kdf);
 
 	/// <summary>
@@ -292,7 +292,7 @@ public:
 	/// <param name="Parameters">Cipher key container. 
 	/// <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &Parameters) override;
 
 	/// <summary>

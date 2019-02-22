@@ -6,6 +6,7 @@
 #include "../CEX/RHX.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/SecureRandom.h"
+#include "../CEX/SecureVector.h"
 
 namespace Test
 {
@@ -237,10 +238,10 @@ namespace Test
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = kp1->PublicKey()->P();
+		std::vector<byte> pk1 = kp1->PublicKey()->Polynomial();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(RLWEParameters::RLWES1Q12289N1024), pk1);
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(RLWEParameters::RLWES1Q12289N1024));
 		cpr1.Initialize(pk2);
 		cpr1.Encapsulate(cpt, sec1);
 
@@ -264,10 +265,10 @@ namespace Test
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
-		std::vector<byte> pk3 = kp2->PublicKey()->P();
+		std::vector<byte> pk3 = kp2->PublicKey()->Polynomial();
 		pk3[0] += 1;
 		pk3[1] += 1;
-		AsymmetricKey* pk4 = new AsymmetricKey(AsymmetricEngines::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(RLWEParameters::RLWES2Q12289N2048), pk3);
+		AsymmetricKey* pk4 = new AsymmetricKey(pk3, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(RLWEParameters::RLWES2Q12289N2048));
 		cpr2.Initialize(pk4);
 		cpr2.Encapsulate(cpt, sec1);
 
@@ -283,7 +284,7 @@ namespace Test
 
 	void RingLWETest::Serialization()
 	{
-		std::vector<byte> skey(0);
+		SecureVector<byte> skey(0);
 
 		// test param 1: RLWES1Q12289N1024
 		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
@@ -291,20 +292,20 @@ namespace Test
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 			AsymmetricKeyPair* kp = cpr1.Generate();
-			AsymmetricKey* priK1 = kp->PrivateKey();
-			skey = priK1->ToBytes();
-			AsymmetricKey priK2(skey);
+			AsymmetricKey* prik1 = kp->PrivateKey();
+			skey = AsymmetricKey::Serialize(*prik1);
+			AsymmetricKey* prik2 = AsymmetricKey::DeSerialize(skey);
 
-			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
+			if (prik1->Polynomial() != prik2->Polynomial() || prik1->Parameters() != prik2->Parameters())
 			{
 				throw TestException(std::string("Serialization"), cpr1.Name(), std::string("Private key serialization test has failed! -RS1"));
 			}
 
-			AsymmetricKey* pubK1 = kp->PublicKey();
-			skey = pubK1->ToBytes();
-			AsymmetricKey pubK2(skey);
+			AsymmetricKey* pubk1 = kp->PublicKey();
+			skey = AsymmetricKey::Serialize(*pubk1);
+			AsymmetricKey* pubk2 = AsymmetricKey::DeSerialize(skey);
 
-			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
+			if (pubk1->Polynomial() != pubk2->Polynomial() || pubk1->Parameters() != pubk2->Parameters())
 			{
 				throw TestException(std::string("Serialization"), std::string("RLWE"), std::string("Public key serialization test has failed! -RS2"));
 			}
@@ -318,20 +319,20 @@ namespace Test
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 			AsymmetricKeyPair* kp = cpr2.Generate();
-			AsymmetricKey* priK1 = kp->PrivateKey();
-			skey = priK1->ToBytes();
-			AsymmetricKey priK2(skey);
+			AsymmetricKey* prik1 = kp->PrivateKey();
+			skey = AsymmetricKey::Serialize(*prik1);
+			AsymmetricKey* prik2 = AsymmetricKey::DeSerialize(skey);
 
-			if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
+			if (prik1->Polynomial() != prik2->Polynomial() || prik1->Parameters() != prik2->Parameters())
 			{
 				throw TestException(std::string("Serialization"), cpr2.Name(), std::string("Private key serialization test has failed! -RS1"));
 			}
 
-			AsymmetricKey* pubK1 = kp->PublicKey();
-			skey = pubK1->ToBytes();
-			AsymmetricKey pubK2(skey);
+			AsymmetricKey* pubk1 = kp->PublicKey();
+			skey = AsymmetricKey::Serialize(*pubk1);
+			AsymmetricKey* pubk2 = AsymmetricKey::DeSerialize(skey);
 
-			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
+			if (pubk1->Polynomial() != pubk2->Polynomial() || pubk1->Parameters() != pubk2->Parameters())
 			{
 				throw TestException(std::string("Serialization"), cpr2.Name(), std::string("Public key serialization test has failed! -RS2"));
 			}

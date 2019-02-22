@@ -78,6 +78,7 @@
 #include "../Test/ACSTest.h"
 #include "../Test/AeadTest.h"
 #include "../Test/AesAvsTest.h"
+#include "../Test/AsymmetricKeyTest.h"
 #include "../Test/AsymmetricSpeedTest.h"
 #include "../Test/BCGTest.h"
 #include "../Test/BCRTest.h"
@@ -231,9 +232,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("// * CEX++ Version 1.0.0.7: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("// *                                             *");
-	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7j (A7)                   *");
+	ConsoleUtils::WriteLine("// * Release:   v1.0.0.7k (A7)                   *");
 	ConsoleUtils::WriteLine("// * License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("// * Date:      February 18, 2019                *");
+	ConsoleUtils::WriteLine("// * Date:      February 21, 2019                *");
 	ConsoleUtils::WriteLine("// * Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -468,8 +469,9 @@ int main()
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new BCGTest());
 			RunTest(new CSGTest());
-			//RunTest(new HCGTest());
+			RunTest(new HCGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
+			RunTest(new AsymmetricKeyTest());
 			RunTest(new SymmetricKeyGeneratorTest());
 			RunTest(new SecureStreamTest());
 			RunTest(new SymmetricKeyTest());

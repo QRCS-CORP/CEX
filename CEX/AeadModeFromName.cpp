@@ -1,14 +1,14 @@
 #include "AeadModeFromName.h"
 #include "BlockCipherFromName.h"
 #include "CryptoCipherModeException.h"
-#include "CryptoSymmetricCipherException.h"
+#include "CryptoSymmetricException.h"
 #include "EAX.h"
 #include "GCM.h"
 
 NAMESPACE_HELPER
 
 using Exception::CryptoCipherModeException;
-using Exception::CryptoSymmetricCipherException;
+using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
 
 const std::string AeadModeFromName::CLASS_NAME("AeadModeFromName");
@@ -94,7 +94,7 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
-	catch (CryptoSymmetricCipherException &ex)
+	catch (CryptoSymmetricException &ex)
 	{
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}

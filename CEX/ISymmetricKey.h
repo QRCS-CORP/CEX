@@ -2,19 +2,17 @@
 #define CEX_ISYMMETRICKEY_H
 
 #include "CexDomain.h"
-#include "CryptoProcessingException.h"
-#include "MemoryStream.h"
+#include "CryptoSymmetricException.h"
 #include "SecureVector.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_CIPHER
 
-using Exception::CryptoProcessingException;
-using IO::MemoryStream;
+using Exception::CryptoSymmetricException;
 
 /// <summary>
 /// Symmetric Key virtual interface class.
-/// <para>Provides virtual interfaces for the symmetric key classes.</para>
+/// <para>Provides virtual interfaces for the SymmetricKey and SymmetricSecureKey classes.</para>
 /// </summary>
 class ISymmetricKey
 {
@@ -49,7 +47,12 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The primary key
+	/// Read/Write: Return a standard-vector copy of the personalization string; can also used as anadditional source of entropy in some constructions
+	/// </summary>
+	virtual const std::vector<byte> Info() = 0;
+
+	/// <summary>
+	/// Read Only: Return a standard-vector copy of the primary key
 	/// </summary>
 	virtual const std::vector<byte> Key() = 0;
 
@@ -59,29 +62,9 @@ public:
 	virtual const SymmetricKeySize KeySizes() = 0;
 
 	/// <summary>
-	/// Read Only: The nonce or initialization vector
+	/// Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv
 	/// </summary>
 	virtual const std::vector<byte> Nonce() = 0;
-
-	/// <summary>
-	/// Read/Write: The personalization string; can used as an optional source of entropy
-	/// </summary>
-	virtual const std::vector<byte> Info() = 0;
-
-	/// <summary>
-	/// Read Only: Return a secure vector copy of the personalization string; can used as an optional source of entropy
-	/// </summary>
-	virtual const SecureVector<byte> SecureInfo() = 0;
-
-	/// <summary>
-	/// Read Only: Return a secure vector copy of the primary encryption key
-	/// </summary>
-	virtual const SecureVector<byte> SecureKey() = 0;
-
-	/// <summary>
-	/// Read Only: Return a secure vector copy of the nonce or salt value
-	/// </summary>
-	virtual const SecureVector<byte> SecureNonce() = 0;
 
 	//~~~Public Functions~~~//
 

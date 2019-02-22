@@ -2,7 +2,7 @@
 #define CEXTEST_ASYMMETRICSPEEDTEST_H
 
 #include "ITest.h"
-#include "../CEX/AsymmetricEngines.h"
+#include "../CEX/AsymmetricPrimitives.h"
 #include "../CEX/DilithiumParameters.h"
 #include "../CEX/IBlockCipher.h"
 #include "../CEX/MLWEParameters.h"

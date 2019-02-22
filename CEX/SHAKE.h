@@ -138,28 +138,28 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes
+	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes
+	/// Fill a secure-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Output">The destination secure-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes, using offset and length parameters
+	/// Fill a standard-vector with pseudo-random bytes, using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
@@ -167,10 +167,10 @@ public:
 	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes, using offset and length parameters
+	/// Fill a secure-vector with pseudo-random bytes, using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Output">The destination secure-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
@@ -187,28 +187,28 @@ public:
 	void Initialize(ISymmetricKey &Parameters) override;
 
 	/// <summary>
-	/// Initialize the SHAKE generator with a standard vector key
+	/// Initialize the SHAKE generator with a standard-vector key
 	/// </summary>
 	/// 
-	/// <param name="Key">The standard vector key used to initialize the generator</param>
+	/// <param name="Key">The standard-vector key used to initialize the generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is illegaly sized</exception>
 	void Initialize(const std::vector<byte> &Key);
 
 	/// <summary>
-	/// Initialize the SHAKE generator with a secure vector key
+	/// Initialize the SHAKE generator with a secure-vector key
 	/// </summary>
 	/// 
-	/// <param name="Key">The secure vector key used to initialize the generator</param>
+	/// <param name="Key">The secure-vector key used to initialize the generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is illegaly sized</exception>
 	void Initialize(const SecureVector<byte> &Key);
 
 	/// <summary>
-	/// Initialize the SHAKE generator with a standard vector key, using length and offset parameters
+	/// Initialize the SHAKE generator with a standard-vector key, using length and offset parameters
 	/// </summary>
 	/// 
-	/// <param name="Key">The standard vector key used to initialize the generator</param>
+	/// <param name="Key">The standard-vector key used to initialize the generator</param>
 	/// <param name="Offset">The starting position within the key vector</param>
 	/// <param name="Length">The number of key bytes to use</param>
 	/// 
@@ -216,10 +216,10 @@ public:
 	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Initialize the SHAKE generator with a secure vector key, using length and offset parameters
+	/// Initialize the SHAKE generator with a secure-vector key, using length and offset parameters
 	/// </summary>
 	/// 
-	/// <param name="Key">The secure vector key used to initialize the generator</param>
+	/// <param name="Key">The secure-vector key used to initialize the generator</param>
 	/// <param name="Offset">The starting position within the key vector</param>
 	/// <param name="Length">The number of key bytes to use</param>
 	/// 
@@ -227,23 +227,23 @@ public:
 	void Initialize(const SecureVector<byte> &Key, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Initialize the SHAKE generator with standard vector key and customization arrays.
+	/// Initialize the SHAKE generator with standard-vector key and customization arrays.
 	/// <para>This method initiatializes cSHAKE using the Customization vector as the pre-initialization parameter.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The standard vector key used to initialize the generator</param>
-	/// <param name="Customization">The customization standard vector used to create a unique generator output</param>
+	/// <param name="Key">The standard-vector key used to initialize the generator</param>
+	/// <param name="Customization">The customization standard-vector used to create a unique generator output</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key or customization array is illegaly sized</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization);
 
 	/// <summary>
-	/// Initialize the SHAKE generator with secure vector key and customization arrays.
+	/// Initialize the SHAKE generator with secure-vector key and customization arrays.
 	/// <para>This method initiatializes cSHAKE using the Customization vector as the pre-initialization parameter.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The secure vector key used to initialize the generator</param>
-	/// <param name="Customization">The customization secure vector used to create a unique generator output</param>
+	/// <param name="Key">The secure-vector key used to initialize the generator</param>
+	/// <param name="Customization">The customization secure-vector used to create a unique generator output</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key or customization array is illegaly sized</exception>
 	void Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization);
@@ -253,9 +253,9 @@ public:
 	/// <para>This method initiatializes cSHAKE using the Customization and Name vectors as the pre-initialization parameters.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The standard vector key used to initialize the generator</param>
-	/// <param name="Customization">The customization standard vector used to create a unique generator output</param>
-	/// <param name="Information">The information customization standard vector</param>
+	/// <param name="Key">The standard-vector key used to initialize the generator</param>
+	/// <param name="Customization">The customization standard-vector used to create a unique generator output</param>
+	/// <param name="Information">The information customization standard-vector</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key, customization, or name array is illegaly sized</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information);
@@ -265,9 +265,9 @@ public:
 	/// <para>This method initiatializes cSHAKE using the Customization and Information vectors as the pre-initialization parameters.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The secure vector key used to initialize the generator</param>
-	/// <param name="Customization">The secure vector customization used to create a unique generator output</param>
-	/// <param name="Information">The information customization secure vector</param>
+	/// <param name="Key">The secure-vector key used to initialize the generator</param>
+	/// <param name="Customization">The secure-vector customization used to create a unique generator output</param>
+	/// <param name="Information">The information customization secure-vector</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key, customization, or name array is illegaly sized</exception>
 	void Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization, const SecureVector<byte> &Information);

@@ -156,7 +156,7 @@ namespace Test
 
 			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE1"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -171,7 +171,7 @@ namespace Test
 
 			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE2"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -186,7 +186,7 @@ namespace Test
 
 			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE3"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)

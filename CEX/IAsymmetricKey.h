@@ -2,18 +2,18 @@
 #define CEX_IASYMMETRICKEY_H
 
 #include "CexDomain.h"
-#include "AsymmetricEngines.h"
+#include "AsymmetricPrimitives.h"
 #include "AsymmetricKeyTypes.h"
+#include "AsymmetricTransforms.h"
 #include "CryptoAsymmetricException.h"
-#include "MemoryStream.h"
+#include "SecureVector.h"
 
 NAMESPACE_ASYMMETRIC
 
-using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricPrimitives;
 using Enumeration::AsymmetricKeyTypes;
 using Enumeration::AsymmetricTransforms;
 using Exception::CryptoAsymmetricException;
-using IO::MemoryStream;
 
 /// <summary>
 /// The Asymmetric key interface
@@ -51,36 +51,31 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The keys cipher type name
+	/// Read Only: The keys private/public classification type
 	/// </summary>
-	virtual const AsymmetricEngines CipherType() = 0;
+	virtual const AsymmetricKeyTypes KeyClass() = 0;
 
 	/// <summary>
-	/// Read Only: The keys assigned type name
+	/// Read Only: The keys asymmetric primitive type-name
 	/// </summary>
-	virtual const AsymmetricKeyTypes KeyType() = 0;
+	virtual const AsymmetricPrimitives PrimitiveType() = 0;
 
 	/// <summary>
-	/// Read Only: The cipher parameters enumeration type name
+	/// Read Only: The asymmetric primitives parameter type-name
 	/// </summary>
 	virtual const AsymmetricTransforms Parameters() = 0;
 
 	/// <summary>
-	/// Read Only: The asymmetric key polynomial
+	/// Read Only: Returns a standard-vector copy of the asymmetric-key polynomial
 	/// </summary>
-	virtual const std::vector<byte> &P() = 0;
+	virtual const std::vector<byte> Polynomial() = 0;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
-	virtual void Destroy() = 0;
-
-	/// <summary>
-	/// Serialize the key
-	/// </summary>
-	virtual std::vector<byte> ToBytes() = 0;
+	virtual void Reset() = 0;
 };
 
 NAMESPACE_ASYMMETRICEND

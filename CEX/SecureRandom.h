@@ -97,7 +97,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a standard vector of uint16 with pseudo-random using offset and length parameters
+	/// Fill a standard-vector of uint16 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The uint16 destination array</param>
@@ -106,7 +106,7 @@ public:
 	void Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
-	/// Fill a secure vector of uint16 with pseudo-random using offset and length parameters
+	/// Fill a secure-vector of uint16 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The uint16 destination array</param>
@@ -115,7 +115,7 @@ public:
 	void Fill(SecureVector<ushort> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
-	/// Fill a standard vector of uint32 with pseudo-random using offset and length parameters
+	/// Fill a standard-vector of uint32 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The uint32 destination array</param>
@@ -124,7 +124,7 @@ public:
 	void Fill(std::vector<uint> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
-	/// Fill a secure vector of uint32 with pseudo-random using offset and length parameters
+	/// Fill a secure-vector of uint32 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The uint32 destination array</param>
@@ -133,7 +133,7 @@ public:
 	void Fill(SecureVector<uint> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
-	/// Fill a standard vector of uint64 with pseudo-random using offset and length parameters
+	/// Fill a standard-vector of uint64 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The uint64 destination array</param>
@@ -142,7 +142,7 @@ public:
 	void Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements);
 
 	/// <summary>
-	/// Fill a secure vector of uint64 with pseudo-random using offset and length parameters
+	/// Fill a secure-vector of uint64 with pseudo-random using offset and length parameters
 	/// </summary>
 	///
 	/// <param name="Output">The uint64 destination array</param>
@@ -179,23 +179,23 @@ public:
 	/// Fill a secure byte vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Output">The destination secure-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to write to the destination array</param>
 	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes
+	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The destination vector to fill</param>
 	void Generate(std::vector<byte> &Output);
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes
+	/// Fill a secure-vector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Output">The destination secure-vector to fill</param>
 	void Generate(SecureVector<byte> &Output);
 
 	//~~~Char~~~//

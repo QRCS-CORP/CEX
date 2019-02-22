@@ -65,13 +65,14 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="class_asymmetric_secure_key-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">AsymmetricSecureKey Class Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
+<div class="title">AsymmetricSecureKey Class Reference<span class="mlabels"><span class="mlabel">final</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___asymmetric.html">Asymmetric</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>An Asymmetric cipher key container  
+<p>An encrypted and authenticated Asymmetric primitive key container.  
  <a href="class_asymmetric_secure_key.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_asymmetric_secure_key_8h_source.html">AsymmetricSecureKey.h</a>&gt;</code></p>
@@ -96,33 +97,33 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad80e1aa71fba766ecd15b84733637c97"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#ad80e1aa71fba766ecd15b84733637c97">AsymmetricSecureKey</a> ()=delete</td></tr>
 <tr class="memdesc:ad80e1aa71fba766ecd15b84733637c97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#ad80e1aa71fba766ecd15b84733637c97">More...</a><br /></td></tr>
 <tr class="separator:ad80e1aa71fba766ecd15b84733637c97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abebcafe4a44c66f5c239b084603c1248"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#abebcafe4a44c66f5c239b084603c1248">AsymmetricSecureKey</a> (<a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a> <a class="el" href="class_asymmetric_secure_key.html#aea3b6c0df6b7cac87d419507cbdd7ce4">CipherType</a>, <a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a> CipherKeyType, <a class="el" href="group___enumeration.html#ga25da89a987f4d7e835bc03bb8599a693">AsymmetricTransforms</a> ParameterType, std::vector&lt; byte &gt; &amp;<a class="el" href="class_asymmetric_secure_key.html#a1ab6fef7a9fa9b7b33ec2f760d1601f4">P</a>, ulong KeySalt=0)</td></tr>
-<tr class="memdesc:abebcafe4a44c66f5c239b084603c1248"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this class with parameters  <a href="#abebcafe4a44c66f5c239b084603c1248">More...</a><br /></td></tr>
-<tr class="separator:abebcafe4a44c66f5c239b084603c1248"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e712911fa29a0b86f9396a5363c526b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a5e712911fa29a0b86f9396a5363c526b">AsymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;KeyStream)</td></tr>
-<tr class="memdesc:a5e712911fa29a0b86f9396a5363c526b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this class with a serialized private key  <a href="#a5e712911fa29a0b86f9396a5363c526b">More...</a><br /></td></tr>
-<tr class="separator:a5e712911fa29a0b86f9396a5363c526b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacd5f59580348ad3e3e45e7fc45f3ee5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#aacd5f59580348ad3e3e45e7fc45f3ee5">AsymmetricSecureKey</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="class_asymmetric_secure_key.html#af64d2662e529382b7b6a08b1c05b7af3">Polynomial</a>, const std::vector&lt; byte &gt; &amp;KeySalt, <a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a> <a class="el" href="class_asymmetric_secure_key.html#a783d115c2d86e8f2321d28597dbb8b78">PrimitiveType</a>, <a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a> <a class="el" href="class_asymmetric_secure_key.html#a0342ec0bae9a8ea035f4629d411e106f">KeyClass</a>, <a class="el" href="group___enumeration.html#ga25da89a987f4d7e835bc03bb8599a693">AsymmetricTransforms</a> <a class="el" href="class_asymmetric_secure_key.html#a43e1eb4451c6d995490d6436780aa28a">Parameters</a>, SecurityPolicy PolicyType)</td></tr>
+<tr class="memdesc:aacd5f59580348ad3e3e45e7fc45f3ee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this class with an asymmetric standard-vector polynomial and the asymmetric primitives parameter settings  <a href="#aacd5f59580348ad3e3e45e7fc45f3ee5">More...</a><br /></td></tr>
+<tr class="separator:aacd5f59580348ad3e3e45e7fc45f3ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae80624ca9129165dcfd1ae8be9b36bb1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#ae80624ca9129165dcfd1ae8be9b36bb1">AsymmetricSecureKey</a> (const SecureVector&lt; byte &gt; &amp;<a class="el" href="class_asymmetric_secure_key.html#af64d2662e529382b7b6a08b1c05b7af3">Polynomial</a>, const SecureVector&lt; byte &gt; &amp;KeySalt, <a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a> <a class="el" href="class_asymmetric_secure_key.html#a783d115c2d86e8f2321d28597dbb8b78">PrimitiveType</a>, <a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a> <a class="el" href="class_asymmetric_secure_key.html#a0342ec0bae9a8ea035f4629d411e106f">KeyClass</a>, <a class="el" href="group___enumeration.html#ga25da89a987f4d7e835bc03bb8599a693">AsymmetricTransforms</a> <a class="el" href="class_asymmetric_secure_key.html#a43e1eb4451c6d995490d6436780aa28a">Parameters</a>, SecurityPolicy PolicyType)</td></tr>
+<tr class="memdesc:ae80624ca9129165dcfd1ae8be9b36bb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this class with an asymmetric secure-vector polynomial and the asymmetric primitives parameter settings  <a href="#ae80624ca9129165dcfd1ae8be9b36bb1">More...</a><br /></td></tr>
+<tr class="separator:ae80624ca9129165dcfd1ae8be9b36bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12ad80f7b8c2f5ab11e4aab635e028bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a12ad80f7b8c2f5ab11e4aab635e028bd">~AsymmetricSecureKey</a> () override</td></tr>
 <tr class="memdesc:a12ad80f7b8c2f5ab11e4aab635e028bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a12ad80f7b8c2f5ab11e4aab635e028bd">More...</a><br /></td></tr>
 <tr class="separator:a12ad80f7b8c2f5ab11e4aab635e028bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea3b6c0df6b7cac87d419507cbdd7ce4"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#aea3b6c0df6b7cac87d419507cbdd7ce4">CipherType</a> () override</td></tr>
-<tr class="memdesc:aea3b6c0df6b7cac87d419507cbdd7ce4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The private keys cipher type name  <a href="#aea3b6c0df6b7cac87d419507cbdd7ce4">More...</a><br /></td></tr>
-<tr class="separator:aea3b6c0df6b7cac87d419507cbdd7ce4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad65db5b7ac58025ed2b78bfff1ab8a7c"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#ad65db5b7ac58025ed2b78bfff1ab8a7c">KeyType</a> () override</td></tr>
-<tr class="memdesc:ad65db5b7ac58025ed2b78bfff1ab8a7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The keys type-name  <a href="#ad65db5b7ac58025ed2b78bfff1ab8a7c">More...</a><br /></td></tr>
-<tr class="separator:ad65db5b7ac58025ed2b78bfff1ab8a7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0342ec0bae9a8ea035f4629d411e106f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a0342ec0bae9a8ea035f4629d411e106f">KeyClass</a> () override</td></tr>
+<tr class="memdesc:a0342ec0bae9a8ea035f4629d411e106f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The keys classification type enumeration  <a href="#a0342ec0bae9a8ea035f4629d411e106f">More...</a><br /></td></tr>
+<tr class="separator:a0342ec0bae9a8ea035f4629d411e106f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43e1eb4451c6d995490d6436780aa28a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga25da89a987f4d7e835bc03bb8599a693">AsymmetricTransforms</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a43e1eb4451c6d995490d6436780aa28a">Parameters</a> () override</td></tr>
-<tr class="memdesc:a43e1eb4451c6d995490d6436780aa28a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher parameters enumeration name  <a href="#a43e1eb4451c6d995490d6436780aa28a">More...</a><br /></td></tr>
+<tr class="memdesc:a43e1eb4451c6d995490d6436780aa28a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The asymmetric primitives parameter-set enumeration  <a href="#a43e1eb4451c6d995490d6436780aa28a">More...</a><br /></td></tr>
 <tr class="separator:a43e1eb4451c6d995490d6436780aa28a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ab6fef7a9fa9b7b33ec2f760d1601f4"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a1ab6fef7a9fa9b7b33ec2f760d1601f4">P</a> () override</td></tr>
-<tr class="memdesc:a1ab6fef7a9fa9b7b33ec2f760d1601f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The private key polynomial  <a href="#a1ab6fef7a9fa9b7b33ec2f760d1601f4">More...</a><br /></td></tr>
-<tr class="separator:a1ab6fef7a9fa9b7b33ec2f760d1601f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52d090cf2cff99163a4c543b9beec701"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a52d090cf2cff99163a4c543b9beec701">Destroy</a> () override</td></tr>
-<tr class="memdesc:a52d090cf2cff99163a4c543b9beec701"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release all resources associated with the object; optional, called by the finalizer  <a href="#a52d090cf2cff99163a4c543b9beec701">More...</a><br /></td></tr>
-<tr class="separator:a52d090cf2cff99163a4c543b9beec701"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8050389f092ce12f3c9066749a0f6eac"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a8050389f092ce12f3c9066749a0f6eac">ToBytes</a> () override</td></tr>
-<tr class="memdesc:a8050389f092ce12f3c9066749a0f6eac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize a private key to a byte array  <a href="#a8050389f092ce12f3c9066749a0f6eac">More...</a><br /></td></tr>
-<tr class="separator:a8050389f092ce12f3c9066749a0f6eac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a783d115c2d86e8f2321d28597dbb8b78"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a783d115c2d86e8f2321d28597dbb8b78">PrimitiveType</a> () override</td></tr>
+<tr class="memdesc:a783d115c2d86e8f2321d28597dbb8b78"><td class="mdescLeft">&#160;</td><td class="mdescRight">ead Only: The keys asymmetric primitive enumeration type  <a href="#a783d115c2d86e8f2321d28597dbb8b78">More...</a><br /></td></tr>
+<tr class="separator:a783d115c2d86e8f2321d28597dbb8b78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af64d2662e529382b7b6a08b1c05b7af3"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#af64d2662e529382b7b6a08b1c05b7af3">Polynomial</a> () override</td></tr>
+<tr class="memdesc:af64d2662e529382b7b6a08b1c05b7af3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The asymmetric keys standard-vector polynomial  <a href="#af64d2662e529382b7b6a08b1c05b7af3">More...</a><br /></td></tr>
+<tr class="separator:af64d2662e529382b7b6a08b1c05b7af3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b82afead0a7c82bed74e438bf8cd4da"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a1b82afead0a7c82bed74e438bf8cd4da">SecurePolynomial</a> (SecureVector&lt; byte &gt; &amp;Output)</td></tr>
+<tr class="memdesc:a1b82afead0a7c82bed74e438bf8cd4da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The asymmetric keys secure-vector polynomial  <a href="#a1b82afead0a7c82bed74e438bf8cd4da">More...</a><br /></td></tr>
+<tr class="separator:a1b82afead0a7c82bed74e438bf8cd4da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c665faa673a4278bbd0f77c44761999"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a7c665faa673a4278bbd0f77c44761999">Reset</a> () override</td></tr>
+<tr class="memdesc:a7c665faa673a4278bbd0f77c44761999"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release all resources associated with the object; optional, called by the finalizer  <a href="#a7c665faa673a4278bbd0f77c44761999">More...</a><br /></td></tr>
+<tr class="separator:a7c665faa673a4278bbd0f77c44761999"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_asymmetric_key"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_asymmetric_key')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a></td></tr>
 <tr class="memitem:a81bc4bf11b2d74e8511c40a487e434a0 inherit pub_methods_class_i_asymmetric_key"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_key.html#a81bc4bf11b2d74e8511c40a487e434a0">IAsymmetricKey</a> (const <a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a81bc4bf11b2d74e8511c40a487e434a0 inherit pub_methods_class_i_asymmetric_key"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_asymmetric_key.html#a81bc4bf11b2d74e8511c40a487e434a0">More...</a><br /></td></tr>
@@ -136,9 +137,22 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a07828a73fcff397b24d0ad378c5de1cc inherit pub_methods_class_i_asymmetric_key"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_key.html#a07828a73fcff397b24d0ad378c5de1cc">~IAsymmetricKey</a> () noexcept</td></tr>
 <tr class="memdesc:a07828a73fcff397b24d0ad378c5de1cc inherit pub_methods_class_i_asymmetric_key"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="class_i_asymmetric_key.html#a07828a73fcff397b24d0ad378c5de1cc">More...</a><br /></td></tr>
 <tr class="separator:a07828a73fcff397b24d0ad378c5de1cc inherit pub_methods_class_i_asymmetric_key"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a111d5f9149f411cf279feb6d9a078024"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_asymmetric_key.html">AsymmetricKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a111d5f9149f411cf279feb6d9a078024">DeSerialize</a> (SecureVector&lt; byte &gt; &amp;KeyStream)</td></tr>
+<tr class="memdesc:a111d5f9149f411cf279feb6d9a078024"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deserialize an AsymmetricKey key-stream and return a pointer to an AsymmetricKey  <a href="#a111d5f9149f411cf279feb6d9a078024">More...</a><br /></td></tr>
+<tr class="separator:a111d5f9149f411cf279feb6d9a078024"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39215c211c3dd63a3b8d67a8f175fa59"><td class="memItemLeft" align="right" valign="top">static SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_asymmetric_secure_key.html#a39215c211c3dd63a3b8d67a8f175fa59">Serialize</a> (<a class="el" href="class_asymmetric_secure_key.html">AsymmetricSecureKey</a> &amp;KeyParams)</td></tr>
+<tr class="memdesc:a39215c211c3dd63a3b8d67a8f175fa59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Serialize and convert an AsymmetricSecureKey into an AsymmetricKey key-stream  <a href="#a39215c211c3dd63a3b8d67a8f175fa59">More...</a><br /></td></tr>
+<tr class="separator:a39215c211c3dd63a3b8d67a8f175fa59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An Asymmetric cipher key container </p>
+<div class="textblock"><p>An encrypted and authenticated Asymmetric primitive key container. </p>
+<p>Contains the keys polynomial vector, the key classification, primitive type, and the primitives parameter-set type name. Internal polynomial storage uses a secure-vector encrypted with an optionally authenticated threefish cipher instance. <br />
+The authentication option, and the ciphers strength (256/512/1024), are set through the SecurityPolicy enumeration in the class constructors. <br />
+The cipher key is derived from system information and various process handles along with a salt value, this is processed by an instance of cSHAKE to produce the cipher key. <br />
+The vector containing the asymmetric primitives key polynomial, can be accessed through a secure-vector copy using SecurePolynomial, or return a standard-vector copy with the Polynomial accessor.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0074aaf6ddc99826d5fc85bd4ec876d1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0074aaf6ddc99826d5fc85bd4ec876d1">&#9670;&nbsp;</a></span>AsymmetricSecureKey() <span class="overload">[1/4]</span></h2>
@@ -195,8 +209,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="abebcafe4a44c66f5c239b084603c1248"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abebcafe4a44c66f5c239b084603c1248">&#9670;&nbsp;</a></span>AsymmetricSecureKey() <span class="overload">[3/4]</span></h2>
+<a id="aacd5f59580348ad3e3e45e7fc45f3ee5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacd5f59580348ad3e3e45e7fc45f3ee5">&#9670;&nbsp;</a></span>AsymmetricSecureKey() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -204,32 +218,38 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">AsymmetricSecureKey::AsymmetricSecureKey </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em>, </td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Polynomial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>KeySalt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a>&#160;</td>
+          <td class="paramname"><em>PrimitiveType</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a>&#160;</td>
-          <td class="paramname"><em>CipherKeyType</em>, </td>
+          <td class="paramname"><em>KeyClass</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#ga25da89a987f4d7e835bc03bb8599a693">AsymmetricTransforms</a>&#160;</td>
-          <td class="paramname"><em>ParameterType</em>, </td>
+          <td class="paramname"><em>Parameters</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>P</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ulong&#160;</td>
-          <td class="paramname"><em>KeySalt</em> = <code>0</code>&#160;</td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>PolicyType</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -239,54 +259,92 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize this class with parameters </p>
+<p>Initialize this class with an asymmetric standard-vector polynomial and the asymmetric primitives parameter settings </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">CipherType</td><td>The asymmetric cipher algorithm enumeration name</td></tr>
-    <tr><td class="paramname">CipherKeyType</td><td>The asymmetric cipher key type enumeration name</td></tr>
-    <tr><td class="paramname">ParameterType</td><td>The asymmetric cipher parameter-set enumeration name</td></tr>
-    <tr><td class="paramname">P</td><td>The cipher key polynomial array</td></tr>
-    <tr><td class="paramname">KeySalt</td><td>The secret 64bit salt value used in internal encryption</td></tr>
+    <tr><td class="paramname">Polynomial</td><td>The asymmetric keys polynomial standard-vector</td></tr>
+    <tr><td class="paramname">PrimitiveType</td><td>The asymmetric primitive enumeration</td></tr>
+    <tr><td class="paramname">KeyClass</td><td>The asymmetric primitives key classification enumeration</td></tr>
+    <tr><td class="paramname">Parameters</td><td>The asymmetric primitives parameter-set enumeration</td></tr>
+    <tr><td class="paramname">KeySalt</td><td>The optional secret salt vector used in internal encryption</td></tr>
+    <tr><td class="paramname">PolicyType</td><td>The asymmetric keys security policy</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoAsymmetricException</td><td>Thrown if invalid parameters are used</td></tr>
+    <tr><td class="paramname">CryptoAsymmetricException</td><td>Thrown if invalid parameters or an empty polynomial vector are passed</td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a5e712911fa29a0b86f9396a5363c526b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e712911fa29a0b86f9396a5363c526b">&#9670;&nbsp;</a></span>AsymmetricSecureKey() <span class="overload">[4/4]</span></h2>
+<a id="ae80624ca9129165dcfd1ae8be9b36bb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae80624ca9129165dcfd1ae8be9b36bb1">&#9670;&nbsp;</a></span>AsymmetricSecureKey() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">AsymmetricSecureKey::AsymmetricSecureKey </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>KeyStream</em></td><td>)</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Polynomial</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>KeySalt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a>&#160;</td>
+          <td class="paramname"><em>PrimitiveType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a>&#160;</td>
+          <td class="paramname"><em>KeyClass</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga25da89a987f4d7e835bc03bb8599a693">AsymmetricTransforms</a>&#160;</td>
+          <td class="paramname"><em>Parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SecurityPolicy&#160;</td>
+          <td class="paramname"><em>PolicyType</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Initialize this class with a serialized private key </p>
+<p>Initialize this class with an asymmetric secure-vector polynomial and the asymmetric primitives parameter settings </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeyStream</td><td>The serialized private key</td></tr>
+    <tr><td class="paramname">Polynomial</td><td>The asymmetric keys polynomial secure-vector</td></tr>
+    <tr><td class="paramname">PrimitiveType</td><td>The asymmetric primitive enumeration</td></tr>
+    <tr><td class="paramname">KeyClass</td><td>The asymmetric primitives key classification enumeration</td></tr>
+    <tr><td class="paramname">Parameters</td><td>The asymmetric primitives parameter-set enumeration</td></tr>
+    <tr><td class="paramname">KeySalt</td><td>The optional secret salt vector used in internal encryption</td></tr>
+    <tr><td class="paramname">PolicyType</td><td>The asymmetric keys security policy</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoAsymmetricException</td><td>Thrown if invalid parameters or an empty polynomial vector are passed</td></tr>
   </table>
   </dd>
 </dl>
@@ -321,8 +379,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aea3b6c0df6b7cac87d419507cbdd7ce4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aea3b6c0df6b7cac87d419507cbdd7ce4">&#9670;&nbsp;</a></span>CipherType()</h2>
+<a id="a111d5f9149f411cf279feb6d9a078024"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a111d5f9149f411cf279feb6d9a078024">&#9670;&nbsp;</a></span>DeSerialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -331,7 +389,42 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a> AsymmetricSecureKey::CipherType </td>
+          <td class="memname"><a class="el" href="class_asymmetric_key.html">AsymmetricKey</a> * AsymmetricSecureKey::DeSerialize </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>KeyStream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Deserialize an AsymmetricKey key-stream and return a pointer to an AsymmetricKey </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">KeyStream</td><td>Stream containing the serialized AsymmetricKey</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A populated AsymmetricKey container</dd></dl>
+
+</div>
+</div>
+<a id="a0342ec0bae9a8ea035f4629d411e106f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0342ec0bae9a8ea035f4629d411e106f">&#9670;&nbsp;</a></span>KeyClass()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a> AsymmetricSecureKey::KeyClass </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -344,67 +437,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The private keys cipher type name </p>
+<p>Read Only: The keys classification type enumeration </p>
 
-<p>Implements <a class="el" href="class_i_asymmetric_key.html#a84408cb18c370f5c9190016e205508e8">IAsymmetricKey</a>.</p>
-
-</div>
-</div>
-<a id="a52d090cf2cff99163a4c543b9beec701"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52d090cf2cff99163a4c543b9beec701">&#9670;&nbsp;</a></span>Destroy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void AsymmetricSecureKey::Destroy </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Release all resources associated with the object; optional, called by the finalizer </p>
-
-<p>Implements <a class="el" href="class_i_asymmetric_key.html#a47a338f1ff30aa7e8197e420737e796f">IAsymmetricKey</a>.</p>
-
-</div>
-</div>
-<a id="ad65db5b7ac58025ed2b78bfff1ab8a7c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad65db5b7ac58025ed2b78bfff1ab8a7c">&#9670;&nbsp;</a></span>KeyType()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a> AsymmetricSecureKey::KeyType </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The keys type-name </p>
-
-<p>Implements <a class="el" href="class_i_asymmetric_key.html#a9a7f72fa765e4d884b211cbb7633d5bf">IAsymmetricKey</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_key.html#af9ccb23538579601f4847ed6fe6ac6df">IAsymmetricKey</a>.</p>
 
 </div>
 </div>
@@ -436,35 +471,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a1ab6fef7a9fa9b7b33ec2f760d1601f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ab6fef7a9fa9b7b33ec2f760d1601f4">&#9670;&nbsp;</a></span>P()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const std::vector&lt; byte &gt; &amp; AsymmetricSecureKey::P </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The private key polynomial </p>
-
-<p>Implements <a class="el" href="class_i_asymmetric_key.html#a647e54e73664a9178771dde8db9eab7b">IAsymmetricKey</a>.</p>
-
-</div>
-</div>
 <a id="a43e1eb4451c6d995490d6436780aa28a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a43e1eb4451c6d995490d6436780aa28a">&#9670;&nbsp;</a></span>Parameters()</h2>
 
@@ -488,14 +494,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The cipher parameters enumeration name </p>
+<p>Read Only: The asymmetric primitives parameter-set enumeration </p>
 
 <p>Implements <a class="el" href="class_i_asymmetric_key.html#a73de9875848b79573c4c5d9313a575ec">IAsymmetricKey</a>.</p>
 
 </div>
 </div>
-<a id="a8050389f092ce12f3c9066749a0f6eac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8050389f092ce12f3c9066749a0f6eac">&#9670;&nbsp;</a></span>ToBytes()</h2>
+<a id="af64d2662e529382b7b6a08b1c05b7af3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af64d2662e529382b7b6a08b1c05b7af3">&#9670;&nbsp;</a></span>Polynomial()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -504,7 +510,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; AsymmetricSecureKey::ToBytes </td>
+          <td class="memname">const std::vector&lt; byte &gt; AsymmetricSecureKey::Polynomial </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -517,9 +523,122 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Serialize a private key to a byte array </p>
+<p>Read Only: The asymmetric keys standard-vector polynomial </p>
 
-<p>Implements <a class="el" href="class_i_asymmetric_key.html#a2d0d4cd2c927774996427d78d0f1ad72">IAsymmetricKey</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_key.html#a3912d92d6dfe653fb53b67b3568e1afc">IAsymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="a783d115c2d86e8f2321d28597dbb8b78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a783d115c2d86e8f2321d28597dbb8b78">&#9670;&nbsp;</a></span>PrimitiveType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a> AsymmetricSecureKey::PrimitiveType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>ead Only: The keys asymmetric primitive enumeration type </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_key.html#ad052f267bc75298d6d4892f417cdaf8e">IAsymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="a7c665faa673a4278bbd0f77c44761999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c665faa673a4278bbd0f77c44761999">&#9670;&nbsp;</a></span>Reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AsymmetricSecureKey::Reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Release all resources associated with the object; optional, called by the finalizer </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_key.html#adadeb009fd26b05b7cfbc4d1871a6448">IAsymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="a1b82afead0a7c82bed74e438bf8cd4da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b82afead0a7c82bed74e438bf8cd4da">&#9670;&nbsp;</a></span>SecurePolynomial()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const void AsymmetricSecureKey::SecurePolynomial </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read Only: The asymmetric keys secure-vector polynomial </p>
+
+</div>
+</div>
+<a id="a39215c211c3dd63a3b8d67a8f175fa59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39215c211c3dd63a3b8d67a8f175fa59">&#9670;&nbsp;</a></span>Serialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SecureVector&lt; byte &gt; AsymmetricSecureKey::Serialize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_asymmetric_secure_key.html">AsymmetricSecureKey</a> &amp;&#160;</td>
+          <td class="paramname"><em>KeyParams</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Serialize and convert an AsymmetricSecureKey into an AsymmetricKey key-stream </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">KeyParams</td><td>The AsymmetricKey key container</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A key-stream containing a serialized AsymmetricKey key</dd></dl>
 
 </div>
 </div>

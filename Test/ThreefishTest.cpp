@@ -17,7 +17,7 @@
 
 namespace Test
 {
-	using Exception::CryptoSymmetricCipherException;
+	using Exception::CryptoSymmetricException;
 	using Utility::IntegerTools;
 	using Utility::MemoryTools;
 	using Prng::SecureRandom;
@@ -523,7 +523,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE1"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -541,7 +541,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Threefish"), std::string("Exception handling failure! -TE2"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -560,7 +560,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Threefish"), std::string("Exception handling failure! -TE3"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -580,7 +580,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Threefish"), std::string("Exception handling failure! -TE5"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)

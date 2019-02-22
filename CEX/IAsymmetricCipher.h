@@ -20,10 +20,10 @@
 #define CEX_IASYMMETRICCIPHER_H
 
 #include "CexDomain.h"
-#include "AsymmetricEngines.h"
 #include "AsymmetricKey.h"
 #include "AsymmetricKeyPair.h"
 #include "AsymmetricKeyTypes.h"
+#include "AsymmetricPrimitives.h"
 #include "AsymmetricTransforms.h"
 #include "CryptoAsymmetricException.h"
 #include "IPrng.h"
@@ -31,8 +31,8 @@
 
 NAMESPACE_ASYMMETRIC
 
-using Enumeration::AsymmetricEngines;
 using Enumeration::AsymmetricKeyTypes;
+using Enumeration::AsymmetricPrimitives;
 using Enumeration::AsymmetricTransforms;
 using Exception::CryptoAsymmetricException;
 using Enumeration::ErrorCodes;
@@ -86,7 +86,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher type-name
 	/// </summary>
-	virtual const AsymmetricEngines Enumeral() = 0;
+	virtual const AsymmetricPrimitives Enumeral() = 0;
 
 	/// <summary>
 	/// Read Only: The cipher is initialized for encryption

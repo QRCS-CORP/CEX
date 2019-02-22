@@ -533,7 +533,7 @@ void CSG::Update(const SecureVector<byte> &Key)
 		Absorb(tmpk, 0, Key.size(), m_csgState);
 	}
 
-	Clear(tmpk);
+	MemoryTools::Clear(tmpk, 0, tmpk.size());
 	Fill(m_csgState);
 }
 

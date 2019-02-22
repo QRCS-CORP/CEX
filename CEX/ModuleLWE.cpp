@@ -93,9 +93,9 @@ std::vector<byte> &ModuleLWE::DomainKey()
 	return m_domainKey;
 }
 
-const AsymmetricEngines ModuleLWE::Enumeral()
+const AsymmetricPrimitives ModuleLWE::Enumeral()
 {
-	return AsymmetricEngines::ModuleLWE;
+	return AsymmetricPrimitives::ModuleLWE;
 }
 
 const bool ModuleLWE::IsEncryption()
@@ -159,10 +159,10 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	int32_t result;
 
 	// decrypt the key
-	MLWEQ7681N256::Decrypt(sec, CipherText, m_privateKey->P());
+	MLWEQ7681N256::Decrypt(sec, CipherText, m_privateKey->Polynomial());
 
 	// multitarget countermeasure for coins + contributory KEM
-	MemoryTools::Copy(m_privateKey->P(), PUBLEN + PRILEN, sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MemoryTools::Copy(m_privateKey->Polynomial(), PUBLEN + PRILEN, sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	Kdf::SHAKE shk256(ShakeModes::SHAKE256);
 	shk256.Initialize(sec);
@@ -170,7 +170,7 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 
 	// coins are in kr+MLWE_SEED_SIZE
 	MemoryTools::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
-	MemoryTools::Copy(m_privateKey->P(), PRILEN, pk, 0, PUBLEN);
+	MemoryTools::Copy(m_privateKey->Polynomial(), PRILEN, pk, 0, PUBLEN);
 	MLWEQ7681N256::Encrypt(cmp, sec, pk, coin);
 
 	// verify the code
@@ -181,7 +181,7 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	shk256.Generate(kr, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// overwrite pre-k with z on re-encryption failure
-	IntegerTools::CMov(kr, 0, m_privateKey->P(), m_privateKey->P().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
+	IntegerTools::CMov(kr, 0, m_privateKey->Polynomial(), m_privateKey->Polynomial().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
 
 	// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 	shk256.Initialize(kr, m_domainKey);
@@ -213,7 +213,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	shk256.Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// multitarget countermeasure for coins + contributory KEM
-	shk256.Initialize(m_publicKey->P());
+	shk256.Initialize(m_publicKey->Polynomial());
 	shk256.Generate(sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// condition kr bytes
 	shk256.Initialize(sec);
@@ -221,7 +221,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 	// coins are in kr+KYBER_KEYBYTES
 	MemoryTools::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
-	MLWEQ7681N256::Encrypt(CipherText, sec, m_publicKey->P(), coin);
+	MLWEQ7681N256::Encrypt(CipherText, sec, m_publicKey->Polynomial(), coin);
 
 	// overwrite coins in kr with H(c)
 	shk256.Initialize(CipherText);
@@ -255,24 +255,24 @@ AsymmetricKeyPair* ModuleLWE::Generate()
 	// copy H(p) and random coin
 	MemoryTools::Copy(buff, 0, sk, PUBLEN + PRILEN, 2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
-	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mlweParameters), pk);
-	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::ModuleLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_mlweParameters), sk);
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mlweParameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_mlweParameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
 
 void ModuleLWE::Initialize(AsymmetricKey* Key)
 {
-	if (Key->CipherType() != AsymmetricEngines::ModuleLWE)
+	if (Key->PrimitiveType() != AsymmetricPrimitives::ModuleLWE)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
-	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
+	if (Key->KeyClass() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 
-	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
 		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
 		m_mlweParameters = static_cast<MLWEParameters>(m_publicKey->Parameters());

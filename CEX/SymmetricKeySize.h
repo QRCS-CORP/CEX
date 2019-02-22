@@ -2,21 +2,20 @@
 #define CEX_SYMMETRICKEYSIZE_H
 
 #include "CexDomain.h"
-#include "CryptoProcessingException.h"
+#include "CryptoSymmetricException.h"
 
 NAMESPACE_CIPHER
 
-using Exception::CryptoProcessingException;
+using Exception::CryptoSymmetricException;
 
 /// <summary>
-/// Contains key and vector sizes
+/// Contains the legal byte lengths for SymmetricKey and SymmetricSecureKey pseudo-random keying material
 /// </summary> 
 struct SymmetricKeySize
 {
 private:
 
 	static const std::string CLASS_NAME;
-	static const size_t HDR_SIZE = sizeof(uint) * 3;
 
 	uint m_infoSize;
 	uint m_keySize;
@@ -32,89 +31,53 @@ public:
 	SymmetricKeySize();
 
 	/// <summary>
-	/// Initialize this structure using a serialized byte array
+	/// Initialize this structure using a serialized SymmetricKeySize vector
 	/// </summary>
 	/// 
-	/// <param name="KeyArray">Key byte array containing a serialized SymmetricKeySize structure</param>
+	/// <param name="KeyArray">Array containing a serialized SymmetricKeySize structure</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the key array is too small</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if the key array is too small</exception>
 	explicit SymmetricKeySize(const std::vector<byte> &KeyArray);
 
 	/// <summary>
 	/// Initialize this structure with parameters
 	/// </summary>
 	/// 
-	/// <param name="KeySize">The key byte array length</param>
-	/// <param name="NonceSize">The nonce byte array length</param>
-	/// <param name="InfoSize">The info byte array length</param>
+	/// <param name="KeySize">The key parameters byte length</param>
+	/// <param name="NonceSize">The nonce parameters byte length</param>
+	/// <param name="InfoSize">The info parameters byte length</param>
 	SymmetricKeySize(size_t KeySize, size_t NonceSize, size_t InfoSize);
 
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: The info byte array length
+	/// Read/Write: The info parameters length in bytes
 	/// </summary>
 	const uint InfoSize();
 
 	/// <summary>
-	/// Read/Write: The key byte array length
+	/// Read/Write: The key parameters length in bytes
 	/// </summary>
 	const uint KeySize();
 
 	/// <summary>
-	/// Read/Write: The nonce byte array length
+	/// Read/Write: The nonce parameters length in bytes
 	/// </summary>
 	const uint NonceSize();
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Create a clone of this structure
-	/// </summary>
-	SymmetricKeySize Clone();
-
-	/// <summary>
 	/// Test a SymmetricKeySize array for specific values
 	/// </summary>
 	/// 
-	/// <param name="SymmetricKeySizes">An array of legal SymmetricKeySizes</param>
-	/// <param name="KeySize">The key byte length</param>
-	/// <param name="NonceSize">The nonce byte length</param>
-	/// <param name="InfoSize">The info byte length</param>
+	/// <param name="SymmetricKeySizes">A vector of SymmetricKeySizes</param>
+	/// <param name="KeySize">The key length to check</param>
+	/// <param name="NonceSize">The nonce length to check</param>
+	/// <param name="InfoSize">The info length to check</param>
 	/// 
-	/// <returns>True if the SymmetricKeySize array contains the values</returns>
+	/// <returns>Returns true if the SymmetricKeySize array contains the values</returns>
 	static bool Contains(std::vector<SymmetricKeySize> SymmetricKeySizes, size_t KeySize, size_t NonceSize = 0, size_t InfoSize = 0);
-
-	/// <summary>
-	/// Create a deep copy of this structure.
-	/// <para>Caller must delete this object.</para>
-	/// </summary>
-	/// 
-	/// <returns>A pointer to a SymmetricKeySize instance</returns>
-	SymmetricKeySize* DeepCopy();
-
-	/// <summary>
-	/// Compare this object instance with another
-	/// </summary>
-	/// 
-	/// <param name="Input">Object to compare</param>
-	/// 
-	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(SymmetricKeySize &Input);
-
-	/// <summary>
-	/// Get the hash code for this object
-	/// </summary>
-	/// 
-	/// <returns>Hash code</returns>
-	uint GetHashCode();
-
-	/// <summary>
-	/// Get the header size in bytes
-	/// </summary>
-	/// 
-	/// <returns>Header size</returns>
-	static size_t GetHeaderSize();
 
 	/// <summary>
 	/// Set all struct members to defaults

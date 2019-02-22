@@ -1,5 +1,6 @@
 #include "HCR.h"
 #include "HCG.h"
+#include "MemoryTools.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
@@ -87,7 +88,7 @@ void HCR::Reset()
 
 	Cipher::SymmetricKey kp(key);
 	m_rngGenerator->Initialize(kp);
-	Clear(key);
+	MemoryTools::Clear(key, 0, key.size());
 }
 
 //~~~Private Functions~~~//
@@ -99,11 +100,7 @@ void HCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std
 
 void HCR::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
-	std::vector<byte> smp(Length);
-	// TODO: change this once secure vectors are in drbgs
-	Generator->Generate(smp, 0, Length);
-	Insert(smp, 0, Output, Offset, Length);
-	Clear(smp);
+	Generator->Generate(Output, Offset, Length);
 }
 
 NAMESPACE_PRNGEND

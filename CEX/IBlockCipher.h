@@ -22,7 +22,7 @@
 #include "CexDomain.h"
 #include "BlockCipherExtensions.h"
 #include "BlockCiphers.h"
-#include "CryptoSymmetricCipherException.h"
+#include "CryptoSymmetricException.h"
 #include "ErrorCodes.h"
 #include "IKdf.h"
 #include "ISymmetricKey.h"
@@ -34,7 +34,7 @@ NAMESPACE_BLOCK
 
 using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
-using Exception::CryptoSymmetricCipherException;
+using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
 using Kdf::IKdf;
 using Cipher::ISymmetricKey;
@@ -194,7 +194,7 @@ public:
 	/// <param name="Parameters">Cipher key container. 
 	/// <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if a null or invalid key is used</exception>
 	virtual void Initialize(bool Encryption, ISymmetricKey &Parameters) = 0;
 
 	/// <summary>

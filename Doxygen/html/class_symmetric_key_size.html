@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Contains key and vector sizes  
+<p>Contains the legal byte lengths for SymmetricKey and SymmetricSecureKey pseudo-random keying material  
  <a href="class_symmetric_key_size.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_symmetric_key_size_8h_source.html">SymmetricKeySize.h</a>&gt;</code></p>
@@ -83,32 +83,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:abf500dfa22fa453b3ebabd38f9d3ea72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the default structure  <a href="#abf500dfa22fa453b3ebabd38f9d3ea72">More...</a><br /></td></tr>
 <tr class="separator:abf500dfa22fa453b3ebabd38f9d3ea72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f516b1e43d64d1b53c035ed15125c2e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a5f516b1e43d64d1b53c035ed15125c2e">SymmetricKeySize</a> (const std::vector&lt; byte &gt; &amp;KeyArray)</td></tr>
-<tr class="memdesc:a5f516b1e43d64d1b53c035ed15125c2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this structure using a serialized byte array  <a href="#a5f516b1e43d64d1b53c035ed15125c2e">More...</a><br /></td></tr>
+<tr class="memdesc:a5f516b1e43d64d1b53c035ed15125c2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this structure using a serialized SymmetricKeySize vector  <a href="#a5f516b1e43d64d1b53c035ed15125c2e">More...</a><br /></td></tr>
 <tr class="separator:a5f516b1e43d64d1b53c035ed15125c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40f7e7cfd84b098aec0b0b070a74d154"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a40f7e7cfd84b098aec0b0b070a74d154">SymmetricKeySize</a> (size_t <a class="el" href="class_symmetric_key_size.html#a067d3a7deb3ed45a9ff16f7450e8ef72">KeySize</a>, size_t <a class="el" href="class_symmetric_key_size.html#aee6755bfcbe21bd8661d128c477752dc">NonceSize</a>, size_t <a class="el" href="class_symmetric_key_size.html#a7fee7088380f38ad9ec30d722fa885f6">InfoSize</a>)</td></tr>
 <tr class="memdesc:a40f7e7cfd84b098aec0b0b070a74d154"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this structure with parameters  <a href="#a40f7e7cfd84b098aec0b0b070a74d154">More...</a><br /></td></tr>
 <tr class="separator:a40f7e7cfd84b098aec0b0b070a74d154"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7fee7088380f38ad9ec30d722fa885f6"><td class="memItemLeft" align="right" valign="top">const uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a7fee7088380f38ad9ec30d722fa885f6">InfoSize</a> ()</td></tr>
-<tr class="memdesc:a7fee7088380f38ad9ec30d722fa885f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The info byte array length  <a href="#a7fee7088380f38ad9ec30d722fa885f6">More...</a><br /></td></tr>
+<tr class="memdesc:a7fee7088380f38ad9ec30d722fa885f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The info parameters length in bytes  <a href="#a7fee7088380f38ad9ec30d722fa885f6">More...</a><br /></td></tr>
 <tr class="separator:a7fee7088380f38ad9ec30d722fa885f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a067d3a7deb3ed45a9ff16f7450e8ef72"><td class="memItemLeft" align="right" valign="top">const uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a067d3a7deb3ed45a9ff16f7450e8ef72">KeySize</a> ()</td></tr>
-<tr class="memdesc:a067d3a7deb3ed45a9ff16f7450e8ef72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The key byte array length  <a href="#a067d3a7deb3ed45a9ff16f7450e8ef72">More...</a><br /></td></tr>
+<tr class="memdesc:a067d3a7deb3ed45a9ff16f7450e8ef72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The key parameters length in bytes  <a href="#a067d3a7deb3ed45a9ff16f7450e8ef72">More...</a><br /></td></tr>
 <tr class="separator:a067d3a7deb3ed45a9ff16f7450e8ef72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee6755bfcbe21bd8661d128c477752dc"><td class="memItemLeft" align="right" valign="top">const uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#aee6755bfcbe21bd8661d128c477752dc">NonceSize</a> ()</td></tr>
-<tr class="memdesc:aee6755bfcbe21bd8661d128c477752dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The nonce byte array length  <a href="#aee6755bfcbe21bd8661d128c477752dc">More...</a><br /></td></tr>
+<tr class="memdesc:aee6755bfcbe21bd8661d128c477752dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The nonce parameters length in bytes  <a href="#aee6755bfcbe21bd8661d128c477752dc">More...</a><br /></td></tr>
 <tr class="separator:aee6755bfcbe21bd8661d128c477752dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adde9d96caa438788605100b87a101b2b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#adde9d96caa438788605100b87a101b2b">Clone</a> ()</td></tr>
-<tr class="memdesc:adde9d96caa438788605100b87a101b2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a clone of this structure  <a href="#adde9d96caa438788605100b87a101b2b">More...</a><br /></td></tr>
-<tr class="separator:adde9d96caa438788605100b87a101b2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a291e2155c13f92de098d9845b7b044fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a291e2155c13f92de098d9845b7b044fa">DeepCopy</a> ()</td></tr>
-<tr class="memdesc:a291e2155c13f92de098d9845b7b044fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a deep copy of this structure.  <a href="#a291e2155c13f92de098d9845b7b044fa">More...</a><br /></td></tr>
-<tr class="separator:a291e2155c13f92de098d9845b7b044fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65287018ef4bd1b94ab8bd234ce00a1c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a65287018ef4bd1b94ab8bd234ce00a1c">Equals</a> (<a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &amp;Input)</td></tr>
-<tr class="memdesc:a65287018ef4bd1b94ab8bd234ce00a1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare this object instance with another  <a href="#a65287018ef4bd1b94ab8bd234ce00a1c">More...</a><br /></td></tr>
-<tr class="separator:a65287018ef4bd1b94ab8bd234ce00a1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3dfe1e601d419ca69632fd6b8321d6eb"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a3dfe1e601d419ca69632fd6b8321d6eb">GetHashCode</a> ()</td></tr>
-<tr class="memdesc:a3dfe1e601d419ca69632fd6b8321d6eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the hash code for this object  <a href="#a3dfe1e601d419ca69632fd6b8321d6eb">More...</a><br /></td></tr>
-<tr class="separator:a3dfe1e601d419ca69632fd6b8321d6eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c76d5ecb5fe576e55a6578612ad8514"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#a2c76d5ecb5fe576e55a6578612ad8514">Reset</a> ()</td></tr>
 <tr class="memdesc:a2c76d5ecb5fe576e55a6578612ad8514"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set all struct members to defaults  <a href="#a2c76d5ecb5fe576e55a6578612ad8514">More...</a><br /></td></tr>
 <tr class="separator:a2c76d5ecb5fe576e55a6578612ad8514"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,12 +109,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ac7eaa07d1730633cbe7a51def5519996"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#ac7eaa07d1730633cbe7a51def5519996">Contains</a> (std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; SymmetricKeySizes, size_t <a class="el" href="class_symmetric_key_size.html#a067d3a7deb3ed45a9ff16f7450e8ef72">KeySize</a>, size_t <a class="el" href="class_symmetric_key_size.html#aee6755bfcbe21bd8661d128c477752dc">NonceSize</a>=0, size_t <a class="el" href="class_symmetric_key_size.html#a7fee7088380f38ad9ec30d722fa885f6">InfoSize</a>=0)</td></tr>
 <tr class="memdesc:ac7eaa07d1730633cbe7a51def5519996"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test a SymmetricKeySize array for specific values  <a href="#ac7eaa07d1730633cbe7a51def5519996">More...</a><br /></td></tr>
 <tr class="separator:ac7eaa07d1730633cbe7a51def5519996"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae681bcc29171a18775f7fd79668cf114"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key_size.html#ae681bcc29171a18775f7fd79668cf114">GetHeaderSize</a> ()</td></tr>
-<tr class="memdesc:ae681bcc29171a18775f7fd79668cf114"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the header size in bytes  <a href="#ae681bcc29171a18775f7fd79668cf114">More...</a><br /></td></tr>
-<tr class="separator:ae681bcc29171a18775f7fd79668cf114"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Contains key and vector sizes </p>
+<div class="textblock"><p>Contains the legal byte lengths for SymmetricKey and SymmetricSecureKey pseudo-random keying material </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abf500dfa22fa453b3ebabd38f9d3ea72"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abf500dfa22fa453b3ebabd38f9d3ea72">&#9670;&nbsp;</a></span>SymmetricKeySize() <span class="overload">[1/3]</span></h2>
@@ -171,16 +156,16 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize this structure using a serialized byte array </p>
+<p>Initialize this structure using a serialized SymmetricKeySize vector </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeyArray</td><td>Key byte array containing a serialized SymmetricKeySize structure</td></tr>
+    <tr><td class="paramname">KeyArray</td><td>Array containing a serialized SymmetricKeySize structure</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if the key array is too small</td></tr>
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if the key array is too small</td></tr>
   </table>
   </dd>
 </dl>
@@ -222,9 +207,9 @@ Static Public Member Functions</h2></td></tr>
 <p>Initialize this structure with parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">KeySize</td><td>The key byte array length</td></tr>
-    <tr><td class="paramname">NonceSize</td><td>The nonce byte array length</td></tr>
-    <tr><td class="paramname">InfoSize</td><td>The info byte array length</td></tr>
+    <tr><td class="paramname">KeySize</td><td>The key parameters byte length</td></tr>
+    <tr><td class="paramname">NonceSize</td><td>The nonce parameters byte length</td></tr>
+    <tr><td class="paramname">InfoSize</td><td>The info parameters byte length</td></tr>
   </table>
   </dd>
 </dl>
@@ -232,25 +217,6 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="adde9d96caa438788605100b87a101b2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adde9d96caa438788605100b87a101b2b">&#9670;&nbsp;</a></span>Clone()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> SymmetricKeySize::Clone </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create a clone of this structure </p>
-
-</div>
-</div>
 <a id="ac7eaa07d1730633cbe7a51def5519996"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac7eaa07d1730633cbe7a51def5519996">&#9670;&nbsp;</a></span>Contains()</h2>
 
@@ -300,110 +266,14 @@ Static Public Member Functions</h2></td></tr>
 <p>Test a SymmetricKeySize array for specific values </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">SymmetricKeySizes</td><td>An array of legal SymmetricKeySizes</td></tr>
-    <tr><td class="paramname">KeySize</td><td>The key byte length</td></tr>
-    <tr><td class="paramname">NonceSize</td><td>The nonce byte length</td></tr>
-    <tr><td class="paramname">InfoSize</td><td>The info byte length</td></tr>
+    <tr><td class="paramname">SymmetricKeySizes</td><td>A vector of SymmetricKeySizes</td></tr>
+    <tr><td class="paramname">KeySize</td><td>The key length to check</td></tr>
+    <tr><td class="paramname">NonceSize</td><td>The nonce length to check</td></tr>
+    <tr><td class="paramname">InfoSize</td><td>The info length to check</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the SymmetricKeySize array contains the values</dd></dl>
-
-</div>
-</div>
-<a id="a291e2155c13f92de098d9845b7b044fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a291e2155c13f92de098d9845b7b044fa">&#9670;&nbsp;</a></span>DeepCopy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> * SymmetricKeySize::DeepCopy </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Create a deep copy of this structure. </p>
-<p>Caller must delete this object.</p>
-<dl class="section return"><dt>Returns</dt><dd>A pointer to a SymmetricKeySize instance</dd></dl>
-
-</div>
-</div>
-<a id="a65287018ef4bd1b94ab8bd234ce00a1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65287018ef4bd1b94ab8bd234ce00a1c">&#9670;&nbsp;</a></span>Equals()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool SymmetricKeySize::Equals </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &amp;&#160;</td>
-          <td class="paramname"><em>Input</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Compare this object instance with another </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>Object to compare</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if equal, otherwise false</dd></dl>
-
-</div>
-</div>
-<a id="a3dfe1e601d419ca69632fd6b8321d6eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3dfe1e601d419ca69632fd6b8321d6eb">&#9670;&nbsp;</a></span>GetHashCode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint SymmetricKeySize::GetHashCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the hash code for this object </p>
-<dl class="section return"><dt>Returns</dt><dd>Hash code</dd></dl>
-
-</div>
-</div>
-<a id="ae681bcc29171a18775f7fd79668cf114"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae681bcc29171a18775f7fd79668cf114">&#9670;&nbsp;</a></span>GetHeaderSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t SymmetricKeySize::GetHeaderSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get the header size in bytes </p>
-<dl class="section return"><dt>Returns</dt><dd>Header size</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if the SymmetricKeySize array contains the values</dd></dl>
 
 </div>
 </div>
@@ -422,7 +292,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Read/Write: The info byte array length </p>
+<p>Read/Write: The info parameters length in bytes </p>
 
 </div>
 </div>
@@ -441,7 +311,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Read/Write: The key byte array length </p>
+<p>Read/Write: The key parameters length in bytes </p>
 
 </div>
 </div>
@@ -460,7 +330,7 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Read/Write: The nonce byte array length </p>
+<p>Read/Write: The nonce parameters length in bytes </p>
 
 </div>
 </div>

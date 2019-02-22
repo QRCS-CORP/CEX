@@ -70,9 +70,9 @@ Dilithium::~Dilithium()
 	}
 }
 
-const AsymmetricEngines Dilithium::Enumeral()
+const AsymmetricPrimitives Dilithium::Enumeral()
 {
-	return AsymmetricEngines::Sphincs;
+	return AsymmetricPrimitives::Sphincs;
 }
 
 const bool Dilithium::IsInitialized()
@@ -127,24 +127,24 @@ AsymmetricKeyPair* Dilithium::Generate()
 
 	DLMN256Q8380417::Generate(pk, sk, m_rndGenerator, m_dlmParameters);
 
-	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_dlmParameters), pk);
-	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_dlmParameters), sk);
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_dlmParameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_dlmParameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
 
 const void Dilithium::Initialize(AsymmetricKey* Key)
 {
-	if (Key->CipherType() != AsymmetricEngines::Dilithium)
+	if (Key->PrimitiveType() != AsymmetricPrimitives::Dilithium)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
-	if (Key->KeyType() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyType() != AsymmetricKeyTypes::SignaturePrivateKey)
+	if (Key->KeyClass() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyClass() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
 
-	if (Key->KeyType() == AsymmetricKeyTypes::SignaturePublicKey)
+	if (Key->KeyClass() == AsymmetricKeyTypes::SignaturePublicKey)
 	{
 		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
 		m_dlmParameters = static_cast<DilithiumParameters>(m_publicKey->Parameters());
@@ -182,7 +182,7 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 		Signature.resize(cparams.SignatureSize + Message.size());
 	}
 
-	DLMN256Q8380417::Sign(Signature, Message, m_privateKey->P(), m_rndGenerator, m_dlmParameters);
+	DLMN256Q8380417::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_dlmParameters);
 
 	return Signature.size();
 }
@@ -206,7 +206,7 @@ bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Me
 		Message.resize(Signature.size() - cparams.SignatureSize);
 	}
 
-	result = DLMN256Q8380417::Verify(Message, Signature, m_publicKey->P(), m_dlmParameters);
+	result = DLMN256Q8380417::Verify(Message, Signature, m_publicKey->Polynomial(), m_dlmParameters);
 
 	return (result == 1);
 }

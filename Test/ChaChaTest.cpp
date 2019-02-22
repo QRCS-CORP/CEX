@@ -19,7 +19,7 @@ namespace Test
 	using Cipher::Stream::ChaCha;
 	using Cipher::Stream::ChaCha256;
 	using Cipher::Stream::ChaCha512;
-	using Exception::CryptoSymmetricCipherException;
+	using Exception::CryptoSymmetricException;
 	using Utility::IntegerTools;
 	using Utility::MemoryTools;
 	using Prng::SecureRandom;
@@ -438,7 +438,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE1"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -456,7 +456,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE2"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -475,7 +475,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE3"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -495,7 +495,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -CE6"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)

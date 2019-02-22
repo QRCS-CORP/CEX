@@ -298,6 +298,7 @@
     <ClInclude Include="..\..\Test\ACSTest.h" />
     <ClInclude Include="..\..\Test\AeadTest.h" />
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
+    <ClInclude Include="..\..\Test\AsymmetricKeyTest.h" />
     <ClInclude Include="..\..\Test\BCRTest.h" />
     <ClInclude Include="..\..\Test\CJPTest.h" />
     <ClInclude Include="..\..\Test\CSPTest.h" />
@@ -365,6 +366,7 @@
     <ClCompile Include="..\..\Test\ACSTest.cpp" />
     <ClCompile Include="..\..\Test\AeadTest.cpp" />
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
+    <ClCompile Include="..\..\Test\AsymmetricKeyTest.cpp" />
     <ClCompile Include="..\..\Test\BCRTest.cpp" />
     <ClCompile Include="..\..\Test\CJPTest.cpp" />
     <ClCompile Include="..\..\Test\CSPTest.cpp" />

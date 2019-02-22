@@ -111,7 +111,7 @@ public:
 	/// 
 	/// <param name="Mac">The <see cref="Mac::IMac"/> instance</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are passed</exception>
 	explicit MacStream(IMac* Mac);
 
 	/// <summary>
@@ -156,7 +156,7 @@ public:
 	/// 
 	/// <param name="Parameters">A SymmetricKey key container class</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid key sizes are passed</exception>
 	void Initialize(ISymmetricKey &Parameters);
 
 private:

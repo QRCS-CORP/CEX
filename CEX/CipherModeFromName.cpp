@@ -4,7 +4,7 @@
 #include "CBC.h"
 #include "CFB.h"
 #include "CryptoCipherModeException.h"
-#include "CryptoSymmetricCipherException.h"
+#include "CryptoSymmetricException.h"
 #include "ICM.h"
 #include "OFB.h"
 
@@ -12,7 +12,7 @@ NAMESPACE_HELPER
 
 using Enumeration::CipherModes;
 using Exception::CryptoCipherModeException;
-using Exception::CryptoSymmetricCipherException;
+using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
 
 const std::string CipherModeFromName::CLASS_NAME("CipherModeFromName");
@@ -119,7 +119,7 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, CipherMode
 			}
 		}
 	}
-	catch (CryptoSymmetricCipherException &ex)
+	catch (CryptoSymmetricException &ex)
 	{
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}

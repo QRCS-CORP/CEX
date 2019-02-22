@@ -61,7 +61,7 @@ enum class ExceptionTypes : byte
 	/// <summary>
 	/// Symmetric cipher operationas exception
 	/// </summary>
-	CryptoSymmetricCipherException = 12
+	CryptoSymmetricException = 12
 };
 
 class ExceptionTypeConvert

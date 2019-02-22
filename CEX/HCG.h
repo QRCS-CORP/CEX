@@ -159,7 +159,7 @@ public:
 	HCG() = delete;
 
 	/// <summary>
-	/// Instantiate the class using a block cipher type name, and an optional entropy source type
+	/// Instantiate the class using a SHA2 digest type name, and an optional entropy source type
 	/// </summary>
 	///
 	/// <param name="DigestType">The hash digests enumeration type name; SHA256/SHA512 are legal options</param>
@@ -204,30 +204,30 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes
+	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	/// <param name="Output">The output standard-vector to fill with random bytes</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes
+	/// Fill a secure-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	/// <param name="Output">The output secure-vector to fill with random bytes</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if the generator is not initialized, the output size is misaligned, 
 	/// the maximum request size is exceeded, or if the maximum reseed requests are exceeded</exception>
 	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
+	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The output standard vector to fill with random bytes</param>
+	/// <param name="Output">The output standard-vector to fill with random bytes</param>
 	/// <param name="OutOffset">The starting position within the output vector</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	///
@@ -236,10 +236,10 @@ public:
 	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes using offset and length parameters
+	/// Fill a secure-vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The output secure vector to fill with random bytes</param>
+	/// <param name="Output">The output secure-vector to fill with random bytes</param>
 	/// <param name="OutOffset">The starting position within the output vector</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	///
@@ -266,10 +266,10 @@ public:
 	void Update(const std::vector<byte> &Key) override;
 
 	/// <summary>
-	/// Update the generators keying material with a secure vector key
+	/// Update the generators keying material with a secure-vector key
 	/// </summary>
 	///
-	/// <param name="Key">The secure vector containing the new key material</param>
+	/// <param name="Key">The secure-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
 	void Update(const SecureVector<byte> &Key) override;

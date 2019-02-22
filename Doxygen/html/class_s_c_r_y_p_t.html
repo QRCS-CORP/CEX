@@ -122,16 +122,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a57a600978ef6e06be8bbee24c0be1d9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Parallel and SIMD capability flags and sizes  <a href="#a57a600978ef6e06be8bbee24c0be1d9f">More...</a><br /></td></tr>
 <tr class="separator:a57a600978ef6e06be8bbee24c0be1d9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c0103127089fcb7aebf8c197a2842e5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a2c0103127089fcb7aebf8c197a2842e5">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a2c0103127089fcb7aebf8c197a2842e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#a2c0103127089fcb7aebf8c197a2842e5">More...</a><br /></td></tr>
+<tr class="memdesc:a2c0103127089fcb7aebf8c197a2842e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard-vector with pseudo-random bytes  <a href="#a2c0103127089fcb7aebf8c197a2842e5">More...</a><br /></td></tr>
 <tr class="separator:a2c0103127089fcb7aebf8c197a2842e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3763ee896665b926b9c2f14e970a468"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#af3763ee896665b926b9c2f14e970a468">Generate</a> (SecureVector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:af3763ee896665b926b9c2f14e970a468"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes  <a href="#af3763ee896665b926b9c2f14e970a468">More...</a><br /></td></tr>
+<tr class="memdesc:af3763ee896665b926b9c2f14e970a468"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure-vector with pseudo-random bytes  <a href="#af3763ee896665b926b9c2f14e970a468">More...</a><br /></td></tr>
 <tr class="separator:af3763ee896665b926b9c2f14e970a468"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6dd2b4ff2ab1c9284c12372d748471ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a6dd2b4ff2ab1c9284c12372d748471ce">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
 <tr class="memdesc:a6dd2b4ff2ab1c9284c12372d748471ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array with pseudo-random bytes, using offset and length parameters  <a href="#a6dd2b4ff2ab1c9284c12372d748471ce">More...</a><br /></td></tr>
 <tr class="separator:a6dd2b4ff2ab1c9284c12372d748471ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca71c8495467d278963999080b8ee29f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#aca71c8495467d278963999080b8ee29f">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:aca71c8495467d278963999080b8ee29f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes, using offset and length parameters  <a href="#aca71c8495467d278963999080b8ee29f">More...</a><br /></td></tr>
+<tr class="memdesc:aca71c8495467d278963999080b8ee29f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure-vector with pseudo-random bytes, using offset and length parameters  <a href="#aca71c8495467d278963999080b8ee29f">More...</a><br /></td></tr>
 <tr class="separator:aca71c8495467d278963999080b8ee29f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac85348f8541815c919d73c84ae2be047"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#ac85348f8541815c919d73c84ae2be047">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
 <tr class="memdesc:ac85348f8541815c919d73c84ae2be047"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string  <a href="#ac85348f8541815c919d73c84ae2be047">More...</a><br /></td></tr>
@@ -341,7 +341,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 <p>Change this value to multiply the cpu cost by this factor, the default value is 1. Setting this value to 0 will automatically use the number of system processor cores.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if an invalid digest name or parameters are used</td></tr>
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if an invalid digest name or parameters are passed</td></tr>
   </table>
   </dd>
 </dl>
@@ -407,7 +407,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 <p>Change this value to multiply the cpu cost by this factor, the default value is 1. Setting this value to 0 will automatically use the number of system processor cores.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if a null digest or invalid parameters are used</td></tr>
+    <tr><td class="paramname">CryptoKdfException</td><td>Thrown if a null digest or invalid parameters are passed</td></tr>
   </table>
   </dd>
 </dl>
@@ -486,10 +486,10 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Fill a standard vector with pseudo-random bytes </p>
+<p>Fill a standard-vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard-vector to fill</td></tr>
   </table>
   </dd>
 </dl>
@@ -528,10 +528,10 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Fill a secure vector with pseudo-random bytes </p>
+<p>Fill a secure-vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination secure-vector to fill</td></tr>
   </table>
   </dd>
 </dl>
@@ -589,7 +589,7 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 <p>Fill an array with pseudo-random bytes, using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard-vector to fill</td></tr>
     <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
@@ -646,10 +646,10 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </table>
 </div><div class="memdoc">
 
-<p>Fill a secure vector with pseudo-random bytes, using offset and length parameters </p>
+<p>Fill a secure-vector with pseudo-random bytes, using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination secure-vector to fill</td></tr>
     <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>

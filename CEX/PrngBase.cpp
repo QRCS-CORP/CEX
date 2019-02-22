@@ -42,7 +42,7 @@ ushort PrngBase::NextUInt16()
 	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(ushort));
-	Clear(smp);
+	MemoryTools::Clear(smp, 0, smp.size());
 
 	return x;
 }
@@ -55,7 +55,7 @@ uint PrngBase::NextUInt32()
 	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint));
-	Clear(smp);
+	MemoryTools::Clear(smp, 0, smp.size());
 
 	return x;
 }
@@ -68,7 +68,7 @@ ulong PrngBase::NextUInt64()
 	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(ulong));
-	Clear(smp);
+	MemoryTools::Clear(smp, 0, smp.size());
 
 	return x;
 }

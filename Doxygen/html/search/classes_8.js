@@ -3,7 +3,6 @@ var searchData=
   ['iaeadmode',['IAeadMode',['../class_i_aead_mode.html',1,'']]],
   ['iasymmetriccipher',['IAsymmetricCipher',['../class_i_asymmetric_cipher.html',1,'']]],
   ['iasymmetrickey',['IAsymmetricKey',['../class_i_asymmetric_key.html',1,'']]],
-  ['iasymmetrickeypair',['IAsymmetricKeyPair',['../class_i_asymmetric_key_pair.html',1,'']]],
   ['iasymmetricparameters',['IAsymmetricParameters',['../class_i_asymmetric_parameters.html',1,'']]],
   ['iasymmetricsign',['IAsymmetricSign',['../class_i_asymmetric_sign.html',1,'']]],
   ['iauthenticate',['IAuthenticate',['../class_i_authenticate.html',1,'']]],

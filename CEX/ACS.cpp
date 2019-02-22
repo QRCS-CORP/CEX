@@ -20,7 +20,7 @@ ACS::ACS(BlockCiphers CipherType, StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType),
 	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
-		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Cipher type can not be none!"), ErrorCodes::InvalidParam)),
+		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_cipherType(CipherType),
 	m_shakeCustom(0),
 	m_expansionMode(ShakeModes::SHAKE512),
@@ -182,26 +182,26 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
 	if (Parameters.Nonce().size() != m_cipherMode->BlockSize())
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}
 	if (Parameters.Info().size() != 0 && Parameters.Info().size() != INFO_SIZE)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The info parameter size is invalid, must be 16 bytes!"), ErrorCodes::InvalidInfo);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The info parameter size is invalid, must be 16 bytes!"), ErrorCodes::InvalidInfo);
 	}
 
 	if (m_parallelProfile.IsParallel())
 	{
 		if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
 		{
-			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size is out of bounds!"), ErrorCodes::InvalidSize);
+			throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The parallel block size is out of bounds!"), ErrorCodes::InvalidSize);
 		}
 		if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		{
-			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidParam);
+			throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -268,7 +268,7 @@ void ACS::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
+		throw CryptoSymmetricException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -278,11 +278,11 @@ void ACS::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
+		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_macAuthenticator == nullptr)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
+		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
 
 	// update the authenticator
@@ -346,15 +346,15 @@ void ACS::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
+		throw CryptoSymmetricException(Name(), std::string("Finalize"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_macAuthenticator == nullptr)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
+		throw CryptoSymmetricException(Name(), std::string("Finalize"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
 	if (Length > m_macAuthenticator->TagSize())
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The MAC code specified is longer than the maximum length!"), ErrorCodes::InvalidParam);
+		throw CryptoSymmetricException(Name(), std::string("Finalize"), std::string("The MAC code specified is longer than the maximum length!"), ErrorCodes::InvalidParam);
 	}
 
 	// generate the mac code

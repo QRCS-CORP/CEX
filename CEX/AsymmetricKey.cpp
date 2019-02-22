@@ -1,91 +1,157 @@
 #include "AsymmetricKey.h"
+#include "ArrayTools.h"
 #include "IntegerTools.h"
 
 NAMESPACE_ASYMMETRIC
 
 using Enumeration::ErrorCodes;
+using Utility::ArrayTools;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 
 const std::string AsymmetricKey::CLASS_NAME = "AsymmetricKey";
 
-AsymmetricKey::AsymmetricKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P)
+//~~~State Container~~~//
+
+class AsymmetricKey::AsymmetricKeyState
+{
+public:
+
+	SecureVector<byte> Polynomial;
+	AsymmetricKeyTypes KeyClass;
+	AsymmetricPrimitives Primitive;
+	AsymmetricTransforms Parameters;
+
+	AsymmetricKeyState(const std::vector<byte> &Poly, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricTransforms ParameterType)
+		:
+		Polynomial(Lock(Poly)),
+		Primitive(PrimitiveType),
+		KeyClass(AsymmetricKeyType),
+		Parameters(ParameterType)
+	{
+	}
+
+	AsymmetricKeyState(const SecureVector<byte> &Poly, AsymmetricPrimitives AsymmetricType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricTransforms ParameterType)
+		:
+		Polynomial(Poly),
+		Primitive(AsymmetricType),
+		KeyClass(AsymmetricKeyType),
+		Parameters(ParameterType)
+	{
+	}
+
+	AsymmetricKeyState(const std::vector<byte> &KeyStream)
+		:
+		KeyClass(static_cast<AsymmetricKeyTypes>(KeyStream[0])),
+		Parameters(static_cast<AsymmetricTransforms>(KeyStream[1])),
+		Primitive(static_cast<AsymmetricPrimitives>(KeyStream[2])),
+		Polynomial(KeyStream.begin() + 3, KeyStream.end())
+	{
+	}
+
+	AsymmetricKeyState(const SecureVector<byte> &KeyStream)
+		:
+		KeyClass(static_cast<AsymmetricKeyTypes>(KeyStream[0])),
+		Parameters(static_cast<AsymmetricTransforms>(KeyStream[1])),
+		Primitive(static_cast<AsymmetricPrimitives>(KeyStream[2])),
+		Polynomial(KeyStream.begin() + 3, KeyStream.end())
+	{
+	}
+
+	~AsymmetricKeyState()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		Clear(Polynomial);
+		Primitive = AsymmetricPrimitives::None;
+		KeyClass = AsymmetricKeyTypes::None;
+		Parameters = AsymmetricTransforms::None;
+	}
+};
+
+//~~~Constructors~~~//
+
+AsymmetricKey::AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType)
 	:
-	m_cipherEngine(CipherType != AsymmetricEngines::None ? CipherType :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher engine type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
-	m_cipherKey(CipherKeyType != AsymmetricKeyTypes::None ? CipherKeyType :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher key type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
-	m_cipherParams(ParameterType != AsymmetricTransforms::None ? ParameterType :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher parameters type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
-	m_isDestroyed(false),
-	m_polyCoeffs(P.size() != 0 ? P :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
+	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricTransforms::None) ?
+		new AsymmetricKeyState(Polynomial, PrimitiveType, CipherKeyType, ParameterType) :
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The types can not be none and the polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
 {
 }
 
-AsymmetricKey::AsymmetricKey(const std::vector<byte> &KeyStream)
+AsymmetricKey::AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType)
 	:
-	m_cipherEngine(static_cast<AsymmetricEngines>(KeyStream[0])),
-	m_cipherKey(static_cast<AsymmetricKeyTypes>(KeyStream[1])),
-	m_cipherParams(static_cast<AsymmetricTransforms>(KeyStream[2])),
-	m_isDestroyed(false),
-	m_polyCoeffs(KeyStream.begin() + 7, KeyStream.begin() + 7 + IntegerTools::LeBytesTo32(KeyStream, 3))
+	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricTransforms::None) ?
+		new AsymmetricKeyState(Polynomial, PrimitiveType, CipherKeyType, ParameterType) :
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The types can not be none and the polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
 {
 }
 
 AsymmetricKey::~AsymmetricKey()
 {
-	Destroy();
+	Reset();
 }
 
-const AsymmetricEngines AsymmetricKey::CipherType()
+//~~~Accessors~~~//
+
+const AsymmetricPrimitives AsymmetricKey::PrimitiveType()
 {
-	return m_cipherEngine;
+	return m_keyState->Primitive;
 }
 
-const AsymmetricKeyTypes AsymmetricKey::KeyType()
+const AsymmetricKeyTypes AsymmetricKey::KeyClass()
 {
-	return m_cipherKey;
+	return m_keyState->KeyClass;
 }
 
 const AsymmetricTransforms AsymmetricKey::Parameters()
 {
-	return m_cipherParams;
+	return m_keyState->Parameters;
 }
 
-const std::vector<byte> &AsymmetricKey::P()
+const std::vector<byte> AsymmetricKey::Polynomial()
 {
-	return m_polyCoeffs;
+	std::vector<byte> tmp = Unlock(m_keyState->Polynomial);
+	return tmp;
 }
 
-void AsymmetricKey::Destroy()
+const SecureVector<byte> &AsymmetricKey::SecurePolynomial()
 {
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_cipherEngine = AsymmetricEngines::None;
-		m_cipherKey = AsymmetricKeyTypes::None;
-		m_cipherParams = AsymmetricTransforms::None;
-
-		if (m_polyCoeffs.size() > 0)
-		{
-			IntegerTools::Clear(m_polyCoeffs);
-		}
-	}
+	return m_keyState->Polynomial;
 }
 
-std::vector<byte> AsymmetricKey::ToBytes()
+//~~~Public Functions~~~//
+
+void AsymmetricKey::Reset()
 {
-	const uint PLYLEN = static_cast<uint>(m_polyCoeffs.size());
-	std::vector<byte> poly(PLYLEN + 7);
+	m_keyState->Reset();
+}
 
-	poly[0] = static_cast<byte>(m_cipherEngine);
-	poly[1] = static_cast<byte>(m_cipherKey);
-	poly[2] = static_cast<byte>(m_cipherParams);
-	IntegerTools::Le32ToBytes(PLYLEN, poly, 3);
-	MemoryTools::Copy(m_polyCoeffs, 0, poly, 7, PLYLEN);
+//~~~Static Functions~~~//
 
-	return poly;
+AsymmetricKey* AsymmetricKey::DeSerialize(SecureVector<byte> &KeyStream)
+{
+	AsymmetricKey* tmpk = new AsymmetricKey(SecureVector<byte>(KeyStream.begin() + 3, KeyStream.end()), 
+		static_cast<AsymmetricPrimitives>(KeyStream[2]),
+		static_cast<AsymmetricKeyTypes>(KeyStream[0]),
+		static_cast<AsymmetricTransforms>(KeyStream[1]));
+
+	return tmpk;
+}
+
+SecureVector<byte> AsymmetricKey::Serialize(AsymmetricKey &KeyParams)
+{
+	SecureVector<byte> tmpr(0);
+
+	ArrayTools::AppendValue(static_cast<byte>(KeyParams.KeyClass()), tmpr);
+	ArrayTools::AppendValue(static_cast<byte>(KeyParams.Parameters()), tmpr);
+	ArrayTools::AppendValue(static_cast<byte>(KeyParams.PrimitiveType()), tmpr);
+	ArrayTools::AppendVector(KeyParams.Polynomial(), tmpr);
+
+	return tmpr;
 }
 
 NAMESPACE_ASYMMETRICEND

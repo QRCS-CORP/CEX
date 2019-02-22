@@ -2,19 +2,21 @@
 #define CEX_ASYMMETRICKEY_H
 
 #include "CexDomain.h"
-#include "AsymmetricEngines.h"
+#include "AsymmetricPrimitives.h"
 #include "AsymmetricKeyTypes.h"
 #include "AsymmetricTransforms.h"
 #include "IAsymmetricKey.h"
 
 NAMESPACE_ASYMMETRIC
 
-using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricPrimitives;
 using Enumeration::AsymmetricKeyTypes;
 using Enumeration::AsymmetricTransforms;
 
 /// <summary>
-/// An Asymmetric cipher key container
+/// An Asymmetric primitive key container.
+/// <para>Contains the keys polynomial vector, the key classification, primitive type, and the primitives parameter-set type name.
+/// Internal storage uses a secure-vector, which can be accessed directly using SecurePolynomial, or return a standard-vector copy with the Polynomial accessor.<para>
 /// </summary>
 class AsymmetricKey final : public IAsymmetricKey
 {
@@ -22,11 +24,8 @@ private:
 
 	static const std::string CLASS_NAME;
 
-	AsymmetricEngines m_cipherEngine;
-	AsymmetricKeyTypes m_cipherKey;
-	AsymmetricTransforms m_cipherParams;
-	bool m_isDestroyed;
-	std::vector<byte> m_polyCoeffs;
+	class AsymmetricKeyState;
+	std::unique_ptr<AsymmetricKeyState> m_keyState;
 
 public:
 
@@ -48,23 +47,28 @@ public:
 	AsymmetricKey() = delete;
 
 	/// <summary>
-	/// Initialize this class with parameters
+	/// Initialize an AsymmetricKey container
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The asymmetric cipher algorithm enumeration name</param>
-	/// <param name="CipherKeyType">The asymmetric cipher key type enumeration name</param>
-	/// <param name="ParameterType">The asymmetric cipher parameter-set enumeration name</param>
-	/// <param name="P">The cipher key polynomial array</param>
+	/// <param name="Polynomial">The asymmetric primitives polynomial key standard-vector</param>
+	/// <param name="PrimitiveType">The keys asymmetric primitives enumeration name</param>
+	/// <param name="KeyClass">The asymmetric primitives key classification enumeration name</param>
+	/// <param name="ParameterType">The asymmetric primitives parameter-set enumeration name</param>
 	///
-	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are used</exception>
-	AsymmetricKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P);
+	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are passed</exception>
+	AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType);
 
 	/// <summary>
-	/// Initialize this class with a serialized private key
+	/// Initialize an AsymmetricKey container
 	/// </summary>
 	/// 
-	/// <param name="KeyStream">The serialized private key</param>
-	explicit AsymmetricKey(const std::vector<byte> &KeyStream);
+	/// <param name="Polynomial">The asymmetric primitives polynomial key secure-vector</param>
+	/// <param name="PrimitiveType">The keys asymmetric primitives enumeration name</param>
+	/// <param name="KeyClass">The asymmetric primitives key classification enumeration name</param>
+	/// <param name="ParameterType">The asymmetric primitives parameter-set enumeration name</param>
+	///
+	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are passed</exception>
+	AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -74,36 +78,56 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The private keys cipher type name
+	/// Read Only: The keys classification enumeration name
 	/// </summary>
-	const AsymmetricEngines CipherType() override;
+	const AsymmetricKeyTypes KeyClass() override;
 
 	/// <summary>
-	/// Read Only: The keys type-name
+	/// ead Only: The keys asymmetric primitives enumeration name
 	/// </summary>
-	const AsymmetricKeyTypes KeyType() override;
+	const AsymmetricPrimitives PrimitiveType() override;
 
 	/// <summary>
-	/// Read Only: The cipher parameters enumeration name
+	/// Read Only: The asymmetric primitives parameter-set enumeration name
 	/// </summary>
 	const AsymmetricTransforms Parameters() override;
 
 	/// <summary>
-	/// Read Only: The private key polynomial
+	/// Read Only: Returns a copy of the asymmetric keys standard-vector polynomial
 	/// </summary>
-	const std::vector<byte> &P() override;
+	const std::vector<byte> Polynomial() override;
+
+	/// <summary>
+	/// Read Only: Returns a reference to the internal asymmetric keys secure-vector polynomial
+	/// </summary>
+	const SecureVector<byte> &SecurePolynomial();
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
-	void Destroy() override;
+	void Reset() override;
+
+	//~~~Static Functions~~~//
 
 	/// <summary>
-	/// Serialize a private key to a byte array
+	/// Deserialize an AsymmetricKey key-stream and return a pointer to an AsymmetricKey
 	/// </summary>
-	std::vector<byte> ToBytes() override;
+	/// 
+	/// <param name="KeyStream">Stream containing the serialized AsymmetricKey</param>
+	/// 
+	/// <returns>A populated AsymmetricKey container</returns>
+	static AsymmetricKey* DeSerialize(SecureVector<byte> &KeyStream);
+
+	/// <summary>
+	/// Serialize an AsymmetricKey into a secure-vector key-stream
+	/// </summary>
+	/// 
+	/// <param name="KeyParams">The AsymmetricKey key container</param>
+	/// 
+	/// <returns>A key-stream containing a serialized AsymmetricKey key</returns>
+	static SecureVector<byte> Serialize(AsymmetricKey &KeyParams);
 };
 
 NAMESPACE_ASYMMETRICEND

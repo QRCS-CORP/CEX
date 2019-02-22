@@ -165,7 +165,7 @@ public:
 	/// 
 	/// <param name="Params">The BlakeParams structure, containing the tree configuration settings.</param>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if an invalid configuration parameters are used</exception>
+	/// <exception cref="CryptoDigestException">Thrown if an invalid configuration parameters are passed</exception>
 	explicit Blake512(BlakeParams &Params);
 
 	/// <summary>

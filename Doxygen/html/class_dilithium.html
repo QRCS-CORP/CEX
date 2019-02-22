@@ -102,9 +102,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae74f506f012cd426ac176b1b293095ad"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#ae74f506f012cd426ac176b1b293095ad">~Dilithium</a> () noexcept</td></tr>
 <tr class="memdesc:ae74f506f012cd426ac176b1b293095ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalizer: destroys the containers objects  <a href="#ae74f506f012cd426ac176b1b293095ad">More...</a><br /></td></tr>
 <tr class="separator:ae74f506f012cd426ac176b1b293095ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a504fe2e7bc6443a0ab7932b33720277a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a504fe2e7bc6443a0ab7932b33720277a">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a504fe2e7bc6443a0ab7932b33720277a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature schemes type-name  <a href="#a504fe2e7bc6443a0ab7932b33720277a">More...</a><br /></td></tr>
-<tr class="separator:a504fe2e7bc6443a0ab7932b33720277a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2aaedbd6271c26e37f9ec045103081b5"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a2aaedbd6271c26e37f9ec045103081b5">Enumeral</a> () override</td></tr>
+<tr class="memdesc:a2aaedbd6271c26e37f9ec045103081b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature schemes type-name  <a href="#a2aaedbd6271c26e37f9ec045103081b5">More...</a><br /></td></tr>
+<tr class="separator:a2aaedbd6271c26e37f9ec045103081b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e9457aab532fb5f640306d77e5945f6"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a4e9457aab532fb5f640306d77e5945f6">IsInitialized</a> () override</td></tr>
 <tr class="memdesc:a4e9457aab532fb5f640306d77e5945f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme has been initialized with a key  <a href="#a4e9457aab532fb5f640306d77e5945f6">More...</a><br /></td></tr>
 <tr class="separator:a4e9457aab532fb5f640306d77e5945f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,7 +148,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Dilithium asymmetric signature scheme </p>
-<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line"><a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">DilithiumPrivateKey* prik = (DilithiumPrivateKey*)kp-&gt;<a class="code" href="class_i_asymmetric_key_pair.html#abe10c0eb64561c576b3419bf07895deb">PrivateKey</a>();</div><div class="line">std::vector&lt;byte&gt; pk = prik-&gt;<a class="code" href="class_i_asymmetric_key.html#a2d0d4cd2c927774996427d78d0f1ad72">ToBytes</a>();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><span class="comment">// if authentication fails, do something</span></div><div class="line">status = sgn.Verify(Signature, msg);</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">IAsymmetricKeyPair* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">DilithiumPrivateKey* prik = (DilithiumPrivateKey*)kp-&gt;PrivateKey();</div><div class="line">std::vector&lt;byte&gt; pk = prik-&gt;ToBytes();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><span class="comment">// if authentication fails, do something</span></div><div class="line">status = sgn.Verify(Signature, msg);</div></div><!-- fragment --> <p>Implementation Notes: </p>
 <p>Dilithium is a digital signature scheme that is strongly secure under chosen message attacks based on the hardness of lattice problems over module lattices. <br />
 The security notion means that an adversary having access to a signing oracle cannot produce a signature of a message whose signature he hasn't yet seen. <br />
 Nor produce a different signature of a message that he already saw signed. </p>
@@ -302,8 +302,8 @@ Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a504fe2e7bc6443a0ab7932b33720277a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a504fe2e7bc6443a0ab7932b33720277a">&#9670;&nbsp;</a></span>Enumeral()</h2>
+<a id="a2aaedbd6271c26e37f9ec045103081b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2aaedbd6271c26e37f9ec045103081b5">&#9670;&nbsp;</a></span>Enumeral()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -312,7 +312,7 @@ Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a> Dilithium::Enumeral </td>
+          <td class="memname">const <a class="el" href="group___enumeration.html#ga0d453c3bfe290768ade0e837b8cec582">AsymmetricPrimitives</a> Dilithium::Enumeral </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -327,7 +327,7 @@ Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </
 
 <p>Read Only: The signature schemes type-name </p>
 
-<p>Implements <a class="el" href="class_i_asymmetric_sign.html#a8829ec09a7064174cd8bf6fb40d2cd9d">IAsymmetricSign</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_sign.html#affe0c39975d88da4bbf6d2dd6e5cf533">IAsymmetricSign</a>.</p>
 
 </div>
 </div>
@@ -394,7 +394,7 @@ Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </
 <p>Initialize the signature scheme for signing (private key) or verifying (public key) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Key</td><td>The <a class="el" href="class_asymmetric_key.html" title="An Asymmetric cipher key container ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
+    <tr><td class="paramname">Key</td><td>The <a class="el" href="class_asymmetric_key.html" title="An Asymmetric primitive key container. ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
   </table>
   </dd>
 </dl>

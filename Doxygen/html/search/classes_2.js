@@ -21,7 +21,7 @@ var searchData=
   ['cryptopaddingexception',['CryptoPaddingException',['../class_crypto_padding_exception.html',1,'']]],
   ['cryptoprocessingexception',['CryptoProcessingException',['../class_crypto_processing_exception.html',1,'']]],
   ['cryptorandomexception',['CryptoRandomException',['../class_crypto_random_exception.html',1,'']]],
-  ['cryptosymmetriccipherexception',['CryptoSymmetricCipherException',['../class_crypto_symmetric_cipher_exception.html',1,'']]],
+  ['cryptosymmetricexception',['CryptoSymmetricException',['../class_crypto_symmetric_exception.html',1,'']]],
   ['csg',['CSG',['../class_c_s_g.html',1,'']]],
   ['csp',['CSP',['../class_c_s_p.html',1,'']]],
   ['csr',['CSR',['../class_c_s_r.html',1,'']]],

@@ -5,6 +5,7 @@
 #include "../CEX/RingLWE.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SecureRandom.h"
+#include "../CEX/SecureVector.h"
 
 namespace Test
 {
@@ -181,11 +182,11 @@ namespace Test
 		AsymmetricKeyPair* kp = cpr.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = kp->PublicKey()->P();
+		std::vector<byte> pk1 = kp->PublicKey()->Polynomial();
 		pk1[0] += 1;
 		pk1[1] += 1;
 
-		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MPKCParameters::MPKCS1M12T62), pk1);
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MPKCParameters::MPKCS1M12T62));
 		cpr.Initialize(pk2);
 		cpr.Encapsulate(cpt, sec1);
 
@@ -201,32 +202,31 @@ namespace Test
 
 	void McElieceTest::Serialization()
 	{
-		std::vector<byte> pkey;
-		std::vector<byte> skey;
+		SecureVector<byte> skey(0);
 
 		McEliece cpr(MPKCParameters::MPKCS1M12T62);
 		AsymmetricKeyPair* kp = cpr.Generate();
-		AsymmetricKey* priK1 = kp->PrivateKey();
-		skey = priK1->ToBytes();
-		AsymmetricKey priK2(skey);
+		AsymmetricKey* prik1 = kp->PrivateKey();
+		skey = AsymmetricKey::Serialize(*prik1);
+		AsymmetricKey* prik2 = AsymmetricKey::DeSerialize(skey);
 
-		if (priK1->P() != priK2.P() || priK1->Parameters() != priK2.Parameters())
+		if (prik1->Polynomial() != prik2->Polynomial() || prik1->Parameters() != prik2->Parameters())
 		{
 			throw TestException(std::string("Serialization"), cpr.Name(), std::string("Private key serialization test has failed! -MR1"));
 		}
 
-		AsymmetricKey* pubK1 = kp->PublicKey();
-		pkey = pubK1->ToBytes();
-		AsymmetricKey pubK2(pkey);
+		AsymmetricKey* pubk1 = kp->PublicKey();
+		skey = AsymmetricKey::Serialize(*pubk1);
+		AsymmetricKey* pubk2 = AsymmetricKey::DeSerialize(skey);
 
-		if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
+		if (pubk1->Polynomial() != pubk2->Polynomial() || pubk1->Parameters() != pubk2->Parameters())
 		{
 			throw TestException(std::string("Serialization"), cpr.Name(), std::string("Public key serialization test has failed! -MR2"));
 		}
 
 		delete kp;
-		delete priK1;
-		delete pubK1;
+		delete prik1;
+		delete pubk1;
 	}
 
 	void McElieceTest::Stress()

@@ -113,16 +113,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ac94066e23147f3fd6da96395c937e13e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of compression cycles used to produce output; must be more than zero, 10,000 recommended  <a href="#ac94066e23147f3fd6da96395c937e13e">More...</a><br /></td></tr>
 <tr class="separator:ac94066e23147f3fd6da96395c937e13e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35dfd610e26bf6ba942cb3b0e62886c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#a35dfd610e26bf6ba942cb3b0e62886c6">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a35dfd610e26bf6ba942cb3b0e62886c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard vector with pseudo-random bytes  <a href="#a35dfd610e26bf6ba942cb3b0e62886c6">More...</a><br /></td></tr>
+<tr class="memdesc:a35dfd610e26bf6ba942cb3b0e62886c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a standard-vector with pseudo-random bytes  <a href="#a35dfd610e26bf6ba942cb3b0e62886c6">More...</a><br /></td></tr>
 <tr class="separator:a35dfd610e26bf6ba942cb3b0e62886c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a41b6db28414c3f72ecf00213781f1ff4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#a41b6db28414c3f72ecf00213781f1ff4">Generate</a> (SecureVector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a41b6db28414c3f72ecf00213781f1ff4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes  <a href="#a41b6db28414c3f72ecf00213781f1ff4">More...</a><br /></td></tr>
+<tr class="memdesc:a41b6db28414c3f72ecf00213781f1ff4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure-vector with pseudo-random bytes  <a href="#a41b6db28414c3f72ecf00213781f1ff4">More...</a><br /></td></tr>
 <tr class="separator:a41b6db28414c3f72ecf00213781f1ff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8d0518aa66074a3435e6ece63258bdb4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#a8d0518aa66074a3435e6ece63258bdb4">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
 <tr class="memdesc:a8d0518aa66074a3435e6ece63258bdb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array with pseudo-random bytes, using offset and length parameters  <a href="#a8d0518aa66074a3435e6ece63258bdb4">More...</a><br /></td></tr>
 <tr class="separator:a8d0518aa66074a3435e6ece63258bdb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa273861bd1bf1e8096dbd1fb4fc137a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#aa273861bd1bf1e8096dbd1fb4fc137a2">Generate</a> (SecureVector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:aa273861bd1bf1e8096dbd1fb4fc137a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure vector with pseudo-random bytes, using offset and length parameters  <a href="#aa273861bd1bf1e8096dbd1fb4fc137a2">More...</a><br /></td></tr>
+<tr class="memdesc:aa273861bd1bf1e8096dbd1fb4fc137a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a secure-vector with pseudo-random bytes, using offset and length parameters  <a href="#aa273861bd1bf1e8096dbd1fb4fc137a2">More...</a><br /></td></tr>
 <tr class="separator:aa273861bd1bf1e8096dbd1fb4fc137a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47622f10656a1bfd1294587f85713c45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#a47622f10656a1bfd1294587f85713c45">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
 <tr class="memdesc:a47622f10656a1bfd1294587f85713c45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey or SecureSymmetricKey; containing the key, and optional salt, and info string  <a href="#a47622f10656a1bfd1294587f85713c45">More...</a><br /></td></tr>
@@ -418,10 +418,10 @@ NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialp
 </table>
 </div><div class="memdoc">
 
-<p>Fill a standard vector with pseudo-random bytes </p>
+<p>Fill a standard-vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard-vector to fill</td></tr>
   </table>
   </dd>
 </dl>
@@ -460,10 +460,10 @@ NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialp
 </table>
 </div><div class="memdoc">
 
-<p>Fill a secure vector with pseudo-random bytes </p>
+<p>Fill a secure-vector with pseudo-random bytes </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination secure-vector to fill</td></tr>
   </table>
   </dd>
 </dl>
@@ -521,7 +521,7 @@ NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialp
 <p>Fill an array with pseudo-random bytes, using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination standard vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination standard-vector to fill</td></tr>
     <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>
@@ -578,10 +578,10 @@ NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialp
 </table>
 </div><div class="memdoc">
 
-<p>Fill a secure vector with pseudo-random bytes, using offset and length parameters </p>
+<p>Fill a secure-vector with pseudo-random bytes, using offset and length parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The destination secure vector to fill</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination secure-vector to fill</td></tr>
     <tr><td class="paramname">Offset</td><td>The starting position within the destination array</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to generate</td></tr>
   </table>

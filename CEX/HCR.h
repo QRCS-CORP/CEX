@@ -107,24 +107,24 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes
+	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Fill a SecureVector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	void Generate(SecureVector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
+	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination vector</param>
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	/// 

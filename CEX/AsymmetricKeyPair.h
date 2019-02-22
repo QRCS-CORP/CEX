@@ -7,15 +7,16 @@
 NAMESPACE_ASYMMETRIC
 
 /// <summary>
-/// A RingLWE public and private key container
+/// An asymmetric key-pair container.
+/// <para>Contains private and public asymmetric keys, and an optional key-pair identification tag.</para>
 /// </summary>
 class AsymmetricKeyPair final
 {
 private:
 
-	AsymmetricKey* m_privateKey;
-	AsymmetricKey* m_publicKey;
-	std::vector<byte> m_Tag;
+	std::unique_ptr<AsymmetricKey> m_privateKey;
+	std::unique_ptr<AsymmetricKey> m_publicKey;
+	std::vector<byte> m_keyTag;
 
 public:
 
@@ -40,46 +41,48 @@ public:
 	/// Constructor: instantiate this class with the public/private keys
 	/// </summary>
 	/// 
-	/// <param name="PrivateKey">The private key</param>
-	/// <param name="PublicKey">The public key</param>
+	/// <param name="PrivateKey">The private asymmetric key</param>
+	/// <param name="PublicKey">The public asymmetric key</param>
 	AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey);
 
 	/// <summary>
 	/// Constructor: instantiate this class with the public/private keys and an identification tag
 	/// </summary>
 	/// 
-	/// <param name="PrivateKey">The private key</param>
-	/// <param name="PublicKey">The public key</param>
-	/// <param name="Tag">The identification tag</param>
+	/// <param name="PrivateKey">The private asymmetric key</param>
+	/// <param name="PublicKey">The public asymmetric key</param>
+	/// <param name="Tag">The key-pairs identification tag</param>
 	AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey, std::vector<byte> &Tag);
 
 	/// <summary>
 	/// Destructor: finalize this class.
-	/// <para>Only the tag is destroyed in the finalizer. Call the Destroy() function on Public/Private key members,
-	/// or let them go out of scope to finalize them.</para>
+	/// <para>Only the tag is destroyed in the finalizer. 
+	/// Call the Reset() function to clear Public and Private key members,
+	/// or let them finalize by going out of scope.</para>
 	/// </summary>
 	~AsymmetricKeyPair();
 
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// The secret private Key
+	/// The secret asymmetric private Key
 	/// </summary>
 	AsymmetricKey* PrivateKey();
 
 	/// <summary>
-	/// The public key
+	/// The asymmetric public key
 	/// </summary>
 	AsymmetricKey* PublicKey();
 
 	/// <summary>
-	/// Read/Write: An optional identification tag
+	/// Read/Write: An optional key-pair identification tag
 	/// </summary>
 	std::vector<byte> &Tag();
 
-private:
-
-	void Destroy();
+	/// <summary>
+	/// Clear all internal state, including the key-pair tag and public and private keys
+	/// </summary>
+	void Reset();
 };
 
 NAMESPACE_ASYMMETRICEND

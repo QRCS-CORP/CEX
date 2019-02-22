@@ -106,7 +106,7 @@ public:
 	/// <param name="DigestType">The digest enumeration member</param>
 	/// <param name="Parallel">Instantiates the multi-threaded implementation of the digest</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are passed</exception>
 	explicit DigestStream(Digests DigestType, bool Parallel = false);
 
 	/// <summary>

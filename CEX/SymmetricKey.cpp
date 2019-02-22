@@ -1,12 +1,14 @@
 #include "SymmetricKey.h"
+#include "ArrayTools.h"
 #include "IntegerTools.h"
-#include "StreamReader.h"
-#include "StreamWriter.h"
 
 NAMESPACE_CIPHER
 
+using Utility::ArrayTools;
 using Enumeration::ErrorCodes;
 using Utility::IntegerTools;
+
+//~~~State Container~~~//
 
 class SymmetricKey::KeyState
 {
@@ -87,9 +89,9 @@ public:
 
 	void Reset()
 	{
-		IntegerTools::Clear(Key);
-		IntegerTools::Clear(Info);
-		IntegerTools::Clear(Nonce);
+		Clear(Key);
+		Clear(Info);
+		Clear(Nonce);
 		KeySizes.Reset();
 	}
 };
@@ -99,42 +101,42 @@ public:
 SymmetricKey::SymmetricKey(const std::vector<byte> &Key)
 	:
 	m_keyState(Key.size() != 0 ? new KeyState(Key) :
-		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam))
+		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
 SymmetricKey::SymmetricKey(const SecureVector<byte> &Key)
 	:
 	m_keyState(Key.size() != 0 ? new KeyState(Key) :
-		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam))
+		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
 SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce)
 	:
 	m_keyState((Key.size() + Nonce.size() != 0) ? new KeyState(Key, Nonce):
-		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key and nonce can not both be be zero sized!"), ErrorCodes::InvalidParam))
+		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key and nonce can not both be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
 SymmetricKey::SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce)
 	:
 	m_keyState((Key.size() + Nonce.size() != 0) ? new KeyState(Key, Nonce) : 
-		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key and nonce can not both be be zero sized!"), ErrorCodes::InvalidParam))
+		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key and nonce can not both be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
 SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
 	:
 	m_keyState((Key.size() + Nonce.size() + Info.size() != 0) ? new KeyState(Key, Nonce, Info) :
-		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key, nonce, and info can not all be be zero sized!"), ErrorCodes::InvalidParam))
+		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key, nonce, and info can not all be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
 SymmetricKey::SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info)
 	:
 	m_keyState((Key.size() + Nonce.size() + Info.size() != 0) ? new KeyState(Key, Nonce, Info) :
-		throw CryptoProcessingException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key, nonce, and info can not all be be zero sized!"), ErrorCodes::InvalidParam))
+		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key, nonce, and info can not all be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
@@ -147,12 +149,14 @@ SymmetricKey::~SymmetricKey()
 
 const std::vector<byte> SymmetricKey::Info() 
 { 
-	return Unlock(m_keyState->Info);
+	std::vector<byte> tmp = Unlock(m_keyState->Info);
+	return tmp;
 }
 
 const std::vector<byte> SymmetricKey::Key()
 {
-	return Unlock(m_keyState->Key);
+	std::vector<byte> tmp = Unlock(m_keyState->Key);
+	return tmp;
 }
 
 const SymmetricKeySize SymmetricKey::KeySizes() 
@@ -162,25 +166,23 @@ const SymmetricKeySize SymmetricKey::KeySizes()
 
 const std::vector<byte> SymmetricKey::Nonce() 
 { 
-	return Unlock(m_keyState->Nonce);
-}
-
-const SecureVector<byte> SymmetricKey::SecureInfo()
-{
-	SecureVector<byte> tmp(m_keyState->Info);
+	std::vector<byte> tmp = Unlock(m_keyState->Nonce);
 	return tmp;
 }
 
-const SecureVector<byte> SymmetricKey::SecureKey()
+const SecureVector<byte> &SymmetricKey::SecureInfo()
 {
-	SecureVector<byte> tmp(m_keyState->Key);
-	return tmp;
+	return m_keyState->Info;
 }
 
-const SecureVector<byte> SymmetricKey::SecureNonce()
+const SecureVector<byte> &SymmetricKey::SecureKey()
 {
-	SecureVector<byte> tmp(m_keyState->Nonce);
-	return tmp;
+	return m_keyState->Key;
+}
+
+const SecureVector<byte> &SymmetricKey::SecureNonce()
+{
+	return m_keyState->Nonce;
 }
 
 //~~~Public Functions~~~//
@@ -195,70 +197,71 @@ void SymmetricKey::Reset()
 	m_keyState->Reset();
 }
 
-SymmetricKey* SymmetricKey::DeSerialize(const MemoryStream &KeyStream)
-{
-	IO::StreamReader reader(KeyStream);
-	std::vector<byte> tmpk;
-	std::vector<byte> tmpn;
-	std::vector<byte> tmpi;
-	size_t klen;
-	size_t nlen;
-	size_t ilen;
+//~~~Static Functions~~~//
 
-	klen = static_cast<size_t>(reader.ReadInt<ushort>());
-	nlen = static_cast<size_t>(reader.ReadInt<ushort>());
-	ilen = static_cast<size_t>(reader.ReadInt<ushort>());
+SymmetricKey* SymmetricKey::DeSerialize(SecureVector<byte> &KeyStream)
+{
+	SecureVector<byte> key(0);
+	SecureVector<byte> nonce(0);
+	SecureVector<byte> info(0);
+	ushort klen;
+	ushort nlen;
+	ushort ilen;
+
+	klen = IntegerTools::LeBytesTo16(KeyStream, 0);
+	nlen = IntegerTools::LeBytesTo16(KeyStream, 2);
+	ilen = IntegerTools::LeBytesTo16(KeyStream, 4);
 
 	if (klen > 0)
 	{
-		tmpk = reader.ReadBytes(klen);
+		key.resize(klen);
+		MemoryTools::Copy(KeyStream, 6, key, 0, static_cast<size_t>(klen));
 	}
 	if (nlen > 0)
 	{
-		tmpn = reader.ReadBytes(nlen);
+		nonce.resize(nlen);
+		MemoryTools::Copy(KeyStream, klen + 6, nonce, 0, static_cast<size_t>(nlen));
 	}
 	if (ilen > 0)
 	{
-		tmpi = reader.ReadBytes(ilen);
+		info.resize(ilen);
+		MemoryTools::Copy(KeyStream, klen + nlen + 6, info, 0, static_cast<size_t>(ilen));
 	}
 
-	return new SymmetricKey(tmpk, tmpn, tmpi);
+	return new SymmetricKey(key, nonce, info);
 }
 
-MemoryStream* SymmetricKey::Serialize(SymmetricKey &KeyObj)
+SecureVector<byte> SymmetricKey::Serialize(SymmetricKey &KeyParams)
 {
-	size_t klen;
-	size_t nlen;
-	size_t ilen;
-	size_t tLen;
+	SecureVector<byte> tmpr(0);
+	ushort klen;
+	ushort nlen;
+	ushort ilen;
+	ushort tlen;
 
-	klen = KeyObj.Key().size();
-	nlen = KeyObj.Nonce().size();
-	ilen = KeyObj.Info().size();
-	tLen = 6 + klen + nlen + ilen;
+	klen = static_cast<ushort>(KeyParams.Key().size());
+	nlen = static_cast<ushort>(KeyParams.Nonce().size());
+	ilen = static_cast<ushort>(KeyParams.Info().size());
+	tlen = 6 + klen + nlen + ilen;
 
-	IO::StreamWriter writer(tLen);
-	writer.Write(static_cast<ushort>(klen));
-	writer.Write(static_cast<ushort>(nlen));
-	writer.Write(static_cast<ushort>(ilen));
+	ArrayTools::AppendVector(IntegerTools::Le16ToBytes<SecureVector<byte>>(klen), tmpr);
+	ArrayTools::AppendVector(IntegerTools::Le16ToBytes<SecureVector<byte>>(nlen), tmpr);
+	ArrayTools::AppendVector(IntegerTools::Le16ToBytes<SecureVector<byte>>(ilen), tmpr);
 
 	if (klen > 0)
 	{
-		writer.Write(KeyObj.Key(), 0, klen);
+		ArrayTools::AppendVector(KeyParams.Key(), tmpr);
 	}
 	if (nlen > 0)
 	{
-		writer.Write(KeyObj.Nonce(), 0, nlen);
+		ArrayTools::AppendVector(KeyParams.Nonce(), tmpr);
 	}
 	if (ilen > 0)
 	{
-		writer.Write(KeyObj.Info(), 0, ilen);
+		ArrayTools::AppendVector(KeyParams.Info(), tmpr);
 	}
 
-	IO::MemoryStream* strm = writer.GetStream();
-	strm->Seek(0, IO::SeekOrigin::Begin);
-
-	return strm;
+	return tmpr;
 }
 
 NAMESPACE_CIPHEREND

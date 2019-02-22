@@ -5,6 +5,7 @@
 #include "../CEX/IntegerTools.h"
 #include "../CEX/ModuleLWE.h"
 #include "../CEX/SecureRandom.h"
+#include "../CEX/SecureVector.h"
 
 namespace Test
 {
@@ -232,9 +233,9 @@ namespace Test
 		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter private key
-		std::vector<byte> sk1 = kp->PrivateKey()->P();
+		std::vector<byte> sk1 = kp->PrivateKey()->Polynomial();
 		gen.Generate(sk1, 0, 16);
-		AsymmetricKey* sk2 = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417), sk1);
+		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417));
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -258,9 +259,9 @@ namespace Test
 		AsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter public key
-		std::vector<byte> pk1 = kp->PublicKey()->P();
+		std::vector<byte> pk1 = kp->PublicKey()->Polynomial();
 		gen.Generate(pk1, 0, 16);
-		AsymmetricKey* pk2 = new AsymmetricKey(AsymmetricEngines::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417), pk1);
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417));
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -276,28 +277,34 @@ namespace Test
 	void DilithiumTest::Serialization()
 	{
 		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
-		std::vector<byte> skey;
+		SecureVector<byte> skey(0);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 			AsymmetricKeyPair* kp = sgn.Generate();
 			AsymmetricKey* prik1 = kp->PrivateKey();
-			skey = prik1->ToBytes();
-			AsymmetricKey prik2(skey);
+			skey = AsymmetricKey::Serialize(*prik1);
+			AsymmetricKey* prik2 = AsymmetricKey::DeSerialize(skey);
 
-			if (prik1->P() != prik2.P() || prik1->Parameters() != prik2.Parameters())
+			if (prik1->Polynomial() != prik2->Polynomial() || prik1->Parameters() != prik2->Parameters())
 			{
 				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Private key serialization test has failed! -DR1"));
 			}
 
-			AsymmetricKey* pubk1 = kp->PublicKey();
-			skey = pubk1->ToBytes();
-			AsymmetricKey pubk2(skey);
+			delete prik1;
+			delete prik2;
 
-			if (pubk1->P() != pubk2.P() || pubk1->Parameters() != pubk2.Parameters())
+			AsymmetricKey* pubk1 = kp->PublicKey();
+			skey = AsymmetricKey::Serialize(*pubk1);
+			AsymmetricKey* pubk2 = AsymmetricKey::DeSerialize(skey);
+
+			if (pubk1->Polynomial() != pubk2->Polynomial() || pubk1->Parameters() != pubk2->Parameters())
 			{
 				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Public key serialization test has failed! -DR2"));
 			}
+
+			delete pubk1;
+			delete pubk2;
 		}
 	}
 

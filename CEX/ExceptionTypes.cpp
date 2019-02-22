@@ -41,8 +41,8 @@ std::string ExceptionTypeConvert::ToName(ExceptionTypes Enumeral)
 	case ExceptionTypes::CryptoRandomException:
 		name = std::string("CryptoRandomException");
 		break;
-	case ExceptionTypes::CryptoSymmetricCipherException:
-		name = std::string("CryptoSymmetricCipherException");
+	case ExceptionTypes::CryptoSymmetricException:
+		name = std::string("CryptoSymmetricException");
 		break;
 	default:
 		name = std::string("None");
@@ -100,9 +100,9 @@ ExceptionTypes ExceptionTypeConvert::FromName(std::string &Name)
 	{
 		tname = ExceptionTypes::CryptoRandomException;
 	}
-	else if (Name == std::string("CryptoSymmetricCipherException"))
+	else if (Name == std::string("CryptoSymmetricException"))
 	{
-		tname = ExceptionTypes::CryptoSymmetricCipherException;
+		tname = ExceptionTypes::CryptoSymmetricException;
 	}
 	else
 	{

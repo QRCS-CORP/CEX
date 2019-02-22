@@ -163,7 +163,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher type-name
 	/// </summary>
-	const AsymmetricEngines Enumeral() override;
+	const AsymmetricPrimitives Enumeral() override;
 
 	/// <summary>
 	/// Read Only: The cipher is initialized for encryption

@@ -21,7 +21,7 @@
 
 #include "CexDomain.h"
 #include "CryptoAuthenticationFailure.h"
-#include "CryptoSymmetricCipherException.h"
+#include "CryptoSymmetricException.h"
 #include "IMac.h"
 #include "ISymmetricKey.h"
 #include "ParallelOptions.h"
@@ -33,7 +33,7 @@
 NAMESPACE_STREAM
 
 using Exception::CryptoAuthenticationFailure;
-using Exception::CryptoSymmetricCipherException;
+using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
 using Mac::IMac;
 using Cipher::ISymmetricKey;
@@ -163,7 +163,7 @@ public:
 	/// <param name="Parameters">Cipher key container. The LegalKeySizes property contains valid sizes</param>
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if a null or invalid key is used</exception>
 	virtual void Initialize(bool Encryption, ISymmetricKey &Parameters) = 0;
 
 	/// <summary>
@@ -174,7 +174,7 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads to allocate</param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
@@ -186,7 +186,7 @@ public:
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if state has been processed</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if state has been processed</exception>
 	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
 
 	/// <summary>

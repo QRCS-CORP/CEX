@@ -41,7 +41,6 @@ var searchData=
   ['_7eiaeadmode',['~IAeadMode',['../class_i_aead_mode.html#a26f02f52967fd0cdc00311f69ac0f239',1,'IAeadMode']]],
   ['_7eiasymmetriccipher',['~IAsymmetricCipher',['../class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5',1,'IAsymmetricCipher']]],
   ['_7eiasymmetrickey',['~IAsymmetricKey',['../class_i_asymmetric_key.html#a07828a73fcff397b24d0ad378c5de1cc',1,'IAsymmetricKey']]],
-  ['_7eiasymmetrickeypair',['~IAsymmetricKeyPair',['../class_i_asymmetric_key_pair.html#a843ece081aa5d0926840e9ea223e73a8',1,'IAsymmetricKeyPair']]],
   ['_7eiasymmetricparameters',['~IAsymmetricParameters',['../class_i_asymmetric_parameters.html#ae7a593c8d7eacbcc012f092818a32d93',1,'IAsymmetricParameters']]],
   ['_7eiasymmetricsign',['~IAsymmetricSign',['../class_i_asymmetric_sign.html#a15d6681f385e01d414ca3523121921d9',1,'IAsymmetricSign']]],
   ['_7eiauthenticate',['~IAuthenticate',['../class_i_authenticate.html#aec926c7d101cd20a82c14e2cf6a6cfd7',1,'IAuthenticate']]],

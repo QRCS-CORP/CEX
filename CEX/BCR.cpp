@@ -1,5 +1,6 @@
 #include "BCR.h"
 #include "BCG.h"
+#include "MemoryTools.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
@@ -7,6 +8,7 @@ NAMESPACE_PRNG
 
 using Drbg::BCG;
 using Enumeration::BlockCipherConvert;
+using Utility::MemoryTools;
 using Enumeration::PrngConvert;
 using Enumeration::ProviderConvert;
 
@@ -95,8 +97,8 @@ void BCR::Reset()
 
 	Cipher::SymmetricKey kp(key, nonce);
 	m_rngGenerator->Initialize(kp);
-	Clear(key);
-	Clear(nonce);
+	MemoryTools::Clear(key, 0, key.size());
+	MemoryTools::Clear(nonce, 0, nonce.size());
 }
 
 //~~~Private Functions~~~//
@@ -108,11 +110,7 @@ void BCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std
 
 void BCR::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
-	std::vector<byte> smp(Length);
-	// TODO: change this once secure vectors are in drbgs
-	Generator->Generate(smp, 0, Length);
-	Insert(smp, 0, Output, Offset, Length);
-	Clear(smp);
+	Generator->Generate(Output, Offset, Length);
 }
 
 NAMESPACE_PRNGEND

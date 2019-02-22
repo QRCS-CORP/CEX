@@ -130,9 +130,6 @@
     <Filter Include="Header Files\Asymmetric\KEX">
       <UniqueIdentifier>{e8f34ed9-02ab-4b46-90d8-ed9955ff823e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Asymmetric\KEX\TLS">
-      <UniqueIdentifier>{d7f12952-6a87-4982-96ad-eac3fb35ac05}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Asymmetric\KEX\STM">
       <UniqueIdentifier>{b0b8ec79-a9b1-4e59-a0eb-c3b734ef3b22}</UniqueIdentifier>
     </Filter>
@@ -162,9 +159,6 @@
     </Filter>
     <Filter Include="Source Files\Asymmetric\KEX\STM">
       <UniqueIdentifier>{da24df47-e9fd-4fb2-877b-ff06d9d63501}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\KEX\TLS">
-      <UniqueIdentifier>{d3fddbff-e594-4495-bb1a-4dd89036f68c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Asymmetric\Sign">
       <UniqueIdentifier>{f32014fa-8dd3-4458-b9f1-324e4fcb7cae}</UniqueIdentifier>
@@ -325,6 +319,12 @@
     <Filter Include="Source Files\Drbg\Base">
       <UniqueIdentifier>{c436046b-bfa6-4e80-947b-b6800d95c1df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Asymmetric\KEX\DTM">
+      <UniqueIdentifier>{d7f12952-6a87-4982-96ad-eac3fb35ac05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\KEX\DTM">
+      <UniqueIdentifier>{d3fddbff-e594-4495-bb1a-4dd89036f68c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -375,9 +375,6 @@
     <ClInclude Include="..\..\CEX\Keccak.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\AsymmetricEngines.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\BlockCiphers.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -421,9 +418,6 @@
       <Filter>Header Files\Exception</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoRandomException.h">
-      <Filter>Header Files\Exception</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CryptoSymmetricCipherException.h">
       <Filter>Header Files\Exception</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\StreamCiphers.h">
@@ -906,9 +900,6 @@
     <ClInclude Include="..\..\CEX\IAsymmetricKey.h">
       <Filter>Header Files\Asymmetric\Key</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\IAsymmetricKeyPair.h">
-      <Filter>Header Files\Asymmetric\Key</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\AsymmetricSecureKey.h">
       <Filter>Header Files\Asymmetric\Key</Filter>
     </ClInclude>
@@ -965,6 +956,12 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\DrbgBase.h">
       <Filter>Header Files\Drbg\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsymmetricPrimitives.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CryptoSymmetricException.h">
+      <Filter>Header Files\Exception</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1152,9 +1149,6 @@
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CryptoRandomException.cpp">
-      <Filter>Source Files\Exception</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\CryptoSymmetricCipherException.cpp">
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\RingLWE.cpp">
@@ -1364,9 +1358,6 @@
     <ClCompile Include="..\..\CEX\AeadModes.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\AsymmetricEngines.cpp">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\AsymmetricTransforms.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
@@ -1459,6 +1450,12 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\DrbgBase.cpp">
       <Filter>Source Files\Drbg\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricPrimitives.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoSymmetricException.cpp">
+      <Filter>Source Files\Exception</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

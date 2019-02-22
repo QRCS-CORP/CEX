@@ -92,9 +92,9 @@ std::vector<byte> &NTRU::DomainKey()
 	return m_domainKey;
 }
 
-const AsymmetricEngines NTRU::Enumeral()
+const AsymmetricPrimitives NTRU::Enumeral()
 {
-	return AsymmetricEngines::NTRU;
+	return AsymmetricPrimitives::NTRU;
 }
 
 const bool NTRU::IsEncryption()
@@ -144,13 +144,13 @@ bool NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &S
 		CEXASSERT(CipherText.size() >= NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		// process message from B and return shared secret
-		result = NTRUSQ4591N761::Decrypt(secret, CipherText, m_privateKey->P());
+		result = NTRUSQ4591N761::Decrypt(secret, CipherText, m_privateKey->Polynomial());
 	}
 	else if (m_ntruParameters == NTRUParameters::NTRUS1LQ4591N761)
 	{
 		CEXASSERT(CipherText.size() >= NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
-		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->P());
+		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->Polynomial());
 	}
 
 	// hash the message to create the shared secret
@@ -171,20 +171,20 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 
 	if (m_ntruParameters == NTRUParameters::NTRUS2SQ4591N761)
 	{
-		CEXASSERT(m_publicKey->P().size() >= NTRUSQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
+		CEXASSERT(m_publicKey->Polynomial().size() >= NTRUSQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
 
 		CipherText.resize(NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE);
 
 		// generate reply and store secret
-		NTRUSQ4591N761::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
+		NTRUSQ4591N761::Encrypt(secret, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
 	}
 	else if (m_ntruParameters == NTRUParameters::NTRUS1LQ4591N761)
 	{
-		CEXASSERT(m_publicKey->P().size() >= NTRULQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
+		CEXASSERT(m_publicKey->Polynomial().size() >= NTRULQ4591N761::NTRU_PUBLICKEY_SIZE, "The public key is invalid");
 
 		CipherText.resize(NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE);
 
-		NTRULQ4591N761::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
+		NTRULQ4591N761::Encrypt(secret, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
 	}
 
 	Kdf::SHAKE gen(ShakeModes::SHAKE256);
@@ -214,24 +214,24 @@ AsymmetricKeyPair* NTRU::Generate()
 		NTRULQ4591N761::Generate(pk, sk, m_rndGenerator);
 	}
 
-	AsymmetricKey* apk = new AsymmetricKey(AsymmetricEngines::NTRU, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_ntruParameters), pk);
-	AsymmetricKey* ask = new AsymmetricKey(AsymmetricEngines::NTRU, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_ntruParameters), sk);
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::NTRU, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_ntruParameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::NTRU, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_ntruParameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
 
 void NTRU::Initialize(AsymmetricKey* Key)
 {
-	if (Key->CipherType() != AsymmetricEngines::NTRU)
+	if (Key->PrimitiveType() != AsymmetricPrimitives::NTRU)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
-	if (Key->KeyType() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyType() != AsymmetricKeyTypes::CipherPrivateKey)
+	if (Key->KeyClass() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
 
-	if (Key->KeyType() == AsymmetricKeyTypes::CipherPublicKey)
+	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
 		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
 		m_ntruParameters = static_cast<NTRUParameters>(m_publicKey->Parameters());

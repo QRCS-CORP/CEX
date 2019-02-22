@@ -24,7 +24,7 @@ var searchData=
   ['skein1024',['Skein1024',['../group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3a8156318455e118f8b0cb6272973292a2',1,'Documentation.h']]],
   ['skein256',['Skein256',['../group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3acf0eeb991062f766c37e1551d1a02c0a',1,'Documentation.h']]],
   ['skein512',['Skein512',['../group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3ac7ded0f97d4810cd3ea63b92bcb1c163',1,'Documentation.h']]],
-  ['sphincs',['Sphincs',['../group___enumeration.html#gga29d0f9dca8992bfdc1e8f55c6b4c13f1a5e8298320be7f7176b817211ebbb9424',1,'Documentation.h']]],
+  ['sphincs',['Sphincs',['../group___enumeration.html#gga0d453c3bfe290768ade0e837b8cec582a5e8298320be7f7176b817211ebbb9424',1,'Documentation.h']]],
   ['spxs128f256',['SPXS128F256',['../group___enumeration.html#gga25da89a987f4d7e835bc03bb8599a693a782caa6858f2ff54bfa2db4381aae8c7',1,'SPXS128F256():&#160;Documentation.h'],['../group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa782caa6858f2ff54bfa2db4381aae8c7',1,'SPXS128F256():&#160;Documentation.h']]],
   ['spxs256f256',['SPXS256F256',['../group___enumeration.html#gga25da89a987f4d7e835bc03bb8599a693a92f0b00f3fe025cf435e642a0727ec8d',1,'SPXS256F256():&#160;Documentation.h'],['../group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa92f0b00f3fe025cf435e642a0727ec8d',1,'SPXS256F256():&#160;Documentation.h']]],
   ['spxs512f256',['SPXS512F256',['../group___enumeration.html#gga25da89a987f4d7e835bc03bb8599a693a03d94ab96a7f3dc9ae5a600d07c904b2',1,'SPXS512F256():&#160;Documentation.h'],['../group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa03d94ab96a7f3dc9ae5a600d07c904b2',1,'SPXS512F256():&#160;Documentation.h']]]

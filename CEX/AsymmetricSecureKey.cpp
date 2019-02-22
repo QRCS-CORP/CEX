@@ -1,92 +1,347 @@
 #include "AsymmetricSecureKey.h"
+#include "ArrayTools.h"
+#include "AsymmetricKey.h"
+#include "CryptoAuthenticationFailure.h"
 #include "IntegerTools.h"
+#include "MemoryTools.h"
+#include "SHAKE.h"
+#include "StreamCipherFromName.h"
+#include "SymmetricKey.h"
+#include "SystemTools.h"
 
 NAMESPACE_ASYMMETRIC
 
+using Utility::ArrayTools;
+
+using Exception::CryptoAuthenticationFailure;
+using Enumeration::ErrorCodes;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
+using Kdf::SHAKE;
+using Enumeration::ShakeModes;
+using Helper::StreamCipherFromName;
+using Cipher::SymmetricKey;
+using Cipher::SymmetricKeySize;
+using Utility::SystemTools;
 
 const std::string AsymmetricSecureKey::CLASS_NAME = "AsymmetricSecureKey";
 
-AsymmetricSecureKey::AsymmetricSecureKey(AsymmetricEngines CipherType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType, std::vector<byte> &P, ulong KeySalt)
-	:
-	m_cipherEngine(CipherType != AsymmetricEngines::None ? CipherType :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher engine type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
-	m_cipherKey(CipherKeyType != AsymmetricKeyTypes::None ? CipherKeyType :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher key type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
-	m_cipherParams(ParameterType != AsymmetricTransforms::None ? ParameterType :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The cipher parameters type can not be None!"), Enumeration::ErrorCodes::InvalidParam)),
-	m_isDestroyed(false),
-	m_polyCoeffs(P.size() != 0 ? P :
-		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
+//~~~State Container~~~//
+
+class AsymmetricSecureKey::AsymmetricSecureKeyState
 {
-	throw; // not completed yet!
+public:
+
+	SecureVector<byte> Polynomial;
+	SecureVector<byte> Salt;
+	AsymmetricPrimitives Primitive;
+	AsymmetricKeyTypes KeyClass;
+	AsymmetricTransforms Parameters;
+	SecurityPolicy Policy;
+
+	AsymmetricSecureKeyState()
+		:
+		Polynomial(0),
+		Salt(0),
+		KeyClass(AsymmetricKeyTypes::None),
+		Parameters(AsymmetricTransforms::None),
+		Policy(SecurityPolicy::None),
+		Primitive(AsymmetricPrimitives::None)
+	{
+	}
+
+	AsymmetricSecureKeyState(const std::vector<byte> &Coefficients, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType, const std::vector<byte> &KeySalt, SecurityPolicy PolicyType)
+		:
+		Polynomial(Lock(Coefficients)),
+		Salt(Lock(KeySalt)),
+		KeyClass(KeyClass),
+		Primitive(PrimitiveType),
+		Parameters(ParameterType),
+		Policy(PolicyType)
+	{
+	}
+
+	AsymmetricSecureKeyState(const SecureVector<byte> &Coefficients, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType, const SecureVector<byte> &KeySalt, SecurityPolicy PolicyType)
+		:
+		Polynomial(Coefficients),
+		Salt(KeySalt),
+		KeyClass(KeyClass),
+		Primitive(PrimitiveType),
+		Parameters(ParameterType),
+		Policy(PolicyType)
+	{
+	}
+
+	~AsymmetricSecureKeyState()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		Clear(Polynomial);
+		Clear(Salt);
+		KeyClass = AsymmetricKeyTypes::None;
+		Parameters = AsymmetricTransforms::None;
+		Policy = SecurityPolicy::None;
+		Primitive = AsymmetricPrimitives::None;
+	}
+};
+
+//~~~Constructors~~~//
+
+AsymmetricSecureKey::AsymmetricSecureKey(const std::vector<byte> &Polynomial, const std::vector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms Parameters, SecurityPolicy PolicyType)
+	:
+	m_secureState(Polynomial.size() != 0 && KeyClass != AsymmetricKeyTypes::None && PrimitiveType != AsymmetricPrimitives::None && Parameters != AsymmetricTransforms::None && PolicyType != SecurityPolicy::None ?
+		new AsymmetricSecureKeyState(Polynomial, PrimitiveType, KeyClass, Parameters, KeySalt, PolicyType) :
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The parameters are invalid!"), ErrorCodes::InvalidParam))
+{
+	Encipher(m_secureState);
 }
 
-AsymmetricSecureKey::AsymmetricSecureKey(const std::vector<byte> &KeyStream)
+AsymmetricSecureKey::AsymmetricSecureKey(const SecureVector<byte> &Polynomial, const SecureVector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms Parameters, SecurityPolicy PolicyType)
 	:
-	m_cipherEngine(static_cast<AsymmetricEngines>(KeyStream[0])),
-	m_cipherKey(static_cast<AsymmetricKeyTypes>(KeyStream[1])),
-	m_cipherParams(static_cast<AsymmetricTransforms>(KeyStream[2])),
-	m_isDestroyed(false),
-	m_polyCoeffs(KeyStream.begin() + 7, KeyStream.begin() + 7 + IntegerTools::LeBytesTo32(KeyStream, 3))
+	m_secureState(Polynomial.size() != 0 && KeyClass != AsymmetricKeyTypes::None && PrimitiveType != AsymmetricPrimitives::None && Parameters != AsymmetricTransforms::None && PolicyType != SecurityPolicy::None ?
+		new AsymmetricSecureKeyState(Polynomial, PrimitiveType, KeyClass, Parameters, KeySalt, PolicyType) :
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The parameters are invalid!"), ErrorCodes::InvalidParam))
 {
-	throw; // not completed yet!
+	Encipher(m_secureState);
 }
 
 AsymmetricSecureKey::~AsymmetricSecureKey()
 {
-	Destroy();
+	Reset();
 }
 
-const AsymmetricEngines AsymmetricSecureKey::CipherType()
+//~~~Accessors~~~//
+
+const AsymmetricPrimitives AsymmetricSecureKey::PrimitiveType()
 {
-	return m_cipherEngine;
+	return m_secureState->Primitive;
 }
 
-const AsymmetricKeyTypes AsymmetricSecureKey::KeyType()
+const AsymmetricKeyTypes AsymmetricSecureKey::KeyClass()
 {
-	return m_cipherKey;
+	return m_secureState->KeyClass;
 }
 
 const AsymmetricTransforms AsymmetricSecureKey::Parameters()
 {
-	return m_cipherParams;
+	return m_secureState->Parameters;
 }
 
-const std::vector<byte> &AsymmetricSecureKey::P()
+const std::vector<byte> AsymmetricSecureKey::Polynomial()
 {
-	return m_polyCoeffs;
-}
+	SecureVector<byte> tmps(m_secureState->Polynomial.size());
 
-void AsymmetricSecureKey::Destroy()
-{
-	if (!m_isDestroyed)
+	// if the state policy has been set to authenticated mode, this will throw on authentication failure
+	try
 	{
-		m_isDestroyed = true;
-		m_cipherEngine = AsymmetricEngines::None;
-		m_cipherKey = AsymmetricKeyTypes::None;
-		m_cipherParams = AsymmetricTransforms::None;
+		Extract(m_secureState, tmps, m_secureState->Polynomial.size());
+	}
+	catch (CryptoAuthenticationFailure &ex)
+	{
+		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Polynomial"), ex.Message(), ErrorCodes::AuthenticationFailure);
+	}
 
-		if (m_polyCoeffs.size() > 0)
-		{
-			IntegerTools::Clear(m_polyCoeffs);
-		}
+	return UnlockClear(tmps);
+}
+
+const void AsymmetricSecureKey::SecurePolynomial(SecureVector<byte> &Output)
+{
+	if (Output.size() < m_secureState->Polynomial.size())
+	{
+		throw CryptoAsymmetricException(CLASS_NAME, std::string("SecurePolynomial"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
+	// if the state policy has been set to authenticated mode, this will throw on authentication failure
+	try
+	{
+		Extract(m_secureState, Output, m_secureState->Polynomial.size());
+	}
+	catch (CryptoAuthenticationFailure &ex)
+	{
+		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("SecurePolynomial"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 }
 
-std::vector<byte> AsymmetricSecureKey::ToBytes()
+//~~~Public Functions~~~//
+
+void AsymmetricSecureKey::Reset()
 {
-	const uint PLYLEN = static_cast<uint>(m_polyCoeffs.size());
-	std::vector<byte> poly(PLYLEN + 7);
+	m_secureState->Reset();
+}
 
-	poly[0] = static_cast<byte>(m_cipherEngine);
-	poly[1] = static_cast<byte>(m_cipherKey);
-	poly[2] = static_cast<byte>(m_cipherParams);
-	IntegerTools::Le32ToBytes(PLYLEN, poly, 3);
-	MemoryTools::Copy(m_polyCoeffs, 0, poly, 7, PLYLEN);
+//~~~Static Functions~~~//
 
-	return poly;
+AsymmetricKey* AsymmetricSecureKey::DeSerialize(SecureVector<byte> &KeyStream)
+{
+	AsymmetricKey* tmpk = AsymmetricKey::DeSerialize(KeyStream);
+
+	return tmpk;
+}
+
+SecureVector<byte> AsymmetricSecureKey::Serialize(AsymmetricSecureKey &KeyParams)
+{
+	SecureVector<byte> tmpr(0);
+
+	ArrayTools::AppendValue(static_cast<byte>(KeyParams.KeyClass()), tmpr);
+	ArrayTools::AppendValue(static_cast<byte>(KeyParams.Parameters()), tmpr);
+	ArrayTools::AppendValue(static_cast<byte>(KeyParams.PrimitiveType()), tmpr);
+	ArrayTools::AppendVector(KeyParams.Polynomial(), tmpr);
+
+	return tmpr;
+}
+
+//~~~Private Functions~~~//
+
+void AsymmetricSecureKey::Encipher(std::unique_ptr<AsymmetricSecureKeyState> &State)
+{
+	IStreamCipher* cpr = GetStreamCipher(State->Policy);
+	SymmetricKeySize ksc = cpr->LegalKeySizes()[0];
+	SecureVector<byte> seed(ksc.KeySize() + ksc.NonceSize());
+	std::vector<byte> tmpt(0);
+	std::vector<byte> tmpk(ksc.KeySize());
+	std::vector<byte> tmpn(ksc.NonceSize());
+	std::vector<byte> cpt(State->Polynomial.size());
+
+	// transfer from the secure-vector to a working state
+	tmpt = UnlockClear(State->Polynomial);
+
+	// resize the cipher-text to accommodate the authentication tag
+	if (cpr->IsAuthenticator())
+	{
+		cpt.resize(cpt.size() + cpr->TagSize());
+	}
+
+	// assemble the cipher key
+	GetSystemKey(State->Policy, State->Salt, seed);
+	MemoryTools::Copy(seed, 0, tmpk, 0, tmpk.size());
+	MemoryTools::Copy(seed, tmpk.size(), tmpn, 0, tmpn.size());
+	SymmetricKey kpc(tmpk, tmpn);
+	// transform the temp state
+	cpr->Initialize(true, kpc);
+	cpr->Transform(tmpt, 0, cpt, 0, tmpt.size());
+	// copy the encrypted cipher-text to secure state and erase buffer
+	State->Polynomial = LockClear(cpt);
+}
+
+void AsymmetricSecureKey::Extract(std::unique_ptr<AsymmetricSecureKeyState> &State, SecureVector<byte> &Output, size_t Length)
+{
+	IStreamCipher* cpr = GetStreamCipher(State->Policy);
+	const size_t CPTSZE = cpr->IsAuthenticator() ? State->Polynomial.size() - cpr->TagSize() : State->Polynomial.size();
+	SymmetricKeySize ksc = cpr->LegalKeySizes()[0];
+	SecureVector<byte> seed(ksc.KeySize() + ksc.NonceSize());
+	std::vector<byte> tmpt(State->Polynomial.size());
+	std::vector<byte> tmpk(ksc.KeySize());
+	std::vector<byte> tmpn(ksc.NonceSize());
+
+	// assemble the cipher key
+	GetSystemKey(State->Policy, State->Salt, seed);
+	MemoryTools::Copy(seed, 0, tmpk, 0, tmpk.size());
+	MemoryTools::Copy(seed, tmpk.size(), tmpn, 0, tmpn.size());
+	SymmetricKey kpc(tmpk, tmpn);
+	cpr->Initialize(false, kpc);
+	// copy from secure-vector to cipher-text buffer
+	std::vector<byte> cpt = Unlock(State->Polynomial);
+	// decrypt to temp state
+	cpr->Transform(cpt, 0, tmpt, 0, CPTSZE);
+	// erase the temp cipher-text
+	MemoryTools::Clear(cpt, 0, cpt.size());
+	// copy the decrypted key to output
+	MemoryTools::Copy(tmpt, 0, Output, 0, Length);
+	// erase the temp state
+	MemoryTools::Clear(tmpt, 0, tmpt.size());
+}
+
+IStreamCipher* AsymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
+{
+	IStreamCipher* cpr;
+
+	switch (Policy)
+	{
+	case SecurityPolicy::SPL256:
+	{
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish256);
+		break;
+	}
+	case SecurityPolicy::SPL256AE:
+	{
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish256AE);
+		break;
+	}
+	case SecurityPolicy::SPL512:
+	{
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512);
+		break;
+	}
+	case SecurityPolicy::SPL512AE:
+	{
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512AE);
+		break;
+	}
+	case SecurityPolicy::SPL1024:
+	{
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish1024);
+		break;
+	}
+	case SecurityPolicy::SPL1024AE:
+	{
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish1024AE);
+		break;
+	}
+	default:
+	{
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512AE);
+	}
+	}
+
+	return cpr;
+}
+
+void AsymmetricSecureKey::GetSystemKey(SecurityPolicy Policy, const SecureVector<byte> &Salt, SecureVector<byte> &Output)
+{
+	std::vector<byte> cust(0);
+	CpuDetect dtc;
+	ShakeModes mode;
+
+	ArrayTools::AppendString(SystemTools::ComputerName(), cust);
+	ArrayTools::AppendString(SystemTools::OsName(), cust);
+	ArrayTools::AppendString(SystemTools::UserId(), cust);
+	ArrayTools::AppendString(SystemTools::UserName(), cust);
+	ArrayTools::AppendValue(SystemTools::ProcessId(), cust);
+	ArrayTools::AppendValue(dtc.BusRefFrequency(), cust);
+	ArrayTools::AppendValue(dtc.FrequencyBase(), cust);
+	ArrayTools::AppendValue(dtc.FrequencyMax(), cust);
+	ArrayTools::AppendValue(dtc.L1CacheLineSize(), cust);
+	ArrayTools::AppendValue(dtc.L1CacheSize(), cust);
+	ArrayTools::AppendValue(dtc.L2CacheSize(), cust);
+	ArrayTools::AppendString(dtc.SerialNumber(), cust);
+	ArrayTools::AppendValue(dtc.Vendor(), cust);
+
+	switch (Policy)
+	{
+		case SecurityPolicy::SPL256:
+		case SecurityPolicy::SPL256AE:
+		{
+			mode = ShakeModes::SHAKE256;
+			break;
+		}
+		case SecurityPolicy::SPL512:
+		case SecurityPolicy::SPL512AE:
+		{
+			mode = ShakeModes::SHAKE512;
+			break;
+		}
+		default:
+		{
+			mode = ShakeModes::SHAKE1024;
+		}
+	}
+
+	SHAKE gen(mode);
+	gen.Initialize(cust, Unlock(Salt));
+	gen.Generate(Output, 0, Output.size());
 }
 
 NAMESPACE_ASYMMETRICEND

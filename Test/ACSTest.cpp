@@ -10,7 +10,7 @@ namespace Test
 	using Cipher::Stream::ACS;
 	using Enumeration::BlockCiphers;
 	using Enumeration::BlockCipherExtensions;
-	using Exception::CryptoSymmetricCipherException;
+	using Exception::CryptoSymmetricException;
 	using Utility::IntegerTools;
 	using Utility::MemoryTools;
 	using Prng::SecureRandom;
@@ -209,7 +209,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE1"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -227,7 +227,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE2"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -246,7 +246,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE3"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -266,7 +266,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE4"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)
@@ -285,7 +285,7 @@ namespace Test
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE6"));
 		}
-		catch (CryptoSymmetricCipherException const &)
+		catch (CryptoSymmetricException const &)
 		{
 		}
 		catch (TestException const &)

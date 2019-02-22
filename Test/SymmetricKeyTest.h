@@ -6,10 +6,9 @@
 namespace Test
 {
 	using namespace Cipher;
-	using namespace IO;
 
 	/// <summary>
-	/// SymmetricKey test; checks constructors, access, and serialization of SymmetricKey and SymmetricSecureKey
+	/// SymmetricKey test; checks constructors, exceptions, access, and serialization of SymmetricKey and SymmetricSecureKey
 	/// </summary>
 	class SymmetricKeyTest final : public ITest
 	{

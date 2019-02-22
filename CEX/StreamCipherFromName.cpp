@@ -2,14 +2,14 @@
 #include "ACS.h"
 #include "ChaCha256.h"
 #include "ChaCha512.h"
-#include "CryptoSymmetricCipherException.h"
+#include "CryptoSymmetricException.h"
 #include "Threefish256.h"
 #include "Threefish512.h"
 #include "Threefish1024.h"
 
 NAMESPACE_HELPER
 
-using Exception::CryptoSymmetricCipherException;
+using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
 
 const std::string StreamCipherFromName::CLASS_NAME("StreamCipherFromName");
@@ -105,7 +105,7 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 			}
 		}
 	}
-	catch (CryptoSymmetricCipherException &ex)
+	catch (CryptoSymmetricException &ex)
 	{
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}

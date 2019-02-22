@@ -23,7 +23,7 @@ AHX::AHX(BlockCipherExtensions CipherExtension)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr : 
-		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
+		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -41,7 +41,7 @@ AHX::AHX(IKdf* Kdf)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf : 
-		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::IllegalOperation)),
+		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::IllegalOperation)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -205,11 +205,11 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.Key().size()))
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
 	if (m_cprExtension != BlockCipherExtensions::None && Parameters.Info().size() > m_distCodeMax)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid info size; info parameter must be no longer than DistributionCodeMax size."), ErrorCodes::InvalidSize);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid info size; info parameter must be no longer than DistributionCodeMax size."), ErrorCodes::InvalidSize);
 	}
 
 	if (Parameters.Info().size() > 0)

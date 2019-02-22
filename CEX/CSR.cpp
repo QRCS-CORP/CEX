@@ -1,14 +1,16 @@
 #include "CSR.h"
 #include "CSG.h"
+#include "MemoryTools.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_PRNG
 
 using Drbg::CSG;
-using Enumeration::ShakeModeConvert;
+using Utility::MemoryTools;
 using Enumeration::PrngConvert;
 using Enumeration::ProviderConvert;
+using Enumeration::ShakeModeConvert;
 
 //~~~Constructor~~~//
 
@@ -85,8 +87,8 @@ void CSR::Reset()
 
 	Cipher::SymmetricKey kp(key, cust);
 	m_rngGenerator->Initialize(kp);
-	Clear(key);
-	Clear(cust);
+	MemoryTools::Clear(key, 0, key.size());
+	MemoryTools::Clear(cust, 0, cust.size());
 }
 
 //~~~Private Functions~~~//
@@ -98,11 +100,7 @@ void CSR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std
 
 void CSR::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
-	std::vector<byte> smp(Length);
-	// TODO: change this once secure vectors are in drbgs
-	Generator->Generate(smp, 0, Length);
-	Insert(smp, 0, Output, Offset, Length);
-	Clear(smp);
+	Generator->Generate(Output, Offset, Length);;
 }
 
 NAMESPACE_PRNGEND

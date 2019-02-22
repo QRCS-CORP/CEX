@@ -1,6 +1,6 @@
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
-#include "CryptoSymmetricCipherException.h"
+#include "CryptoSymmetricException.h"
 #if defined(__AVX__)
 #	include "AHX.h"
 #endif
@@ -9,7 +9,7 @@
 
 NAMESPACE_HELPER
 
-using Exception::CryptoSymmetricCipherException;
+using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
 
 const std::string BlockCipherFromName::CLASS_NAME("BlockCipherFromName");
@@ -148,7 +148,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 		}
 	}
-	catch (CryptoSymmetricCipherException &ex)
+	catch (CryptoSymmetricException &ex)
 	{
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}

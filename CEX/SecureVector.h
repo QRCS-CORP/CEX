@@ -65,7 +65,7 @@ public:
 };
 
 /// <summary>
-/// A secure vector template using locking memory allocations
+/// A secure-vector template using locking memory allocations
 /// </summary>
 template<typename T> 
 using SecureVector = std::vector<T, SecureAllocator<T>>;
@@ -93,20 +93,6 @@ inline bool operator != (const SecureAllocator<T>&, const SecureAllocator<U>&)
 }
 
 /// <summary>
-/// Erase a standard vector and resize it to zero
-/// </summary>
-///
-/// <param name="Input">The SecureVector to erase</param>
-CEX_OPTIMIZE_IGNORE
-template<typename T>
-inline static void Clear(std::vector<T> &Input)
-{
-	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
-	Input.clear();
-}
-CEX_OPTIMIZE_RESUME
-
-/// <summary>
 /// Erase a SecureVector and resize it to zero
 /// </summary>
 ///
@@ -127,7 +113,7 @@ CEX_OPTIMIZE_RESUME
 /// <param name="Input">The SecureVector source array</param>
 /// <param name="InOffset">The starting offset within the SecureVector array</param>
 /// <param name="Output">The SecureVector destination array</param>
-/// <param name="OutOffset">The starting offset within the standard vector</param>
+/// <param name="OutOffset">The starting offset within the standard-vector</param>
 /// <param name="Length">The number of bytes to copy</param>
 template<typename T>
 inline static void Copy(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Length)
@@ -139,12 +125,12 @@ inline static void Copy(const SecureVector<T> &Input, size_t InOffset, SecureVec
 }
 
 /// <summary>
-/// Extract integers from a SecureVector and copy them to a standard vector.
+/// Extract integers from a SecureVector and copy them to a standard-vector.
 /// <para>This method will expand the output array to size.</para>
 /// </summary>
 ///
 /// <param name="Input">The SecureVector source array</param>
-/// <param name="Output">The standard vector destination</param>
+/// <param name="Output">The standard-vector destination</param>
 template<typename T>
 inline static void Extract(const SecureVector<T> &Input, std::vector<T> &Output)
 {
@@ -171,13 +157,13 @@ inline static void Extract(const SecureVector<T> &Input, SecureVector<T> &Output
 }
 
 /// <summary>
-/// Extract integers from a SecureVector and copy them to a standard vector using offsets and an element count.
+/// Extract integers from a SecureVector and copy them to a standard-vector using offsets and an element count.
 /// <para>This method will expand the output array to size.</para>
 /// </summary>
 ///
 /// <param name="Input">The SecureVector source array</param>
 /// <param name="InOffset">The starting offset within the source SecureVector</param>
-/// <param name="Output">The standard vector destination array</param>
+/// <param name="Output">The standard-vector destination array</param>
 /// <param name="OutOffset">The starting offset within the destination SecureVector</param>
 /// <param name="Elements">The number of vector elements to copy</param>
 template<typename T>
@@ -200,7 +186,7 @@ inline static void Extract(const SecureVector<T> &Input, size_t InOffset, std::v
 ///
 /// <param name="Input">The SecureVector source array</param>
 /// <param name="InOffset">The starting offset within the source SecureVector</param>
-/// <param name="Output">The standard vector destination array</param>
+/// <param name="Output">The standard-vector destination array</param>
 /// <param name="OutOffset">The starting offset within the destination SecureVector</param>
 /// <param name="Elements">The number of vector elements to copy</param>
 template<typename T>
@@ -217,11 +203,11 @@ inline static void Extract(const SecureVector<T> &Input, size_t InOffset, Secure
 }
 
 /// <summary>
-/// Insert a standard vector into a SecureVector array.
+/// Insert a standard-vector into a SecureVector array.
 /// <para>This method will expand the output array to size.</para>
 /// </summary>
 ///
-/// <param name="Input">The standard vector source array</param>
+/// <param name="Input">The standard-vector source array</param>
 /// <param name="Output">The SecureVector destination array</param>
 template<typename T>
 inline static void Insert(const std::vector<T> &Input, SecureVector<T> &Output)
@@ -249,12 +235,12 @@ inline static void Insert(const SecureVector<T> &Input, SecureVector<T> &Output)
 }
 
 /// <summary>
-/// Insert a standard vector into a SecureVector array using offsets and an element count.
+/// Insert a standard-vector into a SecureVector array using offsets and an element count.
 /// <para>This method will expand the output array to size.</para>
 /// </summary>
 ///
-/// <param name="Input">The standard vector source array</param>
-/// <param name="InOffset">The starting offset within the standard vector</param>
+/// <param name="Input">The standard-vector source array</param>
+/// <param name="InOffset">The starting offset within the standard-vector</param>
 /// <param name="Output">The SecureVector destination array</param>
 /// <param name="OutOffset">The starting offset within the SecureVector</param>
 /// <param name="Elements">The number of elements to copy</param>
@@ -295,7 +281,7 @@ inline static void Insert(const SecureVector<T> &Input, size_t InOffset, SecureV
 }
 
 /// <summary>
-/// Copy a standard vector to a SecureVector
+/// Copy a standard-vector to a SecureVector
 /// </summary>
 ///
 /// <param name="Input">The input source array to copy</param>
@@ -312,7 +298,7 @@ inline static SecureVector<T> Lock(const std::vector<T> &Input)
 }
 
 /// <summary>
-/// Copy a standard vector to a SecureVector, and erase the input vector
+/// Copy a standard-vector to a SecureVector, and erase the input vector
 /// </summary>
 ///
 /// <param name="Input">The input vector array, this will be erased and cleared</param>
@@ -333,12 +319,12 @@ inline static SecureVector<T> LockClear(std::vector<T> &Input)
 CEX_OPTIMIZE_RESUME
 
 /// <summary>
-/// Move a standard vector to another SecureVector array, clearing the source</para>
+/// Move a standard-vector to another SecureVector array, clearing the source</para>
 /// </summary>
 ///
 /// <param name="Input">The SecureVector source array; will be cleared after copying</param>
 /// <param name="Output">The SecureVector destination array</param>
-/// <param name="OutOffset">The starting offset within the standard vector</param>
+/// <param name="OutOffset">The starting offset within the standard-vector</param>
 /// <param name="Length">The number of bytes to copy</param>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
@@ -358,7 +344,7 @@ CEX_OPTIMIZE_RESUME
 ///
 /// <param name="Input">The SecureVector source array; will be cleared after copying</param>
 /// <param name="Output">The SecureVector destination array</param>
-/// <param name="OutOffset">The starting offset within the standard vector</param>
+/// <param name="OutOffset">The starting offset within the standard-vector</param>
 /// <param name="Length">The number of bytes to copy</param>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
@@ -373,12 +359,12 @@ inline static void Move(SecureVector<T> &Input, SecureVector<T> &Output, size_t 
 CEX_OPTIMIZE_RESUME
 
 /// <summary>
-/// Copy a SecureVector to a standard vector array
+/// Copy a SecureVector to a standard-vector array
 /// </summary>
 ///
 /// <param name="Input">The SecureVector source array</param>
 /// 
-/// <returns>A standard vector copy of the SecureArray</returns>
+/// <returns>A standard-vector copy of the SecureArray</returns>
 template<typename T>
 inline static std::vector<T> Unlock(const SecureVector<T> &Input)
 {
@@ -390,12 +376,12 @@ inline static std::vector<T> Unlock(const SecureVector<T> &Input)
 }
 
 /// <summary>
-/// Copy a SecureVector to a standard vector, and erase the input SecureArray
+/// Copy a SecureVector to a standard-vector, and erase the input SecureArray
 /// </summary>
 ///
 /// <param name="Input">The SecureVector source array</param>
 /// 
-/// <returns>A standard vector copy of the SecureArray</returns>
+/// <returns>A standard-vector copy of the SecureArray</returns>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
 inline static std::vector<T> UnlockClear(SecureVector<T> &Input)

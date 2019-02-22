@@ -84,19 +84,19 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes
+	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	virtual void Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes
+	/// Fill a secure-vector with pseudo-random bytes
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Output">The destination secure-vector to fill</param>
 	/// 
 	/// <exception cref="CryptoKdfException">Thrown if the maximum request size is exceeded</exception>
 	virtual void Generate(SecureVector<byte> &Output) = 0;
@@ -105,7 +105,7 @@ public:
 	/// Fill an array with pseudo-random bytes, using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
@@ -113,10 +113,10 @@ public:
 	virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
-	/// Fill a secure vector with pseudo-random bytes, using offset and length parameters
+	/// Fill a secure-vector with pseudo-random bytes, using offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination secure vector to fill</param>
+	/// <param name="Output">The destination secure-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 

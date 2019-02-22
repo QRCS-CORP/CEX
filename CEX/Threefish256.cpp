@@ -52,7 +52,7 @@ struct Threefish256::Threefish256State
 Threefish256::Threefish256(StreamAuthenticators AuthenticatorType)
 	:
 	m_authenticatorType(AuthenticatorType != StreamAuthenticators::HMACSHA512 && AuthenticatorType != StreamAuthenticators::KMAC512 && AuthenticatorType != StreamAuthenticators::KMAC1024 ? AuthenticatorType :
-		throw CryptoSymmetricCipherException(CLASS_NAME, std::string("Constructor"), std::string("The authenticator must be a 256 MAC function!"), ErrorCodes::IllegalOperation)),
+		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The authenticator must be a 256 MAC function!"), ErrorCodes::IllegalOperation)),
 	m_cipherState(new Threefish256State),
 	m_shakeCustom(0),
 	m_isAuthenticated(AuthenticatorType != StreamAuthenticators::None),
@@ -213,26 +213,26 @@ void Threefish256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
 	if (Parameters.Key().size() != KEY_SIZE)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 	if (Parameters.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidNonce);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidNonce);
 	}
 	if (Parameters.Info().size() > 0 && Parameters.Info().size() != INFO_SIZE)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("Info must be no more than 16 bytes!"), ErrorCodes::InvalidInfo);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Info must be no more than 16 bytes!"), ErrorCodes::InvalidInfo);
 	}
 
 	if (m_parallelProfile.IsParallel())
 	{
 		if (m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
 		{
-			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size is out of bounds!"), ErrorCodes::InvalidSize);
+			throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The parallel block size is out of bounds!"), ErrorCodes::InvalidSize);
 		}
 		if (m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		{
-			throw CryptoSymmetricCipherException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidParam);
+			throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The parallel block size must be evenly aligned to the ParallelMinimumSize!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -304,7 +304,7 @@ void Threefish256::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
+		throw CryptoSymmetricException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -314,11 +314,11 @@ void Threefish256::SetAssociatedData(const std::vector<byte> &Input, const size_
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
+		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_macAuthenticator == nullptr)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
+		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
 
 	// update the authenticator
@@ -381,15 +381,15 @@ void Threefish256::Finalize(std::vector<byte> &Output, const size_t OutOffset, c
 {
 	if (!m_isInitialized)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
+		throw CryptoSymmetricException(Name(), std::string("Finalize"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 	if (m_macAuthenticator == nullptr)
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
+		throw CryptoSymmetricException(Name(), std::string("Finalize"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
 	if (Length > m_macAuthenticator->TagSize())
 	{
-		throw CryptoSymmetricCipherException(Name(), std::string("Finalize"), std::string("The MAC code specified is longer than the maximum length!"), ErrorCodes::InvalidParam);
+		throw CryptoSymmetricException(Name(), std::string("Finalize"), std::string("The MAC code specified is longer than the maximum length!"), ErrorCodes::InvalidParam);
 	}
 
 	// generate the mac code

@@ -15,19 +15,19 @@ CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.7j</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.7k</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   1.0.0.7j
-\date      February 17, 2019
+\version   v1.0.0.7k
+\date      February 21, 2019
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is 1.0.0.7j (A7 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.7k (A7 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release 1.0.0.7j (version A7):</B> \n
+<B>Current Release v1.0.0.7k (version A7):</B> \n
 
 The Dilithium asymmetric signature scheme \n
 The SPHINCS+ asymmetric signature scheme \n
@@ -132,8 +132,8 @@ NAMESPACE_ROOT
 	NAMESPACE_ASYMMETRIC
 		class AsymmetricKey {};
 		class AsymmetricKeyPair {};
+		class AsymmetricSecureKey {};
 		class IAsymmetricKey {};
-		class IAsymmetricKeyPair {};
 
 		/*!
 		*  \addtogroup Encrypt
@@ -345,8 +345,8 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_ENUMERATION
 		enum class AeadModes {};
-		enum class AsymmetricEngines {};
 		enum class AsymmetricKeyTypes {};
+		enum class AsymmetricPrimitives {};
 		enum class AsymmetricTransforms {};
 		enum class Authenticators {};
 		enum class BlockCiphers {};
@@ -398,7 +398,7 @@ NAMESPACE_ROOT
 		class CryptoPaddingException {};
 		class CryptoProcessingException {};
 		class CryptoRandomException {};
-		class CryptoSymmetricCipherException {};
+		class CryptoSymmetricException {};
 	NAMESPACE_EXCEPTIONEND
 	/*! @} */
 
@@ -479,6 +479,7 @@ NAMESPACE_ROOT
 	*  @brief SIMD and Big Integer Namespace
 	*/
 	NAMESPACE_NUMERIC
+		class AES128 {};
 		class Donna128 {};
 		class UInt128 {};
 		class UInt256 {};
@@ -496,7 +497,8 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_PRNG
 		class BCR {};
-		class DCR {};
+		class CSR {};
+		class HCR {};
 		class IPrng {};
 		class SecureRandom {};
 	NAMESPACE_PRNGEND

@@ -59,10 +59,10 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes using offset and length parameters
+	/// Fill a standard-vector with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination vector</param>
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
@@ -71,23 +71,23 @@ public:
 	/// Fill a SecureVector array with pseudo-random bytes using offset and length parameters
 	/// </summary>
 	///
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	/// <param name="Offset">The starting position within the destination vector</param>
 	/// <param name="Length">The number of bytes to write to the destination vector</param>
 	virtual void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
-	/// Fill a standard vector with pseudo-random bytes
+	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	virtual void Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Fill a SecureVector array with pseudo-random bytes
 	/// </summary>
 	///
-	/// <param name="Output">The destination standard vector to fill</param>
+	/// <param name="Output">The destination standard-vector to fill</param>
 	virtual void Generate(SecureVector<byte> &Output) = 0;
 
 	/// <summary>

@@ -7,7 +7,7 @@
 namespace Test
 {
 	/// <summary>
-	/// Tests key generator initialization and access methods
+	/// Tests key generator initialization, exception, randomness, and stress tests
 	/// </summary>
 	class SymmetricKeyGeneratorTest final : public ITest
 	{

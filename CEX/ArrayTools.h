@@ -67,10 +67,10 @@ public:
 	/// <param name="Length">The number of bytes to copy</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
-	template <typename Pointer, typename A>
-	static size_t AppendObject(const Pointer* Input, std::vector<A> &Output, size_t Length)
+	template <typename Pointer, typename Array>
+	static size_t AppendObject(const Pointer* Input, Array &Output, size_t Length)
 	{
-		const size_t OTPLEN = sizeof(A) * Output.size();
+		const size_t OTPLEN = sizeof(Array::value_type) * Output.size();
 
 		Output.resize(OTPLEN + Length);
 		MemoryTools::CopyFromObject(Input, Output, OTPLEN, Length);
@@ -111,13 +111,14 @@ public:
 	/// <param name="Output">The destination byte array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
-	template <typename T>
-	static size_t AppendValue(T Value, std::vector<byte> &Output)
+	template <typename T, typename Array>
+	static size_t AppendValue(T Value, Array &Output)
 	{
 		const size_t VARLEN = sizeof(T);
-		const size_t ARRLEN = Output.size();
+		const size_t ARRLEN = Output.size() * sizeof(Array::value_type);
+		const size_t OTPELM = Output.size();
 
-		Output.resize(Output.size() + VARLEN);
+		Output.resize(OTPELM + VARLEN);
 		MemoryTools::CopyFromValue(Value, Output, ARRLEN, VARLEN);
 
 		return VARLEN;
@@ -131,11 +132,11 @@ public:
 	/// <param name="Output">The destination byte array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
-	template <typename A, typename B>
-	static size_t AppendVector(const std::vector<A> &Input, std::vector<B> &Output)
+	template <typename ArrayA, typename ArrayB>
+	static size_t AppendVector(const ArrayA &Input, ArrayB &Output)
 	{
-		const size_t INPLEN = sizeof(A) * Input.size();
-		const size_t OTPLEN = sizeof(B) * Output.size();
+		const size_t INPLEN = sizeof(ArrayA::value_type) * Input.size();
+		const size_t OTPLEN = sizeof(ArrayB::value_type) * Output.size();
 
 		Output.resize(INPLEN + OTPLEN);
 		MemoryTools::Copy(Input, 0, Output, OTPLEN, INPLEN);

@@ -1,12 +1,14 @@
 #include "SymmetricKeyGeneratorTest.h"
 #include "RandomUtils.h"
 #include "../CEX/CpuDetect.h"
+#include "../CEX/CryptoException.h"
 #include "../CEX/CryptoGeneratorException.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKeyGenerator.h"
 
 namespace Test
 {
+	using Exception::CryptoException;
 	using Exception::CryptoGeneratorException;
 	using Prng::SecureRandom;
 	using Cipher::SymmetricKeyGenerator;
@@ -67,23 +69,27 @@ namespace Test
 
 	void SymmetricKeyGeneratorTest::Evaluate()
 	{
-		std::vector<byte> tmps(SAMPLE_SIZE);
+		SecureVector<byte> tmps(SAMPLE_SIZE);
+		std::vector<byte> tmpv;
 		SymmetricKeyGenerator kgen256(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
 		OnProgress(std::string("Testing pseudo-random generation with a 256-bit security policy using the system provider"));
 		kgen256.Generate(tmps, 0, tmps.size());
-		Evaluate(kgen256.Name(), tmps);
+		tmpv = Unlock(tmps);
+		Evaluate(kgen256.Name(), tmpv);
 
 		std::memset(tmps.data(), 0x00, tmps.size());
 		SymmetricKeyGenerator kgen512(Enumeration::SecurityPolicy::SPL512, Enumeration::Providers::CSP);
 		OnProgress(std::string("Testing pseudo-random generation with a 512-bit security policy using the system provider"));
 		kgen512.Generate(tmps, 0, tmps.size());
-		Evaluate(kgen512.Name(), tmps);
+		tmpv = Unlock(tmps);
+		Evaluate(kgen512.Name(), tmpv);
 
 		std::memset(tmps.data(), 0x00, tmps.size());
 		SymmetricKeyGenerator kgen1024(Enumeration::SecurityPolicy::SPL1024, Enumeration::Providers::CSP);
 		OnProgress(std::string("Testing pseudo-random generation with a 1024-bit security policy using the system provider"));
 		kgen1024.Generate(tmps, 0, tmps.size());
-		Evaluate(kgen1024.Name(), tmps);
+		tmpv = Unlock(tmps);
+		Evaluate(kgen1024.Name(), tmpv);
 	}
 
 	void SymmetricKeyGeneratorTest::Exception()
@@ -95,10 +101,10 @@ namespace Test
 
 			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE1"));
 		}
-		catch (CryptoGeneratorException const &)
+		catch (CryptoGeneratorException const&)
 		{
 		}
-		catch (TestException const &)
+		catch (TestException const&)
 		{
 			throw;
 		}
@@ -110,26 +116,10 @@ namespace Test
 
 			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE2"));
 		}
-		catch (CryptoGeneratorException const &)
+		catch (CryptoGeneratorException const&)
 		{
 		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
-		// test initialization with invalid customization string
-		try
-		{
-			std::vector<byte> tmps(0);
-			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, tmps);
-
-			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE3"));
-		}
-		catch (CryptoGeneratorException const &)
-		{
-		}
-		catch (TestException const &)
+		catch (TestException const&)
 		{
 			throw;
 		}
@@ -144,10 +134,10 @@ namespace Test
 
 			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE4"));
 		}
-		catch (CryptoGeneratorException const &)
+		catch (CryptoGeneratorException const&)
 		{
 		}
-		catch (TestException const &)
+		catch (TestException const&)
 		{
 			throw;
 		}
@@ -162,10 +152,60 @@ namespace Test
 
 			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE5"));
 		}
-		catch (CryptoGeneratorException const &)
+		catch (CryptoGeneratorException const&)
 		{
 		}
-		catch (TestException const &)
+		catch (TestException const&)
+		{
+			throw;
+		}
+
+		// test allocating to an empty vector
+		try
+		{
+			SecureVector<byte> tmpr(0);
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
+			kgen.Generate(tmpr, 0, tmpr.size());
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE6"));
+		}
+		catch (CryptoGeneratorException const&)
+		{
+		}
+		catch (TestException const&)
+		{
+			throw;
+		}
+
+		// test allocating a zero-length request
+		try
+		{
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
+			SecureVector<byte> tmpr = kgen.Generate(0);
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE7"));
+		}
+		catch (CryptoGeneratorException const&)
+		{
+		}
+		catch (TestException const&)
+		{
+			throw;
+		}
+
+		// test a mismatched length request
+		try
+		{
+			SecureVector<byte> tmpr(1);
+			SymmetricKeyGenerator kgen(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
+			kgen.Generate(tmpr, 0, tmpr.size() + 1);
+
+			throw TestException(std::string("Exception"), kgen.Name(), std::string("Exception handling failure! -SE8"));
+		}
+		catch (CryptoGeneratorException const&)
+		{
+		}
+		catch (TestException const&)
 		{
 			throw;
 		}
@@ -173,7 +213,7 @@ namespace Test
 
 	void SymmetricKeyGeneratorTest::Stress()
 	{
-		std::vector<byte> otp;
+		SecureVector<byte> otp;
 		SecureRandom rnd;
 		size_t i;
 		SymmetricKeyGenerator kgen256(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
@@ -188,9 +228,9 @@ namespace Test
 			{ 
 				kgen256.Generate(otp, 0, otp.size());
 			}
-			catch (const std::exception&)
+			catch (CryptoException &ex)
 			{
-				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress test random generation failure! -SG1"));
+				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress test random generation failure! -SG1"), ex.Message());
 			}
 
 			try
@@ -199,9 +239,9 @@ namespace Test
 				SymmetricSecureKey* sk = kgen256.GetSecureKey(ks);
 				delete sk;
 			}
-			catch (const std::exception&)
+			catch (CryptoException &ex)
 			{
-				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress secure key generation failure! -SG2"));
+				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress secure key generation failure! -SG2"), ex.Message());
 			}
 
 			try
@@ -210,9 +250,9 @@ namespace Test
 				SymmetricKey* sk = kgen256.GetSymmetricKey(ks);
 				delete sk;
 			}
-			catch (const std::exception&)
+			catch (CryptoException &ex)
 			{
-				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress key generation failure! -SG3"));
+				throw TestException(std::string("Stress"), rnd.Name(), std::string("Stress key generation failure! -SG3"), ex.Message());
 			}
 		}
 	}
