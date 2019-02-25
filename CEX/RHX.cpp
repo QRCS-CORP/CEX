@@ -9,72 +9,60 @@ const std::string RHX::CIPHER_NAME("Rijndael");
 const std::string RHX::CLASS_NAME("RHX");
 const std::string RHX::DEF_DSTINFO("information string RHX version 1");
 
+using Enumeration::Kdfs;
+
 //~~~Constructor~~~//
 
 RHX::RHX(BlockCipherExtensions CipherExtension)
 	:
-	m_cprExtension(CipherExtension),
 	m_destroyEngine(true),
 	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
 		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
-	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_legalKeySizes(0)
+	m_legalKeySizes(CalculateKeySizes(CipherExtension))
 {
-	LoadState();
 }
 
 RHX::RHX(IKdf* Kdf)
 	:
-	m_cprExtension(BlockCipherExtensions::Custom),
 	m_destroyEngine(false),
 	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::IllegalOperation)),
-	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_legalKeySizes(0)
+	m_legalKeySizes(CalculateKeySizes(static_cast<BlockCipherExtensions>(Kdf->Enumeral())))
 {
-	LoadState();
 }
 
 RHX::~RHX()
 {
-	if (!m_isDestroyed)
+	m_isEncryption = false;
+	m_isInitialized = false;
+	m_rndCount = 0;
+
+	Utility::IntegerTools::Clear(m_expKey);
+	Utility::IntegerTools::Clear(m_legalKeySizes);
+
+	if (m_destroyEngine)
 	{
-		m_cprExtension = BlockCipherExtensions::None;
-		m_distCodeMax = 0;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_rndCount = 0;
+		m_destroyEngine = false;
 
-		Utility::IntegerTools::Clear(m_expKey);
-		Utility::IntegerTools::Clear(m_distCode);
-		Utility::IntegerTools::Clear(m_legalKeySizes);
-
-		if (m_destroyEngine)
+		if (m_kdfGenerator != nullptr)
 		{
-			m_destroyEngine = false;
-
-			if (m_kdfGenerator != nullptr)
-			{
-				m_kdfGenerator.reset(nullptr);
-			}
+			m_kdfGenerator.reset(nullptr);
 		}
-		else
+	}
+	else
+	{
+		if (m_kdfGenerator != nullptr)
 		{
-			if (m_kdfGenerator != nullptr)
-			{
-				m_kdfGenerator.release();
-			}
+			m_kdfGenerator.release();
 		}
 	}
 }
@@ -86,48 +74,36 @@ const size_t RHX::BlockSize()
 	return BLOCK_SIZE;
 }
 
-const BlockCipherExtensions RHX::CipherExtension() // TODO: get rid of this, use the cipher enumeral
-{
-	return m_cprExtension;
-}
-
-std::vector<byte> &RHX::DistributionCode()
-{
-	return m_distCode;
-}
-
-const size_t RHX::DistributionCodeMax()
-{
-	return m_distCodeMax;
-}
-
 const BlockCiphers RHX::Enumeral()
 {
 	BlockCiphers name;
+	Kdfs ext;
 
-	switch (m_cprExtension)
+	ext = (m_kdfGenerator != nullptr) ? m_kdfGenerator->Enumeral() : Kdfs::None;
+
+	switch (ext)
 	{
-		case BlockCipherExtensions::HKDF256:
+		case Kdfs::HKDF256:
 		{
 			name = BlockCiphers::RHXH256;
 			break;
 		}
-		case BlockCipherExtensions::HKDF512:
+		case Kdfs::HKDF512:
 		{
 			name = BlockCiphers::RHXH512;
 			break;
 		}
-		case BlockCipherExtensions::SHAKE256:
+		case Kdfs::SHAKE256:
 		{
 			name = BlockCiphers::RHXS256;
 			break;
 		}
-		case BlockCipherExtensions::SHAKE512:
+		case Kdfs::SHAKE512:
 		{
 			name = BlockCiphers::RHXS512;
 			break;
 		}
-		case BlockCipherExtensions::SHAKE1024:
+		case Kdfs::SHAKE1024:
 		{
 			name = BlockCiphers::RHXS1024;
 			break;
@@ -202,10 +178,6 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.Key().size()))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
-	}
-	if (m_cprExtension != BlockCipherExtensions::None && Parameters.Info().size() > m_distCodeMax)
-	{
-		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid info size; info parameter must be no longer than DistributionCodeMax size."), ErrorCodes::InvalidSize);
 	}
 
 	if (Parameters.Info().size() > 0)
@@ -290,7 +262,7 @@ void RHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, s
 
 void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 {
-	if (m_cprExtension != BlockCipherExtensions::None)
+	if (m_kdfGenerator != nullptr)
 	{
 		// kdf key expansion
 		SecureExpand(Key);
@@ -622,45 +594,64 @@ void RHX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 //~~~Private Functions~~~//
 
-void RHX::LoadState()
+std::vector<SymmetricKeySize> RHX::CalculateKeySizes(BlockCipherExtensions Extension)
 {
-	if (m_cprExtension == BlockCipherExtensions::None)
+	std::vector<SymmetricKeySize> keys(0);
+
+	switch (Extension)
 	{
-		m_legalKeySizes.resize(3);
-		m_legalKeySizes[0] = SymmetricKeySize(16, BLOCK_SIZE, 0);
-		m_legalKeySizes[1] = SymmetricKeySize(24, BLOCK_SIZE, 0);
-		m_legalKeySizes[2] = SymmetricKeySize(32, BLOCK_SIZE, 0);
+		case BlockCipherExtensions::None:
+		{
+			keys.push_back(SymmetricKeySize(16, BLOCK_SIZE, 0));
+			keys.push_back(SymmetricKeySize(24, BLOCK_SIZE, 0));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 0));
+			break;
+		}
+		case BlockCipherExtensions::HKDF256:
+		{
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 15));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 15));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 15));
+			break;
+		}
+		case BlockCipherExtensions::HKDF512:
+		{
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 39));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 39));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 39));
+			break;
+		}
+		case BlockCipherExtensions::SHAKE256:
+		{
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 96));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 96));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 96));
+			break;
+		}
+		case BlockCipherExtensions::SHAKE512:
+		{
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 72));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 72));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 72));
+			break;
+		}
+		case BlockCipherExtensions::SHAKE1024:
+		{
+#if defined CEX_KECCAK_STRONG
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 108));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 108));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 108));
+			break;
+#else
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 72));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 72));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 72));
+			break;
+#endif
+		}
 	}
-	else
-	{
-		m_legalKeySizes.resize(4);
 
-
-		if (m_cprExtension == BlockCipherExtensions::HKDF256)
-		{
-			// hmac(sha2-512) mac size
-			m_distCodeMax = 32;
-		}
-		else if (m_cprExtension == BlockCipherExtensions::HKDF512)
-		{
-			// hmac(sha2-512) mac size
-			m_distCodeMax = 64;
-		}
-		else if (m_cprExtension == BlockCipherExtensions::SHAKE256)
-		{
-			// sha3-256 blocksize
-			m_distCodeMax = 136;
-		}
-		else
-		{
-			// sha3-512/1024 blocksize
-			m_distCodeMax = 72;
-		}
-
-		m_legalKeySizes[0] = SymmetricKeySize(32, BLOCK_SIZE, m_distCodeMax);
-		m_legalKeySizes[1] = SymmetricKeySize(64, BLOCK_SIZE, m_distCodeMax);
-		m_legalKeySizes[2] = SymmetricKeySize(128, BLOCK_SIZE, m_distCodeMax);
-	}
+	return keys;
 }
 
 CEX_OPTIMIZE_IGNORE
@@ -669,67 +660,19 @@ void RHX::Prefetch()
 	// timing defence: pre-load tables into cache
 	if (m_isEncryption)
 	{
-#if defined(__AVX__)
-		PREFETCHT1(SBox[0], 256 * sizeof(byte));
-		PREFETCHT1(&T0[0], 256 * sizeof(uint));
-		PREFETCHT1(&T1[0], 256 * sizeof(uint));
-		PREFETCHT1(&T2[0], 256 * sizeof(uint));
-		PREFETCHT1(&T3[0], 256 * sizeof(uint));
-#else
-		volatile uint dummy = 0;
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= SBox[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= T0[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= T1[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= T2[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= T3[i];
-		}
-#endif
+		MemoryTools::PrefetchL1(SBox, 0, 256);
+		MemoryTools::PrefetchL2(T0, 0, 1024);
+		MemoryTools::PrefetchL2(T1, 0, 1024);
+		MemoryTools::PrefetchL2(T2, 0, 1024);
+		MemoryTools::PrefetchL2(T3, 0, 1024);
 	}
 	else
 	{
-#if defined(__AVX__)
-		PREFETCHT1(&ISBox[0], 256 * sizeof(byte));
-		PREFETCHT1(&IT0[0], 256 * sizeof(uint));
-		PREFETCHT1(&IT1[0], 256 * sizeof(uint));
-		PREFETCHT1(&IT2[0], 256 * sizeof(uint));
-		PREFETCHT1(&IT3[0], 256 * sizeof(uint));
-#else
-		volatile uint dummy = 0;
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= SBox[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= IT0[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= IT1[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= IT2[i];
-		}
-		for (size_t i = 0; i < 256; ++i)
-		{
-			dummy ^= IT3[i];
-		}
-#endif
+		MemoryTools::PrefetchL1(ISBox, 0, 256);
+		MemoryTools::PrefetchL2(IT0, 0, 1024);
+		MemoryTools::PrefetchL2(IT1, 0, 1024);
+		MemoryTools::PrefetchL2(IT2, 0, 1024);
+		MemoryTools::PrefetchL2(IT3, 0, 1024);
 	}
 }
 CEX_OPTIMIZE_RESUME

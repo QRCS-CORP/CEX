@@ -125,17 +125,17 @@ public:
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the personalization string; can used as an optional source of entropy
 	/// </summary>
-	const SecureVector<byte> &SecureInfo();
+	const SecureVector<byte> SecureInfo() override;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the primary cryptographic key
 	/// </summary>
-	const SecureVector<byte> &SecureKey();
+	const SecureVector<byte> SecureKey() override;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the nonce or salt value
 	/// </summary>
-	const SecureVector<byte> &SecureNonce();
+	const SecureVector<byte> SecureNonce() override;
 
 	//~~~Public Functions~~~//
 

@@ -106,9 +106,6 @@
     <Filter Include="Source Files\Numeric">
       <UniqueIdentifier>{28facc4a-d472-4e43-99ca-18f9def6ef9c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Mac\Support">
-      <UniqueIdentifier>{f94d7d61-7ebf-4677-99d1-a30d379cc032}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Network">
       <UniqueIdentifier>{f4b0f131-58dc-4026-8dbf-9665f6ab0a1e}</UniqueIdentifier>
     </Filter>
@@ -117,9 +114,6 @@
     </Filter>
     <Filter Include="Source Files\Exception">
       <UniqueIdentifier>{5e87f908-b4c9-4f80-8d99-c3e7e05a2677}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Mac\Support">
-      <UniqueIdentifier>{a001195e-8358-4c7a-9eb1-96e8ea9044bc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Asymmetric">
       <UniqueIdentifier>{67cc3e24-0bc4-4a34-a724-142719323cb0}</UniqueIdentifier>
@@ -774,9 +768,6 @@
     <ClInclude Include="..\..\CEX\RLWEQ12289N2048.h">
       <Filter>Header Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish512.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Threefish.h">
       <Filter>Header Files\Cipher\Stream\Support</Filter>
     </ClInclude>
@@ -786,20 +777,8 @@
     <ClInclude Include="..\..\CEX\MacFromName.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\ChaCha256.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\ChaCha512.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Donna128.h">
       <Filter>Header Files\Numeric</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish256.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish1024.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ErrorCodes.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -962,6 +941,21 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoSymmetricException.h">
       <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CSX256.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CSX512.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\TSX256.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\TSX512.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\TSX1024.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1253,26 +1247,11 @@
     <ClCompile Include="..\..\CEX\RLWEQ12289N2048.cpp">
       <Filter>Source Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Threefish512.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Threefish.cpp">
       <Filter>Source Files\Cipher\Stream\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MacFromName.cpp">
       <Filter>Source Files\Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\ChaCha256.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\ChaCha512.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Threefish256.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Threefish1024.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Sphincs.cpp">
       <Filter>Source Files\Asymmetric\Sign\Sphincs</Filter>
@@ -1456,6 +1435,21 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\CryptoSymmetricException.cpp">
       <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CSX256.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CSX512.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\TSX256.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\TSX512.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\TSX1024.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
 // ##SCHEDULE FOR 1.0.0.8 RELEASE ###
 // ##ETA is February 14, 2019 ##
 //
-// Authenticated stream ciphers ACS,ThreeFish-256/512/1024, and ChaCha256/512	- done
+// Authenticated stream ciphers ACS,ThreeFish-256/512/1024, and CSX256/512	- done
 // Update secure key mechanisms and integrate internally						- started
 // Full security, documentation, and code review cycles							- started
 // Begin optimization and review of asymmetric primitives						- 
@@ -20,7 +20,7 @@
 // Integrated an optional built - in authentication generator(HMAC / KMAC) to each stream cipher
 // Added the Authenticate and Encrypt and AEAD stream cipher implementation(Authenticated Cipher Stream : ACS).
 // Threefish 256/512/1024 authenticated stream ciphers
-// ChaCha256 - P20 and ChaCha512 - P80 authenticated stream ciphers
+// CSX256 - P20 and CSX512 - P80 authenticated stream ciphers
 //
 // ### Planned Release 1.1.0.1 ###
 //
@@ -282,6 +282,40 @@ void RunTest(ITest* Test)
 		}
 	}
 }
+
+// ### Schedule 1.1.0.7 ###
+// DRBGs..																-done
+// KDFs..																-done
+// MACs..																-done
+// PRNGs..																-done
+// Providers..															-done
+// SymmetricKeyGenerator												-done
+// Asymmetric secure keys and secure-vector								-done
+// 
+// Stream Ciphers
+// 1) Update all the stream ciphers										-
+// 2) Stream cipher using CTR(Rijndael-256)(ACX?)						-
+// 
+// Block Ciphers
+// 1) change the distribution code to formal Name() + default string	-
+// 2) move AES instructions to AES128 class (look at assembly options)	-
+// 3) update cipher standard modes										-
+// 4) update AEAD modes													-
+//
+// Digests
+// 1) internal pointers and templates?									-
+// 2) move blake simd to UIntxxx										-
+// 3) add parallel fallback												-
+// 4) ...
+//
+// Asymmetric
+// 1) .
+// 2) ..
+// 3) ...
+// 4) ....
+//
+// External: (website, documentation, business-plan..)
+// April?
 
 int main()
 {

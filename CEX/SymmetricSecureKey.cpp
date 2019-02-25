@@ -343,55 +343,52 @@ const std::vector<byte> SymmetricSecureKey::Nonce()
 	return Unlock(tmps);
 }
 
-const void SymmetricSecureKey::SecureInfo(SecureVector<byte> &Output)
+const SecureVector<byte> SymmetricSecureKey::SecureInfo()
 {
-	if (Output.size() < m_secureState->KeySizes.InfoSize())
-	{
-		throw CryptoSymmetricException(CLASS_NAME, std::string("SecureInfo"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
-	}
+	SecureVector<byte> tmpr(m_secureState->KeySizes.InfoSize());
 
 	try
 	{
-		Extract(m_secureState, m_secureState->KeySizes.KeySize() + m_secureState->KeySizes.NonceSize(), Output, m_secureState->KeySizes.InfoSize());
+		Extract(m_secureState, m_secureState->KeySizes.KeySize() + m_secureState->KeySizes.NonceSize(), tmpr, m_secureState->KeySizes.InfoSize());
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
 		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Info"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
+
+	return tmpr;
 }
 
-const void SymmetricSecureKey::SecureKey(SecureVector<byte> &Output)
+const SecureVector<byte> SymmetricSecureKey::SecureKey()
 {
-	if (Output.size() < m_secureState->KeySizes.KeySize())
-	{
-		throw CryptoSymmetricException(CLASS_NAME, std::string("SecureKey"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
-	}
+	SecureVector<byte> tmpr(m_secureState->KeySizes.KeySize());
 
 	try
 	{
-		Extract(m_secureState, 0, Output, m_secureState->KeySizes.KeySize());
+		Extract(m_secureState, 0, tmpr, m_secureState->KeySizes.KeySize());
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
 		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Key"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
+
+	return tmpr;
 }
 
-const void SymmetricSecureKey::SecureNonce(SecureVector<byte> &Output)
+const SecureVector<byte> SymmetricSecureKey::SecureNonce()
 {
-	if (Output.size() < m_secureState->KeySizes.NonceSize())
-	{
-		throw CryptoSymmetricException(CLASS_NAME, std::string("SecureNonce"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
-	}
+	SecureVector<byte> tmpr(m_secureState->KeySizes.NonceSize());
 
 	try
 	{
-		Extract(m_secureState, m_secureState->KeySizes.KeySize(), Output, m_secureState->KeySizes.NonceSize());
+		Extract(m_secureState, m_secureState->KeySizes.KeySize(), tmpr, m_secureState->KeySizes.NonceSize());
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
 		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Nonce"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
+
+	return tmpr;
 }
 
 //~~~Public Functions~~~//
@@ -542,37 +539,37 @@ IStreamCipher* SymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 	{
 		case SecurityPolicy::SPL256:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish256);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX256);
 			break;
 		}
 		case SecurityPolicy::SPL256AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish256AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX256AE);
 			break;
 		}
 		case SecurityPolicy::SPL512:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512);
 			break;
 		}
 		case SecurityPolicy::SPL512AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512AE);
 			break;
 		}
 		case SecurityPolicy::SPL1024:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish1024);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX1024);
 			break;
 		}
 		case SecurityPolicy::SPL1024AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish1024AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX1024AE);
 			break;
 		}
 		default:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512AE);
 		}
 	}
 

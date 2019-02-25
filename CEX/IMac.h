@@ -70,7 +70,7 @@ public:
 	/// <summary>
 	/// Read Only: Recommended MAC key sizes in a SymmetricKeySize array
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+	virtual const std::vector<SymmetricKeySize> LegalKeySizes() = 0;
 
 	/// <summary>
 	/// Read Only: Minimum allowed initialization key-size in bytes

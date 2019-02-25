@@ -82,7 +82,8 @@ void HCR::Reset()
 		throw CryptoRandomException(Name(), std::string("Reset"), std::string("The random provider can not be instantiated!"), ErrorCodes::NoAccess);
 	}
 
-	std::vector<byte> key(m_rngGenerator->LegalKeySizes()[1].KeySize());
+	Cipher::SymmetricKeySize ks = m_rngGenerator->LegalKeySizes()[1];
+	std::vector<byte> key(ks.KeySize());
 	pvd->Generate(key);
 	delete pvd;
 

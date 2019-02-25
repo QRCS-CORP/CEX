@@ -13,7 +13,7 @@
 #include "../CEX/ParallelTools.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
-#include "../CEX/ChaCha256.h"
+#include "../CEX/CSX256.h"
 
 namespace Test
 {

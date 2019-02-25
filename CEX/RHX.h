@@ -113,12 +113,9 @@ private:
 	// size of state buffer and lookup tables subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 5120;
 
-	BlockCipherExtensions m_cprExtension;
 	bool m_destroyEngine;
 	std::vector<byte> m_distCode;
-	size_t m_distCodeMax;
 	std::vector<uint> m_expKey;
-	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	std::unique_ptr<IKdf> m_kdfGenerator;
@@ -173,27 +170,6 @@ public:
 	/// Value set in class constructor.</para>
 	/// </summary>
 	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Read Only: The extended key-schedule KDF generator type
-	/// </summary>
-	const BlockCipherExtensions CipherExtension() override;
-
-	/// <summary>
-	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
-	/// <para>Changing this code will create a unique distribution of the cipher.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax size.
-	/// Note: If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
-	/// </summary>
-	std::vector<byte> &DistributionCode() override;
-
-	/// <summary>
-	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
-	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
-	/// </summary>
-	const size_t DistributionCodeMax() override;
 
 	/// <summary>
 	/// Read Only: The block ciphers type name
@@ -350,6 +326,8 @@ public:
 
 private:
 
+	static std::vector<SymmetricKeySize> CalculateKeySizes(BlockCipherExtensions Extension);
+
 	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
@@ -361,7 +339,6 @@ private:
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
 	void ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex);
 	void ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset);
-	void LoadState();
 	void Prefetch();
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);

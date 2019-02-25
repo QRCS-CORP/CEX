@@ -27,38 +27,6 @@ using Numeric::UInt256;
 using Numeric::UInt512;
 #endif
 
-struct ChaCha::ChaChaState
-{
-	// counter
-	std::array<uint, 2> C;
-	// state
-	std::array<uint, 14> S;
-
-	ChaChaState()
-	{
-		Reset();
-	}
-
-	void Increase(size_t Length)
-	{
-		C[0] += static_cast<uint>(Length);
-
-		if (C[0] < Length)
-		{
-			C[1] += 1;
-		}
-	}
-
-	void Reset()
-	{
-		// 128 bits of counter
-		C[0] = 0;
-		C[1] = 0;
-		MemoryTools::Clear(C, 0, C.size() * sizeof(uint));
-		MemoryTools::Clear(S, 0, S.size() * sizeof(uint));
-	}
-};
-
 void ChaCha::PermuteP512C(std::vector<byte> &Output, size_t OutOffset, std::array<uint, 2> &Counter, std::array<uint, 14> &State, size_t Rounds)
 {
 	std::array<uint, 16> S;

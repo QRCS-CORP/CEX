@@ -328,10 +328,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a405601101d450f6482ac828bcdb3cfcb"><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a405601101d450f6482ac828bcdb3cfcb">CMin</a> (T A, T B)</td></tr>
 <tr class="memdesc:a405601101d450f6482ac828bcdb3cfcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: return the lesser value of the two integers  <a href="#a405601101d450f6482ac828bcdb3cfcb">More...</a><br /></td></tr>
 <tr class="separator:a405601101d450f6482ac828bcdb3cfcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4af99e41ab94481fd058662955872f77"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:a4af99e41ab94481fd058662955872f77"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a4af99e41ab94481fd058662955872f77">Compare</a> (const Array &amp;A, size_t AOffset, const Array &amp;B, size_t BOffset, size_t Length)</td></tr>
-<tr class="memdesc:a4af99e41ab94481fd058662955872f77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: comparison of two arrays segments with offset and length parameters  <a href="#a4af99e41ab94481fd058662955872f77">More...</a><br /></td></tr>
-<tr class="separator:a4af99e41ab94481fd058662955872f77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8205d08b76335d60df3d9081ff9f00c2"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB &gt; </td></tr>
+<tr class="memitem:a8205d08b76335d60df3d9081ff9f00c2"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a8205d08b76335d60df3d9081ff9f00c2">Compare</a> (const ArrayA &amp;A, size_t AOffset, const ArrayB &amp;B, size_t BOffset, size_t Length)</td></tr>
+<tr class="memdesc:a8205d08b76335d60df3d9081ff9f00c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: value comparison between two arrays with offset and length parameters.  <a href="#a8205d08b76335d60df3d9081ff9f00c2">More...</a><br /></td></tr>
+<tr class="separator:a8205d08b76335d60df3d9081ff9f00c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abfebf6e565d2c1fa4a5196e8fd930e13"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:abfebf6e565d2c1fa4a5196e8fd930e13"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#abfebf6e565d2c1fa4a5196e8fd930e13">ConditionalCopy</a> (T Value, T *To, const T *From0, const T *From1, size_t Length)</td></tr>
 <tr class="memdesc:abfebf6e565d2c1fa4a5196e8fd930e13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: conditional bit copy  <a href="#abfebf6e565d2c1fa4a5196e8fd930e13">More...</a><br /></td></tr>
@@ -1671,13 +1671,13 @@ template&lt;typename Array &gt; </div>
 
 </div>
 </div>
-<a id="a4af99e41ab94481fd058662955872f77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4af99e41ab94481fd058662955872f77">&#9670;&nbsp;</a></span>Compare()</h2>
+<a id="a8205d08b76335d60df3d9081ff9f00c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8205d08b76335d60df3d9081ff9f00c2">&#9670;&nbsp;</a></span>Compare()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Array &gt; </div>
+template&lt;typename ArrayA , typename ArrayB &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1685,7 +1685,7 @@ template&lt;typename Array &gt; </div>
         <tr>
           <td class="memname">static bool IntegerTools::Compare </td>
           <td>(</td>
-          <td class="paramtype">const Array &amp;&#160;</td>
+          <td class="paramtype">const ArrayA &amp;&#160;</td>
           <td class="paramname"><em>A</em>, </td>
         </tr>
         <tr>
@@ -1697,7 +1697,7 @@ template&lt;typename Array &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const Array &amp;&#160;</td>
+          <td class="paramtype">const ArrayB &amp;&#160;</td>
           <td class="paramname"><em>B</em>, </td>
         </tr>
         <tr>
@@ -1725,7 +1725,8 @@ template&lt;typename Array &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Constant time: comparison of two arrays segments with offset and length parameters </p>
+<p>Constant time: value comparison between two arrays with offset and length parameters. </p>
+<p>Array container types can vary (standard array, vector, or SecureVector), but array elements must be of equal size.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>The first array to compare</td></tr>

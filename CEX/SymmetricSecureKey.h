@@ -243,25 +243,22 @@ public:
 	/// Create a secure-vector copy of the personalization string; can also used as an additional source of entropy in some constructions
 	/// </summary>
 	/// 
-	/// <exception cref="CryptoSymmetricException">Throws if the output vector is too small</exception>
 	/// <exception cref="CryptoAuthenticationFailure">Throws an authentication failure exception if the internal decryption has failed</exception>
-	const void SecureInfo(SecureVector<byte> &Output);
+	const SecureVector<byte> SecureInfo() override;
 
 	/// <summary>
 	/// Create a secure-vector copy of the primary encryption key
 	/// </summary>
 	/// 
-	/// <exception cref="CryptoSymmetricException">Throws if the output vector is too small</exception>
 	/// <exception cref="CryptoAuthenticationFailure">Throws an authentication failure exception if the internal decryption has failed</exception>
-	const void SecureKey(SecureVector<byte> &Output);
+	const SecureVector<byte> SecureKey() override;
 
 	/// <summary>
 	/// Create a secure-vector copy of the nonce; can also be used as the salt or iv
 	/// </summary>
 	/// 
-	/// <exception cref="CryptoSymmetricException">Throws if the output vector is too small</exception>
 	/// <exception cref="CryptoAuthenticationFailure">Throws an authentication failure exception if the internal decryption has failed</exception>
-	const void SecureNonce(SecureVector<byte> &Output);
+	const SecureVector<byte> SecureNonce() override;
 
 	//~~~Public Functions~~~//
 

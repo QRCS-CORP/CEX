@@ -170,19 +170,28 @@ const std::vector<byte> SymmetricKey::Nonce()
 	return tmp;
 }
 
-const SecureVector<byte> &SymmetricKey::SecureInfo()
+const SecureVector<byte> SymmetricKey::SecureInfo()
 {
-	return m_keyState->Info;
+	SecureVector<byte> tmpr(0);
+	Insert(m_keyState->Info, tmpr);
+
+	return tmpr;
 }
 
-const SecureVector<byte> &SymmetricKey::SecureKey()
+const SecureVector<byte> SymmetricKey::SecureKey()
 {
-	return m_keyState->Key;
+	SecureVector<byte> tmpr(0);
+	Insert(m_keyState->Key, tmpr);
+
+	return tmpr;
 }
 
-const SecureVector<byte> &SymmetricKey::SecureNonce()
+const SecureVector<byte> SymmetricKey::SecureNonce()
 {
-	return m_keyState->Nonce;
+	SecureVector<byte> tmpr(0);
+	Insert(m_keyState->Nonce, tmpr);
+
+	return tmpr;
 }
 
 //~~~Public Functions~~~//

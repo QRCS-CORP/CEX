@@ -81,8 +81,9 @@ void BCR::Reset()
 
 	static_cast<BCG*>(m_rngGenerator.get())->ParallelProfile().IsParallel() = m_isParallel;
 
-	std::vector<byte> key(m_rngGenerator->LegalKeySizes()[1].KeySize());
-	std::vector<byte> nonce(m_rngGenerator->LegalKeySizes()[1].NonceSize());
+	Cipher::SymmetricKeySize ks = m_rngGenerator->LegalKeySizes()[1];
+	std::vector<byte> key(ks.KeySize());
+	std::vector<byte> nonce(ks.NonceSize());
 
 	Provider::IProvider* pvd = Helper::ProviderFromName::GetInstance(m_pvdType);
 

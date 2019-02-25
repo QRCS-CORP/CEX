@@ -39,7 +39,7 @@ const Macs MacBase::Enumeral()
 	return m_macEnumeral;
 }
 
-std::vector<SymmetricKeySize> MacBase::LegalKeySizes() const
+const std::vector<SymmetricKeySize> MacBase::LegalKeySizes()
 {
 	return m_legalKeySizes;
 };

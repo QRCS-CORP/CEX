@@ -74,7 +74,7 @@ public:
 	/// <summary>
 	/// Read Only: Available KDF Key Sizes in SymmetricKeySize containers
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+	virtual const std::vector<SymmetricKeySize> LegalKeySizes() = 0;
 
 	/// <summary>
 	/// The KDF generators formal class name

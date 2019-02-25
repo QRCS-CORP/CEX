@@ -486,7 +486,7 @@ typedef unsigned char byte;
 // enabling this value uses the volatile memset to erase array data
 #define CEX_VOLATILE_MEMSET
 
-// toggles ChaCha512 from 40 to 80 rounds of mixing
+// toggles CSX512 from 40 to 80 rounds of mixing
 #define CEX_CHACHA512_STRONG
 
 // toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3

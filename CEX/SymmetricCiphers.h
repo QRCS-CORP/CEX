@@ -78,12 +78,12 @@ enum class SymmetricCiphers : byte
 	/// The Authenticated Stream Cipher; using RHX-KMAC256.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	ACS256A = 64,
+	ACS256H = 64,
 	/// <summary>
 	/// The Authenticated Stream Cipher; using RHX-KMAC512.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	ACS512A = 65,
+	ACS512H = 65,
 	/// <summary>
 	/// The Authenticated Stream Cipher; using SHX-KMAC256.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
@@ -103,52 +103,52 @@ enum class SymmetricCiphers : byte
 	/// An standard implementation of the ChaChaPoly20 stream cipher.
 	/// <para>Standards based implementation: uses a 512-bit block a 256-bit key size</para>
 	/// </summary>
-	ChaCha256 = 96,
+	CSX256 = 96,
 	/// <summary>
 	/// The ChaChaPoly20 stream cipher authenticated with KMAC256
 	/// <para>Extended cipher implementation: uses a 512-bit block a 256-bit key size</para>
 	/// </summary>
-	ChaCha256AE = 97,
+	CSX256AE = 97,
 	/// <summary>
 	/// The ChaChaPoly80 stream cipher.
 	/// <para>Extended cipher implementation: uses a 512-bit block a 512-bit key size</para>
 	/// </summary>
-	ChaCha512 = 98,
+	CSX512 = 98,
 	/// <summary>.
 	/// The ChaChaPoly80 stream cipher authenticated with KMAC512.
 	/// <para>Extended cipher implementation: uses a 512-bit block a 512-bit key size</para>
 	/// </summary>
-	ChaCha512AE = 99,
+	CSX512AE = 99,
 	/// <summary>
 	/// The Threefish 256-bit stream cipher.
 	/// <para>Standards based implementation: uses a 256-bit block a 256-bit key size</para>
 	/// </summary>
-	Threefish256 = 128,
+	TSX256 = 128,
 	/// <summary>
 	/// The Threefish 256-bit stream cipher authenticated with KMAC256.
 	/// <para>Extended cipher implementation: uses a 256-bit block a 256-bit key size</para>
 	/// </summary>
-	Threefish256AE = 129,
+	TSX256AE = 129,
 	/// <summary>
 	/// The Threefish 512-bit stream cipher.
 	/// <para>Extended cipher implementation: uses a 512-bit block a 512-bit key size</para>
 	/// </summary>
-	Threefish512 = 130,
+	TSX512 = 130,
 	/// <summary>
 	/// The Threefish 512-bit stream cipher authenticated with KMAC512.
 	/// <para>Extended cipher implementation: uses a 512-bit block a 512-bit key size</para>
 	/// </summary>
-	Threefish512AE = 131,
+	TSX512AE = 131,
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher.
 	/// <para>Extended cipher implementation: uses a 1024-bit block a 1024-bit key size</para>
 	/// </summary>
-	Threefish1024 = 132,
+	TSX1024 = 132,
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher authenticated with KMAC1024.
 	// <para>Extended cipher implementation: uses a 1024-bit block a 1024-bit key size</para>
 	/// </summary>
-	Threefish1024AE = 133
+	TSX1024AE = 133
 };
 
 class SymmetricCipherConvert

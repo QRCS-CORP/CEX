@@ -80,6 +80,72 @@ public:
 	CEX_OPTIMIZE_IGNORE
 	/// endcond
 	/// <summary>
+	/// Load bytes from an integer array into L1 cache memory.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to load into L1 cache, this must be a compile time constant.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The target integer array to load into cache</param>
+	/// <param name="Offset">The element offset within the target array</param>
+	/// <param name="Length">The number of bytes to load, must be a compile time constant</param>
+	template <typename Array>
+	inline static void PrefetchL1(Array &Input, size_t Offset, size_t Length)
+	{
+		const size_t ELMLEN = sizeof(Array::value_type);
+		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
+
+#if defined(__AVX__)
+		PREFETCHT1(Input.data() + (Offset * ELMLEN), Length);
+#else
+		volatile Array::value_type tmp = 0;
+
+		for (size_t i = 0; i < Length / ELMLEN; ++i)
+		{
+			tmp ^= Input[i + Offset];
+		}
+#endif
+	}
+	/// cond PRIVATE
+	CEX_OPTIMIZE_RESUME
+	/// endcond
+
+	/// cond PRIVATE
+	CEX_OPTIMIZE_IGNORE
+	/// endcond
+	/// <summary>
+	/// Load bytes from an integer array into L2 cache memory.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to load into L2 cache, this must be a compile time constant.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The target integer array to load into cache</param>
+	/// <param name="Offset">The element offset within the target array</param>
+	/// <param name="Length">The number of bytes to load, must be a compile time constant</param>
+	template <typename Array>
+	inline static void PrefetchL2(Array &Input, size_t Offset, size_t Length)
+	{
+		const size_t ELMLEN = sizeof(Array::value_type);
+		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
+
+#if defined(__AVX__)
+		PREFETCHT2(Input.data() + (Offset * ELMLEN), Length);
+#else
+		volatile Array::value_type tmp = 0;
+
+		for (size_t i = 0; i < Length / ELMLEN; ++i)
+		{
+			tmp ^= Input[i + Offset];
+		}
+#endif
+	}
+	/// cond PRIVATE
+	CEX_OPTIMIZE_RESUME
+	/// endcond
+
+	/// cond PRIVATE
+	CEX_OPTIMIZE_IGNORE
+	/// endcond
+	/// <summary>
 	/// Clear bytes from an integer array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Clear.
 	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64/128=AVX512), 

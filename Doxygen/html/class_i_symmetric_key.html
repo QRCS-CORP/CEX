@@ -112,6 +112,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2c791f59a23f510b4963103acd22c537"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_symmetric_key.html#a2c791f59a23f510b4963103acd22c537">Nonce</a> ()=0</td></tr>
 <tr class="memdesc:a2c791f59a23f510b4963103acd22c537"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv  <a href="#a2c791f59a23f510b4963103acd22c537">More...</a><br /></td></tr>
 <tr class="separator:a2c791f59a23f510b4963103acd22c537"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8c58d69f7602116c82652dee46c7462"><td class="memItemLeft" align="right" valign="top">virtual const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_symmetric_key.html#ac8c58d69f7602116c82652dee46c7462">SecureInfo</a> ()=0</td></tr>
+<tr class="memdesc:ac8c58d69f7602116c82652dee46c7462"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Return a secure-vector copy of the personalization string; can also used as an additional source of entropy in some constructions  <a href="#ac8c58d69f7602116c82652dee46c7462">More...</a><br /></td></tr>
+<tr class="separator:ac8c58d69f7602116c82652dee46c7462"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57e4d339d66f63cabd0cb690e2ef7e29"><td class="memItemLeft" align="right" valign="top">virtual const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_symmetric_key.html#a57e4d339d66f63cabd0cb690e2ef7e29">SecureKey</a> ()=0</td></tr>
+<tr class="memdesc:a57e4d339d66f63cabd0cb690e2ef7e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure-vector copy of the primary key  <a href="#a57e4d339d66f63cabd0cb690e2ef7e29">More...</a><br /></td></tr>
+<tr class="separator:a57e4d339d66f63cabd0cb690e2ef7e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a685d0c9724e0961ac6ace74ead22071b"><td class="memItemLeft" align="right" valign="top">virtual const SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_symmetric_key.html#a685d0c9724e0961ac6ace74ead22071b">SecureNonce</a> ()=0</td></tr>
+<tr class="memdesc:a685d0c9724e0961ac6ace74ead22071b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a secure-vector copy of the nonce; can also be used as the salt or iv  <a href="#a685d0c9724e0961ac6ace74ead22071b">More...</a><br /></td></tr>
+<tr class="separator:a685d0c9724e0961ac6ace74ead22071b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a527bcf506867dac550ca70ee76cfad4f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_symmetric_key.html#a527bcf506867dac550ca70ee76cfad4f">Reset</a> ()=0</td></tr>
 <tr class="memdesc:a527bcf506867dac550ca70ee76cfad4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release all resources associated with the object; optional, called by the finalizer  <a href="#a527bcf506867dac550ca70ee76cfad4f">More...</a><br /></td></tr>
 <tr class="separator:a527bcf506867dac550ca70ee76cfad4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -373,6 +382,93 @@ Public Member Functions</h2></td></tr>
 <p>Release all resources associated with the object; optional, called by the finalizer </p>
 
 <p>Implemented in <a class="el" href="class_symmetric_secure_key.html#ad1bcc9cf19f801715e723abef8c1a2a7">SymmetricSecureKey</a>, and <a class="el" href="class_symmetric_key.html#a0efd9d17b4f85ff7894449026f27693a">SymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="ac8c58d69f7602116c82652dee46c7462"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8c58d69f7602116c82652dee46c7462">&#9670;&nbsp;</a></span>SecureInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const SecureVector&lt;byte&gt; ISymmetricKey::SecureInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read/Write: Return a secure-vector copy of the personalization string; can also used as an additional source of entropy in some constructions </p>
+
+<p>Implemented in <a class="el" href="class_symmetric_secure_key.html#adb3868943c5099e39bfe181454e5e662">SymmetricSecureKey</a>, and <a class="el" href="class_symmetric_key.html#a8c26eaaee7214c7d7c0120aa4cde2da8">SymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="a57e4d339d66f63cabd0cb690e2ef7e29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57e4d339d66f63cabd0cb690e2ef7e29">&#9670;&nbsp;</a></span>SecureKey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const SecureVector&lt;byte&gt; ISymmetricKey::SecureKey </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Return a secure-vector copy of the primary key </p>
+
+<p>Implemented in <a class="el" href="class_symmetric_secure_key.html#a00a6464544657703c2accbaef5bbdfd3">SymmetricSecureKey</a>, and <a class="el" href="class_symmetric_key.html#a704f7615d971bbfbdec1cd5af4654561">SymmetricKey</a>.</p>
+
+</div>
+</div>
+<a id="a685d0c9724e0961ac6ace74ead22071b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a685d0c9724e0961ac6ace74ead22071b">&#9670;&nbsp;</a></span>SecureNonce()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const SecureVector&lt;byte&gt; ISymmetricKey::SecureNonce </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Return a secure-vector copy of the nonce; can also be used as the salt or iv </p>
+
+<p>Implemented in <a class="el" href="class_symmetric_secure_key.html#aa16757d9af93e3565a0bc843aab5e210">SymmetricSecureKey</a>, and <a class="el" href="class_symmetric_key.html#a3eb52b8d2492f060a6b9b6d53a80ed92">SymmetricKey</a>.</p>
 
 </div>
 </div>

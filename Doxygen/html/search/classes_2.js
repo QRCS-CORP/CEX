@@ -3,8 +3,6 @@ var searchData=
   ['cbc',['CBC',['../class_c_b_c.html',1,'']]],
   ['cfb',['CFB',['../class_c_f_b.html',1,'']]],
   ['chacha',['ChaCha',['../class_cha_cha.html',1,'']]],
-  ['chacha256',['ChaCha256',['../class_cha_cha256.html',1,'']]],
-  ['chacha512',['ChaCha512',['../class_cha_cha512.html',1,'']]],
   ['ciphermodefromname',['CipherModeFromName',['../class_cipher_mode_from_name.html',1,'']]],
   ['cipherstream',['CipherStream',['../class_cipher_stream.html',1,'']]],
   ['cjp',['CJP',['../class_c_j_p.html',1,'']]],
@@ -25,5 +23,7 @@ var searchData=
   ['csg',['CSG',['../class_c_s_g.html',1,'']]],
   ['csp',['CSP',['../class_c_s_p.html',1,'']]],
   ['csr',['CSR',['../class_c_s_r.html',1,'']]],
+  ['csx256',['CSX256',['../class_c_s_x256.html',1,'']]],
+  ['csx512',['CSX512',['../class_c_s_x512.html',1,'']]],
   ['ctr',['CTR',['../class_c_t_r.html',1,'']]]
 ];

@@ -35,7 +35,7 @@ const Drbgs DrbgBase::Enumeral()
 	return m_drbgEnumeral;
 }
 
-std::vector<SymmetricKeySize> DrbgBase::LegalKeySizes() const
+const std::vector<SymmetricKeySize> DrbgBase::LegalKeySizes()
 {
 	return m_legalKeySizes;
 }

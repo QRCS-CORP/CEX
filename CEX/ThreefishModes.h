@@ -18,27 +18,27 @@ enum class ThreefishModes : byte
 	/// <summary>
 	/// The Threefish 256-bit stream cipher
 	/// </summary>
-	Threefish256 = static_cast<byte>(SymmetricCiphers::Threefish256),
+	TSX256 = static_cast<byte>(SymmetricCiphers::TSX256),
 	/// <summary>
 	/// The Threefish 256-bit stream cipher authenticated with KMAC256
 	/// </summary>
-	Threefish256AE = static_cast<byte>(SymmetricCiphers::Threefish256AE),
+	TSX256AE = static_cast<byte>(SymmetricCiphers::TSX256AE),
 	/// <summary>
 	/// The Threefish 512-bit stream cipher
 	/// </summary>
-	Threefish512 = static_cast<byte>(SymmetricCiphers::Threefish512),
+	TSX512 = static_cast<byte>(SymmetricCiphers::TSX512),
 	/// <summary>
 	/// The Threefish 512-bit stream cipher authenticated with KMAC512
 	/// </summary>
-	Threefish512AE = static_cast<byte>(SymmetricCiphers::Threefish512AE),
+	TSX512AE = static_cast<byte>(SymmetricCiphers::TSX512AE),
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher
 	/// </summary>
-	Threefish1024 = static_cast<byte>(SymmetricCiphers::Threefish1024),
+	TSX1024 = static_cast<byte>(SymmetricCiphers::TSX1024),
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher authenticated with KMAC1024
 	/// </summary>
-	Threefish1024AE = static_cast<byte>(SymmetricCiphers::Threefish1024AE)
+	TSX1024AE = static_cast<byte>(SymmetricCiphers::TSX1024AE)
 };
 
 class ThreefishModeConvert

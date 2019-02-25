@@ -44,11 +44,11 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 		case SymmetricCiphers::SHXS1024:
 			name = std::string("SHXS1024");
 			break;
-		case SymmetricCiphers::ACS256A:
-			name = std::string("ACS256A");
+		case SymmetricCiphers::ACS256H:
+			name = std::string("ACS256H");
 			break;
-		case SymmetricCiphers::ACS512A:
-			name = std::string("ACS512A");
+		case SymmetricCiphers::ACS512H:
+			name = std::string("ACS512H");
 			break;
 		case SymmetricCiphers::ACS256S:
 			name = std::string("ACS256S");
@@ -59,35 +59,35 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 		case SymmetricCiphers::ACS:
 			name = std::string("ACS");
 			break;
-		case SymmetricCiphers::ChaCha256:
-			name = std::string("ChaCha256");
+		case SymmetricCiphers::CSX256:
+			name = std::string("CSX256");
 			break;
-		case SymmetricCiphers::ChaCha256AE:
-			name = std::string("ChaCha256AE");
+		case SymmetricCiphers::CSX256AE:
+			name = std::string("CSX256AE");
 			break;
-		case SymmetricCiphers::ChaCha512:
-			name = std::string("ChaCha512");
+		case SymmetricCiphers::CSX512:
+			name = std::string("CSX512");
 			break;
-		case SymmetricCiphers::ChaCha512AE:
-			name = std::string("ChaCha512AE");
+		case SymmetricCiphers::CSX512AE:
+			name = std::string("CSX512AE");
 			break;
-		case SymmetricCiphers::Threefish256:
-			name = std::string("Threefish256");
+		case SymmetricCiphers::TSX256:
+			name = std::string("TSX256");
 			break;
-		case SymmetricCiphers::Threefish256AE:
-			name = std::string("Threefish256AE");
+		case SymmetricCiphers::TSX256AE:
+			name = std::string("TSX256AE");
 			break;
-		case SymmetricCiphers::Threefish512:
-			name = std::string("Threefish512");
+		case SymmetricCiphers::TSX512:
+			name = std::string("TSX512");
 			break;
-		case SymmetricCiphers::Threefish512AE:
-			name = std::string("Threefish512AE");
+		case SymmetricCiphers::TSX512AE:
+			name = std::string("TSX512AE");
 			break;
-		case SymmetricCiphers::Threefish1024:
-			name = std::string("Threefish1024");
+		case SymmetricCiphers::TSX1024:
+			name = std::string("TSX1024");
 			break;
-		case SymmetricCiphers::Threefish1024AE:
-			name = std::string("Threefish1024AE");
+		case SymmetricCiphers::TSX1024AE:
+			name = std::string("TSX1024AE");
 			break;
 		default:
 			name = std::string("None");
@@ -161,13 +161,13 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	{
 		tname = SymmetricCiphers::SHXS1024;
 	}
-	else if (Name == std::string("ACS256A"))
+	else if (Name == std::string("ACS256H"))
 	{
-		tname = SymmetricCiphers::ACS256A;
+		tname = SymmetricCiphers::ACS256H;
 	}
-	else if (Name == std::string("ACS512A"))
+	else if (Name == std::string("ACS512H"))
 	{
-		tname = SymmetricCiphers::ACS512A;
+		tname = SymmetricCiphers::ACS512H;
 	}
 	else if (Name == std::string("ACS256S"))
 	{
@@ -181,45 +181,45 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	{
 		tname = SymmetricCiphers::ACS;
 	}
-	else if (Name == std::string("ChaCha256"))
+	else if (Name == std::string("CSX256"))
 	{
-		tname = SymmetricCiphers::ChaCha256;
+		tname = SymmetricCiphers::CSX256;
 	}
-	else if (Name == std::string("ChaCha256AE"))
+	else if (Name == std::string("CSX256AE"))
 	{
-		tname = SymmetricCiphers::ChaCha256AE;
+		tname = SymmetricCiphers::CSX256AE;
 	}
-	else if (Name == std::string("ChaCha512"))
+	else if (Name == std::string("CSX512"))
 	{
-		tname = SymmetricCiphers::ChaCha512;
+		tname = SymmetricCiphers::CSX512;
 	}
-	else if (Name == std::string("ChaCha512AE"))
+	else if (Name == std::string("CSX512AE"))
 	{
-		tname = SymmetricCiphers::ChaCha512AE;
+		tname = SymmetricCiphers::CSX512AE;
 	}
-	else if (Name == std::string("Threefish256"))
+	else if (Name == std::string("TSX256"))
 	{
-		tname = SymmetricCiphers::Threefish256;
+		tname = SymmetricCiphers::TSX256;
 	}
-	else if (Name == std::string("Threefish256AE"))
+	else if (Name == std::string("TSX256AE"))
 	{
-		tname = SymmetricCiphers::Threefish256AE;
+		tname = SymmetricCiphers::TSX256AE;
 	}
-	else if (Name == std::string("Threefish512"))
+	else if (Name == std::string("TSX512"))
 	{
-		tname = SymmetricCiphers::Threefish512;
+		tname = SymmetricCiphers::TSX512;
 	}
-	else if (Name == std::string("Threefish512AE"))
+	else if (Name == std::string("TSX512AE"))
 	{
-		tname = SymmetricCiphers::Threefish512AE;
+		tname = SymmetricCiphers::TSX512AE;
 	}
-	else if (Name == std::string("Threefish1024"))
+	else if (Name == std::string("TSX1024"))
 	{
-		tname = SymmetricCiphers::Threefish1024;
+		tname = SymmetricCiphers::TSX1024;
 	}
-	else if (Name == std::string("Threefish1024AE"))
+	else if (Name == std::string("TSX1024AE"))
 	{
-		tname = SymmetricCiphers::Threefish1024AE;
+		tname = SymmetricCiphers::TSX1024AE;
 	}
 	else
 	{

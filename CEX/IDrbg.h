@@ -72,7 +72,7 @@ public:
 	/// <summary>
 	/// Read Only: List of available legal key sizes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+	virtual const std::vector<SymmetricKeySize> LegalKeySizes() = 0;
 
 	/// <summary>
 	/// Read Only: The maximum number of bytes that can be generated with a generator instance

@@ -113,9 +113,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a081a214676e3f199f617fef9a9bdc7ff"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_mac.html#a081a214676e3f199f617fef9a9bdc7ff">IsInitialized</a> ()=0</td></tr>
 <tr class="memdesc:a081a214676e3f199f617fef9a9bdc7ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The MAC generator is ready to process data  <a href="#a081a214676e3f199f617fef9a9bdc7ff">More...</a><br /></td></tr>
 <tr class="separator:a081a214676e3f199f617fef9a9bdc7ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a671cbd60bd2a217275cfc9184641a011"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_mac.html#a671cbd60bd2a217275cfc9184641a011">LegalKeySizes</a> () const =0</td></tr>
-<tr class="memdesc:a671cbd60bd2a217275cfc9184641a011"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Recommended MAC key sizes in a SymmetricKeySize array  <a href="#a671cbd60bd2a217275cfc9184641a011">More...</a><br /></td></tr>
-<tr class="separator:a671cbd60bd2a217275cfc9184641a011"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f4f63459bc774d3159fe61c192ff865"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_mac.html#a8f4f63459bc774d3159fe61c192ff865">LegalKeySizes</a> ()=0</td></tr>
+<tr class="memdesc:a8f4f63459bc774d3159fe61c192ff865"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Recommended MAC key sizes in a SymmetricKeySize array  <a href="#a8f4f63459bc774d3159fe61c192ff865">More...</a><br /></td></tr>
+<tr class="separator:a8f4f63459bc774d3159fe61c192ff865"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79517da50c31934b1ede3fffca730e87"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_mac.html#a79517da50c31934b1ede3fffca730e87">MinimumKeySize</a> ()=0</td></tr>
 <tr class="memdesc:a79517da50c31934b1ede3fffca730e87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Minimum allowed initialization key-size in bytes  <a href="#a79517da50c31934b1ede3fffca730e87">More...</a><br /></td></tr>
 <tr class="separator:a79517da50c31934b1ede3fffca730e87"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -500,8 +500,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a671cbd60bd2a217275cfc9184641a011"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a671cbd60bd2a217275cfc9184641a011">&#9670;&nbsp;</a></span>LegalKeySizes()</h2>
+<a id="a8f4f63459bc774d3159fe61c192ff865"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f4f63459bc774d3159fe61c192ff865">&#9670;&nbsp;</a></span>LegalKeySizes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -510,10 +510,10 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt;<a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a>&gt; IMac::LegalKeySizes </td>
+          <td class="memname">virtual const std::vector&lt;<a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a>&gt; IMac::LegalKeySizes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td></td>
         </tr>
       </table>
   </td>
@@ -525,7 +525,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Recommended MAC key sizes in a SymmetricKeySize array </p>
 
-<p>Implemented in <a class="el" href="class_mac_base.html#aa76c5ebdbca991f69b3174b8de2961d7">MacBase</a>.</p>
+<p>Implemented in <a class="el" href="class_mac_base.html#a88cc4d4bb7845a10c26991689485719e">MacBase</a>.</p>
 
 </div>
 </div>

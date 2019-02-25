@@ -16,13 +16,13 @@ enum class StreamCiphers : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The Authenticated Stream Cipher; using RHX-KMAC256
+	/// The Authenticated Stream Cipher; using RHX-HMAC256
 	/// </summary>
-	ACS256A = static_cast<byte>(SymmetricCiphers::ACS256A),
+	ACS256H = static_cast<byte>(SymmetricCiphers::ACS256H),
 	/// <summary>
-	/// The Authenticated Stream Cipher; using RHX-KMAC512
+	/// The Authenticated Stream Cipher; using RHX-HMAC512
 	/// </summary>
-	ACS512A = static_cast<byte>(SymmetricCiphers::ACS512A),
+	ACS512H = static_cast<byte>(SymmetricCiphers::ACS512H),
 	/// <summary>
 	/// The Authenticated Stream Cipher; using SHX-KMAC256
 	/// </summary>
@@ -32,49 +32,49 @@ enum class StreamCiphers : byte
 	/// </summary>
 	ACS512S = static_cast<byte>(SymmetricCiphers::ACS512S),
 	/// <summary>
-	/// The Authenticated Stream Cipher; using default parameters RHX-CSHAKE512-KMAC512
+	/// The Authenticated Stream Cipher; no authentication specified
 	/// </summary>
 	ACS = static_cast<byte>(SymmetricCiphers::ACS),
 	/// <summary>
 	/// The ChaChaPoly20 stream cipher
 	/// </summary>
-	ChaCha256 = static_cast<byte>(SymmetricCiphers::ChaCha256),
+	CSX256 = static_cast<byte>(SymmetricCiphers::CSX256),
 	/// <summary>
 	/// The ChaChaPoly20 stream cipher authenticated with KMAC256
 	/// </summary>
-	ChaCha256AE = static_cast<byte>(SymmetricCiphers::ChaCha256AE),
+	CSX256AE = static_cast<byte>(SymmetricCiphers::CSX256AE),
 	/// <summary>
 	/// The ChaChaPoly80 stream cipher
 	/// </summary>
-	ChaCha512 = static_cast<byte>(SymmetricCiphers::ChaCha512),
+	CSX512 = static_cast<byte>(SymmetricCiphers::CSX512),
 	/// <summary>
 	/// The ChaChaPoly80 stream cipher authenticated with KMAC512
 	/// </summary>
-	ChaCha512AE = static_cast<byte>(SymmetricCiphers::ChaCha512AE),
+	CSX512AE = static_cast<byte>(SymmetricCiphers::CSX512AE),
 	/// <summary>
 	/// The Threefish 256-bit stream cipher
 	/// </summary>
-	Threefish256 = static_cast<byte>(SymmetricCiphers::Threefish256),
+	TSX256 = static_cast<byte>(SymmetricCiphers::TSX256),
 	/// <summary>
 	/// The Threefish 256-bit stream cipher authenticated with KMAC256
 	/// </summary>
-	Threefish256AE = static_cast<byte>(SymmetricCiphers::Threefish256AE),
+	TSX256AE = static_cast<byte>(SymmetricCiphers::TSX256AE),
 	/// <summary>
 	/// The Threefish 512-bit stream cipher
 	/// </summary>
-	Threefish512 = static_cast<byte>(SymmetricCiphers::Threefish512),
+	TSX512 = static_cast<byte>(SymmetricCiphers::TSX512),
 	/// <summary>
 	/// The Threefish 512-bit stream cipher authenticated with KMAC512
 	/// </summary>
-	Threefish512AE = static_cast<byte>(SymmetricCiphers::Threefish512AE),
+	TSX512AE = static_cast<byte>(SymmetricCiphers::TSX512AE),
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher
 	/// </summary>
-	Threefish1024 = static_cast<byte>(SymmetricCiphers::Threefish1024),
+	TSX1024 = static_cast<byte>(SymmetricCiphers::TSX1024),
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher authenticated with KMAC1024
 	/// </summary>
-	Threefish1024AE = static_cast<byte>(SymmetricCiphers::Threefish1024AE)
+	TSX1024AE = static_cast<byte>(SymmetricCiphers::TSX1024AE)
 };
 
 class StreamCipherConvert

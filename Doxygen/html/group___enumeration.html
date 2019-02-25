@@ -146,12 +146,12 @@ Enumerations</h2></td></tr>
 <tr class="separator:gaa7f8226ec43fe26b57b18e6821c90ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0c1bf76428835ed873d6b250df55b6cd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda6adf97f83acf6453d4a6a4b1070f3754">BlockCipherExtensions::None</a> = 0, 
-<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda4484af85c975af92f5887ba9be983e59">BlockCipherExtensions::HKDF256</a> = 1, 
-<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda2e4a5e5ad9cdce79dbe7a0aa64cecad4">BlockCipherExtensions::HKDF512</a> = 2, 
-<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda514cc564ac1b237d4129b7543308ce0a">BlockCipherExtensions::SHAKE256</a> = 10, 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda4484af85c975af92f5887ba9be983e59">BlockCipherExtensions::HKDF256</a> = static_cast&lt;byte&gt;(Kdfs::HKDF256), 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda2e4a5e5ad9cdce79dbe7a0aa64cecad4">BlockCipherExtensions::HKDF512</a> = static_cast&lt;byte&gt;(Kdfs::HKDF512), 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda514cc564ac1b237d4129b7543308ce0a">BlockCipherExtensions::SHAKE256</a> = static_cast&lt;byte&gt;(Kdfs::SHAKE256), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda5705d645a9d102aa73ead3488b669c34">BlockCipherExtensions::SHAKE512</a> = 11, 
-<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda85f77e16d8e61c80f784e548d8aa1de4">BlockCipherExtensions::SHAKE1024</a> = 12, 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda5705d645a9d102aa73ead3488b669c34">BlockCipherExtensions::SHAKE512</a> = static_cast&lt;byte&gt;(Kdfs::SHAKE512), 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda85f77e16d8e61c80f784e548d8aa1de4">BlockCipherExtensions::SHAKE1024</a> = static_cast&lt;byte&gt;(Kdfs::SHAKE1024), 
 <a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda90589c47f06eb971d548591f23c285af">BlockCipherExtensions::Custom</a> = 99
 <br />
  }</td></tr>
@@ -387,24 +387,24 @@ Enumerations</h2></td></tr>
 <tr class="separator:ga62629810dc7b52fdfb37d80f03d62274"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga62fe0a4066025a96f0d329627b1bf127"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga62fe0a4066025a96f0d329627b1bf127">StreamCiphers</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6adf97f83acf6453d4a6a4b1070f3754">StreamCiphers::None</a> = 0, 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ade2a636dad7a37cdfbb47273b4a962ef">StreamCiphers::ACS256A</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS256A), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a8d6f845177cc5a615948bc7346939c49">StreamCiphers::ACS512A</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS512A), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2a73a3f41e1cc8dd0aa47676aae9a057">StreamCiphers::ACS256H</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS256H), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a97407485478640ca9e6d321c3badc5e5">StreamCiphers::ACS512H</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS512H), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127afc06e5a5503d035d1af71adb4bc29a23">StreamCiphers::ACS256S</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS256S), 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a1f6eaf2274b9b4a623ea92b93aa78054">StreamCiphers::ACS512S</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS512S), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a3763590ba4935513c1f6b8466f644ed6">StreamCiphers::ACS</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a243e0cbb66f20f8e016a34e7fdc59354">StreamCiphers::ChaCha256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ChaCha256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ab0495c1a95333fab71b94c4badf7ae0f">StreamCiphers::ChaCha256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ChaCha256AE), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a9f62076fd9b490d6a2ae42532c35f767">StreamCiphers::CSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2ca2913af15250541b9584b5504388f2">StreamCiphers::CSX256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX256AE), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ace8a66fe03082870b82b2b7c8f396d90">StreamCiphers::ChaCha512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ChaCha512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac0979ad720b184d1d751511eae459e93">StreamCiphers::ChaCha512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ChaCha512AE), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac0bcb1066bc4604ac8e56376c3803844">StreamCiphers::Threefish256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127affafef4c991d5c83a31426da6d8365e4">StreamCiphers::Threefish256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish256AE), 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a5bae7e694331ffe4f22a5f4d34ea8bf9">StreamCiphers::CSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a7d974584e3c969bec73bc993ff85ad7a">StreamCiphers::CSX512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX512AE), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34">StreamCiphers::TSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac3464460a56e69447faf02356ef59579">StreamCiphers::TSX256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256AE), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a515ad9b52d3f35b889bad36f21ec5e7f">StreamCiphers::Threefish512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a5c2dc7b94c0af34e192af41fb8258cac">StreamCiphers::Threefish512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish512AE), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a4297ea2dc592193a31a44a6266dd8d4d">StreamCiphers::Threefish1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish1024), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aacd186534bcb6df7116be8c6490ae9bd">StreamCiphers::Threefish1024AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish1024AE)
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba">StreamCiphers::TSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127abe9068c7a1b62da7c01061c49fbc6ab4">StreamCiphers::TSX512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512AE), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068">StreamCiphers::TSX1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a94995933677fa3af5d4fb2ef8333e9ac">StreamCiphers::TSX1024AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024AE)
 <br />
  }</td></tr>
 <tr class="separator:ga62fe0a4066025a96f0d329627b1bf127"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -431,36 +431,36 @@ Enumerations</h2></td></tr>
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4909f2a35f7134a761d87af66a4985aa">SymmetricCiphers::SHXS512</a> = 48, 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a70f8ec0fd2b16283f44c38b7460cef24">SymmetricCiphers::SHXS1024</a> = 49, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ade2a636dad7a37cdfbb47273b4a962ef">SymmetricCiphers::ACS256A</a> = 64, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a8d6f845177cc5a615948bc7346939c49">SymmetricCiphers::ACS512A</a> = 65, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2a73a3f41e1cc8dd0aa47676aae9a057">SymmetricCiphers::ACS256H</a> = 64, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a97407485478640ca9e6d321c3badc5e5">SymmetricCiphers::ACS512H</a> = 65, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8afc06e5a5503d035d1af71adb4bc29a23">SymmetricCiphers::ACS256S</a> = 66, 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a1f6eaf2274b9b4a623ea92b93aa78054">SymmetricCiphers::ACS512S</a> = 67, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a3763590ba4935513c1f6b8466f644ed6">SymmetricCiphers::ACS</a> = 68, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a243e0cbb66f20f8e016a34e7fdc59354">SymmetricCiphers::ChaCha256</a> = 96, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ab0495c1a95333fab71b94c4badf7ae0f">SymmetricCiphers::ChaCha256AE</a> = 97, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a9f62076fd9b490d6a2ae42532c35f767">SymmetricCiphers::CSX256</a> = 96, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2ca2913af15250541b9584b5504388f2">SymmetricCiphers::CSX256AE</a> = 97, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ace8a66fe03082870b82b2b7c8f396d90">SymmetricCiphers::ChaCha512</a> = 98, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac0979ad720b184d1d751511eae459e93">SymmetricCiphers::ChaCha512AE</a> = 99, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac0bcb1066bc4604ac8e56376c3803844">SymmetricCiphers::Threefish256</a> = 128, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8affafef4c991d5c83a31426da6d8365e4">SymmetricCiphers::Threefish256AE</a> = 129, 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a5bae7e694331ffe4f22a5f4d34ea8bf9">SymmetricCiphers::CSX512</a> = 98, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a7d974584e3c969bec73bc993ff85ad7a">SymmetricCiphers::CSX512AE</a> = 99, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34">SymmetricCiphers::TSX256</a> = 128, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac3464460a56e69447faf02356ef59579">SymmetricCiphers::TSX256AE</a> = 129, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a515ad9b52d3f35b889bad36f21ec5e7f">SymmetricCiphers::Threefish512</a> = 130, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a5c2dc7b94c0af34e192af41fb8258cac">SymmetricCiphers::Threefish512AE</a> = 131, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4297ea2dc592193a31a44a6266dd8d4d">SymmetricCiphers::Threefish1024</a> = 132, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aacd186534bcb6df7116be8c6490ae9bd">SymmetricCiphers::Threefish1024AE</a> = 133
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba">SymmetricCiphers::TSX512</a> = 130, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8abe9068c7a1b62da7c01061c49fbc6ab4">SymmetricCiphers::TSX512AE</a> = 131, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068">SymmetricCiphers::TSX1024</a> = 132, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a94995933677fa3af5d4fb2ef8333e9ac">SymmetricCiphers::TSX1024AE</a> = 133
 <br />
  }</td></tr>
 <tr class="separator:ga83e5aeee49605814f7a50b7521a86bf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab301633efff72f1f771f9e45f23aa72e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gab301633efff72f1f771f9e45f23aa72e">ThreefishModes</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea6adf97f83acf6453d4a6a4b1070f3754">ThreefishModes::None</a> = 0, 
-<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eac0bcb1066bc4604ac8e56376c3803844">ThreefishModes::Threefish256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish256), 
-<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eaffafef4c991d5c83a31426da6d8365e4">ThreefishModes::Threefish256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish256AE), 
-<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea515ad9b52d3f35b889bad36f21ec5e7f">ThreefishModes::Threefish512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish512), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea542d77dbc16fc5a977920334221e5c34">ThreefishModes::TSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eac3464460a56e69447faf02356ef59579">ThreefishModes::TSX256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256AE), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eab0a3c1572eaa1c8dcd068763921394ba">ThreefishModes::TSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea5c2dc7b94c0af34e192af41fb8258cac">ThreefishModes::Threefish512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish512AE), 
-<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea4297ea2dc592193a31a44a6266dd8d4d">ThreefishModes::Threefish1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish1024), 
-<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eaacd186534bcb6df7116be8c6490ae9bd">ThreefishModes::Threefish1024AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::Threefish1024AE)
+&#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eabe9068c7a1b62da7c01061c49fbc6ab4">ThreefishModes::TSX512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512AE), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea4824734e322b78f4894959edbd096068">ThreefishModes::TSX1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea94995933677fa3af5d4fb2ef8333e9ac">ThreefishModes::TSX1024AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024AE)
 <br />
  }</td></tr>
 <tr class="separator:gab301633efff72f1f771f9e45f23aa72e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1534,35 +1534,35 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>No stream cipher is specified </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ade2a636dad7a37cdfbb47273b4a962ef"></a>ACS256A&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC256 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2a73a3f41e1cc8dd0aa47676aae9a057"></a>ACS256H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-HMAC256 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a8d6f845177cc5a615948bc7346939c49"></a>ACS512A&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a97407485478640ca9e6d321c3badc5e5"></a>ACS512H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-HMAC512 </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127afc06e5a5503d035d1af71adb4bc29a23"></a>ACS256S&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using SHX-KMAC256 </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a1f6eaf2274b9b4a623ea92b93aa78054"></a>ACS512S&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using SHX-KMAC512 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a3763590ba4935513c1f6b8466f644ed6"></a>ACS&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using default parameters RHX-CSHAKE512-KMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a3763590ba4935513c1f6b8466f644ed6"></a>ACS&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; no authentication specified </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a243e0cbb66f20f8e016a34e7fdc59354"></a>ChaCha256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a9f62076fd9b490d6a2ae42532c35f767"></a>CSX256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ab0495c1a95333fab71b94c4badf7ae0f"></a>ChaCha256AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC256 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2ca2913af15250541b9584b5504388f2"></a>CSX256AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC256 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ace8a66fe03082870b82b2b7c8f396d90"></a>ChaCha512&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a5bae7e694331ffe4f22a5f4d34ea8bf9"></a>CSX512&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac0979ad720b184d1d751511eae459e93"></a>ChaCha512AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher authenticated with KMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a7d974584e3c969bec73bc993ff85ad7a"></a>CSX512AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher authenticated with KMAC512 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac0bcb1066bc4604ac8e56376c3803844"></a>Threefish256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127affafef4c991d5c83a31426da6d8365e4"></a>Threefish256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac3464460a56e69447faf02356ef59579"></a>TSX256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a515ad9b52d3f35b889bad36f21ec5e7f"></a>Threefish512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a5c2dc7b94c0af34e192af41fb8258cac"></a>Threefish512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127abe9068c7a1b62da7c01061c49fbc6ab4"></a>TSX512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a4297ea2dc592193a31a44a6266dd8d4d"></a>Threefish1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aacd186534bcb6df7116be8c6490ae9bd"></a>Threefish1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a94995933677fa3af5d4fb2ef8333e9ac"></a>TSX1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024 </p>
 </td></tr>
 </table>
 
@@ -1658,10 +1658,10 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a70f8ec0fd2b16283f44c38b7460cef24"></a>SHXS1024&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher extended with an cSHAKE-1024 secure key schedule. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ade2a636dad7a37cdfbb47273b4a962ef"></a>ACS256A&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC256. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2a73a3f41e1cc8dd0aa47676aae9a057"></a>ACS256H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC256. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a8d6f845177cc5a615948bc7346939c49"></a>ACS512A&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC512. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a97407485478640ca9e6d321c3badc5e5"></a>ACS512H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC512. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8afc06e5a5503d035d1af71adb4bc29a23"></a>ACS256S&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using SHX-KMAC256. </p>
@@ -1673,34 +1673,34 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a3763590ba4935513c1f6b8466f644ed6"></a>ACS&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using default parameters AES-CSHAKE512-KMAC512. </p>
 <p>Standards based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a243e0cbb66f20f8e016a34e7fdc59354"></a>ChaCha256&#160;</td><td class="fielddoc"><p>An standard implementation of the ChaChaPoly20 stream cipher. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a9f62076fd9b490d6a2ae42532c35f767"></a>CSX256&#160;</td><td class="fielddoc"><p>An standard implementation of the ChaChaPoly20 stream cipher. </p>
 <p>Standards based implementation: uses a 512-bit block a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ab0495c1a95333fab71b94c4badf7ae0f"></a>ChaCha256AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC256 </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2ca2913af15250541b9584b5504388f2"></a>CSX256AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC256 </p>
 <p>Extended cipher implementation: uses a 512-bit block a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ace8a66fe03082870b82b2b7c8f396d90"></a>ChaCha512&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a5bae7e694331ffe4f22a5f4d34ea8bf9"></a>CSX512&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher. </p>
 <p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac0979ad720b184d1d751511eae459e93"></a>ChaCha512AE&#160;</td><td class="fielddoc"><p>. The ChaChaPoly80 stream cipher authenticated with KMAC512. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a7d974584e3c969bec73bc993ff85ad7a"></a>CSX512AE&#160;</td><td class="fielddoc"><p>. The ChaChaPoly80 stream cipher authenticated with KMAC512. </p>
 <p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac0bcb1066bc4604ac8e56376c3803844"></a>Threefish256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher. </p>
 <p>Standards based implementation: uses a 256-bit block a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8affafef4c991d5c83a31426da6d8365e4"></a>Threefish256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac3464460a56e69447faf02356ef59579"></a>TSX256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256. </p>
 <p>Extended cipher implementation: uses a 256-bit block a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a515ad9b52d3f35b889bad36f21ec5e7f"></a>Threefish512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher. </p>
 <p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a5c2dc7b94c0af34e192af41fb8258cac"></a>Threefish512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8abe9068c7a1b62da7c01061c49fbc6ab4"></a>TSX512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512. </p>
 <p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a4297ea2dc592193a31a44a6266dd8d4d"></a>Threefish1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher. </p>
 <p>Extended cipher implementation: uses a 1024-bit block a 1024-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aacd186534bcb6df7116be8c6490ae9bd"></a>Threefish1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a94995933677fa3af5d4fb2ef8333e9ac"></a>TSX1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024. </p>
 </td></tr>
 </table>
 
@@ -1728,17 +1728,17 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>No Threefish mode has been selected </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eac0bcb1066bc4604ac8e56376c3803844"></a>Threefish256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eaffafef4c991d5c83a31426da6d8365e4"></a>Threefish256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256 </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eac3464460a56e69447faf02356ef59579"></a>TSX256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea515ad9b52d3f35b889bad36f21ec5e7f"></a>Threefish512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea5c2dc7b94c0af34e192af41fb8258cac"></a>Threefish512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512 </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eabe9068c7a1b62da7c01061c49fbc6ab4"></a>TSX512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea4297ea2dc592193a31a44a6266dd8d4d"></a>Threefish1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eaacd186534bcb6df7116be8c6490ae9bd"></a>Threefish1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024 </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea94995933677fa3af5d4fb2ef8333e9ac"></a>TSX1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024 </p>
 </td></tr>
 </table>
 

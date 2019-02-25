@@ -15,7 +15,7 @@ namespace Test
 	/// <remarks>
 	/// <description>References:</description>
 	/// <list type="number">
-	/// <item><description>RFC 7539: <a href="https://tools.ietf.org/html/rfc7539">ChaCha256 and Poly1305</a> for IETF Protocols.</description></item>
+	/// <item><description>RFC 7539: <a href="https://tools.ietf.org/html/rfc7539">CSX256 and Poly1305</a> for IETF Protocols.</description></item>
 	/// <item><description>ChaCha20 and Poly1305 for IETF protocols: <a href="https://tools.ietf.org/html/draft-irtf-cfrg-chacha20-poly1305-10">draft-irtf-cfrg-chacha20-poly1305-10</a>.</description></item>
 	/// <item><description>The cryptographic library: <a href="https://github.com/jedisct1/libsodium">LibSodium</a>.</description></item>
 	/// <item><description>ChaCha20 and Poly1305 based Cipher Suites for TLS: <a href="https://tools.ietf.org/html/draft-agl-tls-chacha20poly1305-04">draft-agl-tls-chacha20poly1305-04</a>.</description></item>

@@ -23,6 +23,7 @@ class BCG::BcgState
 {
 public:
 	
+	std::vector<byte> Code;
 	std::vector<byte> Nonce;
 	size_t Counter;
 	size_t KeySize;
@@ -157,7 +158,8 @@ BCG::~BCG()
 
 const size_t BCG::DistributionCodeMax()
 { 
-	return m_bcgCipher->DistributionCodeMax();
+	SymmetricKeySize ks = m_bcgCipher->LegalKeySizes()[2];
+	return ks.InfoSize();
 }
 
 const bool BCG::IsInitialized() 
@@ -290,16 +292,15 @@ void BCG::Initialize(ISymmetricKey &Parameters)
 	else
 	{
 		// using extended cipher version and custom distribution-code
-		std::vector<byte> tmpi(0);
 		// add the library prefix
-		ArrayTools::AppendVector(CEX_LIBRARY_PREFIX, tmpi);
+		ArrayTools::AppendVector(CEX_LIBRARY_PREFIX, m_bcgState->Code);
 		// assign the formal class name, and the security-strength to the distribution code parameter
-		ArrayTools::AppendString(Name(), tmpi);
-		ArrayTools::AppendValue(static_cast<ushort>(SecurityStrength()), tmpi);
+		ArrayTools::AppendString(Name(), m_bcgState->Code);
+		ArrayTools::AppendValue(static_cast<ushort>(SecurityStrength()), m_bcgState->Code);
 		// add the optional custom distribution code
-		ArrayTools::AppendVector(Parameters.Info(), tmpi);
+		ArrayTools::AppendVector(Parameters.Info(), m_bcgState->Code);
 		// initialize the block cipher
-		SymmetricKey kp(Parameters.Key(), Parameters.Nonce(), tmpi);
+		SymmetricKey kp(Parameters.Key(), Parameters.Nonce(), m_bcgState->Code);
 		m_bcgCipher->Initialize(true, kp);
 	}
 
@@ -356,7 +357,7 @@ void BCG::Update(const std::vector<byte> &Key)
 	}
 
 	// reinitialize the generator with the nonce and distribution codes preserved
-	SymmetricKey kp(tmpk, m_bcgState->Nonce, m_bcgCipher->DistributionCode());
+	SymmetricKey kp(tmpk, m_bcgState->Nonce, m_bcgState->Code);
 	m_bcgCipher->Initialize(true, kp);
 	// reset the reseed counter
 	m_bcgState->Counter = 0;
@@ -395,7 +396,7 @@ void BCG::Update(const SecureVector<byte> &Key)
 	}
 
 	// reinitialize the generator with the nonce and distribution codes preserved
-	SymmetricKey kp(tmpk, m_bcgState->Nonce, m_bcgCipher->DistributionCode());
+	SymmetricKey kp(tmpk, m_bcgState->Nonce, m_bcgState->Code);
 	m_bcgCipher->Initialize(true, kp);
 	// reset the reseed counter
 	m_bcgState->Counter = 0;

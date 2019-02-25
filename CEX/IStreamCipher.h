@@ -26,6 +26,7 @@
 #include "ISymmetricKey.h"
 #include "ParallelOptions.h"
 #include "ParallelTools.h"
+#include "SecureVector.h"
 #include "StreamAuthenticators.h"
 #include "StreamCiphers.h"
 #include "SymmetricKeySize.h"
@@ -77,17 +78,6 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: Internal block size of internal cipher in bytes.
-	/// </summary>
-	virtual const size_t BlockSize() = 0;
-
-	/// <summary>
-	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code is set with the ISymmetricKey Info parameter; and can be used as a secondary domain key.</para>
-	/// </summary>
-	virtual const size_t DistributionCodeMax() = 0;
-
-	/// <summary>
 	/// Read Only: The stream ciphers type name
 	/// </summary>
 	virtual const StreamCiphers Enumeral() = 0;
@@ -96,6 +86,11 @@ public:
 	/// Read Only: Cipher has authentication enabled
 	/// </summary>
 	virtual const bool IsAuthenticator() = 0;
+
+	/// <summary>
+	/// Read Only: The cipher has been initialized for encryption
+	/// </summary>
+	virtual const bool IsEncryption() = 0;
 
 	/// <summary>
 	/// Read Only: Cipher is ready to transform data
@@ -136,7 +131,14 @@ public:
 	/// <summary>
 	/// Read Only: The current MAC tag value
 	/// </summary>
-	virtual const std::vector<byte> &Tag() = 0;
+	virtual const std::vector<byte> Tag() = 0;
+
+	/// <summary>
+	/// Copy the MAC tag to a secure-vector
+	/// </summary>
+	/// 
+	/// <param name="Output">The secure-vector receiving the MAC code</param>
+	virtual const void Tag(SecureVector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Read Only: The legal tag length in bytes
@@ -146,18 +148,10 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Read/Write: The stream ciphers authentication MAC generator type.
-	/// <para>Set the MAC generator (HMAC, KMAK -N), type used to authenticate the stream.</para>
-	/// </summary>
-	/// 
-	/// <param name="AuthenticatorType">The MAC generator used to calculate the authentication code</param>
-	virtual void Authenticator(StreamAuthenticators AuthenticatorType) = 0;
-
-	/// <summary>
 	/// Initialize the cipher with an ISymmetricKey key container.
 	/// <para>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream.
 	/// Authentication on a decrypted stream can be performed by manually by comparing output with the the Finalize(Output, Offset, Length) function.
-	/// If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</para>
+	/// If encryption and authentication are set to true, the MAC code can be appended to the cipher-text array using the Finalize(Output, Offset, Length) function.</para>
 	/// </summary>
 	/// 
 	/// <param name="Parameters">Cipher key container. The LegalKeySizes property contains valid sizes</param>

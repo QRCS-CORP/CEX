@@ -218,8 +218,8 @@
     <ClInclude Include="..\..\CEX\CBC.h" />
     <ClInclude Include="..\..\CEX\CFB.h" />
     <ClInclude Include="..\..\CEX\ChaCha.h" />
-    <ClInclude Include="..\..\CEX\ChaCha256.h" />
-    <ClInclude Include="..\..\CEX\ChaCha512.h" />
+    <ClInclude Include="..\..\CEX\CSX256.h" />
+    <ClInclude Include="..\..\CEX\CSX512.h" />
     <ClInclude Include="..\..\CEX\CipherModeFromName.h" />
     <ClInclude Include="..\..\CEX\CipherModes.h" />
     <ClInclude Include="..\..\CEX\CipherStream.h" />
@@ -361,9 +361,9 @@
     <ClInclude Include="..\..\CEX\SystemTools.h" />
     <ClInclude Include="..\..\CEX\Skein.h" />
     <ClInclude Include="..\..\CEX\Threefish.h" />
-    <ClInclude Include="..\..\CEX\Threefish1024.h" />
-    <ClInclude Include="..\..\CEX\Threefish256.h" />
-    <ClInclude Include="..\..\CEX\Threefish512.h" />
+    <ClInclude Include="..\..\CEX\TSX1024.h" />
+    <ClInclude Include="..\..\CEX\TSX256.h" />
+    <ClInclude Include="..\..\CEX\TSX512.h" />
     <ClInclude Include="..\..\CEX\ThreefishModes.h" />
     <ClInclude Include="..\..\CEX\TimeStamp.h" />
     <ClInclude Include="..\..\CEX\UInt128.h" />
@@ -430,8 +430,8 @@
     <ClCompile Include="..\..\CEX\CBC.cpp" />
     <ClCompile Include="..\..\CEX\CFB.cpp" />
     <ClCompile Include="..\..\CEX\ChaCha.cpp" />
-    <ClCompile Include="..\..\CEX\ChaCha256.cpp" />
-    <ClCompile Include="..\..\CEX\ChaCha512.cpp" />
+    <ClCompile Include="..\..\CEX\CSX256.cpp" />
+    <ClCompile Include="..\..\CEX\CSX512.cpp" />
     <ClCompile Include="..\..\CEX\CipherModeFromName.cpp" />
     <ClCompile Include="..\..\CEX\CipherModes.cpp" />
     <ClCompile Include="..\..\CEX\CipherStream.cpp" />
@@ -566,9 +566,9 @@
     <ClCompile Include="..\..\CEX\SymmetricKey.cpp" />
     <ClCompile Include="..\..\CEX\SystemTools.cpp" />
     <ClCompile Include="..\..\CEX\Threefish.cpp" />
-    <ClCompile Include="..\..\CEX\Threefish1024.cpp" />
-    <ClCompile Include="..\..\CEX\Threefish256.cpp" />
-    <ClCompile Include="..\..\CEX\Threefish512.cpp" />
+    <ClCompile Include="..\..\CEX\TSX1024.cpp" />
+    <ClCompile Include="..\..\CEX\TSX256.cpp" />
+    <ClCompile Include="..\..\CEX\TSX512.cpp" />
     <ClCompile Include="..\..\CEX\ThreefishModes.cpp" />
     <ClCompile Include="..\..\CEX\TimeStamp.cpp" />
     <ClCompile Include="..\..\CEX\X923.cpp" />

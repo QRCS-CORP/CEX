@@ -104,8 +104,6 @@ private:
 
 public:
 
-	struct ChaChaState;
-
 	/// <summary>
 	/// The compact form of the ChaCha permutation function.
 	/// <para>This function has been optimized for a small memory consumption.

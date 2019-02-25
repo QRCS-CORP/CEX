@@ -140,8 +140,8 @@ namespace Test
 		void CBCSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CFBSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CTRSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void ChaCha256SpeedTest();
-		void ChaCha512SpeedTest();
+		void CSX256SpeedTest();
+		void CSX512SpeedTest();
 		void Threefish256SpeedTest();
 		void Threefish512SpeedTest();
 		void Threefish1024SpeedTest();

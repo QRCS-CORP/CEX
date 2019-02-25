@@ -82,7 +82,6 @@ namespace Test
 			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 exception handling tests.."));
 
 			// test 2 succesive finalization calls against mac output and expected ciphertext
-			Kat(acs256s, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
 			Finalization(acsc256h256, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0], m_code[1]);
 			Finalization(acsc256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[2], m_code[3]);
 			Finalization(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[3], m_code[4], m_code[5]);
@@ -245,26 +244,6 @@ namespace Test
 			Cipher->Initialize(true, kp);
 
 			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE3"));
-		}
-		catch (CryptoSymmetricException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
-		// illegaly sized info
-		try
-		{
-			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize());
-			std::vector<byte> info(ks.InfoSize() + 1);
-			SymmetricKey kp(key, nonce, info);
-
-			Cipher->Initialize(true, kp);
-
-			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE4"));
 		}
 		catch (CryptoSymmetricException const &)
 		{
@@ -569,31 +548,33 @@ namespace Test
 		const std::vector<std::string> code =
 		{
 			// acsc256h256
-			std::string("81ed22f8851525e831f572b401e71fd3455ebfb131757745f28e27356cda0df1"),
-			std::string("391edeb9849f52a7d4062423b0704fe1a411a6815a47c418cae74dc9e7ef49b5"),
+			std::string("B4FCEB06CB633AB43D010C05FBE1F5BEA0DC219DE5844347D050FA7D1A199EF3"),
+			std::string("84577B2B0E61382FCF8AAB8554D0C0CD4D935E9D3E237871BCA780B4A0A585BA"),
 			// acsc256k256
-			std::string("945bb97dca3fbd78856296bd336fb6f7e6143b954ef151e0763a1c565a6e8aae"),
-			std::string("a79a6b389fadc2dd6957b7f3fb107c7fcbd17f0070c71ac94a7da113a96984a8"),
+			std::string("306608A5B36E4C72B68CE31E910E384AD993319523990DF14A3502564EA03B01"),
+			std::string("318E37E8590849B3BC9E6A12B0B78F6CE02532A11C9906E123FCE977B539483F"),
 			// acsc512h512
-			std::string("c47340c3358adb6ee04b675d750df482cbf47867ff30b2e3a0fb4c1f5cf1bafef0b801197f3b50dcf0a9e665a41a197d6186fcbbd5e4c68ad9de7cf7d16a7c83"),
-			std::string("14610fd3d0a3845ee08bb737c3d9a65c4f9db0d8faabf01c10451c4855ba91d46dab55d82079945cdcc211250fd83e770238ef10ec269e12acc43b070773df26"),
+			std::string("F708E5DC67ABA5FEC10B1121B5BB9A392CBD583AA490A892F6B33D5698D5D76B81B780265478476E585AB2D85A845DFBFFE58EABFE4E0C30B667E1EC489FF106"),
+			std::string("DA442FB7B4B118882F7FBA1102318D8254B40F06F1BB26DE1B3A5E5DBCF7797742FE5FFE620751D827AD2D4F7D493F3176C1EF6526DDED2BB1BF332FB5CD9082"),
 			// acsc512k512
-			std::string("fee77603c281d8ec218d0edbb87bb6c659ee32b6cfeb3e95f867e20fe401044858e9f4115f4156f23cf146d82e480fa78368a0612875d46e58d2fa7faa9421c4"),
-			std::string("0975d13bd7add466109d5b2d94030b8d5a4ae58702572a00d8601e9861fe079a3687ee8211f63d7f7cf448a35b2d15c7546eae88e769eb2f99c832efef9008e5"),
+			std::string("1D1A16944C1FCE2287722994EE0A974FC8C5C702C8BD3A265BF4A7AFD12A152A192B467E293CDCCBF8BDFDB46EC91F848FC81FDFE6E9BB2846E51489EDDE58C7"),
+			std::string("C637C10AD7780382EEED50F4884544AD24EE3696B7AFAB3A5E361A2A95E15D02792D2C168459716F4451042170C7EB277067BF06610A8C036CEC6309B2A2E47C"),
 			// acs1024k1024
-			std::string("bee261fa0ee3c324a4fb61682c3760ebc3d78cfdad2fc9642a577f0395028dba02554ac7375520f0c0d16eef912042b326d06d9e60641dc7c8d136c8416e99805405b918149e5fa1b477f2f84cb8f2cec2543a77a787f2e4e79f84df27412a4e89452cad1055cd23ce62987a3a9c311dce67b033535100415c016acc8fe1a7c3"),
-			std::string("4f548fb58b13136e7e77f534037a3d87216f0fa9b70f9bf1d013f86c1cd87f000eea920b869ae8666a1e01ebdd87d096b9321773850d1b7e29b662026c6a56689b6e2e481062d5460d9dc7bdd23921f2bdd52ce2cfdcc2dd3c25f7faf08b23084c1581a636de01a3a35e9f51df92ec55e0c8849cd554fda28657d377cf499853")
+			std::string("B10C0B0334EA1C87FF53FAC4EB30FAA20E35A0041DB30B7C7AA96D2D682CDAF89C0D8F5724FB37605B3E684C57CDFBAA182001A5CB4409D47DD266609E25EB6F"
+				"D90F86754E96EA1A40FAD0D350BE72227A6CA4E23E465962C5BC5E13D65BC9D88935FB17B8701030AF7509FCC48F9CE6A5532D4C5F2BE0F664387D5F172CBC93"),
+			std::string("055E73BD5746D8812F499D5F27F0170E77B0D7A404F8F5AB4941BDFDD533F9681EE1EC64809FDAD99A48542964BF6445244E794D262FDD3312FFBDFF89C1F3A5"
+				"4152571B01E3268FC2925C4AC651662C0988E15D9F2E92F1CB714B57E523F7FA28EE8F19F92FE1E3A0E3FAE60E58E436377EB486C6ED7FA82778065471D89850")
 		};
 		HexConverter::Decode(code, 10, m_code);
 
 		const std::vector<std::string> expected =
 		{
 			std::string("81F10A87673A10B1EC8AE4714002D290"),	// acs256s
-			std::string("123e76a4c56c645acc1efc9a8fe5e038"),	// acsc256h256
-			std::string("291eebf102784fbbb0394c01fe4c240a"),	// acsc256k256
-			std::string("b806df0c06acbb245aef54cca8688a1d"),	// acsc512h512
-			std::string("d5d878f2cb7d7bc573e32fc811fb2486"),	// acsc512k512
-			std::string("9483767bb1369c6dabf2db74d76ba938")		// acsc1024k1024
+			std::string("BB51D8B7FFAA21865D2CF2966820B90C"),	// acsc256h256
+			std::string("F6A3BAE81E07DC7DAE0EB1942BB7F050"),	// acsc256k256
+			std::string("441B1CB9D580188340EB427C64933A72"),	// acsc512h512
+			std::string("7891C7C86EEE937E1ECD14E4AF4ACC31"),	// acsc512k512
+			std::string("E5D8B4D0EF17B3E1669EED1278FE74B8")		// acsc1024k1024
 		};
 		HexConverter::Decode(expected, 6, m_expected);
 

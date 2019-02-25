@@ -132,9 +132,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afb36a778b93e9de39f12b2ef61a59012"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_t_r.html#afb36a778b93e9de39f12b2ef61a59012">Name</a> () override</td></tr>
 <tr class="memdesc:afb36a778b93e9de39f12b2ef61a59012"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The mode and cipher name  <a href="#afb36a778b93e9de39f12b2ef61a59012">More...</a><br /></td></tr>
 <tr class="separator:afb36a778b93e9de39f12b2ef61a59012"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe220ca32c60129eb8660df964eef991"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_t_r.html#abe220ca32c60129eb8660df964eef991">Nonce</a> ()</td></tr>
-<tr class="memdesc:abe220ca32c60129eb8660df964eef991"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The CBC initialization vector (exposed for CMAC)  <a href="#abe220ca32c60129eb8660df964eef991">More...</a><br /></td></tr>
-<tr class="separator:abe220ca32c60129eb8660df964eef991"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a377931b7d65e71fbdd1aac7517e612c2"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_t_r.html#a377931b7d65e71fbdd1aac7517e612c2">Nonce</a> ()</td></tr>
+<tr class="memdesc:a377931b7d65e71fbdd1aac7517e612c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The CTR initialization vector (exposed for ACS)  <a href="#a377931b7d65e71fbdd1aac7517e612c2">More...</a><br /></td></tr>
+<tr class="separator:a377931b7d65e71fbdd1aac7517e612c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab54c0017386c419b67b75bf9db511bbc"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_t_r.html#ab54c0017386c419b67b75bf9db511bbc">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:ab54c0017386c419b67b75bf9db511bbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#ab54c0017386c419b67b75bf9db511bbc">More...</a><br /></td></tr>
 <tr class="separator:ab54c0017386c419b67b75bf9db511bbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,7 +178,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of a Big-Endian integer Counter Mode </p>
-<p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_c_t_r.html">CTR</a> cipher(<span class="keyword">new</span> AES());</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_c_t_r.html#abe220ca32c60129eb8660df964eef991">Nonce</a>));</div><div class="line"><span class="comment">// encrypt one block</span></div><div class="line">cipher.EncryptBlock(Input, 0, Output, 0);</div></div><!-- fragment --> <p>Encrypting using parallel processing: </p><div class="fragment"><div class="line"><a class="code" href="class_c_t_r.html">CTR</a> cipher(BlockCiphers::AES);</div><div class="line"><span class="comment">// enable parallel and define parallel input block size</span></div><div class="line">cipher.IsParallel() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// calculated automatically based on cache size, but overridable</span></div><div class="line">cipher.ParallelBlockSize() = cipher.ProcessorCount() * 32000;</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_c_t_r.html#abe220ca32c60129eb8660df964eef991">Nonce</a>));</div><div class="line"><span class="comment">// encrypt one parallel sized block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_c_t_r.html">CTR</a> cipher(<span class="keyword">new</span> AES());</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_c_t_r.html#a377931b7d65e71fbdd1aac7517e612c2">Nonce</a>));</div><div class="line"><span class="comment">// encrypt one block</span></div><div class="line">cipher.EncryptBlock(Input, 0, Output, 0);</div></div><!-- fragment --> <p>Encrypting using parallel processing: </p><div class="fragment"><div class="line"><a class="code" href="class_c_t_r.html">CTR</a> cipher(BlockCiphers::AES);</div><div class="line"><span class="comment">// enable parallel and define parallel input block size</span></div><div class="line">cipher.IsParallel() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// calculated automatically based on cache size, but overridable</span></div><div class="line">cipher.ParallelBlockSize() = cipher.ProcessorCount() * 32000;</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_c_t_r.html#a377931b7d65e71fbdd1aac7517e612c2">Nonce</a>));</div><div class="line"><span class="comment">// encrypt one parallel sized block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>The CTR Counter mode generates a key-stream by encrypting successive values of an incrementing Big Endian ordered 8bit integer counter array. <br />
 The key-stream is then XOR'd with the input message block creating a type of stream cipher. <br />
 In parallel mode, the CTR modes counter is increased by a number factored from the number of message blocks (ParallelBlockSize), allowing for counter pre-calculation and multi-threaded processing. <br />
@@ -924,30 +924,22 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 
 </div>
 </div>
-<a id="abe220ca32c60129eb8660df964eef991"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe220ca32c60129eb8660df964eef991">&#9670;&nbsp;</a></span>Nonce()</h2>
+<a id="a377931b7d65e71fbdd1aac7517e612c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a377931b7d65e71fbdd1aac7517e612c2">&#9670;&nbsp;</a></span>Nonce()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt;byte&gt;&amp; CTR::Nonce </td>
+          <td class="memname">const std::vector&lt; byte &gt; &amp; CTR::Nonce </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Read Only: The CBC initialization vector (exposed for CMAC) </p>
+<p>Read Only: The CTR initialization vector (exposed for ACS) </p>
 
 </div>
 </div>

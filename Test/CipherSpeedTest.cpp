@@ -15,11 +15,11 @@
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
 #include "../CEX/ACS.h"
-#include "../CEX/ChaCha256.h"
-#include "../CEX/ChaCha512.h"
-#include "../CEX/Threefish256.h"
-#include "../CEX/Threefish512.h"
-#include "../CEX/Threefish1024.h"
+#include "../CEX/CSX256.h"
+#include "../CEX/CSX512.h"
+#include "../CEX/TSX256.h"
+#include "../CEX/TSX512.h"
+#include "../CEX/TSX1024.h"
 #include "../CEX/SHA512.h"
 
 namespace Test
@@ -150,20 +150,20 @@ namespace Test
 			OnProgress(std::string("***ACS: Monte Carlo test (K=256; R=22)***"));
 			ACSSpeedTest();
 
-			OnProgress(std::string("***ChaCha256: Monte Carlo test (K=256; R=20)***"));
-			ChaCha256SpeedTest();
+			OnProgress(std::string("***CSX256: Monte Carlo test (K=256; R=20)***"));
+			CSX256SpeedTest();
 #if defined(CEX_CHACHA512_STRONG)
-			OnProgress(std::string("***ChaCha512: Monte Carlo test (K=512; R=80)***"));
+			OnProgress(std::string("***CSX512: Monte Carlo test (K=512; R=80)***"));
 #else
-			OnProgress(std::string("***ChaCha512: Monte Carlo test (K=512; R=40)***"));
+			OnProgress(std::string("***CSX512: Monte Carlo test (K=512; R=40)***"));
 #endif
-			ChaCha512SpeedTest();
+			CSX512SpeedTest();
 
-			OnProgress(std::string("***Threefish256: Monte Carlo test (K=256; R=72)***"));
+			OnProgress(std::string("***TSX256: Monte Carlo test (K=256; R=72)***"));
 			Threefish256SpeedTest();
-			OnProgress(std::string("***Threefish512: Monte Carlo test (K=512; R=96)***"));
+			OnProgress(std::string("***TSX512: Monte Carlo test (K=512; R=96)***"));
 			Threefish512SpeedTest();
-			OnProgress(std::string("***Threefish1024: Monte Carlo test (K=1024; R=120)***"));
+			OnProgress(std::string("***TSX1024: Monte Carlo test (K=1024; R=120)***"));
 			Threefish1024SpeedTest();
 
 			return MESSAGE;
@@ -271,37 +271,37 @@ namespace Test
 		delete cipher;
 	}
 
-	void CipherSpeedTest::ChaCha256SpeedTest()
+	void CipherSpeedTest::CSX256SpeedTest()
 	{
-		ChaCha256* cipher = new ChaCha256(Enumeration::StreamAuthenticators::None);
+		CSX256* cipher = new CSX256(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 32, 8, 10, m_progressEvent);
 		delete cipher;
 	}
 
-	void CipherSpeedTest::ChaCha512SpeedTest()
+	void CipherSpeedTest::CSX512SpeedTest()
 	{
-		ChaCha512* cipher = new ChaCha512(Enumeration::StreamAuthenticators::None);
+		CSX512* cipher = new CSX512(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 64, 0, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish256SpeedTest()
 	{
-		Threefish256* cipher = new Threefish256(Enumeration::StreamAuthenticators::None);
+		TSX256* cipher = new TSX256(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish512SpeedTest()
 	{
-		Threefish512* cipher = new Threefish512(Enumeration::StreamAuthenticators::None);
+		TSX512* cipher = new TSX512(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 64, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::Threefish1024SpeedTest()
 	{
-		Threefish1024* cipher = new Threefish1024(Enumeration::StreamAuthenticators::None);
+		TSX1024* cipher = new TSX1024(Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 128, 16, 10, m_progressEvent);
 		delete cipher;
 	}

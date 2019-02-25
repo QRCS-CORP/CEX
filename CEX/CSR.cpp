@@ -79,8 +79,9 @@ void CSR::Reset()
 		throw CryptoRandomException(Name(), std::string("Reset"), std::string("The random provider can not be instantiated!"), ErrorCodes::NoAccess);
 	}
 
-	std::vector<byte> key(m_rngGenerator->LegalKeySizes()[1].KeySize());
-	std::vector<byte> cust(m_rngGenerator->LegalKeySizes()[1].NonceSize());
+	Cipher::SymmetricKeySize ks = m_rngGenerator->LegalKeySizes()[1];
+	std::vector<byte> key(ks.KeySize());
+	std::vector<byte> cust(ks.NonceSize());
 	pvd->Generate(key);
 	pvd->Generate(cust);
 	delete pvd;

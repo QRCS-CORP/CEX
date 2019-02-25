@@ -68,7 +68,7 @@ public:
 	/// <summary>
 	/// Read Only: Available KDF Key Sizes in SymmetricKeySize containers
 	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+	const std::vector<SymmetricKeySize> LegalKeySizes() override;
 
 	/// <summary>
 	/// Read Only: Minimum recommended initialization key size in bytes

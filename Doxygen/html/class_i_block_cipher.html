@@ -103,15 +103,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa707b80fdc28494d5d036d921181d17b"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_block_cipher.html#aa707b80fdc28494d5d036d921181d17b">BlockSize</a> ()=0</td></tr>
 <tr class="memdesc:aa707b80fdc28494d5d036d921181d17b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Unit block size of internal cipher in bytes  <a href="#aa707b80fdc28494d5d036d921181d17b">More...</a><br /></td></tr>
 <tr class="separator:aa707b80fdc28494d5d036d921181d17b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2839f501c66204d3f5295103bbffefdb"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_block_cipher.html#a2839f501c66204d3f5295103bbffefdb">CipherExtension</a> ()=0</td></tr>
-<tr class="memdesc:a2839f501c66204d3f5295103bbffefdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The extended key-schedule KDF generator type  <a href="#a2839f501c66204d3f5295103bbffefdb">More...</a><br /></td></tr>
-<tr class="separator:a2839f501c66204d3f5295103bbffefdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc9422a89fa5a4c5c8bc103485d6b5a5"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_block_cipher.html#adc9422a89fa5a4c5c8bc103485d6b5a5">DistributionCode</a> ()=0</td></tr>
-<tr class="memdesc:adc9422a89fa5a4c5c8bc103485d6b5a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.  <a href="#adc9422a89fa5a4c5c8bc103485d6b5a5">More...</a><br /></td></tr>
-<tr class="separator:adc9422a89fa5a4c5c8bc103485d6b5a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3d0e675040f543a4e80eb05cb69ac54"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_block_cipher.html#af3d0e675040f543a4e80eb05cb69ac54">DistributionCodeMax</a> ()=0</td></tr>
-<tr class="memdesc:af3d0e675040f543a4e80eb05cb69ac54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum size of the distribution code in bytes.  <a href="#af3d0e675040f543a4e80eb05cb69ac54">More...</a><br /></td></tr>
-<tr class="separator:af3d0e675040f543a4e80eb05cb69ac54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12c496427a3455d2507e23f8df972032"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_block_cipher.html#a12c496427a3455d2507e23f8df972032">Enumeral</a> ()=0</td></tr>
 <tr class="memdesc:a12c496427a3455d2507e23f8df972032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers type name  <a href="#a12c496427a3455d2507e23f8df972032">More...</a><br /></td></tr>
 <tr class="separator:a12c496427a3455d2507e23f8df972032"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -279,35 +270,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2839f501c66204d3f5295103bbffefdb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2839f501c66204d3f5295103bbffefdb">&#9670;&nbsp;</a></span>CipherExtension()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual const <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> IBlockCipher::CipherExtension </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The extended key-schedule KDF generator type </p>
-
-<p>Implemented in <a class="el" href="class_s_h_x.html#a4d3af81ffb2b99e046839608b2a0ef17">SHX</a>, and <a class="el" href="class_r_h_x.html#a880730f9c91af4993d03f2c52a9cd844">RHX</a>.</p>
-
-</div>
-</div>
 <a id="a5978f9cc97448d92315fe12d85ccb840"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5978f9cc97448d92315fe12d85ccb840">&#9670;&nbsp;</a></span>DecryptBlock() <span class="overload">[1/2]</span></h2>
 
@@ -415,66 +377,6 @@ Public Member Functions</h2></td></tr>
 </dl>
 
 <p>Implemented in <a class="el" href="class_s_h_x.html#a0e5ba9f06e186169823a401f6ecebcb8">SHX</a>, and <a class="el" href="class_r_h_x.html#ab7339d75fb6556b927d3e7f9b28a06c8">RHX</a>.</p>
-
-</div>
-</div>
-<a id="adc9422a89fa5a4c5c8bc103485d6b5a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc9422a89fa5a4c5c8bc103485d6b5a5">&#9670;&nbsp;</a></span>DistributionCode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::vector&lt;byte&gt;&amp; IBlockCipher::DistributionCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters. </p>
-<p>Changing this code will create a unique distribution of the cipher. Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size. For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax size. Note: If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</p>
-
-<p>Implemented in <a class="el" href="class_s_h_x.html#a433739e562fa270770d5f123a693e959">SHX</a>, and <a class="el" href="class_r_h_x.html#ab4e13dab8df5c99c65dc50cc709dde86">RHX</a>.</p>
-
-</div>
-</div>
-<a id="af3d0e675040f543a4e80eb05cb69ac54"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af3d0e675040f543a4e80eb05cb69ac54">&#9670;&nbsp;</a></span>DistributionCodeMax()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual const size_t IBlockCipher::DistributionCodeMax </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: The maximum size of the distribution code in bytes. </p>
-<p>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase. If used as a nonce the distribution code should be secret, and equal in size to this value</p>
-
-<p>Implemented in <a class="el" href="class_s_h_x.html#aaea6e92b9321ad8acc1398a3f5cecb89">SHX</a>, and <a class="el" href="class_r_h_x.html#a8205da687db6eb4de6dfffb6dbed0cdb">RHX</a>.</p>
 
 </div>
 </div>

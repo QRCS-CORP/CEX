@@ -83,27 +83,6 @@ public:
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Read Only: The extended key-schedule KDF generator type
-	/// </summary>
-	virtual const BlockCipherExtensions CipherExtension() = 0;
-
-	/// <summary>
-	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
-	/// <para>Changing this code will create a unique distribution of the cipher.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax size.
-	/// Note: If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
-	/// </summary>
-	virtual std::vector<byte> &DistributionCode() = 0;
-
-	/// <summary>
-	/// Read Only: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
-	/// If used as a nonce the distribution code should be secret, and equal in size to this value</para>
-	/// </summary>
-	virtual const size_t DistributionCodeMax() = 0;
-
-	/// <summary>
 	/// Read Only: The block ciphers type name
 	/// </summary>
 	virtual const BlockCiphers Enumeral() = 0;

@@ -59,7 +59,7 @@ DLL API \n \n
 Added the NTRU Prime asymmetric cipher \n
 Added the RSX symmetric cipher \n
 Added the Threefish 256/512/1024 symmetric ciphers \n
-Added ChaCha512-P80 symmetric cipher \n
+Added CSX512-P80 symmetric cipher \n
 Asymmetric ciphers updated to the NIST PQ Round 1 versions \n \n
 
 <B>Version 1.0.0.5, February 22, 2018</B> \n
@@ -283,12 +283,12 @@ NAMESPACE_ROOT
 		*/
 		NAMESPACE_STREAM
 			class ACS {};
-			class ChaCha256 {};
-			class ChaCha512 {};
+			class CSX256 {};
+			class CSX512 {};
 			class IStreamCipher {};
-			class Threefish256 {};
-			class Threefish512 {};
-			class Threefish1024 {};
+			class TSX256 {};
+			class TSX512 {};
+			class TSX1024 {};
 		NAMESPACE_STREAMEND
 		/*! @} */
 

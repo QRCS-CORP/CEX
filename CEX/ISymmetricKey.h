@@ -66,6 +66,21 @@ public:
 	/// </summary>
 	virtual const std::vector<byte> Nonce() = 0;
 
+	/// <summary>
+	/// Read/Write: Return a secure-vector copy of the personalization string; can also used as an additional source of entropy in some constructions
+	/// </summary>
+	virtual const SecureVector<byte> SecureInfo() = 0;
+
+	/// <summary>
+	/// Read Only: Return a secure-vector copy of the primary key
+	/// </summary>
+	virtual const SecureVector<byte> SecureKey() = 0;
+
+	/// <summary>
+	/// Read Only: Return a secure-vector copy of the nonce; can also be used as the salt or iv
+	/// </summary>
+	virtual const SecureVector<byte> SecureNonce() = 0;
+
 	//~~~Public Functions~~~//
 
 	/// <summary>

@@ -228,9 +228,10 @@ namespace Test
 	{
 		BCG gen(BlockCiphers::RHXS256, Providers::CSP, Parallel);
 		CSP pvd;
-		std::vector<byte> tmpk(gen.LegalKeySizes()[1].KeySize());
-		std::vector<byte> tmpn(gen.LegalKeySizes()[1].NonceSize());
-		std::vector<byte> tmpi(gen.LegalKeySizes()[1].InfoSize());
+		SymmetricKeySize ks = gen.LegalKeySizes()[1];
+		std::vector<byte> tmpk(ks.KeySize());
+		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpi(ks.InfoSize());
 		const size_t PRCLEN = Parallel ? gen.ParallelBlockSize() : 1024;
 		std::vector<byte> tmpr(PRCLEN);
 		size_t plen;
@@ -262,9 +263,10 @@ namespace Test
 	{
 		CSG gen(ShakeModes::SHAKE256, Providers::CSP, Parallel);
 		CSP pvd;
-		std::vector<byte> tmpk(gen.LegalKeySizes()[1].KeySize());
-		std::vector<byte> tmpn(gen.LegalKeySizes()[1].NonceSize());
-		std::vector<byte> tmpi(gen.LegalKeySizes()[1].InfoSize());
+		SymmetricKeySize ks = gen.LegalKeySizes()[1];
+		std::vector<byte> tmpk(ks.KeySize());
+		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpi(ks.InfoSize());
 		const size_t PRCLEN = Parallel ? 4096 : 1024;
 		std::vector<byte> tmpr(PRCLEN);
 		size_t plen;
@@ -295,9 +297,10 @@ namespace Test
 	{
 		HCG gen(SHA2Digests::SHA256, Providers::CSP);
 		CSP pvd;
-		std::vector<byte> tmpk(gen.LegalKeySizes()[1].KeySize());
-		std::vector<byte> tmpn(gen.LegalKeySizes()[1].NonceSize());
-		std::vector<byte> tmpi(gen.LegalKeySizes()[1].InfoSize());
+		SymmetricKeySize ks = gen.LegalKeySizes()[1];
+		std::vector<byte> tmpk(ks.KeySize());
+		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpi(ks.InfoSize());
 		std::vector<byte> tmpr(1024);
 		size_t plen;
 
@@ -395,9 +398,10 @@ namespace Test
 	{
 		Kdf::SHAKE gen(ShakeModes::SHAKE256);
 		CSP pvd;
-		std::vector<byte> tmpk(gen.LegalKeySizes()[1].KeySize());
-		std::vector<byte> tmpn(gen.LegalKeySizes()[1].NonceSize());
-		std::vector<byte> tmpi(gen.LegalKeySizes()[1].InfoSize());
+		SymmetricKeySize ks = gen.LegalKeySizes()[1];
+		std::vector<byte> tmpk(ks.KeySize());
+		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpi(ks.InfoSize());
 		std::vector<byte> tmpr(1024);
 		size_t plen;
 

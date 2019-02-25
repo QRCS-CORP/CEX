@@ -33,7 +33,7 @@ const Kdfs KdfBase::Enumeral()
 	return m_kdfEnumeral;
 }
 
-std::vector<SymmetricKeySize> KdfBase::LegalKeySizes() const
+const std::vector<SymmetricKeySize> KdfBase::LegalKeySizes()
 {
 	return m_legalKeySizes;
 }

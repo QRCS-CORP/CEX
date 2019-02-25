@@ -262,37 +262,37 @@ IStreamCipher* AsymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 	{
 	case SecurityPolicy::SPL256:
 	{
-		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish256);
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX256);
 		break;
 	}
 	case SecurityPolicy::SPL256AE:
 	{
-		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish256AE);
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX256AE);
 		break;
 	}
 	case SecurityPolicy::SPL512:
 	{
-		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512);
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512);
 		break;
 	}
 	case SecurityPolicy::SPL512AE:
 	{
-		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512AE);
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512AE);
 		break;
 	}
 	case SecurityPolicy::SPL1024:
 	{
-		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish1024);
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX1024);
 		break;
 	}
 	case SecurityPolicy::SPL1024AE:
 	{
-		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish1024AE);
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX1024AE);
 		break;
 	}
 	default:
 	{
-		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::Threefish512AE);
+		cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512AE);
 	}
 	}
 

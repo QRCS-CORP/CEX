@@ -1448,7 +1448,8 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time: comparison of two arrays segments with offset and length parameters
+	/// Constant time: value comparison between two arrays with offset and length parameters.
+	/// <para>Array container types can vary (standard array, vector, or SecureVector), but array elements must be of equal size.</para>
 	/// </summary>
 	/// 
 	/// <param name="A">The first array to compare</param>
@@ -1458,10 +1459,10 @@ public:
 	/// <param name="Length">The number of elements to compare</param>
 	/// 
 	/// <returns>True if arrays are equivalant</returns>
-	template <typename Array>
-	inline static bool Compare(const Array &A, size_t AOffset, const Array &B, size_t BOffset, size_t Length)
+	template <typename ArrayA, typename ArrayB>
+	inline static bool Compare(const ArrayA &A, size_t AOffset, const ArrayB &B, size_t BOffset, size_t Length)
 	{
-		Array::value_type delta;
+		ArrayA::value_type delta;
 		size_t i;
 
 		delta = 0;

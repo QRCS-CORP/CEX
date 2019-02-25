@@ -117,6 +117,11 @@ const std::string CTR::Name()
 	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
+const std::vector<byte> &CTR::Nonce()
+{ 
+	return m_ctrVector; 
+}
+
 const size_t CTR::ParallelBlockSize()
 {
 	return m_parallelProfile.ParallelBlockSize();
@@ -240,44 +245,44 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	if (Length >= AVX512BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX512BLK);
-		std::vector<byte> ctrBlk(AVX512BLK);
+		std::vector<byte> tmpc(AVX512BLK);
 
 		// stagger counters and process 8 blocks with avx512
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 0);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 0);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 16);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 16);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 32);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 32);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 48);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 48);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 64);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 64);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 80);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 80);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 96);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 96);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 112);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 112);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 128);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 128);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 144);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 144);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 160);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 160);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 176);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 176);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 192);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 192);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 208);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 208);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 224);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 224);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 240);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 240);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			m_blockCipher->Transform2048(ctrBlk, 0, Output, OutOffset + blkCtr);
+			m_blockCipher->Transform2048(tmpc, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX512BLK;
 		}
 	}
@@ -286,28 +291,28 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	if (Length >= AVX2BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX2BLK);
-		std::vector<byte> ctrBlk(AVX2BLK);
+		std::vector<byte> tmpc(AVX2BLK);
 		
 		// stagger counters and process 8 blocks with avx2
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 0);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 0);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 16);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 16);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 32);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 32);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 48);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 48);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 64);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 64);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 80);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 80);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 96);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 96);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 112);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 112);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			m_blockCipher->Transform1024(ctrBlk, 0, Output, OutOffset + blkCtr);
+			m_blockCipher->Transform1024(tmpc, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX2BLK;
 		}
 	}
@@ -316,20 +321,20 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	if (Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
-		std::vector<byte> ctrBlk(AVXBLK);
+		std::vector<byte> tmpc(AVXBLK);
 
 		// 4 blocks with avx
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 0);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 0);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 16);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 16);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 32);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 32);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, ctrBlk, 48);
+			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 48);
 			Utility::IntegerTools::BeIncrement8(Counter);
-			m_blockCipher->Transform512(ctrBlk, 0, Output, OutOffset + blkCtr);
+			m_blockCipher->Transform512(tmpc, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVXBLK;
 		}
 	}

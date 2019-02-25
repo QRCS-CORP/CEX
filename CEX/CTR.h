@@ -212,9 +212,9 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: The CBC initialization vector (exposed for CMAC)
+	/// Read Only: The CTR initialization vector (exposed for ACS)
 	/// </summary>
-	const std::vector<byte> &Nonce() { return m_ctrVector; }
+	const std::vector<byte> &Nonce();
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
