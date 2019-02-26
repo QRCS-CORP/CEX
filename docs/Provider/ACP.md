@@ -59,7 +59,7 @@ Fill a SecureVector with pseudo-random bytes using offset and length parameters
 ```cpp
 void Reset() override
 ```
-Reset the internal state More...
+Reset the internal state
 
 ## Links
 
