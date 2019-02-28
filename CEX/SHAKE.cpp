@@ -200,21 +200,7 @@ void SHAKE::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length
 
 void SHAKE::Initialize(ISymmetricKey &Parameters)
 {
-	if (Parameters.Nonce().size() != 0)
-	{
-		if (Parameters.Info().size() != 0)
-		{
-			Initialize(Parameters.Key(), Parameters.Nonce(), Parameters.Info());
-		}
-		else
-		{
-			Initialize(Parameters.Key(), Parameters.Nonce());
-		}
-	}
-	else
-	{
-		Initialize(Parameters.Key());
-	}
+	Initialize(Parameters.Key(), Parameters.Nonce(), Parameters.Info());
 }
 
 void SHAKE::Initialize(const std::vector<byte> &Key)
@@ -311,8 +297,8 @@ void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Cu
 
 	if (Customization.size() != 0)
 	{
-		std::vector<byte> tmpc(0);
-		Customize(Customization, tmpc, m_shakeState);
+		std::vector<byte> tmpn(0);
+		Customize(Customization, tmpn, m_shakeState);
 	}
 
 	FastAbsorb(Key, 0, Key.size(), m_shakeState);
@@ -348,7 +334,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Cu
 		Reset();
 	}
 
-	if (Customization.size() != 0)
+	if (Customization.size() != 0 || Information.size() != 0)
 	{
 		Customize(Customization, Information, m_shakeState);
 	}

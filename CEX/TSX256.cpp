@@ -165,15 +165,15 @@ const size_t TSX256::TagSize()
 
 void TSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.Key().size() != KEY_SIZE)
+	if (Parameters.KeySizes().KeySize() != KEY_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.Nonce().size() != (NONCE_SIZE * sizeof(ulong)))
+	if (Parameters.KeySizes().NonceSize() != (NONCE_SIZE * sizeof(ulong)))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidNonce);
 	}
-	if (Parameters.Info().size() > 0 && Parameters.Info().size() != INFO_SIZE)
+	if (Parameters.KeySizes().InfoSize() > 0 && Parameters.KeySizes().InfoSize() != INFO_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Info must be no more than 16 bytes!"), ErrorCodes::InvalidInfo);
 	}
@@ -200,7 +200,7 @@ void TSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	m_tsx256State->Nonce[0] = IntegerTools::LeBytesTo64(Parameters.Nonce(), 0);
 	m_tsx256State->Nonce[1] = IntegerTools::LeBytesTo64(Parameters.Nonce(), 8);
 
-	if (Parameters.Info().size() != 0)
+	if (Parameters.KeySizes().InfoSize() != 0)
 	{
 		// custom code
 		m_tsx256State->Tweak[0] = IntegerTools::LeBytesTo64(Parameters.Info(), 0);
@@ -226,10 +226,11 @@ void TSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_tsx256State->Counter = 1;
 
 		// create the cSHAKE customization string
-		m_tsx256State->Custom.resize(sizeof(ulong) + Name().size());
+		std::string tmpn = Name();
+		m_tsx256State->Custom.resize(sizeof(ulong) + tmpn.size());
 		// add mac counter and algorithm name to customization string
 		IntegerTools::Le64ToBytes(m_tsx256State->Counter, m_tsx256State->Custom, 0);
-		MemoryTools::Copy(Name(), 0, m_tsx256State->Custom, sizeof(ulong), Name().size());
+		MemoryTools::CopyFromObject(tmpn.data(), m_tsx256State->Custom, sizeof(ulong), tmpn.size());
 
 		// initialize cSHAKE
 		SHAKE gen(ShakeModes::SHAKE256);

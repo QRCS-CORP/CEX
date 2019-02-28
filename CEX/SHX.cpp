@@ -13,54 +13,80 @@
 
 NAMESPACE_BLOCK
 
-const std::string SHX::CIPHER_NAME("Serpent");
-const std::string SHX::CLASS_NAME("SHX");
-const std::string SHX::DEF_DSTINFO("SHX version 1 information string");
-
+using Utility::IntegerTools;
 using Enumeration::Kdfs;
+using Utility::MemoryTools;
+
+class SHX::ShxState
+{
+public:
+
+	SecureVector<byte> Custom;
+	SecureVector<uint> RoundKeys;
+	size_t Rounds;
+	BlockCipherExtensions Extension;
+	bool Destroyed;
+	bool Encryption;
+	bool Initialized;
+
+	ShxState(BlockCipherExtensions CipherExtension, bool IsDestroyed)
+		:
+		Custom(0),
+		RoundKeys(0),
+		Rounds(0),
+		Extension(CipherExtension),
+		Destroyed(IsDestroyed),
+		Encryption(false),
+		Initialized(false)
+	{
+	}
+
+	~ShxState()
+	{
+		MemoryTools::Clear(Custom, 0, Custom.size());
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		Rounds = 0;
+		Extension = BlockCipherExtensions::None;
+		Destroyed = false;
+		Encryption = false;
+		Initialized = false;
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(Custom, 0, Custom.size());
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		Encryption = false;
+		Initialized = false;
+	}
+};
 
 //~~~Constructor~~~//
 
 SHX::SHX(BlockCipherExtensions CipherExtension)
 	:
-	m_destroyEngine(true),
-	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_expKey(0),
+	m_shxState(new ShxState(CipherExtension, true)),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
-		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
-	m_isEncryption(false),
-	m_isInitialized(false),
 	m_legalKeySizes(CalculateKeySizes(CipherExtension))
 {
 }
 
 SHX::SHX(IKdf* Kdf)
 	:
-	m_destroyEngine(false),
-	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_expKey(0),
-	m_kdfGenerator(Kdf != nullptr ? Kdf :
-		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::IllegalOperation)),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_legalKeySizes(CalculateKeySizes(static_cast<BlockCipherExtensions>(Kdf->Enumeral())))
+	m_shxState(new ShxState(Kdf != nullptr ? static_cast<BlockCipherExtensions>(Kdf->Enumeral()) :
+		BlockCipherExtensions::None,
+		false)),
+	m_kdfGenerator(Kdf),
+	m_legalKeySizes(CalculateKeySizes(Kdf != nullptr ? static_cast<BlockCipherExtensions>(Kdf->Enumeral()) : 
+		BlockCipherExtensions::None))
 {
 }
 
 SHX::~SHX()
 {
-	m_isEncryption = false;
-	m_isInitialized = false;
-	m_rndCount = 0;
-
-	Utility::IntegerTools::Clear(m_expKey);
-	Utility::IntegerTools::Clear(m_legalKeySizes);
-
-	if (m_destroyEngine)
+	if (m_shxState->Destroyed)
 	{
-		m_destroyEngine = false;
-
 		if (m_kdfGenerator != nullptr)
 		{
 			m_kdfGenerator.reset(nullptr);
@@ -73,6 +99,8 @@ SHX::~SHX()
 			m_kdfGenerator.release();
 		}
 	}
+
+	IntegerTools::Clear(m_legalKeySizes);
 }
 
 //~~~Accessors~~~//
@@ -127,12 +155,12 @@ const BlockCiphers SHX::Enumeral()
 
 const bool SHX::IsEncryption()
 {
-	return m_isEncryption;
+	return m_shxState->Encryption;
 }
 
 const bool SHX::IsInitialized()
 {
-	return m_isInitialized;
+	return m_shxState->Initialized;
 }
 
 const std::vector<SymmetricKeySize> &SHX::LegalKeySizes()
@@ -151,7 +179,7 @@ const std::string SHX::Name()
 
 const size_t SHX::Rounds()
 {
-	return m_rndCount;
+	return m_shxState->Rounds;
 }
 
 const size_t SHX::StateCacheSize()
@@ -183,26 +211,42 @@ void SHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void SHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
 
-	if (Parameters.Info().size() > 0)
+	m_shxState->Encryption = Encryption;
+
+	// expand the key
+	if (m_kdfGenerator != nullptr)
 	{
-		m_distCode = Parameters.Info();
+		std::string tmpn = Name();
+		m_shxState->Custom.resize(tmpn.size() + sizeof(ushort) + Parameters.KeySizes().InfoSize());
+		// add the ciphers formal class name to the customization string
+		MemoryTools::CopyFromObject(tmpn.data(), m_shxState->Custom, 0, tmpn.size());
+		// add the key size in bits
+		ushort ksec = static_cast<ushort>(Parameters.KeySizes().KeySize()) * 8;
+		IntegerTools::Le16ToBytes(ksec, m_shxState->Custom, tmpn.size());
+		// append the optional info code
+		MemoryTools::Copy(Parameters.Info(), 0, m_shxState->Custom, tmpn.size() + sizeof(ushort), Parameters.KeySizes().InfoSize());
+
+		// kdf key expansion
+		SecureExpand(Parameters.SecureKey(), m_shxState, m_kdfGenerator);
+	}
+	else
+	{
+		// standard serpent key expansion + k512
+		StandardExpand(Parameters.SecureKey(), m_shxState);
 	}
 
-	m_isEncryption = Encryption;
-	// expand the key
-	ExpandKey(Parameters.Key());
 	// ready to transform data
-	m_isInitialized = true;
+	m_shxState->Initialized = true;
 }
 
 void SHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (m_isEncryption)
+	if (m_shxState->Encryption)
 	{
 		Encrypt128(Input, 0, Output, 0);
 	}
@@ -214,7 +258,7 @@ void SHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void SHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_shxState->Encryption)
 	{
 		Encrypt128(Input, InOffset, Output, OutOffset);
 	}
@@ -226,7 +270,7 @@ void SHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void SHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_shxState->Encryption)
 	{
 		Encrypt512(Input, InOffset, Output, OutOffset);
 	}
@@ -238,7 +282,7 @@ void SHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, st
 
 void SHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_shxState->Encryption)
 	{
 		Encrypt1024(Input, InOffset, Output, OutOffset);
 	}
@@ -250,7 +294,7 @@ void SHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, s
 
 void SHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_shxState->Encryption)
 	{
 		Encrypt2048(Input, InOffset, Output, OutOffset);
 	}
@@ -262,126 +306,132 @@ void SHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, s
 
 //~~~Key Schedule~~~//
 
-void SHX::ExpandKey(const std::vector<byte> &Key)
+void SHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State, std::unique_ptr<IKdf> &Generator)
 {
-	if (m_kdfGenerator != nullptr)
-	{
-		// kdf key expansion
-		SecureExpand(Key);
-	}
-	else
-	{
-		// standard serpent key expansion + k512
-		StandardExpand(Key);
-	}
-}
+	size_t klen;
 
-void SHX::SecureExpand(const std::vector<byte> &Key)
-{
 	// rounds: k256=40, k512=48, k1024=64
-	m_rndCount = Key.size() == 32 ? 40 : Key.size() == 64 ? 48 : 64;
+	State->Rounds = Key.size() == 32 ? 40 : Key.size() == 64 ? 48 : 64;
 	// round-key array size
-	size_t keySize = 4 * (m_rndCount + 1);
-	std::vector<byte> rawKey(keySize * sizeof(uint), 0);
+	klen = 4 * (State->Rounds + 1);
+	SecureVector<byte> tmpr(klen * sizeof(uint));
 	// salt is not used
-	std::vector<byte> salt(0);
+	SecureVector<byte> salt(0);
 	// initialize the generator
-	SymmetricKey kp(Key, salt, m_distCode);
-	m_kdfGenerator->Initialize(kp);
+	SymmetricKey kp(Key, salt, State->Custom);
+	Generator->Initialize(kp);
 	// generate the keying material
-	m_kdfGenerator->Generate(rawKey);
+	Generator->Generate(tmpr);
 	// initialize round-key array
-	m_expKey.resize(keySize, 0);
+	State->RoundKeys.resize(klen, 0);
 
 	// copy bytes to working key
-	for (size_t i = 0; i < m_expKey.size(); ++i)
+#if defined(CEX_IS_LITTLE_ENDIAN)
+	MemoryTools::Copy(tmpr, 0, State->RoundKeys, 0, tmpr.size());
+#else
+	for (size_t i = 0; i < State->RoundKeys.size(); ++i)
 	{
-		m_expKey[i] = Utility::IntegerTools::LeBytesTo32(rawKey, i * sizeof(uint));
+		State->RoundKeys[i] = IntegerTools::LeBytesTo32(tmpr, i * sizeof(uint));
 	}
+#endif
+
+	MemoryTools::Clear(tmpr, 0, tmpr.size());
 }
 
-void SHX::StandardExpand(const std::vector<byte> &Key)
+void SHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State)
 {
-	uint cnt = 0;
-	uint index = 0;
-	size_t padSize = Key.size() < 32 ? 16 : Key.size() / 2;
-	std::vector<uint> Wp(padSize, 0);
-	size_t offset = 0;
-	// CHANGE: 512 key gets (fixed) 8 extra rounds
-	m_rndCount = (Key.size() == 64) ? 40 : 32;
-	size_t keySize = 4 * (m_rndCount + 1);
+	const size_t WPKLEN = Key.size() < 32 ? 16 : Key.size() / 2;
+	std::vector<uint> tmpw(WPKLEN);
+	size_t kctr;
+	size_t kidx;
+	size_t klen;
+	size_t woft;
+
+	State->Rounds = (Key.size() == 64) ? 40 : 32;
+	klen = sizeof(uint) * (State->Rounds + 1);
+	kidx = 0;
+	woft = 0;
 
 	// step 1: reverse copy key to temp array
-	for (offset = Key.size(); offset > 0; offset -= 4)
+	for (woft = Key.size(); woft > 0; woft -= sizeof(uint))
 	{
-		Wp[index] = Utility::IntegerTools::BeBytesTo32(Key, offset - 4);
-		++index;
+		tmpw[kidx] = IntegerTools::BeBytesTo32(Key, woft - sizeof(uint));
+		++kidx;
 	}
 
 	// pad small key
-	if (index < 8)
+	if (kidx < 8)
 	{
-		Wp[index] = 1;
+		tmpw[kidx] = 1;
 	}
 
 	// initialize the key
-	std::vector<uint> Wk(keySize, 0);
+	State->RoundKeys.resize(klen);
 
-	if (padSize == 16)
+	if (WPKLEN == 16)
 	{
 		// 32 byte key
 		// step 2: rotate k into w(k) ints
 		for (size_t i = 8; i < 16; i++)
 		{
-			Wp[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
+			tmpw[i] = IntegerTools::RotL32(static_cast<uint>(tmpw[i - 8] ^ tmpw[i - 5] ^ tmpw[i - 3] ^ tmpw[i - 1] ^ PHI ^ (i - 8)), 11);
 		}
 
 		// copy to expanded key
-		Utility::MemoryTools::Copy(Wp, 8, Wk, 0, 8 * sizeof(uint));
+		MemoryTools::Copy(tmpw, 8, State->RoundKeys, 0, 8 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
-		for (size_t i = 8; i < keySize; i++)
+		for (size_t i = 8; i < klen; i++)
 		{
-			Wk[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+			State->RoundKeys[i] = IntegerTools::RotL32(static_cast<uint>(State->RoundKeys[i - 8] ^ State->RoundKeys[i - 5] ^ State->RoundKeys[i - 3] ^ State->RoundKeys[i - 1] ^ PHI ^ i), 11);
 		}
 	}
 	else
 	{
 		// *extended*: 64 byte key
 		// step 3: rotate k into w(k) ints, with extended polynominal
-		// Wp := (Wp-16 ^ Wp-13 ^ Wp-11 ^ Wp-10 ^ Wp-8 ^ Wp-5 ^ Wp-3 ^ Wp-1 ^ PHI ^ i) <<< 11
+		// tmpw := (tmpw-16 ^ tmpw-13 ^ tmpw-11 ^ tmpw-10 ^ tmpw-8 ^ tmpw-5 ^ tmpw-3 ^ tmpw-1 ^ PHI ^ i) <<< 11
 		for (size_t i = 16; i < 32; i++)
 		{
-			Wp[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
+			tmpw[i] = IntegerTools::RotL32(static_cast<uint>(tmpw[i - 16] ^ tmpw[i - 13] ^ tmpw[i - 11] ^ tmpw[i - 10] ^ tmpw[i - 8] ^ tmpw[i - 5] ^ tmpw[i - 3] ^ tmpw[i - 1] ^ PHI ^ (i - 16)), 11);
 		}
 
 		// copy to expanded key
-		Utility::MemoryTools::Copy(Wp, 16, Wk, 0, 16 * sizeof(uint));
+		MemoryTools::Copy(tmpw, 16, State->RoundKeys, 0, 16 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
-		for (size_t i = 16; i < keySize; i++)
+		for (size_t i = 16; i < klen; i++)
 		{
-			Wk[i] = Utility::IntegerTools::RotL32(static_cast<uint>(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+			State->RoundKeys[i] = IntegerTools::RotL32(static_cast<uint>(State->RoundKeys[i - 16] ^ State->RoundKeys[i - 13] ^ State->RoundKeys[i - 11] ^ State->RoundKeys[i - 10] ^ State->RoundKeys[i - 8] ^ State->RoundKeys[i - 5] ^ State->RoundKeys[i - 3] ^ State->RoundKeys[i - 1] ^ PHI ^ i), 11);
 		}
 	}
 
+	MemoryTools::Clear(tmpw, 0, tmpw.size());
+	kctr = 0;
+
 	// step 4: create the working keys by processing with the Sbox and IP
-	while (cnt < keySize - 4)
+	while (kctr < klen - 4)
 	{
-		Sb3(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
-		Sb2(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
-		Sb1(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
-		Sb0(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
-		Sb7(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
-		Sb6(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
-		Sb5(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
-		Sb4(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]); cnt += 4;
+		Sb3(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
+		Sb2(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
+		Sb1(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
+		Sb0(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
+		Sb7(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
+		Sb6(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
+		Sb5(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
+		Sb4(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]); 
+		kctr += 4;
 	}
 
 	// last round
-	Sb3(Wk[cnt], Wk[cnt + 1], Wk[cnt + 2], Wk[cnt + 3]);
-
-	m_expKey = Wk;
+	Sb3(State->RoundKeys[kctr], State->RoundKeys[kctr + 1], State->RoundKeys[kctr + 2], State->RoundKeys[kctr + 3]);
 }
 
 //~~~Rounds Processing~~~//
@@ -389,99 +439,103 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t RNDCNT = 4;
-	size_t keyCtr = m_expKey.size();
+	size_t kctr;
+	uint R3;
+	uint R2;
+	uint R1;
+	uint R0;
 
 	// input round
-	uint R3 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 12);
-	uint R2 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 8);
-	uint R1 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 4);
-	uint R0 = Utility::IntegerTools::LeBytesTo32(Input, InOffset);
-
-	R3 ^= m_expKey[keyCtr - 1];
-	R2 ^= m_expKey[keyCtr - 2];
-	R1 ^= m_expKey[keyCtr - 3];
-	R0 ^= m_expKey[keyCtr - 4];
-	keyCtr -= 4;
+	kctr = m_shxState->RoundKeys.size();
+	R3 = IntegerTools::LeBytesTo32(Input, InOffset + 12);
+	R2 = IntegerTools::LeBytesTo32(Input, InOffset + 8);
+	R1 = IntegerTools::LeBytesTo32(Input, InOffset + 4);
+	R0 = IntegerTools::LeBytesTo32(Input, InOffset);
+	R3 ^= m_shxState->RoundKeys[kctr - 1];
+	R2 ^= m_shxState->RoundKeys[kctr - 2];
+	R1 ^= m_shxState->RoundKeys[kctr - 3];
+	R0 ^= m_shxState->RoundKeys[kctr - 4];
+	kctr -= 4;
 
 	// process 8 round blocks
 	do
 	{
 		Ib7(R0, R1, R2, R3);
-		R3 ^= m_expKey[keyCtr - 1];
-		R2 ^= m_expKey[keyCtr - 2];
-		R1 ^= m_expKey[keyCtr - 3];
-		R0 ^= m_expKey[keyCtr - 4];
+		R3 ^= m_shxState->RoundKeys[kctr - 1];
+		R2 ^= m_shxState->RoundKeys[kctr - 2];
+		R1 ^= m_shxState->RoundKeys[kctr - 3];
+		R0 ^= m_shxState->RoundKeys[kctr - 4];
 		InverseTransform(R0, R1, R2, R3);
 
 		Ib6(R0, R1, R2, R3);
-		R3 ^= m_expKey[keyCtr - 5];
-		R2 ^= m_expKey[keyCtr - 6];
-		R1 ^= m_expKey[keyCtr - 7];
-		R0 ^= m_expKey[keyCtr - 8];
+		R3 ^= m_shxState->RoundKeys[kctr - 5];
+		R2 ^= m_shxState->RoundKeys[kctr - 6];
+		R1 ^= m_shxState->RoundKeys[kctr - 7];
+		R0 ^= m_shxState->RoundKeys[kctr - 8];
 		InverseTransform(R0, R1, R2, R3);
 
 		Ib5(R0, R1, R2, R3);
-		R3 ^= m_expKey[keyCtr - 9];
-		R2 ^= m_expKey[keyCtr - 10];
-		R1 ^= m_expKey[keyCtr - 11];
-		R0 ^= m_expKey[keyCtr - 12];
+		R3 ^= m_shxState->RoundKeys[kctr - 9];
+		R2 ^= m_shxState->RoundKeys[kctr - 10];
+		R1 ^= m_shxState->RoundKeys[kctr - 11];
+		R0 ^= m_shxState->RoundKeys[kctr - 12];
 		InverseTransform(R0, R1, R2, R3);
 
 		Ib4(R0, R1, R2, R3);
-		R3 ^= m_expKey[keyCtr - 13];
-		R2 ^= m_expKey[keyCtr - 14];
-		R1 ^= m_expKey[keyCtr - 15];
-		R0 ^= m_expKey[keyCtr - 16];
+		R3 ^= m_shxState->RoundKeys[kctr - 13];
+		R2 ^= m_shxState->RoundKeys[kctr - 14];
+		R1 ^= m_shxState->RoundKeys[kctr - 15];
+		R0 ^= m_shxState->RoundKeys[kctr - 16];
 		InverseTransform(R0, R1, R2, R3);
 
 		Ib3(R0, R1, R2, R3);
-		R3 ^= m_expKey[keyCtr - 17];
-		R2 ^= m_expKey[keyCtr - 18];
-		R1 ^= m_expKey[keyCtr - 19];
-		R0 ^= m_expKey[keyCtr - 20];
+		R3 ^= m_shxState->RoundKeys[kctr - 17];
+		R2 ^= m_shxState->RoundKeys[kctr - 18];
+		R1 ^= m_shxState->RoundKeys[kctr - 19];
+		R0 ^= m_shxState->RoundKeys[kctr - 20];
 		InverseTransform(R0, R1, R2, R3);
 
 		Ib2(R0, R1, R2, R3);
-		R3 ^= m_expKey[keyCtr - 21];
-		R2 ^= m_expKey[keyCtr - 22];
-		R1 ^= m_expKey[keyCtr - 23];
-		R0 ^= m_expKey[keyCtr - 24];
+		R3 ^= m_shxState->RoundKeys[kctr - 21];
+		R2 ^= m_shxState->RoundKeys[kctr - 22];
+		R1 ^= m_shxState->RoundKeys[kctr - 23];
+		R0 ^= m_shxState->RoundKeys[kctr - 24];
 		InverseTransform(R0, R1, R2, R3);
 
 		Ib1(R0, R1, R2, R3);
-		R3 ^= m_expKey[keyCtr - 25];
-		R2 ^= m_expKey[keyCtr - 26];
-		R1 ^= m_expKey[keyCtr - 27];
-		R0 ^= m_expKey[keyCtr - 28];
+		R3 ^= m_shxState->RoundKeys[kctr - 25];
+		R2 ^= m_shxState->RoundKeys[kctr - 26];
+		R1 ^= m_shxState->RoundKeys[kctr - 27];
+		R0 ^= m_shxState->RoundKeys[kctr - 28];
 		InverseTransform(R0, R1, R2, R3);
 
 		Ib0(R0, R1, R2, R3);
-		keyCtr -= 28;
+		kctr -= 28;
 
 		// skip on last block
-		if (keyCtr != RNDCNT)
+		if (kctr != RNDCNT)
 		{
-			R3 ^= m_expKey[keyCtr - 1];
-			R2 ^= m_expKey[keyCtr - 2];
-			R1 ^= m_expKey[keyCtr - 3];
-			R0 ^= m_expKey[keyCtr - 4];
+			R3 ^= m_shxState->RoundKeys[kctr - 1];
+			R2 ^= m_shxState->RoundKeys[kctr - 2];
+			R1 ^= m_shxState->RoundKeys[kctr - 3];
+			R0 ^= m_shxState->RoundKeys[kctr - 4];
 			InverseTransform(R0, R1, R2, R3);
-			keyCtr -= 4;
+			kctr -= 4;
 		}
 	} 
-	while (keyCtr != RNDCNT);
+	while (kctr != RNDCNT);
 
 	// last round
-	Utility::IntegerTools::Le32ToBytes(R3 ^ m_expKey[keyCtr - 1], Output, OutOffset + 12);
-	Utility::IntegerTools::Le32ToBytes(R2 ^ m_expKey[keyCtr - 2], Output, OutOffset + 8);
-	Utility::IntegerTools::Le32ToBytes(R1 ^ m_expKey[keyCtr - 3], Output, OutOffset + 4);
-	Utility::IntegerTools::Le32ToBytes(R0 ^ m_expKey[keyCtr - 4], Output, OutOffset);
+	IntegerTools::Le32ToBytes(R3 ^ m_shxState->RoundKeys[kctr - 1], Output, OutOffset + 12);
+	IntegerTools::Le32ToBytes(R2 ^ m_shxState->RoundKeys[kctr - 2], Output, OutOffset + 8);
+	IntegerTools::Le32ToBytes(R1 ^ m_shxState->RoundKeys[kctr - 3], Output, OutOffset + 4);
+	IntegerTools::Le32ToBytes(R0 ^ m_shxState->RoundKeys[kctr - 4], Output, OutOffset);
 }
 
 void SHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
-	SHXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -493,10 +547,10 @@ void SHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 void SHX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if (!defined(__AVX512__)) && defined(__AVX2__)
-	SHXDecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
+	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
-	SHXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
+	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -512,15 +566,15 @@ void SHX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std
 void SHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if defined(__AVX512__)
-	SHXDecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey);
+	DecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #elif (!defined(__AVX512__)) && defined(__AVX2__)
-	SHXDecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
-	SHXDecryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
+	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
+	DecryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);
 #elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
-	SHXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
-	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
-	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey);
+	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_shxState->RoundKeys);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -543,93 +597,98 @@ void SHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t RNDCNT = m_expKey.size() - 4;
-	size_t keyCtr = 0;
+	const size_t RNDCNT = m_shxState->RoundKeys.size() - 4;
+	size_t kctr;
+	uint R0;
+	uint R1;
+	uint R2;
+	uint R3;
 
 	// input round
-	uint R0 = Utility::IntegerTools::LeBytesTo32(Input, InOffset);
-	uint R1 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 4);
-	uint R2 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 8);
-	uint R3 = Utility::IntegerTools::LeBytesTo32(Input, InOffset + 12);
+	kctr = 0;
+	R0 = IntegerTools::LeBytesTo32(Input, InOffset);
+	R1 = IntegerTools::LeBytesTo32(Input, InOffset + 4);
+	R2 = IntegerTools::LeBytesTo32(Input, InOffset + 8);
+	R3 = IntegerTools::LeBytesTo32(Input, InOffset + 12);
 
 	// process 8 round blocks
 	do
 	{
-		R0 ^= m_expKey[keyCtr];
-		R1 ^= m_expKey[keyCtr + 1];
-		R2 ^= m_expKey[keyCtr + 2];
-		R3 ^= m_expKey[keyCtr + 3];
+		R0 ^= m_shxState->RoundKeys[kctr];
+		R1 ^= m_shxState->RoundKeys[kctr + 1];
+		R2 ^= m_shxState->RoundKeys[kctr + 2];
+		R3 ^= m_shxState->RoundKeys[kctr + 3];
 		Sb0(R0, R1, R2, R3);
 		LinearTransform(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[keyCtr + 4];
-		R1 ^= m_expKey[keyCtr + 5];
-		R2 ^= m_expKey[keyCtr + 6];
-		R3 ^= m_expKey[keyCtr + 7];
+		R0 ^= m_shxState->RoundKeys[kctr + 4];
+		R1 ^= m_shxState->RoundKeys[kctr + 5];
+		R2 ^= m_shxState->RoundKeys[kctr + 6];
+		R3 ^= m_shxState->RoundKeys[kctr + 7];
 		Sb1(R0, R1, R2, R3);
 		LinearTransform(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[keyCtr + 8];
-		R1 ^= m_expKey[keyCtr + 9];
-		R2 ^= m_expKey[keyCtr + 10];
-		R3 ^= m_expKey[keyCtr + 11];
+		R0 ^= m_shxState->RoundKeys[kctr + 8];
+		R1 ^= m_shxState->RoundKeys[kctr + 9];
+		R2 ^= m_shxState->RoundKeys[kctr + 10];
+		R3 ^= m_shxState->RoundKeys[kctr + 11];
 		Sb2(R0, R1, R2, R3);
 		LinearTransform(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[keyCtr + 12];
-		R1 ^= m_expKey[keyCtr + 13];
-		R2 ^= m_expKey[keyCtr + 14];
-		R3 ^= m_expKey[keyCtr + 15];
+		R0 ^= m_shxState->RoundKeys[kctr + 12];
+		R1 ^= m_shxState->RoundKeys[kctr + 13];
+		R2 ^= m_shxState->RoundKeys[kctr + 14];
+		R3 ^= m_shxState->RoundKeys[kctr + 15];
 		Sb3(R0, R1, R2, R3);
 		LinearTransform(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[keyCtr + 16];
-		R1 ^= m_expKey[keyCtr + 17];
-		R2 ^= m_expKey[keyCtr + 18];
-		R3 ^= m_expKey[keyCtr + 19];
+		R0 ^= m_shxState->RoundKeys[kctr + 16];
+		R1 ^= m_shxState->RoundKeys[kctr + 17];
+		R2 ^= m_shxState->RoundKeys[kctr + 18];
+		R3 ^= m_shxState->RoundKeys[kctr + 19];
 		Sb4(R0, R1, R2, R3);
 		LinearTransform(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[keyCtr + 20];
-		R1 ^= m_expKey[keyCtr + 21];
-		R2 ^= m_expKey[keyCtr + 22];
-		R3 ^= m_expKey[keyCtr + 23];
+		R0 ^= m_shxState->RoundKeys[kctr + 20];
+		R1 ^= m_shxState->RoundKeys[kctr + 21];
+		R2 ^= m_shxState->RoundKeys[kctr + 22];
+		R3 ^= m_shxState->RoundKeys[kctr + 23];
 		Sb5(R0, R1, R2, R3);
 		LinearTransform(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[keyCtr + 24];
-		R1 ^= m_expKey[keyCtr + 25];
-		R2 ^= m_expKey[keyCtr + 26];
-		R3 ^= m_expKey[keyCtr + 27];
+		R0 ^= m_shxState->RoundKeys[kctr + 24];
+		R1 ^= m_shxState->RoundKeys[kctr + 25];
+		R2 ^= m_shxState->RoundKeys[kctr + 26];
+		R3 ^= m_shxState->RoundKeys[kctr + 27];
 		Sb6(R0, R1, R2, R3);
 		LinearTransform(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[keyCtr + 28];
-		R1 ^= m_expKey[keyCtr + 29];
-		R2 ^= m_expKey[keyCtr + 30];
-		R3 ^= m_expKey[keyCtr + 31];
+		R0 ^= m_shxState->RoundKeys[kctr + 28];
+		R1 ^= m_shxState->RoundKeys[kctr + 29];
+		R2 ^= m_shxState->RoundKeys[kctr + 30];
+		R3 ^= m_shxState->RoundKeys[kctr + 31];
 		Sb7(R0, R1, R2, R3);
-		keyCtr += 32;
+		kctr += 32;
 
 		// skip on last block
-		if (keyCtr != RNDCNT)
+		if (kctr != RNDCNT)
 		{
 			LinearTransform(R0, R1, R2, R3);
 		}
 	} 
-	while (keyCtr != RNDCNT);
+	while (kctr != RNDCNT);
 
 	// last round
-	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr] ^ R0, Output, OutOffset);
-	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr + 1] ^ R1, Output, OutOffset + 4);
-	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr + 2] ^ R2, Output, OutOffset + 8);
-	Utility::IntegerTools::Le32ToBytes(m_expKey[keyCtr + 3] ^ R3, Output, OutOffset + 12);
+	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr] ^ R0, Output, OutOffset);
+	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr + 1] ^ R1, Output, OutOffset + 4);
+	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr + 2] ^ R2, Output, OutOffset + 8);
+	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr + 3] ^ R3, Output, OutOffset + 12);
 }
 
 void SHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
-	SHXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -641,10 +700,10 @@ void SHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 void SHX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if (!defined(__AVX512__)) && defined(__AVX2__)
-	SHXEncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
+	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
-	SHXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
+	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -660,15 +719,15 @@ void SHX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std
 void SHX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if defined(__AVX512__)
-	SHXEncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey);
+	EncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #elif (!defined(__AVX512__)) && defined(__AVX2__)
-	SHXEncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
-	SHXEncryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
+	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
+	EncryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);
 #elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
-	SHXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
-	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
-	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey);
+	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_shxState->RoundKeys);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -695,6 +754,10 @@ std::vector<SymmetricKeySize> SHX::CalculateKeySizes(BlockCipherExtensions Exten
 {
 	std::vector<SymmetricKeySize> keys(0);
 
+	// Note: the hkdf variants info-size calculation: block-size - (name-size + hash-size + 1-byte hkdf counter + sha2 padding) fills one sha2 final block,
+	// this avoids permuting a partially empty block, for security and performance reasons.
+	// In the shake variants, info is the shake name string, which is sized as the shake-rate - the classes string-name-size and 2 bytes for the key-size-bits.
+
 	switch (Extension)
 	{
 		case BlockCipherExtensions::None:
@@ -706,45 +769,45 @@ std::vector<SymmetricKeySize> SHX::CalculateKeySizes(BlockCipherExtensions Exten
 		}
 		case BlockCipherExtensions::HKDF256:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 15));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 15));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 15));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 13));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 13));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 13));
 			break;
 		}
 		case BlockCipherExtensions::HKDF512:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 39));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 39));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 39));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 37));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 37));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 37));
 			break;
 		}
 		case BlockCipherExtensions::SHAKE256:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 96));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 96));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 96));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 127));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 127));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 127));
+			break;
+		}
+		case BlockCipherExtensions::SHAKE128:
+		{
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 159));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 159));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 159));
 			break;
 		}
 		case BlockCipherExtensions::SHAKE512:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 72));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 63));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 63));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 63));
 			break;
 		}
 		case BlockCipherExtensions::SHAKE1024:
 		{
-#if defined CEX_KECCAK_STRONG
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 108));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 108));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 108));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 62));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 62));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 62));
 			break;
-#else
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 72));
-			break;
-#endif
 		}
 	}
 

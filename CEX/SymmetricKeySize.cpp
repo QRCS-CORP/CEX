@@ -39,17 +39,17 @@ SymmetricKeySize::SymmetricKeySize(size_t KeySize, size_t NonceSize, size_t Info
 
 //~~~Accessors~~~//
 
-const uint SymmetricKeySize::InfoSize() 
+const size_t SymmetricKeySize::InfoSize() 
 { 
 	return m_infoSize; 
 }
 
-const uint SymmetricKeySize::KeySize() 
+const size_t SymmetricKeySize::KeySize() 
 { 
 	return m_keySize; 
 }
 
-const uint SymmetricKeySize::NonceSize()
+const size_t SymmetricKeySize::NonceSize()
 {
 	return m_nonceSize; 
 }
@@ -113,9 +113,9 @@ std::vector<byte> SymmetricKeySize::ToBytes()
 {
 	std::vector<byte> trs(0);
 
-	ArrayTools::AppendValue(m_infoSize, trs);
-	ArrayTools::AppendValue(m_keySize, trs);
-	ArrayTools::AppendValue(m_nonceSize, trs);
+	ArrayTools::AppendValue(static_cast<uint>(m_infoSize), trs);
+	ArrayTools::AppendValue(static_cast<uint>(m_keySize), trs);
+	ArrayTools::AppendValue(static_cast<uint>(m_nonceSize), trs);
 
 	return trs;
 }

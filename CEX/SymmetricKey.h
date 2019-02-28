@@ -115,7 +115,7 @@ public:
 	/// <summary>
 	/// Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
 	/// </summary>
-	const SymmetricKeySize KeySizes() override;
+	SymmetricKeySize &KeySizes() const override;
 
 	/// <summary>
 	/// Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv

@@ -65,7 +65,7 @@ std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOf
 
 void MacStream::Initialize(ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoProcessingException(CLASS_NAME, std::string("Initialize"), std::string("Mac Key has invalid length!"), ErrorCodes::InvalidKey);
 	}

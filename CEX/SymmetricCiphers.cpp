@@ -9,7 +9,7 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 	switch (Enumeral)
 	{
 		case SymmetricCiphers::AES:
-			name = std::string("Rijndael");
+			name = std::string("AES");
 			break;
 		case SymmetricCiphers::Serpent:
 			name = std::string("Serpent");

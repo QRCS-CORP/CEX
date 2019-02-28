@@ -97,7 +97,7 @@ public:
 
 		if (STRLEN != 0)
 		{
-			std::memcpy(&Output[OTPLEN], Value.c_str(), STRLEN);
+			MemoryTools::CopyFromObject(Value.data(), Output, OTPLEN, STRLEN);
 		}
 
 		return STRLEN;

@@ -27,14 +27,14 @@ NAMESPACE_BLOCK
 /// internal
 /// 
 
-template<typename T>
-static void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+template<typename T, typename ArrayA, typename ArrayB>
+static void DecryptW(const ArrayA &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, ArrayB &Key)
 {
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
 	const size_t RNDCNT = 4;
 	const size_t INPOFF = T::size();
-	size_t keyCtr = Key.size();
+	size_t kctr = Key.size();
 
 	// input round
 	T R0(Input, InOffset);
@@ -43,122 +43,122 @@ static void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, s
 	T R3(Input, InOffset + (INPOFF * 3));
 	T::Transpose(R0, R1, R2, R3);
 
-	--keyCtr;
-	R3 ^= T(Key[keyCtr]);
-	--keyCtr;
-	R2 ^= T(Key[keyCtr]);
-	--keyCtr;
-	R1 ^= T(Key[keyCtr]);
-	--keyCtr;
-	R0 ^= T(Key[keyCtr]);
+	--kctr;
+	R3 ^= T(Key[kctr]);
+	--kctr;
+	R2 ^= T(Key[kctr]);
+	--kctr;
+	R1 ^= T(Key[kctr]);
+	--kctr;
+	R0 ^= T(Key[kctr]);
 
 	// process 8 round blocks
 	do
 	{
 		Ib7(R0, R1, R2, R3);
-		--keyCtr;
-		R3 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R0 ^= T(Key[keyCtr]);
+		--kctr;
+		R3 ^= T(Key[kctr]);
+		--kctr;
+		R2 ^= T(Key[kctr]);
+		--kctr;
+		R1 ^= T(Key[kctr]);
+		--kctr;
+		R0 ^= T(Key[kctr]);
 		InverseTransformW(R0, R1, R2, R3);
 
 		Ib6(R0, R1, R2, R3);
-		--keyCtr;
-		R3 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R0 ^= T(Key[keyCtr]);
+		--kctr;
+		R3 ^= T(Key[kctr]);
+		--kctr;
+		R2 ^= T(Key[kctr]);
+		--kctr;
+		R1 ^= T(Key[kctr]);
+		--kctr;
+		R0 ^= T(Key[kctr]);
 		InverseTransformW(R0, R1, R2, R3);
 
 		Ib5(R0, R1, R2, R3);
-		--keyCtr;
-		R3 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R0 ^= T(Key[keyCtr]);
+		--kctr;
+		R3 ^= T(Key[kctr]);
+		--kctr;
+		R2 ^= T(Key[kctr]);
+		--kctr;
+		R1 ^= T(Key[kctr]);
+		--kctr;
+		R0 ^= T(Key[kctr]);
 		InverseTransformW(R0, R1, R2, R3);
 
 		Ib4(R0, R1, R2, R3);
-		--keyCtr;
-		R3 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R0 ^= T(Key[keyCtr]);
+		--kctr;
+		R3 ^= T(Key[kctr]);
+		--kctr;
+		R2 ^= T(Key[kctr]);
+		--kctr;
+		R1 ^= T(Key[kctr]);
+		--kctr;
+		R0 ^= T(Key[kctr]);
 		InverseTransformW(R0, R1, R2, R3);
 
 		Ib3(R0, R1, R2, R3);
-		--keyCtr;
-		R3 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R0 ^= T(Key[keyCtr]);
+		--kctr;
+		R3 ^= T(Key[kctr]);
+		--kctr;
+		R2 ^= T(Key[kctr]);
+		--kctr;
+		R1 ^= T(Key[kctr]);
+		--kctr;
+		R0 ^= T(Key[kctr]);
 		InverseTransformW(R0, R1, R2, R3);
 
 		Ib2(R0, R1, R2, R3);
-		--keyCtr;
-		R3 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R0 ^= T(Key[keyCtr]);
+		--kctr;
+		R3 ^= T(Key[kctr]);
+		--kctr;
+		R2 ^= T(Key[kctr]);
+		--kctr;
+		R1 ^= T(Key[kctr]);
+		--kctr;
+		R0 ^= T(Key[kctr]);
 		InverseTransformW(R0, R1, R2, R3);
 
 		Ib1(R0, R1, R2, R3);
-		--keyCtr;
-		R3 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		--keyCtr;
-		R0 ^= T(Key[keyCtr]);
+		--kctr;
+		R3 ^= T(Key[kctr]);
+		--kctr;
+		R2 ^= T(Key[kctr]);
+		--kctr;
+		R1 ^= T(Key[kctr]);
+		--kctr;
+		R0 ^= T(Key[kctr]);
 		InverseTransformW(R0, R1, R2, R3);
 
 		Ib0(R0, R1, R2, R3);
 
 		// skip on last block
-		if (keyCtr != RNDCNT)
+		if (kctr != RNDCNT)
 		{
-			--keyCtr;
-			R3 ^= T(Key[keyCtr]);
-			--keyCtr;
-			R2 ^= T(Key[keyCtr]);
-			--keyCtr;
-			R1 ^= T(Key[keyCtr]);
-			--keyCtr;
-			R0 ^= T(Key[keyCtr]);
+			--kctr;
+			R3 ^= T(Key[kctr]);
+			--kctr;
+			R2 ^= T(Key[kctr]);
+			--kctr;
+			R1 ^= T(Key[kctr]);
+			--kctr;
+			R0 ^= T(Key[kctr]);
 			InverseTransformW(R0, R1, R2, R3);
 		}
 	} 
-	while (keyCtr != RNDCNT);
+	while (kctr != RNDCNT);
 
 	// last round
-	--keyCtr;
-	R3 ^= T(Key[keyCtr]);
-	--keyCtr;
-	R2 ^= T(Key[keyCtr]);
-	--keyCtr;
-	R1 ^= T(Key[keyCtr]);
-	--keyCtr;
-	R0 ^= T(Key[keyCtr]);
+	--kctr;
+	R3 ^= T(Key[kctr]);
+	--kctr;
+	R2 ^= T(Key[kctr]);
+	--kctr;
+	R1 ^= T(Key[kctr]);
+	--kctr;
+	R0 ^= T(Key[kctr]);
 
 	T::Transpose(R0, R1, R2, R3);
 	R0.Store(Output, OutOffset);
@@ -169,14 +169,14 @@ static void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, s
 #endif
 }
 
-template<typename T>
-static void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+template<typename T, typename ArrayA, typename ArrayB>
+static void EncryptW(const ArrayA &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, ArrayB &Key)
 {
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
 	const size_t RNDCNT = Key.size() - 5;
 	const size_t INPOFF = T::size();
-	int keyCtr = -1;
+	int kctr = -1;
 
 	// input round
 	T R0(Input, InOffset);
@@ -188,110 +188,110 @@ static void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, s
 	// process 8 round blocks
 	do
 	{
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb0(R0, R1, R2, R3);
 		LinearTransformW(R0, R1, R2, R3);
 
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb1(R0, R1, R2, R3);
 		LinearTransformW(R0, R1, R2, R3);
 
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb2(R0, R1, R2, R3);
 		LinearTransformW(R0, R1, R2, R3);
 
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb3(R0, R1, R2, R3);
 		LinearTransformW(R0, R1, R2, R3);
 
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb4(R0, R1, R2, R3);
 		LinearTransformW(R0, R1, R2, R3);
 
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb5(R0, R1, R2, R3);
 		LinearTransformW(R0, R1, R2, R3);
 
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb6(R0, R1, R2, R3);
 		LinearTransformW(R0, R1, R2, R3);
 
-		++keyCtr;
-		R0 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R1 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R2 ^= T(Key[keyCtr]);
-		++keyCtr;
-		R3 ^= T(Key[keyCtr]);
+		++kctr;
+		R0 ^= T(Key[kctr]);
+		++kctr;
+		R1 ^= T(Key[kctr]);
+		++kctr;
+		R2 ^= T(Key[kctr]);
+		++kctr;
+		R3 ^= T(Key[kctr]);
 		Sb7(R0, R1, R2, R3);
 
 		// skip on last block
-		if (keyCtr != RNDCNT)
+		if (kctr != RNDCNT)
 		{
 			LinearTransformW(R0, R1, R2, R3);
 		}
 	} 
-	while (keyCtr != RNDCNT);
+	while (kctr != RNDCNT);
 
 	// last round
-	++keyCtr;
-	R0 ^= T(Key[keyCtr]);
-	++keyCtr;
-	R1 ^= T(Key[keyCtr]);
-	++keyCtr;
-	R2 ^= T(Key[keyCtr]);
-	++keyCtr;
-	R3 ^= T(Key[keyCtr]);
+	++kctr;
+	R0 ^= T(Key[kctr]);
+	++kctr;
+	R1 ^= T(Key[kctr]);
+	++kctr;
+	R2 ^= T(Key[kctr]);
+	++kctr;
+	R3 ^= T(Key[kctr]);
 
 	T::Transpose(R0, R1, R2, R3);
 	R0.Store(Output, OutOffset);

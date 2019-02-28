@@ -237,12 +237,12 @@ void HCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 void HCG::Initialize(ISymmetricKey &Parameters)
 {
 #if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key.size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MINKEY_LENGTH)
+	if (Parameters.KeySizes().KeySize() < MINKEY_LENGTH)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidNonce);
 	}
@@ -257,10 +257,10 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	// add the optional custom distribution code
 	ArrayTools::AppendVector(Parameters.Info(), m_hcgState->Code);
 
-	if (Parameters.Nonce().size() != 0)
+	if (Parameters.KeySizes().NonceSize() != 0)
 	{
 		// copy the nonce into the state counter
-		const size_t CTRLEN = IntegerTools::Min(Parameters.Nonce().size(), m_hcgState->Nonce.size());
+		const size_t CTRLEN = IntegerTools::Min(Parameters.KeySizes().NonceSize(), m_hcgState->Nonce.size());
 		MemoryTools::Copy(Parameters.Nonce(), 0, m_hcgState->Nonce, 0, CTRLEN);
 	}
 

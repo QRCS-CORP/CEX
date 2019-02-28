@@ -45,7 +45,10 @@ Poly1305::Poly1305()
 		BLOCK_SIZE,
 		Macs::Poly1305, 
 		MacConvert::ToName(Macs::Poly1305), 
-		std::vector<SymmetricKeySize> { SymmetricKeySize(POLYKEY_SIZE, 0, 0) },
+		std::vector<SymmetricKeySize> { 
+			SymmetricKeySize(POLYKEY_SIZE, 0, 0),
+			SymmetricKeySize(POLYKEY_SIZE, 0, 0),
+			SymmetricKeySize(POLYKEY_SIZE, 0, 0)},
 		POLYKEY_SIZE,
 		MINSALT_LENGTH,
 		BLOCK_SIZE),
@@ -193,7 +196,7 @@ size_t Poly1305::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 
 void Poly1305::Initialize(ISymmetricKey &Parameters)
 {
-	if (Parameters.Key().size() < MinimumKeySize())
+	if (Parameters.KeySizes().KeySize() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}

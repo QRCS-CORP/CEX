@@ -24,6 +24,10 @@ enum class BlockCipherExtensions : byte
 	/// </summary>
 	HKDF512 = static_cast<byte>(Kdfs::HKDF512),
 	/// <summary>
+	/// An implementation of the SHAKE-128 XOF function
+	/// </summary>
+	SHAKE128 = static_cast<byte>(Kdfs::SHAKE128),
+	/// <summary>
 	/// An implementation of the SHAKE-256 XOF function
 	/// </summary>
 	SHAKE256 = static_cast<byte>(Kdfs::SHAKE256),
@@ -34,11 +38,7 @@ enum class BlockCipherExtensions : byte
 	/// <summary>
 	/// An implementation of the SHAKE-1024 XOF function -experimental
 	/// </summary>
-	SHAKE1024 = static_cast<byte>(Kdfs::SHAKE1024),
-	/// <summary>
-	/// User defined derivation function
-	/// </summary>
-	Custom = 99
+	SHAKE1024 = static_cast<byte>(Kdfs::SHAKE1024)
 };
 
 NAMESPACE_ENUMERATIONEND

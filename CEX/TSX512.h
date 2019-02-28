@@ -88,7 +88,6 @@ using Enumeration::ShakeModes;
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description></description></item>
 /// <item><description>The key size is fixed at 64 bytes (512 bits).</description></item>
 /// <item><description>The nonce size is fixed at 16 bytes (128 bits), and should be a random vector.</description></item>
 /// <item><description>The Info string is optional, but can be used to create a tweakable cipher; it must be 16 bytes in length.</description></item>

@@ -322,7 +322,7 @@ const std::vector<byte> SymmetricSecureKey::Key()
 	return Unlock(tmps);
 }
 
-const SymmetricKeySize SymmetricSecureKey::KeySizes() 
+SymmetricKeySize &SymmetricSecureKey::KeySizes() const
 { 
 	return m_secureState->KeySizes; 
 }

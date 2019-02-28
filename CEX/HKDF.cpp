@@ -192,12 +192,12 @@ void HKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 void HKDF::Initialize(ISymmetricKey &Parameters)
 {
 #if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MinimumKeySize())
+	if (Parameters.KeySizes().KeySize() < MinimumKeySize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -208,15 +208,15 @@ void HKDF::Initialize(ISymmetricKey &Parameters)
 		Reset();
 	}
 
-	if (Parameters.Info().size() != 0)
+	if (Parameters.KeySizes().InfoSize() != 0)
 	{
-		m_hkdfState->Info.resize(Parameters.Info().size());
+		m_hkdfState->Info.resize(Parameters.KeySizes().InfoSize());
 		MemoryTools::Copy(Parameters.Info(), 0, m_hkdfState->Info, 0, m_hkdfState->Info.size());
 	}
 
-	if (Parameters.Nonce().size() != 0)
+	if (Parameters.KeySizes().NonceSize() != 0)
 	{
-		if (Parameters.Nonce().size() + Parameters.Info().size() < MinimumSaltSize())
+		if (Parameters.KeySizes().NonceSize() + Parameters.KeySizes().InfoSize() < MinimumSaltSize())
 		{
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}

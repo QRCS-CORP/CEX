@@ -1,58 +1,85 @@
 #include "RHX.h"
-#include "Rijndael.h"
 #include "IntegerTools.h"
+#include "MemoryTools.h"
 #include "KdfFromName.h"
+#include "Rijndael.h"
 
 NAMESPACE_BLOCK
 
-const std::string RHX::CIPHER_NAME("Rijndael");
-const std::string RHX::CLASS_NAME("RHX");
-const std::string RHX::DEF_DSTINFO("information string RHX version 1");
-
+using Utility::MemoryTools;
+using Utility::IntegerTools;
 using Enumeration::Kdfs;
+
+class RHX::RhxState
+{
+public:
+
+	SecureVector<byte> Custom;
+	SecureVector<uint> RoundKeys;
+	size_t Rounds;
+	BlockCipherExtensions Extension;
+	bool Destroyed;
+	bool Encryption;
+	bool Initialized;
+
+	RhxState(BlockCipherExtensions CipherExtension, bool IsDestroyed)
+		:
+		Custom(0),
+		RoundKeys(0),
+		Rounds(0),
+		Extension(CipherExtension),
+		Destroyed(IsDestroyed),
+		Encryption(false),
+		Initialized(false)
+	{
+	}
+
+	~RhxState()
+	{
+		MemoryTools::Clear(Custom, 0, Custom.size());
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		Rounds = 0;
+		Extension = BlockCipherExtensions::None;
+		Destroyed = false;
+		Encryption = false;
+		Initialized = false;
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(Custom, 0, Custom.size());
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		Encryption = false;
+		Initialized = false;
+	}
+};
 
 //~~~Constructor~~~//
 
 RHX::RHX(BlockCipherExtensions CipherExtension)
 	:
-	m_destroyEngine(true),
-	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_expKey(0),
+	m_rhxState(new RhxState(CipherExtension, true)),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
-		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be set as custom with this constructor!"), ErrorCodes::InvalidParam) :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
-	m_isEncryption(false),
-	m_isInitialized(false),
 	m_legalKeySizes(CalculateKeySizes(CipherExtension))
 {
 }
 
 RHX::RHX(IKdf* Kdf)
 	:
-	m_destroyEngine(false),
-	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_expKey(0),
-	m_kdfGenerator(Kdf != nullptr ? Kdf :
-		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Kdf can not be null!"), ErrorCodes::IllegalOperation)),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_legalKeySizes(CalculateKeySizes(static_cast<BlockCipherExtensions>(Kdf->Enumeral())))
+	m_rhxState(new RhxState(Kdf != nullptr ? static_cast<BlockCipherExtensions>(Kdf->Enumeral()) : 
+		BlockCipherExtensions::None, 
+		false)),
+	m_kdfGenerator(Kdf),
+	m_legalKeySizes(CalculateKeySizes(Kdf != nullptr ? static_cast<BlockCipherExtensions>(Kdf->Enumeral()) : 
+		BlockCipherExtensions::None))
 {
 }
 
 RHX::~RHX()
 {
-	m_isEncryption = false;
-	m_isInitialized = false;
-	m_rndCount = 0;
-
-	Utility::IntegerTools::Clear(m_expKey);
-	Utility::IntegerTools::Clear(m_legalKeySizes);
-
-	if (m_destroyEngine)
+	if (m_rhxState->Destroyed)
 	{
-		m_destroyEngine = false;
-
 		if (m_kdfGenerator != nullptr)
 		{
 			m_kdfGenerator.reset(nullptr);
@@ -65,6 +92,8 @@ RHX::~RHX()
 			m_kdfGenerator.release();
 		}
 	}
+
+	IntegerTools::Clear(m_legalKeySizes);
 }
 
 //~~~Accessors~~~//
@@ -119,12 +148,12 @@ const BlockCiphers RHX::Enumeral()
 
 const bool RHX::IsEncryption()
 {
-	return m_isEncryption;
+	return m_rhxState->Encryption;
 }
 
 const bool RHX::IsInitialized()
 {
-	return m_isInitialized;
+	return m_rhxState->Initialized;
 }
 
 const std::vector<SymmetricKeySize> &RHX::LegalKeySizes()
@@ -143,7 +172,7 @@ const std::string RHX::Name()
 
 const size_t RHX::Rounds()
 {
-	return m_rndCount;
+	return m_rhxState->Rounds;
 }
 
 const size_t RHX::StateCacheSize()
@@ -175,32 +204,80 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.Key().size()))
+	size_t bwords;
+	size_t i;
+	size_t j;
+	size_t k;
+
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
 
-	if (Parameters.Info().size() > 0)
+	if (IsInitialized())
 	{
-		m_distCode = Parameters.Info();
+		m_rhxState->Reset();
 	}
 
-	m_isEncryption = Encryption;
+	m_rhxState->Encryption = Encryption;
 
-	// expand the key
-	ExpandKey(Encryption, Parameters.Key());
+	if (m_kdfGenerator != nullptr)
+	{
+		std::string tmpn = Name();
+		m_rhxState->Custom.resize(tmpn.size() + sizeof(ushort) + Parameters.KeySizes().InfoSize());
+		// add the ciphers formal class name to the customization string
+		MemoryTools::CopyFromObject(tmpn.data(), m_rhxState->Custom, 0, tmpn.size());
+		// add the key size in bits
+		ushort ksec = static_cast<ushort>(Parameters.KeySizes().KeySize()) * 8;
+		IntegerTools::Le16ToBytes(ksec, m_rhxState->Custom, tmpn.size());
+		// append the optional info code
+		MemoryTools::Copy(Parameters.Info(), 0, m_rhxState->Custom, tmpn.size() + sizeof(ushort), Parameters.KeySizes().InfoSize());
+
+		// extended kdf key expansion
+		SecureExpand(Parameters.SecureKey(), m_rhxState, m_kdfGenerator);
+	}
+	else
+	{
+		// standard rijndael key expansion
+		StandardExpand(Parameters.SecureKey(), m_rhxState);
+	}
+
+	// inverse cipher
+	if (!m_rhxState->Encryption)
+	{
+		bwords = BLOCK_SIZE / 4;
+
+		// reverse key
+		for (i = 0, k = m_rhxState->RoundKeys.size() - bwords; i < k; i += bwords, k -= bwords)
+		{
+			for (j = 0; j < bwords; j++)
+			{
+				uint tmpk = m_rhxState->RoundKeys[i + j];
+				m_rhxState->RoundKeys[i + j] = m_rhxState->RoundKeys[k + j];
+				m_rhxState->RoundKeys[k + j] = tmpk;
+			}
+		}
+		// sbox inversion
+		for (i = bwords; i < m_rhxState->RoundKeys.size() - bwords; i++)
+		{
+			m_rhxState->RoundKeys[i] = IT0[SBox[(m_rhxState->RoundKeys[i] >> 24)]] ^
+				IT1[SBox[static_cast<byte>(m_rhxState->RoundKeys[i] >> 16)]] ^
+				IT2[SBox[static_cast<byte>(m_rhxState->RoundKeys[i] >> 8)]] ^
+				IT3[SBox[static_cast<byte>(m_rhxState->RoundKeys[i])]];
+		}
+	}
 
 #if defined(CEX_PREFETCH_RHX_TABLES)
-	Prefetch();
+	Prefetch(m_rhxState->Encryption);
 #endif
 
 	// ready to transform data
-	m_isInitialized = true;
+	m_rhxState->Initialized = true;
 }
 
 void RHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (m_isEncryption)
+	if (m_rhxState->Encryption)
 	{
 		Encrypt128(Input, 0, Output, 0);
 	}
@@ -212,7 +289,7 @@ void RHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void RHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_rhxState->Encryption)
 	{
 		Encrypt128(Input, InOffset, Output, OutOffset);
 	}
@@ -224,7 +301,7 @@ void RHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void RHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_rhxState->Encryption)
 	{
 		Encrypt512(Input, InOffset, Output, OutOffset);
 	}
@@ -236,7 +313,7 @@ void RHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, st
 
 void RHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_rhxState->Encryption)
 	{
 		Encrypt1024(Input, InOffset, Output, OutOffset);
 	}
@@ -248,7 +325,7 @@ void RHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, s
 
 void RHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_rhxState->Encryption)
 	{
 		Encrypt2048(Input, InOffset, Output, OutOffset);
 	}
@@ -260,244 +337,226 @@ void RHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, s
 
 //~~~Key Schedule~~~//
 
-void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
+void RHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState> &State, std::unique_ptr<IKdf> &Generator)
 {
-	if (m_kdfGenerator != nullptr)
-	{
-		// kdf key expansion
-		SecureExpand(Key);
-	}
-	else
-	{
-		// standard rijndael key expansion + k512
-		StandardExpand(Key);
-	}
+	size_t klen;
 
-	// inverse cipher
-	if (!Encryption)
-	{
-		size_t blkWords = BLOCK_SIZE / 4;
-
-		// reverse key
-		for (size_t i = 0, k = m_expKey.size() - blkWords; i < k; i += blkWords, k -= blkWords)
-		{
-			for (size_t j = 0; j < blkWords; j++)
-			{
-				uint temp = m_expKey[i + j];
-				m_expKey[i + j] = m_expKey[k + j];
-				m_expKey[k + j] = temp;
-			}
-		}
-		// sbox inversion
-		for (size_t i = blkWords; i < m_expKey.size() - blkWords; i++)
-		{
-			m_expKey[i] = IT0[SBox[(m_expKey[i] >> 24)]] ^
-				IT1[SBox[static_cast<byte>(m_expKey[i] >> 16)]] ^
-				IT2[SBox[static_cast<byte>(m_expKey[i] >> 8)]] ^
-				IT3[SBox[static_cast<byte>(m_expKey[i])]];
-		}
-	}
-}
-
-void RHX::SecureExpand(const std::vector<byte> &Key)
-{
 	// rounds: k256=22, k512=30, k1024=38
-	m_rndCount = Key.size() != 128 ? (Key.size() / 4) + 14 : 38;
+	State->Rounds = Key.size() != 128 ? (Key.size() / 4) + 14 : 38;
 	// round-key array size
-	size_t keySize = ((BLOCK_SIZE / 4) * (m_rndCount + 1));
-	std::vector<byte> rawKey(keySize * sizeof(uint), 0);
+	klen = ((BLOCK_SIZE / 4) * (State->Rounds + 1));
+	SecureVector<byte> tmpr(klen * sizeof(uint));
 	// salt is not used
-	std::vector<byte> salt(0);
+	SecureVector<byte> salt(0);
 	// initialize the generator
-	SymmetricKey kp(Key, salt, m_distCode);
-	m_kdfGenerator->Initialize(kp);
+	SymmetricKey kp(Key, salt, State->Custom);
+	Generator->Initialize(kp);
 	// generate the keying material
-	m_kdfGenerator->Generate(rawKey);
+	Generator->Generate(tmpr);
 	// initialize round-key array
-	m_expKey.resize(keySize, 0);
+	State->RoundKeys.resize(klen);
 
 	// copy bytes to working key
-	for (size_t i = 0; i < m_expKey.size(); ++i)
+#if defined(CEX_IS_LITTLE_ENDIAN)
+	MemoryTools::Copy(tmpr, 0, State->RoundKeys, 0, tmpr.size());
+#else
+	for (size_t i = 0; i < State->RoundKeys.size(); ++i)
 	{
-		m_expKey[i] = Utility::IntegerTools::LeBytesTo32(rawKey, i * sizeof(uint));
+		State->RoundKeys[i] = IntegerTools::LeBytesTo32(tmpr, i * sizeof(uint));
 	}
+#endif
+
+	MemoryTools::Clear(tmpr, 0, tmpr.size());
 }
 
-void RHX::StandardExpand(const std::vector<byte> &Key)
+void RHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState> &State)
 {
-	// key in 32 bit words
-	size_t keyWords = Key.size() / 4;
+	// block and key in 32bit words
+	const size_t BWORDS = BLOCK_SIZE / sizeof(uint);
+	const size_t KWORDS = Key.size() / sizeof(uint);
+
 	// rounds count calculation
-	m_rndCount = keyWords + 6;
+	State->Rounds = KWORDS + 6;
 	// setup expanded key
-	m_expKey.resize((BLOCK_SIZE / 4) * (m_rndCount + 1), 0);
+	State->RoundKeys.resize(BWORDS * (State->Rounds + 1), 0x0UL);
 
-	if (keyWords == 8)
+	if (KWORDS == 8)
 	{
-		m_expKey[0] = Utility::IntegerTools::BeBytesTo32(Key, 0);
-		m_expKey[1] = Utility::IntegerTools::BeBytesTo32(Key, 4);
-		m_expKey[2] = Utility::IntegerTools::BeBytesTo32(Key, 8);
-		m_expKey[3] = Utility::IntegerTools::BeBytesTo32(Key, 12);
-		m_expKey[4] = Utility::IntegerTools::BeBytesTo32(Key, 16);
-		m_expKey[5] = Utility::IntegerTools::BeBytesTo32(Key, 20);
-		m_expKey[6] = Utility::IntegerTools::BeBytesTo32(Key, 24);
-		m_expKey[7] = Utility::IntegerTools::BeBytesTo32(Key, 28);
+		State->RoundKeys[0] = IntegerTools::BeBytesTo32(Key, 0);
+		State->RoundKeys[1] = IntegerTools::BeBytesTo32(Key, 4);
+		State->RoundKeys[2] = IntegerTools::BeBytesTo32(Key, 8);
+		State->RoundKeys[3] = IntegerTools::BeBytesTo32(Key, 12);
+		State->RoundKeys[4] = IntegerTools::BeBytesTo32(Key, 16);
+		State->RoundKeys[5] = IntegerTools::BeBytesTo32(Key, 20);
+		State->RoundKeys[6] = IntegerTools::BeBytesTo32(Key, 24);
+		State->RoundKeys[7] = IntegerTools::BeBytesTo32(Key, 28);
 
-		// k256 R: 8,16,24,32,40,48,56 S: 12,20,28,36,44,52
-		ExpandRotBlock(m_expKey, 8, 8, 1);
-		ExpandSubBlock(m_expKey, 12, 8);
-		ExpandRotBlock(m_expKey, 16, 8, 2);
-		ExpandSubBlock(m_expKey, 20, 8);
-		ExpandRotBlock(m_expKey, 24, 8, 3);
-		ExpandSubBlock(m_expKey, 28, 8);
-		ExpandRotBlock(m_expKey, 32, 8, 4);
-		ExpandSubBlock(m_expKey, 36, 8);
-		ExpandRotBlock(m_expKey, 40, 8, 5);
-		ExpandSubBlock(m_expKey, 44, 8);
-		ExpandRotBlock(m_expKey, 48, 8, 6);
-		ExpandSubBlock(m_expKey, 52, 8);
-		ExpandRotBlock(m_expKey, 56, 8, 7);
+		// k256 R: 8,16,24,32,40,48,56 - S: 12,20,28,36,44,52
+		ExpandRotBlock(State->RoundKeys, 8, 8, 1);
+		ExpandSubBlock(State->RoundKeys, 12, 8);
+		ExpandRotBlock(State->RoundKeys, 16, 8, 2);
+		ExpandSubBlock(State->RoundKeys, 20, 8);
+		ExpandRotBlock(State->RoundKeys, 24, 8, 3);
+		ExpandSubBlock(State->RoundKeys, 28, 8);
+		ExpandRotBlock(State->RoundKeys, 32, 8, 4);
+		ExpandSubBlock(State->RoundKeys, 36, 8);
+		ExpandRotBlock(State->RoundKeys, 40, 8, 5);
+		ExpandSubBlock(State->RoundKeys, 44, 8);
+		ExpandRotBlock(State->RoundKeys, 48, 8, 6);
+		ExpandSubBlock(State->RoundKeys, 52, 8);
+		ExpandRotBlock(State->RoundKeys, 56, 8, 7);
 	}
-	else if (keyWords == 6)
+	else if (KWORDS == 6)
 	{
-		m_expKey[0] = Utility::IntegerTools::BeBytesTo32(Key, 0);
-		m_expKey[1] = Utility::IntegerTools::BeBytesTo32(Key, 4);
-		m_expKey[2] = Utility::IntegerTools::BeBytesTo32(Key, 8);
-		m_expKey[3] = Utility::IntegerTools::BeBytesTo32(Key, 12);
-		m_expKey[4] = Utility::IntegerTools::BeBytesTo32(Key, 16);
-		m_expKey[5] = Utility::IntegerTools::BeBytesTo32(Key, 20);
+		State->RoundKeys[0] = IntegerTools::BeBytesTo32(Key, 0);
+		State->RoundKeys[1] = IntegerTools::BeBytesTo32(Key, 4);
+		State->RoundKeys[2] = IntegerTools::BeBytesTo32(Key, 8);
+		State->RoundKeys[3] = IntegerTools::BeBytesTo32(Key, 12);
+		State->RoundKeys[4] = IntegerTools::BeBytesTo32(Key, 16);
+		State->RoundKeys[5] = IntegerTools::BeBytesTo32(Key, 20);
 
-		// // k192 R: 6,12,18,24,30,36,42,48
-		ExpandRotBlock(m_expKey, 6, 6, 1);
-		m_expKey[10] = m_expKey[4] ^ m_expKey[9];
-		m_expKey[11] = m_expKey[5] ^ m_expKey[10];
-		ExpandRotBlock(m_expKey, 12, 6, 2);
-		m_expKey[16] = m_expKey[10] ^ m_expKey[15];
-		m_expKey[17] = m_expKey[11] ^ m_expKey[16];
-		ExpandRotBlock(m_expKey, 18, 6, 3);
-		m_expKey[22] = m_expKey[16] ^ m_expKey[21];
-		m_expKey[23] = m_expKey[17] ^ m_expKey[22];
-		ExpandRotBlock(m_expKey, 24, 6, 4);
-		m_expKey[28] = m_expKey[22] ^ m_expKey[27];
-		m_expKey[29] = m_expKey[23] ^ m_expKey[28];
-		ExpandRotBlock(m_expKey, 30, 6, 5);
-		m_expKey[34] = m_expKey[28] ^ m_expKey[33];
-		m_expKey[35] = m_expKey[29] ^ m_expKey[34];
-		ExpandRotBlock(m_expKey, 36, 6, 6);
-		m_expKey[40] = m_expKey[34] ^ m_expKey[39];
-		m_expKey[41] = m_expKey[35] ^ m_expKey[40];
-		ExpandRotBlock(m_expKey, 42, 6, 7);
-		m_expKey[46] = m_expKey[40] ^ m_expKey[45];
-		m_expKey[47] = m_expKey[41] ^ m_expKey[46];
-		ExpandRotBlock(m_expKey, 48, 6, 8);
+		// k192 R: 6,12,18,24,30,36,42,48
+		ExpandRotBlock(State->RoundKeys, 6, 6, 1);
+		State->RoundKeys[10] = State->RoundKeys[4] ^ State->RoundKeys[9];
+		State->RoundKeys[11] = State->RoundKeys[5] ^ State->RoundKeys[10];
+		ExpandRotBlock(State->RoundKeys, 12, 6, 2);
+		State->RoundKeys[16] = State->RoundKeys[10] ^ State->RoundKeys[15];
+		State->RoundKeys[17] = State->RoundKeys[11] ^ State->RoundKeys[16];
+		ExpandRotBlock(State->RoundKeys, 18, 6, 3);
+		State->RoundKeys[22] = State->RoundKeys[16] ^ State->RoundKeys[21];
+		State->RoundKeys[23] = State->RoundKeys[17] ^ State->RoundKeys[22];
+		ExpandRotBlock(State->RoundKeys, 24, 6, 4);
+		State->RoundKeys[28] = State->RoundKeys[22] ^ State->RoundKeys[27];
+		State->RoundKeys[29] = State->RoundKeys[23] ^ State->RoundKeys[28];
+		ExpandRotBlock(State->RoundKeys, 30, 6, 5);
+		State->RoundKeys[34] = State->RoundKeys[28] ^ State->RoundKeys[33];
+		State->RoundKeys[35] = State->RoundKeys[29] ^ State->RoundKeys[34];
+		ExpandRotBlock(State->RoundKeys, 36, 6, 6);
+		State->RoundKeys[40] = State->RoundKeys[34] ^ State->RoundKeys[39];
+		State->RoundKeys[41] = State->RoundKeys[35] ^ State->RoundKeys[40];
+		ExpandRotBlock(State->RoundKeys, 42, 6, 7);
+		State->RoundKeys[46] = State->RoundKeys[40] ^ State->RoundKeys[45];
+		State->RoundKeys[47] = State->RoundKeys[41] ^ State->RoundKeys[46];
+		ExpandRotBlock(State->RoundKeys, 48, 6, 8);
 	}
 	else
 	{
-		m_expKey[0] = Utility::IntegerTools::BeBytesTo32(Key, 0);
-		m_expKey[1] = Utility::IntegerTools::BeBytesTo32(Key, 4);
-		m_expKey[2] = Utility::IntegerTools::BeBytesTo32(Key, 8);
-		m_expKey[3] = Utility::IntegerTools::BeBytesTo32(Key, 12);
+		State->RoundKeys[0] = IntegerTools::BeBytesTo32(Key, 0);
+		State->RoundKeys[1] = IntegerTools::BeBytesTo32(Key, 4);
+		State->RoundKeys[2] = IntegerTools::BeBytesTo32(Key, 8);
+		State->RoundKeys[3] = IntegerTools::BeBytesTo32(Key, 12);
 
 		// k128 R: 4,8,12,16,20,24,28,32,36,40
-		ExpandRotBlock(m_expKey, 4, 4, 1);
-		ExpandRotBlock(m_expKey, 8, 4, 2);
-		ExpandRotBlock(m_expKey, 12, 4, 3);
-		ExpandRotBlock(m_expKey, 16, 4, 4);
-		ExpandRotBlock(m_expKey, 20, 4, 5);
-		ExpandRotBlock(m_expKey, 24, 4, 6);
-		ExpandRotBlock(m_expKey, 28, 4, 7);
-		ExpandRotBlock(m_expKey, 32, 4, 8);
-		ExpandRotBlock(m_expKey, 36, 4, 9);
-		ExpandRotBlock(m_expKey, 40, 4, 10);
+		ExpandRotBlock(State->RoundKeys, 4, 4, 1);
+		ExpandRotBlock(State->RoundKeys, 8, 4, 2);
+		ExpandRotBlock(State->RoundKeys, 12, 4, 3);
+		ExpandRotBlock(State->RoundKeys, 16, 4, 4);
+		ExpandRotBlock(State->RoundKeys, 20, 4, 5);
+		ExpandRotBlock(State->RoundKeys, 24, 4, 6);
+		ExpandRotBlock(State->RoundKeys, 28, 4, 7);
+		ExpandRotBlock(State->RoundKeys, 32, 4, 8);
+		ExpandRotBlock(State->RoundKeys, 36, 4, 9);
+		ExpandRotBlock(State->RoundKeys, 40, 4, 10);
 	}
 }
 
-void RHX::ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex)
+void RHX::ExpandRotBlock(SecureVector<uint> &RoundKeys, size_t KeyIndex, size_t KeyOffset, size_t RconIndex)
 {
-	size_t subKey = KeyIndex - KeyOffset;
+	size_t kctr;
 
-	Key[KeyIndex] = Key[subKey] ^ SubByte(static_cast<uint>(Key[KeyIndex - 1] << 8) | static_cast<uint>(Key[KeyIndex - 1] >> 24) & 0xFF) ^ Rcon[RconIndex];
+	kctr = KeyIndex - KeyOffset;
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ SubByte(static_cast<uint>(RoundKeys[KeyIndex - 1] << 8) | static_cast<uint>(RoundKeys[KeyIndex - 1] >> 24) & 0xFF) ^ Rcon[RconIndex];
 	++KeyIndex;
-	++subKey;
-	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
+	++kctr;
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
 	++KeyIndex;
-	++subKey;
-	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
+	++kctr;
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
 	++KeyIndex;
-	++subKey;
-	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
+	++kctr;
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
 }
 
-void RHX::ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset)
+void RHX::ExpandSubBlock(SecureVector<uint> &RoundKeys, size_t KeyIndex, size_t KeyOffset)
 {
-	size_t subKey = KeyIndex - KeyOffset;
+	size_t kctr;
 
-	Key[KeyIndex] = SubByte(Key[KeyIndex - 1]) ^ Key[subKey];
+	kctr = KeyIndex - KeyOffset;
+	RoundKeys[KeyIndex] = SubByte(RoundKeys[KeyIndex - 1]) ^ RoundKeys[kctr];
 	++KeyIndex;
-	++subKey;
-	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
+	++kctr;
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
 	++KeyIndex;
-	++subKey;
-	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
+	++kctr;
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
 	++KeyIndex;
-	++subKey;
-	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
+	++kctr;
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
 }
 
 //~~~Rounds Processing~~~//
 
 void RHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t RNDCNT = m_expKey.size() - 4;
+	const size_t RNDCNT = m_rhxState->RoundKeys.size() - 4;
+	size_t kctr;
+	uint X0;
+	uint X1;
+	uint X2;
+	uint X3;
+	uint Y0;
+	uint Y1;
+	uint Y2;
+	uint Y3;
 
 	// round 0
-	uint X0 = Utility::IntegerTools::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
-	uint X1 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
-	uint X2 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
-	uint X3 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
+	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rhxState->RoundKeys[0];
+	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rhxState->RoundKeys[1];
+	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rhxState->RoundKeys[2];
+	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rhxState->RoundKeys[3];
 
 	// round 1
-	uint Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_expKey[4];
-	uint Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_expKey[5];
-	uint Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_expKey[6];
-	uint Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_expKey[7];
+	Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[4];
+	Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[5];
+	Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[6];
+	Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[7];
 
-	size_t keyCtr = 8;
+	kctr = 8;
 	// rounds loop
-	while (keyCtr != RNDCNT)
+	while (kctr != RNDCNT)
 	{
-		X0 = IT0[(Y0 >> 24)] ^ IT1[static_cast<byte>(Y3 >> 16)] ^ IT2[static_cast<byte>(Y2 >> 8)] ^ IT3[static_cast<byte>(Y1)] ^ m_expKey[keyCtr];
-		X1 = IT0[(Y1 >> 24)] ^ IT1[static_cast<byte>(Y0 >> 16)] ^ IT2[static_cast<byte>(Y3 >> 8)] ^ IT3[static_cast<byte>(Y2)] ^ m_expKey[keyCtr + 1];
-		X2 = IT0[(Y2 >> 24)] ^ IT1[static_cast<byte>(Y1 >> 16)] ^ IT2[static_cast<byte>(Y0 >> 8)] ^ IT3[static_cast<byte>(Y3)] ^ m_expKey[keyCtr + 2];
-		X3 = IT0[(Y3 >> 24)] ^ IT1[static_cast<byte>(Y2 >> 16)] ^ IT2[static_cast<byte>(Y1 >> 8)] ^ IT3[static_cast<byte>(Y0)] ^ m_expKey[keyCtr + 3];
+		X0 = IT0[(Y0 >> 24)] ^ IT1[static_cast<byte>(Y3 >> 16)] ^ IT2[static_cast<byte>(Y2 >> 8)] ^ IT3[static_cast<byte>(Y1)] ^ m_rhxState->RoundKeys[kctr];
+		X1 = IT0[(Y1 >> 24)] ^ IT1[static_cast<byte>(Y0 >> 16)] ^ IT2[static_cast<byte>(Y3 >> 8)] ^ IT3[static_cast<byte>(Y2)] ^ m_rhxState->RoundKeys[kctr + 1];
+		X2 = IT0[(Y2 >> 24)] ^ IT1[static_cast<byte>(Y1 >> 16)] ^ IT2[static_cast<byte>(Y0 >> 8)] ^ IT3[static_cast<byte>(Y3)] ^ m_rhxState->RoundKeys[kctr + 2];
+		X3 = IT0[(Y3 >> 24)] ^ IT1[static_cast<byte>(Y2 >> 16)] ^ IT2[static_cast<byte>(Y1 >> 8)] ^ IT3[static_cast<byte>(Y0)] ^ m_rhxState->RoundKeys[kctr + 3];
 
-		Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_expKey[keyCtr + 4];
-		Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_expKey[keyCtr + 5];
-		Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_expKey[keyCtr + 6];
-		Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_expKey[keyCtr + 7];
-		keyCtr += 8;
+		Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[kctr + 4];
+		Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[kctr + 5];
+		Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[kctr + 6];
+		Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[kctr + 7];
+		kctr += 8;
 	}
 
 	// final round
-	Output[OutOffset] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 1] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 2] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 3] = static_cast<byte>(ISBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_expKey[keyCtr]));
-	++keyCtr;
-	Output[OutOffset + 4] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 5] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 6] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 7] = static_cast<byte>(ISBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_expKey[keyCtr]));
-	++keyCtr;
-	Output[OutOffset + 8] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 9] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 10] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 11] = static_cast<byte>(ISBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_expKey[keyCtr]));
-	++keyCtr;
-	Output[OutOffset + 12] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 13] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 14] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 15] = static_cast<byte>(ISBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_expKey[keyCtr]));
+	Output[OutOffset] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 1] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 2] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 3] = static_cast<byte>(ISBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 4] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 5] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 6] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 7] = static_cast<byte>(ISBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 8] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 9] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 10] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 11] = static_cast<byte>(ISBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 12] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 13] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 14] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 15] = static_cast<byte>(ISBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
 }
 
 void RHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -522,54 +581,63 @@ void RHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t RNDCNT = m_expKey.size() - 4;
+	const size_t RNDCNT = m_rhxState->RoundKeys.size() - 4;
+	size_t kctr;
+	uint X0;
+	uint X1;
+	uint X2;
+	uint X3;
+	uint Y0;
+	uint Y1;
+	uint Y2;
+	uint Y3;
 
 	// round 0
-	uint X0 = Utility::IntegerTools::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
-	uint X1 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
-	uint X2 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
-	uint X3 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
+	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rhxState->RoundKeys[0];
+	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rhxState->RoundKeys[1];
+	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rhxState->RoundKeys[2];
+	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rhxState->RoundKeys[3];
 
 	// round 1
-	uint Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_expKey[4];
-	uint Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_expKey[5];
-	uint Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_expKey[6];
-	uint Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_expKey[7];
+	Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[4];
+	Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[5];
+	Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[6];
+	Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[7];
 
-	size_t keyCtr = 8;
-	while (keyCtr != RNDCNT)
+	kctr = 8;
+	while (kctr != RNDCNT)
 	{
-		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_expKey[keyCtr];
-		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_expKey[keyCtr + 1];
-		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_expKey[keyCtr + 2];
-		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_expKey[keyCtr + 3];
-		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_expKey[keyCtr + 4];
-		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_expKey[keyCtr + 5];
-		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_expKey[keyCtr + 6];
-		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_expKey[keyCtr + 7];
-		keyCtr += 8;
+		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_rhxState->RoundKeys[kctr];
+		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_rhxState->RoundKeys[kctr + 1];
+		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_rhxState->RoundKeys[kctr + 2];
+		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_rhxState->RoundKeys[kctr + 3];
+		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[kctr + 4];
+		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[kctr + 5];
+		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[kctr + 6];
+		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[kctr + 7];
+		kctr += 8;
 	}
 
 	// final round
-	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 1] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 2] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 3] = static_cast<byte>(SBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_expKey[keyCtr]));
-	++keyCtr;
-	Output[OutOffset + 4] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 5] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 6] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 7] = static_cast<byte>(SBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_expKey[keyCtr]));
-	++keyCtr;
-	Output[OutOffset + 8] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 9] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 10] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 11] = static_cast<byte>(SBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_expKey[keyCtr]));
-	++keyCtr;
-	Output[OutOffset + 12] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
-	Output[OutOffset + 13] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
-	Output[OutOffset + 14] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
-	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_expKey[keyCtr]));
+	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 1] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 2] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 3] = static_cast<byte>(SBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 4] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 5] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 6] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 7] = static_cast<byte>(SBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 8] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 9] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 10] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 11] = static_cast<byte>(SBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 12] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 13] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 14] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
 }
 
 void RHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -598,6 +666,10 @@ std::vector<SymmetricKeySize> RHX::CalculateKeySizes(BlockCipherExtensions Exten
 {
 	std::vector<SymmetricKeySize> keys(0);
 
+	// Note: the hkdf variants info-size calculation: block-size - (name-size + hash-size + 1-byte hkdf counter + sha2 padding) fills one sha2 final block,
+	// this avoids permuting a partially empty block, for security and performance reasons.
+	// In the shake variants, info is the shake name string, which is sized as the shake-rate - the classes string-name-size and 2 bytes for the key-size-bits.
+
 	switch (Extension)
 	{
 		case BlockCipherExtensions::None:
@@ -609,45 +681,45 @@ std::vector<SymmetricKeySize> RHX::CalculateKeySizes(BlockCipherExtensions Exten
 		}
 		case BlockCipherExtensions::HKDF256:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 15));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 15));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 15));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 13));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 13));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 13));
 			break;
 		}
 		case BlockCipherExtensions::HKDF512:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 39));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 39));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 39));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 37));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 37));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 37));
 			break;
 		}
 		case BlockCipherExtensions::SHAKE256:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 96));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 96));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 96));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 127));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 127));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 127));
+			break;
+		}
+		case BlockCipherExtensions::SHAKE128:
+		{
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 159));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 159));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 159));
 			break;
 		}
 		case BlockCipherExtensions::SHAKE512:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 72));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 63));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 63));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 63));
 			break;
 		}
 		case BlockCipherExtensions::SHAKE1024:
 		{
-#if defined CEX_KECCAK_STRONG
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 108));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 108));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 108));
+			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 62));
+			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 62));
+			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 62));
 			break;
-#else
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 72));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 72));
-			break;
-#endif
 		}
 	}
 
@@ -655,10 +727,10 @@ std::vector<SymmetricKeySize> RHX::CalculateKeySizes(BlockCipherExtensions Exten
 }
 
 CEX_OPTIMIZE_IGNORE
-void RHX::Prefetch()
+void RHX::Prefetch(bool Encryption)
 {
 	// timing defence: pre-load tables into cache
-	if (m_isEncryption)
+	if (Encryption == true)
 	{
 		MemoryTools::PrefetchL1(SBox, 0, 256);
 		MemoryTools::PrefetchL2(T0, 0, 1024);
@@ -679,15 +751,18 @@ CEX_OPTIMIZE_RESUME
 
 uint RHX::SubByte(uint Rot)
 {
-	uint value = 0xFF & Rot;
-	uint result = SBox[value];
-	value = 0xFF & (Rot >> 8);
-	result |= (static_cast<uint>(SBox[value]) << 8);
-	value = 0xFF & (Rot >> 16);
-	result |= (static_cast<uint>(SBox[value]) << 16);
-	value = 0xFF & (Rot >> 24);
+	uint val;
+	uint res;
 
-	return result | (static_cast<uint>(SBox[value]) << 24);
+	val = 0xFF & Rot;
+	res = SBox[val];
+	val = 0xFF & (Rot >> 8);
+	res |= (static_cast<uint>(SBox[val]) << 8);
+	val = 0xFF & (Rot >> 16);
+	res |= (static_cast<uint>(SBox[val]) << 16);
+	val = 0xFF & (Rot >> 24);
+
+	return res | (static_cast<uint>(SBox[val]) << 24);
 }
 
 NAMESPACE_BLOCKEND

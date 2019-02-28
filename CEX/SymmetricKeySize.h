@@ -17,9 +17,9 @@ private:
 
 	static const std::string CLASS_NAME;
 
-	uint m_infoSize;
-	uint m_keySize;
-	uint m_nonceSize;
+	size_t m_infoSize;
+	size_t m_keySize;
+	size_t m_nonceSize;
 
 public:
 
@@ -53,17 +53,17 @@ public:
 	/// <summary>
 	/// Read/Write: The info parameters length in bytes
 	/// </summary>
-	const uint InfoSize();
+	const size_t InfoSize();
 
 	/// <summary>
 	/// Read/Write: The key parameters length in bytes
 	/// </summary>
-	const uint KeySize();
+	const size_t KeySize();
 
 	/// <summary>
 	/// Read/Write: The nonce parameters length in bytes
 	/// </summary>
-	const uint NonceSize();
+	const size_t NonceSize();
 
 	//~~~Public Functions~~~//
 

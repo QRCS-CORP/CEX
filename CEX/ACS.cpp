@@ -194,11 +194,11 @@ const size_t ACS::TagSize()
 
 void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.Nonce().size() != m_cipherMode->BlockSize())
+	if (Parameters.KeySizes().NonceSize() != m_cipherMode->BlockSize())
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}
@@ -223,10 +223,10 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	SecureVector<byte> code(0);
 
-	if (Parameters.Info().size() != 0)
+	if (Parameters.KeySizes().InfoSize() != 0)
 	{
 		// custom code
-		code.resize(Parameters.Info().size());
+		code.resize(Parameters.KeySizes().InfoSize());
 		MemoryTools::Copy(Parameters.Info(), 0, code, 0, code.size());
 	}
 	else
@@ -248,18 +248,19 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_acsState->Counter = 1;
 
 		// create the cSHAKE customization string
-		m_acsState->Custom.resize(sizeof(ulong) + Name().size());
+		std::string tmpn = Name();
+		m_acsState->Custom.resize(sizeof(ulong) + tmpn.size());
 		// add mac counter and algorithm name to customization string
 		IntegerTools::Le64ToBytes(m_acsState->Counter, m_acsState->Custom, 0);
-		MemoryTools::Copy(Name(), 0, m_acsState->Custom, sizeof(ulong), Name().size());
+		MemoryTools::CopyFromObject(tmpn.data(), m_acsState->Custom, sizeof(ulong), tmpn.size());
 
 		// initialize cSHAKE with k,c
-		m_acsState->Mode = (Parameters.Key().size() == 64) ? ShakeModes::SHAKE512 : (Parameters.Key().size() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
+		m_acsState->Mode = (Parameters.KeySizes().KeySize() == 64) ? ShakeModes::SHAKE512 : (Parameters.KeySizes().KeySize() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
 		Kdf::SHAKE gen(m_acsState->Mode);
 		gen.Initialize(Parameters.SecureKey(), m_acsState->Custom);
 
 		// generate the cipher key
-		SecureVector<byte> cprk(Parameters.Key().size());
+		SecureVector<byte> cprk(Parameters.KeySizes().KeySize());
 		gen.Generate(cprk);
 
 		// initialize the cipher

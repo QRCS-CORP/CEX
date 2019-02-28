@@ -59,7 +59,7 @@ public:
 	/// <summary>
 	/// Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
 	/// </summary>
-	virtual const SymmetricKeySize KeySizes() = 0;
+	virtual SymmetricKeySize &KeySizes() const = 0;
 
 	/// <summary>
 	/// Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv

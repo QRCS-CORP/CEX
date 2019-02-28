@@ -266,12 +266,12 @@ void SCRYPT::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Lengt
 void SCRYPT::Initialize(ISymmetricKey &Parameters)
 {
 #if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MinimumKeySize())
+	if (Parameters.KeySizes().KeySize() < MinimumKeySize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -283,28 +283,28 @@ void SCRYPT::Initialize(ISymmetricKey &Parameters)
 	}
 
 	// add the key to the state
-	m_scryptState->State.resize(Parameters.Key().size());
+	m_scryptState->State.resize(Parameters.KeySizes().KeySize());
 	MemoryTools::Copy(Parameters.Key(), 0, m_scryptState->State, 0, m_scryptState->State.size());
 
-	if (Parameters.Nonce().size() + Parameters.Info().size() != 0)
+	if (Parameters.KeySizes().NonceSize() + Parameters.KeySizes().InfoSize() != 0)
 	{
-		if (Parameters.Nonce().size() + Parameters.Info().size() < MinimumSaltSize())
+		if (Parameters.KeySizes().NonceSize() + Parameters.KeySizes().InfoSize() < MinimumSaltSize())
 		{
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
-		m_scryptState->Salt.resize(Parameters.Nonce().size() + Parameters.Info().size());
+		m_scryptState->Salt.resize(Parameters.KeySizes().NonceSize() + Parameters.KeySizes().InfoSize());
 
 		// add the nonce param to salt
-		if (Parameters.Nonce().size() > 0)
+		if (Parameters.KeySizes().NonceSize() > 0)
 		{
 			MemoryTools::Copy(Parameters.Nonce(), 0, m_scryptState->Salt, 0, m_scryptState->Salt.size());
 		}
 
 		// add info as extension of salt
-		if (Parameters.Info().size() > 0)
+		if (Parameters.KeySizes().InfoSize() > 0)
 		{
-			MemoryTools::Copy(Parameters.Info(), 0, m_scryptState->Salt, Parameters.Nonce().size(), Parameters.Info().size());
+			MemoryTools::Copy(Parameters.Info(), 0, m_scryptState->Salt, Parameters.KeySizes().NonceSize(), Parameters.KeySizes().InfoSize());
 		}
 	}
 

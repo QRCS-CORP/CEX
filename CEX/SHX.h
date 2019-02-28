@@ -44,7 +44,8 @@
 NAMESPACE_BLOCK
 
 /// <summary>
-/// A Serpent cipher using either standard modes, or extended modes of operation with HKDF(SHA2) or cSHAKE powered key schedule and increased transformation rounds.
+/// A Serpent cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cSHAKE key schedule, and increased transformation rounds.
+/// <para>This cipher should not be used directly but through a cipher mode, or as part of a larger construction.</para>
 /// </summary>
 /// 
 /// <example>
@@ -63,17 +64,17 @@ NAMESPACE_BLOCK
 /// <para>SHX is a Serpent implementation that can use either a standard configuration with key sizes of up to 32 bytes (256 bits), 
 /// or an extended mode using key sizes of 32, 64, and 128 bytes, (256, 512, and 1024 bits). \n
 /// In extended mode, the number of transformation rounds are set to 40, 48 and 64 rounds corresponding to the 256, 512, and 1024 input cipher key sizes. \n
-/// Increasing the number of transformation rounds processed by the ciphers rounds function creates a more diffused output, making the resulting cipher-text more difficult to cryptanalyze. \n
+/// Increasing the number of transformation rounds processed by the ciphers rounds function creates a more diffused output, making the resulting cipher-text more resistant to some forms of cryptanalysis. \n
 /// SHX is capable of processing up to 64 rounds, that is twice the number of rounds used in a standard implementation of Serpent. 
 /// </para>
 ///
 /// <description>Implementation Notes:</description>
 /// <para>The key schedule in SHX, and the number of transformation rounds processed are the difference between the extended mode operations, and a standard version of Serpent.
-/// The standard Serpent Key Schedule processes 128, 192, and 256 bit keys, and a fixed 32 transformation rounds, the extended version of the cipher processes 256, 512, and 1024-bit keys and up to 64 rounds. \n
+/// The standard Serpent Key Schedule processes 128, 192, and 256 bit keys, and is fixed at 32 transformation rounds, the extended version of the cipher processes 256, 512, and 1024-bit keys and up to 64 rounds. \n
 /// SHX extended mode can use an HMAC based Key Derivation Function; HKDF(HMAC(SHA2)) or the Keccak XOF function cSHAKE, to expand the cipher key to create the internal round-key integer array. \n
 /// This provides better security, and allows for an implemetation to safely use an increased number of transformation rounds. \n
-/// The DistributionCode array is a user-definable a cipher-tweak, and can be used to create a unique cipher-text output. \n
-/// This tweak array is set as either the information string for HKDF, or as the cSHAKE customization string.</para>
+/// The cipher can also use a user-definable cipher tweak through the Info parameter of the symmetric key container, this can be used to create a unique cipher-text output. \n
+/// This tweak array is set as either the information string for HKDF, or as the cSHAKE name string.</para>
 ///
 /// <para>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. \n
 /// SHX is capable of processing up to 64 rounds, that is twice the number of mixing rounds set in a standard implementation of Serpent; in extended mode a 256-bit key uses 40 rounds, a 512-bit key 48 rounds, and a 1024-bit key is set to 64 rounds.</para>
@@ -84,7 +85,7 @@ NAMESPACE_BLOCK
 /// <item><description>The internal block-size is fixed at 16 bytes (128 bits) wide.</description></item>
 /// <item><description>The cipher can process 128, 192, and 256-bit keys in standard mode, and 256, 512, and 1024-bit keys in extended mode.</description></item>
 /// <item><description>Transformation rounds assignments are 32 in standard modes, and 40, 48, and 64 rounds (256, 512, and 1024-bit keys).</description></item>
-/// <item><description>The DistributionCode array is a user-definable cipher tweak, this can be used to create a unique cipher-text output with a secondary secret.</description></item>
+/// <item><description>The Info parameter in a symmetric key container is a user-definable cipher tweak, this can be used to create a unique cipher-text output with a secondary secret.</description></item>
 /// <item><description>Extended mode is set through the constructors BlockCipherExtensions parameter to either None for standard mode, or HKDF(SHA2-256), HKDF(SHA2-512), cSHAKE256, cSHAKE512, or cSHAKE1024 for extended mode operation.</description></item>
 /// <item><description>It is recommended that in extended mode, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or HKDF(SHA2-512) for a 512-bit key.</description></item>
 /// </list>
@@ -107,23 +108,16 @@ class SHX final : public IBlockCipher
 private:
 
 	static const size_t BLOCK_SIZE = 16;
-	static const std::string CIPHER_NAME;
-	static const std::string CLASS_NAME;
-	static const std::string DEF_DSTINFO;
 	static const size_t MAX_ROUNDS = 64;
 	static const size_t MIN_ROUNDS = 32;
 	static const uint PHI = 0x9E3779B9UL;
 	// size of state buffer subtracted parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	bool m_destroyEngine;
-	std::vector<byte> m_distCode;
-	std::vector<uint> m_expKey;
-	bool m_isEncryption;
-	bool m_isInitialized;
+	class ShxState;
+	std::unique_ptr<ShxState> m_shxState;
 	std::unique_ptr<IKdf> m_kdfGenerator;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_rndCount;
 
 public:
 
@@ -144,10 +138,8 @@ public:
 	/// <para>It is recommended that in extended mode operation, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or, HKDF(SHA2-512) for a 512-bit key.</para>
 	/// </summary>
 	/// 
-	/// <param name="CipherExtensionType">Sets the optional Key Schedule key-expansion engine; valid options are cSHAKE, HKDF, or None for standard mode. 
+	/// <param name="CipherExtensionType">Sets the optional Key Schedule key-expansion function; valid options are cSHAKE, HKDF, or None for standard mode. 
 	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
-	///
-	/// <exception cref="CryptoSymmetricException">Thrown if a the custom cipher extension is used</exception>
 	SHX(BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
@@ -155,9 +147,7 @@ public:
 	/// <para>It is recommended that in extended mode operation, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or, HKDF(SHA2-512) for a 512-bit key.</para>
 	/// </summary>
 	///
-	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
-	///
-	/// <exception cref="CryptoSymmetricException">Thrown if a null kdf is used</exception>
+	/// <param name="Kdf">The Key Schedule KDF engine instance; can be null.</param>
 	SHX(IKdf* Kdf);
 
 	/// <summary>
@@ -169,13 +159,11 @@ public:
 
 	/// <summary>
 	/// Read Only: Unit block size of internal cipher in bytes.
-	/// <para>Block size must be 16 or 32 bytes wide.
-	/// Value set in class constructor.</para>
 	/// </summary>
 	const size_t BlockSize() override;
 
 	/// <summary>
-	/// Read Only: The block ciphers type name
+	/// Read Only: The block ciphers enumeration type name
 	/// </summary>
 	const BlockCiphers Enumeral() override;
 
@@ -191,17 +179,17 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: Available Encryption Key Sizes in bytes
+	/// Read Only: A list of SymmetricKeySize structures containing valid key-sizes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Read Only: The block ciphers class name
+	/// Read Only: The block ciphers formal class name
 	/// </summary>
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: The number of transformation rounds processed by the transform
+	/// Read Only: The number of transformation rounds processed by the rounds function
 	/// </summary>
 	const size_t Rounds() override;
 
@@ -330,6 +318,8 @@ public:
 private:
 
 	static std::vector<SymmetricKeySize> CalculateKeySizes(BlockCipherExtensions Extension);
+	static void SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State, std::unique_ptr<IKdf> &Generator);
+	static void StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<ShxState> &State);
 
 	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
@@ -339,9 +329,7 @@ private:
 	void Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void ExpandKey(const std::vector<byte> &Key);
-	void SecureExpand(const std::vector<byte> &Key);
-	void StandardExpand(const std::vector<byte> &Key);
+
 };
 
 NAMESPACE_BLOCKEND

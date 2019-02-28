@@ -209,12 +209,12 @@ void CMAC::Initialize(ISymmetricKey &Parameters)
 	std::vector<byte> tmpz(BLOCK_SIZE);
 
 #if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MinimumKeySize())
+	if (Parameters.KeySizes().KeySize() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}

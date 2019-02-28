@@ -109,6 +109,7 @@ namespace Test
 				Kat(cpr1, m_keys[11], m_plainText[11], m_cipherText[11]);
 				delete cpr1;
 
+
 				RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
 				Kat(cpr2, m_keys[24], m_plainText[0], m_cipherText[24]);
 				delete cpr2;
@@ -241,36 +242,6 @@ namespace Test
 			cpr.Initialize(true, kp);
 
 			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE1"));
-		}
-		catch (CryptoSymmetricException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
-		// test illegal custom setting through enum constructor
-		try
-		{
-			RHX cpr(BlockCipherExtensions::Custom);
-
-			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE2"));
-		}
-		catch (CryptoSymmetricException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
-		// test illegal null value through instance constructor
-		try
-		{
-			RHX cpr(nullptr);
-
-			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -RE3"));
 		}
 		catch (CryptoSymmetricException const &)
 		{
@@ -481,7 +452,7 @@ namespace Test
 			std::string("5F060D3716B345C253F6749ABAC10917"),
 			std::string("AAFE47EE82411A2BF3F6752AE8D7831138F041560631B114"),
 			std::string("28E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A386"),
-			// hx cipher original vectors
+			// rhx cipher original keys
 			std::string("28E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A386"),
 			std::string("28E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A38628E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A386")
 		};
@@ -489,6 +460,7 @@ namespace Test
 
 		const std::vector<std::string> plainText =
 		{
+			// fips
 			std::string("00000000000000000000000000000000"),
 			std::string("00000000000000000000000000000000"),
 			std::string("80000000000000000000000000000000"),
@@ -501,7 +473,7 @@ namespace Test
 			std::string("00000000000000000000000000000000"),
 			std::string("80000000000000000000000000000000"),
 			std::string("80000000000000000000000000000000"),
-
+			// gladman
 			std::string("00000000000000000000000000000000"),
 			std::string("355F697E8B868B65B25A04E18D782AFA"),
 			std::string("F3F6752AE8D7831138F041560631B114"),
@@ -520,6 +492,7 @@ namespace Test
 
 		const std::vector<std::string> cipherText =
 		{
+			// aes kat tests
 			std::string("0EDD33D3C621E546455BD8BA1418BEC8"),
 			std::string("172AEAB3D507678ECAF455C12587ADB7"),
 			std::string("6CD02513E8D4DC986B4AFE087A60BD0C"),
@@ -532,7 +505,7 @@ namespace Test
 			std::string("172AEAB3D507678ECAF455C12587ADB7"),
 			std::string("6CD02513E8D4DC986B4AFE087A60BD0C"),
 			std::string("DDC6BF790C15760D8D9AEB6F9A75FD4E"),
-
+			// aes monte carlo tests
 			std::string("C34C052CC0DA8D73451AFE5F03BE297F"),
 			std::string("ACC863637868E3E068D2FD6E3508454A"),
 			std::string("77BA00ED5412DFF27C8ED91F3C376172"),
@@ -545,16 +518,22 @@ namespace Test
 			std::string("ACC863637868E3E068D2FD6E3508454A"),
 			std::string("77BA00ED5412DFF27C8ED91F3C376172"),
 			std::string("E58B82BFBA53C0040DC610C642121168"),
-
-			std::string("EB6B1FC020CC3362F2EEDC95B4DB0F5F"),
-			std::string("29E7C52BA5DC968A0AD23AF93EA6E0E0"),
-			std::string("1335B6AFC51238E28536EDCD587A3697"),
-			std::string("046AB3836C6FA2DDD3964A5C7E4BC3E8"),
-
-			std::string("8B2D43CAD3F2F0B80A15AAF07DCFC696"),
-			std::string("686A2F305D9C8F2D1F9A8EC598F269F3"),
-			std::string("3F15DBA9166C355EEB2333078967390B"),
-			std::string("5ddd6f44ba84bcca80189d098eec5293")
+			// rhx kat tests: rhx-hkdf256
+			std::string("356FE2F76E8954C8292C4FE4EFD52A2C"),
+			// rhx-hkdf512
+			std::string("C23E5C88453124D46B81D7229C6A409F"),
+			// rhx-shake256
+			std::string("B93AF9A0635964EE2DD1600A95C56905"),
+			// rhx-shake512
+			std::string("4F9D61042EC51DADAB25F081A3E79AF1"),
+			// rhx monte-carlo tests: rhx-hkdf256
+			std::string("C4E3D76961144D5F1BAC6C0DE5078597"),
+			// rhx-hkdf512
+			std::string("3CC3EB49D4328762000EB0D6DB3924E1"),
+			// rhx-shake256
+			std::string("6DED2973243BCD846C4D98C1BF636FB3"),
+			// rhx-shake512
+			std::string("FB8977B80F5B0B7C2E4048DF590EB2F6")
 		};
 		HexConverter::Decode(cipherText, 32, m_cipherText);
 		/*lint -restore */

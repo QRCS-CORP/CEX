@@ -234,7 +234,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	// recheck params
 	Reset();
 
-	if (Parameters.Key().size() == 0)
+	if (Parameters.KeySizes().KeySize() == 0)
 	{
 		if (Parameters.Nonce() == m_eaxVector)
 		{
@@ -247,7 +247,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 	else
 	{
-		if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+		if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 		{
 			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 		}
@@ -256,7 +256,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_cipherKey = Parameters.Key();
 	}
 
-	if (Parameters.Nonce().size() != m_cipherMode->BlockSize())
+	if (Parameters.KeySizes().NonceSize() != m_cipherMode->BlockSize())
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}

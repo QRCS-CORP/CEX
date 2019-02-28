@@ -21,11 +21,15 @@
 
 #include "CexDomain.h"
 
-#if !defined(__AVX__)
+#if defined(__AVX__)
 #	include "Intrinsics.h"
 #endif
 
 NAMESPACE_NUMERIC
+
+// minimum composition:
+// _mm_loadu_si128, _mm_storeu_si128, _mm_slli_si128, _mm_srli_si128, _mm_shuffle_epi32, _mm_cvtsi128_si32, _mm_xor_si128
+// _mm_aeskeygenassist_si128, _mm_aesdec_si128, _mm_aesdeclast_si128, _mm_aesenc_si128, _mm_aesenclast_si128
 
 /// <summary>
 /// An AES intrinsics wrapper
@@ -37,9 +41,42 @@ class AES128
 public:
 
 	/// <summary>
-	/// The round key array
+	/// Load an array into a register in Little Endian format
 	/// </summary>
-	std::vector<__m128i> RoundKeys;
+	///
+	/// <param name="Input">The source integer array; must be at least 128 bits in length</param>
+	/// <param name="Offset">The starting offset within the Input array</param>
+	/// <param name="Output">The 128-bit integer output</param>
+	template <typename Array>
+	inline static void Load(const Array &Input, size_t Offset, __m128i &Output)
+	{
+		Output = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[Offset]));
+	}
+
+	/// <summary>
+	/// Store register in an integer array
+	/// </summary>
+	///
+	/// <param name="Input">The source 128-bit integer</param>
+	/// <param name="Output">The destination integer array; must be at least 128 bits in length</param>
+	/// <param name="Offset">The starting offset within the Output array</param>
+	template <typename Array>
+	inline void Store(__m128i &Input, Array &Output, size_t Offset) const
+	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[Offset]), Input);
+	}
+
+
+	/// <summary>
+	/// Computes the 32 bit left rotation of four unsigned integers
+	/// </summary>
+	///
+	/// <param name="Shift">The shift degree; maximum is 32</param>
+	inline void RotL(const int Shift)
+	{
+		CEXASSERT(Shift <= 32, "Shift size is too large");
+		xmm = _mm_or_si128(_mm_slli_si128(xmm, static_cast<int>(Shift)), _mm_slli_si128(xmm, static_cast<int>(32 - Shift)));
+	}
 
 	/// <summary>
 	/// Performs the InverseMixColumn operation on the source m128i and stores the result into m128i destination
@@ -127,11 +164,6 @@ public:
 		return _mm_aesenc_si128(V, K);
 	}
 
-	/*
-	 * Generates a m128i round key for the input m128i
-	 * AES cipher key and.
-	 * The second parameter must be a compile time constant.
-	 */
 	 /// <summary>
 	 /// 
 	 /// </summary>

@@ -163,11 +163,11 @@ void OFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void OFB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.Nonce().size() < 1 || Parameters.Nonce().size() > m_blockCipher->BlockSize())
+	if (Parameters.KeySizes().NonceSize() < 1 || Parameters.KeySizes().NonceSize() > m_blockCipher->BlockSize())
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of nonce, and no larger than the block size!"), ErrorCodes::InvalidNonce);
 	}
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}

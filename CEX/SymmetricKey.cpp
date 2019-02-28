@@ -159,7 +159,7 @@ const std::vector<byte> SymmetricKey::Key()
 	return tmp;
 }
 
-const SymmetricKeySize SymmetricKey::KeySizes() 
+SymmetricKeySize &SymmetricKey::KeySizes() const
 { 
 	return m_keyState->KeySizes;
 }

@@ -262,16 +262,16 @@ void BCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 void BCG::Initialize(ISymmetricKey &Parameters)
 {
 #if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key.size(), Parameters.Nonce.KeySizes()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize(), Parameters.Nonce.KeySizes()))
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MINKEY_LENGTH)
+	if (Parameters.KeySizes().KeySize() < MINKEY_LENGTH)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidNonce);
 	}
-	if (Parameters.Nonce().size() != BLOCK_SIZE)
+	if (Parameters.KeySizes().NonceSize() != BLOCK_SIZE)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Nonce size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidNonce);
 	}
@@ -280,8 +280,8 @@ void BCG::Initialize(ISymmetricKey &Parameters)
 	// set state initialization values
 	m_bcgState->Reset();
 	m_parallelProfile.IsParallel() = m_bcgState->IsParallel;
-	m_bcgState->KeySize = Parameters.Key().size();
-	m_bcgState->Strength = static_cast<ushort>(Parameters.Key().size()) * 8;
+	m_bcgState->KeySize = Parameters.KeySizes().KeySize();
+	m_bcgState->Strength = static_cast<ushort>(Parameters.KeySizes().KeySize()) * 8;
 
 	if (m_bcgCipher->Enumeral() == BlockCiphers::AES || m_bcgCipher->Enumeral() == BlockCiphers::Serpent)
 	{

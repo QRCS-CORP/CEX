@@ -217,12 +217,12 @@ void HMAC::Initialize(ISymmetricKey &Parameters)
 	size_t klen;
 
 #if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MinimumKeySize())
+	if (Parameters.KeySizes().KeySize() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
@@ -233,11 +233,11 @@ void HMAC::Initialize(ISymmetricKey &Parameters)
 		Reset();
 	}
 
-	klen = Parameters.Key().size();
+	klen = Parameters.KeySizes().KeySize();
 
 	if (klen > m_hmacGenerator->BlockSize())
 	{
-		m_hmacGenerator->Update(Parameters.Key(), 0, Parameters.Key().size());
+		m_hmacGenerator->Update(Parameters.Key(), 0, Parameters.KeySizes().KeySize());
 		m_hmacGenerator->Finalize(m_hmacState->InputPad, 0);
 		klen = m_hmacGenerator->DigestSize();
 	}

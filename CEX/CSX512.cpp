@@ -170,15 +170,15 @@ const size_t CSX512::TagSize()
 
 void CSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.Key().size() != KEY_SIZE)
+	if (Parameters.KeySizes().KeySize() != KEY_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.Nonce().size() != 0)
+	if (Parameters.KeySizes().NonceSize() != 0)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The nonce is not required with CSX512!"), ErrorCodes::InvalidNonce);
 	}
-	if (Parameters.Info().size() > 0 && Parameters.Info().size() != INFO_SIZE)
+	if (Parameters.KeySizes().InfoSize() > 0 && Parameters.KeySizes().InfoSize() != INFO_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The distribution code must be no larger than DistributionCodeMax!"), ErrorCodes::InvalidInfo);
 	}
@@ -203,10 +203,10 @@ void CSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	SecureVector<byte> code(INFO_SIZE);
 
-	if (Parameters.Info().size() != 0)
+	if (Parameters.KeySizes().InfoSize() != 0)
 	{
 		// custom code
-		MemoryTools::Copy(Parameters.Info(), 0, code, 0, Parameters.Info().size());
+		MemoryTools::Copy(Parameters.Info(), 0, code, 0, Parameters.KeySizes().InfoSize());
 	}
 	else
 	{
@@ -225,10 +225,11 @@ void CSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_csx512State->Counter = 1;
 
 		// create the cSHAKE customization string
-		m_csx512State->Custom.resize(sizeof(ulong) + Name().size());
+		std::string tmpn = Name();
+		m_csx512State->Custom.resize(sizeof(ulong) + tmpn.size());
 		// add mac counter and algorithm name to customization string
 		IntegerTools::Le64ToBytes(m_csx512State->Counter, m_csx512State->Custom, 0);
-		MemoryTools::Copy(Name(), 0, m_csx512State->Custom, sizeof(ulong), Name().size());
+		MemoryTools::CopyFromObject(Name().data(), m_csx512State->Custom, sizeof(ulong), Name().size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE512);

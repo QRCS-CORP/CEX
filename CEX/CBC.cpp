@@ -156,11 +156,11 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void CBC::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.Nonce().size() != BLOCK_SIZE)
+	if (Parameters.KeySizes().NonceSize() != BLOCK_SIZE)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid nonce size; nonce must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidNonce);
 	}
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}

@@ -117,6 +117,29 @@ namespace Test
 		}
 	}
 
+	void SerpentTest::Exception()
+	{
+		// test initialization with illegal key input size
+		try
+		{
+			SHX cpr;
+			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> k(ks.KeySize() + 1);
+			SymmetricKey kp(k);
+
+			cpr.Initialize(true, kp);
+
+			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE1"));
+		}
+		catch (CryptoSymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+	}
+
 	void SerpentTest::Kat(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
 		std::vector<byte> exp(16);
@@ -139,59 +162,6 @@ namespace Test
 		if (msg != Message)
 		{
 			throw TestException(std::string("Kat"), cpr.Name(), std::string("Arrays are not equal! -SC2"));
-		}
-	}
-
-	void SerpentTest::Exception()
-	{
-		// test initialization with illegal key input size
-		try
-		{
-			SHX cpr;
-			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
-			std::vector<byte> k(ks.KeySize() + 1);
-			SymmetricKey kp(k);
-
-			cpr.Initialize(true, kp);
-
-			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE1"));
-		}
-		catch (CryptoSymmetricException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
-		// test illegal custom setting through enum constructor
-		try
-		{
-			SHX cpr(BlockCipherExtensions::Custom);
-
-			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE2"));
-		}
-		catch (CryptoSymmetricException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
-		}
-
-		// test illegal null value through instance constructor
-		try
-		{
-			SHX cpr(nullptr);
-
-			throw TestException(std::string("Kat"), cpr.Name(), std::string("Exception handling failure! -SE3"));
-		}
-		catch (CryptoSymmetricException const &)
-		{
-		}
-		catch (TestException const &)
-		{
-			throw;
 		}
 	}
 
@@ -276,26 +246,29 @@ namespace Test
 
 		// 192 bit keys
 		TestUtils::Read(SERPENTCTEXT192, cipstr);
-
 		if (cipstr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTCTEXT192"), std::string("Could not find the test file! -SKM1"));
 		}
+
 		TestUtils::Read(SERPENTKEY192, keystr);
 		if (keystr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTKEY192"), std::string("Could not find the test file! -SKM2"));
 		}
+
 		TestUtils::Read(SERPENTPTEXT192, plnstr);
 		if (plnstr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTPTEXT192"), std::string("Could not find the test file! -SKM3"));
 		}
+
 		TestUtils::Read(SERPENTM100X192, mntstr);
 		if (mntstr.size() == 0)
 		{
 			throw TestException(std::string("Kat192"), std::string("SERPENTM100X192"), std::string("Could not find the test file! -SKM4"));
 		}
+
 		TestUtils::Read(SERPENTM1000X192, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
@@ -340,26 +313,29 @@ namespace Test
 
 		// 256 bit keys
 		TestUtils::Read(SERPENTCTEXT256, cipstr);
-
 		if (cipstr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTCTEXT256"), std::string("Could not find the test file! -SKL1"));
 		}
+
 		TestUtils::Read(SERPENTKEY256, keystr);
 		if (keystr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTKEY256"), std::string("Could not find the test file! -SKL2"));
 		}
+
 		TestUtils::Read(SERPENTPTEXT256, plnstr);
 		if (plnstr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTPTEXT256"), std::string("Could not find the test file! -SKL3"));
 		}
+
 		TestUtils::Read(SERPENTM100X256, mntstr);
 		if (mntstr.size() == 0)
 		{
 			throw TestException(std::string("Kat256"), std::string("SERPENTM100X256"), std::string("Could not find the test file! -SKL4"));
 		}
+
 		TestUtils::Read(SERPENTM1000X256, mnt1kstr);
 		if (mnt1kstr.size() == 0)
 		{
@@ -583,16 +559,22 @@ namespace Test
 
 		const std::vector<std::string> exp =
 		{
-			// hx cipher original kat vectors
-			std::string("22319F6563B60A0B2B396C0B47B9F7F3"),
-			std::string("78C2983C4CD2F787E1B82C0D0B402A7E"),
-			std::string("15472794386AD9C057D9EEB1240129B6"),
-			std::string("6C888F4DEE790590AB8BE922E71DFA48"),
-			// hx cipher original monte carlo vectors
-			std::string("CBD310200964EC7B13C7327F6B665DD0"),
-			std::string("B92979F1C5E08FBD62558847BE7E1132"),
-			std::string("C63CD9BD3659E9622A45A86B679B7E72"),
-			std::string("18A833426B6E31A104036CEAFC876CFE")
+			// shx kat tests: shx-hkdf256
+			std::string("BA559D68B18F09C340D3D1D22D161FEC"),
+			// shx-hkdf512
+			std::string("46448B72184E8F3215B26C74A1F5702C"),
+			// shx-shake256
+			std::string("6AB8C4C869216165B59DDD568E27B425"),
+			// shx-shake512
+			std::string("F43E715FD5FE9EA0526BDBD81B204604"),
+			// shx monte-carlo tests: shx-hkdf256
+			std::string("B82E6CD9E9EF4223A757EDDCB470AEEA"),
+			// shx-hkdf512
+			std::string("6717843AB2CA17274A8FAA6975F8352D"),
+			// shx-shake256
+			std::string("E205E2DD4D8379C47495D95EFAE0A243"),
+			// shx-shake512
+			std::string("4E5EBEDBBAD24F7F10012A8F6CBBF085")
 		};
 		HexConverter::Decode(exp, 8, m_expected);
 

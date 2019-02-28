@@ -166,15 +166,15 @@ const size_t CSX256::TagSize()
 
 void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.Key().size() != KEY_SIZE)
+	if (Parameters.KeySizes().KeySize() != KEY_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.Nonce().size() != NONCE_SIZE * sizeof(uint))
+	if (Parameters.KeySizes().NonceSize() != NONCE_SIZE * sizeof(uint))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Nonce must be 8 bytes!"), ErrorCodes::InvalidNonce);
 	}
-	if (Parameters.Info().size() > 0 && Parameters.Info().size() != INFO_SIZE)
+	if (Parameters.KeySizes().InfoSize() > 0 && Parameters.KeySizes().InfoSize() != INFO_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("The distribution code must be no larger than LegalKeySizes info size!"), ErrorCodes::InvalidInfo);
 	}
@@ -198,10 +198,10 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	std::vector<byte> code(INFO_SIZE);
 
-	if (Parameters.Info().size() != 0)
+	if (Parameters.KeySizes().InfoSize() != 0)
 	{
 		// custom code
-		MemoryTools::Copy(Parameters.Info(), 0, code, 0, Parameters.Info().size());
+		MemoryTools::Copy(Parameters.Info(), 0, code, 0, Parameters.KeySizes().InfoSize());
 	}
 	else
 	{
@@ -220,10 +220,11 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_csx256State->Counter = 1;
 
 		// create the cSHAKE customization string
-		m_csx256State->Custom.resize(sizeof(ulong) + Name().size());
+		std::string tmpn = Name();
+		m_csx256State->Custom.resize(sizeof(ulong) + tmpn.size());
 		// add mac counter and algorithm name to customization string
 		IntegerTools::Le64ToBytes(m_csx256State->Counter, m_csx256State->Custom, 0);
-		MemoryTools::Copy(Name(), 0, m_csx256State->Custom, sizeof(ulong), Name().size());
+		MemoryTools::CopyFromObject(tmpn.data(), m_csx256State->Custom, sizeof(ulong), tmpn.size());
 
 		// initialize cSHAKE
 		Kdf::SHAKE gen(ShakeModes::SHAKE256);

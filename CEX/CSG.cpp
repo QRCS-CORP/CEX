@@ -342,7 +342,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MINKEY_LENGTH)
+	if (Parameters.KeySizes().KeySize() < MINKEY_LENGTH)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidKey);
 	}
@@ -352,7 +352,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 
 	if (!m_csgState->IsParallel)
 	{
-		if (Parameters.Nonce().size() != 0 || Parameters.Info().size() != 0)
+		if (Parameters.KeySizes().NonceSize() != 0 || Parameters.KeySizes().InfoSize() != 0)
 		{
 			// standard cSHAKE invocation
 			m_csgState->Domain = Keccak::KECCAK_CSHAKE_DOMAIN;
@@ -360,7 +360,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 			// customize the state
 			Customize(Parameters.Nonce(), Parameters.Info(), m_csgState);
 			// absorb the key into state
-			Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+			Absorb(Parameters.Key(), 0, Parameters.KeySizes().KeySize(), m_csgState);
 		}
 		else
 		{
@@ -368,7 +368,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 			m_csgState->Domain = Keccak::KECCAK_SHAKE_DOMAIN;
 			m_csgState->Index = 0;
 			// absorb the key
-			Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+			Absorb(Parameters.Key(), 0, Parameters.KeySizes().KeySize(), m_csgState);
 		}
 	}
 	else
@@ -384,13 +384,13 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 		// assign the custom domain wide-x4 or wide-x8
 		m_csgState->Domain = m_csgState->State.size() == 4 ? Keccak::KECCAK_CSHAKEW4_DOMAIN : Keccak::KECCAK_CSHAKEW8_DOMAIN;
 
-		if (Parameters.Nonce().size() != 0 || Parameters.Info().size() != 0)
+		if (Parameters.KeySizes().NonceSize() != 0 || Parameters.KeySizes().InfoSize() != 0)
 		{
 			// nonce is minimum 8 bytes wide
-			const size_t CSTLEN = Parameters.Nonce().size() + sizeof(uint);
+			const size_t CSTLEN = Parameters.KeySizes().NonceSize() + sizeof(uint);
 			std::vector<byte> tmpc(CSTLEN);
 			// add custom nonce to end of the cSHAKE customization parameter
-			MemoryTools::Copy(Parameters.Nonce(), 0, tmpc, 0, Parameters.Nonce().size());
+			MemoryTools::Copy(Parameters.Nonce(), 0, tmpc, 0, Parameters.KeySizes().NonceSize());
 			// add the library prefix to cSHAKE name parameter
 			ArrayTools::AppendVector(CEX_LIBRARY_PREFIX, tmpi);
 			// add the DRBGs formal class name to the cSHAKE name parameter
@@ -410,7 +410,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 				// cSHAKE: absorb and permute the customizations, initializing each array of keccak states to unique starting values
 				Customize(tmpc, tmpi, m_csgState);
 				// absorb the key into each state member
-				Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+				Absorb(Parameters.Key(), 0, Parameters.KeySizes().KeySize(), m_csgState);
 			}
 		}
 		else
@@ -429,7 +429,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 				IntegerTools::BeIncrease8(tmpc, m_csgState->Rate);
 				m_csgState->Index = i;
 				Customize(tmpc, tmpi, m_csgState);
-				Absorb(Parameters.Key(), 0, Parameters.Key().size(), m_csgState);
+				Absorb(Parameters.Key(), 0, Parameters.KeySizes().KeySize(), m_csgState);
 			}
 		}
 	}

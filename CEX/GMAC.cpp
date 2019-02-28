@@ -190,18 +190,18 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	std::vector<ulong> tmpk;
 
 #if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key or salt size, the key and salt lengths must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
 #else
-	if (Parameters.Key().size() < MinimumKeySize())
+	if (Parameters.KeySizes().KeySize() < MinimumKeySize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
 #endif
 
-	if (Parameters.Nonce().size() < MinimumSaltSize())
+	if (Parameters.KeySizes().NonceSize() < MinimumSaltSize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
 	}
@@ -211,7 +211,7 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 		Reset();
 	}
 
-	if (Parameters.Key().size() != 0)
+	if (Parameters.KeySizes().KeySize() != 0)
 	{
 		// key the cipher and generate H
 		m_blockCipher->Initialize(true, Parameters);
@@ -229,7 +229,7 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	}
 
 	// initialize the nonce
-	m_gmacState->Nonce.resize(Parameters.Nonce().size());
+	m_gmacState->Nonce.resize(Parameters.KeySizes().NonceSize());
 	MemoryTools::Copy(Parameters.Nonce(), 0, m_gmacState->Nonce, 0, m_gmacState->Nonce.size());
 
 	if (m_gmacState->Nonce.size() == 12)

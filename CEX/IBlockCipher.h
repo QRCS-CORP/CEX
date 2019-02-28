@@ -99,7 +99,7 @@ public:
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Read Only: Available Encryption Key Sizes in bytes
+	/// Read Only: A list of SymmetricKeySize structures containing valid key-sizes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 

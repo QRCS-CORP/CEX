@@ -120,7 +120,7 @@ public:
 	{
 		CEXASSERT(InLength % sizeof(ulong) == 0, "The input length is not 64-bit aligned");
 
-#if !defined(CEX_IS_LITTLE_ENDIAN)
+#if defined(CEX_IS_LITTLE_ENDIAN)
 		MemoryTools::XOR(Input, InOffset, State, 0, InLength);
 #else
 		for (size_t i = 0; i < InLength / sizeof(ulong); ++i)

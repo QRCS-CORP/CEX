@@ -19,7 +19,7 @@ class CryptoException : public std::exception
 private:
 
 	ErrorCodes m_error;
-	std::string m_location;  // Location, Origin, Message, ErrorCode == Class, Function, Message, ErrorCode
+	std::string m_location;
 	std::string m_message;
 	std::string m_origin;
 
