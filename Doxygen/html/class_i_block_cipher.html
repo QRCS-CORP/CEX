@@ -81,8 +81,8 @@ Inheritance diagram for IBlockCipher:</div>
  <div class="center">
   <img src="class_i_block_cipher.png" usemap="#IBlockCipher_map" alt=""/>
   <map id="IBlockCipher_map" name="IBlockCipher_map">
-<area href="class_r_h_x.html" title="A Rijndael cipher using either standard modes, or extended modes of operation with HKDF(SHA2) or cSHA..." alt="RHX" shape="rect" coords="0,56,84,80"/>
-<area href="class_s_h_x.html" title="A Serpent cipher using either standard modes, or extended modes of operation with HKDF(SHA2) or cSHAK..." alt="SHX" shape="rect" coords="94,56,178,80"/>
+<area href="class_r_h_x.html" title="A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or c..." alt="RHX" shape="rect" coords="0,56,84,80"/>
+<area href="class_s_h_x.html" title="A Serpent cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cS..." alt="SHX" shape="rect" coords="94,56,178,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -113,7 +113,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a5119952207cba4278018ef18f124dede"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Cipher is ready to transform data  <a href="#a5119952207cba4278018ef18f124dede">More...</a><br /></td></tr>
 <tr class="separator:a5119952207cba4278018ef18f124dede"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc95238bcc57bbe8aba3172ca7e08500"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_block_cipher.html#adc95238bcc57bbe8aba3172ca7e08500">LegalKeySizes</a> ()=0</td></tr>
-<tr class="memdesc:adc95238bcc57bbe8aba3172ca7e08500"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Available Encryption Key Sizes in bytes  <a href="#adc95238bcc57bbe8aba3172ca7e08500">More...</a><br /></td></tr>
+<tr class="memdesc:adc95238bcc57bbe8aba3172ca7e08500"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A list of SymmetricKeySize structures containing valid key-sizes  <a href="#adc95238bcc57bbe8aba3172ca7e08500">More...</a><br /></td></tr>
 <tr class="separator:adc95238bcc57bbe8aba3172ca7e08500"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56fd25fd94bf58bfcdefa40250949879"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_block_cipher.html#a56fd25fd94bf58bfcdefa40250949879">Name</a> ()=0</td></tr>
 <tr class="memdesc:a56fd25fd94bf58bfcdefa40250949879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers class name  <a href="#a56fd25fd94bf58bfcdefa40250949879">More...</a><br /></td></tr>
@@ -561,7 +561,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>The <a class="el" href="class_i_block_cipher.html#adc95238bcc57bbe8aba3172ca7e08500" title="Read Only: Available Encryption Key Sizes in bytes ">LegalKeySizes</a> property contains valid sizes.</p>
+<p>The <a class="el" href="class_i_block_cipher.html#adc95238bcc57bbe8aba3172ca7e08500" title="Read Only: A list of SymmetricKeySize structures containing valid key-sizes ">LegalKeySizes</a> property contains valid sizes.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if a null or invalid key is used</td></tr>
@@ -655,7 +655,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Available Encryption Key Sizes in bytes </p>
+<p>Read Only: A list of SymmetricKeySize structures containing valid key-sizes </p>
 
 <p>Implemented in <a class="el" href="class_s_h_x.html#a5c7006f75c0b2e55ea722f55f2b2942d">SHX</a>, and <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8">RHX</a>.</p>
 

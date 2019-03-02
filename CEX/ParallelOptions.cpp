@@ -124,7 +124,7 @@ bool &ParallelOptions::IsParallel()
 	return m_isParallel;
 }
 
-size_t &ParallelOptions::ParallelBlockSize() 
+const size_t ParallelOptions::ParallelBlockSize() 
 {
 	return m_parallelBlockSize;
 }
@@ -271,6 +271,17 @@ void ParallelOptions::Reset()
 	m_splitChannel = false;
 	m_virtualCores = 0;
 	m_wideBlock = false;
+}
+
+void ParallelOptions::SetBlockSize(size_t BlockSize)
+{
+	if (BlockSize < m_parallelMinimumSize)
+	{
+		throw CryptoProcessingException(CLASS_NAME, std::string("SetBlockSize"), std::string("The block-size must be at least parallel minimum-size in length!"), ErrorCodes::InvalidParam);
+	}
+
+	m_parallelBlockSize = BlockSize;
+	Calculate();
 }
 
 void ParallelOptions::SetMaxDegree(size_t MaxDegree)

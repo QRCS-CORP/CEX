@@ -15,19 +15,19 @@ CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.7l</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.7m</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   v1.0.0.7l
-\date      February 28, 2019
+\version   v1.0.0.7m
+\date      March 02, 2019
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.7l (A7 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.7m (A7 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.7l (version A7):</B> \n
+<B>Current Release v1.0.0.7m (version A7):</B> \n
 
 The Dilithium asymmetric signature scheme \n
 The SPHINCS+ asymmetric signature scheme \n

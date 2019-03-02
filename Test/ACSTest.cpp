@@ -15,6 +15,8 @@ namespace Test
 	using Utility::MemoryTools;
 	using Prng::SecureRandom;
 	using Enumeration::StreamAuthenticators;
+	using Enumeration::StreamCipherConvert;
+	using Enumeration::StreamCiphers;
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
 
@@ -78,7 +80,7 @@ namespace Test
 			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 MAC authentication tests.."));
 
 			// test all exception handlers for correct operation
-			Exception(acs256s);
+			Exception();
 			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 exception handling tests.."));
 
 			// test 2 succesive finalization calls against mac output and expected ciphertext
@@ -193,20 +195,35 @@ namespace Test
 		}
 	}
 
-	void ACSTest::Exception(IStreamCipher* Cipher)
+	void ACSTest::Exception()
 	{
-		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		// test the enumeration constructors for invalid block-cipher type
+		try
+		{
+			ACS cpr(BlockCiphers::None, StreamAuthenticators::None);
+
+			throw TestException(std::string("Exception"), StreamCipherConvert::ToName(StreamCiphers::ACS), std::string("Exception handling failure! -AE1"));
+		}
+		catch (CryptoSymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
 
 		// test initialization key and nonce input sizes
 		try
 		{
+			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
 			std::vector<byte> nonce(ks.NonceSize());
 			SymmetricKey kp(key, nonce);
 
-			Cipher->Initialize(true, kp);
+			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE1"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -AE2"));
 		}
 		catch (CryptoSymmetricException const &)
 		{
@@ -219,12 +236,14 @@ namespace Test
 		// no nonce
 		try
 		{
+			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
 			SymmetricKey kp(key);
 
-			Cipher->Initialize(true, kp);
+			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE2"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -AE3"));
 		}
 		catch (CryptoSymmetricException const &)
 		{
@@ -237,13 +256,15 @@ namespace Test
 		// illegally sized nonce
 		try
 		{
+			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> nonce(1);
 			SymmetricKey kp(key, nonce);
 
-			Cipher->Initialize(true, kp);
+			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE3"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -AE4"));
 		}
 		catch (CryptoSymmetricException const &)
 		{
@@ -256,13 +277,15 @@ namespace Test
 		// test invalid parallel options
 		try
 		{
+			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
 			SymmetricKey kp(key);
 
-			Cipher->Initialize(true, kp);
-			Cipher->ParallelMaxDegree(9999);
+			cpr.Initialize(true, kp);
+			cpr.ParallelMaxDegree(9999);
 
-			throw TestException(std::string("Exception"), Cipher->Name(), std::string("Exception handling failure! -TE6"));
+			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -AE5"));
 		}
 		catch (CryptoSymmetricException const &)
 		{
@@ -422,7 +445,7 @@ namespace Test
 			IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
 			SymmetricKey kp(key, nonce);
 
-			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
+			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
 
 			// sequential
 			Cipher->Initialize(true, kp);
@@ -451,7 +474,7 @@ namespace Test
 		}
 
 		// restore parallel block size
-		Cipher->ParallelProfile().ParallelBlockSize() = prlSize;
+		Cipher->ParallelProfile().SetBlockSize(prlSize);
 	}
 
 	void ACSTest::Stress(IStreamCipher* Cipher)

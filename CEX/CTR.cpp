@@ -5,67 +5,77 @@
 
 NAMESPACE_MODE
 
-const std::string CTR::CLASS_NAME("CTR");
+using Enumeration::BlockCipherConvert;
+using Enumeration::CipherModeConvert;
+using Utility::IntegerTools;
+using Utility::MemoryTools;
+
+class CTR::CtrState
+{
+public:
+
+	std::vector<byte> Nonce;
+	bool Destroyed;
+	bool Encryption;
+	bool Initialized;
+
+	CtrState(bool IsDestroyed)
+		:
+		Nonce(BLOCK_SIZE, 0x00),
+		Destroyed(IsDestroyed),
+		Encryption(false),
+		Initialized(false)
+	{
+	}
+
+	~CtrState()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(Nonce, 0, Nonce.size());
+		Destroyed = false;
+		Encryption = false;
+		Initialized = false;
+	}
+};
 
 //~~~Constructor~~~//
 
 CTR::CTR(BlockCiphers CipherType)
 	:
+	m_ctrState(new CtrState(true)),
 	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
-		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
-	m_cipherType(CipherType),
-	m_ctrVector(BLOCK_SIZE),
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
+		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::CTR), std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
 }
 
 CTR::CTR(IBlockCipher* Cipher)
 	:
+	m_ctrState(new CtrState(false)),
 	m_blockCipher(Cipher != nullptr ? Cipher : 
-		throw CryptoCipherModeException(CLASS_NAME, std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
-	m_cipherType(m_blockCipher->Enumeral()),
-	m_ctrVector(BLOCK_SIZE),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
+		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::CTR), std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
 }
 
 CTR::~CTR()
 {
-	if (!m_isDestroyed)
+	if (m_ctrState->Destroyed)
 	{
-		m_isDestroyed = true;
-		m_cipherType = BlockCiphers::None;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_isLoaded = false;
-
-		Utility::IntegerTools::Clear(m_ctrVector);
-
-		if (m_destroyEngine)
+		if (m_blockCipher != nullptr)
 		{
-			m_destroyEngine = false;
-
-			if (m_blockCipher != nullptr)
-			{
-				m_blockCipher.reset(nullptr);
-			}
+			m_blockCipher.reset(nullptr);
 		}
-		else
+	}
+	else
+	{
+		if (m_blockCipher != nullptr)
 		{
-			if (m_blockCipher != nullptr)
-			{
-				m_blockCipher.release();
-			}
+			m_blockCipher.release();
 		}
 	}
 }
@@ -79,7 +89,7 @@ const size_t CTR::BlockSize()
 
 const BlockCiphers CTR::CipherType()
 {
-	return m_cipherType;
+	return m_blockCipher->Enumeral();
 }
 
 IBlockCipher* CTR::Engine()
@@ -94,12 +104,12 @@ const CipherModes CTR::Enumeral()
 
 const bool CTR::IsEncryption()
 {
-	return m_isEncryption;
+	return m_ctrState->Encryption;
 }
 
 const bool CTR::IsInitialized()
 {
-	return m_isInitialized;
+	return m_ctrState->Initialized;
 }
 
 const bool CTR::IsParallel()
@@ -114,12 +124,16 @@ const std::vector<SymmetricKeySize> &CTR::LegalKeySizes()
 
 const std::string CTR::Name()
 {
-	return CLASS_NAME + "-" + m_blockCipher->Name();
+	std::string tmpn;
+
+	tmpn = CipherModeConvert::ToName(Enumeral()) + std::string("-") + BlockCipherConvert::ToName(m_blockCipher->Enumeral());
+
+	return tmpn;
 }
 
 const std::vector<byte> &CTR::Nonce()
 { 
-	return m_ctrVector; 
+	return m_ctrState->Nonce; 
 }
 
 const size_t CTR::ParallelBlockSize()
@@ -136,22 +150,30 @@ ParallelOptions &CTR::ParallelProfile()
 
 void CTR::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Encrypt128(Input, 0, Output, 0);
+	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
+
+	Encrypt(Input, 0, Output, 0);
 }
 
 void CTR::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Encrypt128(Input, InOffset, Output, OutOffset);
+	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
+
+	Encrypt(Input, InOffset, Output, OutOffset);
 }
 
 void CTR::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Encrypt128(Input, 0, Output, 0);
+	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
+
+	Encrypt(Input, 0, Output, 0);
 }
 
 void CTR::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Encrypt128(Input, InOffset, Output, OutOffset);
+	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
+
+	Encrypt(Input, InOffset, Output, OutOffset);
 }
 
 void CTR::Initialize(bool Encryption, ISymmetricKey &Parameters)
@@ -177,18 +199,17 @@ void CTR::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		}
 	}
 
-	Scope();
 	m_blockCipher->Initialize(true, Parameters);
-	m_ctrVector = Parameters.Nonce();
-	m_isEncryption = Encryption;
-	m_isInitialized = true;
+	MemoryTools::Copy(Parameters.Nonce(), 0, m_ctrState->Nonce, 0, m_ctrState->Nonce.size());
+	m_ctrState->Encryption = Encryption;
+	m_ctrState->Initialized = true;
 }
 
 void CTR::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
-		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
+		throw CryptoCipherModeException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::InvalidParam);
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
@@ -196,8 +217,10 @@ void CTR::ParallelMaxDegree(size_t Degree)
 
 void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+
+	size_t i;
 
 	const size_t PRLBLK = m_parallelProfile.ParallelBlockSize();
 
@@ -205,7 +228,7 @@ void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 	{
 		const size_t BLKCNT = Length / PRLBLK;
 
-		for (size_t i = 0; i < BLKCNT; ++i)
+		for (i = 0; i < BLKCNT; ++i)
 		{
 			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK), PRLBLK);
 		}
@@ -226,19 +249,19 @@ void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 //~~~Private Functions~~~//
 
-void CTR::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void CTR::Encrypt(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
-	m_blockCipher->EncryptBlock(m_ctrVector, 0, Output, OutOffset);
-	Utility::IntegerTools::BeIncrement8(m_ctrVector);
-	Utility::MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
+	m_blockCipher->EncryptBlock(m_ctrState->Nonce, 0, Output, OutOffset);
+	IntegerTools::BeIncrement8(m_ctrState->Nonce);
+	MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
 }
 
 void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
 {
-	size_t blkCtr = 0;
+	size_t bctr = 0;
 
 #if defined(__AVX512__)
 	const size_t AVX512BLK = 16 * BLOCK_SIZE;
@@ -248,42 +271,42 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		std::vector<byte> tmpc(AVX512BLK);
 
 		// stagger counters and process 8 blocks with avx512
-		while (blkCtr != PBKALN)
+		while (bctr != PBKALN)
 		{
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 0);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 16);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 32);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 48);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 64);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 80);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 96);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 112);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 128);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 144);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 160);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 176);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 192);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 208);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 224);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 240);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			m_blockCipher->Transform2048(tmpc, 0, Output, OutOffset + blkCtr);
-			blkCtr += AVX512BLK;
+			MemoryTools::COPY128(Counter, 0, tmpc, 0);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 16);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 32);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 48);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 64);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 80);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 96);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 112);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 128);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 144);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 160);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 176);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 192);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 208);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 224);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 240);
+			IntegerTools::BeIncrement8(Counter);
+			m_blockCipher->Transform2048(tmpc, 0, Output, OutOffset + bctr);
+			bctr += AVX512BLK;
 		}
 	}
 #elif defined(__AVX2__)
@@ -294,26 +317,26 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		std::vector<byte> tmpc(AVX2BLK);
 		
 		// stagger counters and process 8 blocks with avx2
-		while (blkCtr != PBKALN)
+		while (bctr != PBKALN)
 		{
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 0);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 16);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 32);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 48);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 64);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 80);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 96);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 112);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			m_blockCipher->Transform1024(tmpc, 0, Output, OutOffset + blkCtr);
-			blkCtr += AVX2BLK;
+			MemoryTools::COPY128(Counter, 0, tmpc, 0);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 16);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 32);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 48);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 64);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 80);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 96);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 112);
+			IntegerTools::BeIncrement8(Counter);
+			m_blockCipher->Transform1024(tmpc, 0, Output, OutOffset + bctr);
+			bctr += AVX2BLK;
 		}
 	}
 #elif defined(__AVX__)
@@ -324,37 +347,37 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		std::vector<byte> tmpc(AVXBLK);
 
 		// 4 blocks with avx
-		while (blkCtr != PBKALN)
+		while (bctr != PBKALN)
 		{
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 0);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 16);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 32);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			Utility::MemoryTools::COPY128(Counter, 0, tmpc, 48);
-			Utility::IntegerTools::BeIncrement8(Counter);
-			m_blockCipher->Transform512(tmpc, 0, Output, OutOffset + blkCtr);
-			blkCtr += AVXBLK;
+			MemoryTools::COPY128(Counter, 0, tmpc, 0);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 16);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 32);
+			IntegerTools::BeIncrement8(Counter);
+			MemoryTools::COPY128(Counter, 0, tmpc, 48);
+			IntegerTools::BeIncrement8(Counter);
+			m_blockCipher->Transform512(tmpc, 0, Output, OutOffset + bctr);
+			bctr += AVXBLK;
 		}
 	}
 #endif
 
 	const size_t BLKALN = Length - (Length % BLOCK_SIZE);
-	while (blkCtr != BLKALN)
+	while (bctr != BLKALN)
 	{
-		m_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + blkCtr);
-		Utility::IntegerTools::BeIncrement8(Counter);
-		blkCtr += BLOCK_SIZE;
+		m_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + bctr);
+		IntegerTools::BeIncrement8(Counter);
+		bctr += BLOCK_SIZE;
 	}
 
-	if (blkCtr != Length)
+	if (bctr != Length)
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE);
 		m_blockCipher->EncryptBlock(Counter, outputBlock);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
-		Utility::MemoryTools::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
-		Utility::IntegerTools::BeIncrement8(Counter);
+		MemoryTools::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
+		IntegerTools::BeIncrement8(Counter);
 	}
 }
 
@@ -363,35 +386,35 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
-	std::vector<byte> tmpCtr(m_ctrVector.size());
+	std::vector<byte> tmpc(m_ctrState->Nonce.size());
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTRLEN](size_t i)
+	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<byte> thdCtr(m_ctrVector.size());
+		std::vector<byte> thdc(m_ctrState->Nonce.size());
 		// offset counter by chunk size / block size  
-		Utility::IntegerTools::BeIncrease8(m_ctrVector, thdCtr, CTRLEN * i);
+		IntegerTools::BeIncrease8(m_ctrState->Nonce, thdc, CTRLEN * i);
 		// generate random at output offset
-		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr);
+		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdc);
 		// xor with input at offsets
-		Utility::MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+		MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 		{
-			Utility::MemoryTools::COPY128(thdCtr, 0, tmpCtr, 0);
+			MemoryTools::COPY128(thdc, 0, tmpc, 0);
 		}
 	});
 
 	// copy last counter to class variable
-	Utility::MemoryTools::COPY128(tmpCtr, 0, m_ctrVector, 0);
+	MemoryTools::COPY128(tmpc, 0, m_ctrState->Nonce, 0);
 
 	// last block processing
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 	if (ALNLEN < OUTLEN)
 	{
 		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, FNLLEN, m_ctrVector);
+		Generate(Output, ALNLEN, FNLLEN, m_ctrState->Nonce);
 
 		for (size_t i = ALNLEN; i < OUTLEN; i++)
 		{
@@ -402,31 +425,25 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 
 void CTR::ProcessSequential(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	// generate random
-	Generate(Output, OutOffset, Length, m_ctrVector);
 	// get block aligned
-	size_t ALNLEN = Length - (Length % BLOCK_SIZE);
+	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);
+	size_t i;
+
+	// generate random
+	Generate(Output, OutOffset, Length, m_ctrState->Nonce);
 
 	if (ALNLEN != 0)
 	{
-		Utility::MemoryTools::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
+		MemoryTools::XOR(Input, InOffset, Output, OutOffset, ALNLEN);
 	}
 
 	// get the remaining bytes
 	if (ALNLEN != Length)
 	{
-		for (size_t i = ALNLEN; i < Length; ++i)
+		for (i = ALNLEN; i < Length; ++i)
 		{
 			Output[i + OutOffset] ^= Input[i + InOffset];
 		}
-	}
-}
-
-void CTR::Scope()
-{
-	if (!m_parallelProfile.IsDefault())
-	{
-		m_parallelProfile.Calculate();
 	}
 }
 

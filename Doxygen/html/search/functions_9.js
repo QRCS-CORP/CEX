@@ -10,8 +10,8 @@ var searchData=
   ['key',['Key',['../class_i_symmetric_key.html#aa3e476a692092672045ef533588683df',1,'ISymmetricKey::Key()'],['../class_symmetric_key.html#a6b1876e03d9732f59104b435f042cb4c',1,'SymmetricKey::Key()'],['../class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f',1,'SymmetricSecureKey::Key()']]],
   ['keyclass',['KeyClass',['../class_asymmetric_key.html#ab1877520b89fd71be6a4d12d3defd2fc',1,'AsymmetricKey::KeyClass()'],['../class_asymmetric_secure_key.html#a0342ec0bae9a8ea035f4629d411e106f',1,'AsymmetricSecureKey::KeyClass()'],['../class_i_asymmetric_key.html#af9ccb23538579601f4847ed6fe6ac6df',1,'IAsymmetricKey::KeyClass()']]],
   ['keylength',['KeyLength',['../struct_blake_params.html#a3dee1cf1a242bb42f5f7e8e36fd8d4d9',1,'BlakeParams']]],
-  ['keysize',['KeySize',['../class_symmetric_key_size.html#a067d3a7deb3ed45a9ff16f7450e8ef72',1,'SymmetricKeySize']]],
-  ['keysizes',['KeySizes',['../class_i_symmetric_key.html#ae39ebc3bdb354265c73261b848232c52',1,'ISymmetricKey::KeySizes()'],['../class_symmetric_key.html#a45e159e4db7e0acf33a6e321067522fd',1,'SymmetricKey::KeySizes()'],['../class_symmetric_secure_key.html#aa4cd30b00dd22bf7103bf208cbd94678',1,'SymmetricSecureKey::KeySizes()']]],
+  ['keysize',['KeySize',['../class_symmetric_key_size.html#a419367240982c602a46ca393819f695b',1,'SymmetricKeySize']]],
+  ['keysizes',['KeySizes',['../class_i_symmetric_key.html#ad34c4468dd76c88142018c2c6bf9ff20',1,'ISymmetricKey::KeySizes()'],['../class_symmetric_key.html#afe90aec133e56c6657c336f4c498eb2f',1,'SymmetricKey::KeySizes()'],['../class_symmetric_secure_key.html#a0f9c7b9ba79a7f64238f64815199f2f2',1,'SymmetricSecureKey::KeySizes()']]],
   ['kmac',['KMAC',['../class_k_m_a_c.html#a1f90dcc401f5bd5ba31e85e0f13e87c6',1,'KMAC::KMAC(const KMAC &amp;)=delete'],['../class_k_m_a_c.html#a01e5f1e7adca8c556acd02dc296653ac',1,'KMAC::KMAC(KmacModes KmacModeType=KmacModes::KMAC256)']]],
   ['kmacmode',['KmacMode',['../class_k_m_a_c.html#a4a5cf6fecff6bab16d6632015bcef915',1,'KMAC']]]
 ];

@@ -40,8 +40,8 @@ using Cipher::ISymmetricKey;
 using Cipher::SymmetricKeySize;
 
 /// <summary>
-/// Block Cipher standard Mode virtual interface class.
-/// <para>Provides virtual interfaces for standard symmetric block cipher modes.</para>
+/// Block-cipher standard mode virtual interface class.
+/// <para>Provides virtual interfaces for standard symmetric block-cipher modes.</para>
 /// </summary>
 class ICipherMode
 {
@@ -76,17 +76,17 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: Block size of internal cipher in bytes
+	/// Read Only: The ciphers internal block-size in bytes
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Read Only: The block ciphers formal type name
+	/// Read Only: The block ciphers enumeration type name
 	/// </summary>
 	virtual const BlockCiphers CipherType() = 0;
 
 	/// <summary>
-	/// Read Only: The underlying Block Cipher instance
+	/// Read Only: A pointer to the underlying block-cipher instance
 	/// </summary>
 	virtual IBlockCipher* Engine() = 0;
 
@@ -96,12 +96,12 @@ public:
 	virtual const CipherModes Enumeral() = 0;
 
 	/// <summary>
-	/// Read Only: True if initialized for encryption, False for decryption
+	/// Read Only: The operation mode, returns true if initialized for encryption, false for decryption
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
 
 	/// <summary>
-	/// Read Only: The Block Cipher is ready to transform data
+	/// Read Only: The block-cipher mode has been keyed and is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
@@ -113,12 +113,12 @@ public:
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// Read Only: A vector of allowed cipher-mode input key byte-sizes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Read Only: The mode and cipher name
+	/// Read Only: The cipher-modes formal class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
@@ -144,8 +144,8 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of encrypted bytes</param>
-	/// <param name="Output">The output array of decrypted bytes</param>
+	/// <param name="Input">The input vector of cipher-text bytes</param>
+	/// <param name="Output">The output vector of plain-text bytes</param>
 	virtual void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
@@ -154,10 +154,10 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of encrypted bytes</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of decrypted bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of cipher-text bytes</param>
+	/// <param name="InOffset">Starting offset within the input vector</param>
+	/// <param name="Output">The output vector of plain-text bytes</param>
+	/// <param name="OutOffset">Starting offset within the output vector</param>
 	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
@@ -166,8 +166,8 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of plain text bytes</param>
-	/// <param name="Output">The output array of encrypted bytes</param>
+	/// <param name="Input">The input vector of plain-text bytes</param>
+	/// <param name="Output">The output vector of cipher-text bytes</param>
 	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
@@ -176,10 +176,10 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of plain text bytes</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of encrypted bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of plain-text bytes</param>
+	/// <param name="InOffset">Starting offset within the input vector</param>
+	/// <param name="Output">The output vector of cipher-text bytes</param>
+	/// <param name="OutOffset">Starting offset within the output vector</param>
 	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
@@ -211,10 +211,10 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input vector</param>
+	/// <param name="Output">The output vector of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
 };

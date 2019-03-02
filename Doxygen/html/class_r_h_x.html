@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>A Rijndael cipher using either standard modes, or extended modes of operation with HKDF(SHA2) or cSHAKE powered key schedule and increased transformation rounds.  
+<p>A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cSHAKE key schedule, and increased transformation rounds.  
  <a href="class_r_h_x.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_r_h_x_8h_source.html">RHX.h</a>&gt;</code></p>
@@ -106,7 +106,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a36a64f72073a08a8835883d2844f5b4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Unit block size of internal cipher in bytes.  <a href="#a36a64f72073a08a8835883d2844f5b4a">More...</a><br /></td></tr>
 <tr class="separator:a36a64f72073a08a8835883d2844f5b4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7692065430b8abf82a351778521562bb"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a7692065430b8abf82a351778521562bb">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a7692065430b8abf82a351778521562bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers type name  <a href="#a7692065430b8abf82a351778521562bb">More...</a><br /></td></tr>
+<tr class="memdesc:a7692065430b8abf82a351778521562bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers enumeration type name  <a href="#a7692065430b8abf82a351778521562bb">More...</a><br /></td></tr>
 <tr class="separator:a7692065430b8abf82a351778521562bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08bed44fe21bdc4132dad49f6cf9b1d3"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a08bed44fe21bdc4132dad49f6cf9b1d3">IsEncryption</a> () override</td></tr>
 <tr class="memdesc:a08bed44fe21bdc4132dad49f6cf9b1d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Initialized for encryption, false for decryption.  <a href="#a08bed44fe21bdc4132dad49f6cf9b1d3">More...</a><br /></td></tr>
@@ -115,13 +115,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aafa1daad79b5b30d09f379b2cdce518f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Cipher is ready to transform data  <a href="#aafa1daad79b5b30d09f379b2cdce518f">More...</a><br /></td></tr>
 <tr class="separator:aafa1daad79b5b30d09f379b2cdce518f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc0b157591f2be7c83540cd9498966b8"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8">LegalKeySizes</a> () override</td></tr>
-<tr class="memdesc:acc0b157591f2be7c83540cd9498966b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Available Encryption Key Sizes in bytes  <a href="#acc0b157591f2be7c83540cd9498966b8">More...</a><br /></td></tr>
+<tr class="memdesc:acc0b157591f2be7c83540cd9498966b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A list of SymmetricKeySize structures containing valid key-sizes  <a href="#acc0b157591f2be7c83540cd9498966b8">More...</a><br /></td></tr>
 <tr class="separator:acc0b157591f2be7c83540cd9498966b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98a8aa559694e86826a670601d3cd042"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a98a8aa559694e86826a670601d3cd042">Name</a> () override</td></tr>
-<tr class="memdesc:a98a8aa559694e86826a670601d3cd042"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers class name  <a href="#a98a8aa559694e86826a670601d3cd042">More...</a><br /></td></tr>
+<tr class="memdesc:a98a8aa559694e86826a670601d3cd042"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers formal class name  <a href="#a98a8aa559694e86826a670601d3cd042">More...</a><br /></td></tr>
 <tr class="separator:a98a8aa559694e86826a670601d3cd042"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35429d39a9794540d3bb60e57e552ebe"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a35429d39a9794540d3bb60e57e552ebe">Rounds</a> () override</td></tr>
-<tr class="memdesc:a35429d39a9794540d3bb60e57e552ebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The number of transformation rounds processed by the transform  <a href="#a35429d39a9794540d3bb60e57e552ebe">More...</a><br /></td></tr>
+<tr class="memdesc:a35429d39a9794540d3bb60e57e552ebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The number of transformation rounds processed by the rounds function  <a href="#a35429d39a9794540d3bb60e57e552ebe">More...</a><br /></td></tr>
 <tr class="separator:a35429d39a9794540d3bb60e57e552ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3849bc921be071e69c6b794ea7c8bf8b"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_h_x.html#a3849bc921be071e69c6b794ea7c8bf8b">StateCacheSize</a> () override</td></tr>
 <tr class="memdesc:a3849bc921be071e69c6b794ea7c8bf8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The sum size in bytes (plus some allowance for externals) of the classes persistant state.  <a href="#a3849bc921be071e69c6b794ea7c8bf8b">More...</a><br /></td></tr>
@@ -171,25 +171,26 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad16af8e77a95711cf94416f3f080a259 inherit pub_methods_class_i_block_cipher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A Rijndael cipher using either standard modes, or extended modes of operation with HKDF(SHA2) or cSHAKE powered key schedule and increased transformation rounds. </p>
+<div class="textblock"><p>A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cSHAKE key schedule, and increased transformation rounds. </p>
+<p>This cipher should not be used directly but through a cipher mode, or as part of a larger construction.</p>
 <p>Example of encrypting a block: </p><div class="fragment"><div class="line"><a class="code" href="class_c_t_r.html">CTR</a> cipher(Enumeration::BlockCiphers::AES);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>));</div><div class="line"><span class="comment">// encrypt a block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p>Description: </p>
 <p>RHX is a Rijndael implementation that can use either a standard configuration with key sizes of 16, 24, and 32 bytes (128, 192, and 256-bits), or an extended mode using key sizes of 32, 64, and 128 bytes, (256, 512, and 1024 bits). <br />
 In extended mode, the number of transformation rounds are set to 22, 30 and 38, corresponding to the 256, 512, and 1024 input cipher key sizes. <br />
-Increasing the number of transformation rounds processed by the ciphers transformation function creates a more diffused output, making the resulting cipher-text more difficult to cryptanalyze. <br />
+Increasing the number of transformation rounds processed by the ciphers transformation function creates a more diffused output, making the resulting cipher-text more resistant to some forms of cryptanalysis. <br />
 RHX is capable of processing up to 38 rounds, that is 24 rounds more than a standard implementation of AES-256. </p>
 <p>Implementation Notes: </p>
 <p>The key schedule in RHX, and the number of transformation rounds processed are the difference between the extended mode operations, and a standard version of AES. The standard Rijndael Key Schedule processes 128, 192, and 256 bit keys, and a fixed set of transformation rounds of 10, 12, and 14, the extended version of the cipher uses 256, 512, and 1024-bit keys processing 22, 30, and 38 rounds. <br />
 RHX extended mode can use an HMAC based Key Derivation Function; HKDF(HMAC(SHA2)) or the Keccak XOF function cSHAKE, to expand the input cipher key to create the internal round-key integer array. <br />
 This provides better security, and allows for an implemetation to safely use an increased number of transformation rounds further strengthening the cipher. <br />
-The DistributionCode array is a user-definable a cipher-tweak, and can be used to create a unique cipher-text output. <br />
-This tweak array is set as either the information string for HKDF, or as the cSHAKE customization string.</p>
+The cipher can also use a user-definable cipher tweak through the Info parameter of the symmetric key container, this can be used to create a unique cipher-text output. <br />
+This tweak array is set as either the information string for HKDF, or as the cSHAKE name string.</p>
 <p>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. <br />
 RHX is capable of processing up to 38 transformation rounds in extended mode; a 256-bit key uses 22 rounds, a 512-bit key 30 rounds, and a 1024-bit key is set to 38 rounds.</p>
 <ul>
 <li>
 This cipher should only be used in conjunction with an AEAD or standard cipher mode, or as an component in another construction, ex. CMAC. </li>
 <li>
-Valid key sizes can be determined at run-time using the <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8" title="Read Only: Available Encryption Key Sizes in bytes ">LegalKeySizes</a> property. collection. </li>
+Valid key sizes can be determined at run-time using the <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8" title="Read Only: A list of SymmetricKeySize structures containing valid key-sizes ">LegalKeySizes</a> property. collection. </li>
 <li>
 The internal block-size is fixed at 16 bytes (128 bits) wide. </li>
 <li>
@@ -197,7 +198,7 @@ The cipher can process 128, 192, and 256-bit keys in standard mode, and 256, 512
 <li>
 Transformation rounds assignments are 10, 12, and 14 in standard modes, and 22, 30, and 38 rounds with 256, 512, and 1024-bit length keys. </li>
 <li>
-The DistributionCode array is a user-definable cipher tweak, this can be used to create a unique cipher-text output with a secondary secret. </li>
+The Info parameter in a symmetric key container is a user-definable cipher tweak, this can be used to create a unique cipher-text output with a secondary secret. </li>
 <li>
 Extended mode is set through the constructors BlockCipherExtensions parameter to either None for standard mode, or HKDF(SHA2-256), HKDF(SHA2-512), cSHAKE256, cSHAKE512, or cSHAKE1024 for extended mode operation. </li>
 <li>
@@ -274,17 +275,11 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <p>It is recommended that in extended mode operation, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or, HKDF(SHA2-512) for a 512-bit key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">CipherExtensionType</td><td>Sets the optional Key Schedule key-expansion engine; valid options are cSHAKE, HKDF, or None for standard mode. </td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>Sets the optional Key Schedule key-expansion function; valid options are cSHAKE, HKDF, or None for standard mode. </td></tr>
   </table>
   </dd>
 </dl>
 <p>The default engine is None, which invokes the standard key schedule mechanism.</p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if a the custom cipher extension is used</td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -308,13 +303,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <p>It is recommended that in extended mode operation, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or, HKDF(SHA2-512) for a 512-bit key.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Kdf</td><td>The Key Schedule KDF engine instance; can not be null.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if a null kdf is used</td></tr>
+    <tr><td class="paramname">Kdf</td><td>The Key Schedule KDF engine instance; can be null.</td></tr>
   </table>
   </dd>
 </dl>
@@ -373,7 +362,6 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </div><div class="memdoc">
 
 <p>Read Only: Unit block size of internal cipher in bytes. </p>
-<p>Block size must be 16 or 32 bytes wide. Value set in class constructor.</p>
 
 <p>Implements <a class="el" href="class_i_block_cipher.html#aa707b80fdc28494d5d036d921181d17b">IBlockCipher</a>.</p>
 
@@ -622,7 +610,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The block ciphers type name </p>
+<p>Read Only: The block ciphers enumeration type name </p>
 
 <p>Implements <a class="el" href="class_i_block_cipher.html#a12c496427a3455d2507e23f8df972032">IBlockCipher</a>.</p>
 
@@ -670,7 +658,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
   </table>
   </dd>
 </dl>
-<p>The <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8" title="Read Only: Available Encryption Key Sizes in bytes ">LegalKeySizes</a> property contains valid sizes.</p>
+<p>The <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8" title="Read Only: A list of SymmetricKeySize structures containing valid key-sizes ">LegalKeySizes</a> property contains valid sizes.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if a null or invalid key is used</td></tr>
@@ -764,7 +752,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Available Encryption Key Sizes in bytes </p>
+<p>Read Only: A list of SymmetricKeySize structures containing valid key-sizes </p>
 
 <p>Implements <a class="el" href="class_i_block_cipher.html#adc95238bcc57bbe8aba3172ca7e08500">IBlockCipher</a>.</p>
 
@@ -793,7 +781,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The block ciphers class name </p>
+<p>Read Only: The block ciphers formal class name </p>
 
 <p>Implements <a class="el" href="class_i_block_cipher.html#a56fd25fd94bf58bfcdefa40250949879">IBlockCipher</a>.</p>
 
@@ -850,7 +838,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The number of transformation rounds processed by the transform </p>
+<p>Read Only: The number of transformation rounds processed by the rounds function </p>
 
 <p>Implements <a class="el" href="class_i_block_cipher.html#a9c3885fbc9415e2c73de3129cee57878">IBlockCipher</a>.</p>
 

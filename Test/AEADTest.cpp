@@ -266,7 +266,7 @@ namespace Test
 			enc1.resize(dlen + Cipher->MaxTagSize());
 			Cipher->ParallelProfile().IsParallel() = true;
 			// note: changes to parallel block-size must be set before every Initialize() call
-			Cipher->ParallelProfile().ParallelBlockSize() = PRLBLK;
+			Cipher->ParallelProfile().SetBlockSize(PRLBLK);
 			Cipher->Initialize(true, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(data, 0, enc1, 0, data.size());
@@ -288,7 +288,7 @@ namespace Test
 			// parallel decryption mode
 			dec1.resize(dlen);
 			Cipher->ParallelProfile().IsParallel() = true;
-			Cipher->ParallelProfile().ParallelBlockSize() = PRLBLK;
+			Cipher->ParallelProfile().SetBlockSize(PRLBLK);
 			Cipher->Initialize(false, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(enc1, 0, dec1, 0, enc1.size() - Cipher->MaxTagSize());

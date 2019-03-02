@@ -342,7 +342,7 @@ namespace Test
 			IntegerTools::Fill(inp, 0, INPLEN, rnd);
 			SymmetricKey kp(key, iv);
 
-			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
+			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
 
 			// sequential
 			Cipher->Initialize(true, kp);
@@ -371,7 +371,7 @@ namespace Test
 		}
 
 		// restore parallel block size
-		Cipher->ParallelProfile().ParallelBlockSize() = prlSize;
+		Cipher->ParallelProfile().SetBlockSize(prlSize);
 	}
 
 	void RijndaelTest::Stress(ICipherMode* Cipher)

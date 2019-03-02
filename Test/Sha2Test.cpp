@@ -272,7 +272,7 @@ namespace Test
 
 				// restore parallel degree and block size
 				Digest->ParallelMaxDegree(PRLDGR);
-				Digest->ParallelProfile().ParallelBlockSize() = PRLLEN;
+				Digest->ParallelProfile().SetBlockSize(PRLLEN);
 			}
 			catch (const std::exception&)
 			{

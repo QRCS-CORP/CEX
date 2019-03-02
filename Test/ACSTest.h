@@ -83,9 +83,7 @@ namespace Test
 		/// <summary>
 		/// Test exception handlers for correct execution
 		/// </summary>
-		/// 
-		/// <param name="Cipher">The cipher instance pointer</param>
-		void Exception(IStreamCipher* Cipher);
+		void Exception();
 
 		/// <summary>
 		/// Compare known answer test vectors to split-message finalization calls

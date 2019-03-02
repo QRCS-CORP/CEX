@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Block Cipher standard Mode virtual interface class.  
+<p>Block-cipher standard mode virtual interface class.  
  <a href="class_i_cipher_mode.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_i_cipher_mode_8h_source.html">ICipherMode.h</a>&gt;</code></p>
@@ -108,31 +108,31 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a3a3ec68d89511d48a38aff60937f9e67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a3a3ec68d89511d48a38aff60937f9e67">More...</a><br /></td></tr>
 <tr class="separator:a3a3ec68d89511d48a38aff60937f9e67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84a1320fbd9b6a9b077072acf66715ae"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a84a1320fbd9b6a9b077072acf66715ae">BlockSize</a> ()=0</td></tr>
-<tr class="memdesc:a84a1320fbd9b6a9b077072acf66715ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Block size of internal cipher in bytes  <a href="#a84a1320fbd9b6a9b077072acf66715ae">More...</a><br /></td></tr>
+<tr class="memdesc:a84a1320fbd9b6a9b077072acf66715ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers internal block-size in bytes  <a href="#a84a1320fbd9b6a9b077072acf66715ae">More...</a><br /></td></tr>
 <tr class="separator:a84a1320fbd9b6a9b077072acf66715ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af20a1f1a85bcc13ca03670b3cf94491a"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#af20a1f1a85bcc13ca03670b3cf94491a">CipherType</a> ()=0</td></tr>
-<tr class="memdesc:af20a1f1a85bcc13ca03670b3cf94491a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers formal type name  <a href="#af20a1f1a85bcc13ca03670b3cf94491a">More...</a><br /></td></tr>
+<tr class="memdesc:af20a1f1a85bcc13ca03670b3cf94491a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers enumeration type name  <a href="#af20a1f1a85bcc13ca03670b3cf94491a">More...</a><br /></td></tr>
 <tr class="separator:af20a1f1a85bcc13ca03670b3cf94491a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11c630e63903b83044397876f6276ce9"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a11c630e63903b83044397876f6276ce9">Engine</a> ()=0</td></tr>
-<tr class="memdesc:a11c630e63903b83044397876f6276ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The underlying Block Cipher instance  <a href="#a11c630e63903b83044397876f6276ce9">More...</a><br /></td></tr>
+<tr class="memdesc:a11c630e63903b83044397876f6276ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A pointer to the underlying block-cipher instance  <a href="#a11c630e63903b83044397876f6276ce9">More...</a><br /></td></tr>
 <tr class="separator:a11c630e63903b83044397876f6276ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94f085c15d16a8f37192f302773e5bb2"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#ga1d4ccc36db403dcb914cd7c4bac557a1">CipherModes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a94f085c15d16a8f37192f302773e5bb2">Enumeral</a> ()=0</td></tr>
 <tr class="memdesc:a94f085c15d16a8f37192f302773e5bb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Cipher Modes enumeration type name  <a href="#a94f085c15d16a8f37192f302773e5bb2">More...</a><br /></td></tr>
 <tr class="separator:a94f085c15d16a8f37192f302773e5bb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b9e5e05b83c6e84e6082d0b6334d470"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a6b9e5e05b83c6e84e6082d0b6334d470">IsEncryption</a> ()=0</td></tr>
-<tr class="memdesc:a6b9e5e05b83c6e84e6082d0b6334d470"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: True if initialized for encryption, False for decryption  <a href="#a6b9e5e05b83c6e84e6082d0b6334d470">More...</a><br /></td></tr>
+<tr class="memdesc:a6b9e5e05b83c6e84e6082d0b6334d470"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The operation mode, returns true if initialized for encryption, false for decryption  <a href="#a6b9e5e05b83c6e84e6082d0b6334d470">More...</a><br /></td></tr>
 <tr class="separator:a6b9e5e05b83c6e84e6082d0b6334d470"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b57c47c070538abb55e96e09e7ce5a2"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a1b57c47c070538abb55e96e09e7ce5a2">IsInitialized</a> ()=0</td></tr>
-<tr class="memdesc:a1b57c47c070538abb55e96e09e7ce5a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Block Cipher is ready to transform data  <a href="#a1b57c47c070538abb55e96e09e7ce5a2">More...</a><br /></td></tr>
+<tr class="memdesc:a1b57c47c070538abb55e96e09e7ce5a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block-cipher mode has been keyed and is ready to transform data  <a href="#a1b57c47c070538abb55e96e09e7ce5a2">More...</a><br /></td></tr>
 <tr class="separator:a1b57c47c070538abb55e96e09e7ce5a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7851dee20f03d50db63ea951c0ad697d"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a7851dee20f03d50db63ea951c0ad697d">IsParallel</a> ()=0</td></tr>
 <tr class="memdesc:a7851dee20f03d50db63ea951c0ad697d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#a7851dee20f03d50db63ea951c0ad697d">More...</a><br /></td></tr>
 <tr class="separator:a7851dee20f03d50db63ea951c0ad697d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a530595c8040b12a19a21d14f840547ab"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a530595c8040b12a19a21d14f840547ab">LegalKeySizes</a> ()=0</td></tr>
-<tr class="memdesc:a530595c8040b12a19a21d14f840547ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of allowed cipher input key byte-sizes  <a href="#a530595c8040b12a19a21d14f840547ab">More...</a><br /></td></tr>
+<tr class="memdesc:a530595c8040b12a19a21d14f840547ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A vector of allowed cipher-mode input key byte-sizes  <a href="#a530595c8040b12a19a21d14f840547ab">More...</a><br /></td></tr>
 <tr class="separator:a530595c8040b12a19a21d14f840547ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af060eb48e27685b266b7526be3e5db9e"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">Name</a> ()=0</td></tr>
-<tr class="memdesc:af060eb48e27685b266b7526be3e5db9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The mode and cipher name  <a href="#af060eb48e27685b266b7526be3e5db9e">More...</a><br /></td></tr>
+<tr class="memdesc:af060eb48e27685b266b7526be3e5db9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher-modes formal class name  <a href="#af060eb48e27685b266b7526be3e5db9e">More...</a><br /></td></tr>
 <tr class="separator:af060eb48e27685b266b7526be3e5db9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae39d8aaa19ad006669bfbc593b904c15"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#ae39d8aaa19ad006669bfbc593b904c15">ParallelBlockSize</a> ()=0</td></tr>
 <tr class="memdesc:ae39d8aaa19ad006669bfbc593b904c15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#ae39d8aaa19ad006669bfbc593b904c15">More...</a><br /></td></tr>
@@ -163,8 +163,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a26e54aafa8eb9259ed291eb22009874d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Block Cipher standard Mode virtual interface class. </p>
-<p>Provides virtual interfaces for standard symmetric block cipher modes.</p>
+<div class="textblock"><p>Block-cipher standard mode virtual interface class. </p>
+<p>Provides virtual interfaces for standard symmetric block-cipher modes.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a947413f3a4cdd09c69c72bdd75c91c06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a947413f3a4cdd09c69c72bdd75c91c06">&#9670;&nbsp;</a></span>ICipherMode() <span class="overload">[1/2]</span></h2>
@@ -272,7 +272,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Block size of internal cipher in bytes </p>
+<p>Read Only: The ciphers internal block-size in bytes </p>
 
 <p>Implemented in <a class="el" href="class_g_c_m.html#aa574f1f1eab2021479b2969f4330dea4">GCM</a>, <a class="el" href="class_e_a_x.html#aa51b7c945cd2963f73d71f97d12d51b3">EAX</a>, <a class="el" href="class_c_f_b.html#a63e6c8971ceea7542c1fcd246c7f164d">CFB</a>, <a class="el" href="class_i_c_m.html#a9ca8f0b7fbc7d97721ef08849036dd46">ICM</a>, <a class="el" href="class_c_t_r.html#a2c571e5023cc36b28b95a536c4f5a430">CTR</a>, <a class="el" href="class_e_c_b.html#aa4997990dde74c726bbe2979e735377e">ECB</a>, <a class="el" href="class_c_b_c.html#ac41a15222ff6756f3683b9b99bb230ab">CBC</a>, and <a class="el" href="class_o_f_b.html#a53ee534934e13467ccc30c3c327a4de3">OFB</a>.</p>
 
@@ -301,7 +301,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The block ciphers formal type name </p>
+<p>Read Only: The block ciphers enumeration type name </p>
 
 <p>Implemented in <a class="el" href="class_g_c_m.html#a55575bab59f504bff61044b7a2c07ab0">GCM</a>, <a class="el" href="class_e_a_x.html#a910698a7c7814208cb702171ecb2d9eb">EAX</a>, <a class="el" href="class_c_f_b.html#ad3ffaffa19bc64cb897d0944866c8017">CFB</a>, <a class="el" href="class_i_c_m.html#a29a17fa70f52f2f5a9ecf2605ce1a74f">ICM</a>, <a class="el" href="class_c_t_r.html#a9791ea0b1a5f7625605cb6bce57683a3">CTR</a>, <a class="el" href="class_e_c_b.html#a8ae1eed8f68e705ea364b047d5734224">ECB</a>, <a class="el" href="class_c_b_c.html#a647d15a6bb420fa6413c695c47c470ed">CBC</a>, and <a class="el" href="class_o_f_b.html#a145e723ece45fd4c753864f42a6df67a">OFB</a>.</p>
 
@@ -345,8 +345,8 @@ Public Member Functions</h2></td></tr>
 <p>Decrypts one block of bytes beginning at a zero index. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of encrypted bytes</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of decrypted bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of plain-text bytes</td></tr>
   </table>
   </dd>
 </dl>
@@ -405,10 +405,10 @@ Public Member Functions</h2></td></tr>
 <p>Decrypts one block of bytes using the designated offsets. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of encrypted bytes</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of decrypted bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">InOffset</td><td>Starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
@@ -455,8 +455,8 @@ Public Member Functions</h2></td></tr>
 <p>Encrypts one block of bytes beginning at a zero index. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of plain text bytes</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of encrypted bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of cipher-text bytes</td></tr>
   </table>
   </dd>
 </dl>
@@ -515,10 +515,10 @@ Public Member Functions</h2></td></tr>
 <p>Encrypts one block of bytes using the designated offsets. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of plain text bytes</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of encrypted bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">InOffset</td><td>Starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
@@ -550,7 +550,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The underlying Block Cipher instance </p>
+<p>Read Only: A pointer to the underlying block-cipher instance </p>
 
 <p>Implemented in <a class="el" href="class_g_c_m.html#a009a5075e3eb6115668b5ed21c232e58">GCM</a>, <a class="el" href="class_e_a_x.html#ae9f38e23e24374972b925a59daf3a566">EAX</a>, <a class="el" href="class_c_f_b.html#a14b3f192a8f9f28697c0c2f42f1160ba">CFB</a>, <a class="el" href="class_i_c_m.html#a11c51a9d528021bec018e3c258ca6776">ICM</a>, <a class="el" href="class_c_t_r.html#aa0babd765ccdfb082cbff68d0d9056b2">CTR</a>, <a class="el" href="class_e_c_b.html#a5bafdbe36f0fba3929eea14082c731f0">ECB</a>, <a class="el" href="class_c_b_c.html#aec8812227b9bf4bb8cc09b997a21709a">CBC</a>, and <a class="el" href="class_o_f_b.html#a47b577b146e217f82998a7d2f8935665">OFB</a>.</p>
 
@@ -661,7 +661,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: True if initialized for encryption, False for decryption </p>
+<p>Read Only: The operation mode, returns true if initialized for encryption, false for decryption </p>
 
 <p>Implemented in <a class="el" href="class_g_c_m.html#aa141b66ec79ba0056dfa98c18982720c">GCM</a>, <a class="el" href="class_e_a_x.html#a35193525ccf3f7391a20dd8042d3cf80">EAX</a>, <a class="el" href="class_c_f_b.html#ae085e952b196bc125609c606c98a9ea6">CFB</a>, <a class="el" href="class_i_c_m.html#a721407c09a8fb966b67823879202e8b1">ICM</a>, <a class="el" href="class_c_t_r.html#aeaf57a0939cb270c920f707122c79f21">CTR</a>, <a class="el" href="class_e_c_b.html#ab33dbc090fe1beeee8f70875dc9b8664">ECB</a>, <a class="el" href="class_c_b_c.html#ae0c55ef1463edcfc85d561ab724ee2c0">CBC</a>, and <a class="el" href="class_o_f_b.html#a6e5ed25ccbe10b7dde0e61a305b4369a">OFB</a>.</p>
 
@@ -690,7 +690,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The Block Cipher is ready to transform data </p>
+<p>Read Only: The block-cipher mode has been keyed and is ready to transform data </p>
 
 <p>Implemented in <a class="el" href="class_g_c_m.html#a3ab23973cd53a46f48b9586602c6ca50">GCM</a>, <a class="el" href="class_e_a_x.html#aa49e2ce5863bacb0e6fde7308639b1c7">EAX</a>, <a class="el" href="class_c_f_b.html#a2f9ecf5de43883fe9620b06395cc4ee2">CFB</a>, <a class="el" href="class_i_c_m.html#afc458f9c6eb6bd3ed18bef6d8db215c9">ICM</a>, <a class="el" href="class_c_t_r.html#a3d406bc5af55b3b6a3a799e2154faa38">CTR</a>, <a class="el" href="class_e_c_b.html#ad3b9540d9c955a4483ba16a092ecc0c6">ECB</a>, <a class="el" href="class_c_b_c.html#a5821a133abfccbf6343fec617210b73a">CBC</a>, and <a class="el" href="class_o_f_b.html#a5a251feb550c172aa058250169ab922c">OFB</a>.</p>
 
@@ -749,7 +749,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Array of allowed cipher input key byte-sizes </p>
+<p>Read Only: A vector of allowed cipher-mode input key byte-sizes </p>
 
 <p>Implemented in <a class="el" href="class_g_c_m.html#ac17ad19a4888fc8305135c1bb805038d">GCM</a>, <a class="el" href="class_e_a_x.html#a00049094838d16b23e1dfede4b079c73">EAX</a>, <a class="el" href="class_c_f_b.html#ab102367a488336475492423599b586b5">CFB</a>, <a class="el" href="class_i_c_m.html#aca83e2356c7f565f96f79dbfe2311696">ICM</a>, <a class="el" href="class_c_t_r.html#aa325332ea243cc0e0c0beb8081ff9970">CTR</a>, <a class="el" href="class_e_c_b.html#a002341c7ab716854a6a54a651d4710ef">ECB</a>, <a class="el" href="class_c_b_c.html#a78d807a7a4581e18ac7ac5fb24d9416f">CBC</a>, and <a class="el" href="class_o_f_b.html#a0eac533e077a6a0d149d85dd333115d4">OFB</a>.</p>
 
@@ -778,7 +778,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The mode and cipher name </p>
+<p>Read Only: The cipher-modes formal class name </p>
 
 <p>Implemented in <a class="el" href="class_g_c_m.html#afd9c3c9f3981a7663c7d197374475c8b">GCM</a>, <a class="el" href="class_e_a_x.html#a92611f77e5f49a85b5701de6324259f2">EAX</a>, <a class="el" href="class_c_f_b.html#ad49df6844524ca15b7dc4cc58289b18f">CFB</a>, <a class="el" href="class_i_c_m.html#a0f7a80f583ab1fcc4e4f9671dfbae1ff">ICM</a>, <a class="el" href="class_c_t_r.html#afb36a778b93e9de39f12b2ef61a59012">CTR</a>, <a class="el" href="class_e_c_b.html#a2d616ac1b075e187d93a9c0635db7756">ECB</a>, <a class="el" href="class_c_b_c.html#a1e86326a819ff2252fe0c494a1b1b059">CBC</a>, and <a class="el" href="class_o_f_b.html#aea5a2a2b15fdc046c30ae85e86440e3c">OFB</a>.</p>
 
@@ -971,10 +971,10 @@ Public Member Functions</h2></td></tr>
 <p>This method processes a specified length of bytes, utilizing offsets incremented by the caller. If IsParallel() is set to true, and the length is at least ParallelBlockSize(), the transform is run in parallel processing mode. To disable parallel processing, set the ParallelOptions().IsParallel() property to false. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to transform</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of transformed bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of bytes to transform</td></tr>
+    <tr><td class="paramname">InOffset</td><td>Starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of transformed bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to transform</td></tr>
   </table>
   </dd>

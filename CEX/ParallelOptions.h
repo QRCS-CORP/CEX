@@ -181,9 +181,9 @@ public:
 	bool &IsParallel();
 
 	/// <summary>
-	/// Read/Write: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Read: The recommended parallel block size.
 	/// </summary>
-	size_t &ParallelBlockSize();
+	const size_t ParallelBlockSize();
 
 	/// <summary>
 	/// Read Only: Maximum input block byte length when using multi-threaded processing
@@ -252,6 +252,14 @@ public:
 	/// Reset all internal data to defaults
 	/// </summary>
 	void Reset();
+
+	/// <summary>
+	/// Define parallel-block length in bytes.
+	/// <para>Re-calculates the auto-configured [recommended] valuesand replaces it with a user-defined size.</para>
+	/// </summary>
+	/// 
+	/// <param name="BlockSize">The new parallel block-size</param>
+	void SetBlockSize(size_t BlockSize);
 
 	/// <summary>
 	/// Define parallel-block and parallel-minimum sizes based on the max number of cores assigned.

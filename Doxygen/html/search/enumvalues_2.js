@@ -19,6 +19,5 @@ var searchData=
   ['csx512',['CSX512',['../group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a5bae7e694331ffe4f22a5f4d34ea8bf9',1,'CSX512():&#160;Documentation.h'],['../group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a5bae7e694331ffe4f22a5f4d34ea8bf9',1,'CSX512():&#160;Documentation.h']]],
   ['csx512ae',['CSX512AE',['../group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a7d974584e3c969bec73bc993ff85ad7a',1,'CSX512AE():&#160;Documentation.h'],['../group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a7d974584e3c969bec73bc993ff85ad7a',1,'CSX512AE():&#160;Documentation.h']]],
   ['ctr',['CTR',['../group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1aff2a7a5418a49af64a57ef3cf31d7721',1,'Documentation.h']]],
-  ['current',['Current',['../group___i_o.html#ggab40796a2fafb5d9d3fda7510d7aea5b0a222a267cc5778206b253be35ee3ddab5',1,'Documentation.h']]],
-  ['custom',['Custom',['../group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda90589c47f06eb971d548591f23c285af',1,'Documentation.h']]]
+  ['current',['Current',['../group___i_o.html#ggab40796a2fafb5d9d3fda7510d7aea5b0a222a267cc5778206b253be35ee3ddab5',1,'Documentation.h']]]
 ];

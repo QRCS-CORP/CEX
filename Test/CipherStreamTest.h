@@ -11,6 +11,9 @@ namespace Test
 	static const std::string CLASSNAME;
 	static const std::string DESCRIPTION;
 	static const std::string SUCCESS;
+	static const size_t MAXM_ALLOC = 102400;
+	static const size_t MINM_ALLOC = 128;
+	static const size_t TEST_CYCLES = 100;
 
 	/// <summary>
 	/// Tests the CipherStream Processer
@@ -70,12 +73,19 @@ namespace Test
 		/// <summary>
 		/// Test stream modes for correct operation
 		/// </summary>
-		void Mode(CipherStream* Cipher);
+		void Parallel(CipherStream* Cipher);
 
 		/// <summary>
 		/// Test parameters for correct operation
 		/// </summary>
 		void Parameters();
+		
+		/// <summary>
+		/// Test transformation and inverse with random in a looping [TEST_CYCLES] stress-test
+		/// </summary>
+		/// 
+		/// <param name="Cipher">The cipher instance pointer</param>
+		void Stress(CipherStream* Cipher);
 
 	private:
 

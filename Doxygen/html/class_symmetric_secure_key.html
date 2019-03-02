@@ -142,9 +142,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac5182dcd3c29d8f4cf9b7906e0e0f42f"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f">Key</a> () override</td></tr>
 <tr class="memdesc:ac5182dcd3c29d8f4cf9b7906e0e0f42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a standard-vector copy of the primary key  <a href="#ac5182dcd3c29d8f4cf9b7906e0e0f42f">More...</a><br /></td></tr>
 <tr class="separator:ac5182dcd3c29d8f4cf9b7906e0e0f42f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4cd30b00dd22bf7103bf208cbd94678"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#aa4cd30b00dd22bf7103bf208cbd94678">KeySizes</a> () override</td></tr>
-<tr class="memdesc:aa4cd30b00dd22bf7103bf208cbd94678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members  <a href="#aa4cd30b00dd22bf7103bf208cbd94678">More...</a><br /></td></tr>
-<tr class="separator:aa4cd30b00dd22bf7103bf208cbd94678"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f9c7b9ba79a7f64238f64815199f2f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a0f9c7b9ba79a7f64238f64815199f2f2">KeySizes</a> () const override</td></tr>
+<tr class="memdesc:a0f9c7b9ba79a7f64238f64815199f2f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members  <a href="#a0f9c7b9ba79a7f64238f64815199f2f2">More...</a><br /></td></tr>
+<tr class="separator:a0f9c7b9ba79a7f64238f64815199f2f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39c4b042b02d69d9ea636f6e66eb7970"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970">Nonce</a> () override</td></tr>
 <tr class="memdesc:a39c4b042b02d69d9ea636f6e66eb7970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv  <a href="#a39c4b042b02d69d9ea636f6e66eb7970">More...</a><br /></td></tr>
 <tr class="separator:a39c4b042b02d69d9ea636f6e66eb7970"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1036,8 +1036,8 @@ Authentication options and cipher strength are defined by the constructors Secur
 
 </div>
 </div>
-<a id="aa4cd30b00dd22bf7103bf208cbd94678"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa4cd30b00dd22bf7103bf208cbd94678">&#9670;&nbsp;</a></span>KeySizes()</h2>
+<a id="a0f9c7b9ba79a7f64238f64815199f2f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f9c7b9ba79a7f64238f64815199f2f2">&#9670;&nbsp;</a></span>KeySizes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1046,10 +1046,10 @@ Authentication options and cipher strength are defined by the constructors Secur
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> SymmetricSecureKey::KeySizes </td>
+          <td class="memname"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &amp; SymmetricSecureKey::KeySizes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -1061,7 +1061,7 @@ Authentication options and cipher strength are defined by the constructors Secur
 
 <p>Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members </p>
 
-<p>Implements <a class="el" href="class_i_symmetric_key.html#ae39ebc3bdb354265c73261b848232c52">ISymmetricKey</a>.</p>
+<p>Implements <a class="el" href="class_i_symmetric_key.html#ad34c4468dd76c88142018c2c6bf9ff20">ISymmetricKey</a>.</p>
 
 </div>
 </div>

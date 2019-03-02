@@ -101,8 +101,11 @@ CEX_OPTIMIZE_IGNORE
 template<typename T>
 inline static void Clear(SecureVector<T> &Input)
 {
-	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
-	Input.clear();
+	if (Input.size() != 0)
+	{
+		MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
+		Input.clear();
+	}
 }
 CEX_OPTIMIZE_RESUME
 

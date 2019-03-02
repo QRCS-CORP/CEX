@@ -111,7 +111,8 @@ public:
 
 	/// <summary>
 	/// Fills an array of any type with random elements.
-	/// <para>The random source can be any of the Prngs, Drbgs, or entropy Providers</para>
+	/// <para>The random source can be any of the Prngs, Drbgs, or entropy Providers.
+	/// The vector must be pre-sized to fit the new pseudo-random output.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The output array receiving random integers</param>
@@ -131,7 +132,8 @@ public:
 
 	/// <summary>
 	/// Fills an array of any type with random elements.
-	/// <para>The random source can be any of the Prngs, Drbgs, or entropy Providers</para>
+	/// <para>The random source can be any of the Prngs, Drbgs, or entropy Providers.
+	/// The vector must be pre-sized to fit the new pseudo-random output.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The output array receiving random integers</param>

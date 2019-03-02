@@ -1,29 +1,22 @@
 #include "CipherStreamTest.h"
 #include "../CEX/BlockCipherExtensions.h"
-#include "../CEX/FileStream.h"
-#include "../CEX/MemoryStream.h"
-#include "../CEX/SecureRandom.h"
 #include "../CEX/CTR.h"
 #include "../CEX/CBC.h"
 #include "../CEX/CFB.h"
+#include "../CEX/FileStream.h"
+#include "../CEX/ICM.h"
+#include "../CEX/IntegerTools.h"
+#include "../CEX/MemoryStream.h"
 #include "../CEX/OFB.h"
-#include "../CEX/X923.h"
-#include "../CEX/PKCS7.h"
-#include "../CEX/ESP.h"
-#include "../CEX/ParallelTools.h"
-#include "../CEX/RHX.h"
-#include "../CEX/SHX.h"
-#include "../CEX/CSX256.h"
+#include "../CEX/SecureRandom.h"
 
 namespace Test
 {
-	using namespace Enumeration;
 	using namespace Cipher::Block::Mode;
-	using namespace Cipher::Block::Padding;
+	using Utility::IntegerTools;
 	using IO::MemoryStream;
-	using Cipher::Block::RHX;
+	using Enumeration::PaddingModes;
 	using Prng::SecureRandom;
-	using Cipher::Block::SHX;
 	using Cipher::SymmetricKey; 
 
 	const std::string CipherStreamTest::CLASSNAME = "CipherStreamTest";
@@ -55,39 +48,56 @@ namespace Test
 	{
 		try
 		{
-			// local test
+			// Not tested: used for internal testing
 			//FileStreamTest();
 
-			CipherStream* cs1 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CFB, PaddingModes::ESP);
-			Mode(cs1);
-			delete cs1;
-			OnProgress(std::string("Passed CFB Mode tests.."));
-
-			CipherStream* cs2 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
-			Mode(cs2);
-			delete cs2;
-			OnProgress(std::string("Passed CBC Mode tests.."));
-			
-			CipherStream* cs3 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CTR, PaddingModes::None);
-			Mode(cs3);
-			delete cs3;
-			OnProgress(std::string("Passed CTR Mode tests.."));
-			
-			CipherStream* cs4 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::ICM, PaddingModes::None);
-			//ModeTest(cs4);
-			delete cs4;
-			OnProgress(std::string("Passed ICM Mode tests.."));
-
-			CipherStream* cs5 = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::OFB, PaddingModes::ESP);
-			Mode(cs5);
-			delete cs5;
-			OnProgress(std::string("Passed OFB Mode tests.."));
+			CipherStream* cfbm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CFB, PaddingModes::ESP);
+			CipherStream* cbcm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
+			CipherStream* ctrm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CTR, PaddingModes::None);
+			CipherStream* icmm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::ICM, PaddingModes::None);
+			CipherStream* ofbm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::OFB, PaddingModes::ESP);
 
 			Memory();
 			OnProgress(std::string("Passed MemoryStream self test.. "));
 
+			Parallel(cfbm);
+			OnProgress(std::string("Passed CFB Parallel tests.."));
+
+			Parallel(cbcm);
+			OnProgress(std::string("Passed CBC Parallel tests.."));
+
+			Parallel(ctrm);
+			OnProgress(std::string("Passed CTR Parallel tests.."));
+
+			Parallel(icmm);
+			OnProgress(std::string("Passed ICM Parallel tests.."));
+
+			Parallel(ofbm);
+			OnProgress(std::string("Passed OFB Parallel tests.."));
+
 			Parameters();
 			OnProgress(std::string("Passed Cipher Parameters tests.."));
+
+			Stress(cfbm);
+			OnProgress(std::string("Passed CFB stress tests.."));
+
+			Stress(cbcm);
+			OnProgress(std::string("Passed CBC stress tests.."));
+
+			Stress(ctrm);
+			OnProgress(std::string("Passed CTR stress tests.."));
+
+			Stress(icmm);
+			OnProgress(std::string("Passed ICM stress tests.."));
+
+			Stress(ofbm);
+			OnProgress(std::string("Passed OFB stress tests.."));
+
+			delete cfbm;
+			delete cbcm;
+			delete ctrm;
+			delete icmm;
+			delete ofbm;
 
 			return SUCCESS;
 		}
@@ -153,7 +163,7 @@ namespace Test
 		fOut4.Close();
 	}
 
-	void CipherStreamTest::Mode(CipherStream* Cipher)
+	void CipherStreamTest::Parallel(CipherStream* Cipher)
 	{
 		std::vector<byte> iv(16);
 		std::vector<byte> key(32);
@@ -195,7 +205,7 @@ namespace Test
 
 			if (menc.ToArray() != enc)
 			{
-				throw TestException(std::string("Mode"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM1"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM1"));
 			}
 
 			// ***compare decryption output *** //
@@ -208,7 +218,7 @@ namespace Test
 
 			if (mdec.ToArray() != pln)
 			{
-				throw TestException(std::string("Mode"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM2"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM2"));
 			}
 
 			// byte array interface
@@ -218,7 +228,7 @@ namespace Test
 
 			if (dec != pln)
 			{
-				throw TestException(std::string("Mode"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM3"));
+				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM3"));
 			}
 		}
 	}
@@ -373,7 +383,7 @@ namespace Test
 
 			rng.Generate(pln);
 
-			cs.ParallelProfile().ParallelBlockSize() = PRLLEN;
+			cs.ParallelProfile().SetBlockSize(PRLLEN);
 			cs.Initialize(true, kp);
 			cs.Write(pln, 0, enc, 0);
 
@@ -400,7 +410,7 @@ namespace Test
 
 			rng.Generate(pln);
 
-			cs.ParallelProfile().ParallelBlockSize() = PRLLEN;
+			cs.ParallelProfile().SetBlockSize(PRLLEN);
 			cs.Initialize(true, kp);
 			mpln.Reset();
 			mpln.Write(pln, 0, pln.size());
@@ -416,6 +426,50 @@ namespace Test
 			if (mdec.ToArray() != pln)
 			{
 				throw TestException(std::string("Parameters"), cs.Name(), std::string("Encrypted arrays are not equal! -CP6"));
+			}
+		}
+	}
+
+	void CipherStreamTest::Stress(CipherStream* Cipher)
+	{
+		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
+		std::vector<byte> cpt;
+		std::vector<byte> inp;
+		std::vector<byte> key(ks.KeySize());
+		std::vector<byte> nonce(ks.NonceSize());
+		std::vector<byte> otp;
+		SecureRandom rnd;
+		size_t i;
+
+		cpt.reserve(MAXM_ALLOC);
+		inp.reserve(MAXM_ALLOC);
+		otp.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+			const size_t ALNLEN = MSGLEN - (MSGLEN % 16);
+
+			cpt.resize(ALNLEN);
+			inp.resize(ALNLEN);
+			otp.resize(ALNLEN);
+
+			IntegerTools::Fill(inp, 0, ALNLEN, rnd);
+			IntegerTools::Fill(key, 0, key.size(), rnd);
+			IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
+			SymmetricKey kp(key, nonce);
+
+			// encrypt
+			Cipher->Initialize(true, kp);
+			Cipher->Write(inp, 0, cpt, 0);
+
+			// decrypt
+			Cipher->Initialize(false, kp);
+			Cipher->Write(cpt, 0, otp, 0);
+
+			if (otp != inp)
+			{
+				throw TestException(std::string("Stress"), Cipher->Name(), std::string("Transformation output is not equal! -TS1"));
 			}
 		}
 	}

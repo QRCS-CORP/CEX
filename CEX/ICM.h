@@ -23,6 +23,7 @@
 // Updated September 16, 2016
 // Updated April 18, 2017
 // Updated October 14, 2017
+// Updated March 1, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_ICM_H
@@ -86,16 +87,15 @@ NAMESPACE_MODE
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>In ICM mode, Encryption/Decryption can both be pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
-/// <item><description>A cipher mode constructor can either be initialized with a block cipher instance, or using the block ciphers enumeration name.</description></item>
-/// <item><description>A block cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
-/// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
+/// <item><description>A cipher mode constructor can either be initialized with a block-cipher instance, or using the block ciphers enumeration name.</description></item>
+/// <item><description>A block-cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
+/// <item><description>The class functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
 /// <item><description>The EncryptBlock function can only be accessed through the class instance.</description></item>
 /// <item><description>The transformation methods can not be called until the Initialize(bool, ISymmetricKey) function has been called.</description></item>
 /// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
 /// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
 /// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
-/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % .ParallelMinimumSize);</c></description></item>
+/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property; parallel processing can be disabled by setting IsParallel() to false in the ParallelProfile() accessor.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -110,16 +110,10 @@ class ICM final : public ICipherMode
 private:
 
 	static const size_t BLOCK_SIZE = 16;
-	static const std::string CLASS_NAME;
 
+	class IcmState;
+	std::unique_ptr<IcmState> m_icmState;
 	std::unique_ptr<IBlockCipher> m_blockCipher;
-	BlockCiphers m_cipherType;
-	std::vector<ulong> m_ctrVector;
-	bool m_destroyEngine;
-	bool m_isDestroyed;
-	bool m_isEncryption;
-	bool m_isInitialized;
-	bool m_isLoaded;
 	ParallelOptions m_parallelProfile;
 
 public:
@@ -142,21 +136,21 @@ public:
 	ICM() = delete;
 
 	/// <summary>
-	/// Initialize the Cipher Mode using a block cipher type name
+	/// Initialize the Cipher Mode using a block-cipher type name
 	/// </summary>
 	///
-	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
+	/// <param name="CipherType">The enumeration type name of the block-cipher</param>
 	///
-	/// <exception cref="CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if an undefined block-cipher type name is used</exception>
 	explicit ICM(BlockCiphers CipherType);
 
 	/// <summary>
-	/// Initialize the Cipher Mode using a block cipher instance
+	/// Initialize the Cipher Mode using a block-cipher instance
 	/// </summary>
 	///
-	/// <param name="Cipher">The uninitialized block cipher instance; can not be null</param>
+	/// <param name="Cipher">The uninitialized block-cipher instance; can not be null</param>
 	///
-	/// <exception cref="CryptoCipherModeException">Thrown if a null block cipher is used</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if a null block-cipher is used</exception>
 	explicit ICM(IBlockCipher* Cipher);
 
 	/// <summary>
@@ -167,32 +161,32 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: Block size of internal cipher in bytes
+	/// Read Only: The ciphers internal block-size in bytes
 	/// </summary>
 	const size_t BlockSize() override;
 
 	/// <summary>
-	/// Read Only: The block ciphers formal type name
+	/// Read Only: The block ciphers enumeration type name
 	/// </summary>
 	const BlockCiphers CipherType() override;
 
 	/// <summary>
-	/// Read Only: The underlying Block Cipher instance
+	/// Read Only: A pointer to the underlying block-cipher instance
 	/// </summary>
 	IBlockCipher* Engine() override;
 
 	/// <summary>
-	/// Read Only: The cipher modes type name
+	/// Read Only: The cipher modes enumeration type name
 	/// </summary>
 	const CipherModes Enumeral() override;
 
 	/// <summary>
-	/// Read Only: True if initialized for encryption, False for decryption
+	/// Read Only: The operation mode, returns true if initialized for encryption, false for decryption
 	/// </summary>
 	const bool IsEncryption() override;
 
 	/// <summary>
-	/// Read Only: The Block Cipher is ready to transform data
+	/// Read Only: The block-cipher mode has been keyed and is ready to transform data
 	/// </summary>
 	const bool IsInitialized() override;
 
@@ -204,12 +198,12 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// Read Only: A vector of allowed cipher-mode input key byte-sizes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Read Only: The mode and cipher name
+	/// Read Only: The cipher-modes formal class name
 	/// </summary>
 	const std::string Name() override;
 
@@ -220,7 +214,7 @@ public:
 	const size_t ParallelBlockSize() override;
 
 	/// <summary>
-	/// Read/Write: Parallel and SIMD capability flags and sizes (Not supported in this mode)
+	/// Read/Write: Contains parallel and SIMD capability flags and sizes
 	/// </summary>
 	ParallelOptions &ParallelProfile() override;
 
@@ -232,8 +226,8 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of encrypted bytes</param>
-	/// <param name="Output">The output array of decrypted bytes</param>
+	/// <param name="Input">The input vector of cipher-text bytes</param>
+	/// <param name="Output">The output vector of plain-text bytes</param>
 	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -242,10 +236,10 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of encrypted bytes</param>
-	/// <param name="InOffset">Starting offset within the Input array</param>
-	/// <param name="Output">The output array of decrypted bytes</param>
-	/// <param name="OutOffset">Starting offset within the Output array</param>
+	/// <param name="Input">The input vector of cipher-text bytes</param>
+	/// <param name="InOffset">Starting offset within the input vector</param>
+	/// <param name="Output">The output vector of plain-text bytes</param>
+	/// <param name="OutOffset">Starting offset within the output vector</param>
 	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
@@ -254,8 +248,8 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of plain text bytes</param>
-	/// <param name="Output">The output array of encrypted bytes</param>
+	/// <param name="Input">The input vector of plain-text bytes</param>
+	/// <param name="Output">The output vector of cipher-text bytes</param>
 	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -264,17 +258,17 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of plain text bytes</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of encrypted bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of plain-text bytes</param>
+	/// <param name="InOffset">Starting offset within the input vector</param>
+	/// <param name="Output">The output vector of cipher-text bytes</param>
+	/// <param name="OutOffset">Starting offset within the output vector</param>
 	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
-	/// Initialize the Cipher instance
+	/// Initialize the cipher-mode instance
 	/// </summary>
 	/// 
-	/// <param name="Encryption">True if cipher is used for encryption, False to decrypt</param>
+	/// <param name="Encryption">Operation mode, true if cipher is used for encryption, false to decrypt</param>
 	/// <param name="Parameters">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if an invalid key or nonce is used</exception>
@@ -299,19 +293,17 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input vector</param>
+	/// <param name="Output">The output vector of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
 	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 private:
 
-	void Convert(const std::vector<ulong> &Input, std::vector<byte> &Output, size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<ulong> &Counter);
-	void Scope();
 	void ProcessParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void ProcessSequential(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 };

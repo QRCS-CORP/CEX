@@ -146,7 +146,7 @@ namespace Test
 			IntegerTools::Fill(inp, 0, inpLen, rnd);
 			SymmetricKey k(key, iv);
 
-			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
+			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
 
 			// sequential
 			Cipher->Initialize(Encryption, k);

@@ -651,7 +651,7 @@ namespace Test
 			IntegerTools::Fill(inp, 0, MSGLEN, rnd);
 			SymmetricKey kp(key, nonce);
 
-			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
+			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
 
 			// sequential
 			Cipher->Initialize(true, kp);
@@ -680,7 +680,7 @@ namespace Test
 		}
 
 		// restore parallel block size
-		Cipher->ParallelProfile().ParallelBlockSize() = prlSize;
+		Cipher->ParallelProfile().SetBlockSize(prlSize);
 	}
 
 	void ChaChaTest::Stress(IStreamCipher* Cipher)

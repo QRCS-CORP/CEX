@@ -9,6 +9,7 @@ NAMESPACE_PROCESSING
 
 using Exception::CryptoCipherModeException;
 using Exception::ErrorCodes;
+using Utility::MemoryTools;
 
 const std::string CipherStream::CLASS_NAME("CipherStream");
 
@@ -124,7 +125,7 @@ void CipherStream::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	try
 	{
-		m_cipherEngine->ParallelProfile().IsParallel() = m_isParallel;
+		m_cipherEngine->ParallelProfile().IsParallel() = m_isParallel && !(m_cipherEngine->Enumeral() == Enumeration::CipherModes::OFB);
 		m_cipherEngine->Initialize(Encryption, Parameters);
 
 		m_isEncryption = Encryption;
@@ -219,17 +220,17 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
 			std::vector<byte> inpBuffer(BLKLEN);
-			Utility::MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
+			MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
 			std::vector<byte> outBuffer(BLKLEN);
 			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, FNLLEN);
-			Utility::MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
+			MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
 			prcLen += FNLLEN;
 		}
 		else if (m_isEncryption)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
 			std::vector<byte> inpBuffer(BLKLEN);
-			Utility::MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
+			MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
 			if (FNLLEN != BLKLEN)
 			{
 				m_cipherPadding->AddPadding(inpBuffer, FNLLEN, inpBuffer.size());
@@ -248,7 +249,7 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 			std::vector<byte> outBuffer(BLKLEN);
 			m_cipherEngine->DecryptBlock(Input, InOffset, outBuffer, 0);
 			const size_t FNLLEN = m_cipherPadding->GetBlockLength(outBuffer);
-			Utility::MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
+			MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
 			prcLen += FNLLEN;
 
 			if (Output.size() != prcLen)
@@ -315,8 +316,8 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 		if (m_isCounterMode)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			Utility::MemoryTools::Clear(outBuffer, 0, outBuffer.size());
-			Utility::MemoryTools::Clear(inpBuffer, 0, inpBuffer.size());
+			MemoryTools::Clear(outBuffer, 0, outBuffer.size());
+			MemoryTools::Clear(inpBuffer, 0, inpBuffer.size());
 			prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
 			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, prcRead);
 			OutStream->Write(outBuffer, 0, prcRead);

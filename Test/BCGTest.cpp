@@ -498,7 +498,7 @@ namespace Test
 			inp.resize(SMPLEN, 0x00);
 			otp1.resize(SMPLEN, 0x00);
 			otp2.resize(SMPLEN, 0x00);
-			gen2.ParallelProfile().ParallelBlockSize() = SMPLEN - (SMPLEN % MINPRL);
+			gen2.ParallelProfile().SetBlockSize(SMPLEN - (SMPLEN % MINPRL));
 
 			// fill parameters with random
 			IntegerTools::Fill(key, 0, key.size(), rnd);

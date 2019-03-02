@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['ofb',['OFB',['../class_o_f_b.html#a32e92d5f71863fc611a880535b46da17',1,'OFB::OFB(const OFB &amp;)=delete'],['../class_o_f_b.html#aa8422f702d1802d55524b30b20ac4ee4',1,'OFB::OFB()=delete'],['../class_o_f_b.html#a4f294d73c0fbd452ca27e9c8926be86b',1,'OFB::OFB(BlockCiphers CipherType, size_t RegisterSize=16)'],['../class_o_f_b.html#a7321554371828481a792e0ebe1509b04',1,'OFB::OFB(IBlockCipher *Cipher, size_t RegisterSize=16)']]],
+  ['ofb',['OFB',['../class_o_f_b.html#a32e92d5f71863fc611a880535b46da17',1,'OFB::OFB(const OFB &amp;)=delete'],['../class_o_f_b.html#aa8422f702d1802d55524b30b20ac4ee4',1,'OFB::OFB()=delete'],['../class_o_f_b.html#a47b3ad961c67431ec427dd3b65c3d94e',1,'OFB::OFB(BlockCiphers CipherType)'],['../class_o_f_b.html#a9f7f665c1a5f73e5e6fc09178fae4b38',1,'OFB::OFB(IBlockCipher *Cipher)']]],
   ['operator_26',['operator&amp;',['../class_donna128.html#a4f28903fda618ba008780a4168dd5bc5',1,'Donna128']]],
   ['operator_26_3d',['operator&amp;=',['../class_donna128.html#a3d5ed1b0dda5d53c6d5eb7b6a43c02ee',1,'Donna128']]],
   ['operator_28_29',['operator()',['../class_delegate.html#a22f6f60c05581ed3ecf14fb3c420e6c7',1,'Delegate::operator()()'],['../class_event.html#a8f70480a9a384f1b079fe9453f58c813',1,'Event::operator()()']]],

@@ -124,9 +124,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6b1876e03d9732f59104b435f042cb4c"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key.html#a6b1876e03d9732f59104b435f042cb4c">Key</a> () override</td></tr>
 <tr class="memdesc:a6b1876e03d9732f59104b435f042cb4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a standard-vector copy of the primary key  <a href="#a6b1876e03d9732f59104b435f042cb4c">More...</a><br /></td></tr>
 <tr class="separator:a6b1876e03d9732f59104b435f042cb4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45e159e4db7e0acf33a6e321067522fd"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key.html#a45e159e4db7e0acf33a6e321067522fd">KeySizes</a> () override</td></tr>
-<tr class="memdesc:a45e159e4db7e0acf33a6e321067522fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members  <a href="#a45e159e4db7e0acf33a6e321067522fd">More...</a><br /></td></tr>
-<tr class="separator:a45e159e4db7e0acf33a6e321067522fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe90aec133e56c6657c336f4c498eb2f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key.html#afe90aec133e56c6657c336f4c498eb2f">KeySizes</a> () const override</td></tr>
+<tr class="memdesc:afe90aec133e56c6657c336f4c498eb2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members  <a href="#afe90aec133e56c6657c336f4c498eb2f">More...</a><br /></td></tr>
+<tr class="separator:afe90aec133e56c6657c336f4c498eb2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9013a99ed2e7f4fe4fa10a47d241efc3"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symmetric_key.html#a9013a99ed2e7f4fe4fa10a47d241efc3">Nonce</a> () override</td></tr>
 <tr class="memdesc:a9013a99ed2e7f4fe4fa10a47d241efc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv  <a href="#a9013a99ed2e7f4fe4fa10a47d241efc3">More...</a><br /></td></tr>
 <tr class="separator:a9013a99ed2e7f4fe4fa10a47d241efc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -633,8 +633,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a45e159e4db7e0acf33a6e321067522fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a45e159e4db7e0acf33a6e321067522fd">&#9670;&nbsp;</a></span>KeySizes()</h2>
+<a id="afe90aec133e56c6657c336f4c498eb2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe90aec133e56c6657c336f4c498eb2f">&#9670;&nbsp;</a></span>KeySizes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -643,10 +643,10 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> SymmetricKey::KeySizes </td>
+          <td class="memname"><a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &amp; SymmetricKey::KeySizes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -658,7 +658,7 @@ Static Public Member Functions</h2></td></tr>
 
 <p>Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members </p>
 
-<p>Implements <a class="el" href="class_i_symmetric_key.html#ae39ebc3bdb354265c73261b848232c52">ISymmetricKey</a>.</p>
+<p>Implements <a class="el" href="class_i_symmetric_key.html#ad34c4468dd76c88142018c2c6bf9ff20">ISymmetricKey</a>.</p>
 
 </div>
 </div>

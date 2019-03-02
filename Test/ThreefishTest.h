@@ -98,6 +98,8 @@ namespace Test
 		/// <summary>
 		/// Test exception handlers for correct execution
 		/// </summary>
+		/// 
+		/// <param name="Cipher">The stream-cipher instance</param>
 		void Exception(IStreamCipher* Cipher);
 
 		/// <summary>

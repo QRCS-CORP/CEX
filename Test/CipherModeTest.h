@@ -20,6 +20,10 @@ namespace Test
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
+		static const size_t MAXM_ALLOC = 102400;
+		static const size_t MINM_ALLOC = 128;
+		static const size_t MONTE_CYCLES = 10000;
+		static const size_t TEST_CYCLES = 100;
 
         std::vector<std::vector<std::vector<byte>>> m_expected;
         std::vector<std::vector<byte>> m_keys;
@@ -61,6 +65,11 @@ namespace Test
 		std::string Run() override;
 
 		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
+
+		/// <summary>
 		/// Test the Cipher Mode KAT vectors
 		/// </summary>
 		/// 
@@ -70,6 +79,18 @@ namespace Test
 		/// <param name="Expected">The expected output vector</param>
 		/// <param name="Encryption">Set the transformation mode to encrypt ot decrypt</param>
 		void Kat(ICipherMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<std::vector<byte>> &Message, std::vector<std::vector<byte>> &Expected, bool Encryption);
+
+		/// <summary>
+		/// Test the CFB mode output with a an 8-bit register
+		/// </summary>
+		void Register();
+
+		/// <summary>
+		/// Test transformation and inverse with random in a looping [TEST_CYCLES] stress-test
+		/// </summary>
+		/// 
+		/// <param name="Cipher">The cipher mode instance pointer</param>
+		void Stress(ICipherMode* Cipher);
 
     private:
 

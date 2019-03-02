@@ -13,6 +13,6 @@ var searchData=
   ['nodedepth',['NodeDepth',['../struct_blake_params.html#a62e36237a73641561791c6d907293b71',1,'BlakeParams']]],
   ['nodeoffset',['NodeOffset',['../struct_blake_params.html#a0db0bdd37fa3e2043ed6e7c643d1d1b4',1,'BlakeParams::NodeOffset()'],['../struct_s_h_a2.html#aea4c472ae574f16c4d517be0b7894cac',1,'SHA2::NodeOffset()'],['../class_keccak_params.html#aaed77d3630843f4bfdd2956de433a1c4',1,'KeccakParams::NodeOffset()'],['../class_s_h_a2_params.html#a5a55e31d5d2b49d3dfa51c22eadffcba',1,'SHA2Params::NodeOffset()']]],
   ['nonce',['Nonce',['../class_c_t_r.html#a377931b7d65e71fbdd1aac7517e612c2',1,'CTR::Nonce()'],['../class_i_symmetric_key.html#a2c791f59a23f510b4963103acd22c537',1,'ISymmetricKey::Nonce()'],['../class_symmetric_key.html#a9013a99ed2e7f4fe4fa10a47d241efc3',1,'SymmetricKey::Nonce()'],['../class_symmetric_secure_key.html#a39c4b042b02d69d9ea636f6e66eb7970',1,'SymmetricSecureKey::Nonce()']]],
-  ['noncesize',['NonceSize',['../class_symmetric_key_size.html#aee6755bfcbe21bd8661d128c477752dc',1,'SymmetricKeySize']]],
+  ['noncesize',['NonceSize',['../class_symmetric_key_size.html#ae6d0c639f232c991bdfa7da36a9fa090',1,'SymmetricKeySize']]],
   ['ntru',['NTRU',['../class_n_t_r_u.html#a013283bade5eb9f6786cc5a041bedcb5',1,'NTRU::NTRU(const NTRU &amp;)=delete'],['../class_n_t_r_u.html#afa362eb396c0be0795e76c6bd7668972',1,'NTRU::NTRU(NTRUParameters Parameters=NTRUParameters::NTRUS1LQ4591N761, Prngs PrngType=Prngs::BCR)'],['../class_n_t_r_u.html#a26175d1be886acd55b4ec311fa06a58c',1,'NTRU::NTRU(NTRUParameters Parameters, IPrng *Prng)']]]
 ];

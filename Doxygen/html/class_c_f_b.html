@@ -81,7 +81,7 @@ Inheritance diagram for CFB:</div>
  <div class="center">
   <img src="class_c_f_b.png" usemap="#CFB_map" alt=""/>
   <map id="CFB_map" name="CFB_map">
-<area href="class_i_cipher_mode.html" title="Block Cipher standard Mode virtual interface class. " alt="ICipherMode" shape="rect" coords="0,0,85,24"/>
+<area href="class_i_cipher_mode.html" title="Block-cipher standard mode virtual interface class. " alt="ICipherMode" shape="rect" coords="0,0,85,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -97,46 +97,46 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a355ee86171a94004e471202f747dea97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#a355ee86171a94004e471202f747dea97">More...</a><br /></td></tr>
 <tr class="separator:a355ee86171a94004e471202f747dea97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82d1b62a55ee357afa570fd418cf36a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a82d1b62a55ee357afa570fd418cf36a8">CFB</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_c_f_b.html#ad3ffaffa19bc64cb897d0944866c8017">CipherType</a>, size_t RegisterSize=16)</td></tr>
-<tr class="memdesc:a82d1b62a55ee357afa570fd418cf36a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name  <a href="#a82d1b62a55ee357afa570fd418cf36a8">More...</a><br /></td></tr>
+<tr class="memdesc:a82d1b62a55ee357afa570fd418cf36a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block-cipher enumeration type name  <a href="#a82d1b62a55ee357afa570fd418cf36a8">More...</a><br /></td></tr>
 <tr class="separator:a82d1b62a55ee357afa570fd418cf36a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9265f5ed0c1072482fd42ba35a16f7f4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a9265f5ed0c1072482fd42ba35a16f7f4">CFB</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher, size_t RegisterSize=16)</td></tr>
-<tr class="memdesc:a9265f5ed0c1072482fd42ba35a16f7f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher instance  <a href="#a9265f5ed0c1072482fd42ba35a16f7f4">More...</a><br /></td></tr>
+<tr class="memdesc:a9265f5ed0c1072482fd42ba35a16f7f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block-cipher instance  <a href="#a9265f5ed0c1072482fd42ba35a16f7f4">More...</a><br /></td></tr>
 <tr class="separator:a9265f5ed0c1072482fd42ba35a16f7f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad964c04ab994c61d4c3480d60f6449e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#ad964c04ab994c61d4c3480d60f6449e0">~CFB</a> () override</td></tr>
 <tr class="memdesc:ad964c04ab994c61d4c3480d60f6449e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#ad964c04ab994c61d4c3480d60f6449e0">More...</a><br /></td></tr>
 <tr class="separator:ad964c04ab994c61d4c3480d60f6449e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63e6c8971ceea7542c1fcd246c7f164d"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a63e6c8971ceea7542c1fcd246c7f164d">BlockSize</a> () override</td></tr>
-<tr class="memdesc:a63e6c8971ceea7542c1fcd246c7f164d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Block size of internal cipher in bytes  <a href="#a63e6c8971ceea7542c1fcd246c7f164d">More...</a><br /></td></tr>
+<tr class="memdesc:a63e6c8971ceea7542c1fcd246c7f164d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers internal block-size in bytes  <a href="#a63e6c8971ceea7542c1fcd246c7f164d">More...</a><br /></td></tr>
 <tr class="separator:a63e6c8971ceea7542c1fcd246c7f164d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3ffaffa19bc64cb897d0944866c8017"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#ad3ffaffa19bc64cb897d0944866c8017">CipherType</a> () override</td></tr>
-<tr class="memdesc:ad3ffaffa19bc64cb897d0944866c8017"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers formal type name  <a href="#ad3ffaffa19bc64cb897d0944866c8017">More...</a><br /></td></tr>
+<tr class="memdesc:ad3ffaffa19bc64cb897d0944866c8017"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers enumeration type name  <a href="#ad3ffaffa19bc64cb897d0944866c8017">More...</a><br /></td></tr>
 <tr class="separator:ad3ffaffa19bc64cb897d0944866c8017"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14b3f192a8f9f28697c0c2f42f1160ba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a14b3f192a8f9f28697c0c2f42f1160ba">Engine</a> () override</td></tr>
-<tr class="memdesc:a14b3f192a8f9f28697c0c2f42f1160ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The underlying Block Cipher instance  <a href="#a14b3f192a8f9f28697c0c2f42f1160ba">More...</a><br /></td></tr>
+<tr class="memdesc:a14b3f192a8f9f28697c0c2f42f1160ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A pointer to the underlying block-cipher instance  <a href="#a14b3f192a8f9f28697c0c2f42f1160ba">More...</a><br /></td></tr>
 <tr class="separator:a14b3f192a8f9f28697c0c2f42f1160ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b5016638804813b3633afd1ba1d0205"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1d4ccc36db403dcb914cd7c4bac557a1">CipherModes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a2b5016638804813b3633afd1ba1d0205">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a2b5016638804813b3633afd1ba1d0205"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher modes type name  <a href="#a2b5016638804813b3633afd1ba1d0205">More...</a><br /></td></tr>
+<tr class="memdesc:a2b5016638804813b3633afd1ba1d0205"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher modes enumeration type name  <a href="#a2b5016638804813b3633afd1ba1d0205">More...</a><br /></td></tr>
 <tr class="separator:a2b5016638804813b3633afd1ba1d0205"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae085e952b196bc125609c606c98a9ea6"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#ae085e952b196bc125609c606c98a9ea6">IsEncryption</a> () override</td></tr>
-<tr class="memdesc:ae085e952b196bc125609c606c98a9ea6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: True if initialized for encryption, False for decryption  <a href="#ae085e952b196bc125609c606c98a9ea6">More...</a><br /></td></tr>
+<tr class="memdesc:ae085e952b196bc125609c606c98a9ea6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The operation mode, returns true if initialized for encryption, false for decryption  <a href="#ae085e952b196bc125609c606c98a9ea6">More...</a><br /></td></tr>
 <tr class="separator:ae085e952b196bc125609c606c98a9ea6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f9ecf5de43883fe9620b06395cc4ee2"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a2f9ecf5de43883fe9620b06395cc4ee2">IsInitialized</a> () override</td></tr>
-<tr class="memdesc:a2f9ecf5de43883fe9620b06395cc4ee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Block Cipher is ready to transform data  <a href="#a2f9ecf5de43883fe9620b06395cc4ee2">More...</a><br /></td></tr>
+<tr class="memdesc:a2f9ecf5de43883fe9620b06395cc4ee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block-cipher mode has been keyed and is ready to transform data  <a href="#a2f9ecf5de43883fe9620b06395cc4ee2">More...</a><br /></td></tr>
 <tr class="separator:a2f9ecf5de43883fe9620b06395cc4ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04b9ac2bf73c617b480793e0b1190490"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a04b9ac2bf73c617b480793e0b1190490">IsParallel</a> () override</td></tr>
 <tr class="memdesc:a04b9ac2bf73c617b480793e0b1190490"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#a04b9ac2bf73c617b480793e0b1190490">More...</a><br /></td></tr>
 <tr class="separator:a04b9ac2bf73c617b480793e0b1190490"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab102367a488336475492423599b586b5"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#ab102367a488336475492423599b586b5">LegalKeySizes</a> () override</td></tr>
-<tr class="memdesc:ab102367a488336475492423599b586b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of allowed cipher input key byte-sizes  <a href="#ab102367a488336475492423599b586b5">More...</a><br /></td></tr>
+<tr class="memdesc:ab102367a488336475492423599b586b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A vector of allowed cipher-mode input key byte-sizes  <a href="#ab102367a488336475492423599b586b5">More...</a><br /></td></tr>
 <tr class="separator:ab102367a488336475492423599b586b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad49df6844524ca15b7dc4cc58289b18f"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#ad49df6844524ca15b7dc4cc58289b18f">Name</a> () override</td></tr>
-<tr class="memdesc:ad49df6844524ca15b7dc4cc58289b18f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The mode and cipher name  <a href="#ad49df6844524ca15b7dc4cc58289b18f">More...</a><br /></td></tr>
+<tr class="memdesc:ad49df6844524ca15b7dc4cc58289b18f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher-modes formal class name  <a href="#ad49df6844524ca15b7dc4cc58289b18f">More...</a><br /></td></tr>
 <tr class="separator:ad49df6844524ca15b7dc4cc58289b18f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a532efbf6eb3c7742ef07f36a934f1071"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a532efbf6eb3c7742ef07f36a934f1071">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:a532efbf6eb3c7742ef07f36a934f1071"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#a532efbf6eb3c7742ef07f36a934f1071">More...</a><br /></td></tr>
 <tr class="separator:a532efbf6eb3c7742ef07f36a934f1071"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4890e3891199fd19e6d8e2004355a518"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_parallel_options.html">ParallelOptions</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a4890e3891199fd19e6d8e2004355a518">ParallelProfile</a> () override</td></tr>
-<tr class="memdesc:a4890e3891199fd19e6d8e2004355a518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Parallel and SIMD capability flags and sizes (Not supported in this mode)  <a href="#a4890e3891199fd19e6d8e2004355a518">More...</a><br /></td></tr>
+<tr class="memdesc:a4890e3891199fd19e6d8e2004355a518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Contains parallel and SIMD capability flags and sizes  <a href="#a4890e3891199fd19e6d8e2004355a518">More...</a><br /></td></tr>
 <tr class="separator:a4890e3891199fd19e6d8e2004355a518"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a969c9eae91acbc91eac4d5172c49161f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#a969c9eae91acbc91eac4d5172c49161f">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:a969c9eae91acbc91eac4d5172c49161f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a single block of bytes.  <a href="#a969c9eae91acbc91eac4d5172c49161f">More...</a><br /></td></tr>
@@ -151,7 +151,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:abaffdd770c6ce0819c857feb8fdf8bac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="#abaffdd770c6ce0819c857feb8fdf8bac">More...</a><br /></td></tr>
 <tr class="separator:abaffdd770c6ce0819c857feb8fdf8bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9c55e3c9791cce9b6406838b48aecb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#ad9c55e3c9791cce9b6406838b48aecb0">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
-<tr class="memdesc:ad9c55e3c9791cce9b6406838b48aecb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance  <a href="#ad9c55e3c9791cce9b6406838b48aecb0">More...</a><br /></td></tr>
+<tr class="memdesc:ad9c55e3c9791cce9b6406838b48aecb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher-mode instance  <a href="#ad9c55e3c9791cce9b6406838b48aecb0">More...</a><br /></td></tr>
 <tr class="separator:ad9c55e3c9791cce9b6406838b48aecb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0df58723e2207b9ba97372d21c028d2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_f_b.html#ac0df58723e2207b9ba97372d21c028d2">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:ac0df58723e2207b9ba97372d21c028d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#ac0df58723e2207b9ba97372d21c028d2">More...</a><br /></td></tr>
@@ -175,11 +175,11 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of a Cipher FeedBack Mode </p>
-<p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_c_f_b.html">CFB</a> cipher(<span class="keyword">new</span> AES());</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>));</div><div class="line"><span class="comment">// encrypt one block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p>Decrypting using multi-threading: </p><div class="fragment"><div class="line"><a class="code" href="class_c_f_b.html">CFB</a> cipher(BlockCiphers::AES);</div><div class="line"><span class="comment">// enable parallel and set the parallel input block size</span></div><div class="line">cipher.IsParallel() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// calculated automatically based on cache size, but overridable</span></div><div class="line">cipher.ParallelBlockSize() = cipher.ProcessorCount() * 32000;</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>));</div><div class="line"><span class="comment">// decrypt one parallel sized block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p><b>Overview:</b>//encrypt the register, xor the ciphertext with the plaintext by block-size bytes left shift the register copy cipher text to the register </p>
-<p>The Cipher FeedBack mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output. <br />
+<p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_c_f_b.html">CFB</a> cipher(<span class="keyword">new</span> AES(), [RegisterSize]);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>));</div><div class="line"><span class="comment">// encrypt one block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p>Decrypting using multi-threading: </p><div class="fragment"><div class="line"><a class="code" href="class_c_f_b.html">CFB</a> cipher(BlockCiphers::AES, [RegisterSize]);</div><div class="line"><span class="comment">// enable parallel and set the parallel input block size</span></div><div class="line">cipher.IsParallel() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// calculated automatically based on cache size, but overridable</span></div><div class="line">cipher.ParallelBlockSize() = cipher.ProcessorCount() * 1600;</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>));</div><div class="line"><span class="comment">// decrypt one parallel sized block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>The Cipher FeedBack mode wraps a symmetric block-cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output. <br />
 Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks. <br />
-On the first block the Nonce (register) is first encrypted, then XOR'd with the plaintext, using the specified BlockSize number of bytes. <br />
-The block is left-shifted by block-size bytes, and the ciphertext is used to fill the end of the vector. <br />
+On the first block the IV is encrypted, then XOR'd with the plaintext, using the specified feedback-register number of bytes. <br />
+The block is left-shifted by rehister-size bytes, and the ciphertext is used to fill the end of the vector. <br />
 The second block is encrypted and XOR'd with the first encrypted block using the same register shift, and all subsequent blocks follow this pattern. <br />
 The decryption function follows the reverse pattern; the block is decrypted with the symmetric cipher, and then XOR'd with the ciphertext from the previous block to produce the plain-text.</p>
 <p><b>Description:</b> </p>
@@ -187,7 +187,7 @@ The decryption function follows the reverse pattern; the block is decrypted with
  <b>C</b>=ciphertext, <b>P</b>=plaintext, <b>K</b>=key, <b>E</b>=encrypt, <b>D</b>=decrypt, <b>^</b>=XOR <br />
 <em>Encryption</em> <br />
 I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u: <br />
-(a) Oj ← EK(Ij). (Compute the block cipher output) <br />
+(a) Oj ← EK(Ij). (Compute the block-cipher output) <br />
 (b) tj ← the r leftmost bits of Oj. (Assume the leftmost is identified as bit 1) <br />
 (c) Cj ← Pj ^ tj. (Transmit the r-bit ciphertext block cj) <br />
 (d) Ij+1 ← 2r · Ij + Cj mod 2n. (Shift Cj into right end of shift register) <br />
@@ -195,27 +195,22 @@ I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u: <br /
 Pj ← Cj ^ tj. where tj, Oj and Ij</p>
 <p><b>Multi-Threading:</b> </p>
 <p>The encryption function of the CFB mode is limited by its dependency chain; that is, each block relies on information from the previous block, and so can not be multi-threaded. The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores. <br />
-This is achieved by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads. <br />
- The CFB parallel decryption mode also leverages SIMD instructions to 'double parallelize' those segments. A block of cipher-text assigned to a thread uses SIMD instructions to decrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.</p>
+This is achieved by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads.</p>
 <p><b>Implementation Notes:</b> </p><ul>
 <li>
-A cipher mode constructor can either be initialized with a block cipher instance, or using the block ciphers enumeration name. </li>
+A cipher mode constructor can either be initialized with a block-cipher instance, or using the block ciphers enumeration type name. </li>
 <li>
-A block cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed. </li>
+A block-cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed. </li>
 <li>
-The Transform functions are virtual, and can be accessed from an ICipherMode instance. </li>
+The class functions are virtual, and can be accessed from an ICipherMode instance. </li>
 <li>
 The transformation methods can not be called until the Initialize(bool, ISymmetricKey) function has been called. </li>
 <li>
 In CFB mode, only the decryption function can be processed in parallel. </li>
 <li>
-The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system. </li>
+Parallel processing is enabled on decryption by passing an input block of at least ParallelBlockSize() to the transform; this can be disabled by setting IsParallel() to false in the ParallelProfile() accessor. </li>
 <li>
-Parallel processing is enabled on decryption by setting IsParallel() to true, and passing an input block of ParallelBlockSize() to the transform. </li>
-<li>
-ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize(). </li>
-<li>
-Parallel block calculation ex. <code>ParallelBlockSize() = data.size() - (data.size() % cipher.ParallelMinimumSize());</code> </li>
+ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, but must be evenly divisible by ParallelMinimumSize(). </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -313,17 +308,17 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the Cipher Mode using a block cipher type name </p>
+<p>Initialize the Cipher Mode using a block-cipher enumeration type name </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">CipherType</td><td>The formal enumeration name of a block cipher</td></tr>
-    <tr><td class="paramname">RegisterSize</td><td>Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</td></tr>
+    <tr><td class="paramname">CipherType</td><td>The enumeration name of a block-cipher</td></tr>
+    <tr><td class="paramname">RegisterSize</td><td>The feedback register size in bytes; minimum is 1 byte, the default is the block-ciphers internal block size</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if an undefined block cipher type name is used</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if an undefined block-cipher type name is used</td></tr>
   </table>
   </dd>
 </dl>
@@ -364,17 +359,17 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the Cipher Mode using a block cipher instance </p>
+<p>Initialize the Cipher Mode using a block-cipher instance </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Cipher</td><td>An uninitialized block cipher instance; can not be null</td></tr>
-    <tr><td class="paramname">RegisterSize</td><td>Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size; default value is 16 bytes</td></tr>
+    <tr><td class="paramname">Cipher</td><td>The uninitialized block-cipher instance; can not be null</td></tr>
+    <tr><td class="paramname">RegisterSize</td><td>Register size in bytes; minimum is 1 byte, maximum is the block-ciphers internal block size; default value is 16 bytes</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if a null Block Cipher is used, or the specified block size is invalid</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if a null block-cipher is used, or the specified block size is invalid</td></tr>
   </table>
   </dd>
 </dl>
@@ -432,7 +427,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Block size of internal cipher in bytes </p>
+<p>Read Only: The ciphers internal block-size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#a84a1320fbd9b6a9b077072acf66715ae">ICipherMode</a>.</p>
 
@@ -461,7 +456,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The block ciphers formal type name </p>
+<p>Read Only: The block ciphers enumeration type name </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#af20a1f1a85bcc13ca03670b3cf94491a">ICipherMode</a>.</p>
 
@@ -505,8 +500,8 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Decrypts one block of bytes beginning at a zero index. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of encrypted bytes</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of decrypted bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of plain-text bytes</td></tr>
   </table>
   </dd>
 </dl>
@@ -565,10 +560,10 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Decrypts one block of bytes at the designated offsets. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of encrypted bytes</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the Input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of decrypted bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the Output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">InOffset</td><td>Starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
@@ -615,8 +610,8 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Encrypts one block of bytes beginning at a zero index. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of plain text bytes</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of encrypted bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of cipher-text bytes</td></tr>
   </table>
   </dd>
 </dl>
@@ -675,10 +670,10 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Encrypts one block of bytes at the designated offsets. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of plain text bytes</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of encrypted bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">InOffset</td><td>Starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
@@ -710,7 +705,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The underlying Block Cipher instance </p>
+<p>Read Only: A pointer to the underlying block-cipher instance </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#a11c630e63903b83044397876f6276ce9">ICipherMode</a>.</p>
 
@@ -739,7 +734,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The cipher modes type name </p>
+<p>Read Only: The cipher modes enumeration type name </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#a94f085c15d16a8f37192f302773e5bb2">ICipherMode</a>.</p>
 
@@ -779,10 +774,10 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the Cipher instance </p>
+<p>Initialize the cipher-mode instance </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Encryption</td><td>True if cipher is used for encryption, False to decrypt</td></tr>
+    <tr><td class="paramname">Encryption</td><td>Operation mode, true if cipher is used for encryption, false to decrypt</td></tr>
     <tr><td class="paramname">Parameters</td><td>SymmetricKey containing the encryption Key and Initialization Vector</td></tr>
   </table>
   </dd>
@@ -821,7 +816,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: True if initialized for encryption, False for decryption </p>
+<p>Read Only: The operation mode, returns true if initialized for encryption, false for decryption </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#a6b9e5e05b83c6e84e6082d0b6334d470">ICipherMode</a>.</p>
 
@@ -850,7 +845,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The Block Cipher is ready to transform data </p>
+<p>Read Only: The block-cipher mode has been keyed and is ready to transform data </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#a1b57c47c070538abb55e96e09e7ce5a2">ICipherMode</a>.</p>
 
@@ -909,7 +904,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Array of allowed cipher input key byte-sizes </p>
+<p>Read Only: A vector of allowed cipher-mode input key byte-sizes </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#a530595c8040b12a19a21d14f840547ab">ICipherMode</a>.</p>
 
@@ -938,7 +933,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The mode and cipher name </p>
+<p>Read Only: The cipher-modes formal class name </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">ICipherMode</a>.</p>
 
@@ -1068,7 +1063,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read/Write: Parallel and SIMD capability flags and sizes (Not supported in this mode) </p>
+<p>Read/Write: Contains parallel and SIMD capability flags and sizes </p>
 
 <p>Implements <a class="el" href="class_i_cipher_mode.html#ae0c45109dd147c8d8db02fb02561379f">ICipherMode</a>.</p>
 
@@ -1130,10 +1125,10 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>This method processes a specified length of bytes, utilizing offsets incremented by the caller. If IsParallel() is set to true, and the length is at least ParallelBlockSize(), the transform is run in parallel processing mode. Parallel processing is limited to the Decryption function only, the Encryption function will process ParallelBlockSize() blocks in sequential mode. To disable parallel processing, set the ParallelOptions().IsParallel() property to false. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to transform</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of transformed bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of bytes to transform</td></tr>
+    <tr><td class="paramname">InOffset</td><td>Starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of transformed bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to transform</td></tr>
   </table>
   </dd>
