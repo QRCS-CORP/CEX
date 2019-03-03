@@ -5,10 +5,11 @@ RHX is a Rijndael implementation that can use either a standard configuration wi
 In extended mode, the number of transformation rounds are set to 22, 30 and 38, corresponding to the 256, 512, and 1024 input cipher key sizes. 
 Increasing the number of transformation rounds processed by the ciphers transformation function creates a more diffused output, making the resulting cipher-text more resistant to some forms of cryptanalysis. 
 RHX is capable of processing up to 38 rounds, that is 24 rounds more than a standard implementation of AES-256. 
-Implementation Notes: 
+ 
 The key schedule in RHX, and the number of transformation rounds processed are the difference between the extended mode operations, and a standard version of AES. The standard Rijndael Key Schedule processes 128, 192, and 256 bit keys, and a fixed set of transformation rounds of 10, 12, and 14, the extended version of the cipher uses 256, 512, and 1024-bit keys processing 22, 30, and 38 rounds. 
 RHX extended mode can use an HMAC based Key Derivation Function; HKDF(HMAC(SHA2)) or the Keccak XOF function cSHAKE, to expand the input cipher key to create the internal round-key integer array. 
 This provides better security, and allows for an implemetation to safely use an increased number of transformation rounds further strengthening the cipher. 
+
 The cipher can also use a user-definable cipher tweak through the Info parameter of the symmetric key container, this can be used to create a unique cipher-text output. 
 This tweak array is set as either the information string for HKDF, or as the cSHAKE name string.
 When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. 
