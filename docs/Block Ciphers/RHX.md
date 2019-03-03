@@ -50,7 +50,7 @@ RHX &operator= (const RHX&)=delete
 Copy operator: copy is restricted, this function has been deleted
  
 ```cpp
-RHX (BlockCipherExtensions CipherExtensionType=BlockCipherExtensions::None)
+RHX(BlockCipherExtensions CipherExtensionType=BlockCipherExtensions::None)
 ```
 Instantiate the class with an optional block-cipher extension type.
  
