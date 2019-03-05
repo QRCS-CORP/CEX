@@ -158,9 +158,5 @@ Transform a length of bytes with offset parameters.
 
 ## Links
 
-* [ChaCha](http://cr.yp.to/chacha/chacha-20080128.pdf): Specification 
-* [Fips-202](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf): The SHA-3 Standard 
-* [SP800-185](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf): SHA-3 Derived Functions 
-* [RFC 2104](http://tools.ietf.org/html/rfc2104): HMAC: Keyed-Hashing for Message Authentication. 
-* [Fips 198-1](http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf): The Keyed-Hash Message Authentication Code (HMAC). 
-* [Fips 180-4](http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf): Secure Hash Standard (SHS)
+NIST [SP800-38A](http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf). 
+Handbook of Applied Cryptography Chapter 7: [Block Ciphers](http://cacr.uwaterloo.ca/hac/about/chap7.pdf). 
