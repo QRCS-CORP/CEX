@@ -34,7 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// An implementation of a Cipher FeedBack Mode
+/// CFB: An implementation of a Cipher FeedBack Mode
 /// </summary>
 /// 
 /// <example>

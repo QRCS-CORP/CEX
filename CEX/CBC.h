@@ -34,7 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// An implementation of a Cipher Block Chaining Mode
+/// CBC: An implementation of a Cipher Block Chaining Mode
 /// </summary> 
 /// 
 /// <example>

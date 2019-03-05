@@ -56,10 +56,15 @@ GMAC::GMAC(BlockCiphers CipherType)
 		CMUL::CMUL_BLOCK_SIZE,
 		Macs::GMAC,
 		MacConvert::ToName(Macs::GMAC) + std::string("-") + BlockCipherConvert::ToName(CipherType),
-		std::vector<SymmetricKeySize> { 
-			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, CMUL::CMUL_BLOCK_SIZE, 0),
-			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 32, 0),
-			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 64, 0)},
+		((CipherType == BlockCiphers::AES || CipherType == BlockCiphers::Serpent) ?
+			std::vector<SymmetricKeySize> { 
+				SymmetricKeySize(16, CMUL::CMUL_BLOCK_SIZE, 0),
+				SymmetricKeySize(24, CMUL::CMUL_BLOCK_SIZE, 0),
+				SymmetricKeySize(32, CMUL::CMUL_BLOCK_SIZE, 0)} :
+			std::vector<SymmetricKeySize>{
+				SymmetricKeySize(16, CMUL::CMUL_BLOCK_SIZE, 0),
+				SymmetricKeySize(32, CMUL::CMUL_BLOCK_SIZE, 0),
+				SymmetricKeySize(64, CMUL::CMUL_BLOCK_SIZE, 0)}),
 #if defined(CEX_ENFORCE_LEGALKEY)
 		CMUL::CMUL_BLOCK_SIZE,
 		CMUL::CMUL_BLOCK_SIZE,
@@ -83,10 +88,15 @@ GMAC::GMAC(IBlockCipher* Cipher)
 		Macs::GMAC,
 		(Cipher != nullptr ? MacConvert::ToName(Macs::GMAC) + std::string("-") + BlockCipherConvert::ToName(Cipher->Enumeral()) : 
 			std::string("")),
-		std::vector<SymmetricKeySize> {
-			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, CMUL::CMUL_BLOCK_SIZE, 0),
-			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 32, 0),
-			SymmetricKeySize(CMUL::CMUL_BLOCK_SIZE, 64, 0)},
+			((Cipher == nullptr || Cipher->Enumeral() == BlockCiphers::AES || Cipher->Enumeral() == BlockCiphers::Serpent) ?
+				std::vector<SymmetricKeySize> {
+					SymmetricKeySize(16, CMUL::CMUL_BLOCK_SIZE, 0),
+					SymmetricKeySize(24, CMUL::CMUL_BLOCK_SIZE, 0),
+					SymmetricKeySize(32, CMUL::CMUL_BLOCK_SIZE, 0)} :
+				std::vector<SymmetricKeySize>{
+					SymmetricKeySize(16, CMUL::CMUL_BLOCK_SIZE, 0),
+					SymmetricKeySize(32, CMUL::CMUL_BLOCK_SIZE, 0),
+					SymmetricKeySize(64, CMUL::CMUL_BLOCK_SIZE, 0)}),
 #if defined(CEX_ENFORCE_LEGALKEY)
 		CMUL::CMUL_BLOCK_SIZE,
 		CMUL::CMUL_BLOCK_SIZE,
@@ -232,10 +242,10 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	m_gmacState->Nonce.resize(Parameters.KeySizes().NonceSize());
 	MemoryTools::Copy(Parameters.Nonce(), 0, m_gmacState->Nonce, 0, m_gmacState->Nonce.size());
 
-	if (m_gmacState->Nonce.size() == 12)
+	if (m_gmacState->Nonce.size() == MINSALT_LENGTH)
 	{
 		m_gmacState->Nonce.resize(CMUL::CMUL_BLOCK_SIZE);
-		m_gmacState->Nonce[15] = 0x01;
+		m_gmacState->Nonce[CMUL::CMUL_BLOCK_SIZE - 1] = 0x01;
 	}
 	else
 	{

@@ -364,7 +364,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CBC), std::string("Threefish"), std::string("Exception handling failure! -ME13"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CBC), std::string("Exception handling failure! -ME13"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -384,7 +384,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CFB), std::string("Threefish"), std::string("Exception handling failure! -ME14"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CFB), std::string("Exception handling failure! -ME14"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -404,7 +404,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CTR), std::string("Threefish"), std::string("Exception handling failure! -ME15"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CTR), std::string("Exception handling failure! -ME15"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -424,7 +424,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ECB), std::string("Threefish"), std::string("Exception handling failure! -ME16"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ECB), std::string("Exception handling failure! -ME16"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -444,7 +444,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ICM), std::string("Threefish"), std::string("Exception handling failure! -ME17"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ICM), std::string("Exception handling failure! -ME17"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -464,7 +464,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::OFB), std::string("Threefish"), std::string("Exception handling failure! -ME18"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::OFB), std::string("Exception handling failure! -ME18"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -486,7 +486,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CBC), std::string("Threefish"), std::string("Exception handling failure! -ME19"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CBC), std::string("Exception handling failure! -ME19"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -506,7 +506,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CFB), std::string("Threefish"), std::string("Exception handling failure! -ME20"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CFB), std::string("Exception handling failure! -ME20"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -526,7 +526,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CTR), std::string("Threefish"), std::string("Exception handling failure! -ME21"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CTR), std::string("Exception handling failure! -ME21"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -546,7 +546,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ICM), std::string("Threefish"), std::string("Exception handling failure! -ME23"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ICM), std::string("Exception handling failure! -ME23"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -566,7 +566,7 @@ namespace Test
 
 			cpr.Initialize(true, kp);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::OFB), std::string("Threefish"), std::string("Exception handling failure! -ME24"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::OFB), std::string("Exception handling failure! -ME24"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -589,7 +589,7 @@ namespace Test
 			cpr.Initialize(true, kp);
 			cpr.ParallelMaxDegree(9999);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CBC), std::string("Threefish"), std::string("Exception handling failure! -ME25"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CBC), std::string("Exception handling failure! -ME25"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -610,7 +610,7 @@ namespace Test
 			cpr.Initialize(true, kp);
 			cpr.ParallelMaxDegree(9999);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CFB), std::string("Threefish"), std::string("Exception handling failure! -ME26"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::CFB), std::string("Exception handling failure! -ME26"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -631,7 +631,7 @@ namespace Test
 			cpr.Initialize(true, kp);
 			cpr.ParallelMaxDegree(9999);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ECB), std::string("Threefish"), std::string("Exception handling failure! -ME27"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ECB), std::string("Exception handling failure! -ME27"));
 		}
 		catch (CryptoCipherModeException const &)
 		{
@@ -652,7 +652,7 @@ namespace Test
 			cpr.Initialize(true, kp);
 			cpr.ParallelMaxDegree(9999);
 
-			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ICM), std::string("Threefish"), std::string("Exception handling failure! -ME28"));
+			throw TestException(std::string("Exception"), CipherModeConvert::ToName(CipherModes::ICM), std::string("Exception handling failure! -ME28"));
 		}
 		catch (CryptoCipherModeException const &)
 		{

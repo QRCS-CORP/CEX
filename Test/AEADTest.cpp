@@ -6,10 +6,14 @@
 
 namespace Test
 {
-	using Cipher::Block::IBlockCipher;
+	using Enumeration::AeadModes;
+	using Enumeration::AeadModeConvert;
+	using Exception::CryptoCipherModeException;
 	using Cipher::Block::Mode::EAX;
 	using Cipher::Block::Mode::GCM;
+	using Cipher::Block::IBlockCipher;
 	using Utility::IntegerTools;
+	using Cipher::SymmetricKeySize;
 
 	const std::string AeadTest::CLASSNAME = "AeadTest";
 	const std::string AeadTest::DESCRIPTION = "Authenticate Encrypt and Associated Data (AEAD) Cipher Mode Tests.";
@@ -58,61 +62,75 @@ namespace Test
 	{
 		try
 		{
-			EAX* cpr1 = new EAX(Enumeration::BlockCiphers::AES);
-			Kat(cpr1, m_key[0], m_nonce[0], m_associatedText[0], m_plainText[0], m_cipherText[0], m_expectedCode[0]);
-			Kat(cpr1, m_key[1], m_nonce[1], m_associatedText[1], m_plainText[1], m_cipherText[1], m_expectedCode[1]);
-			Kat(cpr1, m_key[2], m_nonce[2], m_associatedText[2], m_plainText[2], m_cipherText[2], m_expectedCode[2]);
-			Kat(cpr1, m_key[3], m_nonce[3], m_associatedText[3], m_plainText[3], m_cipherText[3], m_expectedCode[3]);
-			Kat(cpr1, m_key[4], m_nonce[4], m_associatedText[4], m_plainText[4], m_cipherText[4], m_expectedCode[4]);
-			Kat(cpr1, m_key[5], m_nonce[5], m_associatedText[5], m_plainText[5], m_cipherText[5], m_expectedCode[5]);
-			Kat(cpr1, m_key[6], m_nonce[6], m_associatedText[6], m_plainText[6], m_cipherText[6], m_expectedCode[6]);
-			Kat(cpr1, m_key[7], m_nonce[7], m_associatedText[7], m_plainText[7], m_cipherText[7], m_expectedCode[7]);
-			Kat(cpr1, m_key[8], m_nonce[8], m_associatedText[8], m_plainText[8], m_cipherText[8], m_expectedCode[8]);
-			Kat(cpr1, m_key[9], m_nonce[9], m_associatedText[9], m_plainText[9], m_cipherText[9], m_expectedCode[9]);
+			// test all exception handlers for correct operation
+			Exception();
+			OnProgress(std::string("AeadTest: Passed EAX and GCM exception handling tests.."));
+
+			EAX* eax1 = new EAX(Enumeration::BlockCiphers::AES);
+			Kat(eax1, m_key[0], m_nonce[0], m_associatedText[0], m_plainText[0], m_cipherText[0], m_expectedCode[0]);
+			Kat(eax1, m_key[1], m_nonce[1], m_associatedText[1], m_plainText[1], m_cipherText[1], m_expectedCode[1]);
+			Kat(eax1, m_key[2], m_nonce[2], m_associatedText[2], m_plainText[2], m_cipherText[2], m_expectedCode[2]);
+			Kat(eax1, m_key[3], m_nonce[3], m_associatedText[3], m_plainText[3], m_cipherText[3], m_expectedCode[3]);
+			Kat(eax1, m_key[4], m_nonce[4], m_associatedText[4], m_plainText[4], m_cipherText[4], m_expectedCode[4]);
+			Kat(eax1, m_key[5], m_nonce[5], m_associatedText[5], m_plainText[5], m_cipherText[5], m_expectedCode[5]);
+			Kat(eax1, m_key[6], m_nonce[6], m_associatedText[6], m_plainText[6], m_cipherText[6], m_expectedCode[6]);
+			Kat(eax1, m_key[7], m_nonce[7], m_associatedText[7], m_plainText[7], m_cipherText[7], m_expectedCode[7]);
+			Kat(eax1, m_key[8], m_nonce[8], m_associatedText[8], m_plainText[8], m_cipherText[8], m_expectedCode[8]);
+			Kat(eax1, m_key[9], m_nonce[9], m_associatedText[9], m_plainText[9], m_cipherText[9], m_expectedCode[9]);
+			delete eax1;
 			OnProgress(std::string("AeadTest: Passed EAX known answer comparison tests.."));
 
-			Stress(cpr1);
-			OnProgress(std::string("AeadTest: Passed EAX stress tests.."));
-
-			Parallel(cpr1);
-			OnProgress(std::string("AeadTest: Passed EAX parallel tests.."));
-
-			Incremental(cpr1);
+			EAX* eax2 = new EAX(Enumeration::BlockCiphers::AES);
+			Incremental(eax2);
+			delete eax2;
 			OnProgress(std::string("AeadTest: Passed EAX auto incrementing tests.."));
 
-			delete cpr1;
+			EAX* eax3 = new EAX(Enumeration::BlockCiphers::AES);
+			Parallel(eax3);
+			delete eax3;
+			OnProgress(std::string("AeadTest: Passed EAX parallel tests.."));
 
-			GCM* cpr3 = new GCM(Enumeration::BlockCiphers::AES);
-			Kat(cpr3, m_key[26], m_nonce[26], m_associatedText[26], m_plainText[26], m_cipherText[26], m_expectedCode[26]);
-			Kat(cpr3, m_key[27], m_nonce[27], m_associatedText[27], m_plainText[27], m_cipherText[27], m_expectedCode[27]);
-			Kat(cpr3, m_key[28], m_nonce[28], m_associatedText[28], m_plainText[28], m_cipherText[28], m_expectedCode[28]);
-			Kat(cpr3, m_key[29], m_nonce[29], m_associatedText[29], m_plainText[29], m_cipherText[29], m_expectedCode[29]);
-			Kat(cpr3, m_key[30], m_nonce[30], m_associatedText[30], m_plainText[30], m_cipherText[30], m_expectedCode[30]);
-			Kat(cpr3, m_key[31], m_nonce[31], m_associatedText[31], m_plainText[31], m_cipherText[31], m_expectedCode[31]);
-			Kat(cpr3, m_key[32], m_nonce[32], m_associatedText[32], m_plainText[32], m_cipherText[32], m_expectedCode[32]);
-			Kat(cpr3, m_key[33], m_nonce[33], m_associatedText[33], m_plainText[33], m_cipherText[33], m_expectedCode[33]);
-			Kat(cpr3, m_key[34], m_nonce[34], m_associatedText[34], m_plainText[34], m_cipherText[34], m_expectedCode[34]);
-			Kat(cpr3, m_key[35], m_nonce[35], m_associatedText[35], m_plainText[35], m_cipherText[35], m_expectedCode[35]);
-			Kat(cpr3, m_key[36], m_nonce[36], m_associatedText[36], m_plainText[36], m_cipherText[36], m_expectedCode[36]);
-			Kat(cpr3, m_key[37], m_nonce[37], m_associatedText[37], m_plainText[37], m_cipherText[37], m_expectedCode[37]);
-			Kat(cpr3, m_key[38], m_nonce[38], m_associatedText[38], m_plainText[38], m_cipherText[38], m_expectedCode[38]);
-			Kat(cpr3, m_key[39], m_nonce[39], m_associatedText[39], m_plainText[39], m_cipherText[39], m_expectedCode[39]);
-			Kat(cpr3, m_key[40], m_nonce[40], m_associatedText[40], m_plainText[40], m_cipherText[40], m_expectedCode[40]);
-			Kat(cpr3, m_key[41], m_nonce[41], m_associatedText[41], m_plainText[41], m_cipherText[41], m_expectedCode[41]);
-			Kat(cpr3, m_key[42], m_nonce[42], m_associatedText[42], m_plainText[42], m_cipherText[42], m_expectedCode[42]);
-			Kat(cpr3, m_key[43], m_nonce[43], m_associatedText[43], m_plainText[43], m_cipherText[43], m_expectedCode[43]);
+			EAX* eax4 = new EAX(Enumeration::BlockCiphers::AES);
+			Stress(eax4);
+			delete eax4;
+			OnProgress(std::string("AeadTest: Passed EAX stress tests.."));
+
+			GCM* gcm1 = new GCM(Enumeration::BlockCiphers::AES);
+			Kat(gcm1, m_key[10], m_nonce[10], m_associatedText[10], m_plainText[10], m_cipherText[10], m_expectedCode[10]);
+			Kat(gcm1, m_key[11], m_nonce[11], m_associatedText[11], m_plainText[11], m_cipherText[11], m_expectedCode[11]);
+			Kat(gcm1, m_key[12], m_nonce[12], m_associatedText[12], m_plainText[12], m_cipherText[12], m_expectedCode[12]);
+			Kat(gcm1, m_key[13], m_nonce[13], m_associatedText[13], m_plainText[13], m_cipherText[13], m_expectedCode[13]);
+			Kat(gcm1, m_key[14], m_nonce[14], m_associatedText[14], m_plainText[14], m_cipherText[14], m_expectedCode[14]);
+			Kat(gcm1, m_key[15], m_nonce[15], m_associatedText[15], m_plainText[15], m_cipherText[15], m_expectedCode[15]);
+			Kat(gcm1, m_key[16], m_nonce[16], m_associatedText[16], m_plainText[16], m_cipherText[16], m_expectedCode[16]);
+			Kat(gcm1, m_key[17], m_nonce[17], m_associatedText[17], m_plainText[17], m_cipherText[17], m_expectedCode[17]);
+			Kat(gcm1, m_key[18], m_nonce[18], m_associatedText[18], m_plainText[18], m_cipherText[18], m_expectedCode[18]);
+			Kat(gcm1, m_key[19], m_nonce[19], m_associatedText[19], m_plainText[19], m_cipherText[19], m_expectedCode[19]);
+			Kat(gcm1, m_key[20], m_nonce[20], m_associatedText[20], m_plainText[20], m_cipherText[20], m_expectedCode[20]);
+			Kat(gcm1, m_key[21], m_nonce[21], m_associatedText[21], m_plainText[21], m_cipherText[21], m_expectedCode[21]);
+			Kat(gcm1, m_key[22], m_nonce[22], m_associatedText[22], m_plainText[22], m_cipherText[22], m_expectedCode[22]);
+			Kat(gcm1, m_key[23], m_nonce[23], m_associatedText[23], m_plainText[23], m_cipherText[23], m_expectedCode[23]);
+			Kat(gcm1, m_key[24], m_nonce[24], m_associatedText[24], m_plainText[24], m_cipherText[24], m_expectedCode[24]);
+			Kat(gcm1, m_key[25], m_nonce[25], m_associatedText[25], m_plainText[25], m_cipherText[25], m_expectedCode[25]);
+			Kat(gcm1, m_key[26], m_nonce[26], m_associatedText[26], m_plainText[26], m_cipherText[26], m_expectedCode[26]);
+			Kat(gcm1, m_key[27], m_nonce[27], m_associatedText[27], m_plainText[27], m_cipherText[27], m_expectedCode[27]);
+			delete gcm1;
 			OnProgress(std::string("AeadTest: Passed GCM known answer comparison tests.."));
 
-			Stress(cpr3);
-			OnProgress(std::string("AeadTest: Passed GCM stress tests.."));
-
-			Parallel(cpr3);
-			OnProgress(std::string("AeadTest: Passed GCM parallel tests.."));
-
-			Incremental(cpr3);
+			GCM* gcm2 = new GCM(Enumeration::BlockCiphers::AES);
+			Incremental(gcm2);
+			delete gcm2;
 			OnProgress(std::string("AeadTest: Passed GCM auto incrementing tests.."));
 
-			delete cpr3;
+			GCM* gcm3 = new GCM(Enumeration::BlockCiphers::AES);
+			Parallel(gcm3);
+			delete gcm3;
+			OnProgress(std::string("AeadTest: Passed GCM parallel tests.."));
+
+			GCM* gcm4 = new GCM(Enumeration::BlockCiphers::AES);
+			Stress(gcm4);
+			delete gcm4;
+			OnProgress(std::string("AeadTest: Passed GCM stress tests.."));
 
 			return SUCCESS;
 		}
@@ -130,10 +148,525 @@ namespace Test
 		}
 	}
 
+	void AeadTest::Exception()
+	{
+		// test every modes enumeration constructors for invalid block-cipher type //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::None);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Exception handling failure! -AE1"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::None);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::GCM), std::string("Exception handling failure! -AE2"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test every modes pointer constructor for invalid cipher //
+
+		try
+		{
+			EAX cpr(nullptr);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Exception handling failure! -AE3"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(nullptr);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::GCM), std::string("Exception handling failure! -AE4"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test every modes initialization with an invalid key size //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize() + 1);
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+
+			cpr.Initialize(true, kp);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE5"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize() + 1);
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+
+			cpr.Initialize(true, kp);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::GCM), std::string("Threefish"), std::string("Exception handling failure! -AE6"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test each modes initialization with an invalid nonce size //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize() - 1);
+			SymmetricKey kp(key, nonce);
+
+			cpr.Initialize(true, kp);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE7"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(0);
+			SymmetricKey kp(key, nonce);
+
+			cpr.Initialize(true, kp);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::GCM), std::string("Threefish"), std::string("Exception handling failure! -AE8"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test each mode for invalid parallel options //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+
+			cpr.Initialize(true, kp);
+			cpr.ParallelMaxDegree(9999);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+
+			cpr.Initialize(true, kp);
+			cpr.ParallelMaxDegree(9999);
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::GCM), std::string("Threefish"), std::string("Exception handling failure! -AE10"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test each mode for uninitialized finalize call //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			std::vector<byte> tag(0);
+
+			// call finalize on an uninitialized cipher
+			tag.resize(cpr.MaxTagSize());
+			cpr.Finalize(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			std::vector<byte> tag(0);
+
+			// call finalize on an uninitialized cipher
+			tag.resize(cpr.MaxTagSize());
+			cpr.Finalize(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test each mode for invalid tag size //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> tag(0);
+
+			// use an invalid mac-tag size when calling finalize
+			tag.resize(1);
+			cpr.Initialize(true, kp);
+			cpr.Finalize(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> tag(0);
+
+			// use an invalid mac-tag size when calling finalize
+			tag.resize(1);
+			cpr.Initialize(true, kp);
+			cpr.Finalize(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test each mode uninitialized associated data calls //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			std::vector<byte> aad(16);
+
+			// set associated data on an uninitialized cipher
+			cpr.SetAssociatedData(aad, 0, aad.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			std::vector<byte> aad(16);
+
+			// set associated data on an uninitialized cipher
+			cpr.SetAssociatedData(aad, 0, aad.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test overlapping set associated data calls //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> aad(16);
+
+			cpr.Initialize(true, kp);
+			// set associated data for this stream
+			cpr.SetAssociatedData(aad, 0, aad.size());
+			// set associated data again, without calling finalize to reset the state
+			cpr.SetAssociatedData(aad, 0, aad.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> aad(16);
+
+			cpr.Initialize(true, kp);
+			// set associated data for this stream
+			cpr.SetAssociatedData(aad, 0, aad.size());
+			// set associated data again, without calling finalize to reset the state
+			cpr.SetAssociatedData(aad, 0, aad.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test uninitialized verify call //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			std::vector<byte> tag(cpr.MaxTagSize());
+
+			// call verify without initializing or processing data
+			cpr.Verify(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			std::vector<byte> tag(cpr.MaxTagSize());
+
+			// call verify without initializing or processing data
+			cpr.Verify(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test illegal verify call in encrypt operation mode  //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> tag(cpr.MaxTagSize());
+
+			// initialize for encryption
+			cpr.Initialize(true, kp);
+			// call verify in wrong operation mode
+			cpr.Verify(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> tag(cpr.MaxTagSize());
+
+			// initialize for encryption
+			cpr.Initialize(true, kp);
+			// call verify in wrong operation mode
+			cpr.Verify(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test verify call with invalid tag size  //
+
+		try
+		{
+			EAX cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> inp(cpr.BlockSize());
+			std::vector<byte> otp(cpr.BlockSize());
+			std::vector<byte> tag(1);
+
+			// initialize for decryption
+			cpr.Initialize(false, kp);
+			cpr.Transform(inp, 0, otp, 0, inp.size());
+			// the tag is sized too small
+			cpr.Verify(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			GCM cpr(Enumeration::BlockCiphers::AES);
+			SymmetricKeySize ks = cpr.LegalKeySizes()[0];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> nonce(ks.NonceSize());
+			SymmetricKey kp(key, nonce);
+			std::vector<byte> inp(cpr.BlockSize());
+			std::vector<byte> otp(cpr.BlockSize());
+			std::vector<byte> tag(1);
+
+			// initialize for decryption
+			cpr.Initialize(false, kp);
+			cpr.Transform(inp, 0, otp, 0, inp.size());
+			// the tag is sized too small
+			cpr.Verify(tag, 0, tag.size());
+
+			throw TestException(std::string("Exception"), AeadModeConvert::ToName(AeadModes::EAX), std::string("Threefish"), std::string("Exception handling failure! -AE9"));
+		}
+		catch (CryptoCipherModeException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+	}
+
 	void AeadTest::Kat(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
 		std::vector<byte> &CipherText, std::vector<byte> &MacCode)
 	{
-		Cipher::SymmetricKey kp(Key, Nonce);
+		SymmetricKey kp(Key, Nonce);
 		Cipher->Initialize(true, kp);
 
 		if (AssociatedText.size() != 0)
@@ -195,7 +728,7 @@ namespace Test
 		std::vector<byte> enc1(80);
 
 		// get base value
-		Cipher::SymmetricKey kp1(key, nonce);
+		SymmetricKey kp1(key, nonce);
 		Cipher->Initialize(true, kp1);
 		// test persisted ad
 		Cipher->PreserveAD() = true;
@@ -207,7 +740,7 @@ namespace Test
 		std::vector<byte> enc2(80);
 		// decrement counter by 10
 		nonce[nonce.size() - 1] -= 10;
-		Cipher::SymmetricKey kp2(key, nonce);
+		SymmetricKey kp2(key, nonce);
 		// set to auto increment, with nonce auto-incremented post finalize, last run should equal first output
 		Cipher->AutoIncrement() = true;
 		Cipher->Initialize(true, kp2);
@@ -244,7 +777,7 @@ namespace Test
 		std::vector<byte> enc1;
 		std::vector<byte> enc2;
 		std::vector<byte> key(32);
-		std::vector<Cipher::SymmetricKeySize> keySizes = Cipher->LegalKeySizes();
+		std::vector<SymmetricKeySize> keySizes = Cipher->LegalKeySizes();
 		std::vector<byte> nonce(keySizes[0].NonceSize());
 		std::vector<byte> assoc(16);
 		Prng::SecureRandom rng;
@@ -260,7 +793,7 @@ namespace Test
 			rng.Generate(nonce);
 			rng.Generate(key);
 			rng.Generate(assoc);
-			Cipher::SymmetricKey kp(key, nonce);
+			SymmetricKey kp(key, nonce);
 
 			// parallel encryption mode
 			enc1.resize(dlen + Cipher->MaxTagSize());
@@ -319,7 +852,7 @@ namespace Test
 
 	void AeadTest::Stress(IAeadMode* Cipher)
 	{
-		Cipher::SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
+		SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
 		std::vector<byte> data;
 		std::vector<byte> dec;
 		std::vector<byte> enc;
@@ -340,7 +873,7 @@ namespace Test
 			rng.Generate(nonce);
 			rng.Generate(key);
 			rng.Generate(assoc);
-			Cipher::SymmetricKey kp(key, nonce);
+			SymmetricKey kp(key, nonce);
 
 			enc.resize(dlen + Cipher->MaxTagSize());
 			Cipher->Initialize(true, kp);
@@ -378,23 +911,6 @@ namespace Test
 			std::string("5FFF20CAFAB119CA2FC73549E20F5B0D"),
 			std::string("A4A4782BCFFD3EC5E7EF6D8C34A56123"),
 			std::string("8395FCF1E95BEBD697BD010BC766AAC3"),
-			//ocb
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
 			// gcm
 			std::string("00000000000000000000000000000000"),
 			std::string("00000000000000000000000000000000"),
@@ -415,7 +931,7 @@ namespace Test
 			std::string("FEFFE9928665731C6D6A8F9467308308FEFFE9928665731C6D6A8F9467308308"),
 			std::string("FEFFE9928665731C6D6A8F9467308308FEFFE9928665731C6D6A8F9467308308")
 		};
-		HexConverter::Decode(key, 44, m_key);
+		HexConverter::Decode(key, 28, m_key);
 
 		const std::vector<std::string> nonce =
 		{
@@ -430,23 +946,6 @@ namespace Test
 			std::string("DDE59B97D722156D4D9AFF2BC7559826"),
 			std::string("B781FCF2F75FA5A8DE97A9CA48E522EC"),
 			std::string("22E7ADD93CFC6393C57EC0B3C17D6B44"),
-			// ocb
-			std::string("BBAA99887766554433221100"),
-			std::string("BBAA99887766554433221101"),
-			std::string("BBAA99887766554433221102"),
-			std::string("BBAA99887766554433221103"),
-			std::string("BBAA99887766554433221104"),
-			std::string("BBAA99887766554433221105"),
-			std::string("BBAA99887766554433221106"),
-			std::string("BBAA99887766554433221107"),
-			std::string("BBAA99887766554433221108"),
-			std::string("BBAA99887766554433221109"),    
-			std::string("BBAA9988776655443322110A"),
-			std::string("BBAA9988776655443322110B"),
-			std::string("BBAA9988776655443322110C"),
-			std::string("BBAA9988776655443322110D"),
-			std::string("BBAA9988776655443322110E"),
-			std::string("BBAA9988776655443322110F"),
 			// gcm
 			std::string("000000000000000000000000"),
 			std::string("000000000000000000000000"),
@@ -467,7 +966,7 @@ namespace Test
 			std::string("CAFEBABEFACEDBAD"),
 			std::string("9313225DF88406E555909C5AFF5269AA6A7A9538534F7DA1E4C303D2A318A728C3C0C95156809539FCF0E2429A6B525416AEDBF5A0DE6A57A637B39B")
 		};
-		HexConverter::Decode(nonce, 44, m_nonce);
+		HexConverter::Decode(nonce, 28, m_nonce);
 
 		const std::vector<std::string> associated =
 		{
@@ -482,23 +981,6 @@ namespace Test
 			std::string("54B9F04E6A09189A"),
 			std::string("899A175897561D7E"),
 			std::string("126735FCC320D25A"),
-			// ocb
-			std::string(""),
-			std::string("0001020304050607"),
-			std::string("0001020304050607"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F1011121314151617"),
-			std::string("000102030405060708090A0B0C0D0E0F1011121314151617"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
-			std::string(""),
 			// gcm
 			std::string(""),
 			std::string(""),
@@ -519,7 +1001,7 @@ namespace Test
 			std::string("FEEDFACEDEADBEEFFEEDFACEDEADBEEFABADDAD2"),
 			std::string("FEEDFACEDEADBEEFFEEDFACEDEADBEEFABADDAD2")
 		};
-		HexConverter::Decode(associated, 44, m_associatedText);
+		HexConverter::Decode(associated, 28, m_associatedText);
 
 		const std::vector<std::string> plain =
 		{
@@ -534,23 +1016,6 @@ namespace Test
 			std::string("1BDA122BCE8A8DBAF1877D962B8592DD2D56"),
 			std::string("6CF36720872B8513F6EAB1A8A44438D5EF11"),
 			std::string("CA40D7446E545FFAED3BD12A740A659FFBBB3CEAB7"),
-			// ocb
-			std::string(""),
-			std::string("0001020304050607"),
-			std::string(""),
-			std::string("0001020304050607"),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F"),
-			std::string("000102030405060708090A0B0C0D0E0F1011121314151617"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F1011121314151617"),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
-			std::string(""),
-			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
 			// gcm
 			std::string(""),
 			std::string("00000000000000000000000000000000"),
@@ -571,7 +1036,7 @@ namespace Test
 			std::string("D9313225F88406E5A55909C5AFF5269A86A7A9531534F7DA2E4C303D8A318A721C3C0C95956809532FCF0E2449A6B525B16AEDF5AA0DE657BA637B39"),
 			std::string("D9313225F88406E5A55909C5AFF5269A86A7A9531534F7DA2E4C303D8A318A721C3C0C95956809532FCF0E2449A6B525B16AEDF5AA0DE657BA637B39")
 		};
-		HexConverter::Decode(plain, 44, m_plainText);
+		HexConverter::Decode(plain, 28, m_plainText);
 
 		const std::vector<std::string> cipher =
 		{
@@ -586,23 +1051,6 @@ namespace Test
 			std::string("2EC47B2C4954A489AFC7BA4897EDCDAE8CC33B60450599BD02C96382902AEF7F832A"),
 			std::string("0DE18FD0FDD91E7AF19F1D8EE8733938B1E8E7F6D2231618102FDB7FE55FF1991700"),
 			std::string("CB8920F87A6C75CFF39627B56E3ED197C552D295A7CFC46AFC253B4652B1AF3795B124AB6E"),
-			// ocb
-			std::string("785407BFFFC8AD9EDCC5520AC9111EE6"),
-			std::string("6820B3657B6F615A5725BDA0D3B4EB3A257C9AF1F8F03009"),
-			std::string("81017F8203F081277152FADE694A0A00"),
-			std::string("45DD69F8F5AAE72414054CD1F35D82760B2CD00D2F99BFA9"),
-			std::string("571D535B60B277188BE5147170A9A22C3AD7A4FF3835B8C5701C1CCEC8FC3358"),
-			std::string("8CF761B6902EF764462AD86498CA6B97"),
-			std::string("5CE88EC2E0692706A915C00AEB8B2396F40E1C743F52436BDF06D8FA1ECA343D"),
-			std::string("1CA2207308C87C010756104D8840CE1952F09673A448A122C92C62241051F57356D7F3C90BB0E07F"),
-			std::string("6DC225A071FC1B9F7C69F93B0F1E10DE"),
-			std::string("221BD0DE7FA6FE993ECCD769460A0AF2D6CDED0C395B1C3CE725F32494B9F914D85C0B1EB38357FF"),
-			std::string("BD6F6C496201C69296C11EFD138A467ABD3C707924B964DEAFFC40319AF5A48540FBBA186C5553C68AD9F592A79A4240"),
-			std::string("FE80690BEE8A485D11F32965BC9D2A32"),
-			std::string("2942BFC773BDA23CABC6ACFD9BFD5835BD300F0973792EF46040C53F1432BCDFB5E1DDE3BC18A5F840B52E653444D5DF"),
-			std::string("D5CA91748410C1751FF8A2F618255B68A0A12E093FF454606E59F9C1D0DDC54B65E8628E568BAD7AED07BA06A4A69483A7035490C5769E60"),
-			std::string("C5CD9D1850C141E358649994EE701B68"),
-			std::string("4412923493C57D5DE0D700F753CCE0D1D2D95060122E9F15A5DDBFC5787E50B5CC55EE507BCB084E479AD363AC366B95A98CA5F3000B1479"),
 			// gcm
 			std::string("58E2FCCEFA7E3061367F1D57A4E7455A"),
 			std::string("0388DACE60B6A392F328C2B971B2FE78AB6E47D42CEC13BDF53A67B21257BDDF"),
@@ -623,7 +1071,7 @@ namespace Test
 			std::string("C3762DF1CA787D32AE47C13BF19844CBAF1AE14D0B976AFAC52FF7D79BBA9DE0FEB582D33934A4F0954CC2363BC73F7862AC430E64ABE499F47C9B1F3A337DBF46A792C45E454913FE2EA8F2"),
 			std::string("5A8DEF2F0C9E53F1F75D7853659E2A20EEB2B22AAFDE6419A058AB4F6F746BF40FC0C3B780F244452DA3EBF1C5D82CDEA2418997200EF82E44AE7E3FA44A8266EE1C8EB0C8B5D4CF5AE9F19A")
 		};
-		HexConverter::Decode(cipher, 44, m_cipherText);
+		HexConverter::Decode(cipher, 28, m_cipherText);
 
 		const std::vector<std::string> code =
 		{
@@ -638,23 +1086,6 @@ namespace Test
 			std::string("3B60450599BD02C96382902AEF7F832A"),
 			std::string("E7F6D2231618102FDB7FE55FF1991700"),
 			std::string("CFC46AFC253B4652B1AF3795B124AB6E"),
-			// ocb
-			std::string("785407BFFFC8AD9EDCC5520AC9111EE6"),
-			std::string("5725BDA0D3B4EB3A257C9AF1F8F03009"),
-			std::string("81017F8203F081277152FADE694A0A00"),
-			std::string("14054CD1F35D82760B2CD00D2F99BFA9"),
-			std::string("3AD7A4FF3835B8C5701C1CCEC8FC3358"),
-			std::string("8CF761B6902EF764462AD86498CA6B97"),
-			std::string("F40E1C743F52436BDF06D8FA1ECA343D"),
-			std::string("C92C62241051F57356D7F3C90BB0E07F"),
-			std::string("6DC225A071FC1B9F7C69F93B0F1E10DE"),
-			std::string("E725F32494B9F914D85C0B1EB38357FF"),
-			std::string("40FBBA186C5553C68AD9F592A79A4240"),
-			std::string("FE80690BEE8A485D11F32965BC9D2A32"),
-			std::string("B5E1DDE3BC18A5F840B52E653444D5DF"),
-			std::string("ED07BA06A4A69483A7035490C5769E60"),
-			std::string("C5CD9D1850C141E358649994EE701B68"),
-			std::string("479AD363AC366B95A98CA5F3000B1479"),
 			// gcm
 			std::string("58E2FCCEFA7E3061367F1D57A4E7455A"),
 			std::string("AB6E47D42CEC13BDF53A67B21257BDDF"),
@@ -675,7 +1106,7 @@ namespace Test
 			std::string("3A337DBF46A792C45E454913FE2EA8F2"),
 			std::string("A44A8266EE1C8EB0C8B5D4CF5AE9F19A")
 		};
-		HexConverter::Decode(code, 44, m_expectedCode);
+		HexConverter::Decode(code, 28, m_expectedCode);
 		/*lint -restore */
 	}
 

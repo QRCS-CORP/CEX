@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An Encrypt and Authenticate AEAD Block Cipher Mode  
+<p>EAX: An Encrypt and Authenticate AEAD Block Cipher Mode  
  <a href="class_e_a_x.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_e_a_x_8h_source.html">EAX.h</a>&gt;</code></p>
@@ -152,7 +152,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ada22f030127e5c3bc0f8fc6d8a600956"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Persist a one-time associated data for the entire session.  <a href="#ada22f030127e5c3bc0f8fc6d8a600956">More...</a><br /></td></tr>
 <tr class="separator:ada22f030127e5c3bc0f8fc6d8a600956"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab8a643c16f3f3812849580a98ba6584"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#aab8a643c16f3f3812849580a98ba6584">Tag</a> () override</td></tr>
-<tr class="memdesc:aab8a643c16f3f3812849580a98ba6584"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Returns the full finalized MAC code value array  <a href="#aab8a643c16f3f3812849580a98ba6584">More...</a><br /></td></tr>
+<tr class="memdesc:aab8a643c16f3f3812849580a98ba6584"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Returns the finalized MAC tag vector  <a href="#aab8a643c16f3f3812849580a98ba6584">More...</a><br /></td></tr>
 <tr class="separator:aab8a643c16f3f3812849580a98ba6584"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0379845160e92db232961d5358f93ad0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#a0379845160e92db232961d5358f93ad0">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:a0379845160e92db232961d5358f93ad0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a single block of bytes.  <a href="#a0379845160e92db232961d5358f93ad0">More...</a><br /></td></tr>
@@ -167,9 +167,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a54d5555ecc39f163be47e54f63cff6f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="#a54d5555ecc39f163be47e54f63cff6f7">More...</a><br /></td></tr>
 <tr class="separator:a54d5555ecc39f163be47e54f63cff6f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac59751c47da026569f346a3087cebaee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#ac59751c47da026569f346a3087cebaee">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length) override</td></tr>
-<tr class="memdesc:ac59751c47da026569f346a3087cebaee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output array. <br />
+<tr class="memdesc:ac59751c47da026569f346a3087cebaee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output standard-vector. <br />
   <a href="#ac59751c47da026569f346a3087cebaee">More...</a><br /></td></tr>
 <tr class="separator:ac59751c47da026569f346a3087cebaee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9d842b20fdfe06bac88792af4fa5068"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#aa9d842b20fdfe06bac88792af4fa5068">Finalize</a> (SecureVector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length) override</td></tr>
+<tr class="memdesc:aa9d842b20fdfe06bac88792af4fa5068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output secure-vector. <br />
+  <a href="#aa9d842b20fdfe06bac88792af4fa5068">More...</a><br /></td></tr>
+<tr class="separator:aa9d842b20fdfe06bac88792af4fa5068"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3af23b77851c0a145ebac868f63766ea"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#a3af23b77851c0a145ebac868f63766ea">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
 <tr class="memdesc:a3af23b77851c0a145ebac868f63766ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance.  <a href="#a3af23b77851c0a145ebac868f63766ea">More...</a><br /></td></tr>
 <tr class="separator:a3af23b77851c0a145ebac868f63766ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,16 +181,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aa6ed3a56f0f453cd4c3f3b4a4c7557e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#aa6ed3a56f0f453cd4c3f3b4a4c7557e7">More...</a><br /></td></tr>
 <tr class="separator:aa6ed3a56f0f453cd4c3f3b4a4c7557e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4b303a623b49f0b8771e5bedcab5d96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#aa4b303a623b49f0b8771e5bedcab5d96">SetAssociatedData</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length) override</td></tr>
-<tr class="memdesc:aa4b303a623b49f0b8771e5bedcab5d96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the authentication generator. <br />
+<tr class="memdesc:aa4b303a623b49f0b8771e5bedcab5d96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the nessage authentication code generator. <br />
   <a href="#aa4b303a623b49f0b8771e5bedcab5d96">More...</a><br /></td></tr>
 <tr class="separator:aa4b303a623b49f0b8771e5bedcab5d96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57929a80df2c614dffc2d5f6dcc2ddd8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#a57929a80df2c614dffc2d5f6dcc2ddd8">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length) override</td></tr>
-<tr class="memdesc:a57929a80df2c614dffc2d5f6dcc2ddd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset parameters.  <a href="#a57929a80df2c614dffc2d5f6dcc2ddd8">More...</a><br /></td></tr>
+<tr class="memdesc:a57929a80df2c614dffc2d5f6dcc2ddd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset and length parameters.  <a href="#a57929a80df2c614dffc2d5f6dcc2ddd8">More...</a><br /></td></tr>
 <tr class="separator:a57929a80df2c614dffc2d5f6dcc2ddd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbf46607bb416548b7c381dcae30348d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#afbf46607bb416548b7c381dcae30348d">Verify</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length) override</td></tr>
-<tr class="memdesc:afbf46607bb416548b7c381dcae30348d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input array. <br />
+<tr class="memdesc:afbf46607bb416548b7c381dcae30348d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input standard-vector. <br />
   <a href="#afbf46607bb416548b7c381dcae30348d">More...</a><br /></td></tr>
 <tr class="separator:afbf46607bb416548b7c381dcae30348d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fa46779c4fe897659a8bb2cbf576eb6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_a_x.html#a3fa46779c4fe897659a8bb2cbf576eb6">Verify</a> (const SecureVector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length) override</td></tr>
+<tr class="memdesc:a3fa46779c4fe897659a8bb2cbf576eb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input secure-vector. <br />
+  <a href="#a3fa46779c4fe897659a8bb2cbf576eb6">More...</a><br /></td></tr>
+<tr class="separator:a3fa46779c4fe897659a8bb2cbf576eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_aead_mode"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_aead_mode')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_aead_mode.html">IAeadMode</a></td></tr>
 <tr class="memitem:a42066de39d76426fbb7bba804b60667e inherit pub_methods_class_i_aead_mode"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a42066de39d76426fbb7bba804b60667e">IAeadMode</a> (const <a class="el" href="class_i_aead_mode.html">IAeadMode</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a42066de39d76426fbb7bba804b60667e inherit pub_methods_class_i_aead_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_aead_mode.html#a42066de39d76426fbb7bba804b60667e">More...</a><br /></td></tr>
@@ -215,12 +223,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3a3ec68d89511d48a38aff60937f9e67 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An Encrypt and Authenticate AEAD Block Cipher Mode </p>
-<p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_e_a_x.html">EAX</a> cipher(BlockCiphers::AES);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>, [Info]));</div><div class="line"><span class="comment">// encrypt one block</span></div><div class="line"><span class="keywordtype">size_t</span> encLen = cipher.BlockSize();</div><div class="line">cipher.Transform(Input, 0, Output, 0, encLen);</div><div class="line"><span class="comment">// append the mac code to the output</span></div><div class="line">cipher.Finalize(Output, encLen);</div></div><!-- fragment --> <p>Decrypting a block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_e_a_x.html">EAX</a> cipher(BlockCiphers::AES);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>, [Associated Data]));</div><div class="line"><span class="comment">// calculate offset; mac code should always be last block after ciphertext</span></div><div class="line"><span class="keywordtype">size_t</span> decLen = Input.size() - cipher.BlockSize();</div><div class="line"><span class="comment">// decrypt a block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0, decLen);</div><div class="line"><span class="comment">// generate the internal mac code and compare it</span></div><div class="line"><span class="keywordflow">if</span> (!cipher.Verify(Input, decLen))</div><div class="line">    <span class="keywordflow">throw</span>;</div></div><!-- fragment --> <p><b>Overview:</b> </p>
-<p>The EAX Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode. <br />
-EAX is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. <br />
-It also has provable security, dependant on the block cipher used by the mode. <br />
-EAX first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a CBC-based MAC function used for data authentication. <br />
+<div class="textblock"><p>EAX: An Encrypt and Authenticate AEAD Block Cipher Mode </p>
+<p>Encrypting a 1kb block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_e_a_x.html">EAX</a> cipher(BlockCiphers::AES);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>, [Info]));</div><div class="line"><span class="comment">// encrypt 1kb</span></div><div class="line">cipher.Transform(Input, 0, Output, 0, 1024);</div><div class="line"><span class="comment">// finalize the mac, and append the code to the end of the output vector</span></div><div class="line">cipher.Finalize(Output, 1024);</div></div><!-- fragment --> <p>Decrypting a 1kb block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_e_a_x.html">EAX</a> cipher(BlockCiphers::AES);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>, [Info]));</div><div class="line"><span class="comment">// decrypt 1kb</span></div><div class="line">cipher.Transform(Input, 0, Output, 0, 1024);</div><div class="line"></div><div class="line"><span class="comment">// The verify call finalizes the mac and compares the internal code </span></div><div class="line"><span class="comment">// to the one appended to the cipher-text input vector.</span></div><div class="line"><span class="comment">// If the call returns false, authentication has failed.</span></div><div class="line"><span class="comment">// This can also be done manually, by calling the Finalize function to generate the MAC tag,</span></div><div class="line"><span class="comment">// and comparing it to the tag attached to the cipher-text</span></div><div class="line"><span class="keywordflow">if</span> (!cipher.Verify(Input, decLen))</div><div class="line">{</div><div class="line">    <span class="keywordflow">throw</span>;</div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>The EAX Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated block-cipher mode. <br />
+EAX is an online mode, meaning it can stream data of any length, without needing to know the data size in advance. <br />
+It also has provable security, the security-level dependant on the block cipher used by the mode. <br />
+EAX first encrypts the plaintext using a block-cipher counter mode (CTR), then processes that cipher-text using a CBC-based MAC function (CMAC) used for data authentication. <br />
 When encryption is completed, the MAC code is generated and appended to the output stream using the Finalize(Output, Offset) call. <br />
 Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text. <br />
 The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process.</p>
@@ -233,27 +241,27 @@ For i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T. <br />
 For i ...n (T = Mk(Ci), Pi = D(Ci)). PT = P||T.</p>
 <p><b>Multi-Threading:</b> </p>
 <p>The encryption and decryption functions of the EAX mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. <br />
-The EAX parallel mode also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions. <br />
-Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems. The cipher transform is parallelizable, however the authentication pass, (CMAC), is processed sequentially.</p>
+The EAX parallel mode also leverages SIMD instructions to 'double parallelize' those segments. <br />
+An input block assigned to a thread uses SIMD instructions to decrypt/encrypt 4, 8, or 16 blocks in parallel per cycle, depending on which framework is runtime available, AVX, AVX2, or AVX512 instructions. <br />
+Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems, this can be disabled through the ParallelProfile accessor function. <br />
+The cipher transform is parallelizable, however the authentication pass, (CMAC), is processed sequentially.</p>
 <p>Implementation Notes: </p><ul>
 <li>
 EAX is an AEAD authenticated mode, additional data such as packet header information can be added to the authentication process. </li>
 <li>
 Additional data can be added using the SetAssociatedData(Input, Offset, Length) call, and during Initialize, using the Info parameter of the SymmetricKey. </li>
 <li>
-Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output array in either encryption or decryption operation mode. </li>
+Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output vector in either encryption or decryption operation mode. </li>
 <li>
 The Verify(Input, Offset, Length) function can be used to compare the MAC code embedded with the cipher-text to the internal MAC code generated after a Decryption cycle. </li>
 <li>
-Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and multi-threaded. </li>
+Encryption and decryption can both be pipelined (AVX/AVX2/AVX512), and multi-threaded with any even number of threads up to the processors total [virtual] processing cores. </li>
 <li>
 If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized. </li>
 <li>
-ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize(). </li>
+The recommended parallel input block-size ParallelBlockSize(), is calculated automatically based on the processor(s) L1/L2 cache sizes, the algorithms code-cache requirements, and available memory.//, this property can be user defined, and must be evenly divisible by ParallelMinimumSize(). </li>
 <li>
-The ParallelBlockSize() can be changed through the ParallelProfile() property </li>
-<li>
-Parallel block calculation ex. <code>ParallelBlockSize = N - (N % .ParallelMinimumSize);</code> </li>
+The ParallelBlockSize() can be changed through the ParallelProfile() property, this value can be user defined, but must be evenly divisible by ParallelMinimumSize(). </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -452,7 +460,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </div><div class="memdoc">
 
 <p>Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called. </p>
-<p>Treats the Nonce value loaded during Initialize as a monotonic counter; incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. If set to false, requires a re-key after each finalizer cycle.</p>
+<p>Treats the Nonce value loaded during Initialize as a monotonic counter; incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. If set to false, requires a re-key after each finalization cycle.</p>
 
 <p>Implements <a class="el" href="class_i_aead_mode.html#a945fb5422ae3a0b5821ca6ab7d4dcef1">IAeadMode</a>.</p>
 
@@ -554,8 +562,8 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Decrypts one block of bytes beginning at a zero index. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of encrypted bytes</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of decrypted bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of plain-text bytes</td></tr>
   </table>
   </dd>
 </dl>
@@ -614,10 +622,10 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Decrypts one block of bytes using the designated offsets. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of encrypted bytes</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of decrypted bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
@@ -664,8 +672,8 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Encrypts one block of bytes beginning at a zero index. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of plain text bytes</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of encrypted bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of cipher-text bytes</td></tr>
   </table>
   </dd>
 </dl>
@@ -724,10 +732,10 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>Encrypts one block of bytes using the designated offsets. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of plain text bytes</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of encrypted bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of plain-text bytes</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of cipher-text bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
@@ -795,7 +803,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </div>
 </div>
 <a id="ac59751c47da026569f346a3087cebaee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac59751c47da026569f346a3087cebaee">&#9670;&nbsp;</a></span>Finalize()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac59751c47da026569f346a3087cebaee">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -834,26 +842,89 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Calculate the MAC code (Tag) and copy it to the Output array. <br />
+<p>Calculate the MAC code (Tag) and copy it to the Output standard-vector. <br />
  </p>
-<p>The output array must be of sufficient length to receive the MAC code. This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
+<p>The output vector must be of sufficient length to receive the MAC code. This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used, unless AutoIncrement is enabled.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output array that receives the authentication code</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of MAC code bytes to write to the output array. </td></tr>
+    <tr><td class="paramname">Output</td><td>The output standard-vector that receives the authentication code</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of MAC code bytes to write to the output vector. </td></tr>
   </table>
   </dd>
 </dl>
-<p>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</p>
+<p>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized, or output array is too small</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized, or output vector is too small</td></tr>
   </table>
   </dd>
 </dl>
 
 <p>Implements <a class="el" href="class_i_aead_mode.html#ab3a347bdbe07cd32ca3e7867add49b01">IAeadMode</a>.</p>
+
+</div>
+</div>
+<a id="aa9d842b20fdfe06bac88792af4fa5068"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9d842b20fdfe06bac88792af4fa5068">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void EAX::Finalize </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculate the MAC code (Tag) and copy it to the Output secure-vector. <br />
+ </p>
+<p>The output vector must be of sufficient length to receive the MAC code. This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output secure-vector that receives the authentication code</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of MAC code bytes to write to the output vector. </td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized, or output vector is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_aead_mode.html#add2783bc9e931c6f07370e8d08fc1376">IAeadMode</a>.</p>
 
 </div>
 </div>
@@ -895,7 +966,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <p>The legal symmetric key and nonce sizes are contained in the LegalKeySizes() property. The Info parameter of the SymmetricKey can be used as the initial associated data.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Encryption</td><td>True if cipher is used for encryption, false to decrypt</td></tr>
+    <tr><td class="paramname">Encryption</td><td>Set to true if cipher is used for encryption, false for decryption operation mode</td></tr>
     <tr><td class="paramname">Parameters</td><td>SymmetricKey containing the encryption Key and Nonce</td></tr>
   </table>
   </dd>
@@ -1316,20 +1387,20 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Add additional data to the authentication generator. <br />
+<p>Add additional data to the nessage authentication code generator. <br />
  </p>
 <p>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input. This function can only be called once per each initialization/finalization cycle.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to process</td></tr>
-    <tr><td class="paramname">Offset</td><td>Starting offset within the input array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input standard-vector of bytes to process</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset within the input vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to process</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if state has been processed</td></tr>
   </table>
   </dd>
 </dl>
@@ -1361,13 +1432,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Returns the full finalized MAC code value array </p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher has not been finalized</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Read Only: Returns the finalized MAC tag vector </p>
 
 <p>Implements <a class="el" href="class_i_aead_mode.html#ad19fd97a58a68c9f8f02bc366135abf8">IAeadMode</a>.</p>
 
@@ -1425,14 +1490,14 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Transform a length of bytes with offset parameters. </p>
+<p>Transform a length of bytes with offset and length parameters. </p>
 <p>This method processes a specified length of bytes, utilizing offsets incremented by the caller. If IsParallel() is set to true, and the length is at least ParallelBlockSize(), the transform is run in parallel processing mode. To disable parallel processing, set the ParallelOptions().IsParallel() property to false. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to transform</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of transformed bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of bytes to transform</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of transformed bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to transform</td></tr>
   </table>
   </dd>
@@ -1443,7 +1508,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </div>
 </div>
 <a id="afbf46607bb416548b7c381dcae30348d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afbf46607bb416548b7c381dcae30348d">&#9670;&nbsp;</a></span>Verify()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afbf46607bb416548b7c381dcae30348d">&#9670;&nbsp;</a></span>Verify() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1482,19 +1547,19 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </table>
 </div><div class="memdoc">
 
-<p>Generate the internal MAC code and compare it with the tag contained in the Input array. <br />
+<p>Generate the internal MAC code and compare it with the tag contained in the Input standard-vector. <br />
  </p>
 <p>This function finalizes the Decryption cycle and generates the MAC tag. The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function. Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array containing the expected authentication code</td></tr>
-    <tr><td class="paramname">Offset</td><td>Starting offset within the input array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input standard-vector containing the expected authentication code</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset within the input vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to compare. </td></tr>
   </table>
   </dd>
 </dl>
 <p>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</p>
-<dl class="section return"><dt>Returns</dt><dd>Returns false if the MAC code does not match</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if the authentication codes match</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized for decryption</td></tr>
@@ -1503,6 +1568,70 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </dl>
 
 <p>Implements <a class="el" href="class_i_aead_mode.html#affc499278bec892d22da47a3d7905527">IAeadMode</a>.</p>
+
+</div>
+</div>
+<a id="a3fa46779c4fe897659a8bb2cbf576eb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fa46779c4fe897659a8bb2cbf576eb6">&#9670;&nbsp;</a></span>Verify() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool EAX::Verify </td>
+          <td>(</td>
+          <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generate the internal MAC code and compare it with the tag contained in the Input secure-vector. <br />
+ </p>
+<p>This function finalizes the Decryption cycle and generates the MAC tag. The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function. Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input secure-vector containing the expected authentication code</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to compare. </td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</p>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if the authentication codes match</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized for decryption</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_aead_mode.html#ab645379496c11f6145266d1de4c86b65">IAeadMode</a>.</p>
 
 </div>
 </div>

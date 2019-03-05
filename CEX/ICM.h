@@ -34,7 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// An implementation of a Little-Endian Integer Counter Mode
+/// ICM: An implementation of a Little-Endian Integer Counter Mode
 /// </summary> 
 /// 
 /// <example>

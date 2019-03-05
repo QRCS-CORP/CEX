@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of a Cipher FeedBack Mode  
+<p>CFB: An implementation of a Cipher FeedBack Mode  
  <a href="class_c_f_b.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_c_f_b_8h_source.html">CFB.h</a>&gt;</code></p>
@@ -174,7 +174,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a3a3ec68d89511d48a38aff60937f9e67 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of a Cipher FeedBack Mode </p>
+<div class="textblock"><p>CFB: An implementation of a Cipher FeedBack Mode </p>
 <p>Encrypting a single block of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_c_f_b.html">CFB</a> cipher(<span class="keyword">new</span> AES(), [RegisterSize]);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>));</div><div class="line"><span class="comment">// encrypt one block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p>Decrypting using multi-threading: </p><div class="fragment"><div class="line"><a class="code" href="class_c_f_b.html">CFB</a> cipher(BlockCiphers::AES, [RegisterSize]);</div><div class="line"><span class="comment">// enable parallel and set the parallel input block size</span></div><div class="line">cipher.IsParallel() = <span class="keyword">true</span>;</div><div class="line"><span class="comment">// calculated automatically based on cache size, but overridable</span></div><div class="line">cipher.ParallelBlockSize() = cipher.ProcessorCount() * 1600;</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, <a class="code" href="class_symmetric_key.html">SymmetricKey</a>(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>));</div><div class="line"><span class="comment">// decrypt one parallel sized block</span></div><div class="line">cipher.Transform(Input, 0, Output, 0);</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>The Cipher FeedBack mode wraps a symmetric block-cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output. <br />
 Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks. <br />

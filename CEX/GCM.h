@@ -33,7 +33,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// A Galois/Counter Authenticated Block Cipher Mode
+/// GCM: A Galois/Counter Authenticated Block Cipher Mode
 /// </summary> 
 /// 
 /// <example>
@@ -42,11 +42,10 @@ NAMESPACE_MODE
 /// GCM cipher(BlockCiphers::AES);
 /// // initialize for encryption
 /// cipher.Initialize(true, SymmetricKey(Key, Nonce, [Info]));
-/// // encrypt one block
-/// size_t encLen = cipher.BlockSize();
-/// cipher.Transform(Input, 0, Output, 0, encLen);
-/// // append the mac code to the output
-/// cipher.Finalize(Output, encLen);
+/// // encrypt 1kb
+/// cipher.Transform(Input, 0, Output, 0, 1024);
+/// // finalize the mac, and append the code to the end of the output vector
+/// cipher.Finalize(Output, 1024);
 /// </code>
 /// </example>
 ///
@@ -56,27 +55,31 @@ NAMESPACE_MODE
 /// GCM cipher(BlockCiphers::AES);
 /// // initialize for decryption
 /// cipher.Initialize(false, SymmetricKey(Key, Nonce, [Info]));
-/// // calculate offset; mac code should always be last block after ciphertext
-/// size_t decLen = Input.size() - cipher.BlockSize();
-/// // decrypt a block
-/// cipher.Transform(Input, 0, Output, 0, decLen);
-/// // generate the internal mac code and compare it
+/// // decrypt 1kb
+/// cipher.Transform(Input, 0, Output, 0, 1024);
+///
+/// // The verify call finalizes the mac and compares the internal code 
+/// // to the one appended to the cipher-text input vector.
+/// // If the call returns false, authentication has failed.
+/// // This can also be done manually, by calling the Finalize function to generate the MAC tag,
+/// // and comparing it to the tag attached to the cipher-text
 /// if (!cipher.Verify(Input, decLen))
+/// {
 ///		throw;
+/// }
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>
-/// The GCM Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode. \n
+/// <para>The GCM Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated block-cipher mode. \n
 /// GCM is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. \n
-/// GCM uses a Galois Multiply function then combines the ciphertext with an authentication code to produce an authentication tag. \n
-/// A nonce is generated and XOR'd with the encrypted plain-text to create the cipher-text. \n
-/// Decryption performs these steps in reverse, creating a nonce and the cipher-text bytes through the decryption function, then adding the plain-text to a checksum. \n
+/// GCM uses a Galois Multiply function then combines the ciphertext to produce a message authentication code (Tag). \n
+/// In encryption operation mode, GCM encrypts the plaintext using a block-cipher counter mode (CTR), then processes that cipher-text using a Galois-counter message authentication code generator (GMAC). \n
+/// When encryption is completed, the MAC code is generated and appended to the output stream using the Finalize(Output, Offset) call. \n
+/// Decryption performs these steps in reverse, processing the cipher-text bytes through the GMAC function, then decrypting the data to plain-text. \n
 /// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process. \n
-/// The Finalize(Output, Offset, Length) function writes the MAC code to an output stream in either encryption or decryption operation modes.
-/// </para>
+/// The Finalize(Output, Offset, Length) function writes the MAC code to an output stream in either encryption or decryption operation modes</para>
 ///
 /// <description><B>Description:</B></description>
 /// <para><EM>Mac Legend:</EM> \n 
@@ -97,22 +100,21 @@ NAMESPACE_MODE
 ///
 /// <description><B>Multi-Threading:</B></description>
 /// <para>The encryption and decryption functions of GCM mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
-/// The GCM parallel mode also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
-/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions. \n
-/// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
-/// Sequential processing is used when the system dows not support SIMD or has only one core, or a standard an input blockis less than the parallel block size.</para>
+/// The GCM parallel mode also leverages SIMD instructions to 'double parallelize' those segments. \n
+/// An input block assigned to a thread uses SIMD instructions to decrypt/encrypt 4, 8, or 16 blocks in parallel per cycle, depending on which framework is runtime available, AVX, AVX2, or AVX512 instructions. \n
+/// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems, this can be disabled through the ParallelProfile accessor function. \n
+/// The cipher transform is parallelizable, however the authentication pass, (GMAC), is processed sequentially.</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>GCM is an AEAD authenticated mode, additional data such as packet header information can be added to the authentication process.</description></item>
-/// <item><description>Additional data can be added using the SetAssociatedData(Input, Offset, Length) call.</description></item>
-/// <item><description>Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output array in either encryption or decryption operation mode.</description></item>
+/// <item><description>Additional data can be added using the SetAssociatedData(Input, Offset, Length) call, and during Initialize, using the Info parameter of the SymmetricKey.</description></item>
+/// <item><description>Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output vector in either encryption or decryption operation mode.</description></item>
 /// <item><description>The Verify(Input, Offset, Length) function can be used to compare the MAC code embedded with the cipher-text to the internal MAC code generated after a Decryption cycle.</description></item>
-/// <item><description>Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and optionally multi-threaded.</description></item>
+/// <item><description>Encryption and decryption can both be pipelined (AVX/AVX2/AVX512), and multi-threaded with any even number of threads up to the processors total [virtual] processing cores.</description></item>
 /// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
-/// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size and available threads, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() accessor property</description></item>
-/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % ParallelMinimumSize);</c></description></item>
+/// <item><description>The recommended parallel input block-size ParallelBlockSize(), is calculated automatically based on the processor(s) L1/L2 cache sizes, the algorithms code-cache requirements, and available memory.</description></item>//, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().
+/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property, this value can be user defined, but must be evenly divisible by ParallelMinimumSize().</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -127,30 +129,15 @@ class GCM final : public IAeadMode
 private:
 
 	static const size_t BLOCK_SIZE = 16;
-	static const std::string CLASS_NAME;
 	static const size_t MAX_PRLALLOC = 100000000;
+	static const size_t MIN_NONCESIZE = 8;
 	static const size_t MIN_TAGSIZE = 12;
 
-	std::vector<byte> m_aadData;
-	bool m_aadLoaded;
-	bool m_aadPreserve;
-	size_t m_aadSize;
-	bool m_autoIncrement;
-	std::vector<byte> m_checkSum;
+	class GcmState;
+	std::unique_ptr<GcmState> m_gcmState;
 	std::unique_ptr<CTR> m_cipherMode;
-	BlockCiphers m_cipherType;
-	bool m_destroyEngine;
 	std::unique_ptr<Digest::GHASH> m_gcmHash;
-	std::vector<byte> m_gcmKey;
-	std::vector<byte> m_gcmNonce;
-	std::vector<byte> m_gcmVector;
-	bool m_isDestroyed;
-	bool m_isEncryption;
-	bool m_isFinalized;
-	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_msgSize;
-	std::vector<byte> m_msgTag;
 	ParallelOptions m_parallelProfile;
 
 public:
@@ -202,7 +189,7 @@ public:
 	/// Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called.
 	/// <para>Treats the Nonce value loaded during Initialize as a monotonic counter; 
 	/// incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. 
-	/// If set to false, requires a re-key after each finalizer cycle.</para>
+	/// If set to false, requires a re-key after each finalization cycle.</para>
 	/// </summary>
 	bool &AutoIncrement() override;
 
@@ -285,10 +272,8 @@ public:
 	bool &PreserveAD() override;
 
 	/// <summary>
-	/// Read Only: Returns the full finalized MAC code value array
+	/// Read Only: Returns the finalized MAC tag vector
 	/// </summary>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
 	const std::vector<byte> Tag() override;
 
 	//~~~Public Functions~~~//
@@ -299,8 +284,8 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of encrypted bytes</param>
-	/// <param name="Output">The output array of decrypted bytes</param>
+	/// <param name="Input">The input vector of cipher-text bytes</param>
+	/// <param name="Output">The output vector of plain-text bytes</param>
 	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -309,10 +294,10 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of encrypted bytes</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of decrypted bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of cipher-text bytes</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Output">The output vector of plain-text bytes</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
 	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
@@ -321,8 +306,8 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of plain text bytes</param>
-	/// <param name="Output">The output array of encrypted bytes</param>
+	/// <param name="Input">The input vector of plain-text bytes</param>
+	/// <param name="Output">The output vector of cipher-text bytes</param>
 	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -331,26 +316,41 @@ public:
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of plain text bytes</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of encrypted bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of plain-text bytes</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Output">The output vector of cipher-text bytes</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
 	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
-	/// Calculate the MAC code (Tag) and copy it to the Output array.
-	/// <para>The output array must be of sufficient length to receive the MAC code.
+	/// Calculate the MAC code (Tag) and copy it to the Output standard-vector.     
+	/// <para>The output vector must be of sufficient length to receive the MAC code.
+	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
+	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used, unless AutoIncrement is enabled.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output standard-vector that receives the authentication code</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
+	/// <param name="Length">The number of MAC code bytes to write to the output vector.
+	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
+	///
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
+	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+
+	/// <summary>
+	/// Calculate the MAC code (Tag) and copy it to the Output vector.
+	/// <para>The output vector must be of sufficient length to receive the MAC code.
 	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
 	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The output array that receives the authentication code</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	/// <param name="Length">The number of MAC code bytes to write to the output array.
+	/// <param name="Output">The output vector that receives the authentication code</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
+	/// <param name="Length">The number of MAC code bytes to write to the output vector.
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
 	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
-	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
+	void Finalize(SecureVector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 	/// <summary>
 	/// Initialize the Cipher instance.
@@ -358,7 +358,7 @@ public:
 	/// The Info parameter of the SymmetricKey can be used as the initial associated data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
+	/// <param name="Encryption">Set to true if cipher is used for encryption, false for decryption operation mode</param>
 	/// <param name="Parameters">SymmetricKey containing the encryption Key and Nonce</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a null or invalid Key/Nonce is used</exception>
@@ -376,58 +376,74 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
-	/// Add additional data to the authentication generator.  
+	/// Add additional data to the nessage authentication code generator.  
 	/// <para>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input. 
 	/// This function can only be called once per each initialization/finalization cycle.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of bytes to process</param>
-	/// <param name="Offset">Starting offset within the input array</param>
+	/// <param name="Input">The input standard-vector of bytes to process</param>
+	/// <param name="Offset">The starting offset within the input vector</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized</exception>
+	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
 	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 	/// <summary>
-	/// Transform a length of bytes with offset parameters. 
+	/// Transform a length of bytes with offset and length parameters. 
 	/// <para>This method processes a specified length of bytes, utilizing offsets incremented by the caller.
 	/// If IsParallel() is set to true, and the length is at least ParallelBlockSize(), the transform is run in parallel processing mode.
 	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Input">The input vector of bytes to transform</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Output">The output vector of transformed bytes</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
 	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 	/// <summary>
-	/// Generate the internal MAC code and compare it with the tag contained in the Input array.   
+	/// Generate the internal MAC code and compare it with the tag contained in the Input standard-vector.   
 	/// <para>This function finalizes the Decryption cycle and generates the MAC tag.
 	/// The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function.
 	/// Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization.
 	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array containing the expected authentication code</param>
-	/// <param name="Offset">Starting offset within the input array</param>
+	/// <param name="Input">The input standard-vector containing the expected authentication code</param>
+	/// <param name="Offset">The starting offset within the input vector</param>
 	/// <param name="Length">The number of bytes to compare.
 	/// <para>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</para></param>
 	/// 
-	/// <returns>Returns false if the MAC code does not match</returns>
+	/// <returns>Returns true if the authentication codes match</returns>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
 	bool Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
+	/// <summary>
+	/// Generate the internal MAC code and compare it with the tag contained in the Input secure-vector.   
+	/// <para>This function finalizes the Decryption cycle and generates the MAC tag.
+	/// The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function.
+	/// Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization.
+	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input secure-vector containing the expected authentication code</param>
+	/// <param name="Offset">The starting offset within the input vector</param>
+	/// <param name="Length">The number of bytes to compare.
+	/// <para>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</para></param>
+	/// 
+	/// <returns>Returns true if the authentication codes match</returns>
+	///
+	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
+	bool Verify(const SecureVector<byte> &Input, const size_t Offset, const size_t Length) override;
+
 private:
 
-	void CalculateMac();
+	void Compute();
 	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void Reset();
-	void Scope();
 };
 
 NAMESPACE_MODEEND

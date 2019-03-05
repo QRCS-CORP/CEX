@@ -10,7 +10,7 @@ namespace Test
 
 	/// <summary>
 	/// Tests the AEAD cipher modes; EAX and GCM.
-	/// <para>Tests each AEAD mode for correct operation, including KAT, parallel-mode, auto-increment, and stress tests.</para>
+	/// <para>Tests each AEAD mode for correct operation, including KAT, parallel-mode, auto-increment, exception handling, and stress tests.</para>
 	/// </summary>
 	class AeadTest final : public ITest
 	{
@@ -66,6 +66,11 @@ namespace Test
 		/// Start the tests
 		/// </summary>
 		std::string Run() override;
+
+		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
 
 		/// <summary>
 		/// Compare output with known answer vectors

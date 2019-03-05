@@ -152,7 +152,8 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 void GHASH::Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::vector<byte> &Output)
 {
 	std::array<byte, 16> tmp;
-	std::memcpy(tmp.data(), Output.data(), 16);
+
+	MemoryTools::COPY128(Output, 0, tmp, 0);
 
 	if (HAS_CMUL)
 	{
@@ -167,7 +168,7 @@ void GHASH::Permute(std::array<ulong, CMUL::CMUL_STATE_SIZE> &State, std::vector
 #endif
 	}
 
-	std::memcpy(Output.data(), tmp.data(), 16);
+	MemoryTools::COPY128(tmp, 0, Output, 0);
 }
 
 bool GHASH::HasGmul()

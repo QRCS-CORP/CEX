@@ -117,7 +117,7 @@ const bool OFB::IsInitialized()
 
 const bool OFB::IsParallel()
 {
-	return m_parallelProfile.IsParallel();
+	return false;
 }
 
 const std::vector<SymmetricKeySize> &OFB::LegalKeySizes()

@@ -34,7 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// An implementation of an Electronic CodeBook Mode
+/// ECB: An implementation of an Electronic CodeBook Mode
 /// <para>ECB is an Insecure Mode; used only for testing purposes.</para>
 /// </summary> 
 /// 

@@ -34,7 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// An implementation of a Big-Endian integer Counter Mode
+/// CTR: An implementation of a Big-Endian integer Counter Mode
 /// </summary> 
 /// 
 /// <example>

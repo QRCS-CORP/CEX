@@ -34,7 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// An implementation of a Output FeedBack Mode
+/// OFB: An implementation of a Output FeedBack Mode
 /// </summary>
 /// 
 /// <example>
