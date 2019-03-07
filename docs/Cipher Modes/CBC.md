@@ -49,7 +49,7 @@ Default constructor: default is restricted, this function has been deleted.
 ```cpp
 CBC(BlockCiphers CipherType)
 ```
-Initialize the Cipher Mode using a block-cipher type name.
+Initialize the Cipher Mode using a block-cipher enumeration type name.
  
 ```cpp
 CBC(IBlockCipher* Cipher)
