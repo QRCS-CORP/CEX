@@ -159,4 +159,4 @@ Transform a length of bytes with offset parameters.
 ## Links
 
 NIST [SP800-38A](http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf). 
-Handbook of Applied Cryptography Chapter 7: [Block Ciphers](http://cacr.uwaterloo.ca/hac/about/chap7.pdf). 
+Handbook of [Applied Cryptography](http://cacr.uwaterloo.ca/hac/about/chap7.pdf) Chapter 7: Block Ciphers. 
