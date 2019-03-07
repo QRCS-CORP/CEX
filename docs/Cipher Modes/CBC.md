@@ -157,6 +157,5 @@ void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vecto
 Transform a length of bytes with offset parameters.
 
 ## Links
-
-NIST [SP800-38A](http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf). 
-Handbook of [Applied Cryptography](http://cacr.uwaterloo.ca/hac/about/chap7.pdf) Chapter 7: Block Ciphers. 
+* NIST [SP800-38A](http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf). 
+* Handbook of [Applied Cryptography](http://cacr.uwaterloo.ca/hac/about/chap7.pdf) Chapter 7: Block Ciphers. 
