@@ -132,9 +132,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5d085bbb954b715f4a85aa077c25640f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_digest.html#a5d085bbb954b715f4a85aa077c25640f">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
 <tr class="memdesc:a5d085bbb954b715f4a85aa077c25640f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Hash value  <a href="#a5d085bbb954b715f4a85aa077c25640f">More...</a><br /></td></tr>
 <tr class="separator:a5d085bbb954b715f4a85aa077c25640f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a053f8cf8e3efe23f4203f6bd4f88c86e"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_digest.html#a053f8cf8e3efe23f4203f6bd4f88c86e">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset)=0</td></tr>
-<tr class="memdesc:a053f8cf8e3efe23f4203f6bd4f88c86e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#a053f8cf8e3efe23f4203f6bd4f88c86e">More...</a><br /></td></tr>
-<tr class="separator:a053f8cf8e3efe23f4203f6bd4f88c86e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2aec1dc5f826b4a958f15d1487dacae"><td class="memItemLeft" align="right" valign="top">virtual size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_digest.html#af2aec1dc5f826b4a958f15d1487dacae">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)=0</td></tr>
+<tr class="memdesc:af2aec1dc5f826b4a958f15d1487dacae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#af2aec1dc5f826b4a958f15d1487dacae">More...</a><br /></td></tr>
+<tr class="separator:af2aec1dc5f826b4a958f15d1487dacae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7a2f8afffc106332ccb72c53cd5b505"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_digest.html#aa7a2f8afffc106332ccb72c53cd5b505">ParallelMaxDegree</a> (size_t Degree)=0</td></tr>
 <tr class="memdesc:aa7a2f8afffc106332ccb72c53cd5b505"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of threads allocated when using multi-threaded tree hashing processing.  <a href="#aa7a2f8afffc106332ccb72c53cd5b505">More...</a><br /></td></tr>
 <tr class="separator:aa7a2f8afffc106332ccb72c53cd5b505"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -368,8 +368,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a053f8cf8e3efe23f4203f6bd4f88c86e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a053f8cf8e3efe23f4203f6bd4f88c86e">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="af2aec1dc5f826b4a958f15d1487dacae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2aec1dc5f826b4a958f15d1487dacae">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -386,7 +386,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>&#160;</td>
         </tr>
         <tr>
@@ -412,7 +412,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Size of Hash value</dd></dl>
 
-<p>Implemented in <a class="el" href="class_s_h_a512.html#a50981148f678e4380bd89f86a78911ad">SHA512</a>, <a class="el" href="class_s_h_a256.html#a425e5aa5f7ecf84822401ba1c71afb92">SHA256</a>, <a class="el" href="class_blake256.html#a9ac52f2084657eba9381c7affc5db1e9">Blake256</a>, <a class="el" href="class_blake512.html#a71a0bde9d01644bba518671bcbc516ef">Blake512</a>, <a class="el" href="class_skein256.html#a69b66bb8e82ad296d4f7c3767ae0e326">Skein256</a>, <a class="el" href="class_skein512.html#ab1afbcce9b9b6346df4104f2eedded9d">Skein512</a>, <a class="el" href="class_skein1024.html#ab1bb9c90a60e9448aaa6aa94387ba008">Skein1024</a>, <a class="el" href="class_keccak1024.html#a085afca2576ae38e4cfcef9542829157">Keccak1024</a>, <a class="el" href="class_keccak256.html#a1c2620fe98cd9311c2e711f2e5dbfd17">Keccak256</a>, and <a class="el" href="class_keccak512.html#ade0730a2649a50276a03d403b1149e39">Keccak512</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_a512.html#a15f688059ce19dcfa309a2dcf6db4ad1">SHA512</a>, <a class="el" href="class_s_h_a256.html#ad2fe58eb701f660cfb545e7b35aa5dce">SHA256</a>, <a class="el" href="class_blake256.html#abaaf42de844e5ffb51c9b033e565b5ea">Blake256</a>, <a class="el" href="class_blake512.html#aed7cb475dfe265a89c703b52ad6b3434">Blake512</a>, <a class="el" href="class_skein256.html#a78dfb50f2867ddb808d3831b58590cdc">Skein256</a>, <a class="el" href="class_skein512.html#ab18472b81fdc36fddd6d9a6ad7128d78">Skein512</a>, <a class="el" href="class_skein1024.html#aab08c3439c083150cf14b82c56f07f31">Skein1024</a>, <a class="el" href="class_keccak1024.html#a95b5001923f4b5d1ae37478eea8b1160">Keccak1024</a>, <a class="el" href="class_keccak256.html#a10bef62929d6178c7de7fb26ac8c8845">Keccak256</a>, and <a class="el" href="class_keccak512.html#a243e3e6a552c48a450c70e1b7c96f2e5">Keccak512</a>.</p>
 
 </div>
 </div>
@@ -561,7 +561,7 @@ Public Member Functions</h2></td></tr>
 <p>Thread count must be an even number, and not exceed the number of processor cores. Changing this value from the default (8 threads), will change the output hash value.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>

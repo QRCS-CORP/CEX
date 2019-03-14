@@ -116,26 +116,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad19fd97a58a68c9f8f02bc366135abf8"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ad19fd97a58a68c9f8f02bc366135abf8">Tag</a> ()=0</td></tr>
 <tr class="memdesc:ad19fd97a58a68c9f8f02bc366135abf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Returns the finalized MAC tag vector  <a href="#ad19fd97a58a68c9f8f02bc366135abf8">More...</a><br /></td></tr>
 <tr class="separator:ad19fd97a58a68c9f8f02bc366135abf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3a347bdbe07cd32ca3e7867add49b01"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ab3a347bdbe07cd32ca3e7867add49b01">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length)=0</td></tr>
-<tr class="memdesc:ab3a347bdbe07cd32ca3e7867add49b01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output standard-vector. <br />
-  <a href="#ab3a347bdbe07cd32ca3e7867add49b01">More...</a><br /></td></tr>
-<tr class="separator:ab3a347bdbe07cd32ca3e7867add49b01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add2783bc9e931c6f07370e8d08fc1376"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#add2783bc9e931c6f07370e8d08fc1376">Finalize</a> (SecureVector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length)=0</td></tr>
-<tr class="memdesc:add2783bc9e931c6f07370e8d08fc1376"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output secure-vector. <br />
-  <a href="#add2783bc9e931c6f07370e8d08fc1376">More...</a><br /></td></tr>
-<tr class="separator:add2783bc9e931c6f07370e8d08fc1376"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0a604354f048e6dbbb8f6bc34d24d88"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ae0a604354f048e6dbbb8f6bc34d24d88">SetAssociatedData</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length)=0</td></tr>
-<tr class="memdesc:ae0a604354f048e6dbbb8f6bc34d24d88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the nessage authentication code generator. <br />
-  <a href="#ae0a604354f048e6dbbb8f6bc34d24d88">More...</a><br /></td></tr>
-<tr class="separator:ae0a604354f048e6dbbb8f6bc34d24d88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affc499278bec892d22da47a3d7905527"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#affc499278bec892d22da47a3d7905527">Verify</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length)=0</td></tr>
-<tr class="memdesc:affc499278bec892d22da47a3d7905527"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input standard-vector. <br />
-  <a href="#affc499278bec892d22da47a3d7905527">More...</a><br /></td></tr>
-<tr class="separator:affc499278bec892d22da47a3d7905527"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab645379496c11f6145266d1de4c86b65"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ab645379496c11f6145266d1de4c86b65">Verify</a> (const SecureVector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length)=0</td></tr>
-<tr class="memdesc:ab645379496c11f6145266d1de4c86b65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input secure-vector. <br />
-  <a href="#ab645379496c11f6145266d1de4c86b65">More...</a><br /></td></tr>
-<tr class="separator:ab645379496c11f6145266d1de4c86b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a311a22bb63bdd93990fc497a153d2004"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a311a22bb63bdd93990fc497a153d2004">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
+<tr class="memdesc:a311a22bb63bdd93990fc497a153d2004"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output standard-vector. <br />
+  <a href="#a311a22bb63bdd93990fc497a153d2004">More...</a><br /></td></tr>
+<tr class="separator:a311a22bb63bdd93990fc497a153d2004"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8d0d13fb5640530e83d74e2eb52ed69"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ad8d0d13fb5640530e83d74e2eb52ed69">Finalize</a> (SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
+<tr class="memdesc:ad8d0d13fb5640530e83d74e2eb52ed69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output secure-vector. <br />
+  <a href="#ad8d0d13fb5640530e83d74e2eb52ed69">More...</a><br /></td></tr>
+<tr class="separator:ad8d0d13fb5640530e83d74e2eb52ed69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6523ab4680898c42ad9aaf9963042163"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a6523ab4680898c42ad9aaf9963042163">SetAssociatedData</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:a6523ab4680898c42ad9aaf9963042163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the nessage authentication code generator. <br />
+  <a href="#a6523ab4680898c42ad9aaf9963042163">More...</a><br /></td></tr>
+<tr class="separator:a6523ab4680898c42ad9aaf9963042163"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0378ecf21cd9e507b9634e9e96791e1e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a0378ecf21cd9e507b9634e9e96791e1e">Verify</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:a0378ecf21cd9e507b9634e9e96791e1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input standard-vector. <br />
+  <a href="#a0378ecf21cd9e507b9634e9e96791e1e">More...</a><br /></td></tr>
+<tr class="separator:a0378ecf21cd9e507b9634e9e96791e1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02a3bd719730b999002c9d83ca6bd8ae"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a02a3bd719730b999002c9d83ca6bd8ae">Verify</a> (const SecureVector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:a02a3bd719730b999002c9d83ca6bd8ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input secure-vector. <br />
+  <a href="#a02a3bd719730b999002c9d83ca6bd8ae">More...</a><br /></td></tr>
+<tr class="separator:a02a3bd719730b999002c9d83ca6bd8ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_cipher_mode"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_cipher_mode')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_cipher_mode.html">ICipherMode</a></td></tr>
 <tr class="memitem:a947413f3a4cdd09c69c72bdd75c91c06 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a947413f3a4cdd09c69c72bdd75c91c06">ICipherMode</a> (const <a class="el" href="class_i_cipher_mode.html">ICipherMode</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a947413f3a4cdd09c69c72bdd75c91c06 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_cipher_mode.html#a947413f3a4cdd09c69c72bdd75c91c06">More...</a><br /></td></tr>
@@ -185,24 +185,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3f0210d1097cf69bce107824d4dfa6da inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a3f0210d1097cf69bce107824d4dfa6da">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
 <tr class="memdesc:a3f0210d1097cf69bce107824d4dfa6da inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a single block of bytes.  <a href="class_i_cipher_mode.html#a3f0210d1097cf69bce107824d4dfa6da">More...</a><br /></td></tr>
 <tr class="separator:a3f0210d1097cf69bce107824d4dfa6da inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a567520f345d7cbc99f356d357ac8086c inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a567520f345d7cbc99f356d357ac8086c">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset)=0</td></tr>
-<tr class="memdesc:a567520f345d7cbc99f356d357ac8086c inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a block of bytes with offset parameters.  <a href="class_i_cipher_mode.html#a567520f345d7cbc99f356d357ac8086c">More...</a><br /></td></tr>
-<tr class="separator:a567520f345d7cbc99f356d357ac8086c inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a897f5c1fe92b891bed1aaba9f7f2338e inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a897f5c1fe92b891bed1aaba9f7f2338e">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)=0</td></tr>
+<tr class="memdesc:a897f5c1fe92b891bed1aaba9f7f2338e inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a block of bytes with offset parameters.  <a href="class_i_cipher_mode.html#a897f5c1fe92b891bed1aaba9f7f2338e">More...</a><br /></td></tr>
+<tr class="separator:a897f5c1fe92b891bed1aaba9f7f2338e inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2662c08e4ca778ca45496506e954af4a inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a2662c08e4ca778ca45496506e954af4a">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
 <tr class="memdesc:a2662c08e4ca778ca45496506e954af4a inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a single block of bytes.  <a href="class_i_cipher_mode.html#a2662c08e4ca778ca45496506e954af4a">More...</a><br /></td></tr>
 <tr class="separator:a2662c08e4ca778ca45496506e954af4a inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94d24281759928169f725b4943c02527 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a94d24281759928169f725b4943c02527">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset)=0</td></tr>
-<tr class="memdesc:a94d24281759928169f725b4943c02527 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="class_i_cipher_mode.html#a94d24281759928169f725b4943c02527">More...</a><br /></td></tr>
-<tr class="separator:a94d24281759928169f725b4943c02527 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46b801d441d51659d4df3b2cdec8c8ea inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a46b801d441d51659d4df3b2cdec8c8ea">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)=0</td></tr>
+<tr class="memdesc:a46b801d441d51659d4df3b2cdec8c8ea inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="class_i_cipher_mode.html#a46b801d441d51659d4df3b2cdec8c8ea">More...</a><br /></td></tr>
+<tr class="separator:a46b801d441d51659d4df3b2cdec8c8ea inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a805bbcccd6f31a8a5250ca7766518a4a inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters)=0</td></tr>
 <tr class="memdesc:a805bbcccd6f31a8a5250ca7766518a4a inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance  <a href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">More...</a><br /></td></tr>
 <tr class="separator:a805bbcccd6f31a8a5250ca7766518a4a inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9985b6851274ada2137ea7496a91671d inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a9985b6851274ada2137ea7496a91671d">ParallelMaxDegree</a> (size_t Degree)=0</td></tr>
 <tr class="memdesc:a9985b6851274ada2137ea7496a91671d inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="class_i_cipher_mode.html#a9985b6851274ada2137ea7496a91671d">More...</a><br /></td></tr>
 <tr class="separator:a9985b6851274ada2137ea7496a91671d inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26e54aafa8eb9259ed291eb22009874d inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a26e54aafa8eb9259ed291eb22009874d">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length)=0</td></tr>
-<tr class="memdesc:a26e54aafa8eb9259ed291eb22009874d inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset parameters.  <a href="class_i_cipher_mode.html#a26e54aafa8eb9259ed291eb22009874d">More...</a><br /></td></tr>
-<tr class="separator:a26e54aafa8eb9259ed291eb22009874d inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a601e136fb56cd77209f583350a92d33e inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a601e136fb56cd77209f583350a92d33e">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
+<tr class="memdesc:a601e136fb56cd77209f583350a92d33e inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset parameters.  <a href="class_i_cipher_mode.html#a601e136fb56cd77209f583350a92d33e">More...</a><br /></td></tr>
+<tr class="separator:a601e136fb56cd77209f583350a92d33e inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An AEAD Cipher Mode virtual interface class. </p>
@@ -321,8 +321,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ab3a347bdbe07cd32ca3e7867add49b01"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab3a347bdbe07cd32ca3e7867add49b01">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[1/2]</span></h2>
+<a id="a311a22bb63bdd93990fc497a153d2004"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a311a22bb63bdd93990fc497a153d2004">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -339,13 +339,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -380,12 +380,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ab46ad50a71cafcbabbe9d48c8f33d0df">GCM</a>, and <a class="el" href="class_e_a_x.html#ac59751c47da026569f346a3087cebaee">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a03a920a1727055f558677c986ba9763d">GCM</a>, and <a class="el" href="class_e_a_x.html#ae96b87a5745e4479a923b6313a84473f">EAX</a>.</p>
 
 </div>
 </div>
-<a id="add2783bc9e931c6f07370e8d08fc1376"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add2783bc9e931c6f07370e8d08fc1376">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[2/2]</span></h2>
+<a id="ad8d0d13fb5640530e83d74e2eb52ed69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8d0d13fb5640530e83d74e2eb52ed69">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -402,13 +402,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -443,7 +443,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a279416b65ee8834d3b9b143b6fb28ac0">GCM</a>, and <a class="el" href="class_e_a_x.html#aa9d842b20fdfe06bac88792af4fa5068">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ab29b6013d635491a5156eec566f74b96">GCM</a>, and <a class="el" href="class_e_a_x.html#ac3608783dae2c6fd0b13a1459d7c6387">EAX</a>.</p>
 
 </div>
 </div>
@@ -563,8 +563,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae0a604354f048e6dbbb8f6bc34d24d88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0a604354f048e6dbbb8f6bc34d24d88">&#9670;&nbsp;</a></span>SetAssociatedData()</h2>
+<a id="a6523ab4680898c42ad9aaf9963042163"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6523ab4680898c42ad9aaf9963042163">&#9670;&nbsp;</a></span>SetAssociatedData()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -581,13 +581,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -621,7 +621,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ad020b507efe58cb0f04923f9dd81bdf5">GCM</a>, and <a class="el" href="class_e_a_x.html#aa4b303a623b49f0b8771e5bedcab5d96">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aa5ba6a934f8b8fbd41a83cb232127e0d">GCM</a>, and <a class="el" href="class_e_a_x.html#a2d4a0499158ef54f546bb8dad7bc852d">EAX</a>.</p>
 
 </div>
 </div>
@@ -654,8 +654,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="affc499278bec892d22da47a3d7905527"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#affc499278bec892d22da47a3d7905527">&#9670;&nbsp;</a></span>Verify() <span class="overload">[1/2]</span></h2>
+<a id="a0378ecf21cd9e507b9634e9e96791e1e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0378ecf21cd9e507b9634e9e96791e1e">&#9670;&nbsp;</a></span>Verify() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -672,13 +672,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -714,12 +714,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aee978e3db6bc9342bf8b005909c2eb26">GCM</a>, and <a class="el" href="class_e_a_x.html#afbf46607bb416548b7c381dcae30348d">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aa11db96f4d255f7977cc09ec78e4be54">GCM</a>, and <a class="el" href="class_e_a_x.html#a7597fe7adf5d24ee5e543a8cffa3f770">EAX</a>.</p>
 
 </div>
 </div>
-<a id="ab645379496c11f6145266d1de4c86b65"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab645379496c11f6145266d1de4c86b65">&#9670;&nbsp;</a></span>Verify() <span class="overload">[2/2]</span></h2>
+<a id="a02a3bd719730b999002c9d83ca6bd8ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02a3bd719730b999002c9d83ca6bd8ae">&#9670;&nbsp;</a></span>Verify() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -736,13 +736,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -778,7 +778,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a220173632e9952c374f3b44aacbcc56a">GCM</a>, and <a class="el" href="class_e_a_x.html#a3fa46779c4fe897659a8bb2cbf576eb6">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a798a428f295bf5505b07c1344468cf6c">GCM</a>, and <a class="el" href="class_e_a_x.html#abc23dba6ea34e52f97cfcf2f43a6dd73">EAX</a>.</p>
 
 </div>
 </div>

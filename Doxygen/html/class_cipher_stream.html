@@ -94,9 +94,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9d71de1c91d41a1c1bf67b91b385b386"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_cipher_stream.html#a9d71de1c91d41a1c1bf67b91b385b386">~CipherStream</a> ()</td></tr>
 <tr class="memdesc:a9d71de1c91d41a1c1bf67b91b385b386"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy this class  <a href="#a9d71de1c91d41a1c1bf67b91b385b386">More...</a><br /></td></tr>
 <tr class="separator:a9d71de1c91d41a1c1bf67b91b385b386"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afcc326fb3614573d9b91e0dfe0c207d7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_cipher_stream.html#afcc326fb3614573d9b91e0dfe0c207d7">IsParallel</a> ()</td></tr>
-<tr class="memdesc:afcc326fb3614573d9b91e0dfe0c207d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Automatic processor parallelization capable.  <a href="#afcc326fb3614573d9b91e0dfe0c207d7">More...</a><br /></td></tr>
-<tr class="separator:afcc326fb3614573d9b91e0dfe0c207d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee81eecf905684ed366d444598f63e06"><td class="memItemLeft" align="right" valign="top">bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_cipher_stream.html#aee81eecf905684ed366d444598f63e06">IsParallel</a> ()</td></tr>
+<tr class="memdesc:aee81eecf905684ed366d444598f63e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Automatic processor parallelization capable.  <a href="#aee81eecf905684ed366d444598f63e06">More...</a><br /></td></tr>
+<tr class="separator:aee81eecf905684ed366d444598f63e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac98374870ba08319f47f4377f3a09426"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_cipher_stream.html#ac98374870ba08319f47f4377f3a09426">LegalKeySizes</a> ()</td></tr>
 <tr class="memdesc:ac98374870ba08319f47f4377f3a09426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The supported key, nonce, and info sizes for the selected cipher configuration  <a href="#ac98374870ba08319f47f4377f3a09426">More...</a><br /></td></tr>
 <tr class="separator:ac98374870ba08319f47f4377f3a09426"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,7 +154,7 @@ The ParallelThreadsMax() property is used as the thread count in the parallel lo
 <li>
 ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize(). </li>
 <li>
-The ParallelBlockSize() can be changed through the ParallelProfile() property </li>
+The ParallelBlockSize(), IsParallel(), and ParallelThreadsMax() accessors, can be changed through the ParallelProfile() property </li>
 <li>
 Parallel block calculation ex. <code>ParallelBlockSize = N - (N % .ParallelMinimumSize);</code> </li>
 </ul>
@@ -361,14 +361,14 @@ Parallel block calculation ex. <code>ParallelBlockSize = N - (N % .ParallelMinim
 
 </div>
 </div>
-<a id="afcc326fb3614573d9b91e0dfe0c207d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afcc326fb3614573d9b91e0dfe0c207d7">&#9670;&nbsp;</a></span>IsParallel()</h2>
+<a id="aee81eecf905684ed366d444598f63e06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee81eecf905684ed366d444598f63e06">&#9670;&nbsp;</a></span>IsParallel()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool CipherStream::IsParallel </td>
+          <td class="memname">bool &amp; CipherStream::IsParallel </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -486,7 +486,7 @@ Parallel block calculation ex. <code>ParallelBlockSize = N - (N % .ParallelMinim
 <p>Thread count must be an even number, and not exceed the number of processor cores. Changing this value from the default (8 threads), will change the output hash value.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>

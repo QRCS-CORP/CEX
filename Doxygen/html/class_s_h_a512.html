@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a17fe9b0f8639ef921eb790ac434e1264"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a512.html#a17fe9b0f8639ef921eb790ac434e1264">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:a17fe9b0f8639ef921eb790ac434e1264"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the hash code for a message input array  <a href="#a17fe9b0f8639ef921eb790ac434e1264">More...</a><br /></td></tr>
 <tr class="separator:a17fe9b0f8639ef921eb790ac434e1264"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50981148f678e4380bd89f86a78911ad"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a512.html#a50981148f678e4380bd89f86a78911ad">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset) override</td></tr>
-<tr class="memdesc:a50981148f678e4380bd89f86a78911ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize processing and get the hash code  <a href="#a50981148f678e4380bd89f86a78911ad">More...</a><br /></td></tr>
-<tr class="separator:a50981148f678e4380bd89f86a78911ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15f688059ce19dcfa309a2dcf6db4ad1"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a512.html#a15f688059ce19dcfa309a2dcf6db4ad1">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
+<tr class="memdesc:a15f688059ce19dcfa309a2dcf6db4ad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize processing and get the hash code  <a href="#a15f688059ce19dcfa309a2dcf6db4ad1">More...</a><br /></td></tr>
+<tr class="separator:a15f688059ce19dcfa309a2dcf6db4ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff890fc37904d2e85042834e6f85f229"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a512.html#aff890fc37904d2e85042834e6f85f229">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:aff890fc37904d2e85042834e6f85f229"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of threads allocated when using multi-threaded tree hashing processing.  <a href="#aff890fc37904d2e85042834e6f85f229">More...</a><br /></td></tr>
 <tr class="separator:aff890fc37904d2e85042834e6f85f229"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,7 +157,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the SHA-2 digest with a 512 bit digest return size </p>
-<p>Using the Compute method: </p><div class="fragment"><div class="line"><a class="code" href="class_s_h_a512.html">SHA512</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(digest.<a class="code" href="class_keccak512.html#a962018e8b134cf29aa8b5b680c165030">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_s_h_a512.html#ae154a88edba7f9796759f9149b4ffede">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_s_h_a512.html#a50981148f678e4380bd89f86a78911ad">Finalize</a>(hash, 0);</div><div class="line">dgt.<a class="code" href="class_s_h_a512.html#a98bab7a412005d93ca294e2058bb333d">Reset</a>();</div></div><!-- fragment --> <p>Tree Hashing Description: </p>
+<p>Using the Compute method: </p><div class="fragment"><div class="line"><a class="code" href="class_s_h_a512.html">SHA512</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(digest.<a class="code" href="class_keccak512.html#a962018e8b134cf29aa8b5b680c165030">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_s_h_a512.html#ae154a88edba7f9796759f9149b4ffede">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_s_h_a512.html#a15f688059ce19dcfa309a2dcf6db4ad1">Finalize</a>(hash, 0);</div><div class="line">dgt.<a class="code" href="class_s_h_a512.html#a98bab7a412005d93ca294e2058bb333d">Reset</a>();</div></div><!-- fragment --> <p>Tree Hashing Description: </p>
 <p>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter. <br />
  The default number of threads is 8, this can be changed using the ParallelMaxDegree(size_t) function, but not directly through the ParallelProfile accessor, (state sizes must be recalculated when the thread count changes). Changing the thread count from the default, will produce a different hash output. <br />
 The thread count must be an even number less or equal to the number of processing cores. <br />
@@ -468,8 +468,8 @@ Recommendation for Random Number Generation Using <a href="http://nvlpubs.nist.g
 
 </div>
 </div>
-<a id="a50981148f678e4380bd89f86a78911ad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50981148f678e4380bd89f86a78911ad">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="a15f688059ce19dcfa309a2dcf6db4ad1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15f688059ce19dcfa309a2dcf6db4ad1">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -486,7 +486,7 @@ Recommendation for Random Number Generation Using <a href="http://nvlpubs.nist.g
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>&#160;</td>
         </tr>
         <tr>
@@ -518,7 +518,7 @@ Recommendation for Random Number Generation Using <a href="http://nvlpubs.nist.g
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_digest.html#a053f8cf8e3efe23f4203f6bd4f88c86e">IDigest</a>.</p>
+<p>Implements <a class="el" href="class_i_digest.html#af2aec1dc5f826b4a958f15d1487dacae">IDigest</a>.</p>
 
 </div>
 </div>
@@ -667,7 +667,7 @@ Recommendation for Random Number Generation Using <a href="http://nvlpubs.nist.g
 <p>Thread count must be an even number, and not exceed the number of processor cores. Changing this value from the default (8 threads), will change the output hash value.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>

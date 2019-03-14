@@ -1,7 +1,7 @@
 var searchData=
 [
   ['macbase',['MacBase',['../class_mac_base.html#aa58012e7753f6cbcc36e57ed6d6f6908',1,'MacBase::MacBase(const MacBase &amp;)=delete'],['../class_mac_base.html#a3004785eade89ead6822a54fde7b57f7',1,'MacBase::MacBase()=delete'],['../class_mac_base.html#a8f02b551dd4f25f84ab47c93b30c7366',1,'MacBase::MacBase(size_t BlockSize, Macs Enumeral, std::string &amp;Name, std::vector&lt; SymmetricKeySize &gt; &amp;KeySizes, size_t MinimumKey, size_t MinimumSalt, size_t TagSize)']]],
-  ['macstream',['MacStream',['../class_mac_stream.html#a298c4f9ba4fa26f8b603515530706a82',1,'MacStream::MacStream(const MacStream &amp;)=delete'],['../class_mac_stream.html#ab90551051a9da31608f9db2bb29979bf',1,'MacStream::MacStream()=delete'],['../class_mac_stream.html#a3cc2b7e29b8b0684c0c0a42392efda2d',1,'MacStream::MacStream(IMac *Mac)']]],
+  ['macstream',['MacStream',['../class_mac_stream.html#a298c4f9ba4fa26f8b603515530706a82',1,'MacStream::MacStream(const MacStream &amp;)=delete'],['../class_mac_stream.html#ab90551051a9da31608f9db2bb29979bf',1,'MacStream::MacStream()=delete'],['../class_mac_stream.html#a47b97059fa50022a530a02643d40611e',1,'MacStream::MacStream(Macs MacType)'],['../class_mac_stream.html#a3cc2b7e29b8b0684c0c0a42392efda2d',1,'MacStream::MacStream(IMac *Mac)']]],
   ['max',['Max',['../class_integer_tools.html#a013fe0c0864812529ffc86bdff3dc783',1,'IntegerTools']]],
   ['maxdepth',['MaxDepth',['../struct_blake_params.html#a95c88eeff39589ce26100cda1d8dd7dd',1,'BlakeParams']]],
   ['maxoutputsize',['MaxOutputSize',['../class_drbg_base.html#a91dd8c5b533f536198d96a8819ed9c7e',1,'DrbgBase::MaxOutputSize()'],['../class_i_drbg.html#aa1f45f9c66f6f991dc2d3ee85cd9a829',1,'IDrbg::MaxOutputSize()']]],
@@ -9,6 +9,7 @@ var searchData=
   ['maxreseedcount',['MaxReseedCount',['../class_drbg_base.html#ae750bd31b66bd0ecbe439ff5d5b0322f',1,'DrbgBase::MaxReseedCount()'],['../class_i_drbg.html#a7f49fa3076791f999d8aabe5acde8326',1,'IDrbg::MaxReseedCount()']]],
   ['maxtagsize',['MaxTagSize',['../class_e_a_x.html#a04dc2179a208f53e4eef5dd862f46aec',1,'EAX::MaxTagSize()'],['../class_g_c_m.html#aed4760123c8ce8359059a2373283ffc2',1,'GCM::MaxTagSize()'],['../class_i_aead_mode.html#a78b9f3137d60c26fd4a8a3776ee2880e',1,'IAeadMode::MaxTagSize()']]],
   ['mceliece',['McEliece',['../class_mc_eliece.html#a800af1476a3f5fdc7337e10575999a29',1,'McEliece::McEliece(const McEliece &amp;)=delete'],['../class_mc_eliece.html#a9977e8205b9a451ee8da3128cc46afe8',1,'McEliece::McEliece(MPKCParameters Parameters=MPKCParameters::MPKCS1M12T62, Prngs PrngType=Prngs::BCR)'],['../class_mc_eliece.html#af71ae49a1e546776a5bd864de1b62962',1,'McEliece::McEliece(MPKCParameters Parameters, IPrng *Prng)']]],
+  ['mcs',['MCS',['../class_m_c_s.html#a48b1a3d321620cae7ef91551d56bccda',1,'MCS::MCS(const MCS &amp;)=delete'],['../class_m_c_s.html#addd41e1b051c768856e990544515880b',1,'MCS::MCS(BlockCiphers CipherType=BlockCiphers::RHXH256, StreamAuthenticators AuthenticatorType=StreamAuthenticators::KMAC256)']]],
   ['memoryphysicaltotal',['MemoryPhysicalTotal',['../class_system_tools.html#a016e1947b94f8f0a5ad24de37577f7af',1,'SystemTools']]],
   ['memoryphysicalused',['MemoryPhysicalUsed',['../class_system_tools.html#a4b4abcd4cad657933599163639f17552',1,'SystemTools']]],
   ['memorypool',['MemoryPool',['../class_memory_pool.html#a53c2cdd632ca6b37be44292cdba49a0f',1,'MemoryPool']]],

@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aecb592b396238a5a7c983988d08a8ef1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak512.html#aecb592b396238a5a7c983988d08a8ef1">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:aecb592b396238a5a7c983988d08a8ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Hash value  <a href="#aecb592b396238a5a7c983988d08a8ef1">More...</a><br /></td></tr>
 <tr class="separator:aecb592b396238a5a7c983988d08a8ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade0730a2649a50276a03d403b1149e39"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak512.html#ade0730a2649a50276a03d403b1149e39">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset) override</td></tr>
-<tr class="memdesc:ade0730a2649a50276a03d403b1149e39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#ade0730a2649a50276a03d403b1149e39">More...</a><br /></td></tr>
-<tr class="separator:ade0730a2649a50276a03d403b1149e39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a243e3e6a552c48a450c70e1b7c96f2e5"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak512.html#a243e3e6a552c48a450c70e1b7c96f2e5">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
+<tr class="memdesc:a243e3e6a552c48a450c70e1b7c96f2e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#a243e3e6a552c48a450c70e1b7c96f2e5">More...</a><br /></td></tr>
+<tr class="separator:a243e3e6a552c48a450c70e1b7c96f2e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8701c06a53aa9475cf31251656ce6de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak512.html#ac8701c06a53aa9475cf31251656ce6de">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:ac8701c06a53aa9475cf31251656ce6de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of threads allocated when using multi-threaded tree hashing processing.  <a href="#ac8701c06a53aa9475cf31251656ce6de">More...</a><br /></td></tr>
 <tr class="separator:ac8701c06a53aa9475cf31251656ce6de"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -452,8 +452,8 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 
 </div>
 </div>
-<a id="ade0730a2649a50276a03d403b1149e39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade0730a2649a50276a03d403b1149e39">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="a243e3e6a552c48a450c70e1b7c96f2e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a243e3e6a552c48a450c70e1b7c96f2e5">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -470,7 +470,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>&#160;</td>
         </tr>
         <tr>
@@ -502,7 +502,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_digest.html#a053f8cf8e3efe23f4203f6bd4f88c86e">IDigest</a>.</p>
+<p>Implements <a class="el" href="class_i_digest.html#af2aec1dc5f826b4a958f15d1487dacae">IDigest</a>.</p>
 
 </div>
 </div>
@@ -651,7 +651,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 <p>Thread count must be an even number, and not exceed the number of processor cores. Changing this value from the default (8 threads), will change the output hash value.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>

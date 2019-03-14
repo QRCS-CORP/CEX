@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['rcs',['RCS',['../class_r_c_s.html',1,'']]],
   ['rdp',['RDP',['../class_r_d_p.html',1,'']]],
   ['rhx',['RHX',['../class_r_h_x.html',1,'']]],
   ['ringlwe',['RingLWE',['../class_ring_l_w_e.html',1,'']]],

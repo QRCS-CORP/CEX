@@ -1,7 +1,6 @@
 var searchData=
 [
   ['_7eacp',['~ACP',['../class_a_c_p.html#ae41c00d3a93e7af606e57b27035253df',1,'ACP']]],
-  ['_7eacs',['~ACS',['../class_a_c_s.html#af9e39c39167620f9c1171b9b32e7f834',1,'ACS']]],
   ['_7eacstest',['~ACSTest',['../class_test_1_1_a_c_s_test.html#ac8a894323cd731ea94304ee0575dc643',1,'Test::ACSTest']]],
   ['_7easymmetrickey',['~AsymmetricKey',['../class_asymmetric_key.html#a68a418ecb0bb5ee29b4f795d6092cf48',1,'AsymmetricKey']]],
   ['_7easymmetrickeypair',['~AsymmetricKeyPair',['../class_asymmetric_key_pair.html#aa6c6dc89b6434ff3c54bbd862c5fad6f',1,'AsymmetricKeyPair']]],
@@ -66,6 +65,7 @@ var searchData=
   ['_7emacbase',['~MacBase',['../class_mac_base.html#a7e7f57c9847992e0d17b8e71a41477ab',1,'MacBase']]],
   ['_7emacstream',['~MacStream',['../class_mac_stream.html#a1cd68da67abb690c3a9d3faadf4ca74d',1,'MacStream']]],
   ['_7emceliece',['~McEliece',['../class_mc_eliece.html#a3615468a600346879f07a5e5833b6d0a',1,'McEliece']]],
+  ['_7emcs',['~MCS',['../class_m_c_s.html#ae118641558bf19d4a2e168d7b9f2aa69',1,'MCS']]],
   ['_7ememorystream',['~MemoryStream',['../class_memory_stream.html#ac226b9c1eb36f0421a632a8209a7fcbe',1,'MemoryStream']]],
   ['_7emodulelwe',['~ModuleLWE',['../class_module_l_w_e.html#a196980bffb1533b19ccfd3508c4cd5f0',1,'ModuleLWE']]],
   ['_7entru',['~NTRU',['../class_n_t_r_u.html#ae7c1c80ef5e53114bafd848cfb089b3f',1,'NTRU']]],
@@ -76,6 +76,7 @@ var searchData=
   ['_7epoly1305',['~Poly1305',['../class_poly1305.html#a66e5cfd224dca48b6292f65c019a6a03',1,'Poly1305']]],
   ['_7eprngbase',['~PrngBase',['../class_prng_base.html#a2ec8943c480d2b53cd09dda9dd90cb7e',1,'PrngBase']]],
   ['_7eproviderbase',['~ProviderBase',['../class_provider_base.html#adf46c5e8e45bb6cab7a914fdb1710b76',1,'ProviderBase']]],
+  ['_7ercs',['~RCS',['../class_r_c_s.html#a0b570d13028b7a6f089b07ef3c2b2170',1,'RCS']]],
   ['_7erdp',['~RDP',['../class_r_d_p.html#a8dfb0f2798b94673eb2a1ee14acbc4a2',1,'RDP']]],
   ['_7erhx',['~RHX',['../class_r_h_x.html#aacc15a76a6a292f35786e6d6f9fc7169',1,'RHX']]],
   ['_7eringlwe',['~RingLWE',['../class_ring_l_w_e.html#a4dbd37ccb1ea492b70f251185a859a59',1,'RingLWE']]],

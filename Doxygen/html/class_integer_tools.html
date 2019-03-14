@@ -100,7 +100,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a70b93198cf823c1919aa0a12bf8667f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ab7a2f2a9e663113ab65a50b14771e3"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a6ab7a2f2a9e663113ab65a50b14771e3"><td class="memTemplItemLeft" align="right" valign="top">static byte&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a6ab7a2f2a9e663113ab65a50b14771e3">GetByte</a> (T Value, size_t Index)</td></tr>
-<tr class="memdesc:a6ab7a2f2a9e663113ab65a50b14771e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract an 8bit integer from a larger integer  <a href="#a6ab7a2f2a9e663113ab65a50b14771e3">More...</a><br /></td></tr>
+<tr class="memdesc:a6ab7a2f2a9e663113ab65a50b14771e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract an 8-bit integer from a larger integer  <a href="#a6ab7a2f2a9e663113ab65a50b14771e3">More...</a><br /></td></tr>
 <tr class="separator:a6ab7a2f2a9e663113ab65a50b14771e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e0c5ada557282025b041b43eef809da"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a7e0c5ada557282025b041b43eef809da"><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a7e0c5ada557282025b041b43eef809da">Abs</a> (T A, T B)</td></tr>
@@ -155,7 +155,7 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:acc80f4b733d574f145ec621ff71abeb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa559bfe3ea294f05ba1cac1078f0cd00"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB &gt; </td></tr>
 <tr class="memitem:aa559bfe3ea294f05ba1cac1078f0cd00"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#aa559bfe3ea294f05ba1cac1078f0cd00">BlockToBe</a> (const ArrayA &amp;Input, size_t InOffset, ArrayB &amp;Output, size_t OutOffset, size_t Length)</td></tr>
-<tr class="memdesc:aa559bfe3ea294f05ba1cac1078f0cd00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert 8bit byte array to a Big Endian integer array  <a href="#aa559bfe3ea294f05ba1cac1078f0cd00">More...</a><br /></td></tr>
+<tr class="memdesc:aa559bfe3ea294f05ba1cac1078f0cd00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert 8-bit byte array to a Big Endian integer array  <a href="#aa559bfe3ea294f05ba1cac1078f0cd00">More...</a><br /></td></tr>
 <tr class="separator:aa559bfe3ea294f05ba1cac1078f0cd00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad00ef7dd392cc5d8a7de5309957b70e6"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB &gt; </td></tr>
 <tr class="memitem:ad00ef7dd392cc5d8a7de5309957b70e6"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#ad00ef7dd392cc5d8a7de5309957b70e6">BeToBlock</a> (ArrayA &amp;Input, size_t InOffset, ArrayB &amp;Output, size_t OutOffset, size_t Length)</td></tr>
@@ -213,20 +213,28 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a3b93ed47a8d1f3ed14bab591d78ef7a1"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a3b93ed47a8d1f3ed14bab591d78ef7a1">BeIncrement8</a> (Array &amp;Output, size_t Offset, size_t Length)</td></tr>
 <tr class="memdesc:a3b93ed47a8d1f3ed14bab591d78ef7a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats a byte array as a large Big Endian integer, incrementing the total value by one  <a href="#a3b93ed47a8d1f3ed14bab591d78ef7a1">More...</a><br /></td></tr>
 <tr class="separator:a3b93ed47a8d1f3ed14bab591d78ef7a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6254ddc115766f084194c7120539f638"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:a6254ddc115766f084194c7120539f638"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a6254ddc115766f084194c7120539f638">BeIncrease8</a> (Array &amp;Output, const size_t Length)</td></tr>
-<tr class="memdesc:a6254ddc115766f084194c7120539f638"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length  <a href="#a6254ddc115766f084194c7120539f638">More...</a><br /></td></tr>
-<tr class="separator:a6254ddc115766f084194c7120539f638"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0617de5b7f8799145fa26a7985921766"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:a0617de5b7f8799145fa26a7985921766"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a0617de5b7f8799145fa26a7985921766">BeIncrease8</a> (const Array &amp;Input, Array &amp;Output, const size_t Length)</td></tr>
-<tr class="memdesc:a0617de5b7f8799145fa26a7985921766"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length  <a href="#a0617de5b7f8799145fa26a7985921766">More...</a><br /></td></tr>
-<tr class="separator:a0617de5b7f8799145fa26a7985921766"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5ff476533ce948c5dbabb932839532a"><td class="memTemplParams" colspan="2">template&lt;typename Array , typename T &gt; </td></tr>
+<tr class="memitem:aa5ff476533ce948c5dbabb932839532a"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#aa5ff476533ce948c5dbabb932839532a">BeIncrease8</a> (Array &amp;Output, T Value)</td></tr>
+<tr class="memdesc:aa5ff476533ce948c5dbabb932839532a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment an 8-bit integer array by the value, treating the array as a segmented large Big Endian integer counter.  <a href="#aa5ff476533ce948c5dbabb932839532a">More...</a><br /></td></tr>
+<tr class="separator:aa5ff476533ce948c5dbabb932839532a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64505ff5e56f4a0ce3c275997f32ed57"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB , typename T &gt; </td></tr>
+<tr class="memitem:a64505ff5e56f4a0ce3c275997f32ed57"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a64505ff5e56f4a0ce3c275997f32ed57">BeIncrease8</a> (const ArrayA &amp;Input, ArrayB &amp;Output, T Value)</td></tr>
+<tr class="memdesc:a64505ff5e56f4a0ce3c275997f32ed57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter.  <a href="#a64505ff5e56f4a0ce3c275997f32ed57">More...</a><br /></td></tr>
+<tr class="separator:a64505ff5e56f4a0ce3c275997f32ed57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a421ca5fc67d34ad66a2cb0c1aaabf3fd"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB , typename T &gt; </td></tr>
+<tr class="memitem:a421ca5fc67d34ad66a2cb0c1aaabf3fd"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a421ca5fc67d34ad66a2cb0c1aaabf3fd">BeIncrease8</a> (const ArrayA &amp;Input, ArrayB &amp;Output, size_t OutOffset, T Value)</td></tr>
+<tr class="memdesc:a421ca5fc67d34ad66a2cb0c1aaabf3fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter.  <a href="#a421ca5fc67d34ad66a2cb0c1aaabf3fd">More...</a><br /></td></tr>
+<tr class="separator:a421ca5fc67d34ad66a2cb0c1aaabf3fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b5a36ec41ecc6c93cf7206883b6999e"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB , typename T &gt; </td></tr>
+<tr class="memitem:a5b5a36ec41ecc6c93cf7206883b6999e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a5b5a36ec41ecc6c93cf7206883b6999e">BeIncrease8</a> (const ArrayA &amp;Input, ArrayB &amp;Output, size_t OutOffset, size_t Length, T Value)</td></tr>
+<tr class="memdesc:a5b5a36ec41ecc6c93cf7206883b6999e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter.  <a href="#a5b5a36ec41ecc6c93cf7206883b6999e">More...</a><br /></td></tr>
+<tr class="separator:a5b5a36ec41ecc6c93cf7206883b6999e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3c7d6f9ddf7b92eee4f5490d02d14da"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#ac3c7d6f9ddf7b92eee4f5490d02d14da">IsLittleEndian</a> ()</td></tr>
 <tr class="memdesc:ac3c7d6f9ddf7b92eee4f5490d02d14da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run time check for Little Endian byte order  <a href="#ac3c7d6f9ddf7b92eee4f5490d02d14da">More...</a><br /></td></tr>
 <tr class="separator:ac3c7d6f9ddf7b92eee4f5490d02d14da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39f3d8ee47f8a8cf9ba36a5d21b566d4"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB &gt; </td></tr>
 <tr class="memitem:a39f3d8ee47f8a8cf9ba36a5d21b566d4"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a39f3d8ee47f8a8cf9ba36a5d21b566d4">BlockToLe</a> (const ArrayA &amp;Input, size_t InOffset, ArrayB &amp;Output, size_t OutOffset, size_t Length)</td></tr>
-<tr class="memdesc:a39f3d8ee47f8a8cf9ba36a5d21b566d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a Little Endian N * 8bit word array to an unsigned integer array.  <a href="#a39f3d8ee47f8a8cf9ba36a5d21b566d4">More...</a><br /></td></tr>
+<tr class="memdesc:a39f3d8ee47f8a8cf9ba36a5d21b566d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert a Little Endian N * 8-bit word array to an unsigned integer array.  <a href="#a39f3d8ee47f8a8cf9ba36a5d21b566d4">More...</a><br /></td></tr>
 <tr class="separator:a39f3d8ee47f8a8cf9ba36a5d21b566d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1881baf8ff7d9c9897e5b8404928f2cd"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB &gt; </td></tr>
 <tr class="memitem:a1881baf8ff7d9c9897e5b8404928f2cd"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a1881baf8ff7d9c9897e5b8404928f2cd">LeToBlock</a> (ArrayA &amp;Input, size_t InOffset, ArrayB &amp;Output, size_t OutOffset, size_t Length)</td></tr>
@@ -304,18 +312,34 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a7ae137281c8e572d72639af7ea252766"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a7ae137281c8e572d72639af7ea252766">LeIncrement</a> (Array &amp;Output)</td></tr>
 <tr class="memdesc:a7ae137281c8e572d72639af7ea252766"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an array as a large Little Endian integer, incrementing the total value by one  <a href="#a7ae137281c8e572d72639af7ea252766">More...</a><br /></td></tr>
 <tr class="separator:a7ae137281c8e572d72639af7ea252766"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a161dedb36471beb1b68bb8ac5d074800"><td class="memTemplParams" colspan="2">template&lt;typename Array , typename T &gt; </td></tr>
+<tr class="memitem:a161dedb36471beb1b68bb8ac5d074800"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a161dedb36471beb1b68bb8ac5d074800">LeIncrease8</a> (Array &amp;Output, T Value)</td></tr>
+<tr class="memdesc:a161dedb36471beb1b68bb8ac5d074800"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment an 8-bit integer array by the value, treating the array as a segmented large Little Endian integer counter.  <a href="#a161dedb36471beb1b68bb8ac5d074800">More...</a><br /></td></tr>
+<tr class="separator:a161dedb36471beb1b68bb8ac5d074800"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9446798853dae9373fb46ed424b7b84a"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB , typename T &gt; </td></tr>
+<tr class="memitem:a9446798853dae9373fb46ed424b7b84a"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a9446798853dae9373fb46ed424b7b84a">LeIncrease8</a> (const ArrayA &amp;Input, ArrayB &amp;Output, T Value)</td></tr>
+<tr class="memdesc:a9446798853dae9373fb46ed424b7b84a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter.  <a href="#a9446798853dae9373fb46ed424b7b84a">More...</a><br /></td></tr>
+<tr class="separator:a9446798853dae9373fb46ed424b7b84a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ebbecac07da87caaefc45ddec4f958a"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB , typename T &gt; </td></tr>
+<tr class="memitem:a8ebbecac07da87caaefc45ddec4f958a"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a8ebbecac07da87caaefc45ddec4f958a">LeIncrease8</a> (const ArrayA &amp;Input, ArrayB &amp;Output, size_t OutOffset, T Value)</td></tr>
+<tr class="memdesc:a8ebbecac07da87caaefc45ddec4f958a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter.  <a href="#a8ebbecac07da87caaefc45ddec4f958a">More...</a><br /></td></tr>
+<tr class="separator:a8ebbecac07da87caaefc45ddec4f958a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9350ea1c8032f494e559cca8c45fdd1b"><td class="memTemplParams" colspan="2">template&lt;typename ArrayA , typename ArrayB , typename T &gt; </td></tr>
+<tr class="memitem:a9350ea1c8032f494e559cca8c45fdd1b"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a9350ea1c8032f494e559cca8c45fdd1b">LeIncrease8</a> (const ArrayA &amp;Input, ArrayB &amp;Output, size_t OutOffset, size_t Length, const T Value)</td></tr>
+<tr class="memdesc:a9350ea1c8032f494e559cca8c45fdd1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter.  <a href="#a9350ea1c8032f494e559cca8c45fdd1b">More...</a><br /></td></tr>
+<tr class="separator:a9350ea1c8032f494e559cca8c45fdd1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a845fc608cfdf99003cdccb56b97a5bda"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
 <tr class="memitem:a845fc608cfdf99003cdccb56b97a5bda"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a845fc608cfdf99003cdccb56b97a5bda">LeIncrementW</a> (Array &amp;Output)</td></tr>
 <tr class="memdesc:a845fc608cfdf99003cdccb56b97a5bda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an integer array as a large Little Endian integer, incrementing the total value by one.  <a href="#a845fc608cfdf99003cdccb56b97a5bda">More...</a><br /></td></tr>
 <tr class="separator:a845fc608cfdf99003cdccb56b97a5bda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad07377a97beb3760b1f4770fda89d983"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:ad07377a97beb3760b1f4770fda89d983"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#ad07377a97beb3760b1f4770fda89d983">LeIncreaseW</a> (Array &amp;Output, const size_t Length)</td></tr>
-<tr class="memdesc:ad07377a97beb3760b1f4770fda89d983"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an integer array as a large Little Endian integer, increasing the total value by a defined length.  <a href="#ad07377a97beb3760b1f4770fda89d983">More...</a><br /></td></tr>
-<tr class="separator:ad07377a97beb3760b1f4770fda89d983"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8503a028b6c28093c4dc6dcfe2f9e9ee"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:a8503a028b6c28093c4dc6dcfe2f9e9ee"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a8503a028b6c28093c4dc6dcfe2f9e9ee">LeIncreaseW</a> (const Array &amp;Input, Array &amp;Output, const size_t Length)</td></tr>
-<tr class="memdesc:a8503a028b6c28093c4dc6dcfe2f9e9ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an integer array as a large Little Endian integer, increasing the total value by a defined length.  <a href="#a8503a028b6c28093c4dc6dcfe2f9e9ee">More...</a><br /></td></tr>
-<tr class="separator:a8503a028b6c28093c4dc6dcfe2f9e9ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8ed0214a2b6657fc7821cab9390e48d"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:ab8ed0214a2b6657fc7821cab9390e48d"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#ab8ed0214a2b6657fc7821cab9390e48d">LeIncreaseW</a> (Array &amp;Output, size_t Length)</td></tr>
+<tr class="memdesc:ab8ed0214a2b6657fc7821cab9390e48d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an integer array as a large Little Endian integer, increasing the total value by a defined length.  <a href="#ab8ed0214a2b6657fc7821cab9390e48d">More...</a><br /></td></tr>
+<tr class="separator:ab8ed0214a2b6657fc7821cab9390e48d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74362df7ef85e6e826699b2a16ee3a34"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:a74362df7ef85e6e826699b2a16ee3a34"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a74362df7ef85e6e826699b2a16ee3a34">LeIncreaseW</a> (const Array &amp;Input, Array &amp;Output, size_t Length)</td></tr>
+<tr class="memdesc:a74362df7ef85e6e826699b2a16ee3a34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an integer array as a large Little Endian integer, increasing the total value by a defined length.  <a href="#a74362df7ef85e6e826699b2a16ee3a34">More...</a><br /></td></tr>
+<tr class="separator:a74362df7ef85e6e826699b2a16ee3a34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab7a23490fe053fd353007ddac02f84c"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:aab7a23490fe053fd353007ddac02f84c"><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#aab7a23490fe053fd353007ddac02f84c">CMax</a> (T A, T B)</td></tr>
 <tr class="memdesc:aab7a23490fe053fd353007ddac02f84c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: return the larger value of the two integers  <a href="#aab7a23490fe053fd353007ddac02f84c">More...</a><br /></td></tr>
@@ -869,13 +893,13 @@ template&lt;typename Array &gt; </div>
 
 </div>
 </div>
-<a id="a6254ddc115766f084194c7120539f638"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6254ddc115766f084194c7120539f638">&#9670;&nbsp;</a></span>BeIncrease8() <span class="overload">[1/2]</span></h2>
+<a id="aa5ff476533ce948c5dbabb932839532a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5ff476533ce948c5dbabb932839532a">&#9670;&nbsp;</a></span>BeIncrease8() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Array &gt; </div>
+template&lt;typename Array , typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -889,8 +913,8 @@ template&lt;typename Array &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -905,24 +929,25 @@ template&lt;typename Array &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length </p>
+<p>Increment an 8-bit integer array by the value, treating the array as a segmented large Big Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The modified output byte array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number to increase by</td></tr>
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a0617de5b7f8799145fa26a7985921766"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0617de5b7f8799145fa26a7985921766">&#9670;&nbsp;</a></span>BeIncrease8() <span class="overload">[2/2]</span></h2>
+<a id="a64505ff5e56f4a0ce3c275997f32ed57"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64505ff5e56f4a0ce3c275997f32ed57">&#9670;&nbsp;</a></span>BeIncrease8() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Array &gt; </div>
+template&lt;typename ArrayA , typename ArrayB , typename T &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -930,20 +955,20 @@ template&lt;typename Array &gt; </div>
         <tr>
           <td class="memname">static void IntegerTools::BeIncrease8 </td>
           <td>(</td>
-          <td class="paramtype">const Array &amp;&#160;</td>
+          <td class="paramtype">const ArrayA &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">Array &amp;&#160;</td>
+          <td class="paramtype">ArrayB &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -958,12 +983,144 @@ template&lt;typename Array &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length </p>
+<p>Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The initial array of bytes</td></tr>
-    <tr><td class="paramname">Output</td><td>The modified output byte array</td></tr>
-    <tr><td class="paramname">Length</td><td>The number to increase by</td></tr>
+    <tr><td class="paramname">Input</td><td>The input byte array to copy</td></tr>
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a421ca5fc67d34ad66a2cb0c1aaabf3fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a421ca5fc67d34ad66a2cb0c1aaabf3fd">&#9670;&nbsp;</a></span>BeIncrease8() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayA , typename ArrayB , typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntegerTools::BeIncrease8 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayA &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayB &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input byte array to copy</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output byte array</td></tr>
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5b5a36ec41ecc6c93cf7206883b6999e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b5a36ec41ecc6c93cf7206883b6999e">&#9670;&nbsp;</a></span>BeIncrease8() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayA , typename ArrayB , typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntegerTools::BeIncrease8 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayA &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayB &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input byte array to copy</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output byte array</td></tr>
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes within the array to treat as a segmented counter</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
   </table>
   </dd>
 </dl>
@@ -1304,7 +1461,7 @@ template&lt;typename ArrayA , typename ArrayB &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Convert 8bit byte array to a Big Endian integer array </p>
+<p>Convert 8-bit byte array to a Big Endian integer array </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Input</td><td>The source byte array</td></tr>
@@ -1372,7 +1529,7 @@ template&lt;typename ArrayA , typename ArrayB &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Convert a Little Endian N * 8bit word array to an unsigned integer array. </p>
+<p>Convert a Little Endian N * 8-bit word array to an unsigned integer array. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Input</td><td>The source byte array</td></tr>
@@ -2227,7 +2384,7 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Extract an 8bit integer from a larger integer </p>
+<p>Extract an 8-bit integer from a larger integer </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Value</td><td>The parent integer value to extract from</td></tr>
@@ -3172,8 +3329,242 @@ template&lt;typename ArrayA , typename ArrayB &gt; </div>
 
 </div>
 </div>
-<a id="ad07377a97beb3760b1f4770fda89d983"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad07377a97beb3760b1f4770fda89d983">&#9670;&nbsp;</a></span>LeIncreaseW() <span class="overload">[1/2]</span></h2>
+<a id="a161dedb36471beb1b68bb8ac5d074800"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a161dedb36471beb1b68bb8ac5d074800">&#9670;&nbsp;</a></span>LeIncrease8() <span class="overload">[1/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array , typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntegerTools::LeIncrease8 </td>
+          <td>(</td>
+          <td class="paramtype">Array &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Increment an 8-bit integer array by the value, treating the array as a segmented large Little Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9446798853dae9373fb46ed424b7b84a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9446798853dae9373fb46ed424b7b84a">&#9670;&nbsp;</a></span>LeIncrease8() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayA , typename ArrayB , typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntegerTools::LeIncrease8 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayA &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayB &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input byte array to copy</td></tr>
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8ebbecac07da87caaefc45ddec4f958a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ebbecac07da87caaefc45ddec4f958a">&#9670;&nbsp;</a></span>LeIncrease8() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayA , typename ArrayB , typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntegerTools::LeIncrease8 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayA &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayB &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input byte array to copy</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output byte array</td></tr>
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9350ea1c8032f494e559cca8c45fdd1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9350ea1c8032f494e559cca8c45fdd1b">&#9670;&nbsp;</a></span>LeIncrease8() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayA , typename ArrayB , typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntegerTools::LeIncrease8 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayA &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayB &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter. </p>
+<p>The value type can be a 16, 32, or 64-bit integer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input byte array to copy</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output byte array</td></tr>
+    <tr><td class="paramname">Output</td><td>The target output byte array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes within the array to treat as a segmented counter</td></tr>
+    <tr><td class="paramname">Value</td><td>The T value number to increase by</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab8ed0214a2b6657fc7821cab9390e48d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8ed0214a2b6657fc7821cab9390e48d">&#9670;&nbsp;</a></span>LeIncreaseW() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3192,7 +3583,7 @@ template&lt;typename Array &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -3220,8 +3611,8 @@ template&lt;typename Array &gt; </div>
 
 </div>
 </div>
-<a id="a8503a028b6c28093c4dc6dcfe2f9e9ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8503a028b6c28093c4dc6dcfe2f9e9ee">&#9670;&nbsp;</a></span>LeIncreaseW() <span class="overload">[2/2]</span></h2>
+<a id="a74362df7ef85e6e826699b2a16ee3a34"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74362df7ef85e6e826699b2a16ee3a34">&#9670;&nbsp;</a></span>LeIncreaseW() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3246,7 +3637,7 @@ template&lt;typename Array &gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>

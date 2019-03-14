@@ -281,11 +281,10 @@ Enumerations</h2></td></tr>
 <tr class="memitem:ga2da315b4e41c3a75fd478a5d60c4d685"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga2da315b4e41c3a75fd478a5d60c4d685">PaddingModes</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685a6adf97f83acf6453d4a6a4b1070f3754">PaddingModes::None</a> = 0, 
 <a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685a3e30ce90c5b1d89ae09b7d4c73d8e172">PaddingModes::ESP</a> = 1, 
-<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685ad093b04fdf58bfc72c9e789ae86be4d2">PaddingModes::ISO7816</a> = 2, 
-<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685a0ee2623db2098d20cc248a0c42970a56">PaddingModes::PKCS7</a> = 3, 
+<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685a0ee2623db2098d20cc248a0c42970a56">PaddingModes::PKCS7</a> = 2, 
+<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685a79314a549f8b1986485e042238b73b8b">PaddingModes::X923</a> = 3, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685a79314a549f8b1986485e042238b73b8b">PaddingModes::X923</a> = 4, 
-<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685acfd59461e5840908303d5cc015d7abd2">PaddingModes::ZeroOne</a> = 5
+&#160;&#160;<a class="el" href="group___enumeration.html#gga2da315b4e41c3a75fd478a5d60c4d685acfd59461e5840908303d5cc015d7abd2">PaddingModes::ZeroOne</a> = 4
 <br />
  }</td></tr>
 <tr class="separator:ga2da315b4e41c3a75fd478a5d60c4d685"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -381,30 +380,75 @@ Enumerations</h2></td></tr>
 <a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a> = static_cast&lt;byte&gt;(Macs::KMAC256), 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ade80307d986a42c3fd894b2923057bf1">StreamAuthenticators::KMAC512</a> = static_cast&lt;byte&gt;(Macs::KMAC512), 
-<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ac5ba8d97d4055160e3d16817de07618f">StreamAuthenticators::KMAC1024</a> = static_cast&lt;byte&gt;(Macs::KMAC1024)
+<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ac5ba8d97d4055160e3d16817de07618f">StreamAuthenticators::KMAC1024</a> = static_cast&lt;byte&gt;(Macs::KMAC1024), 
+<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ab6fd733868a97b1057243c9e9e381074">StreamAuthenticators::Poly1305</a> = static_cast&lt;byte&gt;(Macs::Poly1305)
 <br />
  }</td></tr>
 <tr class="separator:ga62629810dc7b52fdfb37d80f03d62274"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga62fe0a4066025a96f0d329627b1bf127"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga62fe0a4066025a96f0d329627b1bf127">StreamCiphers</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6adf97f83acf6453d4a6a4b1070f3754">StreamCiphers::None</a> = 0, 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2a73a3f41e1cc8dd0aa47676aae9a057">StreamCiphers::ACS256H</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS256H), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a97407485478640ca9e6d321c3badc5e5">StreamCiphers::ACS512H</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS512H), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127afc06e5a5503d035d1af71adb4bc29a23">StreamCiphers::ACS256S</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS256S), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a1f6eaf2274b9b4a623ea92b93aa78054">StreamCiphers::ACS512S</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS512S), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a3763590ba4935513c1f6b8466f644ed6">StreamCiphers::ACS</a> = static_cast&lt;byte&gt;(SymmetricCiphers::ACS), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a9f62076fd9b490d6a2ae42532c35f767">StreamCiphers::CSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2ca2913af15250541b9584b5504388f2">StreamCiphers::CSX256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX256AE), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2bef0cef4d388c11665e19e5da90f1d4">StreamCiphers::CSXR20H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR20H256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a80cfe562faa23d8c2e9ae7f55c59f9ac">StreamCiphers::CSXR20H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR20H512), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a5bae7e694331ffe4f22a5f4d34ea8bf9">StreamCiphers::CSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a7d974584e3c969bec73bc993ff85ad7a">StreamCiphers::CSX512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX512AE), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34">StreamCiphers::TSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac3464460a56e69447faf02356ef59579">StreamCiphers::TSX256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256AE), 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127abc5ebec8b462871ac01f536026baa8de">StreamCiphers::CSXR20K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR20K256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a42a2a90620157c2e917718971bc0544e">StreamCiphers::CSXR20K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR20K512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127afbda191d6a5464ef54b61dcd15ddee3d">StreamCiphers::CSXR20P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR20P256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a5bae7e694331ffe4f22a5f4d34ea8bf9">StreamCiphers::CSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSX512), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba">StreamCiphers::TSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127abe9068c7a1b62da7c01061c49fbc6ab4">StreamCiphers::TSX512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512AE), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068">StreamCiphers::TSX1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a94995933677fa3af5d4fb2ef8333e9ac">StreamCiphers::TSX1024AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024AE)
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ab6a6f7d69b22af7598815c8a00305557">StreamCiphers::CSXR80H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR80H256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a08cd096404bd88193aa1a77147fa82e7">StreamCiphers::CSXR80H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR80H512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a43337381c61d260a26a86c6a578cde63">StreamCiphers::CSXR80K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR80K256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a0314d6b81c6e54cb79f747e1a66adf53">StreamCiphers::CSXR80K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR80K512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127af756b6b8a38709eef5a9b24d05dedcce">StreamCiphers::CSXR80P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR80P256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6c59a4c8ca7b1d2e29a48613ab5c686f">StreamCiphers::MCSRH256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRH256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aedcee530317adf99c9bed3c75e096dff">StreamCiphers::MCSRH512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRH512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aaaf31bb351279714ca6abf5a0c758112">StreamCiphers::MCSRK256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRK256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa919ceebc053687496d9e4d805f1cc85">StreamCiphers::MCSRK512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRK512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a9d3138ff6abf0def0bc1de9dbb161a05">StreamCiphers::MCSRP256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRP256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a27cc0c9c636bda3ebb4c240de169165f">StreamCiphers::MCSSH256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSH256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6fed2cdd66e9aebfb123617c7d8b5799">StreamCiphers::MCSSH512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSH512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a7e712209a64dd93bb2bfc89d8e0ccfa7">StreamCiphers::MCSSK256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSK256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac6ce0869b25a2e37e95a4b3b13d4d81a">StreamCiphers::MCSSK512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSK512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2094b0cbced8031f6ba27dfeaa1e0e31">StreamCiphers::MCSSP256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSP256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2afa689ca12af7a68d7ec2998eeeb8f2">StreamCiphers::MCSR</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSR), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa469b38881a027d83e20b43c1ec30205">StreamCiphers::MCSS</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSS), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a5852281688f5bba8ddab1a5c7a2a3c6b">StreamCiphers::RCS</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCS), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ae25f0d52fe9399665f0135b3853cddf3">StreamCiphers::RCSH256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSH256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ada244fa36dbcd674492d6a1d5f452858">StreamCiphers::RCSH512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSH512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a87ff8ca88c78ac5ccf25c571da9a0f19">StreamCiphers::RCSK256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aca5b4a009862f795cccf6a407032cdd5">StreamCiphers::RCSK512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a3aaf1b1e627f76e88fe1d50b293b628e">StreamCiphers::RCSK1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK1024), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6718e0cb553f2279d28c618e2ab91c1b">StreamCiphers::RCSP256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSP256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34">StreamCiphers::TSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac3294e2eccd1538e59122fce2949b772">StreamCiphers::TSXR72H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72H256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a54e482aa136621746ea03eca7db3bbf1">StreamCiphers::TSXR72H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72H512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127acbd6cb7a36f7cdf3f808c8bcdd8d3ffd">StreamCiphers::TSXR72K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72K256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a29b30e584965154ba752f39a11e0418a">StreamCiphers::TSXR72K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72K512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a7620a0f8b98b59a1d69b0d4d44426be5">StreamCiphers::TSXR72P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72P256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba">StreamCiphers::TSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a24cdf3cd94bb74191355aaf8846c1c2d">StreamCiphers::TSXR96H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96H256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac342858f297612d7296f46e1903626bd">StreamCiphers::TSXR96H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96H512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a22acb14d0f87905024002a5ced6c3d63">StreamCiphers::TSXR96K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96K256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac24e3734b59446e8bd9ed4c768ce81f2">StreamCiphers::TSXR96K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96K512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa5fa492f81c532c560d545318611e710">StreamCiphers::TSXR96P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96P256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068">StreamCiphers::TSX1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a66953cde9469e61bc737055854dd7874">StreamCiphers::TSXR120H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120H256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ad3e518758af5fa6a4e852d3968cdddd1">StreamCiphers::TSXR120H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120H512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa86c1b935e9bdf312ac00dcecd93e8c2">StreamCiphers::TSXR120K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ae050bd249a1dcdafa734ec75b154937f">StreamCiphers::TSXR120K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127adfa625df24ded54bf98e44a9c2221c7e">StreamCiphers::TSXR120K1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K1024), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a0441feb05297b2a9d102829b05883305">StreamCiphers::TSXR120P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120P256)
 <br />
  }</td></tr>
 <tr class="separator:ga62fe0a4066025a96f0d329627b1bf127"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -431,36 +475,96 @@ Enumerations</h2></td></tr>
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4909f2a35f7134a761d87af66a4985aa">SymmetricCiphers::SHXS512</a> = 48, 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a70f8ec0fd2b16283f44c38b7460cef24">SymmetricCiphers::SHXS1024</a> = 49, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2a73a3f41e1cc8dd0aa47676aae9a057">SymmetricCiphers::ACS256H</a> = 64, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a97407485478640ca9e6d321c3badc5e5">SymmetricCiphers::ACS512H</a> = 65, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8afc06e5a5503d035d1af71adb4bc29a23">SymmetricCiphers::ACS256S</a> = 66, 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a1f6eaf2274b9b4a623ea92b93aa78054">SymmetricCiphers::ACS512S</a> = 67, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a3763590ba4935513c1f6b8466f644ed6">SymmetricCiphers::ACS</a> = 68, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a9f62076fd9b490d6a2ae42532c35f767">SymmetricCiphers::CSX256</a> = 96, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2ca2913af15250541b9584b5504388f2">SymmetricCiphers::CSX256AE</a> = 97, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2bef0cef4d388c11665e19e5da90f1d4">SymmetricCiphers::CSXR20H256</a> = 97, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a80cfe562faa23d8c2e9ae7f55c59f9ac">SymmetricCiphers::CSXR20H512</a> = 98, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a5bae7e694331ffe4f22a5f4d34ea8bf9">SymmetricCiphers::CSX512</a> = 98, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a7d974584e3c969bec73bc993ff85ad7a">SymmetricCiphers::CSX512AE</a> = 99, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34">SymmetricCiphers::TSX256</a> = 128, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac3464460a56e69447faf02356ef59579">SymmetricCiphers::TSX256AE</a> = 129, 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8abc5ebec8b462871ac01f536026baa8de">SymmetricCiphers::CSXR20K256</a> = 99, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a42a2a90620157c2e917718971bc0544e">SymmetricCiphers::CSXR20K512</a> = 100, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8afbda191d6a5464ef54b61dcd15ddee3d">SymmetricCiphers::CSXR20P256</a> = 101, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a5bae7e694331ffe4f22a5f4d34ea8bf9">SymmetricCiphers::CSX512</a> = 102, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba">SymmetricCiphers::TSX512</a> = 130, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8abe9068c7a1b62da7c01061c49fbc6ab4">SymmetricCiphers::TSX512AE</a> = 131, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068">SymmetricCiphers::TSX1024</a> = 132, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a94995933677fa3af5d4fb2ef8333e9ac">SymmetricCiphers::TSX1024AE</a> = 133
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ab6a6f7d69b22af7598815c8a00305557">SymmetricCiphers::CSXR80H256</a> = 103, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a08cd096404bd88193aa1a77147fa82e7">SymmetricCiphers::CSXR80H512</a> = 104, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a43337381c61d260a26a86c6a578cde63">SymmetricCiphers::CSXR80K256</a> = 105, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a0314d6b81c6e54cb79f747e1a66adf53">SymmetricCiphers::CSXR80K512</a> = 106, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8af756b6b8a38709eef5a9b24d05dedcce">SymmetricCiphers::CSXR80P256</a> = 107, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6c59a4c8ca7b1d2e29a48613ab5c686f">SymmetricCiphers::MCSRH256</a> = 64, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aedcee530317adf99c9bed3c75e096dff">SymmetricCiphers::MCSRH512</a> = 65, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aaaf31bb351279714ca6abf5a0c758112">SymmetricCiphers::MCSRK256</a> = 66, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa919ceebc053687496d9e4d805f1cc85">SymmetricCiphers::MCSRK512</a> = 67, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a9d3138ff6abf0def0bc1de9dbb161a05">SymmetricCiphers::MCSRP256</a> = 68, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a27cc0c9c636bda3ebb4c240de169165f">SymmetricCiphers::MCSSH256</a> = 69, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6fed2cdd66e9aebfb123617c7d8b5799">SymmetricCiphers::MCSSH512</a> = 70, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a7e712209a64dd93bb2bfc89d8e0ccfa7">SymmetricCiphers::MCSSK256</a> = 71, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac6ce0869b25a2e37e95a4b3b13d4d81a">SymmetricCiphers::MCSSK512</a> = 72, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2094b0cbced8031f6ba27dfeaa1e0e31">SymmetricCiphers::MCSSP256</a> = 73, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2afa689ca12af7a68d7ec2998eeeb8f2">SymmetricCiphers::MCSR</a> = 74, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa469b38881a027d83e20b43c1ec30205">SymmetricCiphers::MCSS</a> = 75, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a5852281688f5bba8ddab1a5c7a2a3c6b">SymmetricCiphers::RCS</a> = 160, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ae25f0d52fe9399665f0135b3853cddf3">SymmetricCiphers::RCSH256</a> = 161, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ada244fa36dbcd674492d6a1d5f452858">SymmetricCiphers::RCSH512</a> = 162, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a87ff8ca88c78ac5ccf25c571da9a0f19">SymmetricCiphers::RCSK256</a> = 163, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aca5b4a009862f795cccf6a407032cdd5">SymmetricCiphers::RCSK512</a> = 164, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a3aaf1b1e627f76e88fe1d50b293b628e">SymmetricCiphers::RCSK1024</a> = 165, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6718e0cb553f2279d28c618e2ab91c1b">SymmetricCiphers::RCSP256</a> = 166, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34">SymmetricCiphers::TSX256</a> = 128, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac3294e2eccd1538e59122fce2949b772">SymmetricCiphers::TSXR72H256</a> = 129, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a54e482aa136621746ea03eca7db3bbf1">SymmetricCiphers::TSXR72H512</a> = 130, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8acbd6cb7a36f7cdf3f808c8bcdd8d3ffd">SymmetricCiphers::TSXR72K256</a> = 131, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a29b30e584965154ba752f39a11e0418a">SymmetricCiphers::TSXR72K512</a> = 132, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a7620a0f8b98b59a1d69b0d4d44426be5">SymmetricCiphers::TSXR72P256</a> = 133, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba">SymmetricCiphers::TSX512</a> = 134, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a24cdf3cd94bb74191355aaf8846c1c2d">SymmetricCiphers::TSXR96H256</a> = 135, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac342858f297612d7296f46e1903626bd">SymmetricCiphers::TSXR96H512</a> = 136, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a22acb14d0f87905024002a5ced6c3d63">SymmetricCiphers::TSXR96K256</a> = 137, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac24e3734b59446e8bd9ed4c768ce81f2">SymmetricCiphers::TSXR96K512</a> = 138, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa5fa492f81c532c560d545318611e710">SymmetricCiphers::TSXR96P256</a> = 139, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068">SymmetricCiphers::TSX1024</a> = 140, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a66953cde9469e61bc737055854dd7874">SymmetricCiphers::TSXR120H256</a> = 141, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ad3e518758af5fa6a4e852d3968cdddd1">SymmetricCiphers::TSXR120H512</a> = 142, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa86c1b935e9bdf312ac00dcecd93e8c2">SymmetricCiphers::TSXR120K256</a> = 143, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ae050bd249a1dcdafa734ec75b154937f">SymmetricCiphers::TSXR120K512</a> = 144, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8adfa625df24ded54bf98e44a9c2221c7e">SymmetricCiphers::TSXR120K1024</a> = 145, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a0441feb05297b2a9d102829b05883305">SymmetricCiphers::TSXR120P256</a> = 146
 <br />
  }</td></tr>
 <tr class="separator:ga83e5aeee49605814f7a50b7521a86bf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gab301633efff72f1f771f9e45f23aa72e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gab301633efff72f1f771f9e45f23aa72e">ThreefishModes</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea6adf97f83acf6453d4a6a4b1070f3754">ThreefishModes::None</a> = 0, 
 <a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea542d77dbc16fc5a977920334221e5c34">ThreefishModes::TSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256), 
-<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eac3464460a56e69447faf02356ef59579">ThreefishModes::TSX256AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256AE), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eac3294e2eccd1538e59122fce2949b772">ThreefishModes::TSXR72H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72H256), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea54e482aa136621746ea03eca7db3bbf1">ThreefishModes::TSXR72H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72H512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eacbd6cb7a36f7cdf3f808c8bcdd8d3ffd">ThreefishModes::TSXR72K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72K256), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea29b30e584965154ba752f39a11e0418a">ThreefishModes::TSXR72K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72K512), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea7620a0f8b98b59a1d69b0d4d44426be5">ThreefishModes::TSXR72P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72P256), 
 <a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eab0a3c1572eaa1c8dcd068763921394ba">ThreefishModes::TSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eabe9068c7a1b62da7c01061c49fbc6ab4">ThreefishModes::TSX512AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512AE), 
+&#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea24cdf3cd94bb74191355aaf8846c1c2d">ThreefishModes::TSXR96H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96H256), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eac342858f297612d7296f46e1903626bd">ThreefishModes::TSXR96H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96H512), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea22acb14d0f87905024002a5ced6c3d63">ThreefishModes::TSXR96K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96K256), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eac24e3734b59446e8bd9ed4c768ce81f2">ThreefishModes::TSXR96K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96K512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eaa5fa492f81c532c560d545318611e710">ThreefishModes::TSXR96P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96P256), 
 <a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea4824734e322b78f4894959edbd096068">ThreefishModes::TSX1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024), 
-<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea94995933677fa3af5d4fb2ef8333e9ac">ThreefishModes::TSX1024AE</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024AE)
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea66953cde9469e61bc737055854dd7874">ThreefishModes::TSXR120H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120H256), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ead3e518758af5fa6a4e852d3968cdddd1">ThreefishModes::TSXR120H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120H512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eaa86c1b935e9bdf312ac00dcecd93e8c2">ThreefishModes::TSXR120K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K256), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eae050bd249a1dcdafa734ec75b154937f">ThreefishModes::TSXR120K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K512), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72eadfa625df24ded54bf98e44a9c2221c7e">ThreefishModes::TSXR120K1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K1024), 
+<a class="el" href="group___enumeration.html#ggab301633efff72f1f771f9e45f23aa72ea0441feb05297b2a9d102829b05883305">ThreefishModes::TSXR120P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120P256)
 <br />
  }</td></tr>
 <tr class="separator:gab301633efff72f1f771f9e45f23aa72e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1146,8 +1250,6 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga2da315b4e41c3a75fd478a5d60c4d685a3e30ce90c5b1d89ae09b7d4c73d8e172"></a>ESP&#160;</td><td class="fielddoc"><p>ESP Padding Mode </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga2da315b4e41c3a75fd478a5d60c4d685ad093b04fdf58bfc72c9e789ae86be4d2"></a>ISO7816&#160;</td><td class="fielddoc"><p>ISO7816 Padding Mode </p>
-</td></tr>
 <tr><td class="fieldname"><a id="gga2da315b4e41c3a75fd478a5d60c4d685a0ee2623db2098d20cc248a0c42970a56"></a>PKCS7&#160;</td><td class="fielddoc"><p>PKCS7 Padding Mode </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga2da315b4e41c3a75fd478a5d60c4d685a79314a549f8b1986485e042238b73b8b"></a>X923&#160;</td><td class="fielddoc"><p>X923 Padding Mode </p>
@@ -1508,6 +1610,8 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274ac5ba8d97d4055160e3d16817de07618f"></a>KMAC1024&#160;</td><td class="fielddoc"><p>The KMAC-1024 message authentication code generator (experimental) </p>
 </td></tr>
+<tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274ab6fd733868a97b1057243c9e9e381074"></a>Poly1305&#160;</td><td class="fielddoc"><p>The Poly1305 message authentication code generator </p>
+</td></tr>
 </table>
 
 </div>
@@ -1534,35 +1638,155 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>No stream cipher is specified </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2a73a3f41e1cc8dd0aa47676aae9a057"></a>ACS256H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-HMAC256 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a9f62076fd9b490d6a2ae42532c35f767"></a>CSX256&#160;</td><td class="fielddoc"><p>A standard implementation of the ChaChaPoly20 stream-cipher, this variant uses 20 rounds and has no athentication. </p>
+<p>A standard ChaChaPoly20 stream-cipher implementation: uses a 512-bit block and a 256-bit key, and 8-byte nonce</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a97407485478640ca9e6d321c3badc5e5"></a>ACS512H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-HMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2bef0cef4d388c11665e19e5da90f1d4"></a>CSXR20H256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with HMAC-SHA2-256 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127afc06e5a5503d035d1af71adb4bc29a23"></a>ACS256S&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using SHX-KMAC256 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a80cfe562faa23d8c2e9ae7f55c59f9ac"></a>CSXR20H512&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with HMAC-SHA2-512 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a1f6eaf2274b9b4a623ea92b93aa78054"></a>ACS512S&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using SHX-KMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127abc5ebec8b462871ac01f536026baa8de"></a>CSXR20K256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC-256 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a3763590ba4935513c1f6b8466f644ed6"></a>ACS&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; no authentication specified </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a42a2a90620157c2e917718971bc0544e"></a>CSXR20K512&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC-512 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a9f62076fd9b490d6a2ae42532c35f767"></a>CSX256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127afbda191d6a5464ef54b61dcd15ddee3d"></a>CSXR20P256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with Poly1305 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2ca2913af15250541b9584b5504388f2"></a>CSX256AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC256 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a5bae7e694331ffe4f22a5f4d34ea8bf9"></a>CSX512&#160;</td><td class="fielddoc"><p>A extended implementation of the ChaCha stream-cipher, this variant uses 80 rounds and has no athentication. </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a5bae7e694331ffe4f22a5f4d34ea8bf9"></a>CSX512&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ab6a6f7d69b22af7598815c8a00305557"></a>CSXR80H256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with HMAC-SHA2-256 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a7d974584e3c969bec73bc993ff85ad7a"></a>CSX512AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher authenticated with KMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a08cd096404bd88193aa1a77147fa82e7"></a>CSXR80H512&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with HMAC-SHA2-512 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a43337381c61d260a26a86c6a578cde63"></a>CSXR80K256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with KMAC-256 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac3464460a56e69447faf02356ef59579"></a>TSX256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a0314d6b81c6e54cb79f747e1a66adf53"></a>CSXR80K512&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with KMAC-512 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127af756b6b8a38709eef5a9b24d05dedcce"></a>CSXR80P256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with Poly1305 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127abe9068c7a1b62da7c01061c49fbc6ab4"></a>TSX512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6c59a4c8ca7b1d2e29a48613ab5c686f"></a>MCSRH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aedcee530317adf99c9bed3c75e096dff"></a>MCSRH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a94995933677fa3af5d4fb2ef8333e9ac"></a>TSX1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024 </p>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aaaf31bb351279714ca6abf5a0c758112"></a>MCSRK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aa919ceebc053687496d9e4d805f1cc85"></a>MCSRK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a9d3138ff6abf0def0bc1de9dbb161a05"></a>MCSRP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and Poly1305 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a27cc0c9c636bda3ebb4c240de169165f"></a>MCSSH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6fed2cdd66e9aebfb123617c7d8b5799"></a>MCSSH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a7e712209a64dd93bb2bfc89d8e0ccfa7"></a>MCSSK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac6ce0869b25a2e37e95a4b3b13d4d81a"></a>MCSSK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2094b0cbced8031f6ba27dfeaa1e0e31"></a>MCSSP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and Poly1305 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2afa689ca12af7a68d7ec2998eeeb8f2"></a>MCSR&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aa469b38881a027d83e20b43c1ec30205"></a>MCSS&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a5852281688f5bba8ddab1a5c7a2a3c6b"></a>RCS&#160;</td><td class="fielddoc"><p>The Rijndael wide-block based authenticated stream cipher. </p>
+<p>A Rijndael Extended cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ae25f0d52fe9399665f0135b3853cddf3"></a>RCSH256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-256 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ada244fa36dbcd674492d6a1d5f452858"></a>RCSH512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using RHX-KMAC-512 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a87ff8ca88c78ac5ccf25c571da9a0f19"></a>RCSK256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-256 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aca5b4a009862f795cccf6a407032cdd5"></a>RCSK512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-512 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a3aaf1b1e627f76e88fe1d50b293b628e"></a>RCSK1024&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6718e0cb553f2279d28c618e2ab91c1b"></a>RCSP256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>A standard implementation of the Threefish-256 stream-cipher, this variant uses 72 rounds and has no athentication. </p>
+<p>A Threefish-256 stream-cipher: uses a 256-bit block a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac3294e2eccd1538e59122fce2949b772"></a>TSXR72H256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-256 </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a54e482aa136621746ea03eca7db3bbf1"></a>TSXR72H512&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-512 </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127acbd6cb7a36f7cdf3f808c8bcdd8d3ffd"></a>TSXR72K256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a29b30e584965154ba752f39a11e0418a"></a>TSXR72K512&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a7620a0f8b98b59a1d69b0d4d44426be5"></a>TSXR72P256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher, this variant uses 96 rounds and has no athentication. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a24cdf3cd94bb74191355aaf8846c1c2d"></a>TSXR96H256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-256. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac342858f297612d7296f46e1903626bd"></a>TSXR96H512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-512. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a22acb14d0f87905024002a5ced6c3d63"></a>TSXR96K256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac24e3734b59446e8bd9ed4c768ce81f2"></a>TSXR96K512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aa5fa492f81c532c560d545318611e710"></a>TSXR96P256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher, this variant uses 120 rounds and has no athentication. </p>
+<p>Extended cipher implementation: uses a 1024-bit block and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a66953cde9469e61bc737055854dd7874"></a>TSXR120H256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-256. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ad3e518758af5fa6a4e852d3968cdddd1"></a>TSXR120H512&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-512. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aa86c1b935e9bdf312ac00dcecd93e8c2"></a>TSXR120K256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ae050bd249a1dcdafa734ec75b154937f"></a>TSXR120K512&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127adfa625df24ded54bf98e44a9c2221c7e"></a>TSXR120K1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-1024. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a0441feb05297b2a9d102829b05883305"></a>TSXR120P256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
 </td></tr>
 </table>
 
@@ -1658,49 +1882,155 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a70f8ec0fd2b16283f44c38b7460cef24"></a>SHXS1024&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher extended with an cSHAKE-1024 secure key schedule. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2a73a3f41e1cc8dd0aa47676aae9a057"></a>ACS256H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC256. </p>
-<p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a9f62076fd9b490d6a2ae42532c35f767"></a>CSX256&#160;</td><td class="fielddoc"><p>A standard implementation of the ChaChaPoly20 stream-cipher, this variant uses 20 rounds and has no athentication. </p>
+<p>A standard ChaChaPoly20 stream-cipher implementation: uses a 512-bit block and a 256-bit key, and 8-byte nonce</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a97407485478640ca9e6d321c3badc5e5"></a>ACS512H&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using RHX-KMAC512. </p>
-<p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2bef0cef4d388c11665e19e5da90f1d4"></a>CSXR20H256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with HMAC-SHA2-256 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8afc06e5a5503d035d1af71adb4bc29a23"></a>ACS256S&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using SHX-KMAC256. </p>
-<p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a80cfe562faa23d8c2e9ae7f55c59f9ac"></a>CSXR20H512&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with HMAC-SHA2-512 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a1f6eaf2274b9b4a623ea92b93aa78054"></a>ACS512S&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using SHX-KMAC512. </p>
-<p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8abc5ebec8b462871ac01f536026baa8de"></a>CSXR20K256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC-256 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a3763590ba4935513c1f6b8466f644ed6"></a>ACS&#160;</td><td class="fielddoc"><p>The Authenticated Stream Cipher; using default parameters AES-CSHAKE512-KMAC512. </p>
-<p>Standards based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a42a2a90620157c2e917718971bc0544e"></a>CSXR20K512&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC-512 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a9f62076fd9b490d6a2ae42532c35f767"></a>CSX256&#160;</td><td class="fielddoc"><p>An standard implementation of the ChaChaPoly20 stream cipher. </p>
-<p>Standards based implementation: uses a 512-bit block a 256-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8afbda191d6a5464ef54b61dcd15ddee3d"></a>CSXR20P256&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with Poly1305 </p>
+<p>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2ca2913af15250541b9584b5504388f2"></a>CSX256AE&#160;</td><td class="fielddoc"><p>The ChaChaPoly20 stream cipher authenticated with KMAC256 </p>
-<p>Extended cipher implementation: uses a 512-bit block a 256-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a5bae7e694331ffe4f22a5f4d34ea8bf9"></a>CSX512&#160;</td><td class="fielddoc"><p>A extended implementation of the ChaCha stream-cipher, this variant uses 80 rounds and has no athentication. </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a5bae7e694331ffe4f22a5f4d34ea8bf9"></a>CSX512&#160;</td><td class="fielddoc"><p>The ChaChaPoly80 stream cipher. </p>
-<p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ab6a6f7d69b22af7598815c8a00305557"></a>CSXR80H256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with HMAC-SHA2-256 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a7d974584e3c969bec73bc993ff85ad7a"></a>CSX512AE&#160;</td><td class="fielddoc"><p>. The ChaChaPoly80 stream cipher authenticated with KMAC512. </p>
-<p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a08cd096404bd88193aa1a77147fa82e7"></a>CSXR80H512&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with HMAC-SHA2-512 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher. </p>
-<p>Standards based implementation: uses a 256-bit block a 256-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a43337381c61d260a26a86c6a578cde63"></a>CSXR80K256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with KMAC-256 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac3464460a56e69447faf02356ef59579"></a>TSX256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256. </p>
-<p>Extended cipher implementation: uses a 256-bit block a 256-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a0314d6b81c6e54cb79f747e1a66adf53"></a>CSXR80K512&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with KMAC-512 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher. </p>
-<p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8af756b6b8a38709eef5a9b24d05dedcce"></a>CSXR80P256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with Poly1305 </p>
+<p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8abe9068c7a1b62da7c01061c49fbc6ab4"></a>TSX512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512. </p>
-<p>Extended cipher implementation: uses a 512-bit block a 512-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6c59a4c8ca7b1d2e29a48613ab5c686f"></a>MCSRH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher. </p>
-<p>Extended cipher implementation: uses a 1024-bit block a 1024-bit key size</p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aedcee530317adf99c9bed3c75e096dff"></a>MCSRH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a94995933677fa3af5d4fb2ef8333e9ac"></a>TSX1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aaaf31bb351279714ca6abf5a0c758112"></a>MCSRK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aa919ceebc053687496d9e4d805f1cc85"></a>MCSRK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a9d3138ff6abf0def0bc1de9dbb161a05"></a>MCSRP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and Poly1305 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a27cc0c9c636bda3ebb4c240de169165f"></a>MCSSH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6fed2cdd66e9aebfb123617c7d8b5799"></a>MCSSH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a7e712209a64dd93bb2bfc89d8e0ccfa7"></a>MCSSK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-256 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac6ce0869b25a2e37e95a4b3b13d4d81a"></a>MCSSK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-512 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2094b0cbced8031f6ba27dfeaa1e0e31"></a>MCSSP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and Poly1305 for authentication. </p>
+<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2afa689ca12af7a68d7ec2998eeeb8f2"></a>MCSR&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
+<p>Extended Rijndael-based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aa469b38881a027d83e20b43c1ec30205"></a>MCSS&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
+<p>Extended Serpent-based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a5852281688f5bba8ddab1a5c7a2a3c6b"></a>RCS&#160;</td><td class="fielddoc"><p>The Rijndael wide-block based authenticated stream cipher. </p>
+<p>A Rijndael Extended cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ae25f0d52fe9399665f0135b3853cddf3"></a>RCSH256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-256 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ada244fa36dbcd674492d6a1d5f452858"></a>RCSH512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using RHX-KMAC-512 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a87ff8ca88c78ac5ccf25c571da9a0f19"></a>RCSK256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-256 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aca5b4a009862f795cccf6a407032cdd5"></a>RCSK512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-512 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a3aaf1b1e627f76e88fe1d50b293b628e"></a>RCSK1024&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6718e0cb553f2279d28c618e2ab91c1b"></a>RCSP256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>A standard implementation of the Threefish-256 stream-cipher, this variant uses 72 rounds and has no athentication. </p>
+<p>A Threefish-256 stream-cipher: uses a 256-bit block a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac3294e2eccd1538e59122fce2949b772"></a>TSXR72H256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-256 </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a54e482aa136621746ea03eca7db3bbf1"></a>TSXR72H512&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-512 </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8acbd6cb7a36f7cdf3f808c8bcdd8d3ffd"></a>TSXR72K256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a29b30e584965154ba752f39a11e0418a"></a>TSXR72K512&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a7620a0f8b98b59a1d69b0d4d44426be5"></a>TSXR72P256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher, this variant uses 96 rounds and has no athentication. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a24cdf3cd94bb74191355aaf8846c1c2d"></a>TSXR96H256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-256. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac342858f297612d7296f46e1903626bd"></a>TSXR96H512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-512. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a22acb14d0f87905024002a5ced6c3d63"></a>TSXR96K256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac24e3734b59446e8bd9ed4c768ce81f2"></a>TSXR96K512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aa5fa492f81c532c560d545318611e710"></a>TSXR96P256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher, this variant uses 120 rounds and has no athentication. </p>
+<p>Extended cipher implementation: uses a 1024-bit block and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a66953cde9469e61bc737055854dd7874"></a>TSXR120H256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-256. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ad3e518758af5fa6a4e852d3968cdddd1"></a>TSXR120H512&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-512. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aa86c1b935e9bdf312ac00dcecd93e8c2"></a>TSXR120K256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ae050bd249a1dcdafa734ec75b154937f"></a>TSXR120K512&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8adfa625df24ded54bf98e44a9c2221c7e"></a>TSXR120K1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-1024. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a0441feb05297b2a9d102829b05883305"></a>TSXR120P256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
 </td></tr>
 </table>
 
@@ -1728,17 +2058,62 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>No Threefish mode has been selected </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>A standard implementation of the Threefish-256 stream-cipher, this variant uses 72 rounds and has no athentication. </p>
+<p>A Threefish-256 stream-cipher: uses a 256-bit block a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eac3464460a56e69447faf02356ef59579"></a>TSX256AE&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC256 </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eac3294e2eccd1538e59122fce2949b772"></a>TSXR72H256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-256 </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea54e482aa136621746ea03eca7db3bbf1"></a>TSXR72H512&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-512 </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eabe9068c7a1b62da7c01061c49fbc6ab4"></a>TSX512AE&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC512 </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eacbd6cb7a36f7cdf3f808c8bcdd8d3ffd"></a>TSXR72K256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea29b30e584965154ba752f39a11e0418a"></a>TSXR72K512&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea94995933677fa3af5d4fb2ef8333e9ac"></a>TSX1024AE&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC1024 </p>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea7620a0f8b98b59a1d69b0d4d44426be5"></a>TSXR72P256&#160;</td><td class="fielddoc"><p>The Threefish 256-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eab0a3c1572eaa1c8dcd068763921394ba"></a>TSX512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher, this variant uses 96 rounds and has no athentication. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea24cdf3cd94bb74191355aaf8846c1c2d"></a>TSXR96H256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-256. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eac342858f297612d7296f46e1903626bd"></a>TSXR96H512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-512. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea22acb14d0f87905024002a5ced6c3d63"></a>TSXR96K256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eac24e3734b59446e8bd9ed4c768ce81f2"></a>TSXR96K512&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eaa5fa492f81c532c560d545318611e710"></a>TSXR96P256&#160;</td><td class="fielddoc"><p>The Threefish 512-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea4824734e322b78f4894959edbd096068"></a>TSX1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher, this variant uses 120 rounds and has no athentication. </p>
+<p>Extended cipher implementation: uses a 1024-bit block and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea66953cde9469e61bc737055854dd7874"></a>TSXR120H256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-256. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ead3e518758af5fa6a4e852d3968cdddd1"></a>TSXR120H512&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-512. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eaa86c1b935e9bdf312ac00dcecd93e8c2"></a>TSXR120K256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-256. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eae050bd249a1dcdafa734ec75b154937f"></a>TSXR120K512&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-512. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72eadfa625df24ded54bf98e44a9c2221c7e"></a>TSXR120K1024&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with KMAC-1024. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggab301633efff72f1f771f9e45f23aa72ea0441feb05297b2a9d102829b05883305"></a>TSXR120P256&#160;</td><td class="fielddoc"><p>The Threefish 1024-bit stream cipher authenticated with Poly1305. </p>
+<p>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</p>
 </td></tr>
 </table>
 

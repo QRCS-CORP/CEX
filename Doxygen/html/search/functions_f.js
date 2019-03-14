@@ -1,6 +1,7 @@
 var searchData=
 [
   ['randomshuffle',['RandomShuffle',['../class_array_tools.html#a9ca64f08cc59fd4abdc2818c25ce058e',1,'ArrayTools']]],
+  ['rcs',['RCS',['../class_r_c_s.html#a53af795b5257d946bd13a8d22d56719a',1,'RCS::RCS(const RCS &amp;)=delete'],['../class_r_c_s.html#ae84aee45823fe0f87b1b73f0a25f9d26',1,'RCS::RCS(StreamAuthenticators AuthenticatorType=StreamAuthenticators::KMAC256)']]],
   ['rdp',['RDP',['../class_r_d_p.html#a24f4c53233485ec18bdc2e0af7f592f3',1,'RDP::RDP(const RDP &amp;)=delete'],['../class_r_d_p.html#a6ce117b2eb890d7fe7791a7cf1f479c3',1,'RDP::RDP(DrandEngines DrandType=DrandEngines::RdRand)']]],
   ['rdrand',['RDRAND',['../class_cpu_detect.html#aec41688c0ef939fad121ec3e1f427821',1,'CpuDetect']]],
   ['rdseed',['RDSEED',['../class_cpu_detect.html#a8ddadbca2b9119d43e71f1db63082f38',1,'CpuDetect']]],

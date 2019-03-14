@@ -115,7 +115,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a934e06f66f92952d3ef2ab2b6804a8e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#a934e06f66f92952d3ef2ab2b6804a8e8">More...</a><br /></td></tr>
 <tr class="separator:a934e06f66f92952d3ef2ab2b6804a8e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73ab0e46f404f17608cb158fd000452b"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#a73ab0e46f404f17608cb158fd000452b">LegalKeySizes</a> () override</td></tr>
-<tr class="memdesc:a73ab0e46f404f17608cb158fd000452b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes  <a href="#a73ab0e46f404f17608cb158fd000452b">More...</a><br /></td></tr>
+<tr class="memdesc:a73ab0e46f404f17608cb158fd000452b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A vector of SymmetricKeySize containers, containing legal cipher input-key sizes  <a href="#a73ab0e46f404f17608cb158fd000452b">More...</a><br /></td></tr>
 <tr class="separator:a73ab0e46f404f17608cb158fd000452b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f3ccf879ae0bd7c46e1040970646370"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#a4f3ccf879ae0bd7c46e1040970646370">Name</a> () override</td></tr>
 <tr class="memdesc:a4f3ccf879ae0bd7c46e1040970646370"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers formal implementation name  <a href="#a4f3ccf879ae0bd7c46e1040970646370">More...</a><br /></td></tr>
@@ -130,10 +130,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:abb342604bcb6f8eb8f4578e6e2d311df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The current MAC tag value  <a href="#abb342604bcb6f8eb8f4578e6e2d311df">More...</a><br /></td></tr>
 <tr class="separator:abb342604bcb6f8eb8f4578e6e2d311df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c0026f8950e1ac25a4deeff09cbf783"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#a9c0026f8950e1ac25a4deeff09cbf783">Tag</a> (SecureVector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a9c0026f8950e1ac25a4deeff09cbf783"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy the MAC tag to a secure-vector  <a href="#a9c0026f8950e1ac25a4deeff09cbf783">More...</a><br /></td></tr>
+<tr class="memdesc:a9c0026f8950e1ac25a4deeff09cbf783"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies the internal MAC tag to a secure-vector  <a href="#a9c0026f8950e1ac25a4deeff09cbf783">More...</a><br /></td></tr>
 <tr class="separator:a9c0026f8950e1ac25a4deeff09cbf783"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f72b8ec39e4b03c730ceb3eb5c67d73"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#a7f72b8ec39e4b03c730ceb3eb5c67d73">TagSize</a> () override</td></tr>
-<tr class="memdesc:a7f72b8ec39e4b03c730ceb3eb5c67d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The legal tag length in bytes  <a href="#a7f72b8ec39e4b03c730ceb3eb5c67d73">More...</a><br /></td></tr>
+<tr class="memdesc:a7f72b8ec39e4b03c730ceb3eb5c67d73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The legal MAC tag length in bytes  <a href="#a7f72b8ec39e4b03c730ceb3eb5c67d73">More...</a><br /></td></tr>
 <tr class="separator:a7f72b8ec39e4b03c730ceb3eb5c67d73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad5c3fb36e6a9ae2419a48eb05c02eaaa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#ad5c3fb36e6a9ae2419a48eb05c02eaaa">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters) override</td></tr>
 <tr class="memdesc:ad5c3fb36e6a9ae2419a48eb05c02eaaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher with an ISymmetricKey key container.  <a href="#ad5c3fb36e6a9ae2419a48eb05c02eaaa">More...</a><br /></td></tr>
@@ -141,13 +141,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af455357a7e0c0c37c140b381728781c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#af455357a7e0c0c37c140b381728781c0">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:af455357a7e0c0c37c140b381728781c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#af455357a7e0c0c37c140b381728781c0">More...</a><br /></td></tr>
 <tr class="separator:af455357a7e0c0c37c140b381728781c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c5be62cea16dff5e94c6bbdc5193f5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#a5c5be62cea16dff5e94c6bbdc5193f5c">SetAssociatedData</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length) override</td></tr>
-<tr class="memdesc:a5c5be62cea16dff5e94c6bbdc5193f5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the authentication generator. <br />
-  <a href="#a5c5be62cea16dff5e94c6bbdc5193f5c">More...</a><br /></td></tr>
-<tr class="separator:a5c5be62cea16dff5e94c6bbdc5193f5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac36d5f03b6ae0aea025c1d51b4d00ee5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#ac36d5f03b6ae0aea025c1d51b4d00ee5">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length) override</td></tr>
-<tr class="memdesc:ac36d5f03b6ae0aea025c1d51b4d00ee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt/Decrypt an array of bytes with offset and length parameters.  <a href="#ac36d5f03b6ae0aea025c1d51b4d00ee5">More...</a><br /></td></tr>
-<tr class="separator:ac36d5f03b6ae0aea025c1d51b4d00ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d0245458c9b91161b8aa42f86468489"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#a1d0245458c9b91161b8aa42f86468489">SetAssociatedData</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a1d0245458c9b91161b8aa42f86468489"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the message authentication code generator. <br />
+  <a href="#a1d0245458c9b91161b8aa42f86468489">More...</a><br /></td></tr>
+<tr class="separator:a1d0245458c9b91161b8aa42f86468489"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1429d2eba1ed6f9b7191249155d119ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_t_s_x1024.html#a1429d2eba1ed6f9b7191249155d119ab">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length) override</td></tr>
+<tr class="memdesc:a1429d2eba1ed6f9b7191249155d119ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt/Decrypt a vector of bytes with offset and length parameters.  <a href="#a1429d2eba1ed6f9b7191249155d119ab">More...</a><br /></td></tr>
+<tr class="separator:a1429d2eba1ed6f9b7191249155d119ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_stream_cipher"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_stream_cipher')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_stream_cipher.html">IStreamCipher</a></td></tr>
 <tr class="memitem:aab5703da1dc45a1b920469dae8cd8ccf inherit pub_methods_class_i_stream_cipher"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_stream_cipher.html#aab5703da1dc45a1b920469dae8cd8ccf">IStreamCipher</a> (const <a class="el" href="class_i_stream_cipher.html">IStreamCipher</a> &amp;)=delete</td></tr>
 <tr class="memdesc:aab5703da1dc45a1b920469dae8cd8ccf inherit pub_methods_class_i_stream_cipher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_stream_cipher.html#aab5703da1dc45a1b920469dae8cd8ccf">More...</a><br /></td></tr>
@@ -164,11 +164,11 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A vectorized and optionally parallelized Threefish-1024 120-round stream cipher [TSX1024] implementation. </p>
-<p>Uses an optional authentication mode; HMAC(SHA2) or KMAC set through the constructor to authenticate the stream.</p>
+<p>This cipher uses an optional authentication mode; Poly1305, HMAC(SHA2), or KMAC set through the constructor to authenticate the stream.</p>
 <p>Encrypt and add a MAC code to an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_t_s_x1024.html">TSX1024</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_t_s_x1024.html">TSX1024</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"></div><div class="line"><span class="comment">// decrypt the ciphertext, if the authentication fails an exception is thrown</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="class_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>This cipher is a vectorized and optionally parallelized implementation of the Threefish-1024 cipher, used by the Skein family of hash functions. <br />
 It is capable of processing data using AVX2 or AVX512 SIMD instructions, and can also optionally employ multi-threaded parallelism. <br />
-An optional authentication component has also been added, and the cipher output can be authenticated using either an SHA2 hash based HMAC, or the Keccak based KMAC message authentication code generators. <br />
+An optional authentication component has also been added, and the cipher output can be authenticated using either an SHA2 hash based HMAC, the Keccak based KMAC, or Poly1305 message authentication code generators. <br />
 The number of rounds in the permutation function has been increased in this implementation from the standard 80 to 120 rounds to increase the potential security of the cipher.</p>
 <p><b>Multi-Threading:</b> </p>
 <p>The transformation function used by Threefish is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded. <br />
@@ -178,7 +178,7 @@ This is achieved by pre-calculating the counters positional offset over multiple
 <p>When operating in authenticated mode; in an encryption cycle the MAC code is automatically appended to the output cipher-text. <br />
 During a decryption cycle, the code is checked against the new code generated by the MAC generator, and a failure will throw a CryptoAuthenticationFailure exception. <br />
 It is recommended that the decryption function is wrapped in a try/catch block, so that the CryptoAuthenticationFailure exception can be handled by the calling function. <br />
-The supported MAC generator options for TSX1024 are HMAC(SHA2-256/512), and the Keccak based KMAC-256, KMAC-512, and the experimental KMAC-1024.</p>
+The supported MAC generator options for TSX1024 are Poly1305, HMAC(SHA2-256/512), and the Keccak based KMAC-256, KMAC-512, and the experimental KMAC-1024.</p>
 <p>Implementation Notes: </p><ul>
 <li>
 The key size is fixed at 128 bytes (1024 bits). </li>
@@ -191,9 +191,9 @@ The internal block size is 128 bytes wide. </li>
 <li>
 Permutation rounds have been increased from the standard Threefish-1024 implementation of 80, and are fixed at 120. </li>
 <li>
-Authentication using HMAC or KMAC, can be invoked by setting the StreamAuthenticators parameter in the constructor. </li>
+Authentication using Poly1305, HMAC, or KMAC, can be invoked by setting the StreamAuthenticators parameter in the constructor. </li>
 <li>
-This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to one of the HMAC or KMAC options. </li>
+This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to Poly1305, or one of the HMAC or KMAC options. </li>
 <li>
 In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text of each transform call, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception. </li>
 <li>
@@ -209,11 +209,11 @@ The transformation functions can not be called until the Initialize(ISymmetricKe
 <li>
 If the system supports Parallel processing, and ParallelProfile().IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized. </li>
 <li>
-The ParallelProfile().ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system. </li>
+The ParallelProfile().ParallelThreadsMax() property is used as the thread count in the parallel loop; it defaults to the maximum number of available virtual cores, but is user-assignable, and must be an even number no greater than the number of processer cores on the system. </li>
 <li>
 ParallelProfile().ParallelBlockSize() is calculated automatically based on processor(s) cache size but can be user defined, but must be evenly divisible by ParallelProfile().ParallelMinimumSize(). </li>
 <li>
-The ParallelBlockSize() can be changed through the ParallelProfile() property </li>
+The ParallelBlockSize(), IsParallel(), and ParallelThreadsMax() accessors, can be changed through the ParallelProfile() property </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -546,7 +546,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes </p>
+<p>Read Only: A vector of SymmetricKeySize containers, containing legal cipher input-key sizes </p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a50c9524e55e3a37bf648baf2c3933d0e">IStreamCipher</a>.</p>
 
@@ -633,7 +633,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </div><div class="memdoc">
 
 <p>Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing. </p>
-<p>This value can be changed through the ParallelProfile class.</p>
+<p>This value can be changed through the ParallelProfile class, but must be a multiple of the ParallelMinimumSize().</p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#af232e69a8ad4186b8595cdd3ff51a393">IStreamCipher</a>.</p>
 
@@ -667,7 +667,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <p>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. Thread count must be an even number, and not exceed the number of processor virtual cores.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>
@@ -712,8 +712,8 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 
 </div>
 </div>
-<a id="a5c5be62cea16dff5e94c6bbdc5193f5c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c5be62cea16dff5e94c6bbdc5193f5c">&#9670;&nbsp;</a></span>SetAssociatedData()</h2>
+<a id="a1d0245458c9b91161b8aa42f86468489"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d0245458c9b91161b8aa42f86468489">&#9670;&nbsp;</a></span>SetAssociatedData()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -730,13 +730,13 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -752,13 +752,13 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Add additional data to the authentication generator. <br />
+<p>Add additional data to the message authentication code generator. <br />
  </p>
-<p>Must be called after Initialize(bool, ISymmetricKey), and can be called before or after a stream segment has been processed.</p>
+<p>Must be called after Initialize(bool, ISymmetricKey), and can then be called before or after a stream segment has been processed.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to process</td></tr>
-    <tr><td class="paramname">Offset</td><td>Starting offset within the input array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of bytes to process</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset within the input vector</td></tr>
     <tr><td class="paramname">Length</td><td>The number of bytes to process</td></tr>
   </table>
   </dd>
@@ -770,7 +770,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_stream_cipher.html#aac6f69ec029ba6b6c13a3271d05cec80">IStreamCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_stream_cipher.html#ac6bccba6291cbb123d273dbfefe0d03c">IStreamCipher</a>.</p>
 
 </div>
 </div>
@@ -827,7 +827,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Copy the MAC tag to a secure-vector </p>
+<p>Copies the internal MAC tag to a secure-vector </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>The secure-vector receiving the MAC code</td></tr>
@@ -862,14 +862,14 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The legal tag length in bytes </p>
+<p>Read Only: The legal MAC tag length in bytes </p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#ab51d863de0bc86b4fdec2f9fa065adb4">IStreamCipher</a>.</p>
 
 </div>
 </div>
-<a id="ac36d5f03b6ae0aea025c1d51b4d00ee5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac36d5f03b6ae0aea025c1d51b4d00ee5">&#9670;&nbsp;</a></span>Transform()</h2>
+<a id="a1429d2eba1ed6f9b7191249155d119ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1429d2eba1ed6f9b7191249155d119ab">&#9670;&nbsp;</a></span>Transform()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -886,7 +886,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>InOffset</em>, </td>
         </tr>
         <tr>
@@ -898,13 +898,13 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -920,14 +920,14 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Encrypt/Decrypt an array of bytes with offset and length parameters. </p>
+<p>Encrypt/Decrypt a vector of bytes with offset and length parameters. </p>
 <p>Initialize(bool, ISymmetricKey) must be called before this method can be used. In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be long enough to accommodate this TagSize() code. In decryption mode, this code is checked before the stream is decrypted, if the authentication fails a CryptoAuthenticationFailure exception is thrown.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input array of bytes to transform</td></tr>
-    <tr><td class="paramname">InOffset</td><td>Starting offset within the input array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output array of transformed bytes</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input vector of bytes to transform</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of transformed bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
     <tr><td class="paramname">Length</td><td>Number of bytes to process</td></tr>
   </table>
   </dd>
@@ -939,7 +939,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_stream_cipher.html#aec123c7f27b0c09142523018fe206b38">IStreamCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_stream_cipher.html#a719e0915e31c51c8c5bf886064c56ea7">IStreamCipher</a>.</p>
 
 </div>
 </div>

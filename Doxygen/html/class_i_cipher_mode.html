@@ -143,24 +143,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3f0210d1097cf69bce107824d4dfa6da"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a3f0210d1097cf69bce107824d4dfa6da">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
 <tr class="memdesc:a3f0210d1097cf69bce107824d4dfa6da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a single block of bytes.  <a href="#a3f0210d1097cf69bce107824d4dfa6da">More...</a><br /></td></tr>
 <tr class="separator:a3f0210d1097cf69bce107824d4dfa6da"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a567520f345d7cbc99f356d357ac8086c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a567520f345d7cbc99f356d357ac8086c">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset)=0</td></tr>
-<tr class="memdesc:a567520f345d7cbc99f356d357ac8086c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a block of bytes with offset parameters.  <a href="#a567520f345d7cbc99f356d357ac8086c">More...</a><br /></td></tr>
-<tr class="separator:a567520f345d7cbc99f356d357ac8086c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a897f5c1fe92b891bed1aaba9f7f2338e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a897f5c1fe92b891bed1aaba9f7f2338e">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)=0</td></tr>
+<tr class="memdesc:a897f5c1fe92b891bed1aaba9f7f2338e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a block of bytes with offset parameters.  <a href="#a897f5c1fe92b891bed1aaba9f7f2338e">More...</a><br /></td></tr>
+<tr class="separator:a897f5c1fe92b891bed1aaba9f7f2338e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2662c08e4ca778ca45496506e954af4a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a2662c08e4ca778ca45496506e954af4a">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
 <tr class="memdesc:a2662c08e4ca778ca45496506e954af4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a single block of bytes.  <a href="#a2662c08e4ca778ca45496506e954af4a">More...</a><br /></td></tr>
 <tr class="separator:a2662c08e4ca778ca45496506e954af4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94d24281759928169f725b4943c02527"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a94d24281759928169f725b4943c02527">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset)=0</td></tr>
-<tr class="memdesc:a94d24281759928169f725b4943c02527"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="#a94d24281759928169f725b4943c02527">More...</a><br /></td></tr>
-<tr class="separator:a94d24281759928169f725b4943c02527"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46b801d441d51659d4df3b2cdec8c8ea"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a46b801d441d51659d4df3b2cdec8c8ea">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)=0</td></tr>
+<tr class="memdesc:a46b801d441d51659d4df3b2cdec8c8ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="#a46b801d441d51659d4df3b2cdec8c8ea">More...</a><br /></td></tr>
+<tr class="separator:a46b801d441d51659d4df3b2cdec8c8ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a805bbcccd6f31a8a5250ca7766518a4a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters)=0</td></tr>
 <tr class="memdesc:a805bbcccd6f31a8a5250ca7766518a4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance  <a href="#a805bbcccd6f31a8a5250ca7766518a4a">More...</a><br /></td></tr>
 <tr class="separator:a805bbcccd6f31a8a5250ca7766518a4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9985b6851274ada2137ea7496a91671d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a9985b6851274ada2137ea7496a91671d">ParallelMaxDegree</a> (size_t Degree)=0</td></tr>
 <tr class="memdesc:a9985b6851274ada2137ea7496a91671d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#a9985b6851274ada2137ea7496a91671d">More...</a><br /></td></tr>
 <tr class="separator:a9985b6851274ada2137ea7496a91671d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26e54aafa8eb9259ed291eb22009874d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a26e54aafa8eb9259ed291eb22009874d">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, const size_t InOffset, std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset, const size_t Length)=0</td></tr>
-<tr class="memdesc:a26e54aafa8eb9259ed291eb22009874d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset parameters.  <a href="#a26e54aafa8eb9259ed291eb22009874d">More...</a><br /></td></tr>
-<tr class="separator:a26e54aafa8eb9259ed291eb22009874d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a601e136fb56cd77209f583350a92d33e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a601e136fb56cd77209f583350a92d33e">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
+<tr class="memdesc:a601e136fb56cd77209f583350a92d33e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset parameters.  <a href="#a601e136fb56cd77209f583350a92d33e">More...</a><br /></td></tr>
+<tr class="separator:a601e136fb56cd77209f583350a92d33e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Block-cipher standard mode virtual interface class. </p>
@@ -355,8 +355,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a567520f345d7cbc99f356d357ac8086c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a567520f345d7cbc99f356d357ac8086c">&#9670;&nbsp;</a></span>DecryptBlock() <span class="overload">[2/2]</span></h2>
+<a id="a897f5c1fe92b891bed1aaba9f7f2338e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a897f5c1fe92b891bed1aaba9f7f2338e">&#9670;&nbsp;</a></span>DecryptBlock() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -373,7 +373,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>InOffset</em>, </td>
         </tr>
         <tr>
@@ -385,7 +385,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>&#160;</td>
         </tr>
         <tr>
@@ -413,7 +413,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ac978904a322b454996c9a05d5b5668e2">GCM</a>, <a class="el" href="class_e_a_x.html#aefc10c26f120e8765026453d5534f0fa">EAX</a>, <a class="el" href="class_c_f_b.html#a3ef2e81b431efbc9a9da373f17f08e6d">CFB</a>, <a class="el" href="class_c_t_r.html#ae79cfe8150c94630d56fc94fc9bf3330">CTR</a>, <a class="el" href="class_i_c_m.html#a2800c4bacfb46b359c4a58ed8b841112">ICM</a>, <a class="el" href="class_e_c_b.html#a77dee750a4da1d383c9a152e84cefa3e">ECB</a>, <a class="el" href="class_c_b_c.html#ac395ff4a1c887643a4c0a0a763e0e80a">CBC</a>, and <a class="el" href="class_o_f_b.html#a0a2a47b085c6deb7e7b7d09a33878235">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a1e5b8c046f6365f9701802b4e7c16fd0">GCM</a>, <a class="el" href="class_e_a_x.html#a7656a627f6f603bfe3d61ab64c8f138e">EAX</a>, <a class="el" href="class_c_f_b.html#a3dca6cdebe9b6e59c51cfda786c1c737">CFB</a>, <a class="el" href="class_c_t_r.html#a169476e586f4bf9af0fc09acef2328aa">CTR</a>, <a class="el" href="class_i_c_m.html#a8c2822a8fab692375a96728f65d949e9">ICM</a>, <a class="el" href="class_e_c_b.html#a1186192c3f2ac2bfcffbaafc75493f03">ECB</a>, <a class="el" href="class_c_b_c.html#a448766bb97131730f8b95a2d795bb9d4">CBC</a>, and <a class="el" href="class_o_f_b.html#a4b9fad78aa577ecf7c716246a7db6703">OFB</a>.</p>
 
 </div>
 </div>
@@ -465,8 +465,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a94d24281759928169f725b4943c02527"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94d24281759928169f725b4943c02527">&#9670;&nbsp;</a></span>EncryptBlock() <span class="overload">[2/2]</span></h2>
+<a id="a46b801d441d51659d4df3b2cdec8c8ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46b801d441d51659d4df3b2cdec8c8ea">&#9670;&nbsp;</a></span>EncryptBlock() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -483,7 +483,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>InOffset</em>, </td>
         </tr>
         <tr>
@@ -495,7 +495,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>&#160;</td>
         </tr>
         <tr>
@@ -523,7 +523,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a209869874aaf0da5f4e40a1ceba1fd34">GCM</a>, <a class="el" href="class_e_a_x.html#a54d5555ecc39f163be47e54f63cff6f7">EAX</a>, <a class="el" href="class_c_f_b.html#abaffdd770c6ce0819c857feb8fdf8bac">CFB</a>, <a class="el" href="class_c_t_r.html#ae36630a2841a3733781b8a17f60daae1">CTR</a>, <a class="el" href="class_i_c_m.html#a0a8740e195e641c80b60ba486a582b95">ICM</a>, <a class="el" href="class_e_c_b.html#aba791a7dc1cf97e276b956989971467b">ECB</a>, <a class="el" href="class_c_b_c.html#ad6372779e9e4ceddee647acdcb5b4286">CBC</a>, and <a class="el" href="class_o_f_b.html#a930e86d1af91462f30fbe3e2f711ed18">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ab188c9acafb52223af721a352ea85fea">GCM</a>, <a class="el" href="class_e_a_x.html#a86a44f94c5cb4177af3d3d33c6ba00ab">EAX</a>, <a class="el" href="class_c_f_b.html#a7b57dad0a2155fe619da6cf841546bc3">CFB</a>, <a class="el" href="class_c_t_r.html#aba7b5e23e31a588629e84b29ffda078a">CTR</a>, <a class="el" href="class_i_c_m.html#adb3d1c01febda377233b470c202ef15a">ICM</a>, <a class="el" href="class_e_c_b.html#a707afccfa019bf5d83e0aca3a5200e77">ECB</a>, <a class="el" href="class_c_b_c.html#a5912aefcb826d3953aeed29752704816">CBC</a>, and <a class="el" href="class_o_f_b.html#a060d3ddf897bddf6cead1d700f2fdbdf">OFB</a>.</p>
 
 </div>
 </div>
@@ -870,7 +870,7 @@ Public Member Functions</h2></td></tr>
 <p>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. Thread count must be an even number, and not exceed the number of processor cores.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>
@@ -915,8 +915,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a26e54aafa8eb9259ed291eb22009874d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26e54aafa8eb9259ed291eb22009874d">&#9670;&nbsp;</a></span>Transform()</h2>
+<a id="a601e136fb56cd77209f583350a92d33e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a601e136fb56cd77209f583350a92d33e">&#9670;&nbsp;</a></span>Transform()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -933,7 +933,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>InOffset</em>, </td>
         </tr>
         <tr>
@@ -945,13 +945,13 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em>&#160;</td>
         </tr>
         <tr>
@@ -980,7 +980,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a7c9ef8e01cf01c4e13bd39b167feecd1">GCM</a>, <a class="el" href="class_e_a_x.html#a57929a80df2c614dffc2d5f6dcc2ddd8">EAX</a>, <a class="el" href="class_c_f_b.html#a56c676f8ec93c5cdaa0829c77cad654c">CFB</a>, <a class="el" href="class_c_t_r.html#a334c530be41b3e72af85af70faa5e3b3">CTR</a>, <a class="el" href="class_i_c_m.html#a541db3c1050a101816e3ffef63a382c1">ICM</a>, <a class="el" href="class_e_c_b.html#a1f688e88b2ee79c3db90a7084acd97e5">ECB</a>, <a class="el" href="class_c_b_c.html#aa2add0f41020c81070877f4fcff6852a">CBC</a>, and <a class="el" href="class_o_f_b.html#a9c56128649a805a148e8b99b3f03de97">OFB</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#ac655c5184ef5a14375c1363122e20523">GCM</a>, <a class="el" href="class_e_a_x.html#a2df302208b1cbebe4273a9e463221274">EAX</a>, <a class="el" href="class_c_f_b.html#a9a6b61a2fb526e177bfebe7948a8d39e">CFB</a>, <a class="el" href="class_c_t_r.html#a429dcb12c192a87817869821ee9b0516">CTR</a>, <a class="el" href="class_i_c_m.html#aab0c9af267a913c63b07615cb731e9dd">ICM</a>, <a class="el" href="class_e_c_b.html#ac2627981a9ea705d038d3925207f3dd1">ECB</a>, <a class="el" href="class_c_b_c.html#a3ba171d3fd068bf26134d19405341584">CBC</a>, and <a class="el" href="class_o_f_b.html#aab2ca981f0cac4f34df17a0a3d0f0e27">OFB</a>.</p>
 
 </div>
 </div>

@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a58ea96666601927985b01256a6fc3298"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein256.html#a58ea96666601927985b01256a6fc3298">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:a58ea96666601927985b01256a6fc3298"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Hash value  <a href="#a58ea96666601927985b01256a6fc3298">More...</a><br /></td></tr>
 <tr class="separator:a58ea96666601927985b01256a6fc3298"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69b66bb8e82ad296d4f7c3767ae0e326"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein256.html#a69b66bb8e82ad296d4f7c3767ae0e326">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, const size_t OutOffset) override</td></tr>
-<tr class="memdesc:a69b66bb8e82ad296d4f7c3767ae0e326"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#a69b66bb8e82ad296d4f7c3767ae0e326">More...</a><br /></td></tr>
-<tr class="separator:a69b66bb8e82ad296d4f7c3767ae0e326"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78dfb50f2867ddb808d3831b58590cdc"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein256.html#a78dfb50f2867ddb808d3831b58590cdc">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
+<tr class="memdesc:a78dfb50f2867ddb808d3831b58590cdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#a78dfb50f2867ddb808d3831b58590cdc">More...</a><br /></td></tr>
+<tr class="separator:a78dfb50f2867ddb808d3831b58590cdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6f6287b025d233788b948c7822b88b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein256.html#ac6f6287b025d233788b948c7822b88b6">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:ac6f6287b025d233788b948c7822b88b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of threads allocated when using multi-threaded tree hashing processing.  <a href="#ac6f6287b025d233788b948c7822b88b6">More...</a><br /></td></tr>
 <tr class="separator:ac6f6287b025d233788b948c7822b88b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -157,7 +157,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Skein message digest with a 256 bit digest return size </p>
-<p>Example using the Update method: </p><div class="fragment"><div class="line"><a class="code" href="class_skein256.html">Skein256</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(digest.<a class="code" href="class_keccak512.html#a962018e8b134cf29aa8b5b680c165030">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_skein256.html#abf977e2a9076d08f9f0605689fc4d336">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_skein256.html#a69b66bb8e82ad296d4f7c3767ae0e326">Finalize</a>(hash, 0);</div><div class="line">dgt.<a class="code" href="class_skein256.html#abb635fbcf48d37a8b8506a9f7bfad346">Reset</a>();</div></div><!-- fragment --> <p>Tree Hashing Description: </p>
+<p>Example using the Update method: </p><div class="fragment"><div class="line"><a class="code" href="class_skein256.html">Skein256</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(digest.<a class="code" href="class_keccak512.html#a962018e8b134cf29aa8b5b680c165030">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_skein256.html#abf977e2a9076d08f9f0605689fc4d336">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_skein256.html#a78dfb50f2867ddb808d3831b58590cdc">Finalize</a>(hash, 0);</div><div class="line">dgt.<a class="code" href="class_skein256.html#abb635fbcf48d37a8b8506a9f7bfad346">Reset</a>();</div></div><!-- fragment --> <p>Tree Hashing Description: </p>
 <p>The tree hashing mode is instantiated when the parallel mechanism is engaged through one of the two constructors. <br />
  The default settings are applied when using the Skein256(bool) constructor, or a manually defined configuration when using the Skein256(SkeinParams) constructor. <br />
 The SkeinParams structure contains property accessors that are initialized by the boolean constructor at their defaults; Schema(83,72,65,51) OuputSize(64), Version(1), FanOut(Parallel ? 8 : 0), and LeafSize(32). <br />
@@ -464,8 +464,8 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 
 </div>
 </div>
-<a id="a69b66bb8e82ad296d4f7c3767ae0e326"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a69b66bb8e82ad296d4f7c3767ae0e326">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="a78dfb50f2867ddb808d3831b58590cdc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78dfb50f2867ddb808d3831b58590cdc">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -482,7 +482,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>OutOffset</em>&#160;</td>
         </tr>
         <tr>
@@ -514,7 +514,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_digest.html#a053f8cf8e3efe23f4203f6bd4f88c86e">IDigest</a>.</p>
+<p>Implements <a class="el" href="class_i_digest.html#af2aec1dc5f826b4a958f15d1487dacae">IDigest</a>.</p>
 
 </div>
 </div>
@@ -663,7 +663,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 <p>Thread count must be an even number, and not exceed the number of processor cores. Changing this value from the default (8 threads), will change the output hash value.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Degree</td><td>The desired number of threads to allocate</td></tr>
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
   </table>
   </dd>
 </dl>
