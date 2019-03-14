@@ -1,4 +1,4 @@
-﻿// The GPL version 3 License (GPLv3)
+// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2019 vtdev.com
 // This file is part of the CEX Cryptographic library.
@@ -16,106 +16,118 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
+//
 // Implementation Details:
-// CSX256: An implementation of the ChaCha stream cipher
-// Written by John G. Underhill, October 21, 2014
-// Updated January 27, 2017
-// Updated August 29, 2017
-// Updated October 14, 2017
+// An implementation of an Authenticated Counter Mode (MCS).
+// Written by John G. Underhill, December 9, 2018
 // Updated December 20, 2018
 // Updated December 26, 2018
 // Updated February 24, 2019
 // Contact: develop@vtdev.com
 
-#ifndef CEX_CSX256_H
-#define CEX_CSX256_H
+#ifndef CEX_MCS_H
+#define CEX_MCS_H
 
 #include "IStreamCipher.h"
+#include "BlockCiphers.h"
+#include "BlockCipherExtensions.h"
+#include "CTR.h"
+#include "IBlockCipher.h"
+#include "IMac.h"
 #include "ShakeModes.h"
+#include "StreamAuthenticators.h"
 
 NAMESPACE_STREAM
 
+using Enumeration::BlockCiphers;
+using Enumeration::BlockCipherExtensions;
+using Cipher::Block::Mode::CTR;
+using Cipher::Block::Mode::IBlockCipher;
+using Mac::IMac;
 using Enumeration::ShakeModes;
+using Enumeration::StreamAuthenticators;
 
 /// <summary>
-/// A parallelized and vectorized ChaCha-256 20-round stream cipher [CSX256] implementation.
-/// <para>Uses an optional authentication mode; HMAC(SHA2-256) or KMAC-256 set through the constructor to authenticate the stream.</para>
-/// </summary>
+/// An Encrypt and Authenticate AEAD stream cipher implementation (Modular Cipher Stream).
+/// <para>This cipher uses an optional authentication mode; Poly1305, HMAC(SHA2), or KMAC set through the constructor to authenticate the stream.</para>
+/// </summary> 
 /// 
 /// <example>
-/// <description>Encrypt and add a MAC code to an array:</description>
+/// <description>Encrypting an array of bytes:</description>
 /// <code>
 /// SymmetricKey kp(Key, Nonce);
-/// CSX256 cipher(StreamAuthenticators::HMACSHA256);
-/// // initialize for encryption
+/// // initialize the Rijndael cipher with the SHAKE-256 key-schedule extension
+/// MCS cipher(BlockCiphers::RHXS256, StreamAuthenticators::KMAC256);
+/// // mac code is appended to the cipher-text stream in authentication mode
 /// cipher.Initialize(true, kp);
 /// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
 /// </code>
 ///
-/// <description>Decrypt and authenticate an array:</description>
+/// <description>Decrypt and verify an array:</description>
 /// <code>
 /// SymmetricKey kp(Key, Nonce);
-/// CSX256 cipher(StreamAuthenticators::HMACSHA256);
+/// MCS cipher(BlockCiphers::RHXS256, StreamAuthenticators::KMAC256);
 /// // initialize for decryption
 /// cipher.Initialize(false, kp);
 ///
-/// // decrypt the ciphertext, if the authentication fails an exception is thrown
+/// // decrypt the ciphertext and catch authentication failures
 /// try
 /// {
 ///		cipher.Transform(Input, InOffset, Output, OutOffset, Length);
 /// }
 /// catch (CryptoAuthenticationFailure)
 /// {
-///		// do something...
+///		// authentication has failed, do something...
 /// }
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The ChaCha stream cipher generates a key-stream by encrypting successive values of an incrementing 32bit unsigned integer counter array. \n
-/// The key-stream is then XOR'd with the input message block to create the cipher-text output. \n
-/// In parallel mode, the counter is increased by a number factored from the number and size of input blocks, allowing for a multi-threaded operation. \n
-/// The implementation is further parallelized by constructing a larger 'staggered' counter array, and processing large blocks using 128, 256, or 512bit SIMD instructions.</para>
-/// 
-/// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM> \n 
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>^</B>=XOR \n
-/// <EM>Encryption</EM> \n
-/// C0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj) ^ Pj, C+1.</para> \n
+/// <para>
+/// The MCS stream cipher is an Authenticate Encrypt and Additional Data (AEAD) authenticated cipher. \n
+/// MCS is an online cipher, meaning it can stream data of any size, without needing to know the data size in advance. \n
+/// It also has provable security, dependant upon the block cipher used by the mode. \n
+/// MCS first encrypts the plaintext using a Big-Endian counter mode (CTR), then processes that cipher-text using a MAC function for data authentication. \n
+/// When each transform encryption call is completed, the MAC code is generated and appended to the output vector automatically. \n
+/// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, and if authentication succeeds, then decrypting the data to plain-text. \n
+/// During decryption, if the MAC codes do not match, a CryptoAuthenticationFailure exception error is thrown, this is checked before the cipher-text is decrypted.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The transformation function used by ChaCha is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded. \n
-/// This is achieved by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads. \n 
-/// The key stream generated by encrypting the counter array(s), is used as a source of random, and XOR'd with the message input to produce the cipher text.</para>
+/// <para>The encryption and decryption functions of the MCS mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
+/// The MCS stream cipher also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
+/// uses SIMD instructions to decrypt/encrypt blocks in parallel, depending on which framework is runtime available, AVX, AVX2, or AVX512 SIMD instructions. \n
+/// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
+/// The cipher transform is parallelizable, however the authentication pass, is processed sequentially.</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>The Key size is fixed at is 32 bytes (256 bits).</description></item>
-/// <item><description>The Nonce size is fixed at is 8 bytes (64 bits).</description></item>
-/// <item><description>In authenticated mode ISymmetricKey info value can be used as a cipher tweak to create a unique ciphertext and MAC output.</description></item>
-/// <item><description>The ciphers Initialize function can use either a SymmetricKey container, or an encrypted SymmetricSecureKey.</description></item>
-/// <item><description>The internal block size is 64 bytes (512 bits) wide.</description></item>
+/// <item><description>Supported key sizes are 32, 64, and 128 bytes (256, 512, and 1024 bits).</description></item>
+/// <item><description>The required Nonce size is 16 bytes (128 bits).</description></item>
+/// <item><description>The ISymmetricKey info value can be used as a cipher tweak to create a unique ciphertext and MAC output.</description></item>
+/// <item><description>The ciphers Initialize function can use either a SymmetricKey, or an encrypted SymmetricSecureKey key container.</description></item>
+/// <item><description>The internal block input-size is fixed at 16 bytes wide (128 bits).</description></item>
 /// <item><description>This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to Poly1305, or one of the HMAC or KMAC options.</description></item>
-/// <item><description>In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text at the end of each transform call, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception.</description></item>
-/// <item><description>If authentication is enabled, the cipher-key and MAC seed are generated using cSHAKE, this will change the cipher-text output from a standard ChaChaPoly20 implementation.</description></item>
-/// <item><description>In authenticated mode, the internal keys generated by cSHAKE will be unique with each MAC generator, each authentication option should be considered a seperate and distinct variant of the cipher, for example, CSX256-SHAKE256 or CSX512-HMAC256</description></item>
-/// <item><description>If authentication is enabled, the cipher-key and MAC key are generated using cSHAKE, the SHAKE generator takes the ciphers formal class name as part of the customization string; changing the authentication mode will create a cipher-text output unique to the ciphers configuration.</description></item>
-/// <item><description>The Info string is optional, but can be used to create a tweakable cipher; the info size is fixed at 16 bytes in length.</description></item>
-/// <item><description>Permutation rounds are fixed at 20 (ChaChaPoly20).</description></item>
+/// <item><description>In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception.</description></item>
+/// <item><description>If authentication is enabled, the cipher and MAC keys are generated by passing the input cipher-key through an instance of cSHAKE, this will yield a different cipher-text output from non-authenticated modes.</description></item>
+/// <item><description>In authenticated mode, the internal keys generated by cSHAKE will be unique with each MAC generator, each authentication option should be considered a seperate and distinct variant of the cipher, for example, MCS-RHX512-SHAKE512 or MCS-SHX512-HMAC512</description></item>
+/// <item><description>The Info string is optional, but can be used to create a tweakable cipher, this can be used for adding additional key material, or using a second key to restrict decryption to a domain based system.</description></item>
+/// <item><description>In the extended ciphers, permutation rounds are fixed 22, 30, and 38 when using the Rijndael cipher, or 40, 48, and 64 with the Serpent based cipher, for 256, 512, and 1024-bit keys; standard variants use the fixed standard round assignments.</description></item>
+/// <item><description>Authentication using Poly1305, HMAC, or KMAC, can be invoked by setting the StreamAuthenticators parameter in the constructor, when set to None, authentication is disabled.</description></item>
 /// <item><description>The class functions are virtual, and can be accessed from an IStreamCipher instance.</description></item>
 /// <item><description>The transformation methods can not be called until the Initialize(ISymmetricKey) function has been called.</description></item>
-/// <item><description>Encryption can both be pipelined (AVX2 or AVX512), and multi-threaded with any even number of threads no greater than the processors maximum virtual thread count.</description></item>
-/// <item><description>If the system supports Parallel processing, and ParallelProfile().IsParallel() is set to true; passing an input block of ParallelProfile().ParallelBlockSize() to the transform will be auto parallelized.</description></item>
+/// <item><description>Encryption can both be pipelined (AVX, AVX2, or AVX512), and multi-threaded with any even number of threads, the configuration can be modified using the ParallelProfile() accessor function.</description></item>
+/// <item><description>If the system supports Parallel processing, and ParallelProfile().IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto-parallelized.</description></item>
 /// <item><description>The ParallelProfile().ParallelThreadsMax() property is used as the thread count in the parallel loop; it defaults to the maximum number of available virtual cores, but is user-assignable, and must be an even number no greater than the number of processer cores on the system.</description></item>
 /// <item><description>ParallelProfile().ParallelBlockSize() is calculated automatically based on processor(s) cache size but can be user defined, but must be evenly divisible by ParallelProfile().ParallelMinimumSize().</description></item>
-/// <item><description>The ParallelBlockSize(), IsParallel(), and ParallelThreadsMax() accessors, can be changed through the ParallelProfile() property, the initial size is calculated automatically based on the systems capabilities, and modifying this vale is not recommended</description></item>
+/// <item><description>The ParallelBlockSize(), IsParallel(), and ParallelThreadsMax() accessors, can be changed through the ParallelProfile() property, but this has been auto-calculated based on the systems hardware, modifications are not recommended</description></item>
 /// </list>
-/// 
+///
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>ChaCha <a href="http://cr.yp.to/chacha/chacha-20080128.pdf">Specification</a>.</description></item>
+/// <item><description>The <a href="http://web.cs.ucdavis.edu/~rogaway/papers/acs.pdf">MCS Mode</a> of Operation.</description></item>
+/// <item><description>RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorithms for Authenticated Encryption</a>.</description></item>
+/// <item><description>Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/chap7.pdf">Chapter 7: Block Ciphers</a>.</description></item>
 /// <item><description>Fips-202: The <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">SHA-3 Standard</a></description>.</item>
 /// <item><description>SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a></description></item>
 /// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2104">2104</a>: HMAC: Keyed-Hashing for Message Authentication.</description></item>
@@ -123,23 +135,19 @@ using Enumeration::ShakeModes;
 /// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">180-4</a>: Secure Hash Standard (SHS).</description></item>
 /// </list>
 /// </remarks>
-class CSX256 final : public IStreamCipher
+class MCS final : public IStreamCipher
 {
 private:
 
-	static const size_t BLOCK_SIZE = 64;
+	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
-	static const size_t KEY_SIZE = 32;
-	static const size_t INFO_SIZE = 16;
-	static const size_t NONCE_SIZE = 2;
-	static const size_t ROUND_COUNT = 20;
-	static const size_t STATE_PRECACHED = 2048;
-	static const std::vector<byte> SIGMA_INFO;
-	static const size_t STATE_SIZE = 14;
+	static const size_t MAX_PRLALLOC = 100000000;
+	static const std::vector<byte> OMEGA_INFO;
+	static const byte UPDATE_PREFIX = 0x80;
 
-	class CSX256State;
-	std::unique_ptr<CSX256State> m_csx256State;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
+	class McsState;
+	std::unique_ptr<McsState> m_acsState;
+	std::unique_ptr<CTR> m_cipherMode;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ParallelOptions m_parallelProfile;
 
@@ -150,39 +158,38 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	CSX256(const CSX256&) = delete;
+	MCS(const MCS&) = delete;
 
 	/// <summary>
 	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	CSX256& operator=(const CSX256&) = delete;
+	MCS& operator=(const MCS&) = delete;
 
 	/// <summary>
-	/// Initialize the ChaCha-256 cipher.
-	/// <para>Setting the optional AuthenticatorType parameter to any value other than None, enables authentication for this cipher.
-	/// Use the Finalize function to derive the Mac code once processing of the message stream has completed.
-	/// The default authenticator parameter in ChaCha-256 is KMAC256</para>
+	/// Initialize the Cipher Mode using a block cipher type name.
+	/// <para>The cipher instance is created and destroyed automatically.</para>
 	/// </summary>
-	/// 
-	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256; valid options are, None, HMACSHA256, and KMAC256</param>
 	///
-	/// <exception cref="CryptoSymmetricException">Thrown if an invalid authentication method is chosen</exception>
-	explicit CSX256(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
+	/// <param name="CipherType">The enumeration name of the underlying block cipher; the default is RHXH256</param>
+	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
+	///
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid block cipher type is used</exception>
+	MCS(BlockCiphers CipherType = BlockCiphers::RHXH256, StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	~CSX256() override;
+	~MCS() override;
 
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The stream ciphers enumeration type name
+	/// Read Only: The stream ciphers type name
 	/// </summary>
 	const StreamCiphers Enumeral() override;
 
 	/// <summary>
-	/// Read Only: The cipher has authentication enabled
+	/// Read Only: Cipher has authentication enabled
 	/// </summary>
 	const bool IsAuthenticator() override;
 
@@ -192,19 +199,19 @@ public:
 	const bool IsEncryption() override;
 
 	/// <summary>
-	/// Read Only: The cipher is ready to transform data
+	/// Read Only: Cipher is ready to transform data
 	/// </summary>
 	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this cipher.
-	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallel processing.</para>
+	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: A vector of SymmetricKeySize containers, containing legal cipher input-key sizes
+	/// Read Only: Vector of SymmetricKeySize containers, containing legal cipher input key sizes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
@@ -250,11 +257,11 @@ public:
 	/// Initialize the cipher with an ISymmetricKey key container.
 	/// <para>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream.
 	/// Authentication on a decrypted stream is performed automatically; failure will throw a CryptoAuthenticationFailure exception.
-	/// If encryption and authentication are set to true, the MAC code is appended to the cipher-text array after each transform call.</para>
+	/// If encryption and authentication are set to true, the MAC code is appended to the cipher-text array.</para>
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="Parameters">Cipher key structure, containing cipher key, nonce, and optional info array</param>
+	/// <param name="Parameters">Cipher key structure, containing cipher key, nonce, and optional info vectors</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &Parameters) override;
@@ -284,7 +291,7 @@ public:
 
 	/// <summary>
 	/// Encrypt/Decrypt a vector of bytes with offset and length parameters.
-	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.
+	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used. 
 	///	In authenticated encryption mode, the MAC code is automatically appended to the output stream at the end of the cipher-text, the output array must be long enough to accommodate this TagSize() code.
 	/// In decryption mode, this code is checked before the stream is decrypted, if the authentication fails a CryptoAuthenticationFailure exception is thrown.</para>
 	/// </summary>
@@ -292,21 +299,17 @@ public:
 	/// <param name="Input">The input vector of bytes to transform</param>
 	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Output">The output vector of transformed bytes</param>
-	/// <param name="OutOffset">The starting offset within the output array</param>
-	/// <param name="Length">The number of bytes to process</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
+	/// <param name="Length">Number of bytes to process</param>
 	///
 	/// <exception cref="CryptoAuthenticationFailure">Thrown during decryption if the the ciphertext fails authentication</exception>
 	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 
-	static void Finalize(std::unique_ptr<CSX256State> &State, std::unique_ptr<IMac> &Authenticator);
-	static void Generate(std::unique_ptr<CSX256State> &State, std::array<uint, NONCE_SIZE> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void Load(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Code);
-	void Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	static void Finalize(std::unique_ptr<McsState> &State, std::unique_ptr<IMac> &Authenticator);
 	void Reset();
 };
 
 NAMESPACE_STREAMEND
 #endif
-

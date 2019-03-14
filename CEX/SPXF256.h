@@ -82,7 +82,7 @@ private:
 
 	static void AddressToBytes(std::vector<byte> &Output, size_t Offset, const std::array<uint, 8> &Address);
 
-	static void BaseW(std::vector<int> &Output, size_t OutOffset, const size_t OutLength, const std::vector<byte> &Input);
+	static void BaseW(std::vector<int> &Output, size_t OutOffset, size_t OutLength, const std::vector<byte> &Input);
 
 	static void ChainLengths(std::vector<int> &Lengths, const std::vector<byte> &Message);
 

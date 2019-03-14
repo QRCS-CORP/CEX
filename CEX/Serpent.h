@@ -21,14 +21,14 @@
 
 #include "CexDomain.h"
 
-NAMESPACE_BLOCK
+NAMESPACE_SERPENTBASE
 
 /// 
 /// internal
 /// 
 
 template<typename T, typename ArrayA, typename ArrayB>
-static void DecryptW(const ArrayA &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, ArrayB &Key)
+static void DecryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, ArrayB &Key)
 {
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
@@ -170,7 +170,7 @@ static void DecryptW(const ArrayA &Input, const size_t InOffset, std::vector<byt
 }
 
 template<typename T, typename ArrayA, typename ArrayB>
-static void EncryptW(const ArrayA &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, ArrayB &Key)
+static void EncryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, ArrayB &Key)
 {
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
@@ -793,5 +793,5 @@ static void Ib7(T &R0, T &R1, T &R2, T &R3)
 	R3 = B4;
 }
 
-NAMESPACE_BLOCKEND
+NAMESPACE_SERPENTBASEEND
 #endif

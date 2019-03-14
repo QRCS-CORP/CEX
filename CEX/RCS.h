@@ -18,12 +18,12 @@
 //
 //
 // Implementation Details:
-// An implementation of an Rijndael-256 Counter Mode (ACS).
+// An implementation of an Rijndael-256 Counter Mode (RCS).
 // Written by John G. Underhill, March 8, 2019
 // Contact: develop@vtdev.com
 
-#ifndef CEX_ACS_H
-#define CEX_ACS_H
+#ifndef CEX_RCS_H
+#define CEX_RCS_H
 
 #include "IStreamCipher.h"
 #include "BlockCiphers.h"
@@ -33,16 +33,15 @@
 
 NAMESPACE_STREAM
 
-#if defined(__AVX__)
-
 using Enumeration::BlockCiphers;
 using Enumeration::BlockCipherExtensions;
 using Mac::IMac;
 using Enumeration::StreamAuthenticators;
 
 /// <summary>
-/// An AES-NI implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counter-mode, as an Authenticate, Encrypt, and Additional Data (AEAD) stream cipher implementation  (AESNI-256 Cipher Stream).
-/// <para>This cipher uses an optional authentication mode; Poly1305, HMAC(SHA2), or KMAC set through the constructor to authenticate the stream.</para>
+/// An implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counter-mode, as an Authenticate, Encrypt, and Additional Data (AEAD) stream cipher implementation (Rijndael-256 Cipher Stream). \n
+/// <para>This is a fallback for the AES-NI implementation of this cipher ACS.
+/// This cipher uses an optional authentication mode; Poly1305, HMAC(SHA2), or KMAC set through the constructor to authenticate the stream.</para>
 /// </summary> 
 /// 
 /// <example>
@@ -50,7 +49,7 @@ using Enumeration::StreamAuthenticators;
 /// <code>
 /// SymmetricKey kp(Key, Nonce);
 /// // initialize the Rijndael cipher with the SHAKE-256 key-schedule extension
-/// ACS cipher(StreamAuthenticators::KMAC256);
+/// RCS cipher(StreamAuthenticators::KMAC256);
 /// // mac code is appended to the cipher-text stream in authentication mode
 /// cipher.Initialize(true, kp);
 /// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
@@ -59,7 +58,7 @@ using Enumeration::StreamAuthenticators;
 /// <description>Decrypt and verify an array:</description>
 /// <code>
 /// SymmetricKey kp(Key, Nonce);
-/// ACS cipher(StreamAuthenticators::KMAC256);
+/// RCS cipher(StreamAuthenticators::KMAC256);
 /// // initialize for decryption
 /// cipher.Initialize(false, kp);
 ///
@@ -78,17 +77,17 @@ using Enumeration::StreamAuthenticators;
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>
-/// The ACS symmetric cipher is a 256-bit wide-block Rijndael based, Authenticate, Encrypt, and Additional Data (AEAD) authenticated stream-cipher. \n
-/// ACS is an online cipher, meaning it can stream data of any size, without needing to know the data size in advance. \n
+/// The RCS symmetric cipher is a 256-bit wide-block Rijndael based, Authenticate, Encrypt, and Additional Data (AEAD) authenticated stream-cipher. \n
+/// RCS is an online cipher, meaning it can stream data of any size, without needing to know the data size in advance. \n
 /// It also has provable security, based on the Rijndael-256 permutation function used by this cipher. \n
-/// ACS first encrypts the plain-text using a Little-Endian counter mode, then processes that cipher-text using a MAC function used for data authentication. \n\n
+/// RCS first encrypts the plain-text using a Little-Endian counter mode, then processes that cipher-text using a MAC function used for data authentication. \n
 /// When each transform encryption call is completed, the MAC code is generated and appended to the output vector automatically. \n
 /// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, and if authentication succeeds, then decrypting the data to plain-text. \n
 /// During decryption, if the MAC codes do not match, a CryptoAuthenticationFailure exception error is thrown.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The encryption and decryption functions of the ACS mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
-/// The ACS stream cipher also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
+/// <para>The encryption and decryption functions of the RCS mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
+/// The RCS stream cipher also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
 /// uses SIMD instructions to decrypt/encrypt blocks in parallel, depending on which framework is runtime available, AVX, AVX2, or AVX512 SIMD instructions. \n
 /// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
 /// The cipher transform is parallelizable, however the authentication pass, is processed sequentially.</para>
@@ -99,7 +98,7 @@ using Enumeration::StreamAuthenticators;
 /// <item><description>The required Nonce size is 16 bytes (128 bits).</description></item>
 /// <item><description>The ISymmetricKey info value can be used as a cipher tweak to create a unique ciphertext and MAC output.</description></item>
 /// <item><description>The ciphers Initialize function can use either a SymmetricKey, or an encrypted SymmetricSecureKey key container.</description></item>
-/// <item><description>The internal block input-size is fixed at 32 bytes wide (256 bits).<</description></item>
+/// <item><description>The internal block input-size is fixed at 32 bytes wide (256 bits).</description></item>
 /// <item><description>This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to Poly1305, or one of the HMAC or KMAC options.</description></item>
 /// <item><description>In authentication mode, during encryption the MAC code is automatically appended to the output cipher-text, during decryption, this MAC code is checked and authentication failure will generate a CryptoAuthenticationFailure exception.</description></item>
 /// <item><description>If authentication is enabled, the cipher and MAC keys are generated by passing the input cipher-key through an instance of cSHAKE, this will yield a different cipher-text output from non-authenticated modes.</description></item>
@@ -130,7 +129,7 @@ using Enumeration::StreamAuthenticators;
 /// <item><description>Team Keccak <a href="https://keccak.team/index.html">Homepage</a>.</description></item>
 /// </list>
 /// </remarks>
-class ACS final : public IStreamCipher
+class RCS final : public IStreamCipher
 {
 private:
 
@@ -141,8 +140,8 @@ private:
 	static const size_t STATE_PRECACHED = 2048;
 	static const byte UPDATE_PREFIX = 0x80;
 
-	class AcsState;
-	std::unique_ptr<AcsState> m_rcsState;
+	class RcsState;
+	std::unique_ptr<RcsState> m_rcsState;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ParallelOptions m_parallelProfile;
@@ -154,12 +153,12 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	ACS(const ACS&) = delete;
+	RCS(const RCS&) = delete;
 
 	/// <summary>
 	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	ACS& operator=(const ACS&) = delete;
+	RCS& operator=(const RCS&) = delete;
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher type name.
@@ -169,12 +168,12 @@ public:
 	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid block cipher type is used</exception>
-	ACS(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
+	RCS(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	~ACS() override;
+	~RCS() override;
 
 	//~~~Accessors~~~//
 
@@ -302,7 +301,8 @@ public:
 
 private:
 
-	static void Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Authenticator);
+	static void Finalize(std::unique_ptr<RcsState> &State, std::unique_ptr<IMac> &Authenticator);
+	static void Prefetch();
 	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter);
 	void Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
@@ -314,6 +314,5 @@ private:
 	void Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 };
 
-#endif
 NAMESPACE_STREAMEND
 #endif

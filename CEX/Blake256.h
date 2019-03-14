@@ -26,7 +26,7 @@
 // Based on the Blake2 Github projects by Samuel Neves and Christian Winnerlein.
 // Blake2: https://github.com/BLAKE2/BLAKE2
 //
-// Written by John Underhill, June 19, 2016
+// Written by John G. Underhill, June 19, 2016
 // Updated March 1, 2017
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
@@ -240,7 +240,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) override;
+	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the digest as a MAC code generator
@@ -260,7 +260,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;

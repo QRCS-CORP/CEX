@@ -23,7 +23,7 @@
 // 
 // Implementation Details:
 // An implementation of the SHA-3 digest with a 512 bit return size. 
-// Written by John Underhill, September 19, 2014
+// Written by John G. Underhill, September 19, 2014
 // Updated December 25, 2017
 // Contact: develop@vtdev.com
 
@@ -196,7 +196,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) override;
+	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -204,7 +204,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;

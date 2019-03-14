@@ -146,6 +146,11 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 				mptr = new KMAC(KmacModes::KMAC1024);
 				break;
 			}
+			case StreamAuthenticators::Poly1305:
+			{
+				mptr = new Poly1305;
+				break;
+			}
 			default:
 			{
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);

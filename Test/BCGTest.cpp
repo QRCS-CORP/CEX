@@ -483,8 +483,8 @@ namespace Test
 		SecureRandom rnd;
 		size_t i;
 
-		const uint MINPRL = static_cast<uint>(cpr.ParallelProfile().ParallelMinimumSize());
-		const uint MAXPRL = static_cast<uint>(cpr.ParallelProfile().ParallelBlockSize());
+		const uint MINPRL = static_cast<uint>(cpr.ParallelProfile().ParallelBlockSize());
+		const uint MAXPRL = static_cast<uint>(cpr.ParallelProfile().ParallelBlockSize() * 4);
 
 		cpt.reserve(SAMPLE_SIZE);
 		inp.reserve(SAMPLE_SIZE);

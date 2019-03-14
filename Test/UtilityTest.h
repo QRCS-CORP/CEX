@@ -60,6 +60,7 @@ namespace Test
 		}
 
 		void Conversions();
+		void CounterTest();
 		void Rotation();
 		void Operations();
 		void OnProgress(const std::string &Data);

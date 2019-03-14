@@ -150,7 +150,7 @@ void ICM::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void ICM::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void ICM::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
@@ -164,7 +164,7 @@ void ICM::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void ICM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void ICM::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
@@ -210,7 +210,7 @@ void ICM::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void ICM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void ICM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length!");
@@ -244,7 +244,7 @@ void ICM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 //~~~Private Functions~~~//
 
-void ICM::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void ICM::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
@@ -256,7 +256,7 @@ void ICM::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
 }
 
-void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<ulong> &Counter)
+void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<ulong> &Counter)
 {
 	size_t bctr;
 
@@ -385,7 +385,7 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	}
 }
 
-void ICM::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void ICM::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
@@ -427,7 +427,7 @@ void ICM::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 	}
 }
 
-void ICM::ProcessSequential(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void ICM::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	size_t i;
 

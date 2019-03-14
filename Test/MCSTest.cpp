@@ -1,5 +1,5 @@
-#include "ACSTest.h"
-#include "../CEX/ACS.h"
+#include "MCSTest.h"
+#include "../CEX/MCS.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/MemoryTools.h"
 #include "../CEX/SecureRandom.h"
@@ -7,7 +7,7 @@
 
 namespace Test
 {
-	using Cipher::Stream::ACS;
+	using Cipher::Stream::MCS;
 	using Enumeration::BlockCiphers;
 	using Enumeration::BlockCipherExtensions;
 	using Exception::CryptoSymmetricException;
@@ -20,13 +20,13 @@ namespace Test
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
 
-	const std::string ACSTest::CLASSNAME = "ACSTest";
-	const std::string ACSTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the ACS stream cipher.";
-	const std::string ACSTest::SUCCESS = "SUCCESS! All ACS tests have executed succesfully.";
+	const std::string MCSTest::CLASSNAME = "MCS Test";
+	const std::string MCSTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the MCS stream cipher.";
+	const std::string MCSTest::SUCCESS = "SUCCESS! All MCS tests have executed succesfully.";
 
 	//~~~Constructor~~~//
 
-	ACSTest::ACSTest()
+	MCSTest::MCSTest()
 		:
 		m_code(0),
 		m_expected(0),
@@ -39,7 +39,7 @@ namespace Test
 		Initialize();
 	}
 
-	ACSTest::~ACSTest()
+	MCSTest::~MCSTest()
 	{
 		IntegerTools::Clear(m_code);
 		IntegerTools::Clear(m_expected);
@@ -51,37 +51,37 @@ namespace Test
 
 	//~~~Accessors~~~//
 
-	const std::string ACSTest::Description()
+	const std::string MCSTest::Description()
 	{
 		return DESCRIPTION;
 	}
 
-	TestEventHandler &ACSTest::Progress()
+	TestEventHandler &MCSTest::Progress()
 	{
 		return m_progressEvent;
 	}
 
 	//~~~Public Functions~~~//
 
-	std::string ACSTest::Run()
+	std::string MCSTest::Run()
 	{
 		try
 		{
 			// acs standard and authenticated variants
-			ACS* acs256s = new ACS(BlockCiphers::AES, StreamAuthenticators::None);
-			ACS* acsc256h256 = new ACS(BlockCiphers::RHXH256, StreamAuthenticators::HMACSHA256);
-			ACS* acsc256k256 = new ACS(BlockCiphers::RHXS256, StreamAuthenticators::KMAC256);
-			ACS* acsc512h512 = new ACS(BlockCiphers::RHXH512, StreamAuthenticators::HMACSHA512);
-			ACS* acsc512k512 = new ACS(BlockCiphers::RHXS512, StreamAuthenticators::KMAC512);
-			ACS* acsc1024k1024 = new ACS(BlockCiphers::RHXS1024, StreamAuthenticators::KMAC1024);
+			MCS* acs256s = new MCS(BlockCiphers::AES, StreamAuthenticators::None);
+			MCS* acsc256h256 = new MCS(BlockCiphers::RHXH256, StreamAuthenticators::HMACSHA256);
+			MCS* acsc256k256 = new MCS(BlockCiphers::RHXS256, StreamAuthenticators::KMAC256);
+			MCS* acsc512h512 = new MCS(BlockCiphers::RHXH512, StreamAuthenticators::HMACSHA512);
+			MCS* acsc512k512 = new MCS(BlockCiphers::RHXS512, StreamAuthenticators::KMAC512);
+			MCS* acsc1024k1024 = new MCS(BlockCiphers::RHXS1024, StreamAuthenticators::KMAC1024);
 
 			// stress test authentication and verification using random input and keys
 			Authentication(acsc256k256);
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 MAC authentication tests.."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 MAC authentication tests.."));
 
 			// test all exception handlers for correct operation
 			Exception();
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 exception handling tests.."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 exception handling tests.."));
 
 			// test 2 succesive finalization calls against mac output and expected ciphertext
 			Finalization(acsc256h256, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0], m_code[1]);
@@ -89,7 +89,7 @@ namespace Test
 			Finalization(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[3], m_code[4], m_code[5]);
 			Finalization(acsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[4], m_code[6], m_code[7]);
 			Finalization(acsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[5], m_code[8], m_code[9]);
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 known answer finalization tests."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 known answer finalization tests."));
 
 			// original known answer test vectors generated with this implementation
 			Kat(acs256s, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
@@ -98,19 +98,19 @@ namespace Test
 			Kat(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[3]);
 			Kat(acsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[4]);
 			Kat(acsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[5]);
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 known answer cipher tests.."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 known answer cipher tests.."));
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
 			MonteCarlo(acs256s, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 monte carlo tests.."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 monte carlo tests.."));
 
 			// compare parallel output with sequential for equality
 			Parallel(acs256s);
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 parallel to sequential equivalence test.."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 parallel to sequential equivalence test.."));
 
 			// looping test of successful decryption with random keys and input
 			Stress(acs256s);
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 stress tests.."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 stress tests.."));
 
 			// verify ciphertext output, decryption, and mac code generation
 			Verification(acsc256h256, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0]);
@@ -118,7 +118,7 @@ namespace Test
 			Verification(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[3], m_code[4]);
 			Verification(acsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[4], m_code[6]);
 			Verification(acsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[5], m_code[8]);
-			OnProgress(std::string("ACSTest: Passed ACS-256/512/1024 known answer authentication tests.."));
+			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 known answer authentication tests.."));
 
 			delete acs256s;
 			delete acsc256h256;
@@ -143,7 +143,7 @@ namespace Test
 		}
 	}
 
-	void ACSTest::Authentication(IStreamCipher* Cipher)
+	void MCSTest::Authentication(IStreamCipher* Cipher)
 	{
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		const size_t TAGLEN = Cipher->TagSize();
@@ -195,14 +195,14 @@ namespace Test
 		}
 	}
 
-	void ACSTest::Exception()
+	void MCSTest::Exception()
 	{
 		// test the enumeration constructors for invalid block-cipher type
 		try
 		{
-			ACS cpr(BlockCiphers::None, StreamAuthenticators::None);
+			MCS cpr(BlockCiphers::None, StreamAuthenticators::None);
 
-			throw TestException(std::string("Exception"), StreamCipherConvert::ToName(StreamCiphers::ACS), std::string("Exception handling failure! -AE1"));
+			throw TestException(std::string("Exception"), StreamCipherConvert::ToName(StreamCiphers::MCSR), std::string("Exception handling failure! -AE1"));
 		}
 		catch (CryptoSymmetricException const &)
 		{
@@ -215,7 +215,7 @@ namespace Test
 		// test initialization key and nonce input sizes
 		try
 		{
-			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			MCS cpr(BlockCiphers::AES, StreamAuthenticators::None);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
 			std::vector<byte> nonce(ks.NonceSize());
@@ -236,7 +236,7 @@ namespace Test
 		// no nonce
 		try
 		{
-			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			MCS cpr(BlockCiphers::AES, StreamAuthenticators::None);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
 			SymmetricKey kp(key);
@@ -256,7 +256,7 @@ namespace Test
 		// illegally sized nonce
 		try
 		{
-			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			MCS cpr(BlockCiphers::AES, StreamAuthenticators::None);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> nonce(1);
@@ -277,7 +277,7 @@ namespace Test
 		// test invalid parallel options
 		try
 		{
-			ACS cpr(BlockCiphers::AES, StreamAuthenticators::None);
+			MCS cpr(BlockCiphers::AES, StreamAuthenticators::None);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
 			SymmetricKey kp(key);
@@ -296,7 +296,7 @@ namespace Test
 		}
 	}
 
-	void ACSTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
+	void MCSTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
 	{
 		const size_t CPTLEN = Message.size() + Cipher->TagSize();
 		const size_t MSGLEN = Message.size();
@@ -350,7 +350,7 @@ namespace Test
 		}
 	}
 
-	void ACSTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void MCSTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
@@ -378,7 +378,7 @@ namespace Test
 		}
 	}
 
-	void ACSTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void MCSTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
 		const size_t MSGLEN = Message.size();
 		std::vector<byte> msg = Message;
@@ -413,10 +413,10 @@ namespace Test
 		}
 	}
 
-	void ACSTest::Parallel(IStreamCipher* Cipher)
+	void MCSTest::Parallel(IStreamCipher* Cipher)
 	{
-		const size_t MINSMP = 2048;
-		const size_t MAXSMP = 16384;
+		const size_t MINSMP = Cipher->ParallelBlockSize();
+		const size_t MAXSMP = Cipher->ParallelBlockSize() * 4;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;
@@ -425,7 +425,6 @@ namespace Test
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> nonce(ks.NonceSize());
 		Prng::SecureRandom rnd;
-		size_t prlSize = Cipher->ParallelProfile().ParallelBlockSize();
 
 		cpt1.reserve(MAXSMP);
 		cpt2.reserve(MAXSMP);
@@ -444,8 +443,6 @@ namespace Test
 			IntegerTools::Fill(inp, 0, MSGLEN, rnd);
 			IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
 			SymmetricKey kp(key, nonce);
-
-			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
 
 			// sequential
 			Cipher->Initialize(true, kp);
@@ -472,15 +469,12 @@ namespace Test
 				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -TP2"));
 			}
 		}
-
-		// restore parallel block size
-		Cipher->ParallelProfile().SetBlockSize(prlSize);
 	}
 
-	void ACSTest::Stress(IStreamCipher* Cipher)
+	void MCSTest::Stress(IStreamCipher* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
-		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
@@ -522,7 +516,7 @@ namespace Test
 		}
 	}
 
-	void ACSTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
+	void MCSTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
 	{
 		const size_t MSGLEN = Message.size();
 		const size_t TAGLEN = Cipher->TagSize();
@@ -562,7 +556,7 @@ namespace Test
 
 	//~~~Private Functions~~~//
 
-	void ACSTest::Initialize()
+	void MCSTest::Initialize()
 	{
 		/*lint -save -e417 */
 
@@ -571,33 +565,33 @@ namespace Test
 		const std::vector<std::string> code =
 		{
 			// acsc256h256
-			std::string("C1EC12C3271F1B279878DF97C4367C82A05CB143CD8A4E05D7C27CE308D63C4E"),
-			std::string("F64992BF3156232AECBC818ED36E08661135221A7C4283E4AA13CAF9C523504D"),
+			std::string("7CD65960B28F0CCEAC04DB6C7D1C21A59B50961BD3CE7CE01B9A6596A68A3D5D"),
+			std::string("4AA2C8A8C3369B2F9FE01916AD98F6522B5FBF4A313D552677F9B24B5B9A6743"),
 			// acsc256k256
-			std::string("B92602256604A86B51D6AFFE2D91EDBD1F8B84D9F5452B980306AC432163C420"),
-			std::string("540E0C3497D4B7501F238DF3804CA201C2D5D014B94892BDC71D4D14BE0C0950"),
+			std::string("F18C0CD16876F795FE1D74AF1567435542B35B17D83DB96F2814BF3D44FE4229"),
+			std::string("D5F43C714A011A4DC06EA0DD06CD37EA2E0F1CC4303A84B62B79D4F634183D12"),
 			// acsc512h512
-			std::string("03570248111C9D42B6C25F9EA7415D6AF0B5DF4DB3D17910E65868F97E31D1BBE34AB463D5B8C8400780FD3986532513060DF84F509BAA4A927A5DA5180FF85A"),
-			std::string("FBD5819295506FA6D50CFCA1AE7CCF8ECE1C4C36A2D21FF161478B34547AC9274BF16C868DA7E090C41C9D721A83E62789AEA6B89A58448A02D5EA3602641D4C"),
+			std::string("E8D9CEACEBFD7168BD5BE8D41AF5876FB696D6A652E5F33D4B9ACB94BE684A982C029E8E2039AD44043629AB3F2C3A243AFD0423C8BD09EDC386669F7B3424D8"),
+			std::string("38FDFC0B594612840AF3C0E8808BDF6F070FA9B313AD98278816EE253184EA8F8EA31A6F428187B1F63E8996569C0361EB0C19D4E54D590FAB2002109D225B9E"),
 			// acsc512k512
-			std::string("139519B2C65A446C5453CE37184B725B94646F4A5E810CCFA54B8311655993165FA61C0CCDCBA46CF782412E94981A1ADFF07EF524058931769C52871B2B7153"),
-			std::string("A87B907FD1B05CB4702BC8BD73E1D5195DB59D856CC0AC1D97EC6B655A91008C03774BDF5FC095C284AD436DF6F841BEEC33A31C9F17D3E3EF473EFE60F70BBA"),
+			std::string("51B9B95EC3BAFF8F50025DE963BC0BD62E3C0D783AD412220D478E2F21DAB41EAB423B1A2104B20972556018DF139BC791A41965E91EF3BF3D6B9EC2657C6CBE"),
+			std::string("914317394B012BC7F87E743318E2E9049609D47D725BDCC070C08B7A2B447D44BC33FBD55144D8E1F5CE60A7A11C503B9D801ECC73C77F512A744687E694536E"),
 			// acs1024k1024
-			std::string("2D721F9EB4241DB3DF2A9F8D07227929143836D2FB956FCE3431D75E5DAB2AC93074E3926ACB42148023D4EAEA24746DF9681313C557F51A2C7C8DFA1F5B1EB2"
-				"E0611E54AC20A2DB8F21BA8251EB608CAC425038A59AD1BD965C11FD5517FB00D6267DA01030A9F01A814A74F4A1BD17A5A661454DF2A0451D6BCB34D59F3E49"),
-			std::string("311A13698DBF7222D03FB833360D6640B6A1A1E5F20D186DDB39AA7E30CF999C89C5BAE50F0B3C31B81D085C99BB2C38D4C0CA89BC07FBFB66B86AAAB1348D52"
-				"B64AC70D4D05C8CE6AD17A8BBC71CF68F85E72D66D90BF964300ECEDE679186F05ECFDB63E06110FDFD483975799B21300BDDC186CFB13FAB134F241131217CE")
+			std::string("7DB5B07E64D3C55813E3795A29D6D7C955FD96583848730DFD44312363F5228FE6503F9C86387293DAD2250C527A4CF84165D21F3370A46DCFF41E2654475FA8"
+				"270F7EA6E0CA2C96C1D334E29FDF857ABC9646D063B0ECED0AE3C34C9D979908958364FAB57FF757975C1F80819BFD6BF0118852F42C1CC322E22FD928ACEC5E"),
+			std::string("B43AC34818B6AA48735B5F2416F8DDEBAA463B1A3E317D411E0C2A026D3288249C02024E502AB65760B9BAD4B05A4917A82FCFC66570229C4969EE0A97C5DB5E"
+				"E6A88779CEFC62CB5C84EDB3AFBD33928764824E891E993C3367A330EFD06DC93EFE26246B3CD9DD7DF90BD5EB3DB9449C00A65CD2082970D33BE00A07B95EF6")
 		};
 		HexConverter::Decode(code, 10, m_code);
 
 		const std::vector<std::string> expected =
 		{
 			std::string("81F10A87673A10B1EC8AE4714002D290"),	// acs256s
-			std::string("D6C8352E1765FB4729563B9D3CCAFB4F"),	// acsc256h256
-			std::string("C64655905F19748D546D553AD5863075"),	// acsc256k256
-			std::string("89873857DEC12730F79ACDA79A2FFAFE"),	// acsc512h512
-			std::string("3808CA4E1695B803C463C6DE53673D43"),	// acsc512k512
-			std::string("962DF397AF8574C720B0B0ED60243D29")		// acsc1024k1024
+			std::string("4BA1DFF25E8BEA4928821B58BA2678D0"),	// acsc256h256
+			std::string("83131264443AD7F15518D620AAD119D1"),	// acsc256k256
+			std::string("D78702564AA56F77FFF871168DBCC0FA"),	// acsc512h512
+			std::string("25019BA9E697ABED1C0E383E81DEF527"),	// acsc512k512
+			std::string("987AF6C0BA319F497921668F06667A72")		// acsc1024k1024
 		};
 		HexConverter::Decode(expected, 6, m_expected);
 
@@ -630,7 +624,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void ACSTest::OnProgress(const std::string &Data)
+	void MCSTest::OnProgress(const std::string &Data)
 	{
 		m_progressEvent(Data);
 	}

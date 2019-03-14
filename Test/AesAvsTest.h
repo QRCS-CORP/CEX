@@ -19,6 +19,7 @@ namespace Test
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
+		static const bool HAS_AESNI;
 
 		TestEventHandler m_progressEvent;
 		bool m_testNI;
@@ -56,6 +57,7 @@ namespace Test
         
     private:
 
+		static bool HasAESNI();
 		void Kat(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void OnProgress(const std::string &Data);
     };

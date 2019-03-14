@@ -171,7 +171,7 @@ void Skein256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 	Finalize(Output, 0);
 }
 
-size_t Skein256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
+size_t Skein256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
 

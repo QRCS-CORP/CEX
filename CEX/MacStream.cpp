@@ -1,30 +1,73 @@
 #include "MacStream.h"
-#include "Macs.h"
+#include "MacFromName.h"
 
 NAMESPACE_PROCESSING
 
 using Exception::CryptoMacException;
 using Enumeration::ErrorCodes;
+using Helper::MacFromName;
 using Enumeration::Macs;
 
 const std::string MacStream::CLASS_NAME("MacStream");
 
 //~~~Constructor~~~//
 
+class MacStream::MacStreamState
+{
+public:
+
+	size_t Interval;
+	bool Destroy;
+	bool Initialized;
+
+	MacStreamState(bool Destroyed)
+		:
+		Interval(0),
+		Destroy(Destroyed),
+		Initialized(false)
+	{
+	}
+
+	~MacStreamState()
+	{
+		Interval = 0;
+		Destroy = false;
+		Initialized = false;
+	}
+};
+
+MacStream::MacStream(Macs MacType)
+	:
+	m_streamState(new MacStreamState(true)),
+	m_macEngine(MacType != Macs::None && MacType != Macs::GMAC ? MacFromName::GetInstance(MacType) :
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("MAC type can not be none!"), ErrorCodes::InvalidParam))
+{
+}
+
 MacStream::MacStream(IMac* Mac)
 	:
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isInitialized(false),
+	m_streamState(new MacStreamState(false)),
 	m_macEngine(Mac != nullptr && Mac->Enumeral() != Macs::GMAC ? Mac :
-		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Mac generator can not be null!"), ErrorCodes::IllegalOperation)),
-	m_progressInterval(0)
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Mac generator can not be null!"), ErrorCodes::IllegalOperation))
 {
 }
 
 MacStream::~MacStream()
 {
-	Destroy();
+	if (m_streamState->Destroy)
+	{
+		if (m_macEngine != nullptr)
+		{
+			m_macEngine.reset(nullptr);
+		}
+	}
+	else
+	{
+		if (m_macEngine != nullptr)
+		{
+			m_macEngine.release();
+		}
+	}
 }
 
 //~~~Accessors~~~//
@@ -38,27 +81,27 @@ const std::vector<SymmetricKeySize> MacStream::LegalKeySizes()
 
 std::vector<byte> MacStream::Compute(IByteStream* InStream)
 {
-	CEXASSERT(m_isInitialized, "The mac has not been initialized");
+	CEXASSERT(m_streamState->Initialized, "The mac has not been initialized");
 	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too short");
 	CEXASSERT(InStream->CanRead(), "The input stream is set to write only!");
 
-	size_t dataLen;
+	size_t plen;
 
-	dataLen = InStream->Length() - InStream->Position();
-	CalculateInterval(dataLen);
+	plen = InStream->Length() - InStream->Position();
+	CalculateInterval(plen);
 
-	return Process(InStream, dataLen);
+	return Process(InStream, plen);
 }
 
 std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(m_isInitialized, "The mac has not been initialized");
+	CEXASSERT(m_streamState->Initialized, "The mac has not been initialized");
 	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "The input array is too short");
 
-	size_t dataLen;
+	size_t plen;
 
-	dataLen = Length - InOffset;
-	CalculateInterval(dataLen);
+	plen = Length - InOffset;
+	CalculateInterval(plen);
 
 	return Process(Input, InOffset, Length);
 }
@@ -73,7 +116,7 @@ void MacStream::Initialize(ISymmetricKey &Parameters)
 	try
 	{
 		m_macEngine->Initialize(Parameters);
-		m_isInitialized = true;
+		m_streamState->Initialized = true;
 	}
 	catch (CryptoMacException &ex)
 	{
@@ -85,70 +128,48 @@ void MacStream::Initialize(ISymmetricKey &Parameters)
 
 void MacStream::CalculateInterval(size_t Length)
 {
-	size_t interval;
+	size_t itv;
 
-	interval = Length / 100;
+	itv = Length / 100;
 
-	if (interval < m_macEngine->BlockSize())
+	if (itv < m_macEngine->BlockSize())
 	{
-		m_progressInterval = m_macEngine->BlockSize();
+		m_streamState->Interval = m_macEngine->BlockSize();
 	}
 	else
 	{
-		m_progressInterval = (interval - (interval % m_macEngine->BlockSize()));
+		m_streamState->Interval = (itv - (itv % m_macEngine->BlockSize()));
 	}
 
-	if (m_progressInterval == 0)
+	if (m_streamState->Interval == 0)
 	{
-		m_progressInterval = m_macEngine->BlockSize();
+		m_streamState->Interval = m_macEngine->BlockSize();
 	}
 }
 
 void MacStream::CalculateProgress(size_t Length, size_t Processed)
 {
+	double prg;
+	size_t blk;
+
 	if (Length >= Processed)
 	{
-		double progress = 100.0 * (static_cast<double>(Processed) / Length);
-		if (progress > 100.0)
+		prg = 100.0 * (static_cast<double>(Processed) / Length);
+
+		if (prg > 100.0)
 		{
-			progress = 100.0;
+			prg = 100.0;
 		}
 
-		size_t block = Length / 100;
-		if (block == 0)
-		{
-			ProgressPercent(static_cast<int>(progress));
-		}
-		else if (Processed % block == 0)
-		{
-			ProgressPercent(static_cast<int>(progress));
-		}
-	}
-}
+		blk = Length / 100;
 
-void MacStream::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_progressInterval = 0;
-
-		if (m_destroyEngine)
+		if (blk == 0)
 		{
-			m_destroyEngine = false;
-
-			if (m_macEngine != nullptr)
-			{
-				m_macEngine.reset(nullptr);
-			}
+			ProgressPercent(static_cast<int>(prg));
 		}
-		else
+		else if (Processed % blk == 0)
 		{
-			if (m_macEngine != nullptr)
-			{
-				m_macEngine.release();
-			}
+			ProgressPercent(static_cast<int>(prg));
 		}
 	}
 }
@@ -157,71 +178,72 @@ std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
 {
 	const size_t BLKLEN = m_macEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
-	size_t prcLen;
-	size_t prcRead;
+	std::vector<byte> tmph;
+	size_t plen;
+	size_t pread;
 
 	std::vector<byte> inpBuffer(BLKLEN);
 
-	prcLen = 0;
-	prcRead = 0;
+	plen = 0;
+	pread = 0;
 
-	while (prcLen != ALNLEN)
+	while (plen != ALNLEN)
 	{
-		prcRead = InStream->Read(inpBuffer, 0, BLKLEN);
-		m_macEngine->Update(inpBuffer, 0, prcRead);
-		prcLen += prcRead;
+		pread = InStream->Read(inpBuffer, 0, BLKLEN);
+		m_macEngine->Update(inpBuffer, 0, pread);
+		plen += pread;
 		CalculateProgress(Length, InStream->Position());
 	}
 
 	// last block
-	if (prcLen < Length)
+	if (plen < Length)
 	{
-		const size_t FNLLEN = Length - prcLen;
+		const size_t FNLLEN = Length - plen;
 		inpBuffer.resize(FNLLEN);
-		prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
-		m_macEngine->Update(inpBuffer, 0, prcRead);
-		prcLen += prcRead;
+		pread = InStream->Read(inpBuffer, 0, FNLLEN);
+		m_macEngine->Update(inpBuffer, 0, pread);
+		plen += pread;
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(m_macEngine->TagSize());
-	m_macEngine->Finalize(chkSum, 0);
-	CalculateProgress(Length, prcLen);
+	tmph.resize(m_macEngine->TagSize());
+	m_macEngine->Finalize(tmph, 0);
+	CalculateProgress(Length, plen);
 
-	return chkSum;
+	return tmph;
 }
 
 std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	size_t prcLen;
-
 	const size_t BLKLEN = m_macEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
+	std::vector<byte> tmph;
+	size_t plen;
 
-	prcLen = 0;
+	plen = 0;
 
-	while (prcLen != ALNLEN)
+	while (plen != ALNLEN)
 	{
 		m_macEngine->Update(Input, InOffset, BLKLEN);
 		InOffset += BLKLEN;
-		prcLen += BLKLEN;
-		CalculateProgress(Length, prcLen);
+		plen += BLKLEN;
+		CalculateProgress(Length, plen);
 	}
 
 	// last block
-	if (prcLen < Length)
+	if (plen < Length)
 	{
-		const size_t FNLLEN = Length - prcLen;
+		const size_t FNLLEN = Length - plen;
 		m_macEngine->Update(Input, InOffset, FNLLEN);
-		prcLen += FNLLEN;
+		plen += FNLLEN;
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(m_macEngine->TagSize());
-	m_macEngine->Finalize(chkSum, 0);
-	CalculateProgress(Length, prcLen);
+	tmph.resize(m_macEngine->TagSize());
+	m_macEngine->Finalize(tmph, 0);
+	CalculateProgress(Length, plen);
 
-	return chkSum;
+	return tmph;
 }
 
 NAMESPACE_PROCESSINGEND

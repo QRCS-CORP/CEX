@@ -99,8 +99,8 @@ namespace Test
 
 	void ParallelModeTest::Stress(ICipherMode* Cipher, bool Encryption)
 	{
-		const size_t MINSMP = 2048;
-		const size_t MAXSMP = 16384;
+		const size_t MINSMP = Cipher->ParallelProfile().ParallelBlockSize();
+		const size_t MAXSMP = Cipher->ParallelProfile().ParallelBlockSize() * 4;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[1];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;
@@ -117,46 +117,44 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			size_t inpLen = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
+			size_t plen = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
 
 			if (Cipher->Enumeral() == Enumeration::CipherModes::CBC || 
 				Cipher->Enumeral() == Enumeration::CipherModes::CFB || 
 				Cipher->Enumeral() == Enumeration::CipherModes::OFB ||
 				Cipher->Enumeral() == Enumeration::CipherModes::ECB)
 			{
-				inpLen = inpLen - (inpLen % Cipher->BlockSize());
+				plen = plen - (plen % Cipher->BlockSize());
 			}
 
-			inp.resize(inpLen);
-			otp.resize(inpLen);
+			inp.resize(plen);
+			otp.resize(plen);
 
 			if (Cipher->Enumeral() == Enumeration::CipherModes::EAX ||
 				Cipher->Enumeral() == Enumeration::CipherModes::GCM)
 			{
-				cpt1.resize(inpLen + ((IAeadMode*)Cipher)->MaxTagSize());
+				cpt1.resize(plen + ((IAeadMode*)Cipher)->MaxTagSize());
 				cpt2.resize(cpt1.size());
 			}
 			else
 			{
-				cpt1.resize(inpLen);
-				cpt2.resize(inpLen);
+				cpt1.resize(plen);
+				cpt2.resize(plen);
 			}
 
 			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(inp, 0, inpLen, rnd);
+			IntegerTools::Fill(inp, 0, plen, rnd);
 			SymmetricKey k(key, iv);
-
-			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
 
 			// sequential
 			Cipher->Initialize(Encryption, k);
 			Cipher->ParallelProfile().IsParallel() = false;
-			Cipher->Transform(inp, 0, cpt1, 0, inpLen);
+			Cipher->Transform(inp, 0, cpt1, 0, plen);
 
 			// parallel
 			Cipher->Initialize(Encryption, k);
 			Cipher->ParallelProfile().IsParallel() = true;
-			Cipher->Transform(inp, 0, cpt2, 0, inpLen);
+			Cipher->Transform(inp, 0, cpt2, 0, plen);
 
 			if (cpt1 != cpt2)
 			{
@@ -168,7 +166,7 @@ namespace Test
 				// decrypt sequential ciphertext
 				Cipher->Initialize(false, k);
 				Cipher->ParallelProfile().IsParallel() = true;
-				Cipher->Transform(cpt1, 0, otp, 0, inpLen);
+				Cipher->Transform(cpt1, 0, otp, 0, plen);
 
 				if (otp != inp)
 				{

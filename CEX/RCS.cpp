@@ -1,19 +1,19 @@
-#include "ACS.h"
-
+#include "RCS.h"
+#include "CpuDetect.h"
+#include "IntegerTools.h"
+#include "MacFromName.h"
+#include "MemoryTools.h"
+#include "Rijndael.h"
+#include "SHAKE.h"
+#include "SymmetricKey.h"
 #if defined(__AVX__)
-#	include "CpuDetect.h"
-#	include "IntegerTools.h"
-#	include "MacFromName.h"
-#	include "MemoryTools.h"
-#	include "SHAKE.h"
-#	include "SymmetricKey.h"
 #	include <wmmintrin.h>
 #endif
 
+
 NAMESPACE_STREAM
 
-#if defined(__AVX__)
-
+using namespace Cipher::Block::RijndaelBase;
 using Enumeration::BlockCipherConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
@@ -21,13 +21,13 @@ using Enumeration::ShakeModes;
 using Enumeration::StreamAuthenticatorConvert;
 using Cipher::SymmetricKey;
 
-const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x61 };
+const std::vector<byte> RCS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x61 };
 
-class ACS::AcsState
+class RCS::RcsState
 {
 public:
 
-	std::vector<__m128i> RoundKeys;
+	SecureVector<uint> RoundKeys;
 	SecureVector<byte> Custom;
 	std::vector<byte> Nonce;
 	SecureVector<byte> MacKey;
@@ -38,7 +38,7 @@ public:
 	bool Encryption;
 	bool Initialized;
 
-	AcsState(StreamAuthenticators AuthenticatorType)
+	RcsState(StreamAuthenticators AuthenticatorType)
 		:
 		RoundKeys(0),
 		Custom(0),
@@ -53,7 +53,7 @@ public:
 	{
 	}
 
-	~AcsState()
+	~RcsState()
 	{
 		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
 		MemoryTools::Clear(Custom, 0, Custom.size());
@@ -82,10 +82,10 @@ public:
 
 //~~~Constructor~~~//
 
-ACS::ACS(StreamAuthenticators AuthenticatorType)
+RCS::RCS(StreamAuthenticators AuthenticatorType)
 	:
-	m_rcsState(new AcsState(AuthenticatorType)),
-	m_legalKeySizes{
+	m_rcsState(new RcsState(AuthenticatorType)),
+	m_legalKeySizes { 
 		SymmetricKeySize(32, BLOCK_SIZE, INFO_SIZE),
 		SymmetricKeySize(64, BLOCK_SIZE, INFO_SIZE),
 		SymmetricKeySize(128, BLOCK_SIZE, INFO_SIZE)},
@@ -95,7 +95,7 @@ ACS::ACS(StreamAuthenticators AuthenticatorType)
 {
 }
 
-ACS::~ACS()
+RCS::~RCS()
 {
 	if (m_macAuthenticator != nullptr)
 	{
@@ -105,7 +105,7 @@ ACS::~ACS()
 
 //~~~Accessors~~~//
 
-const StreamCiphers ACS::Enumeral()
+const StreamCiphers RCS::Enumeral()
 {
 	StreamAuthenticators auth;
 	StreamCiphers tmpn;
@@ -116,32 +116,32 @@ const StreamCiphers ACS::Enumeral()
 	return tmpn;
 }
 
-const bool ACS::IsAuthenticator()
+const bool RCS::IsAuthenticator()
 {
 	return (m_macAuthenticator != nullptr);
 }
 
-const bool ACS::IsEncryption()
+const bool RCS::IsEncryption()
 {
 	return m_rcsState->Encryption;
 }
 
-const bool ACS::IsInitialized()
+const bool RCS::IsInitialized()
 {
 	return m_rcsState->Initialized;
 }
 
-const bool ACS::IsParallel()
+const bool RCS::IsParallel()
 {
 	return m_parallelProfile.IsParallel();
 }
 
-const std::vector<SymmetricKeySize> &ACS::LegalKeySizes()
+const std::vector<SymmetricKeySize> &RCS::LegalKeySizes()
 {
 	return m_legalKeySizes;
 }
 
-const std::string ACS::Name()
+const std::string RCS::Name()
 {
 	std::string name;
 
@@ -150,36 +150,37 @@ const std::string ACS::Name()
 	return name;
 }
 
-const size_t ACS::ParallelBlockSize()
+const size_t RCS::ParallelBlockSize()
 {
 	return m_parallelProfile.ParallelBlockSize();
 }
 
-ParallelOptions &ACS::ParallelProfile()
+ParallelOptions &RCS::ParallelProfile()
 {
 	return m_parallelProfile;
 }
 
-const std::vector<byte> ACS::Tag()
+const std::vector<byte> RCS::Tag()
 {
 	return Unlock(m_rcsState->MacTag);
 }
 
-const void ACS::Tag(SecureVector<byte> &Output)
+const void RCS::Tag(SecureVector<byte> &Output)
 {
 	Copy(m_rcsState->MacTag, 0, Output, 0, m_rcsState->MacTag.size());
 }
 
-const size_t ACS::TagSize()
+const size_t RCS::TagSize()
 {
 	return IsAuthenticator() ? m_macAuthenticator->TagSize() : 0;
 }
 
 //~~~Public Functions~~~//
 
-void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
+void RCS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
 	size_t i;
+	uint tmpbk;
 
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
@@ -242,16 +243,27 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	gen.Initialize(Parameters.SecureKey(), m_rcsState->Custom);
 
 	// generate the cipher round-keys
-	const size_t RNKLEN = ((BLOCK_SIZE / sizeof(uint)) * (m_rcsState->Rounds + 1)) / 4;
+	const size_t RNKLEN = ((BLOCK_SIZE / 4) * (m_rcsState->Rounds + 1));
 	m_rcsState->RoundKeys.resize(RNKLEN);
-	SecureVector<byte> tmpr(RNKLEN * sizeof(__m128i));
+	SecureVector<byte> tmpr(RNKLEN * sizeof(uint));
 	gen.Generate(tmpr);
 
-	// copy bytes to working key
-	for (i = 0; i < RNKLEN; ++i)
+	// big endian format to align with test vectors
+	for (i = 0; i < tmpr.size(); i += sizeof(uint))
 	{
-		m_rcsState->RoundKeys[i] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&tmpr[i * sizeof(__m128i)]));
+		tmpbk = IntegerTools::BeBytesTo32(tmpr, i);
+		IntegerTools::Le32ToBytes(tmpbk, tmpr, i);
 	}
+
+	// copy bytes to working key
+#if defined(CEX_IS_LITTLE_ENDIAN)
+	MemoryTools::Copy(tmpr, 0, m_rcsState->RoundKeys, 0, tmpr.size());
+#else
+	for (size_t i = 0; i < RNKLEN; ++i)
+	{
+		m_rcsState->RoundKeys[i] = IntegerTools::LeBytesTo32(tmpr, i * sizeof(uint));
+	}
+#endif
 
 	MemoryTools::Clear(tmpr, 0, tmpr.size());
 
@@ -270,11 +282,16 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_rcsState->MacTag.resize(TagSize());
 	}
 
+	// pre-load the s-box and multiplication tables into l2 as a timing defence
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	Prefetch();
+#endif
+
 	m_rcsState->Encryption = Encryption;
 	m_rcsState->Initialized = true;
 }
 
-void ACS::ParallelMaxDegree(size_t Degree)
+void RCS::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
 	{
@@ -284,7 +301,7 @@ void ACS::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void ACS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
+void RCS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (!IsInitialized())
 	{
@@ -299,7 +316,7 @@ void ACS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 	m_macAuthenticator->Update(Input, Offset, Length);
 }
 
-void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void RCS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
@@ -357,7 +374,7 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 //~~~Private Functions~~~//
 
-void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Authenticator)
+void RCS::Finalize(std::unique_ptr<RcsState> &State, std::unique_ptr<IMac> &Authenticator)
 {
 	// generate the mac code
 	Authenticator->Finalize(State->MacTag, 0);
@@ -379,7 +396,7 @@ void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Auth
 	Move(mack, State->MacKey, 0);
 }
 
-void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
+void RCS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
 {
 	size_t bctr;
 
@@ -436,7 +453,6 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 			IntegerTools::LeIncrease8(Counter, tmpc, 224, 256);
 			Transform2048(tmpc, 0, Output, OutOffset + bctr);
 			IntegerTools::LeIncrease8(Counter, static_cast<uint>(AVX2BLK));
-			MemoryTools::Copy(tmpc, 224, Counter, 0, BLOCK_SIZE);
 			bctr += AVX2BLK;
 		}
 	}
@@ -479,7 +495,20 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	}
 }
 
-void ACS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+CEX_OPTIMIZE_IGNORE
+void RCS::Prefetch()
+{
+	// timing defence: pre-load tables into cache
+	MemoryTools::PrefetchL2(SBox, 0, 256);
+	MemoryTools::PrefetchL2(T0, 0, 1024);
+	MemoryTools::PrefetchL2(T1, 0, 1024);
+	MemoryTools::PrefetchL2(T2, 0, 1024);
+	MemoryTools::PrefetchL2(T3, 0, 1024);
+
+}
+CEX_OPTIMIZE_RESUME
+
+void RCS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	size_t i;
 
@@ -508,7 +537,7 @@ void ACS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<b
 	}
 }
 
-void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void RCS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t OTPLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
@@ -549,7 +578,7 @@ void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	}
 }
 
-void ACS::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void RCS::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	// get block aligned
 	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);
@@ -573,7 +602,7 @@ void ACS::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std
 	}
 }
 
-void ACS::Reset()
+void RCS::Reset()
 {
 	m_rcsState->Reset();
 
@@ -585,61 +614,127 @@ void ACS::Reset()
 	m_parallelProfile.Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 }
 
-void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RCS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(__AVX__)
-	const size_t HLFBLK = 16;
-	const size_t RNDCNT = m_rcsState->RoundKeys.size() - 3;
+	const size_t RNDCNT = m_rcsState->RoundKeys.size() - 8;
 	size_t kctr;
+	uint X0;
+	uint X1;
+	uint X2;
+	uint X3;
+	uint X4;
+	uint X5;
+	uint X6;
+	uint X7;
+	uint Y0;
+	uint Y1;
+	uint Y2;
+	uint Y3;
+	uint Y4;
+	uint Y5;
+	uint Y6;
+	uint Y7;
 
-	__m128i BLDMSK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
-	__m128i RJDMSK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
-	__m128i blk1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
-	__m128i blk2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + HLFBLK]));
-	__m128i tmp1;
-	__m128i tmp2;
+	// round 0
+	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rcsState->RoundKeys[0];
+	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rcsState->RoundKeys[1];
+	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rcsState->RoundKeys[2];
+	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rcsState->RoundKeys[3];
+	X4 = IntegerTools::BeBytesTo32(Input, InOffset + 16) ^ m_rcsState->RoundKeys[4];
+	X5 = IntegerTools::BeBytesTo32(Input, InOffset + 20) ^ m_rcsState->RoundKeys[5];
+	X6 = IntegerTools::BeBytesTo32(Input, InOffset + 24) ^ m_rcsState->RoundKeys[6];
+	X7 = IntegerTools::BeBytesTo32(Input, InOffset + 28) ^ m_rcsState->RoundKeys[7];
 
-	kctr = 0;
-	blk1 = _mm_xor_si128(blk1, m_rcsState->RoundKeys[kctr]);
-	++kctr;
-	blk2 = _mm_xor_si128(blk2, m_rcsState->RoundKeys[kctr]);
+	// round 1
+	Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X4)] ^ m_rcsState->RoundKeys[8];
+	Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X4 >> 8)] ^ T3[static_cast<byte>(X5)] ^ m_rcsState->RoundKeys[9];
+	Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X5 >> 8)] ^ T3[static_cast<byte>(X6)] ^ m_rcsState->RoundKeys[10];
+	Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X4 >> 16)] ^ T2[static_cast<byte>(X6 >> 8)] ^ T3[static_cast<byte>(X7)] ^ m_rcsState->RoundKeys[11];
+	Y4 = T0[static_cast<byte>(X4 >> 24)] ^ T1[static_cast<byte>(X5 >> 16)] ^ T2[static_cast<byte>(X7 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rcsState->RoundKeys[12];
+	Y5 = T0[static_cast<byte>(X5 >> 24)] ^ T1[static_cast<byte>(X6 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rcsState->RoundKeys[13];
+	Y6 = T0[static_cast<byte>(X6 >> 24)] ^ T1[static_cast<byte>(X7 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rcsState->RoundKeys[14];
+	Y7 = T0[static_cast<byte>(X7 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rcsState->RoundKeys[15];
 
+	kctr = 16;
 	while (kctr != RNDCNT)
 	{
-		// mix the blocks
-		tmp1 = _mm_blendv_epi8(blk1, blk2, BLDMSK);
-		tmp2 = _mm_blendv_epi8(blk2, blk1, BLDMSK);
-		// shuffle
-		tmp1 = _mm_shuffle_epi8(tmp1, RJDMSK);
-		tmp2 = _mm_shuffle_epi8(tmp2, RJDMSK);
+		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y4)] ^ m_rcsState->RoundKeys[kctr];
 		++kctr;
-		// encrypt the first half block
-		blk1 = _mm_aesenc_si128(tmp1, m_rcsState->RoundKeys[kctr]);
+		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y4 >> 8)] ^ T3[static_cast<byte>(Y5)] ^ m_rcsState->RoundKeys[kctr];
 		++kctr;
-		// encrypt the second block
-		blk2 = _mm_aesenc_si128(tmp2, m_rcsState->RoundKeys[kctr]);
+		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y5 >> 8)] ^ T3[static_cast<byte>(Y6)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y4 >> 16)] ^ T2[static_cast<byte>(Y6 >> 8)] ^ T3[static_cast<byte>(Y7)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		X4 = T0[static_cast<byte>(Y4 >> 24)] ^ T1[static_cast<byte>(Y5 >> 16)] ^ T2[static_cast<byte>(Y7 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		X5 = T0[static_cast<byte>(Y5 >> 24)] ^ T1[static_cast<byte>(Y6 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		X6 = T0[static_cast<byte>(Y6 >> 24)] ^ T1[static_cast<byte>(Y7 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		X7 = T0[static_cast<byte>(Y7 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X4)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X4 >> 8)] ^ T3[static_cast<byte>(X5)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X5 >> 8)] ^ T3[static_cast<byte>(X6)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X4 >> 16)] ^ T2[static_cast<byte>(X6 >> 8)] ^ T3[static_cast<byte>(X7)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y4 = T0[static_cast<byte>(X4 >> 24)] ^ T1[static_cast<byte>(X5 >> 16)] ^ T2[static_cast<byte>(X7 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y5 = T0[static_cast<byte>(X5 >> 24)] ^ T1[static_cast<byte>(X6 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y6 = T0[static_cast<byte>(X6 >> 24)] ^ T1[static_cast<byte>(X7 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
+		Y7 = T0[static_cast<byte>(X7 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rcsState->RoundKeys[kctr];
+		++kctr;
 	}
 
-	// final block
-	tmp1 = _mm_blendv_epi8(blk1, blk2, BLDMSK);
-	tmp2 = _mm_blendv_epi8(blk2, blk1, BLDMSK);
-	tmp1 = _mm_shuffle_epi8(tmp1, RJDMSK);
-	tmp2 = _mm_shuffle_epi8(tmp2, RJDMSK);
+	// final round
+	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 1] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 2] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 3] = static_cast<byte>(SBox[static_cast<byte>(Y4)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
 	++kctr;
-	blk1 = _mm_aesenclast_si128(tmp1, m_rcsState->RoundKeys[kctr]);
+	Output[OutOffset + 4] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 5] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 6] = static_cast<byte>(SBox[static_cast<byte>(Y4 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 7] = static_cast<byte>(SBox[static_cast<byte>(Y5)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
 	++kctr;
-	blk2 = _mm_aesenclast_si128(tmp2, m_rcsState->RoundKeys[kctr]);
-
-	// store them in output
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), blk1);
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + HLFBLK]), blk2);
-
-#else
-
-#endif
+	Output[OutOffset + 8] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 9] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 10] = static_cast<byte>(SBox[static_cast<byte>(Y5 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 11] = static_cast<byte>(SBox[static_cast<byte>(Y6)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 12] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 13] = static_cast<byte>(SBox[static_cast<byte>(Y4 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 14] = static_cast<byte>(SBox[static_cast<byte>(Y6 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y7)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 16] = static_cast<byte>(SBox[static_cast<byte>(Y4 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 17] = static_cast<byte>(SBox[static_cast<byte>(Y5 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 18] = static_cast<byte>(SBox[static_cast<byte>(Y7 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 19] = static_cast<byte>(SBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 20] = static_cast<byte>(SBox[static_cast<byte>(Y5 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 21] = static_cast<byte>(SBox[static_cast<byte>(Y6 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 22] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 23] = static_cast<byte>(SBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 24] = static_cast<byte>(SBox[static_cast<byte>(Y6 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 25] = static_cast<byte>(SBox[static_cast<byte>(Y7 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 26] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 27] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
+	++kctr;
+	Output[OutOffset + 28] = static_cast<byte>(SBox[static_cast<byte>(Y7 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
+	Output[OutOffset + 29] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
+	Output[OutOffset + 30] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
+	Output[OutOffset + 31] = static_cast<byte>(SBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
 }
 
-void ACS::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RCS::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Transform256(Input, InOffset, Output, OutOffset);
 	Transform256(Input, InOffset + 32, Output, OutOffset + 32);
@@ -647,17 +742,16 @@ void ACS::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::ve
 	Transform256(Input, InOffset + 96, Output, OutOffset + 96);
 }
 
-void ACS::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RCS::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Transform1024(Input, InOffset, Output, OutOffset);
 	Transform1024(Input, InOffset + 128, Output, OutOffset + 128);
 }
 
-void ACS::Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RCS::Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Transform2048(Input, InOffset, Output, OutOffset);
 	Transform2048(Input, InOffset + 256, Output, OutOffset + 256);
 }
 
-#endif
 NAMESPACE_STREAMEND

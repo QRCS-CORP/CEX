@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of a keyed Keccak MAC function (KMAC).
-// Written by John Underhill, March 2, 2018
+// Written by John G. Underhill, March 2, 2018
 // Updated February 6, 2018
 // Contact: develop@vtdev.com
 

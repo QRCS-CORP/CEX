@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
-// Written by John Underhill, January 21, 2015
+// Written by John G. Underhill, January 21, 2015
 // Updated April 21, 2016
 // Contact: develop@vtdev.com
 
@@ -39,24 +39,24 @@ using Routing::Event;
 using Cipher::ISymmetricKey;
 using IO::IByteStream;
 using Mac::IMac;
+using Enumeration::Macs;
 using Cipher::SymmetricKeySize;
 
 /// <summary>
 /// MAC stream helper class.
-/// <para>Wraps Message Authentication Code (MAC) stream functions in an easy to use interface.</para>
+/// <para>Wraps Message Authentication Code (MAC) function in an easy to use interface.</para>
 /// </summary> 
 /// 
 /// <example>
 /// <description>Example of hashing a Stream:</description>
 /// <code>
-/// SHA256* eng = new SHA256();
-/// HMAC* mac = new HMAC(eng);
-/// hmac->Initialize(Key, Iv);
-/// MacStream ds(mac);
+/// // instantiate the mac function
+/// MacStream ms(Macs::HMACSHA256);
+/// // initialize with a key
+/// ms.Initialize(Key);
+/// // wrap the input buyes in a memory stream
 /// IByteStream* ms = new MemoryStream(Input);
 /// Code = ds.Compute(ms);
-/// delete eng;
-/// delete mac;
 /// delete ms;
 /// </code>
 /// </example>
@@ -64,8 +64,7 @@ using Cipher::SymmetricKeySize;
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Uses any of the implemented Macs using the IMac interface.</description></item>
-/// <item><description>Mac must be fully initialized before passed to the constructor.</description></item>
+/// <item><description>Uses any of the implemented Macs using the IMac interface, or a MAC enumeration type.</description></item>
 /// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either Compute() calls.</description></item>
 /// </list>
 /// </remarks>
@@ -75,11 +74,9 @@ private:
 
 	static const std::string CLASS_NAME;
 
-	bool m_destroyEngine;
-	bool m_isDestroyed;
-	bool m_isInitialized;
+	class MacStreamState;
+	std::unique_ptr<MacStreamState> m_streamState;
 	std::unique_ptr<IMac> m_macEngine;
-	size_t m_progressInterval;
 
 public:
 
@@ -104,6 +101,15 @@ public:
 	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
 	MacStream() = delete;
+
+	/// <summary>
+	/// Initialize the class with a MAC enumeration type
+	/// </summary>
+	/// 
+	/// <param name="MacType">The digest enumeration member</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are passed</exception>
+	MacStream(Macs MacType);
 
 	/// <summary>
 	/// Initialize the class with a Mac instance
@@ -163,7 +169,6 @@ private:
 
 	void CalculateInterval(size_t Length);
 	void CalculateProgress(size_t Length, size_t Processed);
-	void Destroy();
 	std::vector<byte> Process(IByteStream* InStream, size_t Length);
 	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 };

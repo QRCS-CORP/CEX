@@ -136,7 +136,7 @@ namespace Test
 #if defined(__AVX__)
 		void AHXSpeedTest();
 #endif
-		void ACSSpeedTest();
+		void MCSSpeedTest();
 		void CBCSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CFBSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CTRSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);

@@ -11,87 +11,94 @@ using Exception::CryptoCipherModeException;
 using Exception::ErrorCodes;
 using Utility::MemoryTools;
 
+class CipherStream::CipherState
+{
+public:
+
+	bool Destroy;
+	bool Buffered;
+	bool CounterMode;
+	bool Encryption;
+	bool Initialized;
+
+	CipherState(bool IsCounter, bool Destroyed)
+		:
+		Destroy(Destroyed),
+		Buffered(false),
+		CounterMode(IsCounter),
+		Encryption(false),
+		Initialized(false)
+	{
+
+	}
+
+	~CipherState()
+	{
+		Destroy = false;
+		Buffered = false;
+		CounterMode = false;
+		Encryption = false;
+		Initialized = false;
+	}
+};
+
 const std::string CipherStream::CLASS_NAME("CipherStream");
 
 //~~~Constructor~~~//
 
 CipherStream::CipherStream(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType, PaddingModes PaddingType)
 	:
+	m_cipherState(new CipherState((CipherModeType == CipherModes::CTR || CipherModeType == CipherModes::ICM), true)),
 	m_cipherEngine(CipherModeType != CipherModes::None && CipherType != BlockCiphers::None ? GetCipherMode(CipherType, CipherExtensionType, CipherModeType) :
 		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_cipherPadding(CipherModeType == CipherModes::CBC || CipherModeType == CipherModes::CFB || CipherModeType == CipherModes::OFB ? GetPaddingMode(PaddingType) : nullptr),
-	m_destroyEngine(true),
-	m_isBufferedIO(false),
-	m_isCounterMode(CipherModeType == CipherModes::CTR || CipherModeType == CipherModes::ICM),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isParallel(false),
-	m_legalKeySizes(0)
+	m_legalKeySizes(m_cipherEngine->LegalKeySizes())
 {
-	Scope();
 }
 
 CipherStream::CipherStream(ICipherMode* Cipher, IPadding* Padding)
 	:
+	m_cipherState(new CipherState(((Cipher != nullptr && (Cipher->Enumeral() == CipherModes::CTR || Cipher->Enumeral() == CipherModes::ICM)) ? true : false), false)),
 	m_cipherEngine(Cipher != nullptr ? Cipher :
 		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_cipherPadding(Padding),
-	m_destroyEngine(false),
-	m_isBufferedIO(false),
-	m_isCounterMode(Cipher->Enumeral() == CipherModes::CTR || Cipher->Enumeral() == CipherModes::ICM),
-	m_isDestroyed(false),
-	m_isEncryption(Cipher->IsEncryption()),
-	m_isInitialized(false),
-	m_isParallel(false),
-	m_legalKeySizes(0)
+	m_legalKeySizes(m_cipherEngine->LegalKeySizes())
 {
-	Scope();
 }
 
 CipherStream::~CipherStream()
 {
-	if (!m_isDestroyed)
+	if (m_cipherState->Destroy)
 	{
-		m_isDestroyed = true;
-		m_isCounterMode = false;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_isParallel = false;
-		Utility::IntegerTools::Clear(m_legalKeySizes);
-
-		if (m_destroyEngine)
+		if (m_cipherEngine != nullptr)
 		{
-			m_destroyEngine = false;
-
-			if (m_cipherEngine != nullptr)
-			{
-				m_cipherEngine.reset(nullptr);
-			}
-			if (m_cipherPadding != nullptr)
-			{
-				m_cipherPadding.reset(nullptr);
-			}
+			m_cipherEngine.reset(nullptr);
 		}
-		else
+		if (m_cipherPadding != nullptr)
 		{
-			if (m_cipherEngine != nullptr)
-			{
-				m_cipherEngine.release();
-			}
-			if (m_cipherPadding != nullptr)
-			{
-				m_cipherPadding.release();
-			}
+			m_cipherPadding.reset(nullptr);
 		}
 	}
+	else
+	{
+		if (m_cipherEngine != nullptr)
+		{
+			m_cipherEngine.release();
+		}
+		if (m_cipherPadding != nullptr)
+		{
+			m_cipherPadding.release();
+		}
+	}
+
+	Utility::IntegerTools::Clear(m_legalKeySizes);
 }
 
 //~~~Accessors~~~//
 
-bool CipherStream::IsParallel() 
+bool &CipherStream::IsParallel() 
 {
-	return m_cipherEngine->IsParallel();
+	return m_cipherEngine->ParallelProfile().IsParallel();
 }
 
 const std::vector<SymmetricKeySize> CipherStream::LegalKeySizes() 
@@ -125,11 +132,11 @@ void CipherStream::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	try
 	{
-		m_cipherEngine->ParallelProfile().IsParallel() = m_isParallel && !(m_cipherEngine->Enumeral() == Enumeration::CipherModes::OFB);
+		m_cipherEngine->ParallelProfile().IsParallel() = IsParallel() && !(m_cipherEngine->Enumeral() == Enumeration::CipherModes::OFB);
 		m_cipherEngine->Initialize(Encryption, Parameters);
 
-		m_isEncryption = Encryption;
-		m_isInitialized = true;
+		m_cipherState->Encryption = Encryption;
+		m_cipherState->Initialized = true;
 	}
 	catch(CryptoCipherModeException &ex)
 	{
@@ -149,7 +156,7 @@ void CipherStream::ParallelMaxDegree(size_t Degree)
 
 void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 {
-	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(m_cipherState->Initialized, "The cipher has not been initialized");
 	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The Input stream is too short");
 	CEXASSERT(InStream->CanRead(), "The Input stream is set to write only!");
 	CEXASSERT(OutStream->CanRead() || OutStream->CanWrite(), "The Output stream is to read only!");
@@ -164,7 +171,7 @@ void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 
 void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher has not been initialized");
+	CEXASSERT(m_cipherState->Initialized, "The cipher has not been initialized");
 	CEXASSERT(Input.size() - InOffset > 0, "The input array is too short");
 	CEXASSERT(Input.size() - InOffset <= Output.size() - OutOffset, "The output array is too short!");
 
@@ -176,39 +183,39 @@ void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::v
 void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t INPLEN = Input.size() - InOffset;
-	size_t prcLen;
+	size_t plen;
 
-	prcLen = 0;
+	plen = 0;
 
-	if (m_isParallel)
+	if (IsParallel())
 	{
 		const size_t PRLBLK = m_cipherEngine->ParallelBlockSize();
 		if (INPLEN > PRLBLK)
 		{
-			const size_t PRCLEN = (INPLEN % PRLBLK != 0 || m_isCounterMode || m_isEncryption) ? (INPLEN / PRLBLK) * PRLBLK : ((INPLEN / PRLBLK) * PRLBLK) - PRLBLK;
+			const size_t PRCLEN = (INPLEN % PRLBLK != 0 || m_cipherState->CounterMode || m_cipherState->Encryption) ? (INPLEN / PRLBLK) * PRLBLK : ((INPLEN / PRLBLK) * PRLBLK) - PRLBLK;
 
-			while (prcLen != PRCLEN)
+			while (plen != PRCLEN)
 			{
 				m_cipherEngine->Transform(Input, InOffset, Output, OutOffset, PRLBLK);
 				InOffset += PRLBLK;
 				OutOffset += PRLBLK;
-				prcLen += PRLBLK;
+				plen += PRLBLK;
 				CalculateProgress(INPLEN, InOffset);
 			}
 		}
 	}
 
 	const size_t BLKLEN = m_cipherEngine->BlockSize();
-	const size_t ALNLEN = (m_isCounterMode || m_isEncryption) ? (INPLEN / BLKLEN) * BLKLEN : (INPLEN < BLKLEN) ? 0 : ((INPLEN / BLKLEN) * BLKLEN) - BLKLEN;
+	const size_t ALNLEN = (m_cipherState->CounterMode || m_cipherState->Encryption) ? (INPLEN / BLKLEN) * BLKLEN : (INPLEN < BLKLEN) ? 0 : ((INPLEN / BLKLEN) * BLKLEN) - BLKLEN;
 
 	if (INPLEN > BLKLEN)
 	{
-		while (prcLen != ALNLEN)
+		while (plen != ALNLEN)
 		{
 			m_cipherEngine->Transform(Input, InOffset, Output, OutOffset, BLKLEN);
 			InOffset += BLKLEN;
 			OutOffset += BLKLEN;
-			prcLen += BLKLEN;
+			plen += BLKLEN;
 			CalculateProgress(INPLEN, InOffset);
 		}
 	}
@@ -216,45 +223,45 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 	// partial
 	if (ALNLEN != INPLEN)
 	{
-		if (m_isCounterMode)
+		if (m_cipherState->CounterMode)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			std::vector<byte> inpBuffer(BLKLEN);
-			MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
-			std::vector<byte> outBuffer(BLKLEN);
-			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, FNLLEN);
-			MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
-			prcLen += FNLLEN;
+			std::vector<byte> inp(BLKLEN);
+			MemoryTools::Copy(Input, InOffset, inp, 0, FNLLEN);
+			std::vector<byte> otp(BLKLEN);
+			m_cipherEngine->Transform(inp, 0, otp, 0, FNLLEN);
+			MemoryTools::Copy(otp, 0, Output, OutOffset, FNLLEN);
+			plen += FNLLEN;
 		}
-		else if (m_isEncryption)
+		else if (m_cipherState->Encryption)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			std::vector<byte> inpBuffer(BLKLEN);
-			MemoryTools::Copy(Input, InOffset, inpBuffer, 0, FNLLEN);
+			std::vector<byte> inp(BLKLEN);
+			MemoryTools::Copy(Input, InOffset, inp, 0, FNLLEN);
 			if (FNLLEN != BLKLEN)
 			{
-				m_cipherPadding->AddPadding(inpBuffer, FNLLEN, inpBuffer.size());
+				m_cipherPadding->AddPadding(inp, FNLLEN, inp.size());
 			}
-			prcLen += BLKLEN;
+			plen += BLKLEN;
 
-			if (Output.size() != prcLen)
+			if (Output.size() != plen)
 			{
-				Output.resize(prcLen);
+				Output.resize(plen);
 			}
 
-			m_cipherEngine->EncryptBlock(inpBuffer, 0, Output, OutOffset);
+			m_cipherEngine->EncryptBlock(inp, 0, Output, OutOffset);
 		}
 		else
 		{
-			std::vector<byte> outBuffer(BLKLEN);
-			m_cipherEngine->DecryptBlock(Input, InOffset, outBuffer, 0);
-			const size_t FNLLEN = m_cipherPadding->GetBlockLength(outBuffer);
-			MemoryTools::Copy(outBuffer, 0, Output, OutOffset, FNLLEN);
-			prcLen += FNLLEN;
+			std::vector<byte> otp(BLKLEN);
+			m_cipherEngine->DecryptBlock(Input, InOffset, otp, 0);
+			const size_t FNLLEN = m_cipherPadding->GetBlockLength(otp);
+			MemoryTools::Copy(otp, 0, Output, OutOffset, FNLLEN);
+			plen += FNLLEN;
 
-			if (Output.size() != prcLen)
+			if (Output.size() != plen)
 			{
-				Output.resize(prcLen);
+				Output.resize(plen);
 			}
 		}
 	}
@@ -265,47 +272,47 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t INPLEN = InStream->Length() - InStream->Position();
-	size_t prcLen;
-	size_t prcRead;
-	std::vector<byte> inpBuffer(0);
-	std::vector<byte> outBuffer(0);
+	size_t plen;
+	size_t pread;
+	std::vector<byte> inp(0);
+	std::vector<byte> otp(0);
 
-	prcLen = 0;
-	prcRead = 0;
+	plen = 0;
+	pread = 0;
 
-	if (m_isParallel)
+	if (IsParallel())
 	{
 		const size_t PRLBLK = m_cipherEngine->ParallelBlockSize();
 		if (INPLEN > PRLBLK)
 		{
-			const size_t PRCLEN = (INPLEN % PRLBLK != 0 || m_isCounterMode || m_isEncryption) ? (INPLEN / PRLBLK) * PRLBLK : ((INPLEN / PRLBLK) * PRLBLK) - PRLBLK;
-			inpBuffer.resize(PRLBLK);
-			outBuffer.resize(PRLBLK);
+			const size_t PRCLEN = (INPLEN % PRLBLK != 0 || m_cipherState->CounterMode || m_cipherState->Encryption) ? (INPLEN / PRLBLK) * PRLBLK : ((INPLEN / PRLBLK) * PRLBLK) - PRLBLK;
+			inp.resize(PRLBLK);
+			otp.resize(PRLBLK);
 
-			while (prcLen != PRCLEN)
+			while (plen != PRCLEN)
 			{
-				prcRead = InStream->Read(inpBuffer, 0, PRLBLK);
-				m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, prcRead);
-				OutStream->Write(outBuffer, 0, prcRead);
-				prcLen += prcRead;
+				pread = InStream->Read(inp, 0, PRLBLK);
+				m_cipherEngine->Transform(inp, 0, otp, 0, pread);
+				OutStream->Write(otp, 0, pread);
+				plen += pread;
 				CalculateProgress(INPLEN, OutStream->Position());
 			}
 		}
 	}
 
 	const size_t BLKLEN = m_cipherEngine->BlockSize();
-	const size_t ALNLEN = (m_isCounterMode || m_isEncryption) ? (INPLEN / BLKLEN) * BLKLEN : (INPLEN < BLKLEN) ? 0 : ((INPLEN / BLKLEN) * BLKLEN) - BLKLEN;
-	inpBuffer.resize(BLKLEN);
-	outBuffer.resize(BLKLEN);
+	const size_t ALNLEN = (m_cipherState->CounterMode || m_cipherState->Encryption) ? (INPLEN / BLKLEN) * BLKLEN : (INPLEN < BLKLEN) ? 0 : ((INPLEN / BLKLEN) * BLKLEN) - BLKLEN;
+	inp.resize(BLKLEN);
+	otp.resize(BLKLEN);
 
 	if (INPLEN > BLKLEN)
 	{
-		while (prcLen != ALNLEN)
+		while (plen != ALNLEN)
 		{
-			prcRead = InStream->Read(inpBuffer, 0, BLKLEN);
-			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, prcRead);
-			OutStream->Write(outBuffer, 0, prcRead);
-			prcLen += prcRead;
+			pread = InStream->Read(inp, 0, BLKLEN);
+			m_cipherEngine->Transform(inp, 0, otp, 0, pread);
+			OutStream->Write(otp, 0, pread);
+			plen += pread;
 			CalculateProgress(INPLEN, OutStream->Position());
 		}
 	}
@@ -313,32 +320,32 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 	// partial
 	if (ALNLEN != INPLEN)
 	{
-		if (m_isCounterMode)
+		if (m_cipherState->CounterMode)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			MemoryTools::Clear(outBuffer, 0, outBuffer.size());
-			MemoryTools::Clear(inpBuffer, 0, inpBuffer.size());
-			prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
-			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, prcRead);
-			OutStream->Write(outBuffer, 0, prcRead);
+			MemoryTools::Clear(otp, 0, otp.size());
+			MemoryTools::Clear(inp, 0, inp.size());
+			pread = InStream->Read(inp, 0, FNLLEN);
+			m_cipherEngine->Transform(inp, 0, otp, 0, pread);
+			OutStream->Write(otp, 0, pread);
 		}
-		else if (m_isEncryption)
+		else if (m_cipherState->Encryption)
 		{
 			const size_t FNLLEN = INPLEN - ALNLEN;
-			prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
+			pread = InStream->Read(inp, 0, FNLLEN);
 			if (FNLLEN != BLKLEN)
 			{
-				m_cipherPadding->AddPadding(inpBuffer, prcRead, inpBuffer.size());
+				m_cipherPadding->AddPadding(inp, pread, inp.size());
 			}
-			m_cipherEngine->EncryptBlock(inpBuffer, 0, outBuffer, 0);
-			OutStream->Write(outBuffer, 0, BLKLEN);
+			m_cipherEngine->EncryptBlock(inp, 0, otp, 0);
+			OutStream->Write(otp, 0, BLKLEN);
 		}
 		else
 		{
-			InStream->Read(inpBuffer, 0, BLKLEN);
-			m_cipherEngine->DecryptBlock(inpBuffer, 0, outBuffer, 0);
-			const size_t FNLLEN = m_cipherPadding->GetBlockLength(outBuffer);
-			OutStream->Write(outBuffer, 0, FNLLEN);
+			InStream->Read(inp, 0, BLKLEN);
+			m_cipherEngine->DecryptBlock(inp, 0, otp, 0);
+			const size_t FNLLEN = m_cipherPadding->GetBlockLength(otp);
+			OutStream->Write(otp, 0, FNLLEN);
 		}
 	}
 
@@ -350,12 +357,13 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 	if (Length >= Processed)
 	{
 		double progress = 100.0 * (static_cast<double>(Processed) / Length);
+
 		if (progress > 100.0)
 		{
 			progress = 100.0;
 		}
 
-		if (m_isParallel)
+		if (IsParallel())
 		{
 			ProgressPercent(static_cast<int>(progress));
 		}
@@ -382,12 +390,6 @@ ICipherMode* CipherStream::GetCipherMode(BlockCiphers CipherType, BlockCipherExt
 IPadding* CipherStream::GetPaddingMode(PaddingModes PaddingType)
 {
 	return Helper::PaddingFromName::GetInstance(PaddingType);
-}
-
-void CipherStream::Scope()
-{
-	m_isParallel = m_cipherEngine->IsParallel();
-	m_legalKeySizes = m_cipherEngine->LegalKeySizes();
 }
 
 NAMESPACE_PROCESSINGEND

@@ -38,15 +38,15 @@ public:
 
 	static ushort Diff(ushort X, ushort Y);
 
-	static ushort Invert(ushort X, const size_t Degree);
+	static ushort Invert(ushort X, size_t Degree);
 
 	static ulong MaskNonZero64(ushort X);
 
 	static ulong MaskLeq64(ushort X, ushort Y);
 
-	static ushort Multiply(ushort X, ushort Y, const size_t Degree);
+	static ushort Multiply(ushort X, ushort Y, size_t Degree);
 
-	static ushort Square(ushort X, const size_t Degree);
+	static ushort Square(ushort X, size_t Degree);
 
 	//~~~Templates~~~//
 
@@ -429,7 +429,7 @@ public:
 	}
 
 	template<typename Array>
-	inline static ulong Or(const Array &Input, const size_t Degree)
+	inline static ulong Or(const Array &Input, size_t Degree)
 	{
 		ulong ret = Input[0];
 
@@ -442,7 +442,7 @@ public:
 	}
 
 	template<typename Array>
-	static ushort Reduce(const Array &Product, const size_t Degree)
+	static ushort Reduce(const Array &Product, size_t Degree)
 	{
 		ushort ret = 0;
 		int i = static_cast<int>(Degree - 1);

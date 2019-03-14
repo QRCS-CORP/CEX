@@ -1,5 +1,5 @@
-#ifndef CEXTEST_CHACHATEST_H
-#define CEXTEST_CHACHATEST_H
+#ifndef CEXTEST_RCSTEST_H
+#define CEXTEST_RCSTEST_H
 
 #include "ITest.h"
 #include "../CEX/IStreamCipher.h"
@@ -9,25 +9,26 @@ namespace Test
 	using Cipher::Stream::IStreamCipher;
 
 	/// <summary>
-	/// The ChaCha implementation KAT, monte carlo, stress, permutation, parallelization, authentication, and exception handling tests
+	/// The RCS implementation KAT, monte carlo, stress, permutation, parallelization, authentication, and exception handling tests
 	/// </summary>
 	/// 
 	/// <remarks>
 	/// <description>References:</description>
 	/// <list type="number">
-	/// <item><description>The <a href="http://cr.yp.to/chacha/chacha-20080128.pdf">ChaCha</a> cipher specification.</description></item>
-	/// <item><description>ChaCha20 and Poly1305 for IETF protocols: <a href="https://tools.ietf.org/html/draft-irtf-cfrg-chacha20-poly1305-10">draft-irtf-cfrg-chacha20-poly1305-10</a>.</description></item>
-	/// <item><description>The cryptographic library: <a href="https://github.com/jedisct1/libsodium">LibSodium</a>.</description></item>
-	/// <item><description>ChaCha20 and Poly1305 based Cipher Suites for TLS: <a href="https://tools.ietf.org/html/draft-agl-tls-chacha20poly1305-04">draft-agl-tls-chacha20poly1305-04</a>.</description></item>
+	/// <item><description>The Skein Hash Function Family <a href="https://www.schneier.com/academic/paperfiles/skein1.3.pdf">Skein V1.1</a>.</description></item>
+	/// <item><description>NIST Round 3 <a href="https://www.schneier.com/academic/paperfiles/skein-1.3-modifications.pdf">Tweak Description</a>.</description></item>
+	/// <item><description>Skein <a href="https://www.schneier.com/academic/paperfiles/skein-proofs.pdf">Provable Security</a> Support for the Skein Hash Family.</description></item>
+	/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition>.</description></item>
 	/// </list>
 	/// </remarks>
-	class ChaChaTest final : public ITest
+	class RCSTest final : public ITest
 	{
 	private:
 
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
+		static const bool HAS_AESNI;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 10;
@@ -45,14 +46,14 @@ namespace Test
 		//~~~Constructor~~~//
 
 		/// <summary>
-		/// Original known answer tests for the 256, and 512 bit [original] versions of ChaCha
+		/// Original known answer tests for the 256, 512, and 1024 bit versions of RCS
 		/// </summary>
-		ChaChaTest();
+		RCSTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~ChaChaTest();
+		~RCSTest();
 
 		//~~~Accessors~~~//
 
@@ -77,25 +78,13 @@ namespace Test
 		/// Tests the the cipher transformation using each supported authentication mode
 		/// </summary>
 		/// 
-		/// <param name="Cipher">The cipher instance pointer</param>
+		/// <param name="Cipher">The authenticated cipher instance pointer</param>
 		void Authentication(IStreamCipher* Cipher);
-
-		/// <summary>
-		/// Compare ChaCha-256 vectorized, compact, and unrolled, permutation functions for equivalence
-		/// </summary>
-		void CompareP256();
-
-		/// <summary>
-		/// Compare ChaCha-512 vectorized, compact, and unrolled, permutation functions for equivalence
-		/// </summary>
-		void CompareP512();
 
 		/// <summary>
 		/// Test exception handlers for correct execution
 		/// </summary>
-		/// 
-		/// <param name="Cipher">The cipher instance pointer</param>
-		void Exception(IStreamCipher* Cipher);
+		void Exception();
 
 		/// <summary>
 		/// Compare known answer test vectors to split-message finalization calls
@@ -160,6 +149,7 @@ namespace Test
 
 	private:
 
+		static bool HasAESNI();
 		void Initialize();
 		void OnProgress(const std::string &Data);
 	};

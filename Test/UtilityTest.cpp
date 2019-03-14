@@ -36,6 +36,8 @@ namespace Test
 		{
 			Conversions();
 			OnProgress(std::string("UtilityTest: Passed endian conversion tests.."));
+			CounterTest();
+			OnProgress(std::string("UtilityTest: Passed endian counter tests.."));
 			//Operations();
 			//OnProgress(std::string("UtilityTest: Passed mathematical operations tests.."));
 			Rotation();
@@ -206,6 +208,154 @@ namespace Test
 		if (ret64 != inp64)
 		{
 			throw TestException(std::string("Conversions"), std::string("LeToBlock"), std::string("LE64 block conversion has failed!"));
+		}
+	}
+
+	void UtilityTest::CounterTest()
+	{
+		const uint INCLEN = 32;
+		const size_t TESTITR = 100;
+		std::vector<byte> tmp(INCLEN, 0x00);
+		std::vector<byte> tmp2(INCLEN * 8);
+		ulong ret;
+		size_t i;
+
+		// little endian
+
+		for (i = 0; i < TESTITR; ++i)
+		{
+			IntegerTools::LeIncrease8(tmp, INCLEN);
+		}
+
+		ret = IntegerTools::LeBytesTo64(tmp, 0);
+
+		if (ret != INCLEN * TESTITR)
+		{
+			throw;
+		}
+
+		tmp.clear();
+		tmp.resize(INCLEN, 0x00);
+
+		for (i = 0; i < TESTITR; ++i)
+		{
+			IntegerTools::LeIncrease8(tmp, tmp2, 0, INCLEN);
+			IntegerTools::LeIncrease8(tmp, tmp2, 32, INCLEN);
+			IntegerTools::LeIncrease8(tmp, tmp2, 64, INCLEN);
+			IntegerTools::LeIncrease8(tmp, tmp2, 96, INCLEN);
+			IntegerTools::LeIncrease8(tmp, tmp2, 128, INCLEN);
+			IntegerTools::LeIncrease8(tmp, tmp2, 160, INCLEN);
+			IntegerTools::LeIncrease8(tmp, tmp2, 192, INCLEN);
+			IntegerTools::LeIncrease8(tmp, tmp2, 224, INCLEN);
+			MemoryTools::Copy(tmp2, 224, tmp, 0, INCLEN);
+		}
+
+		for (i = 0; i < 8; ++i)
+		{
+			ret = IntegerTools::LeBytesTo64(tmp2, i * INCLEN);
+			if (ret != INCLEN * TESTITR)
+			{
+				throw;
+			}
+		}
+
+		tmp.clear();
+		tmp.resize(INCLEN, 0x00);
+		tmp2.clear();
+		tmp2.resize(INCLEN * 8, 0x00);
+		const uint MAXPOS = static_cast<uint>(INCLEN);
+
+		for (i = 0; i < TESTITR; ++i)
+		{
+			IntegerTools::LeIncrease8(tmp, tmp2, 0, INCLEN, MAXPOS);
+			IntegerTools::LeIncrease8(tmp, tmp2, 32, INCLEN, MAXPOS);
+			IntegerTools::LeIncrease8(tmp, tmp2, 64, INCLEN, MAXPOS);
+			IntegerTools::LeIncrease8(tmp, tmp2, 96, INCLEN, MAXPOS);
+			IntegerTools::LeIncrease8(tmp, tmp2, 128, INCLEN, MAXPOS);
+			IntegerTools::LeIncrease8(tmp, tmp2, 160, INCLEN, MAXPOS);
+			IntegerTools::LeIncrease8(tmp, tmp2, 192, INCLEN, MAXPOS);
+			IntegerTools::LeIncrease8(tmp, tmp2, 224, INCLEN, MAXPOS);
+			MemoryTools::Copy(tmp2, 224, tmp, 0, INCLEN);
+		}
+
+		for (i = 0; i < 8; ++i)
+		{
+			ret = IntegerTools::LeBytesTo64(tmp2, i * INCLEN);
+			if (ret != INCLEN * TESTITR)
+			{
+				throw;
+			}
+		}
+
+		// big endian/**/
+
+		tmp.clear();
+		tmp.resize(INCLEN, 0x00);
+
+		for (i = 0; i < TESTITR; ++i)
+		{
+			IntegerTools::BeIncrease8(tmp, INCLEN);
+		}
+
+		ret = IntegerTools::BeBytesTo64(tmp, 24);
+
+		if (ret != INCLEN * TESTITR)
+		{
+			throw;
+		}
+
+		tmp.clear();
+		tmp.resize(INCLEN, 0x00);
+		tmp2.clear();
+		tmp2.resize(INCLEN * 8, 0x00);
+
+		for (i = 0; i < TESTITR; ++i)
+		{
+			IntegerTools::BeIncrease8(tmp, tmp2, 0, INCLEN);
+			IntegerTools::BeIncrease8(tmp, tmp2, 32, INCLEN);
+			IntegerTools::BeIncrease8(tmp, tmp2, 64, INCLEN);
+			IntegerTools::BeIncrease8(tmp, tmp2, 96, INCLEN);
+			IntegerTools::BeIncrease8(tmp, tmp2, 128, INCLEN);
+			IntegerTools::BeIncrease8(tmp, tmp2, 160, INCLEN);
+			IntegerTools::BeIncrease8(tmp, tmp2, 192, INCLEN);
+			IntegerTools::BeIncrease8(tmp, tmp2, 224, INCLEN);
+			MemoryTools::Copy(tmp2, 224, tmp, 0, INCLEN);
+		}
+
+		for (i = 0; i < 8; ++i)
+		{
+			ret = IntegerTools::BeBytesTo64(tmp2, 24 + (i * INCLEN));
+			if (ret != INCLEN * TESTITR)
+			{
+				throw;
+			}
+		}
+
+		tmp.clear();
+		tmp.resize(INCLEN, 0x00);
+		tmp2.clear();
+		tmp2.resize(INCLEN * 8, 0x00);
+
+		for (i = 0; i < TESTITR; ++i)
+		{
+			IntegerTools::BeIncrease8(tmp, tmp2, 0, INCLEN, MAXPOS);
+			IntegerTools::BeIncrease8(tmp, tmp2, 32, INCLEN, MAXPOS);
+			IntegerTools::BeIncrease8(tmp, tmp2, 64, INCLEN, MAXPOS);
+			IntegerTools::BeIncrease8(tmp, tmp2, 96, INCLEN, MAXPOS);
+			IntegerTools::BeIncrease8(tmp, tmp2, 128, INCLEN, MAXPOS);
+			IntegerTools::BeIncrease8(tmp, tmp2, 160, INCLEN, MAXPOS);
+			IntegerTools::BeIncrease8(tmp, tmp2, 192, INCLEN, MAXPOS);
+			IntegerTools::BeIncrease8(tmp, tmp2, 224, INCLEN, MAXPOS);
+			MemoryTools::Copy(tmp2, 224, tmp, 0, INCLEN);
+		}
+
+		for (i = 0; i < 8; ++i)
+		{
+			ret = IntegerTools::BeBytesTo64(tmp2, 24 + (i * INCLEN));
+			if (ret != INCLEN * TESTITR)
+			{
+				throw;
+			}
 		}
 	}
 

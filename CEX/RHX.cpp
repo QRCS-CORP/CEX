@@ -9,6 +9,7 @@ NAMESPACE_BLOCK
 using Utility::MemoryTools;
 using Utility::IntegerTools;
 using Enumeration::Kdfs;
+using namespace Cipher::Block::RijndaelBase;
 
 class RHX::RhxState
 {
@@ -105,7 +106,7 @@ const size_t RHX::BlockSize()
 
 const BlockCiphers RHX::Enumeral()
 {
-	BlockCiphers name;
+	BlockCiphers tmpn;
 	Kdfs ext;
 
 	ext = (m_kdfGenerator != nullptr) ? m_kdfGenerator->Enumeral() : Kdfs::None;
@@ -114,36 +115,36 @@ const BlockCiphers RHX::Enumeral()
 	{
 		case Kdfs::HKDF256:
 		{
-			name = BlockCiphers::RHXH256;
+			tmpn = BlockCiphers::RHXH256;
 			break;
 		}
 		case Kdfs::HKDF512:
 		{
-			name = BlockCiphers::RHXH512;
+			tmpn = BlockCiphers::RHXH512;
 			break;
 		}
 		case Kdfs::SHAKE256:
 		{
-			name = BlockCiphers::RHXS256;
+			tmpn = BlockCiphers::RHXS256;
 			break;
 		}
 		case Kdfs::SHAKE512:
 		{
-			name = BlockCiphers::RHXS512;
+			tmpn = BlockCiphers::RHXS512;
 			break;
 		}
 		case Kdfs::SHAKE1024:
 		{
-			name = BlockCiphers::RHXS1024;
+			tmpn = BlockCiphers::RHXS1024;
 			break;
 		}
 		default:
 		{
-			name = BlockCiphers::AES;
+			tmpn = BlockCiphers::AES;
 		}
 	}
 
-	return name;
+	return tmpn;
 }
 
 const bool RHX::IsEncryption()
@@ -163,11 +164,11 @@ const std::vector<SymmetricKeySize> &RHX::LegalKeySizes()
 
 const std::string RHX::Name()
 {
-	std::string name;
+	std::string tmpn;
 
-	name = Enumeration::BlockCipherConvert::ToName(Enumeral());
+	tmpn = Enumeration::BlockCipherConvert::ToName(Enumeral());
 
-	return name;
+	return tmpn;
 }
 
 const size_t RHX::Rounds()
@@ -187,7 +188,7 @@ void RHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Decrypt128(Input, 0, Output, 0);
 }
 
-void RHX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
 }
@@ -197,7 +198,7 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
@@ -287,7 +288,7 @@ void RHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 	}
 }
 
-void RHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	if (m_rhxState->Encryption)
 	{
@@ -299,7 +300,7 @@ void RHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 	}
 }
 
-void RHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	if (m_rhxState->Encryption)
 	{
@@ -311,7 +312,7 @@ void RHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, st
 	}
 }
 
-void RHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	if (m_rhxState->Encryption)
 	{
@@ -323,7 +324,7 @@ void RHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, s
 	}
 }
 
-void RHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	if (m_rhxState->Encryption)
 	{
@@ -496,7 +497,7 @@ void RHX::ExpandSubBlock(SecureVector<uint> &RoundKeys, size_t KeyIndex, size_t 
 
 //~~~Rounds Processing~~~//
 
-void RHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t RNDCNT = m_rhxState->RoundKeys.size() - 4;
 	size_t kctr;
@@ -559,7 +560,7 @@ void RHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	Output[OutOffset + 15] = static_cast<byte>(ISBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
 }
 
-void RHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -567,19 +568,19 @@ void RHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 	Decrypt128(Input, InOffset + 48, Output, OutOffset + 48);
 }
 
-void RHX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Decrypt512(Input, InOffset, Output, OutOffset);
 	Decrypt512(Input, InOffset + 64, Output, OutOffset + 64);
 }
 
-void RHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Decrypt1024(Input, InOffset, Output, OutOffset);
 	Decrypt1024(Input, InOffset + 128, Output, OutOffset + 128);
 }
 
-void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t RNDCNT = m_rhxState->RoundKeys.size() - 4;
 	size_t kctr;
@@ -605,17 +606,25 @@ void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[7];
 
 	kctr = 8;
+
 	while (kctr != RNDCNT)
 	{
 		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_rhxState->RoundKeys[kctr];
-		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_rhxState->RoundKeys[kctr + 1];
-		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_rhxState->RoundKeys[kctr + 2];
-		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_rhxState->RoundKeys[kctr + 3];
-		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[kctr + 4];
-		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[kctr + 5];
-		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[kctr + 6];
-		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[kctr + 7];
-		kctr += 8;
+		++kctr;
+		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_rhxState->RoundKeys[kctr];
+		++kctr;
+		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_rhxState->RoundKeys[kctr];
+		++kctr;
+		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_rhxState->RoundKeys[kctr];
+		++kctr;
+		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[kctr];
+		++kctr;
+		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[kctr];
+		++kctr;
+		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[kctr];
+		++kctr;
+		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[kctr];
+		++kctr;
 	}
 
 	// final round
@@ -640,7 +649,7 @@ void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
 }
 
-void RHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -648,13 +657,13 @@ void RHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 	Encrypt128(Input, InOffset + 48, Output, OutOffset + 48);
 }
 
-void RHX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Encrypt512(Input, InOffset, Output, OutOffset);
 	Encrypt512(Input, InOffset + 64, Output, OutOffset + 64);
 }
 
-void RHX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void RHX::Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Encrypt1024(Input, InOffset, Output, OutOffset);
 	Encrypt1024(Input, InOffset + 128, Output, OutOffset + 128);
@@ -732,7 +741,7 @@ void RHX::Prefetch(bool Encryption)
 	// timing defence: pre-load tables into cache
 	if (Encryption == true)
 	{
-		MemoryTools::PrefetchL1(SBox, 0, 256);
+		MemoryTools::PrefetchL2(SBox, 0, 256);
 		MemoryTools::PrefetchL2(T0, 0, 1024);
 		MemoryTools::PrefetchL2(T1, 0, 1024);
 		MemoryTools::PrefetchL2(T2, 0, 1024);
@@ -740,7 +749,7 @@ void RHX::Prefetch(bool Encryption)
 	}
 	else
 	{
-		MemoryTools::PrefetchL1(ISBox, 0, 256);
+		MemoryTools::PrefetchL2(ISBox, 0, 256);
 		MemoryTools::PrefetchL2(IT0, 0, 1024);
 		MemoryTools::PrefetchL2(IT1, 0, 1024);
 		MemoryTools::PrefetchL2(IT2, 0, 1024);

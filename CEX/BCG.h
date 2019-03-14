@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of a block cipher Counter mode Generator
-// Written by John Underhill, November 21, 2015
+// Written by John G. Underhill, November 21, 2015
 // Updated October 23, 2016
 // Updated April 18, 2017
 // Updated February 14, 2019
@@ -301,7 +301,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor cores (times 2 for hyperthreading).</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);
@@ -330,7 +330,7 @@ private:
 
 	static void Derive(std::vector<byte> &Key, std::unique_ptr<BcgState> &State, std::unique_ptr<IProvider> &Provider);
 	void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	static void Permute(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter, std::unique_ptr<IBlockCipher> &Cipher);
+	static void Permute(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter, std::unique_ptr<IBlockCipher> &Cipher);
 };
 
 NAMESPACE_DRBGEND

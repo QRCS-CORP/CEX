@@ -229,7 +229,7 @@ void GCM::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Decrypt128(Input, 0, Output, 0);
 }
 
-void GCM::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void GCM::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(!IsEncryption(), "The cipher mode has been initialized for encryption!");
@@ -247,7 +247,7 @@ void GCM::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt128(Input, 0, Output, 0);
 }
 
-void GCM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void GCM::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IsEncryption(), "The cipher mode has been initialized for encryption!");
@@ -256,7 +256,7 @@ void GCM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void GCM::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void GCM::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (Length < MIN_TAGSIZE || Length > BLOCK_SIZE)
 	{
@@ -271,7 +271,7 @@ void GCM::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 	MemoryTools::Copy(m_gcmState->Tag, 0, Output, OutOffset, Length);
 }
 
-void GCM::Finalize(SecureVector<byte> &Output, const size_t OutOffset, const size_t Length)
+void GCM::Finalize(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (Length < MIN_TAGSIZE || Length > BLOCK_SIZE)
 	{
@@ -399,7 +399,7 @@ void GCM::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
+void GCM::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (!IsInitialized())
 	{
@@ -415,7 +415,7 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 	m_gcmHash->Multiply(m_gcmState->AAD, m_gcmState->Tag, Length);
 }
 
-void GCM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void GCM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
@@ -434,7 +434,7 @@ void GCM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 	m_gcmState->Counter += Length;
 }
 
-bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
+bool GCM::Verify(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (IsEncryption())
 	{
@@ -457,7 +457,7 @@ bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 	return IntegerTools::Compare(m_gcmState->Tag, 0, Input, Offset, Length);
 }
 
-bool GCM::Verify(const SecureVector<byte> &Input, const size_t Offset, const size_t Length)
+bool GCM::Verify(const SecureVector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (IsEncryption())
 	{
@@ -520,14 +520,14 @@ void GCM::Compute()
 	m_gcmState->Finalized = true;
 }
 
-void GCM::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void GCM::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	m_gcmHash->Update(Input, InOffset, m_gcmState->Tag, BLOCK_SIZE);
 	m_cipherMode->EncryptBlock(Input, InOffset, Output, OutOffset);
 	m_gcmState->Counter += BLOCK_SIZE;
 }
 
-void GCM::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void GCM::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	m_cipherMode->EncryptBlock(Input, InOffset, Output, OutOffset);
 	m_gcmHash->Update(Input, InOffset, m_gcmState->Tag, BLOCK_SIZE);

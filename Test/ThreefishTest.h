@@ -30,7 +30,7 @@ namespace Test
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t MONTE_CYCLES = 10000;
-		static const size_t TEST_CYCLES = 100;
+		static const size_t TEST_CYCLES = 10;
 
 		std::vector<std::vector<byte>> m_code;
 		std::vector<std::vector<byte>> m_expected;

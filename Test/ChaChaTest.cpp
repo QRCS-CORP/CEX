@@ -85,6 +85,7 @@ namespace Test
 			// Standard ChaChaPoly20 + authenticator
 			CSX256* csx256h256 = new CSX256(StreamAuthenticators::HMACSHA256);
 			CSX256* csx256k256 = new CSX256(StreamAuthenticators::KMAC256);
+			CSX256* csx256p256 = new CSX256(StreamAuthenticators::Poly1305);
 			CSX256* csx256s = new CSX256(StreamAuthenticators::None);
 
 			// stress test authentication and verification using random input and keys
@@ -100,8 +101,9 @@ namespace Test
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 exception handling tests.."));
 
 			// test 2 succesive finalization calls against mac output and expected ciphertext
-			Finalization(csx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0], m_code[2]);
-			Finalization(csx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[1], m_code[3]);
+			Finalization(csx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0], m_code[1]);
+			Finalization(csx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[2], m_code[3]);
+			Finalization(csx256p256, m_message[0], m_key[0], m_nonce[0], m_expected[8], m_code[4], m_code[5]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer finalization tests."));
 
 			// original known answer test vectors generated with this implementation
@@ -115,11 +117,15 @@ namespace Test
 			Kat(csx256k256, m_message[0], m_key[5], m_nonce[4], m_expected[5]);
 			Kat(csx256k256, m_message[0], m_key[4], m_nonce[5], m_expected[6]);
 			Kat(csx256k256, m_message[0], m_key[4], m_nonce[6], m_expected[7]);
+			// chachapoly20-poly1305 vectors
+			Kat(csx256p256, m_message[0], m_key[0], m_nonce[0], m_expected[8]);
+			Kat(csx256p256, m_message[0], m_key[1], m_nonce[1], m_expected[9]);
+
 			// IETF vectors: non-authenticated standard chachapoly20
-			Kat(csx256s, m_message[0], m_key[4], m_nonce[4], m_expected[8]);
-			Kat(csx256s, m_message[0], m_key[5], m_nonce[4], m_expected[9]);
-			Kat(csx256s, m_message[0], m_key[4], m_nonce[5], m_expected[10]);
-			Kat(csx256s, m_message[0], m_key[4], m_nonce[6], m_expected[11]);
+			Kat(csx256s, m_message[0], m_key[4], m_nonce[4], m_expected[10]);
+			Kat(csx256s, m_message[0], m_key[5], m_nonce[4], m_expected[11]);
+			Kat(csx256s, m_message[0], m_key[4], m_nonce[5], m_expected[12]);
+			Kat(csx256s, m_message[0], m_key[4], m_nonce[6], m_expected[13]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer cipher tests.."));
 			
 			// run the monte carlo equivalency tests and compare encryption to a vector
@@ -136,7 +142,7 @@ namespace Test
 
 			// verify ciphertext output, decryption, and mac code generation
 			Verification(csx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
-			Verification(csx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[1]);
+			Verification(csx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[2]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer authentication tests.."));
 
 			delete csx256h256;
@@ -159,22 +165,22 @@ namespace Test
 			Exception(csx512s);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 exception handling tests.."));
 
-			Finalization(csx512h256, m_message[0], m_key[2], m_nonce[7], m_expected[12], m_code[4], m_code[8]);
-			Finalization(csx512h512, m_message[0], m_key[3], m_nonce[7], m_expected[15], m_code[5], m_code[9]);
-			Finalization(csx512k256, m_message[0], m_key[2], m_nonce[7], m_expected[16], m_code[6], m_code[10]);
-			Finalization(csx512k512, m_message[0], m_key[3], m_nonce[7], m_expected[19], m_code[7], m_code[11]);
+			Finalization(csx512h256, m_message[0], m_key[2], m_nonce[7], m_expected[14], m_code[6], m_code[7]);
+			Finalization(csx512h512, m_message[0], m_key[3], m_nonce[7], m_expected[17], m_code[8], m_code[9]);
+			Finalization(csx512k256, m_message[0], m_key[2], m_nonce[7], m_expected[18], m_code[10], m_code[11]);
+			Finalization(csx512k512, m_message[0], m_key[3], m_nonce[7], m_expected[21], m_code[12], m_code[13]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer finalization tests."));
 
-			Kat(csx512h256, m_message[0], m_key[2], m_nonce[7], m_expected[12]);
-			Kat(csx512h256, m_message[0], m_key[3], m_nonce[7], m_expected[13]);
-			Kat(csx512h512, m_message[0], m_key[2], m_nonce[7], m_expected[14]);
-			Kat(csx512h512, m_message[0], m_key[3], m_nonce[7], m_expected[15]);
-			Kat(csx512k256, m_message[0], m_key[2], m_nonce[7], m_expected[16]);
-			Kat(csx512k256, m_message[0], m_key[3], m_nonce[7], m_expected[17]);
-			Kat(csx512k512, m_message[0], m_key[2], m_nonce[7], m_expected[18]);
-			Kat(csx512k512, m_message[0], m_key[3], m_nonce[7], m_expected[19]);
-			Kat(csx512s, m_message[0], m_key[2], m_nonce[7], m_expected[20]);
-			Kat(csx512s, m_message[0], m_key[3], m_nonce[7], m_expected[21]);
+			Kat(csx512h256, m_message[0], m_key[2], m_nonce[7], m_expected[14]);
+			Kat(csx512h256, m_message[0], m_key[3], m_nonce[7], m_expected[15]);
+			Kat(csx512h512, m_message[0], m_key[2], m_nonce[7], m_expected[16]);
+			Kat(csx512h512, m_message[0], m_key[3], m_nonce[7], m_expected[17]);
+			Kat(csx512k256, m_message[0], m_key[2], m_nonce[7], m_expected[18]);
+			Kat(csx512k256, m_message[0], m_key[3], m_nonce[7], m_expected[19]);
+			Kat(csx512k512, m_message[0], m_key[2], m_nonce[7], m_expected[20]);
+			Kat(csx512k512, m_message[0], m_key[3], m_nonce[7], m_expected[21]);
+			Kat(csx512s, m_message[0], m_key[2], m_nonce[7], m_expected[22]);
+			Kat(csx512s, m_message[0], m_key[3], m_nonce[7], m_expected[23]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer cipher tests.."));
 
 			MonteCarlo(csx512s, m_message[0], m_key[3], m_nonce[7], m_monte[1]);
@@ -186,10 +192,10 @@ namespace Test
 			Stress(csx512s);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 stress tests.."));
 			
-			Verification(csx512h256, m_message[0], m_key[2], m_nonce[7], m_expected[12], m_code[4]);
-			Verification(csx512h512, m_message[0], m_key[3], m_nonce[7], m_expected[15], m_code[5]);
-			Verification(csx512k256, m_message[0], m_key[2], m_nonce[7], m_expected[16], m_code[6]);
-			Verification(csx512k512, m_message[0], m_key[3], m_nonce[7], m_expected[19], m_code[7]);
+			Verification(csx512h256, m_message[0], m_key[2], m_nonce[7], m_expected[14], m_code[6]);
+			Verification(csx512h512, m_message[0], m_key[3], m_nonce[7], m_expected[17], m_code[8]);
+			Verification(csx512k256, m_message[0], m_key[2], m_nonce[7], m_expected[18], m_code[10]);
+			Verification(csx512k512, m_message[0], m_key[3], m_nonce[7], m_expected[21], m_code[12]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer authentication tests.."));
 
 			delete csx512h256;
@@ -622,8 +628,8 @@ namespace Test
 
 	void ChaChaTest::Parallel(IStreamCipher* Cipher)
 	{
-		const size_t MINSMP = 2048;
-		const size_t MAXSMP = 16384;
+		const size_t MINSMP = Cipher->ParallelBlockSize();
+		const size_t MAXSMP = Cipher->ParallelBlockSize() * 4;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;
@@ -632,7 +638,6 @@ namespace Test
 		std::vector<byte> nonce(ks.NonceSize());
 		std::vector<byte> otp;
 		Prng::SecureRandom rnd;
-		size_t prlSize = Cipher->ParallelProfile().ParallelBlockSize();
 
 		cpt1.reserve(MAXSMP);
 		cpt2.reserve(MAXSMP);
@@ -650,8 +655,6 @@ namespace Test
 			IntegerTools::Fill(key, 0, key.size(), rnd);
 			IntegerTools::Fill(inp, 0, MSGLEN, rnd);
 			SymmetricKey kp(key, nonce);
-
-			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
 
 			// sequential
 			Cipher->Initialize(true, kp);
@@ -678,14 +681,11 @@ namespace Test
 				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Cipher output is not equal! -CP2"));
 			}
 		}
-
-		// restore parallel block size
-		Cipher->ParallelProfile().SetBlockSize(prlSize);
 	}
 
 	void ChaChaTest::Stress(IStreamCipher* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
+		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
 		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
@@ -770,39 +770,43 @@ namespace Test
 		const std::vector<std::string> code =
 		{
 			std::string("22A276A4A7E878E305DE15B14B63785B55F974FB01425A994FED06015BB23DD4"),																	// csx256h256
-			std::string("C8A1895F47422265160F768004F9F9775659C748C8B1539ADC0486022865F409"),																	// csx256k256
+			std::string("2A2410DF99D811D6A0A0609B055D554BA52E85C8E2E7E695674AF73128F3384B"),
 
 			// csx256 finalization tests: mac-2
-			std::string("2A2410DF99D811D6A0A0609B055D554BA52E85C8E2E7E695674AF73128F3384B"),																	// csx256h256
-			std::string("8C139298CAF31C595CBA3F2E398770AC8E6796D9810175A1F627C6449EB57619"),																	// csx256k256
+			std::string("C8A1895F47422265160F768004F9F9775659C748C8B1539ADC0486022865F409"),																	// csx256h256
+			std::string("8C139298CAF31C595CBA3F2E398770AC8E6796D9810175A1F627C6449EB57619"),
+
+			// csx256 finalization tests: mac-2
+			std::string("A25E79042E782D2773A2F180D4E729EE"),																									// csx256p256
+			std::string("0EF5240B05134793B60923051EF7AE4F"),
 
 #if defined(CEX_CHACHA512_STRONG)
 			// csx512 - verification
-			std::string("DDD1BC1363EE81007B73672C28A2D6E2B5D8E95DB725F6379BC6D6F5E345649B"),																	// csx512h256
-			std::string("40BDDC8AAE96D4E6426B0CC85C6E83B5AC85EF4B0A79FF9093E6B18DFE3890AE33316D40B08EDD346DE1175EC683CB9E770EBC84BA959C1886E9DFFFA808DA21"),	// csx512h512
-			std::string("35F1C836BF7239193CC2241495F145BCD8B19A8E295929EE8A313DB371D85852"),																	// csx512k256
-			std::string("880117A461BEA31125A96F97093A98E24329E5676F810A34689C308E5F05B83F211C7D8D218F11DD59CF24C5D868F9414FAF7F3F5FF3D27A41694C5F0DBB56E6"),	// csx512k512
+			std::string("DDD1BC1363EE81007B73672C28A2D6E2B5D8E95DB725F6379BC6D6F5E345649B"),																	// csx256h256
+			std::string("61C0F3E3DF6D115054CACBA0D8E20DFB056D8FDA17BE10465408E1822996EC69"),
+			std::string("40BDDC8AAE96D4E6426B0CC85C6E83B5AC85EF4B0A79FF9093E6B18DFE3890AE33316D40B08EDD346DE1175EC683CB9E770EBC84BA959C1886E9DFFFA808DA21"),	// csx512k512
+			std::string("64CB334E00B2A235D9AB300FEFCF40DB9A2EADB58F44C78A5D04E1556230513080D4C828DEA73BE22E432F897FF7C7FF28A6739DE8F274DEECCD80FFC30D3431"),
 
 			// csx512p80 finalization tests: mac-2
-			std::string("61C0F3E3DF6D115054CACBA0D8E20DFB056D8FDA17BE10465408E1822996EC69"),																	// csx512h256
-			std::string("64CB334E00B2A235D9AB300FEFCF40DB9A2EADB58F44C78A5D04E1556230513080D4C828DEA73BE22E432F897FF7C7FF28A6739DE8F274DEECCD80FFC30D3431"),	// csx512h512
-			std::string("915256DC5121F11C60B1545DC42323750D5CFF3A34A9ADA09A8CA1606D14FB9D"),																	// csx512k256
-			std::string("6499C86DB99C46106D284BF0D70D9F3B14499C02A4B743A9BA03610B3ADD113C0E37320789F1A851C26C84C83065C4C7773A11CD53480F1630708013491F66F4")		// csx512k512
+			std::string("35F1C836BF7239193CC2241495F145BCD8B19A8E295929EE8A313DB371D85852"),																	// csx512h256
+			std::string("915256DC5121F11C60B1545DC42323750D5CFF3A34A9ADA09A8CA1606D14FB9D"),
+			std::string("880117A461BEA31125A96F97093A98E24329E5676F810A34689C308E5F05B83F211C7D8D218F11DD59CF24C5D868F9414FAF7F3F5FF3D27A41694C5F0DBB56E6"),	// csx512k512
+			std::string("6499C86DB99C46106D284BF0D70D9F3B14499C02A4B743A9BA03610B3ADD113C0E37320789F1A851C26C84C83065C4C7773A11CD53480F1630708013491F66F4")
 #else
 			// csx512p40 - verification
 			std::string("F5590F821728D3C332218E3785A2CD1F471FA43FDE2A334D9BEF59737DFC3A28"),																	// csx512h256
-			std::string("10078627D60BBFA0CDD67C84880ED4B6400FD7BEE3FB238EC74B92EBBE4E4EF2CE95F1569B0EA48E0D8347153726072D90808D5523861360C95546C4D65F93C3"),	// csx512h512
-			std::string("3036EC2237D8E88327218DB5A8EC31649CA43894FFCCF929AF94E0DA86F68F1C"),																	// csx512k256
-			std::string("35EB2121F7064B8C7D832491921EFA568F541AF962198E2DCACF7D483181FA7665B8E697F1B44F28D23307BA74D2F4BB62E4EBFAD303E72FB35DC491684826A3"),	// csx512k512
+			std::string("7F7C4A8E775913AE8081FD79FFEF0CEF0FBD01E45FC7D9B86745D9F016DE03C6"),
+			std::string("10078627D60BBFA0CDD67C84880ED4B6400FD7BEE3FB238EC74B92EBBE4E4EF2CE95F1569B0EA48E0D8347153726072D90808D5523861360C95546C4D65F93C3"),	// csx512k512
+			std::string("F123AB71DE508CD21A1AEAAB823DD28B64B69B1EBCD8C692B50D31DDA730355C04BE50AA07872BFE6AFD6DA0704B7699106C8722FA8BD044F87F253B11852AEE"),
 
 			// csx512p40 finalization tests: mac-2
-			std::string("7F7C4A8E775913AE8081FD79FFEF0CEF0FBD01E45FC7D9B86745D9F016DE03C6"),																	// csx512h256
-			std::string("F123AB71DE508CD21A1AEAAB823DD28B64B69B1EBCD8C692B50D31DDA730355C04BE50AA07872BFE6AFD6DA0704B7699106C8722FA8BD044F87F253B11852AEE"),	// csx512h512
-			std::string("A8F408B93F8421CB75E198A7A112C06E524ADC41394E59BB731078D735C121A5"),																	// csx512k256
-			std::string("C43985B79378BD4A5F3E53457579203991BBC46CE033686FDFF1301EE0AD4539EEC47A62ABA36105D4861BA36F49CA35E0DFD5A85B5C3AFEE7C785A829F52B0D")		// csx512k512
+			std::string("3036EC2237D8E88327218DB5A8EC31649CA43894FFCCF929AF94E0DA86F68F1C"),																	// csx512h256
+			std::string("A8F408B93F8421CB75E198A7A112C06E524ADC41394E59BB731078D735C121A5"),
+			std::string("35EB2121F7064B8C7D832491921EFA568F541AF962198E2DCACF7D483181FA7665B8E697F1B44F28D23307BA74D2F4BB62E4EBFAD303E72FB35DC491684826A3"),	// csx512k512
+			std::string("C43985B79378BD4A5F3E53457579203991BBC46CE033686FDFF1301EE0AD4539EEC47A62ABA36105D4861BA36F49CA35E0DFD5A85B5C3AFEE7C785A829F52B0D")
 #endif
 		};
-		HexConverter::Decode(code, 12, m_code);
+		HexConverter::Decode(code, 14, m_code);
 
 		const std::vector<std::string> expected =
 		{
@@ -814,6 +818,8 @@ namespace Test
 			std::string("56DB7DD6BBD795E30E0E7C8AB01F5809D1333FB2CB72B21F3F0C0ED5D43F44BF3828F929C29BBA3EFC77F5A2D83F915973E9534A53F88D3CFC94E09D1F8DE3E3"),	// csx256k256
 			std::string("72D4196641D52B440A66FEE9F23A82B3F1D410C8F78DAE182A9BD8EF7E8B2CA8C5119C5249525A3F06211B86A87F946F5EED6CC6A3EF011D829DD5D6AEB3907C"),	// csx256k256
 			std::string("C73AD84C26BE700C646DC0E2DB2A96F68221AF59341EE693EC5F7AFDC0B62F35731F90C70B233ED90CBAD3820BE19AB4D706AA015F6EBCF38E34828669FF820D"),	// csx256k256
+			std::string("14A8B4F493D707DC2ACEEABBAD1BA949CE0197A25B080F148986FA4F50058B380C63A13143D1FA0A31902629C8D17AE677E96D395F6AD3C9A84D0FD1982E7F78"),	// csx256p256
+			std::string("8392235DECAE5DC4F3491E2ABCE2FB25D3F0CB81370AEB550D40C8A3D7FAC76CBA78AA0229C1B24D6E908B2A0E7FB6F45DBDA10720122555DAADFEB1DA84BE8F"),	// csx256p256
 			// IETF chacha-poly1305 for TLS, test vectors
 			std::string("76B8E0ADA0F13D90405D6AE55386BD28BDD219B8A08DED1AA836EFCC8B770DC7DA41597C5157488D7724E03FB8D84A376A43B8F41518A11CC387B669B2EE6586"),	// csx256s: IETF test vector 1
 			std::string("4540F05A9F1FB296D7736E7B208E3C96EB4FE1834688D2604F450952ED432D41BBE2A0B6EA7566D2A5D1E7E20D42AF2C53D792B1C43FEA817E9AD275AE546963"),	// csx256s: IETF test vector 2
@@ -821,31 +827,31 @@ namespace Test
 			std::string("EF3FDFD6C61578FBF5CF35BD3DD33B8009631634D21E42AC33960BD138E50D32111E4CAF237EE53CA8AD6426194A88545DDC497A0B466E7D6BBDB0041B2F586B"),	// csx256s: IETF test vector 4
 
 #if defined(CEX_CHACHA512_STRONG)
-			std::string("18AD32FBA6504045B733F3AA0CBDAD2AFAD6540152DD19BFDF7EAADB8930B73AD6309DD874315E7DDD74C2953958AFC2B0256B74E1B347ED897DB041ABF34DFA"),
+			std::string("18AD32FBA6504045B733F3AA0CBDAD2AFAD6540152DD19BFDF7EAADB8930B73AD6309DD874315E7DDD74C2953958AFC2B0256B74E1B347ED897DB041ABF34DFA"),	// csxp80256h256
 			std::string("4AEA13BC19DC7979877B2330636A6C6206979890BD730353CE104458C6D2FAC091D1A169693876598A48C5C46D7E71467285179E93A1DC65D87C6C29209E4B9E"),
-			std::string("E7CAC5160D697C8D7E0269CCE5990E4A117BA75D617442A757849FAF8921C3DFE9EBC500CA8265CB3B59E5FD9EAF36C4227ACD316304BCDA3D2BD2B179C2944B"),
+			std::string("E7CAC5160D697C8D7E0269CCE5990E4A117BA75D617442A757849FAF8921C3DFE9EBC500CA8265CB3B59E5FD9EAF36C4227ACD316304BCDA3D2BD2B179C2944B"),	// csxp80256h512
 			std::string("9476E544CD233A3885A114EAEA470228265EF3D267A5914C62ABA21121998E637E3B385611167356C47EBE42F52362D291E503C6C048845DA7D0B074A9186783"),
-			std::string("4459B5A9E5CB4CBDBA3DD6D489F48CBF548F632161EDAC983DDF7677E7406C5780CE18B8841915860BAA477440966D8C5A2D76EE8467CB1112DF04AFAC841612"),
+			std::string("4459B5A9E5CB4CBDBA3DD6D489F48CBF548F632161EDAC983DDF7677E7406C5780CE18B8841915860BAA477440966D8C5A2D76EE8467CB1112DF04AFAC841612"),	// csxp80256kh256
 			std::string("DC6EFB6227E6E278F0E9DF98D7A68E3B4DA625F3FD3FEE1ADDFC056D07C4ADF3BA3A3DB46EBF903C5A3350D80AEB76FB46FD985CF54A46F04DD53CAB72E02AF1"),
-			std::string("9469954FBD272C2B4227C8F971D6E5AC46C3AAA96EC25525AC8B0D6D78671CAE31C5DE245A8C92ADED0534B1F87708D6C2BC31C1B881EB56FAD1E800A1E14913"),
+			std::string("9469954FBD272C2B4227C8F971D6E5AC46C3AAA96EC25525AC8B0D6D78671CAE31C5DE245A8C92ADED0534B1F87708D6C2BC31C1B881EB56FAD1E800A1E14913"),	// csxp80256h512
 			std::string("7B4C96D6FB7D2917E06CADCCBDE36C3F298633747BA41855109C9D1688928DC822443FE980435B0C807CA2CDB78F2F5563195B9C6AED7026F8BBDC4972471E0D"),
-			std::string("23A5B37570F6E3585EFB4614460616A926243B865CFD6C2C1CBFC33CC4C8B8F3C8F67FD56A9589C2C144D5F02029C9DEE003A7A6A7185AE697D242FD531F0D69"),
+			std::string("23A5B37570F6E3585EFB4614460616A926243B865CFD6C2C1CBFC33CC4C8B8F3C8F67FD56A9589C2C144D5F02029C9DEE003A7A6A7185AE697D242FD531F0D69"),	// csxp80256s
 			std::string("DCBA51986EED0FDA2E15F9AD021B26CE17567A3EBE9F43FE8B5BD460527EDA8D77BB80C5B8BE29850A21428A7D390DF9631C5C126EFCED7E14441E8CD2A9AFF1")
 #else
-			std::string("FC4045B5B67B5D7212A4C26D78BA0602AE83FDB8A0A12E512140CA3528F7CA0457356E5D8F71AF834924C89C30349FC9BC1DBC5D63E069107FF5BC034496C2BF"),
+			std::string("FC4045B5B67B5D7212A4C26D78BA0602AE83FDB8A0A12E512140CA3528F7CA0457356E5D8F71AF834924C89C30349FC9BC1DBC5D63E069107FF5BC034496C2BF"),	// csxp40256h256
 			std::string("81577699A387884D6FC123F19E68C34F5E8228E6C2779BB4130EAA7AAEE1B6B0B03D8284EB3C32C72C03D589A0C8C45E8AD71FB69600A49B6B5D43B54D20A895"),
-			std::string("4B447313946643682678B8E9D63399DF6F70144D4CBA3EABF80D482782B99EC4010A5C5E6D36E137E6866C3EDEC6F9F77844E4092FF0AD51D02C3B09F203EB56"),
+			std::string("4B447313946643682678B8E9D63399DF6F70144D4CBA3EABF80D482782B99EC4010A5C5E6D36E137E6866C3EDEC6F9F77844E4092FF0AD51D02C3B09F203EB56"),	// csxp40256h512
 			std::string("DD994D5B597F76E3F16A411211617EE0BCFE1CB4B730BAC10EE790C5C490102E0F973CEA6B854916D142FA0606616D6EAC343760817148BF51989B0154DF894A"),
-			std::string("2F6D970F4810001F6DD7F6B20DF25007E77AE969D2C44A3A172D984DAB1CE84132C16C228642A5F51FB3658FF76502A57BB23361D13BDEF9A24029BEE1E7E853"),
+			std::string("2F6D970F4810001F6DD7F6B20DF25007E77AE969D2C44A3A172D984DAB1CE84132C16C228642A5F51FB3658FF76502A57BB23361D13BDEF9A24029BEE1E7E853"),	// csxp40256kh256
 			std::string("F3889A1594EAF7B84737C3B07376CE9AEE1C113E309E75E6A8B551A5A71BEE412DAB1E644138FDA8F30574E9F82B79CC3767679E1EDEE5974F6EE3141F11CEBC"),
-			std::string("D3E291737933AA45E2F0FCC1764E5757238AEAF149F9F327DE6542594038B161146872032936365903B9D6ADA58080359D5DCD45044FF52C068C16613651E156"),
+			std::string("D3E291737933AA45E2F0FCC1764E5757238AEAF149F9F327DE6542594038B161146872032936365903B9D6ADA58080359D5DCD45044FF52C068C16613651E156"),	// csxp40256h512
 			std::string("E300B36EEC4896F2BC65D81F996EB91AD810665CCA525058B89B691FBDCF403EC34546A7B8A42A1B7CABF2EE18254D962C0792AEE230BD0A097A6444929A2BEB"),
-			std::string("5ADBA319A0A42546444C3121E94D3AFA40B5E63CEC9C667109DEF0E17009399E74C994AB07D7631344CBF266754DDE31C265082A9B630E97DE287023AAED8A21"),
+			std::string("5ADBA319A0A42546444C3121E94D3AFA40B5E63CEC9C667109DEF0E17009399E74C994AB07D7631344CBF266754DDE31C265082A9B630E97DE287023AAED8A21"),	// csxp40256s
 			std::string("C67BE57127D42320B584074F0964C75C643768B94E01C2D61A9F4071F71604D5F4A8A90A867FC47FA90592DEF26D36C72DC5CE7561B9AF564DCC217A19045175")
 #endif
 
 		};
-		HexConverter::Decode(expected, 22, m_expected);
+		HexConverter::Decode(expected, 24, m_expected);
 
 		const std::vector<std::string> key =
 		{

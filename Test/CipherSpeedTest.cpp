@@ -14,7 +14,7 @@
 #include "../CEX/ICM.h"
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
-#include "../CEX/ACS.h"
+#include "../CEX/MCS.h"
 #include "../CEX/CSX256.h"
 #include "../CEX/CSX512.h"
 #include "../CEX/TSX256.h"
@@ -147,8 +147,8 @@ namespace Test
 			OnProgress(std::string("### Uses default of 20 rounds, 256 bit key"));
 			OnProgress(std::string(""));
 
-			OnProgress(std::string("***ACS: Monte Carlo test (K=256; R=22)***"));
-			ACSSpeedTest();
+			OnProgress(std::string("***MCS: Monte Carlo test (K=256; R=22)***"));
+			MCSSpeedTest();
 
 			OnProgress(std::string("***CSX256: Monte Carlo test (K=256; R=20)***"));
 			CSX256SpeedTest();
@@ -264,9 +264,9 @@ namespace Test
 
 	//*** Stream Cipher Tests ***//
 
-	void CipherSpeedTest::ACSSpeedTest()
+	void CipherSpeedTest::MCSSpeedTest()
 	{
-		ACS* cipher = new ACS(Enumeration::BlockCiphers::RHXS256, Enumeration::StreamAuthenticators::None);
+		MCS* cipher = new MCS(Enumeration::BlockCiphers::RHXS256, Enumeration::StreamAuthenticators::None);
 		ParallelStreamLoop(cipher, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}

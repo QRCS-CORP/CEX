@@ -196,6 +196,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\ACS.h" />
+    <ClInclude Include="..\..\CEX\MCS.h" />
     <ClInclude Include="..\..\CEX\ACP.h" />
     <ClInclude Include="..\..\CEX\AeadModeFromName.h" />
     <ClInclude Include="..\..\CEX\AeadModes.h" />
@@ -278,6 +279,7 @@
     <ClInclude Include="..\..\CEX\ProviderBase.h" />
     <ClInclude Include="..\..\CEX\DrandEngines.h" />
     <ClInclude Include="..\..\CEX\ProviderSelfTest.h" />
+    <ClInclude Include="..\..\CEX\RCS.h" />
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h" />
     <ClInclude Include="..\..\CEX\NTRULQ4591N761.h" />
     <ClInclude Include="..\..\CEX\FileStream.h" />
@@ -410,6 +412,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\ACS.cpp" />
+    <ClCompile Include="..\..\CEX\MCS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp" />
     <ClCompile Include="..\..\CEX\AeadModes.cpp" />
@@ -492,6 +495,7 @@
     <ClCompile Include="..\..\CEX\ProviderBase.cpp" />
     <ClCompile Include="..\..\CEX\Providers.cpp" />
     <ClCompile Include="..\..\CEX\ProviderSelfTest.cpp" />
+    <ClCompile Include="..\..\CEX\RCS.cpp" />
     <ClCompile Include="..\..\CEX\RLWEParameters.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
     <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp" />

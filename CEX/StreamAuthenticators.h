@@ -34,7 +34,11 @@ enum class StreamAuthenticators : byte
 	/// <summary>
 	/// The KMAC-1024 message authentication code generator (experimental)
 	/// </summary>
-	KMAC1024 = static_cast<byte>(Macs::KMAC1024)
+	KMAC1024 = static_cast<byte>(Macs::KMAC1024),
+	/// <summary>
+	/// The Poly1305 message authentication code generator
+	/// </summary>
+	Poly1305 = static_cast<byte>(Macs::Poly1305)
 };
 
 class StreamAuthenticatorConvert

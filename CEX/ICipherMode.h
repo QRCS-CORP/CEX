@@ -158,7 +158,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+	virtual void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -180,7 +180,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+	virtual void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Initialize the Cipher instance
@@ -198,7 +198,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
@@ -216,7 +216,7 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
+	virtual void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 };
 
 NAMESPACE_MODEEND

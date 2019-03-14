@@ -152,7 +152,7 @@ public:
 	}
 
 	/// <summary>
-	/// Extract an 8bit integer from a larger integer
+	/// Extract an 8-bit integer from a larger integer
 	/// </summary>
 	/// 
 	/// <param name="Value">The parent integer value to extract from</param>
@@ -405,7 +405,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert 8bit byte array to a Big Endian integer array
+	/// Convert 8-bit byte array to a Big Endian integer array
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
@@ -732,7 +732,7 @@ public:
 	template<typename Array>
 	inline static void BeIncrement8(Array &Output)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be an array of 8bit integers");
+		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be an array of 8-bit integers");
 		CEXASSERT(!std::is_signed<Array::value_type>::value, "Output must be an unsigned integer array");
 
 		int i = static_cast<int>(Output.size());
@@ -751,7 +751,7 @@ public:
 	template<typename Array>
 	inline static void BeIncrement8(Array &Output, size_t Offset, size_t Length)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be an array of 8bit integers");
+		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be an array of 8-bit integers");
 		CEXASSERT(!std::is_signed<Array::value_type>::value, "Output must be an unsigned integer array");
 
 		int i = static_cast<int>(Length + Offset);
@@ -761,62 +761,159 @@ public:
 	}
 
 	/// <summary>
-	/// Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length
+	/// Increment an 8-bit integer array by the value, treating the array as a segmented large Big Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The modified output byte array</param>
-	/// <param name="Length">The number to increase by</param>
-	template<typename Array>
-	inline static void BeIncrease8(Array &Output, const size_t Length)
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename Array, typename T>
+	inline static void BeIncrease8(Array &Output, T Value)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input and Output must be an array of 8bit integers");
-		CEXASSERT(!std::is_signed<Array::value_type>::value, "Input and Output must be an unsigned integer array");
+		const size_t MAXPOS = Output.size() - 1;
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
 
-		const int CTRLEN = static_cast<int>(Output.size() - 1);
-		uint ctrLen = static_cast<uint>(Length);
-		std::array<byte, sizeof(uint)> ctrInc;
+		lctr = 0;
 
-		std::memcpy(&ctrInc[0], &ctrLen, ctrInc.size());
-		byte carry = 0;
-
-		for (int i = CTRLEN; i >= 0; --i)
+		while (lctr != sizeof(T))
 		{
-			byte odst = Output[i];
-			byte osrc = CTRLEN - i < static_cast<int>(ctrInc.size()) ? static_cast<byte>(ctrInc[CTRLEN - i]) : static_cast<byte>(0);
-			byte ndst = static_cast<byte>(odst + osrc + carry);
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		carry = 0;
+		lctr = Output.size();
+
+		while (lctr != 0)
+		{
+			--lctr;
+			byte odst = Output[lctr];
+			byte osrc = ((MAXPOS - lctr) < cinc.size()) ? cinc[MAXPOS - lctr] : 0x00;
+			byte ndst = odst + osrc + carry;
 			carry = ndst < odst ? 1 : 0;
-			Output[i] = ndst;
+			Output[lctr] = ndst;
 		}
 	}
 
 	/// <summary>
-	/// Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length
+	/// Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The initial array of bytes</param>
-	/// <param name="Output">The modified output byte array</param>
-	/// <param name="Length">The number to increase by</param>
-	template<typename Array>
-	inline static void BeIncrease8(const Array &Input, Array &Output, const size_t Length)
+	/// <param name="Input">The input byte array to copy</param>
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename ArrayA, typename ArrayB, typename T>
+	inline static void BeIncrease8(const ArrayA &Input, ArrayB &Output, T Value)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Input and Output must be an array of 8bit integers");
-		CEXASSERT(!std::is_signed<Array::value_type>::value, "Input and Output must be an unsigned integer array");
+		const size_t MAXPOS = Input.size() - 1;
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
 
-		const int CTRLEN = static_cast<int>(Output.size() - 1);
-		uint ctrLen = static_cast<uint>(Length);
-		std::array<byte, sizeof(uint)> ctrInc;
+		lctr = 0;
 
-		std::memcpy(&ctrInc[0], &ctrLen, ctrInc.size());
-		std::memcpy(&Output[0], &Input[0], Input.size());
-		byte carry = 0;
-
-		for (int i = CTRLEN; i >= 0; --i)
+		while (lctr != sizeof(T))
 		{
-			byte odst = Output[i];
-			byte osrc = CTRLEN - i < static_cast<int>(ctrInc.size()) ? static_cast<byte>(ctrInc[CTRLEN - i]) : static_cast<byte>(0);
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		MemoryTools::Copy(Input, 0, Output, 0, Input.size());
+		carry = 0;
+		lctr = Input.size();
+
+		while (lctr != 0)
+		{
+			--lctr;
+			byte odst = Output[lctr];
+			byte osrc = ((MAXPOS - lctr) < cinc.size()) ? cinc[MAXPOS - lctr] : 0x00;
 			byte ndst = static_cast<byte>(odst + osrc + carry);
 			carry = ndst < odst ? 1 : 0;
-			Output[i] = ndst;
+			Output[lctr] = ndst;
+		}
+	}
+
+	/// <summary>
+	/// Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array to copy</param>
+	/// <param name="OutOffset">The starting offset within the output byte array</param>
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename ArrayA, typename ArrayB, typename T>
+	inline static void BeIncrease8(const ArrayA &Input, ArrayB &Output, size_t OutOffset, T Value)
+	{
+		const size_t MAXPOS = OutOffset + Input.size() - 1;
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
+
+		lctr = 0;
+
+		while (lctr != sizeof(T))
+		{
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size());
+		carry = 0;
+		lctr = MAXPOS + 1;
+
+		while (lctr != OutOffset)
+		{
+			--lctr;
+			byte odst = Output[lctr];
+			byte osrc = ((MAXPOS - lctr) < cinc.size()) ? cinc[MAXPOS - lctr] : 0x00;
+			byte ndst = static_cast<byte>(odst + osrc + carry);
+			carry = ndst < odst ? 1 : 0;
+			Output[lctr] = ndst;
+		}
+	}
+
+	/// <summary>
+	/// Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Big Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array to copy</param>
+	/// <param name="OutOffset">The starting offset within the output byte array</param>
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Length">The number of bytes within the array to treat as a segmented counter</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename ArrayA, typename ArrayB, typename T>
+	inline static void BeIncrease8(const ArrayA &Input, ArrayB &Output, size_t OutOffset, size_t Length, T Value)
+	{
+		const size_t MAXPOS = OutOffset + Length - 1;
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
+
+		lctr = 0;
+
+		while (lctr != sizeof(T))
+		{
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size());
+		carry = 0;
+		lctr = MAXPOS + 1;
+
+		while (lctr != OutOffset)
+		{
+			--lctr;
+			byte odst = Output[lctr];
+			byte osrc = ((MAXPOS - lctr) < cinc.size()) ? cinc[MAXPOS - lctr] : 0x00;
+			byte ndst = static_cast<byte>(odst + osrc + carry);
+			carry = ndst < odst ? 1 : 0;
+			Output[lctr] = ndst;
 		}
 	}
 
@@ -832,7 +929,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert a Little Endian N * 8bit word array to an unsigned integer array.
+	/// Convert a Little Endian N * 8-bit word array to an unsigned integer array.
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
@@ -1338,6 +1435,161 @@ public:
 	}
 
 	/// <summary>
+	/// Increment an 8-bit integer array by the value, treating the array as a segmented large Little Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename Array, typename T>
+	inline static void LeIncrease8(Array &Output, T Value)
+	{
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
+
+		lctr = 0;
+
+		while (lctr != sizeof(T))
+		{
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		carry = 0;
+		lctr = 0;
+
+		while (lctr != Output.size())
+		{
+			byte odst = Output[lctr];
+			byte osrc = (lctr < cinc.size() ? cinc[lctr] : 0x00);
+			byte ndst = static_cast<byte>(odst + osrc + carry);
+			carry = ndst < odst ? 1 : 0;
+			Output[lctr] = ndst;
+			++lctr;
+		}
+	}
+
+	/// <summary>
+	/// Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array to copy</param>
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename ArrayA, typename ArrayB, typename T>
+	inline static void LeIncrease8(const ArrayA &Input, ArrayB &Output, T Value)
+	{
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
+
+		MemoryTools::Copy(Input, 0, Output, 0, Input.size());
+		lctr = 0;
+
+		while (lctr != sizeof(T))
+		{
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		carry = 0;
+		lctr = 0;
+
+		while (lctr != Input.size())
+		{
+			byte odst = Output[lctr];
+			byte osrc = (lctr < cinc.size() ? cinc[lctr] : 0x00);
+			byte ndst = static_cast<byte>(odst + osrc + carry);
+			carry = ndst < odst ? 1 : 0;
+			Output[lctr] = ndst;
+			++lctr;
+		}
+	}
+
+	/// <summary>
+	/// Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array to copy</param>
+	/// <param name="OutOffset">The starting offset within the output byte array</param>
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename ArrayA, typename ArrayB, typename T>
+	inline static void LeIncrease8(const ArrayA &Input, ArrayB &Output, size_t OutOffset, T Value)
+	{
+		const size_t MAXPOS = OutOffset + Input.size();
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
+
+		MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size());
+		lctr = 0;
+
+		while (lctr != sizeof(T))
+		{
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		carry = 0;
+		lctr = OutOffset;
+
+		while (lctr != MAXPOS)
+		{
+			byte odst = Output[lctr];
+			byte osrc = ((lctr - OutOffset < cinc.size()) ? cinc[lctr - OutOffset] : 0x00);
+			byte ndst = odst + osrc + carry;
+			carry = ndst < odst ? 1 : 0;
+			Output[lctr] = ndst;
+			++lctr;
+		}
+	}
+
+	/// <summary>
+	/// Copy an 8-bit integer array, and then increment it by the value, treating the array as a segmented large Little Endian integer counter.
+	/// <para>The value type can be a 16, 32, or 64-bit integer.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array to copy</param>
+	/// <param name="OutOffset">The starting offset within the output byte array</param>
+	/// <param name="Output">The target output byte array</param>
+	/// <param name="Length">The number of bytes within the array to treat as a segmented counter</param>
+	/// <param name="Value">The T value number to increase by</param>
+	template <typename ArrayA, typename ArrayB, typename T>
+	inline static void LeIncrease8(const ArrayA &Input, ArrayB &Output, size_t OutOffset, size_t Length, const T Value)
+	{
+		const size_t MAXPOS = OutOffset + Length;
+		std::array<byte, sizeof(T)> cinc;
+		size_t lctr;
+		byte carry;
+
+		MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size());
+		lctr = 0;
+
+		while (lctr != sizeof(T))
+		{
+			cinc[lctr] = static_cast<byte>(Value >> (lctr * 8));
+			++lctr;
+		}
+
+		carry = 0;
+		lctr = OutOffset;
+
+		while (lctr != MAXPOS)
+		{
+			byte odst = Output[lctr];
+			byte osrc = ((lctr - OutOffset < cinc.size()) ? cinc[lctr - OutOffset] : 0x00);
+			byte ndst = odst + osrc + carry;
+			carry = ndst < odst ? 1 : 0;
+			Output[lctr] = ndst;
+			++lctr;
+		}
+	}
+
+	/// <summary>
 	/// Treats an integer array as a large Little Endian integer, incrementing the total value by one.
 	/// <para>Uses only the first two elements of the Output array; used by 32 or 64 bit integer types.
 	/// Uses only unsigned integer types; signed types are UB.</para>
@@ -1363,7 +1615,7 @@ public:
 	/// <param name="Output">The counter array to increment</param>
 	/// <param name="Length">The number to increase by</param>
 	template <typename Array>
-	inline static void LeIncreaseW(Array &Output, const size_t Length)
+	inline static void LeIncreaseW(Array &Output, size_t Length)
 	{
 		Output[0] += Length;
 
@@ -1382,7 +1634,7 @@ public:
 	/// <param name="Output">The incremented output array</param>
 	/// <param name="Length">The number to increase by</param>
 	template <typename Array>
-	inline static void LeIncreaseW(const Array &Input, Array &Output, const size_t Length)
+	inline static void LeIncreaseW(const Array &Input, Array &Output, size_t Length)
 	{
 		CEXASSERT(!std::is_signed<Array::value_type>::value, "Input must be an unsigned integer array");
 

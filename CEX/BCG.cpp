@@ -456,7 +456,7 @@ void BCG::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 			// thread level counter
 			std::vector<byte> thdCtr(BLOCK_SIZE);
 			// offset counter by chunk size / block size  
-			IntegerTools::BeIncrease8(m_bcgState->Nonce, thdCtr, CTRLEN * i);
+			IntegerTools::BeIncrease8(m_bcgState->Nonce, thdCtr, static_cast<uint>(CTRLEN * i));
 			// generate random at output offset
 			this->Permute(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr, m_bcgCipher);
 			// store last counter
@@ -479,7 +479,7 @@ void BCG::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 }
 
-void BCG::Permute(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter, std::unique_ptr<IBlockCipher> &Cipher)
+void BCG::Permute(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter, std::unique_ptr<IBlockCipher> &Cipher)
 {
 	size_t bctr = 0;
 

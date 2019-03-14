@@ -37,6 +37,11 @@
 #define NAMESPACE_CIPHEREND } }
 #define NAMESPACE_BLOCK namespace CEX { namespace Cipher { namespace Block {
 #define NAMESPACE_BLOCKEND } } }
+
+#define NAMESPACE_RIJNDAELBASE namespace CEX { namespace Cipher { namespace Block { namespace RijndaelBase { 
+#define NAMESPACE_RIJNDAELBASEEND } } } }
+#define NAMESPACE_SERPENTBASE namespace CEX { namespace Cipher { namespace Block { namespace SerpentBase { 
+#define NAMESPACE_SERPENTBASEEND } } } }
 #define NAMESPACE_MODE namespace CEX { namespace Cipher { namespace Block { namespace Mode {
 #define NAMESPACE_MODEEND } } } }
 #define NAMESPACE_PADDING namespace CEX { namespace Cipher { namespace Block { namespace Padding {

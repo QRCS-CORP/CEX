@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of a Output FeedBack Mode (OFB).
-// Written by John Underhill, January 2, 2015
+// Written by John G. Underhill, January 2, 2015
 // Updated September 16, 2016
 // Updated April 18, 2017
 // Updated October 14, 2017
@@ -220,7 +220,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+	void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -242,7 +242,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+	void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the cipher-mode instance
@@ -273,11 +273,11 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 
-	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 };
 
 NAMESPACE_MODEEND

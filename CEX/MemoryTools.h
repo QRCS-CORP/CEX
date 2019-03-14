@@ -97,7 +97,9 @@ public:
 #if defined(__AVX__)
 		PREFETCHT1(Input.data() + (Offset * ELMLEN), Length);
 #else
-		volatile Array::value_type tmp = 0;
+		volatile Array::value_type tmp;
+
+		tmp = 0;
 
 		for (size_t i = 0; i < Length / ELMLEN; ++i)
 		{
@@ -130,7 +132,9 @@ public:
 #if defined(__AVX__)
 		PREFETCHT2(Input.data() + (Offset * ELMLEN), Length);
 #else
-		volatile Array::value_type tmp = 0;
+		volatile Array::value_type tmp;
+
+		tmp = 0;
 
 		for (size_t i = 0; i < Length / ELMLEN; ++i)
 		{
@@ -158,13 +162,15 @@ public:
 	template <typename Array>
 	inline static void Clear(Array &Output, size_t Offset, size_t Length)
 	{
+		size_t pctr;
+
 		if (Length != 0)
 		{
 			const size_t ELMLEN = sizeof(Array::value_type);
 			CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
 			CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
-			size_t prcCtr = 0;
+			pctr = 0;
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -179,23 +185,23 @@ public:
 			{
 				const size_t ALNLEN = (Length / (SMDBLK * ELMLEN)) * SMDBLK;
 
-				while (prcCtr != ALNLEN)
+				while (pctr != ALNLEN)
 				{
 #if defined(__AVX512__)
-					CLEAR512(Output, Offset + prcCtr);
+					CLEAR512(Output, Offset + pctr);
 #elif defined(__AVX2__)
-					CLEAR256(Output, Offset + prcCtr);
+					CLEAR256(Output, Offset + pctr);
 #elif defined(__AVX__)
-					CLEAR128(Output, Offset + prcCtr);
+					CLEAR128(Output, Offset + pctr);
 #endif
-					prcCtr += SMDBLK;
+					pctr += SMDBLK;
 				}
 			}
 #endif
 
-			if (prcCtr * ELMLEN != Length)
+			if (pctr * ELMLEN != Length)
 			{
-				std::memset(&Output[Offset + prcCtr], 0, Length - (prcCtr * ELMLEN));
+				std::memset(&Output[Offset + pctr], 0, Length - (pctr * ELMLEN));
 			}
 		}
 	}
@@ -272,7 +278,9 @@ public:
 		CEXASSERT((A.size() - AOffset) >= Length, "Length is larger than A size");
 		CEXASSERT((B.size() - BOffset) >= Length, "Length is larger than B size");
 
-		size_t diff = 0;
+		size_t diff;
+
+		diff = 0;
 
 		for (size_t i = 0; i != Elements; ++i)
 		{
@@ -296,13 +304,14 @@ public:
 	template <typename Object, typename Array>
 	inline static void CopyFromObject(const Object* Input, Array &Output, size_t OutOffset, size_t Length)
 	{
+		const size_t ELMLEN = sizeof(Array::value_type);
+		size_t pctr;
+
+		CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
+
 		if (Length != 0)
 		{
-			const size_t ELMLEN = sizeof(Array::value_type);
-
-			CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
-
-			size_t prcCtr = 0;
+			pctr = 0;
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -317,23 +326,23 @@ public:
 			{
 				const size_t ALNLEN = (Length / (SMDBLK * ELMLEN)) * SMDBLK;
 
-				while (prcCtr != ALNLEN)
+				while (pctr != ALNLEN)
 				{
 #if defined(__AVX512__)
-					COPY512(Input + prcCtr, Output, OutOffset + prcCtr);
+					COPY512FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
 #elif defined(__AVX2__)
-					COPY256(Input + prcCtr, Output, OutOffset + prcCtr);
+					COPY256FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
 #elif defined(__AVX__)
-					COPY128(Input + prcCtr, Output, OutOffset + prcCtr);
+					COPY128FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
 #endif
-					prcCtr += SMDBLK;
+					pctr += SMDBLK;
 				}
 			}
 #endif
 
-			if (prcCtr * ELMLEN != Length)
+			if (pctr * ELMLEN != Length)
 			{
-				std::memcpy(&Output[OutOffset + prcCtr], Input + prcCtr, Length - (prcCtr * ELMLEN));
+				std::memcpy(&Output[OutOffset + pctr], Input + pctr, Length - (pctr * ELMLEN));
 			}
 		}
 	}
@@ -352,13 +361,14 @@ public:
 	template <typename Object, typename Array>
 	inline static void CopyToObject(const Array &Input, size_t InOffset, Object* Output, size_t Length)
 	{
+		const size_t ELMLEN = sizeof(Array::value_type);
+		size_t pctr;
+
+		CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than output capacity");
+
 		if (Length != 0)
 		{
-			const size_t ELMLEN = sizeof(Array::value_type);
-
-			CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than output capacity");
-
-			size_t prcCtr = 0;
+			pctr = 0;
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -373,23 +383,23 @@ public:
 			{
 				const size_t ALNLEN = (Length / (SMDBLK * ELMLEN)) * SMDBLK;
 
-				while (prcCtr != ALNLEN)
+				while (pctr != ALNLEN)
 				{
 #if defined(__AVX512__)
-					COPY512(Input, InOffset + prcCtr, Output + prcCtr);
+					COPY512TOOBJECT(Input, InOffset + pctr, Output + pctr);
 #elif defined(__AVX2__)
-					COPY256(Input, InOffset + prcCtr, Output + prcCtr);
+					COPY256TOOBJECT(Input, InOffset + pctr, Output + pctr);
 #elif defined(__AVX__)
-					COPY128(Input, InOffset + prcCtr, Output + prcCtr);
+					COPY128TOOBJECT(Input, InOffset + pctr, Output + pctr);
 #endif
-					prcCtr += SMDBLK;
+					pctr += SMDBLK;
 				}
 			}
 #endif
 
-			if (prcCtr * ELMLEN != Length)
+			if (pctr * ELMLEN != Length)
 			{
-				std::memcpy(Output + prcCtr, &Input[InOffset + prcCtr], Length - (prcCtr * ELMLEN));
+				std::memcpy(Output + pctr, &Input[InOffset + pctr], Length - (pctr * ELMLEN));
 			}
 		}
 	}
@@ -447,14 +457,15 @@ public:
 	template <typename Array>
 	inline static void Copy(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset, size_t Length)
 	{
+		const size_t ELMLEN = sizeof(Array::value_type);
+		size_t pctr;
+
+		CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
+
 		if (Length != 0)
 		{
-			const size_t ELMLEN = sizeof(Array::value_type);
-
-			CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than input capacity");
-			CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
-
-			size_t prcCtr = 0;
+			pctr = 0;
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -469,23 +480,23 @@ public:
 			{
 				const size_t ALNLEN = (Length / (SMDBLK * ELMLEN)) * SMDBLK;
 
-				while (prcCtr != ALNLEN)
+				while (pctr != ALNLEN)
 				{
 #if defined(__AVX512__)
-					COPY512(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+					COPY512(Input, InOffset + pctr, Output, OutOffset + pctr);
 #elif defined(__AVX2__)
-					COPY256(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+					COPY256(Input, InOffset + pctr, Output, OutOffset + pctr);
 #elif defined(__AVX__)
-					COPY128(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+					COPY128(Input, InOffset + pctr, Output, OutOffset + pctr);
 #endif
-					prcCtr += SMDBLK;
+					pctr += SMDBLK;
 				}
 			}
 #endif
 
-			if (prcCtr * ELMLEN != Length)
+			if (pctr * ELMLEN != Length)
 			{
-				std::memcpy(&Output[OutOffset + prcCtr], &Input[InOffset + prcCtr], Length - (prcCtr * ELMLEN));
+				std::memcpy(&Output[OutOffset + pctr], &Input[InOffset + pctr], Length - (pctr * ELMLEN));
 			}
 		}
 	}
@@ -505,14 +516,15 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void Copy(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+		size_t pctr;
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output capacity");
+
 		if (Length != 0)
 		{
-			const size_t INPLEN = sizeof(ArrayA::value_type);
-			const size_t OUTLEN = sizeof(ArrayB::value_type);
-
-			CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input capacity");
-			CEXASSERT((Output.size() - OutOffset) * OUTLEN >= Length, "Length is larger than output capacity");
-
 #if defined(__AVX512__)
 			const size_t SMDBLK = 64;
 #elif defined(__AVX2__)
@@ -521,44 +533,46 @@ public:
 			const size_t SMDBLK = 16;
 #endif
 
-			size_t prcCtr = 0;
+			pctr = 0;
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 			if (Length >= SMDBLK)
 			{
 				const size_t ALNLEN = Length - (Length % SMDBLK);
 
-				while (prcCtr != ALNLEN)
+				while (pctr != ALNLEN)
 				{
 #if defined(__AVX512__)
-					COPY512(Input, InOffset + (prcCtr / INPLEN), Output, OutOffset + (prcCtr / OUTLEN));
+					COPY512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #elif defined(__AVX2__)
-					COPY256(Input, InOffset + (prcCtr / INPLEN), Output, OutOffset + (prcCtr / OUTLEN));
+					COPY256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #elif defined(__AVX__)
-					COPY128(Input, InOffset + (prcCtr / INPLEN), Output, OutOffset + (prcCtr / OUTLEN));
+					COPY128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #endif
-					prcCtr += SMDBLK;
+					pctr += SMDBLK;
 				}
 			}
 #endif
 
-			if (prcCtr != Length)
+			if (pctr != Length)
 			{
-				std::memcpy(&Output[OutOffset + (prcCtr / OUTLEN)], &Input[InOffset + (prcCtr / INPLEN)], Length - prcCtr);
+				std::memcpy(&Output[OutOffset + (pctr / OTPLEN)], &Input[InOffset + (pctr / INPLEN)], Length - pctr);
 			}
 		}
 	}
 
 	/// <summary>
 	/// Copy 128 bits from an object pointer to an array.
-	/// <para>This is an AVX vectorized copy operation.</para>
+	/// <para>This is an AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The object pointer to copy memory from</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
 	template <typename Object, typename Array>
-	inline static void COPY128(const Object* Input, Array &Output, size_t OutOffset)
+	inline static void COPY128FROMOBJECT(const Object* Input, Array &Output, size_t OutOffset)
 	{
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_loadu_si128(reinterpret_cast<const __m128i*>(Input)));
@@ -569,14 +583,16 @@ public:
 
 	/// <summary>
 	/// Copy 128 bits from an array to an object pointer.
-	/// <para>This is an AVX vectorized copy operation.</para>
+	/// <para>This is an AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The source integer array to copy</param>
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination object pointer</param>
 	template <typename Object, typename Array>
-	inline static void COPY128(Array &Input, size_t InOffset, const Object* Output)
+	inline static void COPY128TOOBJECT(Array &Input, size_t InOffset, const Object* Output)
 	{
 #if defined(__AVX__)
 		_mm_storeu_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(Output), reinterpret_cast<__m128i*>(&Input[OutOffset])));
@@ -587,7 +603,9 @@ public:
 
 	/// <summary>
 	/// Copy 128 bits between integer arrays.
-	/// <para>This is an AVX vectorized copy operation.</para>
+	/// <para>This is an AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The source integer array to copy</param>
@@ -606,14 +624,16 @@ public:
 
 	/// <summary>
 	/// Copy 256 bits from an object pointer to an array.
-	/// <para>This is an AVX2/AVX vectorized copy operation.</para>
+	/// <para>This is an AVX2/AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The object pointer to copy memory from</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
 	template <typename Object, typename Array>
-	inline static void COPY256(const Object* Input, Array &Output, size_t OutOffset)
+	inline static void COPY256FROMOBJECT(const Object* Input, Array &Output, size_t OutOffset)
 	{
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(Input)));
@@ -625,14 +645,16 @@ public:
 
 	/// <summary>
 	/// Copy 256 bits from an array to an object pointer.
-	/// <para>This is an AVX2/AVX vectorized copy operation.</para>
+	/// <para>This is an AVX2/AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The source integer array to copy</param>
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination object pointer</param>
 	template <typename Object, typename Array>
-	inline static void COPY256(const Array &Input, size_t InOffset, Object* Output)
+	inline static void COPY256TOOBJECT(const Array &Input, size_t InOffset, Object* Output)
 	{
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
@@ -644,7 +666,9 @@ public:
 
 	/// <summary>
 	/// Copy 256 bits between integer arrays.
-	/// <para>This is an AVX2/AVX vectorized copy operation.</para>
+	/// <para>This is an AVX2/AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The source integer array to copy</param>
@@ -664,14 +688,16 @@ public:
 
 	/// <summary>
 	/// Copy 512 bits from an object pointer to an array.
-	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.</para>
+	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The object pointer to copy memory from</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
 	template <typename Object, typename Array>
-	inline static void COPY512(const Object* Input, Array &Output, size_t OutOffset)
+	inline static void COPY512FROMOBJECT(const Object* Input, Array &Output, size_t OutOffset)
 	{
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(Input)));
@@ -683,14 +709,16 @@ public:
 
 	/// <summary>
 	/// Copy 512 bits from an array to an object pointer.
-	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.</para>
+	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The source integer array to copy</param>
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination object pointer</param>
 	template <typename Object, typename Array>
-	inline static void COPY512(const Array &Input, size_t InOffset, Object* Output)
+	inline static void COPY512TOOBJECT(const Array &Input, size_t InOffset, Object* Output)
 	{
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(Output), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[OutOffset])));
@@ -702,7 +730,9 @@ public:
 
 	/// <summary>
 	/// Copy 512 bits between integer arrays.
-	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.</para>
+	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.
+	/// Warning! This is an internal function and may not work properly if called directly, 
+	/// use the Copy method instead.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The source integer array to copy</param>
@@ -757,14 +787,15 @@ public:
 	template <typename Array>
 	inline static void SetValue(Array &Output, size_t Offset, size_t Length, byte Value)
 	{
+		const size_t ELMLEN = sizeof(Array::value_type);
+		size_t pctr;
+
+		CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
+
 		if (Length != 0)
 		{
-			const size_t ELMLEN = sizeof(Array::value_type);
-
-			CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
-			CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
-
-			size_t prcCtr = 0;
+			pctr = 0;
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -779,23 +810,23 @@ public:
 			{
 				const size_t ALNLEN = (Length / (SMDBLK * ELMLEN)) * SMDBLK;
 
-				while (prcCtr != ALNLEN)
+				while (pctr != ALNLEN)
 				{
 #if defined(__AVX512__)
-					SETVAL512(Output, Offset + prcCtr, Value);
+					SETVAL512(Output, Offset + pctr, Value);
 #elif defined(__AVX2__)
-					SETVAL256(Output, Offset + prcCtr, Value);
+					SETVAL256(Output, Offset + pctr, Value);
 #elif defined(__AVX__)
-					SETVAL128(Output, Offset + prcCtr, Value);
+					SETVAL128(Output, Offset + pctr, Value);
 #endif
-					prcCtr += SMDBLK;
+					pctr += SMDBLK;
 				}
 			}
 #endif
 
-			if (prcCtr * ELMLEN != Length)
+			if (pctr * ELMLEN != Length)
 			{
-				std::memset(&Output[Offset + prcCtr], Value, Length - (prcCtr * ELMLEN));
+				std::memset(&Output[Offset + pctr], Value, Length - (pctr * ELMLEN));
 			}
 		}
 	}
@@ -878,15 +909,16 @@ public:
 	inline static void XOR(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
 		const size_t INPLEN = sizeof(ArrayA::value_type);
-		const size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+		size_t pctr;
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output capacity");
 		CEXASSERT(Length > 0, "Length can not be zero");
 		CEXASSERT(INPLEN <= Length, "Integer type is larger than length");
-		CEXASSERT(OUTLEN <= Length, "Integer type is larger than length");
+		CEXASSERT(OTPLEN <= Length, "Integer type is larger than length");
 
-		size_t prcCtr = 0;
+		pctr = 0;
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -901,22 +933,22 @@ public:
 		{
 			const size_t ALNLEN = Length - (Length % SMDBLK);
 
-			while (prcCtr != ALNLEN)
+			while (pctr != ALNLEN)
 			{
 #if defined(__AVX512__)
-				XOR512(Input, InOffset + (prcCtr / INPLEN), Output, OutOffset + (prcCtr / OUTLEN));
+				XOR512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #elif defined(__AVX2__)
-				XOR256(Input, InOffset + (prcCtr / INPLEN), Output, OutOffset + (prcCtr / OUTLEN));
+				XOR256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #elif defined(__AVX__)
-				COPY128(Input, InOffset + (prcCtr / INPLEN), Output, OutOffset + (prcCtr / OUTLEN));
+				COPY128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #endif
-				prcCtr += SMDBLK;
+				pctr += SMDBLK;
 			}
 		}
 #endif
-		if (prcCtr * OUTLEN != Length)
+		if (pctr * OTPLEN != Length)
 		{
-			XorPartial(Input, InOffset + (prcCtr / INPLEN), Output, OutOffset + (prcCtr / OUTLEN), Length - prcCtr);
+			XorPartial(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN), Length - pctr);
 		}
 	}
 
@@ -932,15 +964,15 @@ public:
 	inline static void XOR128(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
 		const size_t INPLEN = sizeof(ArrayA::value_type);
-		const size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 16, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output capacity");
 
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 #else
-		for (size_t i = 0; i < (16 / OUTLEN); ++i)
+		for (size_t i = 0; i < (16 / OTPLEN); ++i)
 		{
 			Output[OutOffset + i] ^= Input[InOffset + i];
 		}
@@ -959,16 +991,16 @@ public:
 	inline static void XOR256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
 		const size_t INPLEN = sizeof(ArrayA::value_type);
-		const size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 32, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output capacity");
 
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 #else
 		XOR128(Input, InOffset, Output, OutOffset);
-		XOR128(Input, InOffset + (16 / INPLEN), Output, OutOffset + (16 / OUTLEN));
+		XOR128(Input, InOffset + (16 / INPLEN), Output, OutOffset + (16 / OTPLEN));
 #endif
 	}
 
@@ -984,16 +1016,16 @@ public:
 	inline static void XOR512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
 		const size_t INPLEN = sizeof(ArrayA::value_type);
-		const size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 64, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output capacity");
 
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_xor_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
 #else
 		XOR256(Input, InOffset, Output, OutOffset);
-		XOR256(Input, InOffset + (32 / INPLEN), Output, OutOffset + (32 / OUTLEN));
+		XOR256(Input, InOffset + (32 / INPLEN), Output, OutOffset + (32 / OTPLEN));
 #endif
 	}
 
@@ -1009,13 +1041,13 @@ public:
 	inline static void XOR1024(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
 		const size_t INPLEN = sizeof(ArrayA::value_type);
-		const size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OUTLEN >= 64, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output capacity");
 
 		XOR512(Input, InOffset, Output, OutOffset);
-		XOR512(Input, InOffset + (64 / INPLEN), Output, OutOffset + (64 / OUTLEN));
+		XOR512(Input, InOffset + (64 / INPLEN), Output, OutOffset + (64 / OTPLEN));
 	}
 
 	/// <summary>
@@ -1032,14 +1064,15 @@ public:
 	inline static void XorPartial(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
 		const size_t INPLEN = sizeof(ArrayA::value_type);
-		const size_t OUTLEN = sizeof(ArrayB::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+		size_t i;
 
-		byte* inptr = (byte*)Input.data() + (InOffset * INPLEN);
-		byte* outptr = (byte*)Output.data() + (OutOffset * OUTLEN);
+		byte* pinp = (byte*)Input.data() + (InOffset * INPLEN);
+		byte* potp = (byte*)Output.data() + (OutOffset * OTPLEN);
 
-		for (size_t i = 0; i < Length; ++i)
+		for (i = 0; i < Length; ++i)
 		{
-			outptr[i] ^= inptr[i];
+			potp[i] ^= pinp[i];
 		}
 	}
 

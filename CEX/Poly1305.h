@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of a Stream Cipher based Message Authentication Code (Poly1305).
-// Written by John Underhill, February 2, 2018
+// Written by John G. Underhill, February 2, 2018
 // Updated February 6, 2018
 // Contact: develop@vtdev.com
 

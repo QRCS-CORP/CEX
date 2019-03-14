@@ -21,7 +21,7 @@
 // The Skein Hash Function Family: <a href="https://www.schneier.com/skein1.3.pdf">Skein V1.1</a>.
 // Implementation Details:
 // An implementation of the Skein digest with a 512 bit digest size. 
-// Written by John Underhill, January 13, 2015
+// Written by John G. Underhill, January 13, 2015
 // Updated July 2, 2018
 // Contact: develop@vtdev.com
 
@@ -218,7 +218,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) override;
+	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -226,7 +226,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;

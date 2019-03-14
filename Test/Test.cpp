@@ -4,7 +4,7 @@
 // ##SCHEDULE FOR 1.0.0.8 RELEASE ###
 // ##ETA is February 14, 2019 ##
 //
-// Authenticated stream ciphers ACS,ThreeFish-256/512/1024, and CSX256/512	- done
+// Authenticated stream ciphers MCS,ThreeFish-256/512/1024, and CSX256/512	- done
 // Update secure key mechanisms and integrate internally						- started
 // Full security, documentation, and code review cycles							- started
 // Begin optimization and review of asymmetric primitives						- 
@@ -18,7 +18,7 @@
 // Update of all base asymmetric ciphers and signature schemes to match NIST PQ entries
 // Message digests updated for performance and security
 // Integrated an optional built - in authentication generator(HMAC / KMAC) to each stream cipher
-// Added the Authenticate and Encrypt and AEAD stream cipher implementation(Authenticated Cipher Stream : ACS).
+// Added the Authenticate and Encrypt and AEAD stream cipher implementation(Authenticated Cipher Stream : MCS).
 // Threefish 256/512/1024 authenticated stream ciphers
 // CSX256 - P20 and CSX512 - P80 authenticated stream ciphers
 //
@@ -75,7 +75,7 @@
 #include "../Test/TestFiles.h"
 #include "../Test/TestUtils.h"
 #include "../Test/ACPTest.h"
-#include "../Test/ACSTest.h"
+#include "../Test/MCSTest.h"
 #include "../Test/AeadTest.h"
 #include "../Test/AesAvsTest.h"
 #include "../Test/AsymmetricKeyTest.h"
@@ -116,6 +116,7 @@
 #include "../Test/PBKDF2Test.h"
 #include "../Test/Poly1305Test.h"
 #include "../Test/RandomOutputTest.h"
+#include "../Test/RCSTest.h"
 #include "../Test/RDPTest.h"
 #include "../Test/RijndaelTest.h"
 #include "../Test/RingLWETest.h"
@@ -232,9 +233,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7n (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7o (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      March 06, 2019                    *");
+	ConsoleUtils::WriteLine("* Date:      March 14, 2019                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -411,7 +412,7 @@ int main()
 			}
 
 			PrintHeader("Testing the AES software implementation (AES)");
-			RunTest(new AesAvsTest());
+			RunTest(new AesAvsTest(false));
 
 			if (hasAes)
 			{
@@ -420,7 +421,8 @@ int main()
 			}
 
 			PrintHeader("Testing the AES software implementation (RHX)");
-			RunTest(new RijndaelTest());
+			RunTest(new RijndaelTest(false));
+
 			PrintHeader("Testing the Serpent software implementation (SHX)");
 			RunTest(new SerpentTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
@@ -432,8 +434,9 @@ int main()
 			PrintHeader("TESTING CIPHER PADDING MODES");
 			RunTest(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
-			RunTest(new ACSTest());
 			RunTest(new ChaChaTest());
+			RunTest(new MCSTest());
+			RunTest(new RCSTest());
 			RunTest(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
 			RunTest(new CipherStreamTest());

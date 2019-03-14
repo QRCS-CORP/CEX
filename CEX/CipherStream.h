@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
-// Written by John Underhill, January 21, 2015
+// Written by John G. Underhill, January 21, 2015
 // Updated December 9, 2016
 // Updated April 20, 2016
 // Contact: develop@vtdev.com
@@ -121,7 +121,7 @@ using Cipher::SymmetricKeySize;
 /// <item><description>If the system supports Parallel processing, IsParallel() is set to true; passing an output block of at least ParallelBlockSize to the Write function.</description></item>
 /// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
 /// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
+/// <item><description>The ParallelBlockSize(), IsParallel(), and ParallelThreadsMax() accessors, can be changed through the ParallelProfile() property</description></item>
 /// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % .ParallelMinimumSize);</c></description></item>
 /// </list>
 /// </remarks>
@@ -131,15 +131,10 @@ private:
 
 	static const std::string CLASS_NAME;
 
+	class CipherState;
+	std::unique_ptr<CipherState> m_cipherState;
 	std::unique_ptr<ICipherMode> m_cipherEngine;
 	std::unique_ptr<IPadding> m_cipherPadding;
-	bool m_destroyEngine;
-	bool m_isBufferedIO;
-	bool m_isCounterMode;
-	bool m_isDestroyed;
-	bool m_isEncryption;
-	bool m_isInitialized;
-	bool m_isParallel;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 
 public:
@@ -198,7 +193,7 @@ public:
 	/// <para>This value is true if the host supports parallelization.
 	/// If the system and cipher configuration both support parallelization, it can be disabled by setting this value to false.</para>
 	/// </summary>
-	bool IsParallel();
+	bool &IsParallel();
 
 	/// <summary>
 	/// Read Only: The supported key, nonce, and info sizes for the selected cipher configuration
@@ -243,7 +238,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if invalid degree value is used</exception>
 	void ParallelMaxDegree(size_t Degree);
@@ -279,7 +274,6 @@ private:
 	void CalculateProgress(size_t Length, size_t Processed);
 	static ICipherMode* GetCipherMode(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType);
 	static IPadding* GetPaddingMode(PaddingModes PaddingType);
-	void Scope();
 };
 
 NAMESPACE_PROCESSINGEND

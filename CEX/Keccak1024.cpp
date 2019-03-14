@@ -142,7 +142,7 @@ void Keccak1024::Compute(const std::vector<byte> &Input, std::vector<byte> &Outp
 	Finalize(Output, 0);
 }
 
-size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
+size_t Keccak1024::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t OUTLEN = Output.size() - OutOffset;
 

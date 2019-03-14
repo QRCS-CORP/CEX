@@ -12,7 +12,7 @@ ushort McElieceUtils::Diff(ushort X, ushort Y)
 	return static_cast<ushort>(t);
 }
 
-ushort McElieceUtils::Invert(ushort X, const size_t Degree)
+ushort McElieceUtils::Invert(ushort X, size_t Degree)
 {
 	ushort tmpA;
 	ushort tmpB;
@@ -60,7 +60,7 @@ ulong McElieceUtils::MaskLeq64(ushort X, ushort Y)
 	return ret;
 }
 
-ushort McElieceUtils::Multiply(ushort X, ushort Y, const size_t Degree)
+ushort McElieceUtils::Multiply(ushort X, ushort Y, size_t Degree)
 {
 	uint t;
 	uint t0;
@@ -87,7 +87,7 @@ ushort McElieceUtils::Multiply(ushort X, ushort Y, const size_t Degree)
 	return tmp & ((1 << Degree) - 1);
 }
 
-ushort McElieceUtils::Square(ushort X, const size_t Degree)
+ushort McElieceUtils::Square(ushort X, size_t Degree)
 {
 	static const std::array<uint, 4> B =
 	{

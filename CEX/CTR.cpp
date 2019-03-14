@@ -1,6 +1,7 @@
 #include "CTR.h"
 #include "BlockCipherFromName.h"
 #include "IntegerTools.h"
+#include "Intrinsics.h"
 #include "ParallelTools.h"
 
 NAMESPACE_MODE
@@ -155,7 +156,7 @@ void CTR::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt(Input, 0, Output, 0);
 }
 
-void CTR::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void CTR::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
@@ -169,7 +170,7 @@ void CTR::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt(Input, 0, Output, 0);
 }
 
-void CTR::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void CTR::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
@@ -215,7 +216,7 @@ void CTR::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void CTR::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
@@ -249,7 +250,7 @@ void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 //~~~Private Functions~~~//
 
-void CTR::Encrypt(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void CTR::Encrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
@@ -259,7 +260,7 @@ void CTR::Encrypt(const std::vector<byte> &Input, const size_t InOffset, std::ve
 	MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
 }
 
-void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
+void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
 {
 	size_t bctr = 0;
 
@@ -373,15 +374,15 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 
 	if (bctr != Length)
 	{
-		std::vector<byte> outputBlock(BLOCK_SIZE);
-		m_blockCipher->EncryptBlock(Counter, outputBlock);
+		std::vector<byte> otp(BLOCK_SIZE);
+		m_blockCipher->EncryptBlock(Counter, otp);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
-		MemoryTools::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
+		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
 		IntegerTools::BeIncrement8(Counter);
 	}
 }
 
-void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void CTR::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
@@ -393,7 +394,7 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 		// thread level counter
 		std::vector<byte> thdc(m_ctrState->Nonce.size());
 		// offset counter by chunk size / block size  
-		IntegerTools::BeIncrease8(m_ctrState->Nonce, thdc, CTRLEN * i);
+		IntegerTools::BeIncrease8(m_ctrState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
 		// generate random at output offset
 		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdc);
 		// xor with input at offsets
@@ -423,7 +424,7 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 	}
 }
 
-void CTR::ProcessSequential(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void CTR::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	// get block aligned
 	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);

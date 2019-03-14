@@ -544,7 +544,7 @@ IStreamCipher* SymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 		}
 		case SecurityPolicy::SPL256AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX256AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR72K256);
 			break;
 		}
 		case SecurityPolicy::SPL512:
@@ -554,7 +554,7 @@ IStreamCipher* SymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 		}
 		case SecurityPolicy::SPL512AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR96K512);
 			break;
 		}
 		case SecurityPolicy::SPL1024:
@@ -564,12 +564,12 @@ IStreamCipher* SymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 		}
 		case SecurityPolicy::SPL1024AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX1024AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR120K512);
 			break;
 		}
 		default:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSX512AE);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR96K512);
 		}
 	}
 

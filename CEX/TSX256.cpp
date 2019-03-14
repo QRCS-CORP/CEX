@@ -94,7 +94,13 @@ TSX256::~TSX256()
 
 const StreamCiphers TSX256::Enumeral()
 {
-	return StreamCiphers::TSX256;
+	StreamAuthenticators auth;
+	StreamCiphers tmpn;
+
+	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
+	tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::TSX256, auth);
+
+	return tmpn;
 }
 
 const bool TSX256::IsAuthenticator()
@@ -272,7 +278,7 @@ void TSX256::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void TSX256::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
+void TSX256::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (!IsInitialized())
 	{
@@ -287,7 +293,7 @@ void TSX256::SetAssociatedData(const std::vector<byte> &Input, const size_t Offs
 	m_macAuthenticator->Update(Input, Offset, Length);
 }
 
-void TSX256::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void TSX256::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsEncryption())
 	{
@@ -366,7 +372,7 @@ void TSX256::Finalize(std::unique_ptr<TSX256State> &State, std::unique_ptr<IMac>
 	Move(mack, State->MacKey, 0);
 }
 
-void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> &Nonce, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> &Nonce, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	size_t ctr;
 
@@ -476,7 +482,7 @@ void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> 
 	}
 }
 
-void TSX256::Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void TSX256::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t PRCLEN = Length;
 

@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of an HMAC Counter Generator (HCG)
-// Written by John Underhill, November 2, 2016
+// Written by John G. Underhill, November 2, 2016
 // Updated April 18, 2017
 // Updated February 17, 2019
 // Contact: develop@vtdev.com

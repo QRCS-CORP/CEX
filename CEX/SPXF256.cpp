@@ -20,7 +20,7 @@ void SPXF256::AddressToBytes(std::vector<byte> &Output, size_t Offset, const std
 	}
 }
 
-void SPXF256::BaseW(std::vector<int> &Output, size_t OutOffset, const size_t OutLength, const std::vector<byte> &Input)
+void SPXF256::BaseW(std::vector<int> &Output, size_t OutOffset, size_t OutLength, const std::vector<byte> &Input)
 {
 	// base_w algorithm as described in draft
 	// interprets an array of bytes as integers in base w

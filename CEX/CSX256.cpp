@@ -95,7 +95,13 @@ CSX256::~CSX256()
 
 const StreamCiphers CSX256::Enumeral() 
 {
-	return StreamCiphers::CSX256; 
+	StreamAuthenticators auth;
+	StreamCiphers tmpn;
+
+	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
+	tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::CSX256, auth);
+
+	return tmpn;
 }
 
 const bool CSX256::IsAuthenticator()
@@ -264,7 +270,7 @@ void CSX256::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void CSX256::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
+void CSX256::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (!IsInitialized())
 	{

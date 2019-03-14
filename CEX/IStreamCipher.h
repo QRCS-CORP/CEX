@@ -105,18 +105,18 @@ public:
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Read Only: Array of SymmetricKeySize containers, containing legal cipher input key sizes
+	/// Read Only: A vector of SymmetricKeySize containers, containing legal cipher input-key sizes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Read Only: The stream ciphers implementation name
+	/// Read Only: The stream ciphers formal implementation name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.</para>
+	/// <para>This value can be changed through the ParallelProfile class, but must be a multiple of the ParallelMinimumSize().</para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
 
@@ -134,14 +134,14 @@ public:
 	virtual const std::vector<byte> Tag() = 0;
 
 	/// <summary>
-	/// Copy the MAC tag to a secure-vector
+	/// Copies the internal MAC tag to a secure-vector
 	/// </summary>
 	/// 
 	/// <param name="Output">The secure-vector receiving the MAC code</param>
 	virtual const void Tag(SecureVector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Read Only: The legal tag length in bytes
+	/// Read Only: The legal MAC tag length in bytes
 	/// </summary>
 	virtual const size_t TagSize() = 0;
 
@@ -150,8 +150,8 @@ public:
 	/// <summary>
 	/// Initialize the cipher with an ISymmetricKey key container.
 	/// <para>If authentication is enabled, setting the Encryption parameter to false will decrypt and authenticate a ciphertext stream.
-	/// Authentication on a decrypted stream can be performed by manually by comparing output with the the Finalize(Output, Offset, Length) function.
-	/// If encryption and authentication are set to true, the MAC code can be appended to the cipher-text array using the Finalize(Output, Offset, Length) function.</para>
+	/// Authentication on a decrypted stream is performed automatically; failure will throw a CryptoAuthenticationFailure exception.
+	/// If encryption and authentication are set to true, the MAC code is appended to the cipher-text array after each transform call.</para>
 	/// </summary>
 	/// 
 	/// <param name="Parameters">Cipher key container. The LegalKeySizes property contains valid sizes</param>
@@ -163,37 +163,37 @@ public:
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
 	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
-	/// Thread count must be an even number, and not exceed the number of processor [virtual] cores.</para>
+	/// Thread count must be an even number, and not exceed the number of processor virtual cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
-	/// Add additional data to the authentication generator.  
-	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can be called before or after a stream segment has been processed.</para>
+	/// Add additional data to the message authentication code generator.  
+	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can then be called before or after a stream segment has been processed.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of bytes to process</param>
-	/// <param name="Offset">Starting offset within the input array</param>
+	/// <param name="Input">The input vector of bytes to process</param>
+	/// <param name="Offset">The starting offset within the input vector</param>
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if state has been processed</exception>
-	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
+	virtual void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
-	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
+	/// Encrypt/Decrypt a vector of bytes with offset and length parameters.
 	/// <para>Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	/// <param name="Length">Length of data to process</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
+	/// <param name="Input">The input vector of bytes to transform</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Output">The output vector of transformed bytes</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
+	/// <param name="Length">The byte length of data to process</param>
+	virtual void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 };
 
 NAMESPACE_STREAMEND

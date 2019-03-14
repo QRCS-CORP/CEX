@@ -178,7 +178,7 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_CYCLES; i++)
 		{
-			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize()));
+			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize()));
 			dec.clear();
 			enc.clear();
 			pln.clear();
@@ -191,15 +191,15 @@ namespace Test
 			MemoryStream menc;
 			MemoryStream mdec;
 
-			// *** Compare encryption output *** //
+			// compare encryption output
 
-			// streamcipher linear mode
+			// stream linear mode
 			Cipher->ParallelProfile().IsParallel() = false;
 			// memorystream interface
 			Cipher->Initialize(true, kp);
 			Cipher->Write(&mpln, &menc);
 
-			// byte array interface
+			// byte-array interface
 			Cipher->Initialize(true, kp);
 			Cipher->Write(pln, 0, enc, 0);
 
@@ -208,10 +208,10 @@ namespace Test
 				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("Decrypted arrays are not equal! -CM1"));
 			}
 
-			// ***compare decryption output *** //
+			// decrypt in parallel
 
-			// stream interface
-			Cipher->ParallelProfile().IsParallel() = false;
+			// stream interface, parallel mode
+			Cipher->ParallelProfile().IsParallel() = true;
 			menc.Seek(0, IO::SeekOrigin::Begin);
 			Cipher->Initialize(false, kp);
 			Cipher->Write(&menc, &mdec);
@@ -371,8 +371,7 @@ namespace Test
 		// random block sizes with byte arrays
 		for (size_t i = 0; i < 10; i++)
 		{
-			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(cs.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cs.ParallelProfile().ParallelMinimumSize()));
-			const size_t PRLLEN = SMPLEN - (SMPLEN % cs.ParallelProfile().ParallelMinimumSize());
+			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(cs.ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(cs.ParallelProfile().ParallelBlockSize()));
 
 			dec.clear();
 			enc.clear();
@@ -383,7 +382,6 @@ namespace Test
 
 			rng.Generate(pln);
 
-			cs.ParallelProfile().SetBlockSize(PRLLEN);
 			cs.Initialize(true, kp);
 			cs.Write(pln, 0, enc, 0);
 
@@ -399,8 +397,7 @@ namespace Test
 		// random block sizes with stream
 		for (size_t i = 0; i < 10; i++)
 		{
-			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(cs.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cs.ParallelProfile().ParallelMinimumSize()));
-			const size_t PRLLEN = SMPLEN - (SMPLEN % cs.ParallelProfile().ParallelMinimumSize());
+			const uint SMPLEN = rng.NextUInt32(static_cast<uint>(cs.ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(cs.ParallelProfile().ParallelBlockSize()));
 			dec.clear();
 			enc.clear();
 			pln.clear();
@@ -410,7 +407,6 @@ namespace Test
 
 			rng.Generate(pln);
 
-			cs.ParallelProfile().SetBlockSize(PRLLEN);
 			cs.Initialize(true, kp);
 			mpln.Reset();
 			mpln.Write(pln, 0, pln.size());
@@ -467,7 +463,7 @@ namespace Test
 			Cipher->Initialize(false, kp);
 			Cipher->Write(cpt, 0, otp, 0);
 
-			if (otp != inp)
+			if (!IntegerTools::Compare(inp, 0, otp, 0, otp.size()))
 			{
 				throw TestException(std::string("Stress"), Cipher->Name(), std::string("Transformation output is not equal! -TS1"));
 			}

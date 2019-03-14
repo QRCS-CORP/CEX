@@ -19,7 +19,7 @@
 //
 // Implementation Details:
 // An implementation of an Electronic CodeBook Mode (ECB).
-// Written by John Underhill, September 24, 2014
+// Written by John G. Underhill, September 24, 2014
 // Updated September 16, 2016
 // Updated April 18, 2017
 // Updated October 14, 2017
@@ -89,7 +89,7 @@ NAMESPACE_MODE
 /// <item><description>Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
 /// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
 /// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property; parallel processing can be disabled by setting IsParallel() to false in the ParallelProfile() accessor.</description></item>
+/// <item><description>The ParallelBlockSize(), IsParallel(), and ParallelThreadsMax() accessors, can be changed through the ParallelProfile() property; parallel processing can be disabled by setting IsParallel() to false in the ParallelProfile() accessor.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -233,7 +233,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+	void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -255,7 +255,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input vector</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
-	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+	void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the Cipher instance
@@ -273,7 +273,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
@@ -291,7 +291,7 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 private:
 

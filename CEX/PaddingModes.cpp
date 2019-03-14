@@ -11,9 +11,6 @@ std::string PaddingModeConvert::ToName(PaddingModes Enumeral)
 		case PaddingModes::ESP:
 			name = std::string("ESP");
 			break;
-		case PaddingModes::ISO7816:
-			name = std::string("ISO7816");
-			break;
 		case PaddingModes::PKCS7:
 			name = std::string("PKCS7");
 			break;
@@ -38,10 +35,6 @@ PaddingModes PaddingModeConvert::FromName(std::string &Name)
 	if (Name == std::string("ESP"))
 	{
 		tname = PaddingModes::ESP;
-	}
-	else if (Name == std::string("ISO7816"))
-	{
-		tname = PaddingModes::ISO7816;
 	}
 	else if (Name == std::string("PKCS7"))
 	{

@@ -95,7 +95,13 @@ CSX512::~CSX512()
 
 const StreamCiphers CSX512::Enumeral()
 {
-	return StreamCiphers::CSX512;
+	StreamAuthenticators auth;
+	StreamCiphers tmpn;
+
+	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
+	tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::CSX512, auth);
+
+	return tmpn;
 }
 
 const bool CSX512::IsAuthenticator()
@@ -269,7 +275,7 @@ void CSX512::ParallelMaxDegree(size_t Degree)
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void CSX512::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
+void CSX512::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (!IsInitialized())
 	{
@@ -284,7 +290,7 @@ void CSX512::SetAssociatedData(const std::vector<byte> &Input, const size_t Offs
 	m_macAuthenticator->Update(Input, Offset, Length);
 }
 
-void CSX512::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (IsEncryption())
 	{
@@ -363,7 +369,7 @@ void CSX512::Finalize(std::unique_ptr<CSX512State> &State, std::unique_ptr<IMac>
 	Move(mack, State->MacKey, 0);
 }
 
-void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Output, const size_t OutOffset, std::array<uint, 2> &Counter, const size_t Length)
+void CSX512::Generate(std::unique_ptr<CSX512State> &State, std::vector<byte> &Output, size_t OutOffset, std::array<uint, 2> &Counter, size_t Length)
 {
 	size_t ctr;
 
@@ -554,7 +560,7 @@ void CSX512::Load(const SecureVector<byte> &Key, const SecureVector<byte> &Code)
 	m_csx512State->State[7] += IntegerTools::LeBytesTo32(Code, 12);
 }
 
-void CSX512::Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void CSX512::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t PRCLEN = (Length >= Input.size() - InOffset) && Length >= Output.size() - OutOffset ? IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) : Length;
 

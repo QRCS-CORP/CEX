@@ -2,6 +2,7 @@
 #if defined(__AVX__)
 #	include "../CEX/AHX.h"
 #endif
+#include "../CEX/CpuDetect.h"
 #include "../CEX/CTR.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/RHX.h"
@@ -17,6 +18,7 @@ namespace Test
 	const std::string RijndaelTest::CLASSNAME = "RijndaelTest";
 	const std::string RijndaelTest::DESCRIPTION = "NIST AES specification FIPS 197 Known Answer Tests.";
 	const std::string RijndaelTest::SUCCESS = "SUCCESS! AES tests have executed succesfully.";
+	const bool RijndaelTest::HAS_AESNI = HasAESNI();
 
 	//~~~Constructor~~~//
 
@@ -342,7 +344,7 @@ namespace Test
 			IntegerTools::Fill(inp, 0, INPLEN, rnd);
 			SymmetricKey kp(key, iv);
 
-			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
+			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelBlockSize());
 
 			// sequential
 			Cipher->Initialize(true, kp);
@@ -376,8 +378,8 @@ namespace Test
 
 	void RijndaelTest::Stress(ICipherMode* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
-		const uint MAXPRL = 65536;
+		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
@@ -419,6 +421,13 @@ namespace Test
 	}
 
 	//~~~Private Functions~~~//
+
+	bool RijndaelTest::HasAESNI()
+	{
+		CpuDetect dtc;
+
+		return dtc.AESNI() && dtc.AVX();
+	}
 
 	void RijndaelTest::Initialize()
 	{

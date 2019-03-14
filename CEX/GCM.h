@@ -18,7 +18,7 @@
 //
 // Implementation Details:
 // An implementation of an Offset CodeBook authenticated mode (GCM).
-// Written by John Underhill, February 3, 2017
+// Written by John G. Underhill, February 3, 2017
 // Updated April 18, 2017
 // Updated October 14, 2017
 // Contact: develop@vtdev.com
@@ -114,7 +114,7 @@ NAMESPACE_MODE
 /// <item><description>Encryption and decryption can both be pipelined (AVX/AVX2/AVX512), and multi-threaded with any even number of threads up to the processors total [virtual] processing cores.</description></item>
 /// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
 /// <item><description>The recommended parallel input block-size ParallelBlockSize(), is calculated automatically based on the processor(s) L1/L2 cache sizes, the algorithms code-cache requirements, and available memory.</description></item>//, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().
-/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property, this value can be user defined, but must be evenly divisible by ParallelMinimumSize().</description></item>
+/// <item><description>The ParallelBlockSize(), IsParallel(), and ParallelThreadsMax() accessors, can be changed through the ParallelProfile() property, this value can be user defined, but must be evenly divisible by ParallelMinimumSize().</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -298,7 +298,7 @@ public:
 	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Output">The output vector of plain-text bytes</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
-	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+	void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -320,7 +320,7 @@ public:
 	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Output">The output vector of cipher-text bytes</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
-	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+	void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output standard-vector.     
@@ -335,7 +335,7 @@ public:
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+	void Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output vector.
@@ -350,7 +350,7 @@ public:
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	void Finalize(SecureVector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+	void Finalize(SecureVector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the Cipher instance.
@@ -370,7 +370,7 @@ public:
 	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
@@ -386,7 +386,7 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
-	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
+	void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Transform a length of bytes with offset and length parameters. 
@@ -401,7 +401,7 @@ public:
 	/// <param name="Output">The output vector of transformed bytes</param>
 	/// <param name="OutOffset">The starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
+	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Generate the internal MAC code and compare it with the tag contained in the Input standard-vector.   
@@ -419,7 +419,7 @@ public:
 	/// <returns>Returns true if the authentication codes match</returns>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	bool Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
+	bool Verify(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Generate the internal MAC code and compare it with the tag contained in the Input secure-vector.   
@@ -437,13 +437,13 @@ public:
 	/// <returns>Returns true if the authentication codes match</returns>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	bool Verify(const SecureVector<byte> &Input, const size_t Offset, const size_t Length) override;
+	bool Verify(const SecureVector<byte> &Input, size_t Offset, size_t Length) override;
 
 private:
 
 	void Compute();
-	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 };
 
 NAMESPACE_MODEEND

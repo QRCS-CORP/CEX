@@ -106,7 +106,7 @@ public:
 	/// <param name="OutOffset">The starting offset within the Output array</param>
 	/// 
 	/// <returns>Size of Hash value</returns>
-	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) = 0;
+	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -114,7 +114,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;

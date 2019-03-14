@@ -24,6 +24,7 @@ namespace Test
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
+		static const bool HAS_AESNI;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 100;
@@ -108,6 +109,7 @@ namespace Test
 
     private:
 
+		static bool HasAESNI();
 		void Initialize();
 		void OnProgress(const std::string &Data);
     };

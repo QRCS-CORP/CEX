@@ -476,7 +476,7 @@ namespace Test
 			IntegerTools::Fill(inp, 0, INPLEN, rnd);
 			SymmetricKey kp(key, iv);
 
-			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelMinimumSize());
+			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelBlockSize());
 
 			// sequential
 			Cipher->Initialize(true, kp);
@@ -510,7 +510,7 @@ namespace Test
 
 	void SerpentTest::Stress(ICipherMode* Cipher)
 	{
-		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
+		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
 		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];

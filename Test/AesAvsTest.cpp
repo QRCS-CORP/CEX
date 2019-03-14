@@ -12,6 +12,7 @@ namespace Test
 	const std::string AesAvsTest::CLASSNAME = "AesAvsTest";
 	const std::string AesAvsTest::DESCRIPTION = "NIST Advanced Encryption Standard Algorithm Validation Suite (AESAVS) tests.";
 	const std::string AesAvsTest::SUCCESS = "SUCCESS! AESAVS tests have executed succesfully.";
+	const bool AesAvsTest::HAS_AESNI = HasAESNI();
 
 	//~~~Constructor~~~//
 
@@ -245,6 +246,13 @@ namespace Test
 	}
 
 	//~~~Private Functions~~~//
+
+	bool AesAvsTest::HasAESNI()
+	{
+		CpuDetect dtc;
+
+		return dtc.AESNI() && dtc.AVX();
+	}
 
 	void AesAvsTest::OnProgress(const std::string &Data)
 	{

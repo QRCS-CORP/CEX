@@ -269,7 +269,7 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	m_hcgGenerator->Initialize(kp);
 
 	// increment the counter by the code size
-	IntegerTools::BeIncrease8(m_hcgState->Nonce, m_hcgState->Code.size());
+	IntegerTools::BeIncrease8(m_hcgState->Nonce, static_cast<uint>(m_hcgState->Code.size()));
 	// update HMAC with the code and nonce
 	m_hcgGenerator->Update(m_hcgState->Code, 0, m_hcgState->Code.size());
 	m_hcgGenerator->Update(m_hcgState->Nonce, 0, m_hcgState->Nonce.size());
@@ -414,7 +414,7 @@ void HCG::Fill(std::unique_ptr<HMAC> &Generator, std::unique_ptr<HcgState> &Stat
 	// update HMAC with the info string
 	Generator->Update(State->Code, 0, State->Code.size());
 	// increment and update HMAC with the counter
-	IntegerTools::BeIncrease8(State->Nonce, State->Rate);
+	IntegerTools::BeIncrease8(State->Nonce, static_cast<uint>(State->Rate));
 	Generator->Update(State->Nonce, 0, State->Nonce.size());
 	// generate the block
 	Generator->Finalize(State->Buffer, 0);

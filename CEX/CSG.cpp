@@ -406,7 +406,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 				// synchronize the state index
 				m_csgState->Index = i;
 				// increase the customization counter by multiples of the rate
-				IntegerTools::BeIncrease8(tmpc, m_csgState->Rate);
+				IntegerTools::BeIncrease8(tmpc, static_cast<uint>(m_csgState->Rate));
 				// cSHAKE: absorb and permute the customizations, initializing each array of keccak states to unique starting values
 				Customize(tmpc, tmpi, m_csgState);
 				// absorb the key into each state member
@@ -426,7 +426,7 @@ void CSG::Initialize(ISymmetricKey &Parameters)
 			for (i = 0; i < m_csgState->State.size(); ++i)
 			{
 				// increase counter by the byte rate
-				IntegerTools::BeIncrease8(tmpc, m_csgState->Rate);
+				IntegerTools::BeIncrease8(tmpc, static_cast<uint>(m_csgState->Rate));
 				m_csgState->Index = i;
 				Customize(tmpc, tmpi, m_csgState);
 				Absorb(Parameters.Key(), 0, Parameters.KeySizes().KeySize(), m_csgState);

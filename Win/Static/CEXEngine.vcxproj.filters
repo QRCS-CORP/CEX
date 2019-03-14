@@ -816,9 +816,6 @@
     <ClInclude Include="..\..\CEX\MLWEParameters.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\ACS.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SymmetricCiphers.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -955,6 +952,15 @@
       <Filter>Header Files\Cipher\Stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\TSX1024.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RCS.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MCS.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ACS.h">
       <Filter>Header Files\Cipher\Stream</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1268,9 +1274,6 @@
     <ClCompile Include="..\..\CEX\DLMN256Q8380417.cpp">
       <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\ACS.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\SecureMemory.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -1449,6 +1452,15 @@
       <Filter>Source Files\Cipher\Stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\TSX1024.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RCS.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MCS.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ACS.cpp">
       <Filter>Source Files\Cipher\Stream</Filter>
     </ClCompile>
   </ItemGroup>

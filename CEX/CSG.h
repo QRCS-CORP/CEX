@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of a cSHAKE Generator (CSG)
-// Written by John Underhill, February 23, 2018
+// Written by John G. Underhill, February 23, 2018
 // Updated: May 14, 2018
 // Updated: February 9, 2019
 // Contact: develop@vtdev.com

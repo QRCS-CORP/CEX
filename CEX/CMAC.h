@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of a Cipher based Message Authentication Code (CMAC).
-// Written by John Underhill, January 10, 2014
+// Written by John G. Underhill, January 10, 2014
 // Updated December 20, 2016
 // Updated December 23, 2018
 // Updated February 6, 2018

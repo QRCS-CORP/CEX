@@ -165,7 +165,7 @@ void Blake256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 	Finalize(Output, 0);
 }
 
-size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
+size_t Blake256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (m_parallelProfile.IsParallel())
 	{

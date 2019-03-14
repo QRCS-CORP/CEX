@@ -692,22 +692,22 @@ namespace Test
 			Cipher->SetAssociatedData(AssociatedText, 0, AssociatedText.size());
 		}
 		std::vector<byte> tmp(CipherText.size());
-		const size_t dlen = (enc.size() >= 16) ? enc.size() - Cipher->BlockSize() : 0;
-		Cipher->Transform(enc, 0, tmp, 0, dlen);
+		const size_t BLKLEN = (enc.size() >= 16) ? enc.size() - Cipher->BlockSize() : 0;
+		Cipher->Transform(enc, 0, tmp, 0, BLKLEN);
 
 		std::vector<byte> mac(16);
 		Cipher->Finalize(mac, 0, 16);
 
 		// Finalizer can be skipped if Verify called
-		if (!Cipher->Verify(enc, dlen, 16))
+		if (!Cipher->Verify(enc, BLKLEN, 16))
 		{
 			throw TestException(std::string("Kat"), Cipher->Name(), std::string("AeadTest: Tags do not match! -AK2"));
 		}
 
-		std::vector<byte> dec(dlen);
-		if (dlen != 0)
+		std::vector<byte> dec(BLKLEN);
+		if (BLKLEN != 0)
 		{
-			std::memcpy(&dec[0], &tmp[0], dlen);
+			std::memcpy(&dec[0], &tmp[0], BLKLEN);
 		}
 		if (PlainText != dec)
 		{
@@ -784,11 +784,9 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint32_t dlen = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 10), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 2));
-			// important! if manually sizing parallel block, make it evenly divisible by parallel minimum size
-			const size_t PRLBLK = dlen - (dlen % Cipher->ParallelProfile().ParallelMinimumSize());
+			const uint32_t BLKLEN = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize()));
 
-			data.resize(dlen);
+			data.resize(BLKLEN);
 			rng.Generate(data);
 			rng.Generate(nonce);
 			rng.Generate(key);
@@ -796,22 +794,21 @@ namespace Test
 			SymmetricKey kp(key, nonce);
 
 			// parallel encryption mode
-			enc1.resize(dlen + Cipher->MaxTagSize());
+			enc1.resize(BLKLEN + Cipher->MaxTagSize());
 			Cipher->ParallelProfile().IsParallel() = true;
 			// note: changes to parallel block-size must be set before every Initialize() call
-			Cipher->ParallelProfile().SetBlockSize(PRLBLK);
 			Cipher->Initialize(true, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(data, 0, enc1, 0, data.size());
-			Cipher->Finalize(enc1, dlen, Cipher->MaxTagSize());
+			Cipher->Finalize(enc1, BLKLEN, Cipher->MaxTagSize());
 
 			// sequential mode
-			enc2.resize(dlen + Cipher->MaxTagSize());
+			enc2.resize(BLKLEN + Cipher->MaxTagSize());
 			Cipher->ParallelProfile().IsParallel() = false;
 			Cipher->Initialize(true, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(data, 0, enc2, 0, data.size());
-			Cipher->Finalize(enc2, dlen, Cipher->MaxTagSize());
+			Cipher->Finalize(enc2, BLKLEN, Cipher->MaxTagSize());
 
 			if (enc1 != enc2)
 			{
@@ -819,21 +816,20 @@ namespace Test
 			}
 
 			// parallel decryption mode
-			dec1.resize(dlen);
+			dec1.resize(BLKLEN);
 			Cipher->ParallelProfile().IsParallel() = true;
-			Cipher->ParallelProfile().SetBlockSize(PRLBLK);
 			Cipher->Initialize(false, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(enc1, 0, dec1, 0, enc1.size() - Cipher->MaxTagSize());
-			Cipher->Finalize(enc1, dlen, Cipher->MaxTagSize());
+			Cipher->Finalize(enc1, BLKLEN, Cipher->MaxTagSize());
 
 			// sequential decryption mode
-			dec2.resize(dlen);
+			dec2.resize(BLKLEN);
 			Cipher->ParallelProfile().IsParallel() = false;
 			Cipher->Initialize(false, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(enc2, 0, dec2, 0, enc2.size() - Cipher->MaxTagSize());
-			Cipher->Finalize(enc2, dlen, Cipher->MaxTagSize());
+			Cipher->Finalize(enc2, BLKLEN, Cipher->MaxTagSize());
 
 			if (dec1 != dec2)
 			{
@@ -843,7 +839,7 @@ namespace Test
 			{
 				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AP3"));
 			}
-			if (!Cipher->Verify(enc1, dlen, Cipher->MaxTagSize()))
+			if (!Cipher->Verify(enc1, BLKLEN, Cipher->MaxTagSize()))
 			{
 				throw TestException(std::string("Parallel"), Cipher->Name(), std::string("AeadTest: Tags do not match! -AP4"));
 			}
@@ -867,26 +863,26 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			size_t dlen = rng.NextUInt32(10000, 100);
-			data.resize(dlen);
+			const size_t BLKLEN = rng.NextUInt32(10000, 100);
+			data.resize(BLKLEN);
 			rng.Generate(data);
 			rng.Generate(nonce);
 			rng.Generate(key);
 			rng.Generate(assoc);
 			SymmetricKey kp(key, nonce);
 
-			enc.resize(dlen + Cipher->MaxTagSize());
+			enc.resize(BLKLEN + Cipher->MaxTagSize());
 			Cipher->Initialize(true, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(data, 0, enc, 0, data.size());
-			Cipher->Finalize(enc, dlen, Cipher->MaxTagSize());
+			Cipher->Finalize(enc, BLKLEN, Cipher->MaxTagSize());
 
-			dec.resize(dlen);
+			dec.resize(BLKLEN);
 			Cipher->Initialize(false, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
 			Cipher->Transform(enc, 0, dec, 0, enc.size() - Cipher->MaxTagSize());
 
-			if (!Cipher->Verify(enc, dlen, Cipher->MaxTagSize()))
+			if (!Cipher->Verify(enc, BLKLEN, Cipher->MaxTagSize()))
 			{
 				throw TestException(std::string("Stress"), Cipher->Name(), std::string("AeadTest: Tags do not match! -AS1"));
 			}

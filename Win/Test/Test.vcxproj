@@ -295,7 +295,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Test\ACPTest.h" />
-    <ClInclude Include="..\..\Test\ACSTest.h" />
+    <ClInclude Include="..\..\Test\MCSTest.h" />
     <ClInclude Include="..\..\Test\AeadTest.h" />
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\AsymmetricKeyTest.h" />
@@ -307,6 +307,7 @@
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\HCRTest.h" />
     <ClInclude Include="..\..\Test\RandomUtils.h" />
+    <ClInclude Include="..\..\Test\RCSTest.h" />
     <ClInclude Include="..\..\Test\RDPTest.h" />
     <ClInclude Include="..\..\Test\RijndaelTest.h" />
     <ClInclude Include="..\..\Test\AsymmetricSpeedTest.h" />
@@ -363,7 +364,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\ACPTest.cpp" />
-    <ClCompile Include="..\..\Test\ACSTest.cpp" />
+    <ClCompile Include="..\..\Test\MCSTest.cpp" />
     <ClCompile Include="..\..\Test\AeadTest.cpp" />
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\AsymmetricKeyTest.cpp" />
@@ -375,6 +376,7 @@
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
     <ClCompile Include="..\..\Test\HCRTest.cpp" />
     <ClCompile Include="..\..\Test\RandomUtils.cpp" />
+    <ClCompile Include="..\..\Test\RCSTest.cpp" />
     <ClCompile Include="..\..\Test\RDPTest.cpp" />
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
     <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp" />

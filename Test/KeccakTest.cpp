@@ -463,8 +463,8 @@ namespace Test
 
 	void KeccakTest::Stress(IDigest* Digest)
 	{
-		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelMinimumSize());
-		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
+		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
+		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize() * 4);
 
 		std::vector<byte> code1(Digest->DigestSize());
 		std::vector<byte> code2(Digest->DigestSize());

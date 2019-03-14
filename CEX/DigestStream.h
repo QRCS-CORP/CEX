@@ -17,7 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
-// Written by John Underhill, January 21, 2015
+// Written by John G. Underhill, January 21, 2015
 // Updated April 21, 2016
 // Contact: develop@vtdev.com
 
@@ -26,15 +26,13 @@
 
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"
-#include "DigestFromName.h"
 #include "Event.h"
 #include "IByteStream.h"
-#include "ParallelOptions.h"
+#include "IDigest.h"
 
 NAMESPACE_PROCESSING
 
 using Exception::CryptoProcessingException;
-using Helper::DigestFromName;
 using Enumeration::Digests;
 using Routing::Event;
 using IO::IByteStream;
@@ -42,25 +40,24 @@ using Digest::IDigest;
 
 /// <summary>
 /// Digest stream helper class.
-/// <para>Wraps Message Digest stream functions in an easy to use interface.</para>
+/// <para>Wraps a message digest stream function in an easy to use interface.</para>
 /// </summary> 
 /// 
 /// <example>
 /// <description>Example of hashing a stream:</description>
 /// <code>
-/// SHA512* eng = new SHA512();
-/// StreamDigest sdgt(eng);
+/// // create the instance
+/// StreamDigest sdgt(Digests::SHA256);
 /// // get the hash code
 /// hash = sdgt.Compute(Input);
-/// delete eng;
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Uses any of the implemented Digests using either the IDigest interface, or a Digests enumeration member.</description></item>
-/// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either of the Compute() calls.</description></item>
+/// <item><description>Uses any of the implemented Digests using either the IDigest interface, or a Digests enumeration type.</description></item>
+/// <item><description>This implementation has a Progress counter that returns total sum of bytes processed per either of the Compute() calls.</description></item>
 /// </list>
 /// </remarks>
 class DigestStream
@@ -69,11 +66,9 @@ private:
 
 	static const std::string CLASS_NAME;
 
+	class DigestStreamState;
+	std::unique_ptr<DigestStreamState> m_streamState;
 	std::unique_ptr<IDigest> m_digestEngine;
-	bool m_destroyEngine;
-	bool m_isDestroyed = false;
-	bool m_isParallel;
-	size_t m_progressInterval;
 
 public:
 
@@ -100,10 +95,10 @@ public:
 	DigestStream() = delete;
 
 	/// <summary>
-	/// Initialize the class with a digest enumeration
+	/// Initialize the class with a digest enumeration type name
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The digest enumeration member</param>
+	/// <param name="DigestType">The digest enumeration type</param>
 	/// <param name="Parallel">Instantiates the multi-threaded implementation of the digest</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are passed</exception>
@@ -127,23 +122,21 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: Automatic processor parallelization capable.
+	/// Read Only: Automatic processor parallelization capable.
 	/// <para>This value is true if the host supports parallelization.
-	/// If the system and digest configuration both support parallelization, it can be disabled by setting this value to false.</para>
+	/// If the system and digest configuration both support parallelization, it can be disabled by setting the IsParallel value in ParallelProfile to false.</para>
 	/// </summary>
 	bool IsParallel();
 
 	/// <summary>
-	/// Read/Write: Parallel block size. Must be a multiple of ParallelProfile().ParallelMinimumSize()
+	/// Read Only: Parallel block size; the minimum input size that triggers parallel processing.
 	/// </summary>
 	size_t ParallelBlockSize();
 
 	/// <summary>
 	/// Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
-	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
-	/// and reinitialize the state.</para>
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.</para>
 	/// </summary>
 	ParallelOptions &ParallelProfile();
 
@@ -175,7 +168,6 @@ private:
 	void CalculateProgress(size_t Length, size_t Processed);
 	std::vector<byte> Process(IByteStream* InStream, size_t Length);
 	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
-	void Destroy();
 };
 
 NAMESPACE_PROCESSINGEND

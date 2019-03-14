@@ -1,5 +1,5 @@
-#ifndef CEXTEST_ACSTEST_H
-#define CEXTEST_ACSTEST_H
+#ifndef CEXTEST_MCSTEST_H
+#define CEXTEST_MCSTEST_H
 
 #include "ITest.h"
 #include "../CEX/IStreamCipher.h"
@@ -9,7 +9,7 @@ namespace Test
 	using Cipher::Stream::IStreamCipher;
 
 	/// <summary>
-	/// The ACS implementation KAT, monte carlo, stress, permutation, parallelization, authentication, and exception handling tests
+	/// The MCS implementation KAT, monte carlo, stress, permutation, parallelization, authentication, and exception handling tests
 	/// </summary>
 	/// 
 	/// <remarks>
@@ -21,7 +21,7 @@ namespace Test
 	/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition>.</description></item>
 	/// </list>
 	/// </remarks>
-	class ACSTest final : public ITest
+	class MCSTest final : public ITest
 	{
 	private:
 
@@ -30,7 +30,7 @@ namespace Test
 		static const std::string SUCCESS;
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t MONTE_CYCLES = 10000;
-		static const size_t TEST_CYCLES = 100;
+		static const size_t TEST_CYCLES = 10;
 
 		std::vector<std::vector<byte>> m_code;
 		std::vector<std::vector<byte>> m_expected;
@@ -45,14 +45,14 @@ namespace Test
 		//~~~Constructor~~~//
 
 		/// <summary>
-		/// Original known answer tests for the 256, 512, and 1024 bit versions of ACS
+		/// Original known answer tests for the 256, 512, and 1024 bit versions of MCS
 		/// </summary>
-		ACSTest();
+		MCSTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~ACSTest();
+		~MCSTest();
 
 		//~~~Accessors~~~//
 

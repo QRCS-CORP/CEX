@@ -44,50 +44,149 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 		case SymmetricCiphers::SHXS1024:
 			name = std::string("SHXS1024");
 			break;
-		case SymmetricCiphers::ACS256H:
-			name = std::string("ACS256H");
-			break;
-		case SymmetricCiphers::ACS512H:
-			name = std::string("ACS512H");
-			break;
-		case SymmetricCiphers::ACS256S:
-			name = std::string("ACS256S");
-			break;
-		case SymmetricCiphers::ACS512S:
-			name = std::string("ACS512S");
-			break;
-		case SymmetricCiphers::ACS:
-			name = std::string("ACS");
-			break;
 		case SymmetricCiphers::CSX256:
 			name = std::string("CSX256");
 			break;
-		case SymmetricCiphers::CSX256AE:
-			name = std::string("CSX256AE");
+		case SymmetricCiphers::CSXR20H256:
+			name = std::string("CSXR20H256");
+			break;
+		case SymmetricCiphers::CSXR20H512:
+			name = std::string("CSXR20H512");
+			break;
+		case SymmetricCiphers::CSXR20K256:
+			name = std::string("CSXR20K256");
+			break;
+		case SymmetricCiphers::CSXR20K512:
+			name = std::string("CSXR20K512");
+			break;
+		case SymmetricCiphers::CSXR20P256:
+			name = std::string("CSXR20P256");
 			break;
 		case SymmetricCiphers::CSX512:
 			name = std::string("CSX512");
 			break;
-		case SymmetricCiphers::CSX512AE:
-			name = std::string("CSX512AE");
+		case SymmetricCiphers::CSXR80H256:
+			name = std::string("CSXR80H256");
+			break;
+		case SymmetricCiphers::CSXR80H512:
+			name = std::string("CSXR80H512");
+			break;
+		case SymmetricCiphers::CSXR80K256:
+			name = std::string("CSXR80K256");
+			break;
+		case SymmetricCiphers::CSXR80K512:
+			name = std::string("CSXR80K512");
+			break;
+		case SymmetricCiphers::CSXR80P256:
+			name = std::string("CSXR80P256");
+			break;
+		case SymmetricCiphers::MCSRH256:
+			name = std::string("MCSRH256");
+			break;
+		case SymmetricCiphers::MCSRH512:
+			name = std::string("MCSRH512");
+			break;
+		case SymmetricCiphers::MCSRK256:
+			name = std::string("MCSRK256");
+			break;
+		case SymmetricCiphers::MCSRK512:
+			name = std::string("MCSRK512");
+			break;
+		case SymmetricCiphers::MCSRP256:
+			name = std::string("MCSRP256");
+			break;
+		case SymmetricCiphers::MCSSH256:
+			name = std::string("MCSSH256");
+			break;
+		case SymmetricCiphers::MCSSH512:
+			name = std::string("MCSSH512");
+			break;
+		case SymmetricCiphers::MCSSK256:
+			name = std::string("MCSSK256");
+			break;
+		case SymmetricCiphers::MCSSK512:
+			name = std::string("MCSSK512");
+			break;
+		case SymmetricCiphers::MCSSP256:
+			name = std::string("MCSSP256");
+			break;
+		case SymmetricCiphers::MCSR:
+			name = std::string("MCSR");
+			break;
+		case SymmetricCiphers::RCS:
+			name = std::string("RCS");
+			break;
+		case SymmetricCiphers::RCSH256:
+			name = std::string("RCSH256");
+			break;
+		case SymmetricCiphers::RCSH512:
+			name = std::string("RCSH512");
+			break;
+		case SymmetricCiphers::RCSK256:
+			name = std::string("RCSK256");
+			break;
+		case SymmetricCiphers::RCSK512:
+			name = std::string("RCSK512");
+			break;
+		case SymmetricCiphers::RCSK1024:
+			name = std::string("RCSK1024");
+			break;
+		case SymmetricCiphers::RCSP256:
+			name = std::string("RCSP256");
 			break;
 		case SymmetricCiphers::TSX256:
 			name = std::string("TSX256");
 			break;
-		case SymmetricCiphers::TSX256AE:
-			name = std::string("TSX256AE");
+		case SymmetricCiphers::TSXR72H256:
+			name = std::string("TSXR72H256");
+			break;
+		case SymmetricCiphers::TSXR72H512:
+			name = std::string("TSXR72H512");
+			break;
+		case SymmetricCiphers::TSXR72K256:
+			name = std::string("TSXR72K256");
+			break;
+		case SymmetricCiphers::TSXR72K512:
+			name = std::string("TSXR72K512");
+			break;
+		case SymmetricCiphers::TSXR72P256:
+			name = std::string("TSXR72P256");
 			break;
 		case SymmetricCiphers::TSX512:
 			name = std::string("TSX512");
 			break;
-		case SymmetricCiphers::TSX512AE:
-			name = std::string("TSX512AE");
+		case SymmetricCiphers::TSXR96H256:
+			name = std::string("TSXR96H256");
+			break;
+		case SymmetricCiphers::TSXR96H512:
+			name = std::string("TSXR96H512");
+			break;
+		case SymmetricCiphers::TSXR96K256:
+			name = std::string("TSXR96K256");
+			break;
+		case SymmetricCiphers::TSXR96P256:
+			name = std::string("TSXR96P256");
 			break;
 		case SymmetricCiphers::TSX1024:
 			name = std::string("TSX1024");
 			break;
-		case SymmetricCiphers::TSX1024AE:
-			name = std::string("TSX1024AE");
+		case SymmetricCiphers::TSXR120H256:
+			name = std::string("TSXR120H256");
+			break;
+		case SymmetricCiphers::TSXR120H512:
+			name = std::string("TSXR120H512");
+			break;
+		case SymmetricCiphers::TSXR120K256:
+			name = std::string("TSXR120K256");
+			break;
+		case SymmetricCiphers::TSXR120K512:
+			name = std::string("TSXR120K512");
+			break;
+		case SymmetricCiphers::TSXR120K1024:
+			name = std::string("TSXR120K1024");
+			break;
+		case SymmetricCiphers::TSXR120P256:
+			name = std::string("TSXR120P256");
 			break;
 		default:
 			name = std::string("None");
@@ -161,65 +260,201 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	{
 		tname = SymmetricCiphers::SHXS1024;
 	}
-	else if (Name == std::string("ACS256H"))
-	{
-		tname = SymmetricCiphers::ACS256H;
-	}
-	else if (Name == std::string("ACS512H"))
-	{
-		tname = SymmetricCiphers::ACS512H;
-	}
-	else if (Name == std::string("ACS256S"))
-	{
-		tname = SymmetricCiphers::ACS256S;
-	}
-	else if (Name == std::string("ACS512S"))
-	{
-		tname = SymmetricCiphers::ACS512S;
-	}
-	else if (Name == std::string("ACS"))
-	{
-		tname = SymmetricCiphers::ACS;
-	}
 	else if (Name == std::string("CSX256"))
 	{
 		tname = SymmetricCiphers::CSX256;
 	}
-	else if (Name == std::string("CSX256AE"))
+	else if (Name == std::string("CSXR20H256"))
 	{
-		tname = SymmetricCiphers::CSX256AE;
+		tname = SymmetricCiphers::CSXR20H256;
+	}
+	else if (Name == std::string("CSXR20H512"))
+	{
+		tname = SymmetricCiphers::CSXR20H512;
+	}
+	else if (Name == std::string("CSXR20K256"))
+	{
+		tname = SymmetricCiphers::CSXR20K256;
+	}
+	else if (Name == std::string("CSXR20K512"))
+	{
+		tname = SymmetricCiphers::CSXR20K512;
+	}
+	else if (Name == std::string("CSXR20P256"))
+	{
+		tname = SymmetricCiphers::CSXR20P256;
 	}
 	else if (Name == std::string("CSX512"))
 	{
 		tname = SymmetricCiphers::CSX512;
 	}
-	else if (Name == std::string("CSX512AE"))
+	else if (Name == std::string("CSXR80H256"))
 	{
-		tname = SymmetricCiphers::CSX512AE;
+		tname = SymmetricCiphers::CSXR80H256;
+	}
+	else if (Name == std::string("CSXR80H512"))
+	{
+		tname = SymmetricCiphers::CSXR80H512;
+	}
+	else if (Name == std::string("CSXR80K256"))
+	{
+		tname = SymmetricCiphers::CSXR80K256;
+	}
+	else if (Name == std::string("CSXR80K512"))
+	{
+		tname = SymmetricCiphers::CSXR80K512;
+	}
+	else if (Name == std::string("CSXR80P256"))
+	{
+		tname = SymmetricCiphers::CSXR80P256;
+	}
+	else if (Name == std::string("MCSRH256"))
+	{
+		tname = SymmetricCiphers::MCSRH256;
+	}
+	else if (Name == std::string("MCSRH512"))
+	{
+		tname = SymmetricCiphers::MCSRH512;
+	}
+	else if (Name == std::string("MCSRK256"))
+	{
+		tname = SymmetricCiphers::MCSRK256;
+	}
+	else if (Name == std::string("MCSRK512"))
+	{
+		tname = SymmetricCiphers::MCSRK512;
+	}
+	else if (Name == std::string("MCSRP256"))
+	{
+		tname = SymmetricCiphers::MCSRP256;
+	}
+	else if (Name == std::string("MCSSH256"))
+	{
+		tname = SymmetricCiphers::MCSSH256;
+	}
+	else if (Name == std::string("MCSSH512"))
+	{
+		tname = SymmetricCiphers::MCSSH512;
+	}
+	else if (Name == std::string("MCSSK256"))
+	{
+		tname = SymmetricCiphers::MCSSK256;
+	}
+	else if (Name == std::string("MCSSK512"))
+	{
+		tname = SymmetricCiphers::MCSSK512;
+	}
+	else if (Name == std::string("MCSSP256"))
+	{
+		tname = SymmetricCiphers::MCSSP256;
+	}
+	else if (Name == std::string("MCSR"))
+	{
+		tname = SymmetricCiphers::MCSR;
+	}
+	else if (Name == std::string("RCS"))
+	{
+		tname = SymmetricCiphers::RCS;
+	}
+	else if (Name == std::string("RCSH256"))
+	{
+		tname = SymmetricCiphers::RCSH256;
+	}
+	else if (Name == std::string("RCSH512"))
+	{
+		tname = SymmetricCiphers::RCSH512;
+	}
+	else if (Name == std::string("RCSK256"))
+	{
+		tname = SymmetricCiphers::RCSK256;
+	}
+	else if (Name == std::string("RCSK512"))
+	{
+		tname = SymmetricCiphers::RCSK512;
+	}
+	else if (Name == std::string("RCSK1024"))
+	{
+		tname = SymmetricCiphers::RCSK1024;
+	}
+	else if (Name == std::string("RCSP256"))
+	{
+		tname = SymmetricCiphers::RCSP256;
 	}
 	else if (Name == std::string("TSX256"))
 	{
 		tname = SymmetricCiphers::TSX256;
 	}
-	else if (Name == std::string("TSX256AE"))
+	else if (Name == std::string("TSXR72H256"))
 	{
-		tname = SymmetricCiphers::TSX256AE;
+		tname = SymmetricCiphers::TSXR72H256;
 	}
-	else if (Name == std::string("TSX512"))
+	else if (Name == std::string("TSXR72H512"))
+	{
+		tname = SymmetricCiphers::TSXR72H512;
+	}
+	else if (Name == std::string("TSXR72K256"))
+	{
+		tname = SymmetricCiphers::TSXR72K256;
+	}
+	else if (Name == std::string("TSXR72K512"))
+	{
+		tname = SymmetricCiphers::TSXR72P256;
+	}
+	else if (Name == std::string("TSXR72P256"))
 	{
 		tname = SymmetricCiphers::TSX512;
 	}
-	else if (Name == std::string("TSX512AE"))
+	else if (Name == std::string("TSX512"))
 	{
-		tname = SymmetricCiphers::TSX512AE;
+		tname = SymmetricCiphers::TSXR96H256;
+	}
+	else if (Name == std::string("TSXR96H256"))
+	{
+		tname = SymmetricCiphers::TSXR96H512;
+	}
+	else if (Name == std::string("TSXR96H512"))
+	{
+		tname = SymmetricCiphers::TSXR96K256;
+	}
+	else if (Name == std::string("TSXR96K256"))
+	{
+		tname = SymmetricCiphers::TSXR96K512;
+	}
+	else if (Name == std::string("TSXR96K512"))
+	{
+		tname = SymmetricCiphers::TSXR96K512;
+	}
+	else if (Name == std::string("TSXR96P256"))
+	{
+		tname = SymmetricCiphers::TSXR96P256;
 	}
 	else if (Name == std::string("TSX1024"))
 	{
 		tname = SymmetricCiphers::TSX1024;
 	}
-	else if (Name == std::string("TSX1024AE"))
+	else if (Name == std::string("TSXR120H256"))
 	{
-		tname = SymmetricCiphers::TSX1024AE;
+		tname = SymmetricCiphers::TSXR120H256;
+	}
+	else if (Name == std::string("TSXR120H512"))
+	{
+		tname = SymmetricCiphers::TSXR120H512;
+	}
+	else if (Name == std::string("TSXR120K256"))
+	{
+		tname = SymmetricCiphers::TSXR120K256;
+	}
+	else if (Name == std::string("TSXR120K512"))
+	{
+		tname = SymmetricCiphers::TSXR120K512;
+	}
+	else if (Name == std::string("TSXR120K1024"))
+	{
+		tname = SymmetricCiphers::TSXR120K1024;
+	}
+	else if (Name == std::string("TSXR120P256"))
+	{
+		tname = SymmetricCiphers::TSXR120P256;
 	}
 	else
 	{
@@ -228,6 +463,5 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 
 	return tname;
 }
-
 
 NAMESPACE_ENUMERATIONEND

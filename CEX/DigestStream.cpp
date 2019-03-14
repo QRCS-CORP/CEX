@@ -1,38 +1,72 @@
 #include "DigestStream.h"
+#include "DigestFromName.h"
+#include "ParallelOptions.h"
 
 NAMESPACE_PROCESSING
 
+using Helper::DigestFromName;
 using Exception::ErrorCodes;
 
-const std::string DigestStream::CLASS_NAME("MacStream");
+const std::string DigestStream::CLASS_NAME("DigestStream");
+
+class DigestStream::DigestStreamState
+{
+public:
+
+	size_t Interval;
+	bool Destroy;
+	bool Parallel;
+
+	DigestStreamState(bool Destroyed, bool IsParallel)
+		:
+		Interval(0),
+		Destroy(Destroyed),
+		Parallel(IsParallel)
+	{
+	}
+
+	~DigestStreamState()
+	{
+		Interval = 0;
+		Destroy = false;
+		Parallel = false;
+	}
+};
 
 //~~~Constructor~~~//
 
 DigestStream::DigestStream(Digests DigestType, bool Parallel)
 	:
+	m_streamState(new DigestStreamState(true, Parallel)),
 	m_digestEngine(DigestType != Digests::None ? DigestFromName::GetInstance(DigestType, Parallel) :
-		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_isParallel(Parallel),
-	m_progressInterval(0)
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation))
 {
 }
 
 DigestStream::DigestStream(IDigest* Digest)
 	:
+	m_streamState(new DigestStreamState(true, Digest != nullptr ? Digest->IsParallel() : false)),
 	m_digestEngine(Digest != nullptr ? Digest :
-		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest can not be null!"), ErrorCodes::IllegalOperation)),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isParallel(m_digestEngine->IsParallel()),
-	m_progressInterval(0)
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest can not be null!"), ErrorCodes::IllegalOperation))
 {
 }
 
 DigestStream::~DigestStream()
 {
-	Destroy();
+	if (m_streamState->Destroy)
+	{
+		if (m_digestEngine != nullptr)
+		{
+			m_digestEngine.reset(nullptr);
+		}
+	}
+	else
+	{
+		if (m_digestEngine != nullptr)
+		{
+			m_digestEngine.release();
+		}
+	}
 }
 
 //~~~Accessors~~~//
@@ -59,11 +93,11 @@ std::vector<byte> DigestStream::Compute(IByteStream* InStream)
 	CEXASSERT(InStream->Length() - InStream->Position() > 0, "The input stream is too short");
 	CEXASSERT(InStream->CanRead(), "The input stream is set to write only!");
 
-	size_t dataLen = InStream->Length() - InStream->Position();
-	CalculateInterval(dataLen);
+	size_t plen = InStream->Length() - InStream->Position();
+	CalculateInterval(plen);
 	m_digestEngine->Reset();
 
-	return Process(InStream, dataLen);
+	return Process(InStream, plen);
 }
 
 std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
@@ -80,75 +114,54 @@ std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t I
 
 void DigestStream::CalculateInterval(size_t Length)
 {
-	size_t interval;
+	size_t itv;
 
-	interval = Length / 100;
+	itv = Length / 100;
 
-	if (interval < m_digestEngine->BlockSize())
+	if (itv < m_digestEngine->BlockSize())
 	{
-		m_progressInterval = m_digestEngine->BlockSize();
+		m_streamState->Interval = m_digestEngine->BlockSize();
 	}
 	else
 	{
-		m_progressInterval = (interval - (interval % m_digestEngine->BlockSize()));
+		m_streamState->Interval = (itv - (itv % m_digestEngine->BlockSize()));
 	}
 
-	if (m_progressInterval == 0)
+	if (m_streamState->Interval == 0)
 	{
-		m_progressInterval = m_digestEngine->BlockSize();
+		m_streamState->Interval = m_digestEngine->BlockSize();
 	}
 }
 
 void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 {
+	double prg;
+	size_t blk;
+
 	if (Length >= Processed)
 	{
-		double progress = 100.0 * (static_cast<double>(Processed) / Length);
-		if (progress > 100.0)
+		prg = 100.0 * (static_cast<double>(Processed) / Length);
+
+		if (prg > 100.0)
 		{
-			progress = 100.0;
+			prg = 100.0;
 		}
 
-		if (m_isParallel)
+		if (m_streamState->Parallel)
 		{
-			ProgressPercent(static_cast<int>(progress));
-		}
-		else
-		{
-			size_t block = Length / 100;
-			if (block == 0)
-			{
-				ProgressPercent(static_cast<int>(progress));
-			}
-			else if (Processed % block == 0)
-			{
-				ProgressPercent(static_cast<int>(progress));
-			}
-		}
-	}
-}
-
-void DigestStream::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_progressInterval = 0;
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_digestEngine != nullptr)
-			{
-				m_digestEngine.reset(nullptr);
-			}
+			ProgressPercent(static_cast<int>(prg));
 		}
 		else
 		{
-			if (m_digestEngine != nullptr)
+			blk = Length / 100;
+
+			if (blk == 0)
 			{
-				m_digestEngine.release();
+				ProgressPercent(static_cast<int>(prg));
+			}
+			else if (Processed % blk == 0)
+			{
+				ProgressPercent(static_cast<int>(prg));
 			}
 		}
 	}
@@ -158,107 +171,110 @@ std::vector<byte> DigestStream::Process(IByteStream* InStream, size_t Length)
 {
 	const size_t BLKLEN = m_digestEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
-	size_t prcLen;
-	size_t prcRead;
-	std::vector<byte> inpBuffer(0);
+	size_t plen;
+	size_t pread;
+	std::vector<byte> inp;
+	std::vector<byte> tmph;
 
-	prcLen = 0;
-	prcRead = 0;
+	plen = 0;
+	pread = 0;
 
-	if (m_isParallel)
+	if (m_streamState->Parallel)
 	{
 		const size_t PRLBLK = m_digestEngine->ParallelBlockSize();
+
 		if (Length > PRLBLK)
 		{
 			const size_t PRCLEN = (Length / PRLBLK) * PRLBLK;
-			inpBuffer.resize(PRLBLK);
+			inp.resize(PRLBLK);
 
-			while (prcLen != PRCLEN)
+			while (plen != PRCLEN)
 			{
-				prcRead = InStream->Read(inpBuffer, 0, PRLBLK);
-				m_digestEngine->Update(inpBuffer, 0, prcRead);
-				prcLen += prcRead;
+				pread = InStream->Read(inp, 0, PRLBLK);
+				m_digestEngine->Update(inp, 0, pread);
+				plen += pread;
 				CalculateProgress(Length, InStream->Position());
 			}
 		}
 	}
 
-	inpBuffer.resize(BLKLEN);
+	inp.resize(BLKLEN);
 
-	while (prcLen != ALNLEN)
+	while (plen != ALNLEN)
 	{
-		prcRead = InStream->Read(inpBuffer, 0, BLKLEN);
-		m_digestEngine->Update(inpBuffer, 0, prcRead);
-		prcLen += prcRead;
+		pread = InStream->Read(inp, 0, BLKLEN);
+		m_digestEngine->Update(inp, 0, pread);
+		plen += pread;
 		CalculateProgress(Length, InStream->Position());
 	}
 
 	// last block
-	if (prcLen < Length)
+	if (plen < Length)
 	{
-		const size_t FNLLEN = Length - prcLen;
-		inpBuffer.resize(FNLLEN);
-		prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
-		m_digestEngine->Update(inpBuffer, 0, prcRead);
-		prcLen += prcRead;
+		const size_t RMDLEN = Length - plen;
+		inp.resize(RMDLEN);
+		pread = InStream->Read(inp, 0, RMDLEN);
+		m_digestEngine->Update(inp, 0, pread);
+		plen += pread;
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(m_digestEngine->DigestSize());
-	m_digestEngine->Finalize(chkSum, 0);
-	CalculateProgress(Length, prcLen);
+	tmph.resize(m_digestEngine->DigestSize());
+	m_digestEngine->Finalize(tmph, 0);
+	CalculateProgress(Length, plen);
 
-	return chkSum;
+	return tmph;
 }
 
 std::vector<byte> DigestStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	const size_t BLKLEN = m_digestEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
+	std::vector<byte> tmph;
+	size_t plen;
 
-	size_t prcLen;
+	plen = 0;
 
-	prcLen = 0;
-
-	if (m_isParallel)
+	if (m_streamState->Parallel)
 	{
 		const size_t PRLBLK = m_digestEngine->ParallelBlockSize();
+
 		if (Length > PRLBLK)
 		{
 			const size_t PRCLEN = (Length / PRLBLK) * PRLBLK;
 
-			while (prcLen != PRCLEN)
+			while (plen != PRCLEN)
 			{
 				m_digestEngine->Update(Input, InOffset, PRLBLK);
 				InOffset += PRLBLK;
-				prcLen += PRLBLK;
+				plen += PRLBLK;
 				CalculateProgress(Length, InOffset);
 			}
 		}
 	}
 
-	while (prcLen != ALNLEN)
+	while (plen != ALNLEN)
 	{
 		m_digestEngine->Update(Input, InOffset, BLKLEN);
 		InOffset += BLKLEN;
-		prcLen += BLKLEN;
+		plen += BLKLEN;
 		CalculateProgress(Length, InOffset);
 	}
 
 	// last block
-	if (prcLen != Length)
+	if (plen != Length)
 	{
-		const size_t FNLLEN = Length - prcLen;
-		m_digestEngine->Update(Input, InOffset, FNLLEN);
-		prcLen += FNLLEN;
+		const size_t RMDLEN = Length - plen;
+		m_digestEngine->Update(Input, InOffset, RMDLEN);
+		plen += RMDLEN;
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(m_digestEngine->DigestSize());
-	m_digestEngine->Finalize(chkSum, 0);
-	CalculateProgress(Length, prcLen);
+	tmph.resize(m_digestEngine->DigestSize());
+	m_digestEngine->Finalize(tmph, 0);
+	CalculateProgress(Length, plen);
 
-	return chkSum;
+	return tmph;
 }
 
 NAMESPACE_PROCESSINGEND

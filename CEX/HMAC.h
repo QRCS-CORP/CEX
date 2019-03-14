@@ -19,7 +19,7 @@
 // 
 // Implementation Details:
 // An implementation of a keyed hash function wrapper; Hash based Message Authentication Code (HMAC).
-// Written by John Underhill, September 24, 2014
+// Written by John G. Underhill, September 24, 2014
 // Updated October 3, 2016
 // Updated February 6, 2018
 // Contact: develop@vtdev.com
@@ -232,7 +232,7 @@ public:
 	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
 	///
-	/// <param name="Degree">The desired number of threads to allocate</param>
+	/// <param name="Degree">The number of threads to allocate</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);

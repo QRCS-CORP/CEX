@@ -108,7 +108,7 @@ public:
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	virtual void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
+	virtual void Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output secure-vector.     
@@ -123,7 +123,7 @@ public:
 	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	virtual void Finalize(SecureVector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
+	virtual void Finalize(SecureVector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Add additional data to the nessage authentication code generator.  
@@ -136,7 +136,7 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
-	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
+	virtual void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Generate the internal MAC code and compare it with the tag contained in the Input standard-vector.   
@@ -154,7 +154,7 @@ public:
 	/// <returns>Returns true if the authentication codes match</returns>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	virtual bool Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
+	virtual bool Verify(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Generate the internal MAC code and compare it with the tag contained in the Input secure-vector.   
@@ -172,7 +172,7 @@ public:
 	/// <returns>Returns true if the authentication codes match</returns>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	virtual bool Verify(const SecureVector<byte> &Input, const size_t Offset, const size_t Length) = 0;
+	virtual bool Verify(const SecureVector<byte> &Input, size_t Offset, size_t Length) = 0;
 };
 
 NAMESPACE_MODEEND

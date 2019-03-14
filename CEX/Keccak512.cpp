@@ -142,7 +142,7 @@ void Keccak512::Compute(const std::vector<byte> &Input, std::vector<byte> &Outpu
 	Finalize(Output, 0);
 }
 
-size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
+size_t Keccak512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
 
