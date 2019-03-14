@@ -30,9 +30,7 @@
 
 #include "IStreamCipher.h"
 #include "BlockCiphers.h"
-#include "BlockCipherExtensions.h"
 #include "CTR.h"
-#include "IBlockCipher.h"
 #include "IMac.h"
 #include "ShakeModes.h"
 #include "StreamAuthenticators.h"
@@ -40,9 +38,7 @@
 NAMESPACE_STREAM
 
 using Enumeration::BlockCiphers;
-using Enumeration::BlockCipherExtensions;
 using Cipher::Block::Mode::CTR;
-using Cipher::Block::Mode::IBlockCipher;
 using Mac::IMac;
 using Enumeration::ShakeModes;
 using Enumeration::StreamAuthenticators;

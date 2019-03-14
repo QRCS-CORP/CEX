@@ -28,7 +28,6 @@
 #include "ISymmetricKey.h"
 #include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
-#include "SymmetricSecureKey.h"
 
 NAMESPACE_BLOCK
 
@@ -40,7 +39,6 @@ using Kdf::IKdf;
 using Cipher::ISymmetricKey;
 using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
-using Cipher::SymmetricSecureKey;
 
 /// <summary>
 /// The Block Cipher Interface class

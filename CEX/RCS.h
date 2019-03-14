@@ -26,15 +26,11 @@
 #define CEX_RCS_H
 
 #include "IStreamCipher.h"
-#include "BlockCiphers.h"
-#include "BlockCipherExtensions.h"
 #include "IMac.h"
 #include "StreamAuthenticators.h"
 
 NAMESPACE_STREAM
 
-using Enumeration::BlockCiphers;
-using Enumeration::BlockCipherExtensions;
 using Mac::IMac;
 using Enumeration::StreamAuthenticators;
 

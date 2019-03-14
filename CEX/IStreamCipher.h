@@ -29,6 +29,7 @@
 #include "SecureVector.h"
 #include "StreamAuthenticators.h"
 #include "StreamCiphers.h"
+#include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_STREAM
@@ -40,6 +41,7 @@ using Mac::IMac;
 using Cipher::ISymmetricKey;
 using Enumeration::StreamAuthenticators;
 using Enumeration::StreamCiphers;
+using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
 
 /// <summary>

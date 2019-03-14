@@ -1,7 +1,6 @@
 #include "EAX.h"
 #include "IntegerTools.h"
 #include "ParallelTools.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_MODE
 

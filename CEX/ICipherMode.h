@@ -20,8 +20,8 @@
 #define CEX_ICIPHERMODE_H
 
 #include "CexDomain.h"
-#include "BlockCiphers.h"
 #include "BlockCipherExtensions.h"
+#include "BlockCiphers.h"
 #include "CipherModes.h"
 #include "CryptoCipherModeException.h"
 #include "IBlockCipher.h"
@@ -30,8 +30,8 @@
 
 NAMESPACE_MODE
 
-using Enumeration::BlockCiphers;
 using Enumeration::BlockCipherExtensions;
+using Enumeration::BlockCiphers;
 using Enumeration::CipherModes; 
 using Exception::CryptoCipherModeException;
 using Enumeration::ErrorCodes;

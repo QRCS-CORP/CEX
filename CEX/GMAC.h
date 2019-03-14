@@ -34,7 +34,6 @@ NAMESPACE_MAC
 
 using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
-using Numeric::CMUL;
 using Cipher::Block::IBlockCipher;
 
 /// <summary>
@@ -225,9 +224,9 @@ public:
 
 	static void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<GmacState> &State);
 	static bool HasCMUL();
-	static void Multiply(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output);
-	static void Permute(std::array<ulong, Numeric::CMUL::CMUL_STATE_SIZE> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output);
-	static void PreCompute(std::unique_ptr<GmacState> &State, std::array<byte, CMUL::CMUL_BLOCK_SIZE> &Output, size_t Counter, size_t Length);
+	static void Multiply(std::unique_ptr<GmacState> &State, std::array<byte, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output);
+	static void Permute(std::array<ulong, Numeric::CMUL::CMUL_STATE_SIZE> &State, std::array<byte, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output);
+	static void PreCompute(std::unique_ptr<GmacState> &State, std::array<byte, Numeric::CMUL::CMUL_BLOCK_SIZE> &Output, size_t Counter, size_t Length);
 };
 
 NAMESPACE_MACEND

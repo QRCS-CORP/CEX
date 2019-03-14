@@ -6,6 +6,7 @@
 #include "ISymmetricKey.h"
 #include "Kdfs.h"
 #include "SecureVector.h"
+#include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_KDF
@@ -14,6 +15,7 @@ using Enumeration::ErrorCodes;
 using Enumeration::Kdfs;
 using Cipher::ISymmetricKey;
 using Exception::CryptoKdfException;
+using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
 
 /// <summary>

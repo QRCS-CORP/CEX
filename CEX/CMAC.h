@@ -36,9 +36,7 @@ NAMESPACE_MAC
 
 using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
-using Cipher::Block::Mode::CBC;
 using Cipher::Block::IBlockCipher;
-using Cipher::SymmetricKey;
 
 /// <summary>
 /// An implementation of a symmetric Cipher based Message Authentication Code generator: CMAC
@@ -110,7 +108,7 @@ private:
 	static const byte MIX_C64 = 0x1b;
 
 	class CmacState;
-	std::unique_ptr<CBC> m_cbcMode;
+	std::unique_ptr<Cipher::Block::Mode::CBC> m_cbcMode;
 	std::unique_ptr<CmacState> m_cmacState;
 	bool m_isDestroyed;
 	bool m_isInitialized;

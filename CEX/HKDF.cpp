@@ -1,7 +1,6 @@
 #include "HKDF.h"
 #include "DigestFromName.h"
 #include "IntegerTools.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_KDF
 

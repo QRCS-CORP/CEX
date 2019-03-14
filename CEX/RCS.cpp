@@ -5,21 +5,14 @@
 #include "MemoryTools.h"
 #include "Rijndael.h"
 #include "SHAKE.h"
-#include "SymmetricKey.h"
-#if defined(__AVX__)
-#	include <wmmintrin.h>
-#endif
-
 
 NAMESPACE_STREAM
 
 using namespace Cipher::Block::RijndaelBase;
-using Enumeration::BlockCipherConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 using Enumeration::ShakeModes;
-using Enumeration::StreamAuthenticatorConvert;
-using Cipher::SymmetricKey;
+using Enumeration::StreamCipherConvert;
 
 const std::vector<byte> RCS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x61 };
 
@@ -111,7 +104,7 @@ const StreamCiphers RCS::Enumeral()
 	StreamCiphers tmpn;
 
 	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
-	tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::RCS, auth);
+	tmpn = StreamCipherConvert::FromDescription(StreamCiphers::RCS, auth);
 
 	return tmpn;
 }
@@ -145,7 +138,7 @@ const std::string RCS::Name()
 {
 	std::string name;
 
-	name = Enumeration::StreamCipherConvert::ToName(Enumeral());
+	name = StreamCipherConvert::ToName(Enumeral());
 
 	return name;
 }

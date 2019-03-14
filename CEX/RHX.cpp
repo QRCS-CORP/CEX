@@ -357,7 +357,7 @@ void RHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState> 
 	// initialize round-key array
 	State->RoundKeys.resize(klen);
 
-	// copy bytes to working key
+	// copy p-rand bytes to round keys
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	MemoryTools::Copy(tmpr, 0, State->RoundKeys, 0, tmpr.size());
 #else

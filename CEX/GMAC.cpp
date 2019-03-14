@@ -7,6 +7,7 @@
 NAMESPACE_MAC
 
 using Enumeration::BlockCipherConvert;
+using Numeric::CMUL;
 using Utility::IntegerTools;
 using Enumeration::MacConvert;
 using Utility::MemoryTools;

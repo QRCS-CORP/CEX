@@ -1,7 +1,6 @@
 #include "CTR.h"
 #include "BlockCipherFromName.h"
 #include "IntegerTools.h"
-#include "Intrinsics.h"
 #include "ParallelTools.h"
 
 NAMESPACE_MODE

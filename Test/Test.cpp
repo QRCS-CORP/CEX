@@ -248,6 +248,43 @@ void CloseApp()
 	exit(0);
 }
 
+// ### Schedule 1.1.0.7 ###
+// DRBGs..																-done
+// KDFs..																-done
+// MACs..																-done
+// PRNGs..																-done
+// Providers..															-done
+// SymmetricKeyGenerator												-done
+// Asymmetric secure keys and secure-vector								-done
+// Everything migrated to SecureVector:									-
+// if standard vector is called, that will make unlocked copy
+// Requires: moving digests to templates for mac, start eta: Sunday
+// Second migration is ciphers and modes, (big job!)					-
+// 
+// Stream Ciphers
+// 1) Update all the stream ciphers										-done
+// 2) Stream cipher using CTR(Rijndael-256)(RCS?)						-
+// 
+// Block Ciphers
+// 1) change the distribution code to formal Name() + default string	-done
+// 2) move AES instructions to AES128 class (look at assembly options)	-maybe
+// 3) update cipher standard modes										-done
+// 4) update AEAD modes													-
+//
+// Digests
+// 1) internal pointers and templates?									-
+// 2) move blake simd to UIntxxx										-
+// 3) add parallel fallback												-
+// 4) ...
+//
+// Asymmetric
+// 1) .
+// 2) ..
+// 3) ...
+// 4) ....
+//
+// External: (website, documentation, business-plan..)
+// April?
 void RunTest(ITest* Test)
 {
 	try

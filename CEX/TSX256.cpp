@@ -4,8 +4,6 @@
 #include "MemoryTools.h"
 #include "ParallelTools.h"
 #include "SHAKE.h"
-#include "SymmetricSecureKey.h"
-#include "SymmetricKey.h"
 #include "Threefish.h"
 
 #if defined(__AVX2__)

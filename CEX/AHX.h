@@ -116,7 +116,7 @@ private:
 
 	class AhxState;
 	std::unique_ptr<AhxState> m_ahxState;
-	std::unique_ptr<IKdf> m_kdfGenerator;
+	std::unique_ptr<Kdf::IKdf> m_kdfGenerator;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 
 public:

@@ -27,7 +27,6 @@
 #define CEX_POLY1305_H
 
 #include "MacBase.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_MAC
 

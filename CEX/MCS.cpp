@@ -3,15 +3,12 @@
 #include "MacFromName.h"
 #include "MemoryTools.h"
 #include "SHAKE.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_STREAM
 
-using Enumeration::BlockCipherConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
-using Enumeration::StreamAuthenticatorConvert;
-using Cipher::SymmetricKey;
+using Enumeration::StreamCipherConvert;
 
 const std::string MCS::CLASS_NAME("MCS");
 const std::vector<byte> MCS::OMEGA_INFO = { 0x41, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62 };
@@ -106,12 +103,12 @@ const StreamCiphers MCS::Enumeral()
 		case BlockCiphers::RHXS512:
 		case BlockCiphers::RHXS1024:
 		{
-			tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::MCSR, auth);
+			tmpn = StreamCipherConvert::FromDescription(StreamCiphers::MCSR, auth);
 			break;
 		}
 		default:
 		{
-			tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::MCSS, auth);
+			tmpn = StreamCipherConvert::FromDescription(StreamCiphers::MCSS, auth);
 		}
 	}
 
@@ -147,7 +144,7 @@ const std::string MCS::Name()
 {
 	std::string name;
 
-	name = Enumeration::StreamCipherConvert::ToName(Enumeral());
+	name = StreamCipherConvert::ToName(Enumeral());
 
 	return name;
 }

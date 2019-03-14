@@ -7,6 +7,7 @@
 #include "ISymmetricKey.h"
 #include "Macs.h"
 #include "SecureVector.h"
+#include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_MAC
@@ -15,6 +16,7 @@ using Exception::CryptoMacException;
 using Enumeration::ErrorCodes;
 using Cipher::ISymmetricKey;
 using Enumeration::Macs;
+using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
 
 

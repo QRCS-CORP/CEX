@@ -5,7 +5,6 @@
 #include "MemoryTools.h"
 #include "ParallelTools.h"
 #include "SHAKE.h"
-#include "SymmetricKey.h"
 
 #if defined(__AVX2__)
 #	include "UInt256.h"

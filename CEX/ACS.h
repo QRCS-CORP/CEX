@@ -26,8 +26,6 @@
 #define CEX_ACS_H
 
 #include "IStreamCipher.h"
-#include "BlockCiphers.h"
-#include "BlockCipherExtensions.h"
 #include "IMac.h"
 #include "StreamAuthenticators.h"
 
@@ -35,8 +33,6 @@ NAMESPACE_STREAM
 
 #if defined(__AVX__)
 
-using Enumeration::BlockCiphers;
-using Enumeration::BlockCipherExtensions;
 using Mac::IMac;
 using Enumeration::StreamAuthenticators;
 

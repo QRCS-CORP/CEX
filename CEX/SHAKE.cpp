@@ -2,7 +2,6 @@
 #include "ArrayTools.h"
 #include "IntegerTools.h"
 #include "MemoryTools.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_KDF
 

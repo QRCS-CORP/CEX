@@ -4,7 +4,6 @@
 #include "IntegerTools.h"
 #include "MemoryTools.h"
 #include "ProviderFromName.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_DRBG
 

@@ -2,6 +2,7 @@
 #include "DigestFromName.h"
 #include "IntegerTools.h"
 #include "AeadModes.h"
+
 NAMESPACE_KDF
 
 using Utility::IntegerTools;

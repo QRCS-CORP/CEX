@@ -5,7 +5,6 @@
 #include "PBKDF2.h"
 #include "ParallelTools.h"
 #include "Salsa.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_KDF
 

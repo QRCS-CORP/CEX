@@ -4,6 +4,7 @@
 NAMESPACE_MAC
 
 using Enumeration::BlockCipherConvert;
+using Cipher::Block::Mode::CBC;
 using Utility::IntegerTools;
 using Enumeration::MacConvert;
 using Utility::MemoryTools;

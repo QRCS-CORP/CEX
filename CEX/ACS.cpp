@@ -6,7 +6,6 @@
 #	include "MacFromName.h"
 #	include "MemoryTools.h"
 #	include "SHAKE.h"
-#	include "SymmetricKey.h"
 #	include <wmmintrin.h>
 #endif
 
@@ -14,12 +13,10 @@ NAMESPACE_STREAM
 
 #if defined(__AVX__)
 
-using Enumeration::BlockCipherConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 using Enumeration::ShakeModes;
-using Enumeration::StreamAuthenticatorConvert;
-using Cipher::SymmetricKey;
+using Enumeration::StreamCipherConvert;
 
 const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x61 };
 
@@ -111,7 +108,7 @@ const StreamCiphers ACS::Enumeral()
 	StreamCiphers tmpn;
 
 	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
-	tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::RCS, auth);
+	tmpn = StreamCipherConvert::FromDescription(StreamCiphers::RCS, auth);
 
 	return tmpn;
 }
@@ -145,7 +142,7 @@ const std::string ACS::Name()
 {
 	std::string name;
 
-	name = Enumeration::StreamCipherConvert::ToName(Enumeral());
+	name = StreamCipherConvert::ToName(Enumeral());
 
 	return name;
 }
@@ -247,7 +244,7 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	SecureVector<byte> tmpr(RNKLEN * sizeof(__m128i));
 	gen.Generate(tmpr);
 
-	// copy bytes to working key
+	// copy p-rand bytes to round keys
 	for (i = 0; i < RNKLEN; ++i)
 	{
 		m_rcsState->RoundKeys[i] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&tmpr[i * sizeof(__m128i)]));
@@ -587,7 +584,6 @@ void ACS::Reset()
 
 void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(__AVX__)
 	const size_t HLFBLK = 16;
 	const size_t RNDCNT = m_rcsState->RoundKeys.size() - 3;
 	size_t kctr;
@@ -613,10 +609,10 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 		tmp1 = _mm_shuffle_epi8(tmp1, RJDMSK);
 		tmp2 = _mm_shuffle_epi8(tmp2, RJDMSK);
 		++kctr;
-		// encrypt the first half block
+		// encrypt the first half-block
 		blk1 = _mm_aesenc_si128(tmp1, m_rcsState->RoundKeys[kctr]);
 		++kctr;
-		// encrypt the second block
+		// encrypt the second half-block
 		blk2 = _mm_aesenc_si128(tmp2, m_rcsState->RoundKeys[kctr]);
 	}
 
@@ -630,13 +626,9 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	++kctr;
 	blk2 = _mm_aesenclast_si128(tmp2, m_rcsState->RoundKeys[kctr]);
 
-	// store them in output
+	// store in output
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), blk1);
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + HLFBLK]), blk2);
-
-#else
-
-#endif
 }
 
 void ACS::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)

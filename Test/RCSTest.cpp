@@ -14,8 +14,7 @@ namespace Test
 #if defined(__AVX__)
 	using Cipher::Stream::ACS;
 #endif
-	using Enumeration::BlockCiphers;
-	using Enumeration::BlockCipherExtensions;
+
 	using Exception::CryptoSymmetricException;
 	using Utility::IntegerTools;
 	using Utility::MemoryTools;

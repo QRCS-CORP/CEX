@@ -7,7 +7,6 @@
 #include "SHA2Digests.h"
 #include "SHAKE.h"
 #include "ShakeModes.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_DRBG
 

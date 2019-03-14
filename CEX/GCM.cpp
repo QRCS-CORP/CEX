@@ -1,7 +1,6 @@
 #include "GCM.h"
 #include "IntegerTools.h"
 #include "MemoryTools.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_MODE
 

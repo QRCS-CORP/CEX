@@ -13,10 +13,10 @@
 
 NAMESPACE_BLOCK
 
+using namespace Cipher::Block::SerpentBase;
 using Utility::IntegerTools;
 using Enumeration::Kdfs;
 using Utility::MemoryTools;
-using namespace Cipher::Block::SerpentBase;
 
 class SHX::ShxState
 {
