@@ -11,7 +11,7 @@
 \section intro_sec Welcome
 Welcome to the CEX++ Cryptographic Library, version 1.0.0.7 (A7).
 \brief
-CEX is a library built for both speed and maximum security.
+CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
@@ -29,12 +29,13 @@ The current version is v1.0.0.7o (A7 version), which are the major, minor, patch
 
 <B>Current Release v1.0.0.7o (version A7):</B> \n
 
+The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
 The Dilithium asymmetric signature scheme \n
 The SPHINCS+ asymmetric signature scheme \n
 The NTRU Prime asymmetric cipher \n
 Authenticated Threefish-256/512/1024 stream ciphers \n
 Authenticated ChaCha-256/512 stream ciphers \n
-The cSHAKE option (RSX) integrated into RHX \n
+The cSHAKE option (RHX/SHX) integrated into HX symmetric ciphers \n
 Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
 
 <B>Planned Release 1.1.0.1</B> \n
