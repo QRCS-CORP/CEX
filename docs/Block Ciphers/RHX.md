@@ -155,10 +155,9 @@ void Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::v
 Transform 16 blocks of bytes.
 
 ## Links
-
-NIST AES [Fips 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
-NIST [Rijndael ammended](http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf)
-HKDF [RFC 5869](http://tools.ietf.org/html/rfc5869)
-[FIPS 202](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf): Permutation Based Hash and Extendable Output Functions 
-[NIST SP800-185](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf): SHA-3 Derived Functions. 
+* NIST AES [Fips 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
+* NIST [Rijndael ammended](http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf)
+* HKDF [RFC 5869](http://tools.ietf.org/html/rfc5869)
+* [FIPS 202](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf): Permutation Based Hash and Extendable Output Functions 
+* [NIST SP800-185](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf): SHA-3 Derived Functions. 
    
