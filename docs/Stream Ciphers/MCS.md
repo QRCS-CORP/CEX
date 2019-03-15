@@ -166,7 +166,7 @@ Encrypt/Decrypt an array of bytes with offset and length parameters
 
 ## Links
 * NIST AES [Fips 197](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf)
-* NIST [Rijndael ammended](http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf)
+* Serpent [Specification](http://www.cl.cam.ac.uk/~rja14/Papers/serpent.pdf)
 * [Fips-202](http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf): The SHA-3 Standard 
 * [SP800-185](http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf): SHA-3 Derived Functions 
 * [RFC 2104](http://tools.ietf.org/html/rfc2104): HMAC: Keyed-Hashing for Message Authentication. 
