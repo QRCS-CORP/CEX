@@ -1,4 +1,4 @@
-#include "Blake2.h"
+#include "Blake.h"
 #include "IntegerTools.h"
 
 NAMESPACE_DIGEST
@@ -8,7 +8,7 @@ using Utility::MemoryTools;
 
 //~~~Constants~~~//
 
-const std::vector<uint> Blake2::IV256 =
+const std::vector<uint> Blake::IV256 =
 {
 	0x6A09E667UL,
 	0xBB67AE85UL,
@@ -20,7 +20,7 @@ const std::vector<uint> Blake2::IV256 =
 	0x5BE0CD19UL
 };
 
-const std::vector<ulong> Blake2::IV512 =
+const std::vector<ulong> Blake::IV512 =
 {
 	0x6A09E667F3BCC908ULL,
 	0xBB67AE8584CAA73BULL,
@@ -32,7 +32,7 @@ const std::vector<ulong> Blake2::IV512 =
 	0x5BE0CD19137E2179ULL
 };
 
-const std::vector<byte> Blake2::Sigma256 =
+const std::vector<byte> Blake::Sigma256 =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
 	0x0E, 0x0A, 0x04, 0x08, 0x09, 0x0F, 0x0D, 0x06, 0x01, 0x0C, 0x00, 0x02, 0x0B, 0x07, 0x05, 0x03,
@@ -48,7 +48,7 @@ const std::vector<byte> Blake2::Sigma256 =
 	0x0E, 0x0A, 0x04, 0x08, 0x09, 0x0F, 0x0D, 0x06, 0x01, 0x0C, 0x00, 0x02, 0x0B, 0x07, 0x05, 0x03
 };
 
-const std::vector<byte> Blake2::Sigma512 =
+const std::vector<byte> Blake::Sigma512 =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
 	0x0E, 0x0A, 0x04, 0x08, 0x09, 0x0F, 0x0D, 0x06, 0x01, 0x0C, 0x00, 0x02, 0x0B, 0x07, 0x05, 0x03,
@@ -66,10 +66,10 @@ const std::vector<byte> Blake2::Sigma512 =
 
 //~~~Public Functions~~~//
 
-void Blake2::PermuteR10P512C(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
+void Blake::PermuteR10P512C(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
 {
 	std::array<uint, 16> M;
-	std::array<uint, 16> R{
+	std::array<uint, 16> R {
 		State[0],
 		State[1],
 		State[2],
@@ -208,7 +208,7 @@ void Blake2::PermuteR10P512C(const std::vector<byte> &Input, size_t InOffset, st
 	State[7] ^= R[7] ^ R[15];
 }
 
-void Blake2::PermuteR10P512U(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
+void Blake::PermuteR10P512U(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
 {
 	uint M0 = IntegerTools::LeBytesTo32(Input, InOffset);
 	uint M1 = IntegerTools::LeBytesTo32(Input, InOffset + 4);
@@ -1305,7 +1305,7 @@ void Blake2::PermuteR10P512U(const std::vector<byte> &Input, size_t InOffset, st
 
 #if defined(__AVX__)
 
-void Blake2::PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
+void Blake::PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
 {
 
 	__m128i R1, R2, R3, R4;
@@ -1861,7 +1861,7 @@ void Blake2::PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, st
 
 #if defined(__AVX__)
 
-void Blake2::PermuteR10P8x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State, const std::vector<UInt256> &IV)
+void Blake::PermuteR10P8x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State, const std::vector<UInt256> &IV)
 {
 	std::array<UInt256, 16> M;
 	std::array<UInt256, 16> R{
@@ -2022,7 +2022,7 @@ void Blake2::PermuteR10P8x512H(const std::vector<byte> &Input, size_t InOffset, 
 
 #if defined(__AVX512__)
 
-void Blake2::PermuteR10P16x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State, const std::vector<UInt512> &IV)
+void Blake::PermuteR10P16x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State, const std::vector<UInt512> &IV)
 {
 	std::array<UInt512, 16> M;
 	std::array<UInt512, 16> R{
@@ -2189,7 +2189,7 @@ void Blake2::PermuteR10P16x512H(const std::vector<byte> &Input, size_t InOffset,
 
 #endif
 
-void Blake2::PermuteR12P1024C(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
+void Blake::PermuteR12P1024C(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
 {
 	std::array<ulong, 16> M;
 	std::array<ulong, 16> R{
@@ -2331,7 +2331,7 @@ void Blake2::PermuteR12P1024C(const std::vector<byte> &Input, size_t InOffset, s
 	State[7] ^= R[7] ^ R[15];
 }
 
-void Blake2::PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
+void Blake::PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
 {
 	ulong M0 = IntegerTools::LeBytesTo64(Input, InOffset);
 	ulong M1 = IntegerTools::LeBytesTo64(Input, InOffset + 8);
@@ -3638,7 +3638,7 @@ void Blake2::PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, s
 
 #if defined(__AVX__)
 
-void Blake2::PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
+void Blake::PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
 {
 	const __m128i M0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
 	const __m128i M1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 16]));
@@ -4462,7 +4462,7 @@ void Blake2::PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, s
 
 #if defined(__AVX__)
 
-void Blake2::PermuteR12P4x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, const std::vector<ULong256> &IV)
+void Blake::PermuteR12P4x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, const std::vector<ULong256> &IV)
 {
 	std::array<ULong256, 16> M;
 	std::array<ULong256, 16> R{
@@ -4619,7 +4619,7 @@ void Blake2::PermuteR12P4x1024H(const std::vector<byte> &Input, size_t InOffset,
 
 #if defined(__AVX512__)
 
-void Blake2::PermuteR12P8x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, const std::vector<ULong512> &IV)
+void Blake::PermuteR12P8x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, const std::vector<ULong512> &IV)
 {
 	std::array<ULong512, 16> M;
 	std::array<ULong512, 16> R{

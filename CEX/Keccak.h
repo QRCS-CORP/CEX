@@ -87,21 +87,22 @@ private:
 public:
 
 	static const byte KECCAK_CSHAKE_DOMAIN = 0x04;
+	static const byte KECCAK_SHA3_DOMAIN = 0x06;
 	static const byte KECCAK_SHAKE_DOMAIN = 0x1F;
 	static const byte KECCAK_CSHAKEW4_DOMAIN = 0x21;
 	static const byte KECCAK_CSHAKEW8_DOMAIN = 0x22;
 
-	static const size_t KECCAK_MESSAGE128_SIZE = 16;
-	static const size_t KECCAK_MESSAGE256_SIZE = 32;
-	static const size_t KECCAK_MESSAGE512_SIZE = 64;
-	static const size_t KECCAK_MESSAGE1024_SIZE = 128;
-	static const size_t KECCAK_RATE128_SIZE = 168;
-	static const size_t KECCAK_RATE256_SIZE = 136;
-	static const size_t KECCAK_RATE512_SIZE = 72;
+	static const size_t KECCAK128_DIGEST_SIZE = 16;
+	static const size_t KECCAK256_DIGEST_SIZE = 32;
+	static const size_t KECCAK512_DIGEST_SIZE = 64;
+	static const size_t KECCAK1024_DIGEST_SIZE = 128;
+	static const size_t KECCAK128_RATE_SIZE = 168;
+	static const size_t KECCAK256_RATE_SIZE = 136;
+	static const size_t KECCAK512_RATE_SIZE = 72;
 #if defined CEX_KECCAK_STRONG
-	static const size_t KECCAK_RATE1024_SIZE = 36;
+	static const size_t KECCAK1024_RATE_SIZE = 36;
 #else
-	static const size_t KECCAK_RATE1024_SIZE = 72;
+	static const size_t KECCAK1024_RATE_SIZE = 72;
 #endif
 
 	static const size_t KECCAK_STATE_SIZE = 25;

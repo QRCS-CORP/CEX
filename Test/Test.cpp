@@ -50,7 +50,7 @@
 // function parameters: Pascal case, maximum of two words, ex. Initialize(ISymmetricKey &Key)
 // global variable: Camel Case, with the prefix 'g_', ex. g_globalState
 // class variable: Camel Case, with the prefix 'm_', ex. m_classState
-// function variable: a single word or 2 Camel case words in abbreviated form, ex. ctr, or, blkCtr
+// function variable: a single word or 2 Camel case words in abbreviated form, ex. ctr, or, bctr
 // global constant: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
 // class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
 // function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
@@ -233,9 +233,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7o (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7p (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      March 14, 2019                    *");
+	ConsoleUtils::WriteLine("* Date:      March 23, 2019                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -246,6 +246,42 @@ void CloseApp()
 	PrintHeader("An error has occurred! Press any key to close..", "");
 	GetResponse();
 	exit(0);
+}
+
+void RunTest(ITest* Test)
+{
+	try
+	{
+		TestEventHandler handler;
+		Test->Progress() += &handler;
+		ConsoleUtils::WriteLine(Test->Description());
+		ConsoleUtils::WriteLine(Test->Run());
+		Test->Progress() -= &handler;
+		ConsoleUtils::WriteLine("");
+
+		delete Test;
+	}
+	catch (TestException const &ex)
+	{
+		ConsoleUtils::WriteLine("");
+		ConsoleUtils::WriteLine("*** ERROR CONDITION ***");
+		ConsoleUtils::WriteLine(std::string("Class: ") + ex.Location());
+		ConsoleUtils::WriteLine(std::string("Function: ") + ex.Function());
+		ConsoleUtils::WriteLine(std::string("Origin: ") + ex.Origin());
+		ConsoleUtils::WriteLine(std::string("Message: ") + ex.Message());
+		ConsoleUtils::WriteLine(std::string("Time: ") + GetTime());
+		ConsoleUtils::WriteLine("");
+
+		ConsoleUtils::WriteLine("");
+		ConsoleUtils::WriteLine("Continue Testing? Press 'Y' to continue, all other keys abort..");
+
+		std::string resp;
+
+		if (!CanTest(resp))
+		{
+			CloseApp();
+		}
+	}
 }
 
 // ### Schedule 1.1.0.7 ###
@@ -285,42 +321,6 @@ void CloseApp()
 //
 // External: (website, documentation, business-plan..)
 // April?
-void RunTest(ITest* Test)
-{
-	try
-	{
-		TestEventHandler handler;
-		Test->Progress() += &handler;
-		ConsoleUtils::WriteLine(Test->Description());
-		ConsoleUtils::WriteLine(Test->Run());
-		Test->Progress() -= &handler;
-		ConsoleUtils::WriteLine("");
-
-		delete Test;
-	}
-	catch (TestException const &ex)
-	{
-		ConsoleUtils::WriteLine("");
-		ConsoleUtils::WriteLine("*** ERROR CONDITION ***");
-		ConsoleUtils::WriteLine(std::string("Class: ") + ex.Location());
-		ConsoleUtils::WriteLine(std::string("Function: ") + ex.Function());
-		ConsoleUtils::WriteLine(std::string("Origin: ") + ex.Origin());
-		ConsoleUtils::WriteLine(std::string("Message: ") + ex.Message());
-		ConsoleUtils::WriteLine(std::string("Time: ") + GetTime());
-		ConsoleUtils::WriteLine("");
-
-		ConsoleUtils::WriteLine("");
-		ConsoleUtils::WriteLine("Continue Testing? Press 'Y' to continue, all other keys abort..");
-
-		std::string resp;
-
-		if (!CanTest(resp))
-		{
-			CloseApp();
-		}
-	}
-}
-
 int main()
 {
 	bool hasAes;

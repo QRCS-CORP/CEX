@@ -184,7 +184,7 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 			shk256.Generate(kcoins, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 			
 			// overwrite pre-k with z on re-encryption failure
-			IntegerTools::CMov(kcoins, 0, m_privateKey->Polynomial(), m_privateKey->Polynomial().size() - RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE, result);
+			IntegerTools::CMov(m_privateKey->Polynomial(), m_privateKey->Polynomial().size() - RLWEQ12289N1024::RLWE_SEED_SIZE, kcoins, 0, RLWEQ12289N1024::RLWE_SEED_SIZE, result);
 			
 			// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 			MemoryTools::Copy(kcoins, 0, sec, 0, RLWEQ12289N1024::RLWE_SEED_SIZE * 2);
@@ -226,7 +226,7 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 			shk256.Initialize(cmp, 0, RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE);
 			shk256.Generate(kcoins, RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE);
 			// overwrite pre-k with z on re-encryption failure
-			IntegerTools::CMov(kcoins, 0, m_privateKey->Polynomial(), m_privateKey->Polynomial().size() - RLWEQ12289N2048::RLWE_SEED_SIZE, RLWEQ12289N2048::RLWE_SEED_SIZE, result);
+			IntegerTools::CMov(m_privateKey->Polynomial(), m_privateKey->Polynomial().size() - RLWEQ12289N2048::RLWE_SEED_SIZE, kcoins, 0, RLWEQ12289N2048::RLWE_SEED_SIZE, result);
 			// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 			MemoryTools::Copy(kcoins, 0, sec, 0, RLWEQ12289N2048::RLWE_SEED_SIZE * 2);
 			shk256.Initialize(sec, m_domainKey);

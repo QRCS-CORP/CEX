@@ -21,9 +21,8 @@
 
 #include "CexDomain.h"
 
-#if defined(__AVX__)
-#	include "Intrinsics.h"
-#endif
+#include "Intrinsics.h"
+#include <wmmintrin.h>
 
 NAMESPACE_NUMERIC
 
@@ -36,8 +35,6 @@ NAMESPACE_NUMERIC
 /// </summary>
 class AES128
 {
-#if defined(__AVX__)
-
 public:
 
 	/// <summary>
@@ -71,11 +68,13 @@ public:
 	/// Computes the 32 bit left rotation of four unsigned integers
 	/// </summary>
 	///
+	/// <param name="V">The 128-bit vector</param>
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotL(const int Shift)
+	inline static __m128i RotL(__m128i &V, const int Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
-		xmm = _mm_or_si128(_mm_slli_si128(xmm, static_cast<int>(Shift)), _mm_slli_si128(xmm, static_cast<int>(32 - Shift)));
+
+		return _mm_or_si128(_mm_slli_si128(V, static_cast<int>(Shift)), _mm_slli_si128(V, static_cast<int>(32 - Shift)));
 	}
 
 	/// <summary>
@@ -94,8 +93,7 @@ public:
 	/// Load an array into a register in Little Endian format
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 128 bits in length</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
+	/// <param name="X">The source integer array; must be at least 128 bits in length</param>
 	inline __m128i Load(const byte* X)
 	{
 		return _mm_loadu_si128(reinterpret_cast<const __m128i*>(X));
@@ -165,10 +163,10 @@ public:
 	}
 
 	 /// <summary>
-	 /// 
+	 /// Wraps the keygenassist api
 	 /// </summary>
 	 ///
-	 /// <param name="V"></param>
+	 /// <param name="K">The key vector</param>
 	 /// <param name="R">The byte round constant</param>
 	 ///
 	 /// <returns></returns>
@@ -203,8 +201,6 @@ public:
 	{
 		return _mm_xor_si128(X, Y);
 	}
-
-#endif
 };
 
 NAMESPACE_NUMERICEND

@@ -11,8 +11,8 @@ NAMESPACE_CIPHER
 using Exception::CryptoSymmetricException;
 
 /// <summary>
-/// Symmetric Key virtual interface class.
-/// <para>Provides virtual interfaces for the SymmetricKey and SymmetricSecureKey classes.</para>
+/// The symmetric key virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented symmetric key instances as a parameter.</para>
 /// </summary>
 class ISymmetricKey
 {

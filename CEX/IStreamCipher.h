@@ -45,7 +45,8 @@ using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
 
 /// <summary>
-/// Stream Cipher virtual interface class
+/// The stream-cipher virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented stream-cipher instances as a parameter.</para>
 /// </summary>
 class IStreamCipher
 {

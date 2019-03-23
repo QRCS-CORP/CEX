@@ -13,7 +13,8 @@ using Enumeration::ErrorCodes;
 using Enumeration::Prngs;
 
 /// <summary>
-/// Psuedo Random Number Generator interface
+/// The PRNG virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented PRNG instances as a parameter.</para>
 /// </summary>
 class IPrng
 {

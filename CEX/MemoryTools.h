@@ -91,7 +91,7 @@ public:
 	inline static void PrefetchL1(Array &Input, size_t Offset, size_t Length)
 	{
 		const size_t ELMLEN = sizeof(Array::value_type);
-		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
 		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 #if defined(__AVX__)
@@ -126,7 +126,7 @@ public:
 	inline static void PrefetchL2(Array &Input, size_t Offset, size_t Length)
 	{
 		const size_t ELMLEN = sizeof(Array::value_type);
-		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
 		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 #if defined(__AVX__)
@@ -167,7 +167,7 @@ public:
 		if (Length != 0)
 		{
 			const size_t ELMLEN = sizeof(Array::value_type);
-			CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
+			CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
 			CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 			pctr = 0;
@@ -307,7 +307,7 @@ public:
 		const size_t ELMLEN = sizeof(Array::value_type);
 		size_t pctr;
 
-		CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output size");
 
 		if (Length != 0)
 		{
@@ -364,7 +364,7 @@ public:
 		const size_t ELMLEN = sizeof(Array::value_type);
 		size_t pctr;
 
-		CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than output size");
 
 		if (Length != 0)
 		{
@@ -417,7 +417,7 @@ public:
 	template <typename Array, typename V>
 	inline static void CopyToValue(const Array &Input, size_t InOffset, V &Value, size_t Length)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input capacity");
+		CEXASSERT((Input.size() - InOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input size");
 		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
 
 		std::memcpy(&Value, &Input[InOffset], Length);
@@ -436,7 +436,7 @@ public:
 	template <typename V, typename Array>
 	inline static void CopyFromValue(const V Value, Array &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT((Output.size() - OutOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input size");
 		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
 
 		std::memcpy(&Output[OutOffset], &Value, Length);
@@ -460,8 +460,8 @@ public:
 		const size_t ELMLEN = sizeof(Array::value_type);
 		size_t pctr;
 
-		CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * ELMLEN >= Length, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * ELMLEN >= Length, "Length is larger than output size");
 
 		if (Length != 0)
 		{
@@ -520,8 +520,8 @@ public:
 		const size_t OTPLEN = sizeof(ArrayB::value_type);
 		size_t pctr;
 
-		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output size");
 
 		if (Length != 0)
 		{
@@ -766,8 +766,8 @@ public:
 	{
 		if (Length != 0)
 		{
-			CEXASSERT((Input.size() - InOffset) * sizeof(ArrayA::value_type) >= Length, "Length is larger than input capacity");
-			CEXASSERT((Output.size() - OutOffset) * sizeof(ArrayB::value_type) >= Length, "Length is larger than output capacity");
+			CEXASSERT((Input.size() - InOffset) * sizeof(ArrayA::value_type) >= Length, "Length is larger than input size");
+			CEXASSERT((Output.size() - OutOffset) * sizeof(ArrayB::value_type) >= Length, "Length is larger than output size");
 
 			std::memmove(&Output[OutOffset], &Input[InOffset], Length);
 		}
@@ -790,7 +790,7 @@ public:
 		const size_t ELMLEN = sizeof(Array::value_type);
 		size_t pctr;
 
-		CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
 		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 		if (Length != 0)
@@ -842,7 +842,7 @@ public:
 	template <typename Array>
 	inline static void SETVAL128(Array &Output, size_t Offset, byte Value)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 16, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 16, "Length is larger than output size");
 
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[Offset]), _mm_set1_epi8(Value));
@@ -862,7 +862,7 @@ public:
 	template <typename Array>
 	inline static void SETVAL256(Array &Output, size_t Offset, byte Value)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 32, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 32, "Length is larger than output size");
 
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), _mm256_set1_epi8(Value));
@@ -883,7 +883,7 @@ public:
 	template <typename Array>
 	inline static void SETVAL512(Array &Output, size_t Offset, byte Value)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 64, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 64, "Length is larger than output size");
 
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[Offset]), _mm512_set1_epi8(Value));
@@ -912,8 +912,8 @@ public:
 		const size_t OTPLEN = sizeof(ArrayB::value_type);
 		size_t pctr;
 
-		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output size");
 		CEXASSERT(Length > 0, "Length can not be zero");
 		CEXASSERT(INPLEN <= Length, "Integer type is larger than length");
 		CEXASSERT(OTPLEN <= Length, "Integer type is larger than length");
@@ -966,8 +966,8 @@ public:
 		const size_t INPLEN = sizeof(ArrayA::value_type);
 		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
-		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output size");
 
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
@@ -993,8 +993,8 @@ public:
 		const size_t INPLEN = sizeof(ArrayA::value_type);
 		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
-		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output size");
 
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
@@ -1018,8 +1018,8 @@ public:
 		const size_t INPLEN = sizeof(ArrayA::value_type);
 		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
-		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output size");
 
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_xor_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
@@ -1043,8 +1043,8 @@ public:
 		const size_t INPLEN = sizeof(ArrayA::value_type);
 		const size_t OTPLEN = sizeof(ArrayB::value_type);
 
-		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output size");
 
 		XOR512(Input, InOffset, Output, OutOffset);
 		XOR512(Input, InOffset + (64 / INPLEN), Output, OutOffset + (64 / OTPLEN));

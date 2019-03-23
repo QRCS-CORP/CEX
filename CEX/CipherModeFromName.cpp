@@ -5,6 +5,7 @@
 #include "CFB.h"
 #include "CryptoCipherModeException.h"
 #include "CryptoSymmetricException.h"
+#include "ECB.h"
 #include "ICM.h"
 #include "OFB.h"
 
@@ -76,41 +77,42 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, CipherMode
 {
 	using namespace Cipher::Block::Mode;
 
-	IBlockCipher* cptr;
 	ICipherMode* mptr;
 
-	cptr = nullptr;
 	mptr = nullptr;
 
 	try
 	{
-		cptr = BlockCipherFromName::GetInstance(CipherType);
-
 		switch (CipherModeType)
 		{
 			case CipherModes::CTR:
 			{
-				mptr = new CTR(cptr);
+				mptr = new CTR(CipherType);
 				break;
 			}
 			case CipherModes::CBC:
 			{
-				mptr = new CBC(cptr);
+				mptr = new CBC(CipherType);
 				break;
 			}
 			case CipherModes::CFB:
 			{
-				mptr = new CFB(cptr);
+				mptr = new CFB(CipherType);
+				break;
+			}
+			case CipherModes::ECB:
+			{
+				mptr = new ECB(CipherType);
 				break;
 			}
 			case CipherModes::ICM:
 			{
-				mptr = new ICM(cptr);
+				mptr = new ICM(CipherType);
 				break;
 			}
 			case CipherModes::OFB:
 			{
-				mptr = new OFB(cptr);
+				mptr = new OFB(CipherType);
 				break;
 			}
 			default:
@@ -125,11 +127,6 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, CipherMode
 	}
 	catch (CryptoCipherModeException &ex)
 	{
-		if (cptr != nullptr)
-		{
-			delete cptr;
-		}
-
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (CryptoException &ex)
@@ -138,11 +135,6 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, CipherMode
 	}
 	catch (const std::exception &ex)
 	{
-		if (cptr != nullptr)
-		{
-			delete cptr;
-		}
-
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 

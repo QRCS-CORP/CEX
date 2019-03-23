@@ -29,7 +29,8 @@ using Enumeration::AsymmetricTransforms;
 using Enumeration::BlockCiphers;
 
 /// <summary>
-/// The Asymmetric parameters interface
+/// The asymmetric parameters virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented asymmetric cipher parameter-sets as a parameter.</para>
 /// </summary>
 class IAsymmetricParameters
 {

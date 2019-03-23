@@ -702,9 +702,6 @@
     <ClInclude Include="..\..\CEX\Skein.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
@@ -962,6 +959,9 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\ACS.h">
       <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake.h">
+      <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1238,9 +1238,6 @@
     <ClCompile Include="..\..\CEX\Keccak.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Blake2.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\SHA2.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
@@ -1462,6 +1459,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\ACS.cpp">
       <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Blake.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

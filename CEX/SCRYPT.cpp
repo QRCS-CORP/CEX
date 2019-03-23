@@ -313,7 +313,7 @@ void SCRYPT::Initialize(ISymmetricKey &Parameters)
 void SCRYPT::Reset()
 {
 	m_scryptState->Reset();
-	m_scryptGenerator->Reset();
+	//m_scryptGenerator->Reset();
 	m_isInitialized = false;
 }
 

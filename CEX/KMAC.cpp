@@ -56,60 +56,60 @@ public:
 KMAC::KMAC(KmacModes KmacModeType)
 	:
 	MacBase(
-		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
-			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
-			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
-			KmacModeType == KmacModes::KMAC1024 ? Keccak::KECCAK_RATE1024_SIZE : 0),
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_RATE_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_RATE_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_RATE_SIZE :
+			KmacModeType == KmacModes::KMAC1024 ? Keccak::KECCAK1024_RATE_SIZE : 0),
 		static_cast<Macs>(KmacModeType),
 		KmacModeConvert::ToName(KmacModeType),
 		std::vector<SymmetricKeySize> {
 			SymmetricKeySize(
-				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
 				0,
 				0),
 			SymmetricKeySize(
-				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
-					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
-					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
-					Keccak::KECCAK_RATE1024_SIZE),
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_RATE_SIZE :
+					Keccak::KECCAK1024_RATE_SIZE),
 				0,
-				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE)),
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE)),
 			SymmetricKeySize(
-				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
-					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
-					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
-					Keccak::KECCAK_RATE1024_SIZE),
-				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_RATE128_SIZE :
-					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_RATE256_SIZE :
-					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_RATE512_SIZE :
-					Keccak::KECCAK_RATE1024_SIZE),
-				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE))},
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_RATE_SIZE :
+					Keccak::KECCAK1024_RATE_SIZE),
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_RATE_SIZE :
+					Keccak::KECCAK1024_RATE_SIZE),
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE))},
 #if defined(CEX_ENFORCE_LEGALKEY)
-		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-			Keccak::KECCAK_MESSAGE1024_SIZE),
-		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-			Keccak::KECCAK_MESSAGE1024_SIZE),
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_DIGEST_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
+			Keccak::KECCAK1024_DIGEST_SIZE),
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_DIGEST_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
+			Keccak::KECCAK1024_DIGEST_SIZE),
 #else
 		MINKEY_LENGTH,
 		MINSALT_LENGTH,
 #endif
-		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-			Keccak::KECCAK_MESSAGE1024_SIZE)),
+		(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_DIGEST_SIZE :
+			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
+			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
+			Keccak::KECCAK1024_DIGEST_SIZE)),
 	m_isInitialized(false),
 	m_kmacState(KmacModeType != KmacModes::None ? new KmacState(BlockSize(), TagSize(), KmacModeType) :
 		throw CryptoMacException(std::string("KMAC"), std::string("Constructor"), std::string("The kmac mode type is not supported!"), ErrorCodes::InvalidParam))

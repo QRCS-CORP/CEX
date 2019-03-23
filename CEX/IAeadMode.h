@@ -28,8 +28,8 @@ NAMESPACE_MODE
 using Enumeration::AeadModes;
 
 /// <summary>
-/// An AEAD Cipher Mode virtual interface class.
-/// <para>Provides virtual interfaces for symmetric block cipher AEAD modes.</para>
+/// An AEAD block-cipher mode virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented AEAD modes instances as a parameter.</para>
 /// </summary>
 class IAeadMode : public ICipherMode
 {

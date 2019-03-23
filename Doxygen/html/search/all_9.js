@@ -16,6 +16,7 @@ var searchData=
   ['keccakstate',['KeccakState',['../class_keccak_state.html',1,'']]],
   ['key',['Key',['../class_i_symmetric_key.html#aa3e476a692092672045ef533588683df',1,'ISymmetricKey::Key()'],['../class_symmetric_key.html#a6b1876e03d9732f59104b435f042cb4c',1,'SymmetricKey::Key()'],['../class_symmetric_secure_key.html#ac5182dcd3c29d8f4cf9b7906e0e0f42f',1,'SymmetricSecureKey::Key()'],['../group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba',1,'Key():&#160;Documentation.h']]],
   ['keyclass',['KeyClass',['../class_asymmetric_key.html#ab1877520b89fd71be6a4d12d3defd2fc',1,'AsymmetricKey::KeyClass()'],['../class_asymmetric_secure_key.html#a0342ec0bae9a8ea035f4629d411e106f',1,'AsymmetricSecureKey::KeyClass()'],['../class_i_asymmetric_key.html#af9ccb23538579601f4847ed6fe6ac6df',1,'IAsymmetricKey::KeyClass()']]],
+  ['keygenerate',['KeyGenerate',['../class_a_e_s128.html#affac4c25407c43f9eab3db79028b57c0',1,'AES128']]],
   ['keyidentifier',['KeyIdentifier',['../group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea321e0c047e3a82efc71e035ea30a620f',1,'Documentation.h']]],
   ['keylength',['KeyLength',['../struct_blake_params.html#a3dee1cf1a242bb42f5f7e8e36fd8d4d9',1,'BlakeParams']]],
   ['keysize',['KeySize',['../class_symmetric_key_size.html#a419367240982c602a46ca393819f695b',1,'SymmetricKeySize']]],

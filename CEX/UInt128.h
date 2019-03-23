@@ -20,11 +20,8 @@
 #define CEX_UINT128_H
 
 #include "CexDomain.h"
+#include "Intrinsics.h"
 #include "SimdIntegers.h"
-
-#if defined(__AVX__)
-#	include "Intrinsics.h"
-#endif
 
 NAMESPACE_NUMERIC
 
@@ -36,8 +33,6 @@ using Enumeration::SimdIntegers;
 /// </summary>
 class UInt128
 {
-#if defined(__AVX__)
-
 public:
 
 	/// <summary>
@@ -763,8 +758,6 @@ public:
 	{
 		return ~UInt128(_mm_cmpeq_epi32(xmm, X.xmm));
 	}
-
-#endif
 };
 
 NAMESPACE_NUMERICEND

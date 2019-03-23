@@ -20,11 +20,8 @@
 #define CEX_USHORT128_H
 
 #include "CexDomain.h"
+#include "Intrinsics.h"
 #include "SimdIntegers.h"
-
-#if defined(__AVX__)
-#	include "Intrinsics.h"
-#endif
 
 NAMESPACE_NUMERIC
 
@@ -36,8 +33,6 @@ using Enumeration::SimdIntegers;
 /// </summary>
 class UShort128
 {
-#if defined(__AVX__)
-
 public:
 
 	/// <summary>
@@ -174,7 +169,7 @@ public:
 	/// Store register in a T size integer array in Little Endian format
 	/// </summary>
 	///
-	/// <param name="Input">The destination integer array; must be at least 128 bits in length</param>
+	/// <param name="Output">The destination integer array; must be at least 128 bits in length</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	template<typename Array>
 	inline void Store(Array &Output, size_t Offset) const
@@ -710,8 +705,6 @@ public:
 	{
 		return ~UShort128(_mm_cmpeq_epi16(xmm, X.xmm));
 	}
-
-#endif
 };
 
 NAMESPACE_NUMERICEND

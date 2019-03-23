@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>The Block Cipher Interface class  
+<p>The block-cipher virtual interface class.  
  <a href="class_i_block_cipher.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_i_block_cipher_8h_source.html">IBlockCipher.h</a>&gt;</code></p>
@@ -81,8 +81,9 @@ Inheritance diagram for IBlockCipher:</div>
  <div class="center">
   <img src="class_i_block_cipher.png" usemap="#IBlockCipher_map" alt=""/>
   <map id="IBlockCipher_map" name="IBlockCipher_map">
-<area href="class_r_h_x.html" title="A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or c..." alt="RHX" shape="rect" coords="0,56,84,80"/>
-<area href="class_s_h_x.html" title="A Serpent cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cS..." alt="SHX" shape="rect" coords="94,56,178,80"/>
+<area href="class_a_h_x.html" title="A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or c..." alt="AHX" shape="rect" coords="0,56,84,80"/>
+<area href="class_r_h_x.html" title="A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or c..." alt="RHX" shape="rect" coords="94,56,178,80"/>
+<area href="class_s_h_x.html" title="A Serpent cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cS..." alt="SHX" shape="rect" coords="188,56,272,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -156,7 +157,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae633e704bcc41ab0e0c01b67f0a16e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Block Cipher Interface class </p>
+<div class="textblock"><p>The block-cipher virtual interface class. </p>
+<p>This class can be used to create functions that will accept any of the implemented block-cipher instances as a parameter.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab7f96ce0a0cccb943f2d446a3191353a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab7f96ce0a0cccb943f2d446a3191353a">&#9670;&nbsp;</a></span>IBlockCipher() <span class="overload">[1/2]</span></h2>
@@ -266,7 +268,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Unit block size of internal cipher in bytes </p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#a55d73865bee9745ae15d76b07aee91a3">SHX</a>, and <a class="el" href="class_r_h_x.html#a36a64f72073a08a8835883d2844f5b4a">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#a55d73865bee9745ae15d76b07aee91a3">SHX</a>, <a class="el" href="class_a_h_x.html#a73699346963f90c52504792a6dd0277a">AHX</a>, and <a class="el" href="class_r_h_x.html#a36a64f72073a08a8835883d2844f5b4a">RHX</a>.</p>
 
 </div>
 </div>
@@ -314,7 +316,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ac192252a9b19b528474cad6704baf772">SHX</a>, and <a class="el" href="class_r_h_x.html#a53594836bc150dd5e91a4baac9571b8f">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ac192252a9b19b528474cad6704baf772">SHX</a>, <a class="el" href="class_a_h_x.html#a2ea298cda29e89de1d65b510f7dd78b9">AHX</a>, and <a class="el" href="class_r_h_x.html#a53594836bc150dd5e91a4baac9571b8f">RHX</a>.</p>
 
 </div>
 </div>
@@ -376,7 +378,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#aa5588e989fc7dd114a5b9dd4b2b7f964">SHX</a>, and <a class="el" href="class_r_h_x.html#a5e817ee5570f78777af1f5cbf28b325e">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#aa5588e989fc7dd114a5b9dd4b2b7f964">SHX</a>, <a class="el" href="class_a_h_x.html#a8a9136d1be5b86adce768afb59739912">AHX</a>, and <a class="el" href="class_r_h_x.html#a5e817ee5570f78777af1f5cbf28b325e">RHX</a>.</p>
 
 </div>
 </div>
@@ -424,7 +426,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ae55de346752869ad04bea165a1766e1c">SHX</a>, and <a class="el" href="class_r_h_x.html#a711ed8eba427bd4821bafd5af3f175df">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ae55de346752869ad04bea165a1766e1c">SHX</a>, <a class="el" href="class_a_h_x.html#a7dc1dc79a357d9dae40f0d7736788a8d">AHX</a>, and <a class="el" href="class_r_h_x.html#a711ed8eba427bd4821bafd5af3f175df">RHX</a>.</p>
 
 </div>
 </div>
@@ -486,7 +488,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ac47ecae45336414ae0cd06247c4aa431">SHX</a>, and <a class="el" href="class_r_h_x.html#a5ca94a58aba35a44dc5bf219b1896320">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ac47ecae45336414ae0cd06247c4aa431">SHX</a>, <a class="el" href="class_a_h_x.html#a7f8cda66f39aa9cbcbf3a38668735115">AHX</a>, and <a class="el" href="class_r_h_x.html#a5ca94a58aba35a44dc5bf219b1896320">RHX</a>.</p>
 
 </div>
 </div>
@@ -515,7 +517,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The block ciphers type name </p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#af434ded19889286371bcf7861196f215">SHX</a>, and <a class="el" href="class_r_h_x.html#a7692065430b8abf82a351778521562bb">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#af434ded19889286371bcf7861196f215">SHX</a>, <a class="el" href="class_a_h_x.html#a5b8b11d5a30a954eb1acccd9614a6d49">AHX</a>, and <a class="el" href="class_r_h_x.html#a7692065430b8abf82a351778521562bb">RHX</a>.</p>
 
 </div>
 </div>
@@ -569,7 +571,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#aebed156807720a5585cfe52ccbe5d4e3">SHX</a>, and <a class="el" href="class_r_h_x.html#a54ac922d8245d46a7061cba477eaa21a">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#aebed156807720a5585cfe52ccbe5d4e3">SHX</a>, <a class="el" href="class_a_h_x.html#a2613026a8e2b653d4a8a6afcacab2b22">AHX</a>, and <a class="el" href="class_r_h_x.html#a54ac922d8245d46a7061cba477eaa21a">RHX</a>.</p>
 
 </div>
 </div>
@@ -599,7 +601,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: True is initialized for encryption, false for decryption. </p>
 <p>Value set in Initialize(bool, ISymmetricKey).</p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#a8fb576085c0558aecb5d0299344c2c1c">SHX</a>, and <a class="el" href="class_r_h_x.html#a08bed44fe21bdc4132dad49f6cf9b1d3">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#a8fb576085c0558aecb5d0299344c2c1c">SHX</a>, <a class="el" href="class_a_h_x.html#ac17db5e22226c1d95a3a4809ec1353f0">AHX</a>, and <a class="el" href="class_r_h_x.html#a08bed44fe21bdc4132dad49f6cf9b1d3">RHX</a>.</p>
 
 </div>
 </div>
@@ -628,7 +630,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Cipher is ready to transform data </p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ac4ea567917110bd918296b618851ba9f">SHX</a>, and <a class="el" href="class_r_h_x.html#aafa1daad79b5b30d09f379b2cdce518f">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ac4ea567917110bd918296b618851ba9f">SHX</a>, <a class="el" href="class_a_h_x.html#a04a10544e207a646df7c034677de3586">AHX</a>, and <a class="el" href="class_r_h_x.html#aafa1daad79b5b30d09f379b2cdce518f">RHX</a>.</p>
 
 </div>
 </div>
@@ -657,7 +659,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: A list of SymmetricKeySize structures containing valid key-sizes </p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#a5c7006f75c0b2e55ea722f55f2b2942d">SHX</a>, and <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#a5c7006f75c0b2e55ea722f55f2b2942d">SHX</a>, <a class="el" href="class_a_h_x.html#af77f9d87301dbd41481271062a55d6ef">AHX</a>, and <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8">RHX</a>.</p>
 
 </div>
 </div>
@@ -686,7 +688,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The block ciphers class name </p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ae9fad5c65ff282d1064cdbdf71e414f2">SHX</a>, and <a class="el" href="class_r_h_x.html#a98a8aa559694e86826a670601d3cd042">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ae9fad5c65ff282d1064cdbdf71e414f2">SHX</a>, <a class="el" href="class_a_h_x.html#a1712c2c956cbedf36f809db853945593">AHX</a>, and <a class="el" href="class_r_h_x.html#a98a8aa559694e86826a670601d3cd042">RHX</a>.</p>
 
 </div>
 </div>
@@ -743,7 +745,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The number of transformation rounds processed by the transform </p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#a5610f0429f24030730a3072a0390d431">SHX</a>, and <a class="el" href="class_r_h_x.html#a35429d39a9794540d3bb60e57e552ebe">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#a5610f0429f24030730a3072a0390d431">SHX</a>, <a class="el" href="class_a_h_x.html#a68267b3725d8bea4c5bc58d530762c97">AHX</a>, and <a class="el" href="class_r_h_x.html#a35429d39a9794540d3bb60e57e552ebe">RHX</a>.</p>
 
 </div>
 </div>
@@ -773,7 +775,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: The sum size in bytes (plus some allowance for externals) of the classes persistant state. </p>
 <p>Used in parallel block calculation to reduce L1 cache eviction occurence. see ParallelOptions</p>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ac2810f584c4cb58792b07c36df64acf4">SHX</a>, and <a class="el" href="class_r_h_x.html#a3849bc921be071e69c6b794ea7c8bf8b">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ac2810f584c4cb58792b07c36df64acf4">SHX</a>, <a class="el" href="class_a_h_x.html#af8916a1789e3b9f5a3a2cdb63c7a552e">AHX</a>, and <a class="el" href="class_r_h_x.html#a3849bc921be071e69c6b794ea7c8bf8b">RHX</a>.</p>
 
 </div>
 </div>
@@ -821,7 +823,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#a6c3a38afd6bfba3da04e7f0d7aa4bdb9">SHX</a>, and <a class="el" href="class_r_h_x.html#a890b3f2705e4bc5f7e740a51e20b013e">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#a6c3a38afd6bfba3da04e7f0d7aa4bdb9">SHX</a>, <a class="el" href="class_a_h_x.html#a89904222bb77fc25009f6971e6d4f00c">AHX</a>, and <a class="el" href="class_r_h_x.html#a890b3f2705e4bc5f7e740a51e20b013e">RHX</a>.</p>
 
 </div>
 </div>
@@ -883,7 +885,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#a556c809f434cb97807e5c4c147d0d4d7">SHX</a>, and <a class="el" href="class_r_h_x.html#aed920e28290d598545c6a5192fc2e5bd">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#a556c809f434cb97807e5c4c147d0d4d7">SHX</a>, <a class="el" href="class_a_h_x.html#a984d49c53b47e87a9c6e6c7f7961d6c9">AHX</a>, and <a class="el" href="class_r_h_x.html#aed920e28290d598545c6a5192fc2e5bd">RHX</a>.</p>
 
 </div>
 </div>
@@ -945,7 +947,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#a092a1084a2e24063579a42c2f0c74b21">SHX</a>, and <a class="el" href="class_r_h_x.html#a17fdbc356ffb689370c03e8dc2b26d0e">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#a092a1084a2e24063579a42c2f0c74b21">SHX</a>, <a class="el" href="class_a_h_x.html#a7f0372dca427c02b80b3709c885c0fcb">AHX</a>, and <a class="el" href="class_r_h_x.html#a17fdbc356ffb689370c03e8dc2b26d0e">RHX</a>.</p>
 
 </div>
 </div>
@@ -1007,7 +1009,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ab3e91c3202dbfd577a5bf92fde230525">SHX</a>, and <a class="el" href="class_r_h_x.html#afb06bd19f2f3b916498c59ade390cf27">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ab3e91c3202dbfd577a5bf92fde230525">SHX</a>, <a class="el" href="class_a_h_x.html#a45ad28a5ab05796b1f99eba84cfe8dfd">AHX</a>, and <a class="el" href="class_r_h_x.html#afb06bd19f2f3b916498c59ade390cf27">RHX</a>.</p>
 
 </div>
 </div>
@@ -1069,7 +1071,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_h_x.html#ae2d671dde863449b25851325ba8c967a">SHX</a>, and <a class="el" href="class_r_h_x.html#acf972272a4ab9f578a598e4811e161cb">RHX</a>.</p>
+<p>Implemented in <a class="el" href="class_s_h_x.html#ae2d671dde863449b25851325ba8c967a">SHX</a>, <a class="el" href="class_a_h_x.html#a2aa56e6b8d9d6e6c482efd0fda1db508">AHX</a>, and <a class="el" href="class_r_h_x.html#acf972272a4ab9f578a598e4811e161cb">RHX</a>.</p>
 
 </div>
 </div>

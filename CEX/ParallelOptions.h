@@ -111,6 +111,22 @@ public:
 	ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t ParallelMaxDegree = 0);
 
 	/// <summary>
+	/// Constructor: instantiate this class using automated calculation of recommended values based on the hardware profile, and a parallel override for cross-compliant functions.
+	/// <para>Initializes and calculates the default recommended values. 
+	/// Sizes are auto-calculated based on processor cache sizes, cpu core count, and SIMD availability, to favour a high-performance profile.</para>
+	/// </summary>
+	/// 
+	/// <param name="BlockSize">The calling algorithms base input block-size in bytes</param>
+	/// <param name="Parallel">Multi threaded execution of the algorithm is enabled</param>
+	/// <param name="SimdMultiply">The calling algorithm supports SIMD pipelining; engages a multiplier used to calculate the optimum parallel block size.</param>
+	/// <param name="ReservedCache">The amount of L1 cache in bytes to reserve for arrays and working variables used by the calling algorithm.
+	/// <para>Setting this value to the sum size (or greater) of the classes state variables, can reduce the frequency of L1 cache eviction of that state, 
+	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.</para></param>
+	/// <param name="SplitChannel">The calling algorithm uses two channels of equal size Input and Output when processing data</param>
+	/// <param name="ParallelMaxDegree">The maximum number of processor cores used by the algorithm during parallel processing; if set to zero, uses total number of processor cores</param>
+	ParallelOptions(size_t BlockSize, bool Parallel, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t ParallelMaxDegree = 0);
+
+	/// <summary>
 	/// Constructor: instantiate this class, setting each value manually.
 	/// </summary>
 	/// 

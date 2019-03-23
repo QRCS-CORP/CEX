@@ -1,41 +1,39 @@
 #include "CipherSpeedTest.h"
 #include "../CEX/CpuDetect.h"
-#include "../CEX/IntegerTools.h"
-#if defined(__AVX__)
-#	include "../CEX/AHX.h"
-#endif
+#include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
 #include "../CEX/CTR.h"
 #include "../CEX/CBC.h"
 #include "../CEX/CFB.h"
 #include "../CEX/ECB.h"
-#include "../CEX/OFB.h"
 #include "../CEX/ICM.h"
+#include "../CEX/OFB.h"
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
-#include "../CEX/MCS.h"
+#include "../CEX/ACS.h"
 #include "../CEX/CSX256.h"
 #include "../CEX/CSX512.h"
+#include "../CEX/MCS.h"
+#include "../CEX/RCS.h"
 #include "../CEX/TSX256.h"
 #include "../CEX/TSX512.h"
 #include "../CEX/TSX1024.h"
-#include "../CEX/SHA512.h"
 
 namespace Test
 {
 	using namespace Cipher::Block;
+	using namespace Cipher::Block::Mode;
 	using namespace Cipher::Stream;
-	using Utility::IntegerTools;
+	using Enumeration::StreamAuthenticators;
 
 	const std::string CipherSpeedTest::CLASSNAME = "CipherSpeedTest";
 	const std::string CipherSpeedTest::DESCRIPTION = "Cipher Speed Tests.";
 	const std::string CipherSpeedTest::MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
+	const bool CipherSpeedTest::HAS_AESNI = HasAESNI();
 
 	CipherSpeedTest::CipherSpeedTest()
 		:
-		m_hasAESNI(false),
-		m_hasAVX(false),
 		m_progressEvent()
 	{
 	}
@@ -58,27 +56,14 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
-
 			OnProgress(std::string("### BLOCK CIPHER TESTS ###"));
 			OnProgress(std::string("### Tests Rijndael, Serpent and Twofish ciphers"));
 			OnProgress(std::string("### Uses pipelined and parallelized Electronic CodeBook Mode (ECB)"));
 			OnProgress(std::string("### Each cipher test Encrypts 2GB of data; 100MB chunks * 20 iterations"));
 			OnProgress(std::string(""));
 
-#if defined(__AVX__)
-			if (m_hasAESNI)
-			{
-				OnProgress(std::string("***AHX/ECB (AES-NI): Monte Carlo test (K=256; R=14)***"));
-				AHXSpeedTest();
-			}
-			else
-#endif
-			{
-				OnProgress(std::string("***RHX/ECB: (Rijndael) Monte Carlo test (K=256; R=14)***"));
-				RHXSpeedTest();
-			}
-
+			OnProgress(std::string("***RHX/ECB: (Rijndael) Monte Carlo test (K=256; R=14)***"));
+			RHXSpeedTest();
 			OnProgress(std::string("***SHX/ECB: (Serpent) Monte Carlo test (K=256; R=32)***"));
 			SHXSpeedTest();
 
@@ -87,40 +72,28 @@ namespace Test
 			OnProgress(std::string("### Uses the standard rounds and a 256 bit key"));
 			OnProgress(std::string(""));
 
-			IBlockCipher* engine;
-#if defined(__AVX__)
-			if (m_hasAESNI)
-			{
-				engine = new AHX();
-			}
-			else
-#endif
-			{
-				engine = new RHX();
-			}
-
 			OnProgress(std::string("***AES-CBC Sequential Encryption***"));
-			CBCSpeedTest(engine, true, false);
+			CBCSpeedTest(true, false);
 			OnProgress(std::string("***AES-CBC Parallel Decryption***"));
-			CBCSpeedTest(engine, false, true);
+			CBCSpeedTest(false, true);
 
 			OnProgress(std::string("***AES-CFB Sequential Encryption***"));
-			CFBSpeedTest(engine, true, false);
+			CFBSpeedTest(true, false);
 			OnProgress(std::string("***AES-CFB Parallel Decryption***"));
-			CFBSpeedTest(engine, false, true);
+			CFBSpeedTest(false, true);
 
 			OnProgress(std::string("***AES-CTR Sequential Encryption***"));
-			CTRSpeedTest(engine, true, false);
+			CTRSpeedTest(true, false);
 			OnProgress(std::string("***AES-CTR Parallel Encryption***"));
-			CTRSpeedTest(engine, true, true);
+			CTRSpeedTest(true, true);
 
 			OnProgress(std::string("***AES-ICM Sequential Encryption***"));
-			ICMSpeedTest(engine, true, false);
+			ICMSpeedTest(true, false);
 			OnProgress(std::string("***AES-ICM Parallel Encryption***"));
-			ICMSpeedTest(engine, true, true);
+			ICMSpeedTest(true, true);
 
 			OnProgress(std::string("***AES-OFB Sequential Encryption***"));
-			OFBSpeedTest(engine, true, false);
+			OFBSpeedTest(true, false);
 
 			OnProgress(std::string("### AEAD Authenticated Cipher Modes ###"));
 			OnProgress(std::string("### Tests speeds of EAX and GCM authenticated modes"));
@@ -128,27 +101,19 @@ namespace Test
 			OnProgress(std::string(""));
 
 			OnProgress(std::string("***AES-EAX Sequential Encryption***"));
-			EAXSpeedTest(engine, true, false);
+			EAXSpeedTest(true, false);
 			OnProgress(std::string("***AES-EAX Parallel Encryption***"));
-			EAXSpeedTest(engine, true, true);
+			EAXSpeedTest(true, true);
 
 			OnProgress(std::string("***AES-GCM Sequential Encryption***"));
-			GCMSpeedTest(engine, true, false);
+			GCMSpeedTest(true, false);
 			OnProgress(std::string("***AES-GCM Parallel Encryption***"));
-			GCMSpeedTest(engine, true, true);
-
-			if (engine != nullptr)
-			{
-				delete engine;
-			}
+			GCMSpeedTest(true, true);
 
 			OnProgress(std::string("### STREAM CIPHER TESTS ###"));
 			OnProgress(std::string("### Tests speeds of Salsa and ChaCha stream ciphers"));
 			OnProgress(std::string("### Uses default of 20 rounds, 256 bit key"));
 			OnProgress(std::string(""));
-
-			OnProgress(std::string("***MCS: Monte Carlo test (K=256; R=22)***"));
-			MCSSpeedTest();
 
 			OnProgress(std::string("***CSX256: Monte Carlo test (K=256; R=20)***"));
 			CSX256SpeedTest();
@@ -159,12 +124,18 @@ namespace Test
 #endif
 			CSX512SpeedTest();
 
+			OnProgress(std::string("***MCS: Monte Carlo test (K=256; R=22)***"));
+			MCSSpeedTest();
+
+			OnProgress(std::string("***RCS: Monte Carlo test (K=256; R=22)***"));
+			RCSSpeedTest();
+
 			OnProgress(std::string("***TSX256: Monte Carlo test (K=256; R=72)***"));
-			Threefish256SpeedTest();
+			TSX256SpeedTest();
 			OnProgress(std::string("***TSX512: Monte Carlo test (K=512; R=96)***"));
-			Threefish512SpeedTest();
+			TSX512SpeedTest();
 			OnProgress(std::string("***TSX1024: Monte Carlo test (K=1024; R=120)***"));
-			Threefish1024SpeedTest();
+			TSX1024SpeedTest();
 
 			return MESSAGE;
 		}
@@ -180,130 +151,237 @@ namespace Test
 
 	//*** Block Cipher Tests ***//
 
-#if defined(__AVX__)
-	void CipherSpeedTest::AHXSpeedTest()
-	{
-		AHX* engine = new AHX();
-		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, 32, 16, 20, m_progressEvent);
-		delete cipher;
-		delete engine;
-	}
-#endif
-
 	void CipherSpeedTest::RHXSpeedTest(size_t KeySize)
 	{
-		RHX* engine = new RHX();
-		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20, m_progressEvent);
-		delete cipher;
-		delete engine;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			ECB* cpr = new ECB(eng);
+			ParallelBlockLoop(cpr, true, true, MB100, KeySize, 0, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			ECB* cpr = new ECB(eng);
+			ParallelBlockLoop(cpr, true, true, MB100, KeySize, 0, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
 	void CipherSpeedTest::SHXSpeedTest(size_t KeySize)
 	{
-		SHX* engine = new SHX();
-		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20, m_progressEvent);
-		delete cipher;
-		delete engine;
+		SHX* eng = new SHX();
+		ECB* cpr = new ECB(eng);
+		ParallelBlockLoop(cpr, true, true, MB100, KeySize, 0, 10, m_progressEvent);
+		delete cpr;
+		delete eng;
 	}
 
 	//*** Cipher Mode Tests ***//
 
-	void CipherSpeedTest::CBCSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	void CipherSpeedTest::CBCSpeedTest(bool Encrypt, bool Parallel)
 	{
-		Mode::CBC* cipher = new Mode::CBC(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			CBC* cpr = new CBC(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			CBC* cpr = new CBC(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
-	void CipherSpeedTest::CFBSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	void CipherSpeedTest::CFBSpeedTest(bool Encrypt, bool Parallel)
 	{
-		Mode::CFB* cipher = new Mode::CFB(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			CFB* cpr = new CFB(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			CFB* cpr = new CFB(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
-	void CipherSpeedTest::CTRSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	void CipherSpeedTest::CTRSpeedTest(bool Encrypt, bool Parallel)
 	{
-		Mode::CTR* cipher = new Mode::CTR(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			CTR* cpr = new CTR(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			CTR* cpr = new CTR(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
-	void CipherSpeedTest::ICMSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	void CipherSpeedTest::ICMSpeedTest(bool Encrypt, bool Parallel)
 	{
-		Mode::ICM* cipher = new Mode::ICM(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			ICM* cpr = new ICM(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			ICM* cpr = new ICM(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
-	void CipherSpeedTest::OFBSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	void CipherSpeedTest::OFBSpeedTest(bool Encrypt, bool Parallel)
 	{
-		Mode::OFB* cipher = new Mode::OFB(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			OFB* cpr = new OFB(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			OFB* cpr = new OFB(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
-	//*** IEAD Mode Tests ***//
+	//*** AEAD Mode Tests ***//
 
-	void CipherSpeedTest::EAXSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	void CipherSpeedTest::EAXSpeedTest(bool Encrypt, bool Parallel)
 	{
-		Mode::EAX* cipher = new Mode::EAX(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			EAX* cpr = new EAX(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			EAX* cpr = new EAX(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
-	void CipherSpeedTest::GCMSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	void CipherSpeedTest::GCMSpeedTest(bool Encrypt, bool Parallel)
 	{
-		Mode::GCM* cipher = new Mode::GCM(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 12, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			GCM* cpr = new GCM(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			GCM* cpr = new GCM(eng);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
 	}
 
 	//*** Stream Cipher Tests ***//
 
-	void CipherSpeedTest::MCSSpeedTest()
-	{
-		MCS* cipher = new MCS(Enumeration::BlockCiphers::RHXS256, Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 32, 16, 10, m_progressEvent);
-		delete cipher;
-	}
-
 	void CipherSpeedTest::CSX256SpeedTest()
 	{
-		CSX256* cipher = new CSX256(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 32, 8, 10, m_progressEvent);
-		delete cipher;
+		CSX256* cpr = new CSX256(StreamAuthenticators::None);
+		ParallelStreamLoop(cpr, 32, 8, 10, m_progressEvent);
+		delete cpr;
 	}
 
 	void CipherSpeedTest::CSX512SpeedTest()
 	{
-		CSX512* cipher = new CSX512(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 64, 0, 10, m_progressEvent);
-		delete cipher;
+		CSX512* cpr = new CSX512(StreamAuthenticators::None);
+		ParallelStreamLoop(cpr, 64, 0, 10, m_progressEvent);
+		delete cpr;
 	}
 
-	void CipherSpeedTest::Threefish256SpeedTest()
+	void CipherSpeedTest::MCSSpeedTest()
 	{
-		TSX256* cipher = new TSX256(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 32, 16, 10, m_progressEvent);
-		delete cipher;
+		MCS* cpr = new MCS(Enumeration::BlockCiphers::AES, StreamAuthenticators::None);
+		ParallelStreamLoop(cpr, 32, 16, 10, m_progressEvent);
+		delete cpr;
 	}
 
-	void CipherSpeedTest::Threefish512SpeedTest()
+	void CipherSpeedTest::RCSSpeedTest()
 	{
-		TSX512* cipher = new TSX512(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 64, 16, 10, m_progressEvent);
-		delete cipher;
+		if (HAS_AESNI)
+		{
+			ACS* cpr = new ACS(StreamAuthenticators::None);
+			ParallelStreamLoop(cpr, 32, 32, 10, m_progressEvent);
+			delete cpr;
+		}
+		else
+		{
+			RCS* cpr = new RCS(StreamAuthenticators::None);
+			ParallelStreamLoop(cpr, 32, 32, 10, m_progressEvent);
+			delete cpr;
+		}
 	}
 
-	void CipherSpeedTest::Threefish1024SpeedTest()
+	void CipherSpeedTest::TSX256SpeedTest()
 	{
-		TSX1024* cipher = new TSX1024(Enumeration::StreamAuthenticators::None);
-		ParallelStreamLoop(cipher, 128, 16, 10, m_progressEvent);
-		delete cipher;
+		TSX256* cpr = new TSX256(StreamAuthenticators::None);
+		ParallelStreamLoop(cpr, 32, 16, 10, m_progressEvent);
+		delete cpr;
+	}
+
+	void CipherSpeedTest::TSX512SpeedTest()
+	{
+		TSX512* cpr = new TSX512(StreamAuthenticators::None);
+		ParallelStreamLoop(cpr, 64, 16, 10, m_progressEvent);
+		delete cpr;
+	}
+
+	void CipherSpeedTest::TSX1024SpeedTest()
+	{
+		TSX1024* cpr = new TSX1024(StreamAuthenticators::None);
+		ParallelStreamLoop(cpr, 128, 16, 10, m_progressEvent);
+		delete cpr;
 	}
 
 	//*** Helpers ***//
@@ -316,19 +394,15 @@ namespace Test
 		return (uint64_t)(sze / sec);
 	}
 
-	void CipherSpeedTest::Initialize()
+	bool CipherSpeedTest::HasAESNI()
 	{
-		try
-		{
-			CpuDetect detect;
-			m_hasAESNI = detect.AESNI();
-			m_hasAVX = detect.AVX();
-		}
-		catch (const std::exception)
-		{
-			m_hasAESNI = false;
-			m_hasAVX = false;
-		}
+#if defined(__AVX__)
+		CpuDetect dtc;
+
+		return dtc.AVX() && dtc.AESNI();
+#else
+		return false;
+#endif
 	}
 
 	void CipherSpeedTest::OnProgress(const std::string &Data)

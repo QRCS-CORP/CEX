@@ -25,6 +25,7 @@
 // An implementation of the SHA-3 digest with a 512 bit return size. 
 // Written by John G. Underhill, September 19, 2014
 // Updated December 25, 2017
+// Updated March 19, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_KECCAK512_H
@@ -32,32 +33,45 @@
 
 #include "IDigest.h"
 #include "KeccakParams.h"
-#include "KeccakState.h"
 
 NAMESPACE_DIGEST
 
 /// <summary>
-/// An implementation of the SHA-3 Keccak digest
+/// An implementation of the SHA-3 Keccak sequential and parallel message-digests with a 512-bit hash code
 /// </summary>
 ///
 /// <example>
 /// <description>Example using an <c>IDigest</c> interface:</description>
 /// <code>
-/// Keccak512 digest;
-/// std::vector&lt;byte&gt; hash(digest.DigestSize(), 0);
+/// Keccak512 dgt;
 /// // compute a hash
-/// digest.Compute(Input, hash);
+/// dgt.Update(Input, 0, Input.size());
+/// dgt.Finalize(Output, 0);
 /// </code>
 /// </example>
 ///
 /// <remarks>
+/// <description>Tree Hashing Description:</description>
+/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter. \n 
+/// The default number of threads is 8, this can be changed using the ParallelMaxDegree(size_t) function, but not directly through the ParallelProfile accessor,
+/// (state sizes must be recalculated when the thread count changes).
+/// Changing the thread count from the default, will produce a different hash output. \n
+/// The thread count must be an even number less or equal to the number of processing cores. \n
+/// For best performance in tree hashing mode, the message input block-size (Length parameter of an Update call), should be ParallelBlockSize in length. \n
+/// The ideal parallel block-size is calculated automatically based on the hardware profile and algorithm requirments. \n
+/// The parallel mode uses multi-threaded parallel processing, with each thread maintaining a single unique state. \n
+/// The hash finalizer processes each leaf state as contiguous message input for the root hash; i.e. R = H(S0 || S1 || S2 || ...Sn).</para>
+///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Output aligns with the Nist SHA3 standard.</description></item>
 /// <item><description>The output hash size is 64 bytes (512 bits).</description></item>
 /// <item><description>The input block size is 72 bytes (576 bits).</description></item>
-/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], int, int)"/> and Finalize methods.</description>/></item>
-/// <item><description>The <see cref="Finalize(byte[], int)"/> method resets the internal state.</description></item>
+/// <item><description>The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data).</description>/></item>
+/// <item><description>The Update functions process message input, this can be a byte, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
+/// <item><description>The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
+/// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant.</description></item>
+/// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, this is expected.</description></item>
 /// </list>
 ///
 /// <description>Guiding Publications:</description>
@@ -75,20 +89,17 @@ class Keccak512 final : public IDigest
 {
 private:
 
-	static const std::string CLASS_NAME;
 	static const size_t DEF_PRLDEGREE = 8;
-	static const size_t DIGEST_SIZE = 64;
-	static const byte DOMAIN_CODE = 0x06;
+	static const size_t MAX_PRLDEGREE = 64;
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_SIZE = 25;
 
-	std::vector<KeccakState> m_dgtState;
-	bool m_isDestroyed;
+	class Keccak512State;
+	std::vector<Keccak512State> m_dgtState;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	bool m_treeDestroy;
 	KeccakParams m_treeParams;
 
 public:
@@ -135,17 +146,17 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Digests internal blocksize in bytes
+	/// Read Only: The message-digests internal block size in bytes
 	/// </summary>
 	size_t BlockSize() override;
 
 	/// <summary>
-	/// Read Only: Size of returned digest in bytes
+	/// Read Only: The message-digests output hash-size in bytes
 	/// </summary>
 	size_t DigestSize() override;
 
 	/// <summary>
-	/// Read Only: The digests type name
+	/// Read Only: The message-digests enumeration type-name
 	/// </summary>
 	const Digests Enumeral() override;
 
@@ -157,7 +168,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: The digests class name
+	/// Read Only: The message-digests formal class name
 	/// </summary>
 	const std::string Name() override;
 
@@ -179,24 +190,26 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Get the Hash value
+	/// Compute the hash value in a single-step using the input message and the output vector receiving the hash code.
+	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="Output">The hash output value array</param>
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	///
+	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Do final processing and get the hash value
+	/// Finalize message processing and return the hash code.
+	/// <para>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The Hash output value array</param>
-	/// <param name="OutOffset">The starting offset within the Output array</param>
-	/// 
-	/// <returns>Size of Hash value</returns>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	void Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -210,7 +223,7 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
-	/// Reset the internal state
+	/// Reset the message-digests internal state
 	/// </summary>
 	void Reset() override;
 
@@ -222,21 +235,36 @@ public:
 	void Update(byte Input) override;
 
 	/// <summary>
-	/// Update the buffer
+	/// Update the message digest with a single unsigned 32-bit integer
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">Amount of data to process in bytes</param>
+	/// <param name="Input">The 32-bit integer to process</param>
+	void Update(uint Input) override;
+
+	/// <summary>
+	/// Update the message digest with a single unsigned 64-bit integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The 64-bit integer to process</param>
+	void Update(ulong Input) override;
+
+	/// <summary>
+	/// Update the message digest with a vector using offset and length parameters.
+	/// <para>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
-	void Permute(std::array<ulong, 25> &Hash);
-	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length);
+	static void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak512State &State);
+	static void Permute(std::array<ulong, 25> &Hash);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak512State &State, ulong Length);
 };
 
 NAMESPACE_DIGESTEND

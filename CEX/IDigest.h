@@ -13,7 +13,8 @@ using Enumeration::Digests;
 using Enumeration::ErrorCodes;
 
 /// <summary>
-/// Hash Digest Interface
+/// The message digest virtualnterface class.
+/// <para>This class can be used to create functions that will accept any of the implemented message digest instances as a parameter.</para>
 /// </summary>
 class IDigest
 {
@@ -48,17 +49,17 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Digests internal block size in bytes
+	/// Read Only: The message-digests internal block size in bytes
 	/// </summary>
 	virtual size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Read Only: Size of returned hash value in bytes
+	/// Read Only: The message-digests output hash-size in bytes
 	/// </summary>
 	virtual size_t DigestSize() = 0;
 
 	/// <summary>
-	/// Read Only: The digests type name
+	/// Read Only: The message-digests enumeration type-name
 	/// </summary>
 	virtual const Digests Enumeral() = 0;
 
@@ -70,7 +71,7 @@ public:
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Read Only: The digests class name
+	/// Read Only: The message-digests formal class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
@@ -91,22 +92,22 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Get the Hash value
+	/// Compute the hash value in a single-step using the input message and the output vector receiving the hash code.
+	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="Output">The hash output value array</param>
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Do final processing and get the hash value
+	/// Finalize message processing and return the hash code.
+	/// <para>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The Hash output value array</param>
-	/// <param name="OutOffset">The starting offset within the Output array</param>
-	/// 
-	/// <returns>Size of Hash value</returns>
-	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
+	virtual void Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -120,24 +121,39 @@ public:
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
-	/// Reset the internal state
+	/// Reset the message-digests internal state
 	/// </summary>
 	virtual void Reset() = 0;
 
 	/// <summary>
-	/// Update the message digest with a single byte
+	/// Update the message digest with a single unsigned 8-bit integer
 	/// </summary>
 	/// 
-	/// <param name="Input">Input byte</param>
+	/// <param name="Input">The 8-bit integer added to process</param>
 	virtual void Update(byte Input) = 0;
 
 	/// <summary>
-	/// Update the buffer
+	/// Update the message digest with a single unsigned 32-bit integer
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">Amount of data to process in bytes</param>
+	/// <param name="Input">The 32-bit integer to process</param>
+	virtual void Update(uint Input) = 0;
+
+	/// <summary>
+	/// Update the message digest with a single unsigned 64-bit integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The 64-bit integer to process</param>
+	virtual void Update(ulong Input) = 0;
+
+	/// <summary>
+	/// Update the message digest with a vector using offset and length parameters.
+	/// <para>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Length">The number of bytes to process</param>
 	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
 };
 

@@ -40,8 +40,8 @@ using Cipher::ISymmetricKey;
 using Cipher::SymmetricKeySize;
 
 /// <summary>
-/// Block-cipher standard mode virtual interface class.
-/// <para>Provides virtual interfaces for standard symmetric block-cipher modes.</para>
+/// The block-cipher standard mode virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented block-cipher standard-mode instances as a parameter.</para>
 /// </summary>
 class ICipherMode
 {

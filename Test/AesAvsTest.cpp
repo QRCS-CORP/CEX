@@ -1,7 +1,5 @@
 #include "AesAvsTest.h"
-#if defined(__AVX__)
-#	include "../CEX/AHX.h"
-#endif
+#include "../CEX/AHX.h"
 #include "../CEX/CpuDetect.h"
 #include "../CEX/RHX.h"
 
@@ -19,13 +17,13 @@ namespace Test
 	AesAvsTest::AesAvsTest(bool TestAesNi)
 		:
 		m_progressEvent(),
-		m_testNI(TestAesNi)
+		m_aesniTest(TestAesNi && HAS_AESNI)
 	{
 	}
 
 	AesAvsTest::~AesAvsTest()
 	{
-		m_testNI = false;
+		m_aesniTest = false;
 	}
 
 	//~~~Accessors~~~//
@@ -50,10 +48,8 @@ namespace Test
 		std::vector<byte> key;
 		std::vector<byte> msg;
 
-		RHX* cpr1 = new RHX();
-#if defined(__AVX__)
-		AHX* cpr2 = new AHX();
-#endif
+		RHX* cprr = new RHX();
+		AHX* cpra = new AHX();
 
 		HexConverter::Decode(std::string("00000000000000000000000000000000"), msg);
 
@@ -63,7 +59,7 @@ namespace Test
 			TestUtils::Read(AESAVSKEY128, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cprr->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -74,15 +70,13 @@ namespace Test
 				HexConverter::Decode(istr, key);
 				HexConverter::Decode(jstr, cpt);
 
-#if defined(__AVX__)
-				if (m_testNI)
+				if (m_aesniTest)
 				{
-					Kat(cpr2, key, msg, cpt);
+					Kat(cpra, key, msg, cpt);
 				}
 				else
-#endif
 				{
-					Kat(cpr1, key, msg, cpt);
+					Kat(cprr, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit key vectors test.."));
@@ -91,7 +85,7 @@ namespace Test
 			TestUtils::Read(AESAVSKEY192, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cprr->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 48; i < data.size(); i += 80, j += 80)
@@ -99,15 +93,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 48), key);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
-#if defined(__AVX__)
-				if (m_testNI)
+				if (m_aesniTest)
 				{
-					Kat(cpr2, key, msg, cpt);
+					Kat(cpra, key, msg, cpt);
 				}
 				else
-#endif
 				{
-					Kat(cpr1, key, msg, cpt);
+					Kat(cprr, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit key vectors test.."));
@@ -116,7 +108,7 @@ namespace Test
 			TestUtils::Read(AESAVSKEY256, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cprr->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 64; i < data.size(); i += 96, j += 96)
@@ -124,15 +116,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 64), key);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
-#if defined(__AVX__)
-				if (m_testNI)
+				if (m_aesniTest)
 				{
-					Kat(cpr2, key, msg, cpt);
+					Kat(cpra, key, msg, cpt);
 				}
 				else
-#endif
 				{
-					Kat(cpr1, key, msg, cpt);
+					Kat(cprr, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit key vectors test.."));
@@ -142,7 +132,7 @@ namespace Test
 			TestUtils::Read(AESAVSPTEXT128, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cprr->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -150,15 +140,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), msg);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
-#if defined(__AVX__)
-				if (m_testNI)
+				if (m_aesniTest)
 				{
-					Kat(cpr2, key, msg, cpt);
+					Kat(cpra, key, msg, cpt);
 				}
 				else
-#endif
 				{
-					Kat(cpr1, key, msg, cpt);
+					Kat(cprr, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit plain-text vectors test.."));
@@ -168,7 +156,7 @@ namespace Test
 			TestUtils::Read(AESAVSPTEXT192, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cprr->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -176,15 +164,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), msg);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
-#if defined(__AVX__)
-				if (m_testNI)
+				if (m_aesniTest)
 				{
-					Kat(cpr2, key, msg, cpt);
+					Kat(cpra, key, msg, cpt);
 				}
 				else
-#endif
 				{
-					Kat(cpr1, key, msg, cpt);
+					Kat(cprr, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit plain-text vectors test.."));
@@ -194,7 +180,7 @@ namespace Test
 			TestUtils::Read(AESAVSPTEXT256, data);
 			if (data.size() == 0)
 			{
-				throw TestException(std::string("Run"), cpr1->Name(), std::string("Could not find the test file!"));
+				throw TestException(std::string("Run"), cprr->Name(), std::string("Could not find the test file!"));
 			}
 
 			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
@@ -202,15 +188,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), msg);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
-#if defined(__AVX__)
-				if (m_testNI)
+				if (m_aesniTest)
 				{
-					Kat(cpr2, key, msg, cpt);
+					Kat(cpra, key, msg, cpt);
 				}
 				else
-#endif
 				{
-					Kat(cpr1, key, msg, cpt);
+					Kat(cprr, key, msg, cpt);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit plain-text vectors test.. 960/960 vectors passed"));
@@ -249,9 +233,13 @@ namespace Test
 
 	bool AesAvsTest::HasAESNI()
 	{
+#if defined(__AVX__)
 		CpuDetect dtc;
 
-		return dtc.AESNI() && dtc.AVX();
+		return dtc.AVX() && dtc.AESNI();
+#else
+		return false;
+#endif
 	}
 
 	void AesAvsTest::OnProgress(const std::string &Data)

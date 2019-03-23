@@ -1,15 +1,13 @@
 #include "AHX.h"
-#if defined(__AVX__)
-#	include "KdfFromName.h"
-#	include "IntegerTools.h"
-#	include "MemoryTools.h"
-#	include "UInt128.h"
-#endif
+#include "KdfFromName.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
+#include "UInt128.h"
+#include <wmmintrin.h>
 
 NAMESPACE_BLOCK
 
-#if defined(__AVX__)
-
+using Enumeration::BlockCipherConvert;
 using Utility::MemoryTools;
 using Utility::IntegerTools;
 using Enumeration::Kdfs;
@@ -67,6 +65,9 @@ AHX::AHX(BlockCipherExtensions CipherExtension)
 		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_legalKeySizes(CalculateKeySizes(CipherExtension))
 {
+#if !defined(CEX_AVX_INTRINSICS)
+	throw CryptoSymmetricException(BlockCipherConvert::ToName(BlockCiphers::AES), std::string("Constructor"), std::string("AVX is not supported on this system!"), ErrorCodes::NotSupported);
+#endif
 }
 
 AHX::AHX(IKdf* Kdf)
@@ -78,6 +79,7 @@ AHX::AHX(IKdf* Kdf)
 	m_legalKeySizes(CalculateKeySizes(Kdf != nullptr ? static_cast<BlockCipherExtensions>(Kdf->Enumeral()) :
 		BlockCipherExtensions::None))
 {
+
 }
 
 AHX::~AHX()
@@ -691,6 +693,5 @@ std::vector<SymmetricKeySize> AHX::CalculateKeySizes(BlockCipherExtensions Exten
 	return keys;
 }
 
-#endif
 NAMESPACE_BLOCKEND
 

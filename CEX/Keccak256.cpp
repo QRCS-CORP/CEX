@@ -6,95 +6,76 @@
 
 NAMESPACE_DIGEST
 
+using Enumeration::DigestConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 using Utility::ParallelTools;
 
-const std::string Keccak256::CLASS_NAME("Keccak512");
+class Keccak256::Keccak256State
+{
+public:
+
+	std::array<ulong, 25> H = { 0 };
+
+	Keccak256State()
+	{
+	}
+
+	~Keccak256State()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(H, 0, H.size() * sizeof(ulong));
+	}
+};
 
 //~~~Constructor~~~//
 
 Keccak256::Keccak256(bool Parallel)
 	:
 	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_isDestroyed(false),
-	m_msgBuffer(Parallel ? DEF_PRLDEGREE * Keccak::KECCAK_RATE256_SIZE : Keccak::KECCAK_RATE256_SIZE),
+	m_msgBuffer(Parallel ? DEF_PRLDEGREE * Keccak::KECCAK256_RATE_SIZE :
+		Keccak::KECCAK256_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(Keccak::KECCAK_RATE256_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeDestroy(true),
-	m_treeParams(Parallel ? KeccakParams(DIGEST_SIZE, static_cast<byte>(Keccak::KECCAK_RATE256_SIZE), DEF_PRLDEGREE) : KeccakParams(DIGEST_SIZE, 0, 0))
+	m_parallelProfile(Keccak::KECCAK256_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_treeParams(Parallel ? KeccakParams(Keccak::KECCAK256_DIGEST_SIZE, static_cast<byte>(Keccak::KECCAK256_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) :
+		KeccakParams(Keccak::KECCAK256_DIGEST_SIZE, 0x00, 0x00))
 {
-	// TODO: implement parallel alternate for single core cpu
-	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
-
 	Reset();
 }
 
 Keccak256::Keccak256(KeccakParams &Params)
 	:
-	m_dgtState(1),
-	m_isDestroyed(false),
-	m_msgBuffer(Keccak::KECCAK_RATE256_SIZE),
+	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? Params.FanOut() :
+		throw CryptoDigestException(DigestConvert::ToName(Digests::Keccak256), std::string("Constructor"), std::string("The FanOut parameter can not be zero or exceed the maximum of 64!"), ErrorCodes::IllegalOperation)),
+	m_msgBuffer(Params.FanOut() * Keccak::KECCAK256_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(Keccak::KECCAK_RATE256_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
-	m_treeDestroy(false),
+	m_parallelProfile(Keccak::KECCAK256_RATE_SIZE, static_cast<bool>(Params.FanOut() > 1), false, STATE_PRECACHED, false, Params.FanOut()),
 	m_treeParams(Params)
 {
-	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::NotSupported);
-	}
-	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The tree parameters are invalid!"), ErrorCodes::InvalidParam);
-	}
-
-	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
-	{
-		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * Keccak::KECCAK_RATE256_SIZE);
-	}
-	else if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = false;
-	}
-
 	Reset();
 }
 
 Keccak256::~Keccak256()
 {
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_msgLength = 0;
-
-		if (m_treeDestroy)
-		{
-			m_treeParams.Reset();
-			m_treeDestroy = false;
-		}
-
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
-		{
-			m_dgtState[i].Reset();
-		}
-
-		IntegerTools::Clear(m_dgtState);
-		IntegerTools::Clear(m_msgBuffer);
-	}
+	m_msgLength = 0;
+	IntegerTools::Clear(m_dgtState);
+	IntegerTools::Clear(m_msgBuffer);
 }
 
 //~~~Accessors~~~//
 
 size_t Keccak256::BlockSize() 
 { 
-	return Keccak::KECCAK_RATE256_SIZE; 
+	return Keccak::KECCAK256_RATE_SIZE; 
 }
 
 size_t Keccak256::DigestSize() 
 { 
-	return DIGEST_SIZE; 
+	return Keccak::KECCAK256_DIGEST_SIZE; 
 }
 
 const Digests Keccak256::Enumeral() 
@@ -111,13 +92,13 @@ const std::string Keccak256::Name()
 { 
 	std::string name;
 
-	if (m_parallelProfile.IsParallel())
+	if (m_treeParams.FanOut() > 1)
 	{
-		name = CLASS_NAME + "-P" + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
+		name = DigestConvert::ToName(Enumeral()) + std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 	else
 	{
-		name = CLASS_NAME;
+		name = DigestConvert::ToName(Enumeral());
 	}
 
 	return name;
@@ -137,14 +118,25 @@ ParallelOptions &Keccak256::ParallelProfile()
 
 void Keccak256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Output.resize(DIGEST_SIZE);
+	if (Output.size() < Keccak::KECCAK256_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Compute"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
+	if (Output.size() - OutOffset < Keccak::KECCAK256_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Finalize"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
+	size_t bctr;
+	size_t boft;
+	size_t i;
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -157,46 +149,47 @@ size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		// process buffer
 		if (m_msgLength != 0)
 		{
-			size_t blkCtr = 0;
+			bctr = 0;
 
 			while (m_msgLength != 0)
 			{
-				const size_t MSGRMD = (m_msgLength >= Keccak::KECCAK_RATE256_SIZE) ? Keccak::KECCAK_RATE256_SIZE : m_msgLength;
-				HashFinal(m_msgBuffer, blkCtr * Keccak::KECCAK_RATE256_SIZE, MSGRMD, m_dgtState[blkCtr]);
+				const size_t MSGRMD = (m_msgLength >= Keccak::KECCAK256_RATE_SIZE) ? Keccak::KECCAK256_RATE_SIZE : m_msgLength;
+				HashFinal(m_msgBuffer, bctr * Keccak::KECCAK256_RATE_SIZE, MSGRMD, m_dgtState[bctr]);
 				m_msgLength -= MSGRMD;
-				++blkCtr;
+				++bctr;
 			}
 		}
 
 		// initialize root state
-		KeccakState rootState;
+		Keccak256State proot;
 
 		// add state blocks as contiguous message input
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		for (i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntegerTools::LeULL256ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * DIGEST_SIZE);
-			m_msgLength += DIGEST_SIZE;
+			IntegerTools::LeULL256ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * Keccak::KECCAK256_DIGEST_SIZE);
+			m_msgLength += Keccak::KECCAK256_DIGEST_SIZE;
 		}
 
 		// compress full blocks
-		size_t blkOff = 0;
-		if (m_msgLength > Keccak::KECCAK_RATE256_SIZE)
-		{
-			const size_t BLKRMD = m_msgLength - (m_msgLength % Keccak::KECCAK_RATE256_SIZE);
+		boft = 0;
 
-			for (size_t i = 0; i < BLKRMD / Keccak::KECCAK_RATE256_SIZE; ++i)
+		if (m_msgLength > Keccak::KECCAK256_RATE_SIZE)
+		{
+			const size_t BLKRMD = m_msgLength - (m_msgLength % Keccak::KECCAK256_RATE_SIZE);
+
+			for (i = 0; i < BLKRMD / Keccak::KECCAK256_RATE_SIZE; ++i)
 			{
-				Keccak::Absorb(m_msgBuffer, i * Keccak::KECCAK_RATE256_SIZE, Keccak::KECCAK_RATE256_SIZE, rootState.H);
-				Permute(rootState.H);
+				Keccak::Absorb(m_msgBuffer, i * Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK256_RATE_SIZE, proot.H);
+				Permute(proot.H);
 			}
 
 			m_msgLength -= BLKRMD;
-			blkOff = BLKRMD;
+			boft = BLKRMD;
 		}
 
 		// finalize and store
-		HashFinal(m_msgBuffer, blkOff, m_msgLength, rootState);
-		IntegerTools::LeULL256ToBlock(rootState.H, 0, Output, OutOffset);
+		HashFinal(m_msgBuffer, boft, m_msgLength, proot);
+		IntegerTools::LeULL256ToBlock(proot.H, 0, Output, OutOffset);
 	}
 	else
 	{
@@ -210,13 +203,11 @@ size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 
 	Reset();
-
-	return DIGEST_SIZE;
 }
 
 void Keccak256::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	if (Degree == 0 || Degree % 2 != 0 || Degree > MAX_PRLDEGREE)
 	{
 		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
@@ -228,17 +219,19 @@ void Keccak256::ParallelMaxDegree(size_t Degree)
 
 void Keccak256::Reset()
 {
+	size_t i;
+
 	MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 
-	for (size_t i = 0; i < m_dgtState.size(); ++i)
+	for (i = 0; i < m_dgtState.size(); ++i)
 	{
 		m_dgtState[i].Reset();
 
 		if (m_parallelProfile.IsParallel())
 		{
 			m_treeParams.NodeOffset() = static_cast<uint>(i);
-			Keccak::Absorb(m_treeParams.ToBytes(), 0, Keccak::KECCAK_RATE256_SIZE, m_dgtState[i].H);
+			Keccak::Absorb(m_treeParams.ToBytes(), 0, Keccak::KECCAK256_RATE_SIZE, m_dgtState[i].H);
 			Permute(m_dgtState[i].H);
 		}
 	}
@@ -248,6 +241,20 @@ void Keccak256::Update(byte Input)
 {
 	std::vector<byte> one(1, Input);
 	Update(one, 0, 1);
+}
+
+void Keccak256::Update(uint Input)
+{
+	std::vector<byte> tmp(sizeof(uint));
+	IntegerTools::Le32ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
+}
+
+void Keccak256::Update(ulong Input)
+{
+	std::vector<byte> tmp(sizeof(ulong));
+	IntegerTools::Le64ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
 }
 
 void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
@@ -270,7 +277,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				// empty the message buffer
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
-					Keccak::Absorb(m_msgBuffer, i * Keccak::KECCAK_RATE256_SIZE, Keccak::KECCAK_RATE256_SIZE, m_dgtState[i].H);
+					Keccak::Absorb(m_msgBuffer, i * Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK256_RATE_SIZE, m_dgtState[i].H);
 					Permute(m_dgtState[i].H);
 				});
 
@@ -287,7 +294,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				// process large blocks
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK_RATE256_SIZE), m_dgtState[i], PRCLEN);
+					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK256_RATE_SIZE), m_dgtState[i], PRCLEN);
 				});
 
 				Length -= PRCLEN;
@@ -300,7 +307,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK_RATE256_SIZE), m_dgtState[i], PRMLEN);
+					ProcessLeaf(Input, InOffset + (i * Keccak::KECCAK256_RATE_SIZE), m_dgtState[i], PRMLEN);
 				});
 
 				Length -= PRMLEN;
@@ -309,15 +316,16 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		}
 		else
 		{
-			if (m_msgLength != 0 && (m_msgLength + Length >= Keccak::KECCAK_RATE256_SIZE))
+			if (m_msgLength != 0 && (m_msgLength + Length >= Keccak::KECCAK256_RATE_SIZE))
 			{
-				const size_t RMDLEN = Keccak::KECCAK_RATE256_SIZE - m_msgLength;
+				const size_t RMDLEN = Keccak::KECCAK256_RATE_SIZE - m_msgLength;
+
 				if (RMDLEN != 0)
 				{
 					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
-				Keccak::Absorb(m_msgBuffer, 0, Keccak::KECCAK_RATE256_SIZE, m_dgtState[0].H);
+				Keccak::Absorb(m_msgBuffer, 0, Keccak::KECCAK256_RATE_SIZE, m_dgtState[0].H);
 				Permute(m_dgtState[0].H);
 				m_msgLength = 0;
 				InOffset += RMDLEN;
@@ -325,12 +333,12 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			}
 
 			// sequential loop through blocks
-			while (Length >= Keccak::KECCAK_RATE256_SIZE)
+			while (Length >= Keccak::KECCAK256_RATE_SIZE)
 			{
-				Keccak::Absorb(Input, InOffset, Keccak::KECCAK_RATE256_SIZE, m_dgtState[0].H);
+				Keccak::Absorb(Input, InOffset, Keccak::KECCAK256_RATE_SIZE, m_dgtState[0].H);
 				Permute(m_dgtState[0].H);
-				InOffset += Keccak::KECCAK_RATE256_SIZE;
-				Length -= Keccak::KECCAK_RATE256_SIZE;
+				InOffset += Keccak::KECCAK256_RATE_SIZE;
+				Length -= Keccak::KECCAK256_RATE_SIZE;
 			}
 		}
 
@@ -354,19 +362,19 @@ void Keccak256::Permute(std::array<ulong, 25> &Hash)
 #endif
 }
 
-void Keccak256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State)
+void Keccak256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak256State &State)
 {
-	Input[InOffset + Length] = DOMAIN_CODE;
-	Input[InOffset + Keccak::KECCAK_RATE256_SIZE - 1] |= 128;
-	Keccak::Absorb(Input, InOffset, Keccak::KECCAK_RATE256_SIZE, State.H);
+	Input[InOffset + Length] = Keccak::KECCAK_SHA3_DOMAIN;
+	Input[InOffset + Keccak::KECCAK256_RATE_SIZE - 1] |= 128;
+	Keccak::Absorb(Input, InOffset, Keccak::KECCAK256_RATE_SIZE, State.H);
 	Permute(State.H);
 }
 
-void Keccak256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length)
+void Keccak256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State, ulong Length)
 {
 	do
 	{
-		Keccak::Absorb(Input, InOffset, Keccak::KECCAK_RATE256_SIZE, State.H);
+		Keccak::Absorb(Input, InOffset, Keccak::KECCAK256_RATE_SIZE, State.H);
 		Permute(State.H);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();

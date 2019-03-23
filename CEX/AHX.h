@@ -36,13 +36,11 @@
 #define CEX_AHX_H
 
 #include "IBlockCipher.h"
-#if defined(__AVX__)
-#	include <wmmintrin.h>
-#endif
+#include "Intrinsics.h"
 
 NAMESPACE_BLOCK
 
-#if defined(__AVX__)
+//#if defined(__AVX__)
 
 /// <summary>
 /// A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cSHAKE key schedule, and increased transformation rounds.
@@ -334,6 +332,6 @@ private:
 	void Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 };
 
-#endif
+//#endif
 NAMESPACE_BLOCKEND
 #endif

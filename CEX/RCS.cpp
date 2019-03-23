@@ -405,24 +405,39 @@ void RCS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		// stagger counters and process 8 blocks with avx512
 		while (bctr != PBKALN)
 		{
-			IntegerTools::LeIncrease8(Counter, tmpc, 0, 32);
-			IntegerTools::LeIncrease8(Counter, tmpc, 32, 64);
-			IntegerTools::LeIncrease8(Counter, tmpc, 64, 96);
-			IntegerTools::LeIncrease8(Counter, tmpc, 96, 128);
-			IntegerTools::LeIncrease8(Counter, tmpc, 128, 160);
-			IntegerTools::LeIncrease8(Counter, tmpc, 160, 192);
-			IntegerTools::LeIncrease8(Counter, tmpc, 192, 224);
-			IntegerTools::LeIncrease8(Counter, tmpc, 224, 256);
-			IntegerTools::LeIncrease8(Counter, tmpc, 256, 288);
-			IntegerTools::LeIncrease8(Counter, tmpc, 288, 320);
-			IntegerTools::LeIncrease8(Counter, tmpc, 320, 352);
-			IntegerTools::LeIncrease8(Counter, tmpc, 352, 384);
-			IntegerTools::LeIncrease8(Counter, tmpc, 384, 416);
-			IntegerTools::LeIncrease8(Counter, tmpc, 416, 448);
-			IntegerTools::LeIncrease8(Counter, tmpc, 448, 480);
-			IntegerTools::LeIncrease8(Counter, tmpc, 480, 512);
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 256, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 288, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 320, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 352, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 384, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 416, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 448, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 480, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
 			Transform4096(tmpc, 0, Output, OutOffset + bctr);
-			IntegerTools::LeIncrease8(Counter, static_cast<uint>(AVX512BLK));
 			bctr += AVX512BLK;
 		}
 	}
@@ -436,18 +451,25 @@ void RCS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		// stagger counters and process 8 blocks with avx2
 		while (bctr != PBKALN)
 		{
-			IntegerTools::LeIncrease8(Counter, tmpc, 0, 32);
-			IntegerTools::LeIncrease8(Counter, tmpc, 32, 64);
-			IntegerTools::LeIncrease8(Counter, tmpc, 64, 96);
-			IntegerTools::LeIncrease8(Counter, tmpc, 96, 128);
-			IntegerTools::LeIncrease8(Counter, tmpc, 128, 160);
-			IntegerTools::LeIncrease8(Counter, tmpc, 160, 192);
-			IntegerTools::LeIncrease8(Counter, tmpc, 192, 224);
-			IntegerTools::LeIncrease8(Counter, tmpc, 224, 256);
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
 			Transform2048(tmpc, 0, Output, OutOffset + bctr);
-			IntegerTools::LeIncrease8(Counter, static_cast<uint>(AVX2BLK));
 			bctr += AVX2BLK;
-		}
+}
 	}
 #elif defined(__AVX__)
 	const size_t AVXBLK = 4 * BLOCK_SIZE;
@@ -459,12 +481,15 @@ void RCS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		// 4 blocks with avx
 		while (bctr != PBKALN)
 		{
-			IntegerTools::LeIncrease8(Counter, tmpc, 0, 32);
-			IntegerTools::LeIncrease8(Counter, tmpc, 32, 64);
-			IntegerTools::LeIncrease8(Counter, tmpc, 64, 96);
-			IntegerTools::LeIncrease8(Counter, tmpc, 96, 128);
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
 			Transform1024(tmpc, 0, Output, OutOffset + bctr);
-			IntegerTools::LeIncrease8(Counter, static_cast<uint>(AVXBLK));
 			bctr += AVXBLK;
 		}
 	}
@@ -473,16 +498,16 @@ void RCS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	const size_t BLKALN = Length - (Length % BLOCK_SIZE);
 	while (bctr != BLKALN)
 	{
-		IntegerTools::LeIncrease8(Counter, static_cast<uint>(BLOCK_SIZE));
 		Transform256(Counter, 0, Output, OutOffset + bctr);
+		IntegerTools::LeIncrement(Counter, 16);
 		bctr += BLOCK_SIZE;
 	}
 
 	if (bctr != Length)
 	{
 		std::vector<byte> otp(BLOCK_SIZE);
-		IntegerTools::LeIncrease8(Counter, static_cast<uint>(BLOCK_SIZE));
 		Transform256(Counter, 0, otp, 0);
+		IntegerTools::LeIncrement(Counter, 16);
 		const size_t RMDLEN = Length % BLOCK_SIZE;
 		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - RMDLEN), RMDLEN);
 	}
@@ -532,20 +557,22 @@ void RCS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<b
 
 void RCS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	const size_t OTPLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
+	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
-	std::vector<byte> tmpc(m_rcsState->Nonce.size());
+	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
+	std::vector<byte> tmpc(BLOCK_SIZE);
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN](size_t i)
+	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<byte> thdc(m_rcsState->Nonce.size());
+		std::vector<byte> thdc(BLOCK_SIZE);
 		// offset counter by chunk size / block size  
-		IntegerTools::LeIncrease8(m_rcsState->Nonce, thdc, static_cast<uint>(CNKLEN * i));
+		IntegerTools::LeIncrease8(m_rcsState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
+		const size_t STMPOS = i * CNKLEN;
 		// generate random at output offset
-		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdc);
+		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);
 		// xor with input at offsets
-		MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+		MemoryTools::XOR(Input, InOffset + STMPOS, Output, OutOffset + STMPOS, CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
@@ -559,12 +586,12 @@ void RCS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 
 	// last block processing
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
-	if (ALNLEN < OTPLEN)
+	if (ALNLEN < OUTLEN)
 	{
-		const size_t RMDLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, RMDLEN, m_rcsState->Nonce);
+		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
+		Generate(Output, ALNLEN, FNLLEN, m_rcsState->Nonce);
 
-		for (size_t i = ALNLEN; i < OTPLEN; i++)
+		for (size_t i = ALNLEN; i < OUTLEN; i++)
 		{
 			Output[i] ^= Input[i];
 		}

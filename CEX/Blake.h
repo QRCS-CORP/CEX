@@ -52,7 +52,7 @@ NAMESPACE_DIGEST
 /// PermuteR10P16x512H and PermuteR12P8x1024H use the AVX512 instructions. \n
 /// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitly declared.</para>
 /// </summary>
-class Blake2
+class Blake
 {
 private:
 
@@ -110,10 +110,10 @@ private:
 
 public:
 
-	static const size_t BLAKE2_RATE256_SIZE = 64;
-	static const size_t BLAKE2_RATE512_SIZE = 128;
-	static const size_t BLAKE2_MESSAGE256_SIZE = 32;
-	static const size_t BLAKE2_MESSAGE512_SIZE = 64;
+	static const size_t BLAKE256_DIGEST_SIZE = 32;
+	static const size_t BLAKE512_DIGEST_SIZE = 64;
+	static const size_t BLAKE256_RATE_SIZE = 64;
+	static const size_t BLAKE512_RATE_SIZE = 128;
 
 	static const std::vector<uint> IV256;
 	static const std::vector<ulong> IV512;

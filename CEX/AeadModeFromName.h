@@ -33,13 +33,12 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The block-cipher enumeration name</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// <param name="CipherModeType">The AEAD cipher-mode enumeration name</param>
 	/// 
 	/// <returns>An uninitialized AEAD block-cipher mode instance</returns>
 	/// 
 	/// <exception cref="CryptoException">Thrown if the cipher, extension or mode types are not supported</exception>
-	static IAeadMode* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, AeadModes CipherModeType);
+	static IAeadMode* GetInstance(BlockCiphers CipherType, AeadModes CipherModeType);
 
 	/// <summary>
 	/// Get an uninitialized AEAD mode instance by name and a block-cipher pointer

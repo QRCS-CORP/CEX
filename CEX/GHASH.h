@@ -23,7 +23,7 @@ private:
 	static const bool HAS_CMUL;
 
 	class GhashState;
-	std::unique_ptr<GhashState> m_ghashState;
+	std::unique_ptr<GhashState> m_dgtState;
 
 public:
 

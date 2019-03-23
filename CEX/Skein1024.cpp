@@ -6,22 +6,27 @@
 
 NAMESPACE_DIGEST
 
+using Enumeration::DigestConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 using Utility::ParallelTools;
 
-const std::string Skein1024::CLASS_NAME("Skein1024");
-
-struct Skein1024::Skein1024State
+class Skein1024::Skein1024State
 {
+public:
+
 	// state
-	std::array<ulong, 16> S;
-	// tweak
-	std::array<ulong, 2> T;
+	std::array<ulong, 16> S = { 0 };
 	// config
-	std::array<ulong, 16> V;
+	std::array<ulong, 16> V = { 0 };
+	// tweak
+	std::array<ulong, 2> T = { 0 };
 
 	Skein1024State()
+	{
+	}
+
+	~Skein1024State()
 	{
 		Reset();
 	}
@@ -44,87 +49,45 @@ struct Skein1024::Skein1024State
 Skein1024::Skein1024(bool Parallel)
 	:
 	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_msgBuffer(Parallel ? MIN_PRLBLOCK : BLOCK_SIZE, 0),
+	m_msgBuffer(Parallel ? DEF_PRLDEGREE * Skein::SKEIN1024_RATE_SIZE : 
+		Skein::SKEIN1024_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeDestroy(true),
-	m_treeParams(Parallel ? SkeinParams(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : SkeinParams(DIGEST_SIZE, 0, 0))
+	m_parallelProfile(Skein::SKEIN1024_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_treeParams(Parallel ? SkeinParams(Skein::SKEIN1024_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN1024_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) :
+		SkeinParams(Skein::SKEIN1024_DIGEST_SIZE, 0x00, 0x00))
 {
-	// TODO: implement parallel alternate for single core cpu
-	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
-
-	Initialize();
+	Initialize(m_dgtState, m_treeParams);
 }
 
 Skein1024::Skein1024(SkeinParams &Params)
 	:
-	m_dgtState(1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_msgBuffer(BLOCK_SIZE),
+	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? Params.FanOut() :
+		throw CryptoDigestException(DigestConvert::ToName(Digests::Skein1024), std::string("Constructor"), std::string("The FanOut parameter can not be zero or exceed the maximum of 64!"), ErrorCodes::IllegalOperation)),
+	m_msgBuffer(Skein::SKEIN1024_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
-	m_treeDestroy(false),
+	m_parallelProfile(Skein::SKEIN1024_RATE_SIZE, static_cast<bool>(Params.FanOut() > 1), false, STATE_PRECACHED, false, Params.FanOut()),
 	m_treeParams(Params)
 {
-	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::NotSupported);
-	}
-	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The tree parameters are invalid!"), ErrorCodes::InvalidParam);
-	}
-
-	if (m_treeParams.FanOut() > 1)
-	{
-		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
-	}
-	else if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = false;
-	}
-
-	Initialize();
+	Initialize(m_dgtState, m_treeParams);
 }
 
 Skein1024::~Skein1024()
 {
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_msgLength = 0;
-
-		if (m_treeDestroy)
-		{
-			m_treeParams.Reset();
-			m_treeDestroy = false;
-		}
-
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
-		{
-			m_dgtState[i].Reset();
-		}
-
-		IntegerTools::Clear(m_dgtState);
-		IntegerTools::Clear(m_msgBuffer);
-	}
+	m_msgLength = 0;
+	IntegerTools::Clear(m_dgtState);
+	IntegerTools::Clear(m_msgBuffer);
 }
 
 //~~~Accessors~~~//
 
 size_t Skein1024::BlockSize()
 {
-	return BLOCK_SIZE;
+	return Skein::SKEIN1024_RATE_SIZE;
 }
 
 size_t Skein1024::DigestSize()
 {
-	return DIGEST_SIZE;
+	return Skein::SKEIN1024_DIGEST_SIZE;
 }
 
 const Digests Skein1024::Enumeral()
@@ -141,13 +104,13 @@ const std::string Skein1024::Name()
 {
 	std::string name;
 
-	if (m_parallelProfile.IsParallel())
+	if (m_treeParams.FanOut() > 1)
 	{
-		name = CLASS_NAME + "-P" + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
+		name = DigestConvert::ToName(Digests::Skein1024) + std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 	else
 	{
-		name = CLASS_NAME;
+		name = DigestConvert::ToName(Digests::Skein1024);
 	}
 
 	return name;
@@ -167,14 +130,24 @@ ParallelOptions &Skein1024::ParallelProfile()
 
 void Skein1024::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Output.resize(DIGEST_SIZE);
+	if (Output.size() < Skein::SKEIN1024_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Compute"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-size_t Skein1024::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void Skein1024::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
+	if (Output.size() - OutOffset < Skein::SKEIN1024_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Finalize"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
+	size_t bctr;
+	size_t i;
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -187,35 +160,35 @@ size_t Skein1024::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		// process buffer
 		if (m_msgLength != 0)
 		{
-			size_t blkCtr = 0;
+			bctr = 0;
 
 			while (m_msgLength != 0)
 			{
-				const size_t MSGRMD = (m_msgLength >= BLOCK_SIZE) ? BLOCK_SIZE : m_msgLength;
-				HashFinal(m_msgBuffer, blkCtr * BLOCK_SIZE, MSGRMD, m_dgtState, blkCtr);
+				const size_t MSGRMD = (m_msgLength >= Skein::SKEIN1024_RATE_SIZE) ? Skein::SKEIN1024_RATE_SIZE : m_msgLength;
+				HashFinal(m_msgBuffer, bctr * Skein::SKEIN1024_RATE_SIZE, MSGRMD, m_dgtState[bctr]);
 				m_msgLength -= MSGRMD;
-				++blkCtr;
+				++bctr;
 			}
 		}
 
 		// initialize a linear-mode hash config
-		std::vector<Skein1024State> rootState(1);
-		SkeinParams rootParams{ DIGEST_SIZE };
-		std::vector<ulong> tmp = rootParams.GetConfig();
+		Skein1024State proot;
+		SkeinParams rparam{ Skein::SKEIN1024_DIGEST_SIZE };
+		std::vector<ulong> tmp = rparam.GetConfig();
 		std::array<ulong, 16> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], tmp[9], tmp[10], tmp[11], tmp[12], tmp[13], tmp[14], tmp[15] };
 		// load the initial state
-		LoadState(rootState[0], cfg);
+		LoadState(proot, cfg);
 
 		// add state blocks as contiguous message input
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		for (i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntegerTools::LeULL1024ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * BLOCK_SIZE);
-			m_msgLength += BLOCK_SIZE;
+			IntegerTools::LeULL1024ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * Skein::SKEIN1024_RATE_SIZE);
+			m_msgLength += Skein::SKEIN1024_RATE_SIZE;
 		}
 
 		// finalize and store
-		HashFinal(m_msgBuffer, 0, m_msgLength, rootState, 0);
-		IntegerTools::LeULL1024ToBlock(rootState[0].S, 0, Output, OutOffset);
+		HashFinal(m_msgBuffer, 0, m_msgLength, proot);
+		IntegerTools::LeULL1024ToBlock(proot.S, 0, Output, OutOffset);
 	}
 	else
 	{
@@ -226,18 +199,16 @@ size_t Skein1024::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		}
 
 		// finalize and store
-		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState, 0);
+		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
 		IntegerTools::LeULL1024ToBlock(m_dgtState[0].S, 0, Output, OutOffset);
 	}
 
 	Reset();
-
-	return DIGEST_SIZE;
 }
 
 void Skein1024::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	if (Degree == 0 || Degree % 2 != 0 || Degree > MAX_PRLDEGREE)
 	{
 		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
@@ -246,15 +217,17 @@ void Skein1024::ParallelMaxDegree(size_t Degree)
 	m_dgtState.clear();
 	m_dgtState.resize(Degree);
 	m_msgBuffer.clear();
-	m_msgBuffer.resize(Degree * BLOCK_SIZE);
-	m_treeParams = { DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), static_cast<byte>(Degree) };
+	m_msgBuffer.resize(Degree * Skein::SKEIN1024_RATE_SIZE);
+	m_treeParams = { Skein::SKEIN1024_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN1024_RATE_SIZE), static_cast<byte>(Degree) };
 
-	Initialize();
+	Initialize(m_dgtState, m_treeParams);
 }
 
 void Skein1024::Reset()
 {
-	for (size_t i = 0; i < m_dgtState.size(); ++i)
+	size_t i;
+
+	for (i = 0; i < m_dgtState.size(); ++i)
 	{
 		// copy the configuration value to the state
 		m_dgtState[i].S = m_dgtState[i].V;
@@ -264,13 +237,26 @@ void Skein1024::Reset()
 	// reset bytes filled
 	MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
-	m_isInitialized = false;
 }
 
 void Skein1024::Update(byte Input)
 {
 	std::vector<byte> one(1, Input);
 	Update(one, 0, 1);
+}
+
+void Skein1024::Update(uint Input)
+{
+	std::vector<byte> tmp(sizeof(uint));
+	IntegerTools::Le32ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
+}
+
+void Skein1024::Update(ulong Input)
+{
+	std::vector<byte> tmp(sizeof(ulong));
+	IntegerTools::Le64ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
 }
 
 void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
@@ -293,7 +279,7 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				// empty the message buffer
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
-					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_dgtState, i);
+					ProcessBlock(m_msgBuffer, i * Skein::SKEIN1024_RATE_SIZE, m_dgtState[i], Skein::SKEIN1024_RATE_SIZE);
 				});
 
 				m_msgLength = 0;
@@ -309,7 +295,7 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				// process large blocks
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRCLEN);
+					ProcessLeaf(Input, InOffset + (i * Skein::SKEIN1024_RATE_SIZE), m_dgtState[i], PRCLEN);
 				});
 
 				Length -= PRCLEN;
@@ -322,7 +308,7 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRMLEN);
+					ProcessLeaf(Input, InOffset + (i * Skein::SKEIN1024_RATE_SIZE), m_dgtState[i], PRMLEN);
 				});
 
 				Length -= PRMLEN;
@@ -331,26 +317,26 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		}
 		else
 		{
-			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
+			if (m_msgLength != 0 && (m_msgLength + Length >= Skein::SKEIN1024_RATE_SIZE))
 			{
-				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				const size_t RMDLEN = Skein::SKEIN1024_RATE_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
 					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
-				ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
+				ProcessBlock(m_msgBuffer, 0, m_dgtState[0], Skein::SKEIN1024_RATE_SIZE);
 				m_msgLength = 0;
 				InOffset += RMDLEN;
 				Length -= RMDLEN;
 			}
 
 			// sequential loop through blocks
-			while (Length > BLOCK_SIZE)
+			while (Length > Skein::SKEIN1024_RATE_SIZE)
 			{
-				ProcessBlock(Input, InOffset, m_dgtState, 0);
-				InOffset += BLOCK_SIZE;
-				Length -= BLOCK_SIZE;
+				ProcessBlock(Input, InOffset, m_dgtState[0], Skein::SKEIN1024_RATE_SIZE);
+				InOffset += Skein::SKEIN1024_RATE_SIZE;
+				Length -= Skein::SKEIN1024_RATE_SIZE;
 			}
 		}
 
@@ -365,50 +351,53 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 //~~~Private Functions~~~//
 
-void Skein1024::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<Skein1024State> &State, size_t StateOffset)
+void Skein1024::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Skein1024State &State)
 {
 	// process message block
-	SkeinUbiTweak::IsFinalBlock(State[StateOffset].T, true);
+	SkeinUbiTweak::IsFinalBlock(State.T, true);
 	while (Length != 0)
 	{
-		const size_t MSGRMD = (Length >= BLOCK_SIZE) ? BLOCK_SIZE : Length;
-		ProcessBlock(Input, InOffset, State, StateOffset, MSGRMD);
+		const size_t MSGRMD = (Length >= Skein::SKEIN1024_RATE_SIZE) ? Skein::SKEIN1024_RATE_SIZE : Length;
+		ProcessBlock(Input, InOffset, State, MSGRMD);
 		Length -= MSGRMD;
 		InOffset += MSGRMD;
 	}
 
 	// finalize block
-	SkeinUbiTweak::StartNewBlockType(State[StateOffset].T, SkeinUbiType::Out);
-	SkeinUbiTweak::IsFinalBlock(State[StateOffset].T, true);
-	std::vector<byte> tmp(BLOCK_SIZE);
-	ProcessBlock(tmp, 0, State, StateOffset, 8);
+	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Out);
+	SkeinUbiTweak::IsFinalBlock(State.T, true);
+	std::vector<byte> tmp(Skein::SKEIN1024_RATE_SIZE);
+	ProcessBlock(tmp, 0, State, 8);
 }
 
-void Skein1024::Initialize()
+void Skein1024::Initialize(std::vector<Skein1024State> &State, SkeinParams &Params)
 {
-	std::vector<ulong> tmp = m_treeParams.GetConfig();
+	std::vector<ulong> tmp = Params.GetConfig();
 	std::array<ulong, 16> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], tmp[9], tmp[10], tmp[11], tmp[12], tmp[13], tmp[14], tmp[15] };
+	size_t i;
 
-	LoadState(m_dgtState[0], cfg);
+	LoadState(State[0], cfg);
 
-	if (m_parallelProfile.IsParallel())
+	for (i = 1; i < State.size(); ++i)
 	{
-		for (size_t i = 1; i < m_dgtState.size(); ++i)
-		{
-			// create unique state for each node
-			SkeinUbiTweak::StartNewBlockType(m_dgtState[i].T, SkeinUbiType::Config);
-			SkeinUbiTweak::IsFinalBlock(m_dgtState[i].T, true);
-			m_dgtState[i].Increase(32);
-			// compress previous state
-			Permute(m_dgtState[i - 1].V, m_dgtState[i]);
-			// store the new state in V for reset
-			MemoryTools::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
-			// mix config with state
-			MemoryTools::XOR1024(cfg, 0, m_dgtState[i].V, 0);
-		}
+		// create unique state for each node
+		SkeinUbiTweak::StartNewBlockType(State[i].T, SkeinUbiType::Config);
+		SkeinUbiTweak::IsFinalBlock(State[i].T, true);
+		State[i].Increase(32);
+		// compress previous state
+		Permute(State[i - 1].V, State[i]);
+		// store the new state in V for reset
+		MemoryTools::Copy(State[i].S, 0, State[i].V, 0, State[i].V.size() * sizeof(ulong));
+		// mix config with state
+		MemoryTools::XOR1024(cfg, 0, State[i].V, 0);
 	}
 
-	Reset();
+	for (i = 0; i < State.size(); ++i)
+	{
+		// copy the configuration value to the state
+		State[i].S = State[i].V;
+		SkeinUbiTweak::StartNewBlockType(State[i].T, SkeinUbiType::Message);
+	}
 }
 
 void Skein1024::LoadState(Skein1024State &State, std::array<ulong, 16> &Config)
@@ -433,32 +422,30 @@ void Skein1024::Permute(std::array<ulong, 16> &Message, Skein1024State &State)
 #endif
 }
 
-void Skein1024::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein1024State> &State, size_t StateOffset, size_t Length)
+void Skein1024::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, Skein1024State &State, size_t Length)
 {
 	// update length
-	State[StateOffset].Increase(Length);
+	State.Increase(Length);
 	// encrypt block
 	std::array<ulong, 16> msg;
 	IntegerTools::LeBytesToULL1024(Input, InOffset, msg, 0);
-	Permute(msg, State[StateOffset]);
-
+	Permute(msg, State);
 	// feed-forward input with state
-	MemoryTools::XOR1024(msg, 0, State[StateOffset].S, 0);
+	MemoryTools::XOR1024(msg, 0, State.S, 0);
 
 	// clear first flag
-	if (!m_isInitialized && StateOffset == 0)
+	if (SkeinUbiTweak::IsFirstBlock(State.T))
 	{
-		SkeinUbiTweak::IsFirstBlock(m_dgtState[0].T, false);
-		m_isInitialized = true;
+		SkeinUbiTweak::IsFirstBlock(State.T, false);
 	}
 }
 
-void Skein1024::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein1024State> &State, size_t StateOffset, ulong Length)
+void Skein1024::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Skein1024State &State, ulong Length)
 {
 	do
 	{
 		// process message offset by lane size
-		ProcessBlock(Input, InOffset, State, StateOffset);
+		ProcessBlock(Input, InOffset, State, Skein::SKEIN1024_RATE_SIZE);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
 	} 

@@ -53,30 +53,26 @@ IAeadMode* AeadModeFromName::GetInstance(IBlockCipher* Cipher, AeadModes CipherM
 	return mptr;
 }
 
-IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, AeadModes CipherModeType)
+IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, AeadModes CipherModeType)
 {
 	using namespace Cipher::Block::Mode;
 
-	IBlockCipher* cptr;
 	IAeadMode* mptr;
 
-	cptr = nullptr;
 	mptr = nullptr;
 
 	try
 	{
-		BlockCipherFromName::GetInstance(CipherType);
-
 		switch (CipherModeType)
 		{
 			case AeadModes::EAX:
 			{
-				mptr = new EAX(cptr);
+				mptr = new EAX(CipherType);
 				break;
 			}
 			case AeadModes::GCM:
 			{
-				mptr = new GCM(cptr);
+				mptr = new GCM(CipherType);
 				break;
 			}
 			default:
@@ -87,11 +83,6 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 	}
 	catch (CryptoCipherModeException &ex)
 	{
-		if (cptr != nullptr)
-		{
-			delete cptr;
-		}
-
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
 	}
 	catch (CryptoSymmetricException &ex)
@@ -100,11 +91,6 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExt
 	}
 	catch (const std::exception &ex)
 	{
-		if (cptr != nullptr)
-		{
-			delete cptr;
-		}
-
 		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
 	}
 

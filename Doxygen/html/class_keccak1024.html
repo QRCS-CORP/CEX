@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the SHA-3 Keccak digest  
+<p>An implementation of the SHA-3 Keccak sequential and parallel message-digests with a 1024-bit hash code  
  <a href="class_keccak1024.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_keccak1024_8h_source.html">Keccak1024.h</a>&gt;</code></p>
@@ -81,7 +81,7 @@ Inheritance diagram for Keccak1024:</div>
  <div class="center">
   <img src="class_keccak1024.png" usemap="#Keccak1024_map" alt=""/>
   <map id="Keccak1024_map" name="Keccak1024_map">
-<area href="class_i_digest.html" title="Hash Digest Interface " alt="IDigest" shape="rect" coords="0,0,82,24"/>
+<area href="class_i_digest.html" title="The message digest virtualnterface class. " alt="IDigest" shape="rect" coords="0,0,82,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -103,19 +103,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a122e8ce49f6c74698e02fd2bbd6e7ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a122e8ce49f6c74698e02fd2bbd6e7ff8">More...</a><br /></td></tr>
 <tr class="separator:a122e8ce49f6c74698e02fd2bbd6e7ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56ff7536933dc1c2680b5ab070a6cdd6"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a56ff7536933dc1c2680b5ab070a6cdd6">BlockSize</a> () override</td></tr>
-<tr class="memdesc:a56ff7536933dc1c2680b5ab070a6cdd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Digests internal blocksize in bytes  <a href="#a56ff7536933dc1c2680b5ab070a6cdd6">More...</a><br /></td></tr>
+<tr class="memdesc:a56ff7536933dc1c2680b5ab070a6cdd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests internal block size in bytes  <a href="#a56ff7536933dc1c2680b5ab070a6cdd6">More...</a><br /></td></tr>
 <tr class="separator:a56ff7536933dc1c2680b5ab070a6cdd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a690af0c1305b60ecc831275ed8c9ca22"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a690af0c1305b60ecc831275ed8c9ca22">DigestSize</a> () override</td></tr>
-<tr class="memdesc:a690af0c1305b60ecc831275ed8c9ca22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Size of returned digest in bytes  <a href="#a690af0c1305b60ecc831275ed8c9ca22">More...</a><br /></td></tr>
+<tr class="memdesc:a690af0c1305b60ecc831275ed8c9ca22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests output hash-size in bytes  <a href="#a690af0c1305b60ecc831275ed8c9ca22">More...</a><br /></td></tr>
 <tr class="separator:a690af0c1305b60ecc831275ed8c9ca22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a003be814f8a06499a374567d15a67dbc"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a003be814f8a06499a374567d15a67dbc">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a003be814f8a06499a374567d15a67dbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The digests type name  <a href="#a003be814f8a06499a374567d15a67dbc">More...</a><br /></td></tr>
+<tr class="memdesc:a003be814f8a06499a374567d15a67dbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests enumeration type-name  <a href="#a003be814f8a06499a374567d15a67dbc">More...</a><br /></td></tr>
 <tr class="separator:a003be814f8a06499a374567d15a67dbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45c995d050a9b209ccefb70f8e096246"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a45c995d050a9b209ccefb70f8e096246">IsParallel</a> () override</td></tr>
 <tr class="memdesc:a45c995d050a9b209ccefb70f8e096246"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#a45c995d050a9b209ccefb70f8e096246">More...</a><br /></td></tr>
 <tr class="separator:a45c995d050a9b209ccefb70f8e096246"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5c1ccdfa892730558dbed1c03d30314"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#ac5c1ccdfa892730558dbed1c03d30314">Name</a> () override</td></tr>
-<tr class="memdesc:ac5c1ccdfa892730558dbed1c03d30314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The digests class name  <a href="#ac5c1ccdfa892730558dbed1c03d30314">More...</a><br /></td></tr>
+<tr class="memdesc:ac5c1ccdfa892730558dbed1c03d30314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests formal class name  <a href="#ac5c1ccdfa892730558dbed1c03d30314">More...</a><br /></td></tr>
 <tr class="separator:ac5c1ccdfa892730558dbed1c03d30314"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06e41b063c6535729a2e4a26d856579c"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a06e41b063c6535729a2e4a26d856579c">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:a06e41b063c6535729a2e4a26d856579c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.  <a href="#a06e41b063c6535729a2e4a26d856579c">More...</a><br /></td></tr>
@@ -124,22 +124,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af8621aa697c21a35868968222e6b031b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.  <a href="#af8621aa697c21a35868968222e6b031b">More...</a><br /></td></tr>
 <tr class="separator:af8621aa697c21a35868968222e6b031b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac24313d1e4f061cf3bebbbfc6412e051"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#ac24313d1e4f061cf3bebbbfc6412e051">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:ac24313d1e4f061cf3bebbbfc6412e051"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Hash value  <a href="#ac24313d1e4f061cf3bebbbfc6412e051">More...</a><br /></td></tr>
+<tr class="memdesc:ac24313d1e4f061cf3bebbbfc6412e051"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the hash value in a single-step using the input message and the output vector receiving the hash code.  <a href="#ac24313d1e4f061cf3bebbbfc6412e051">More...</a><br /></td></tr>
 <tr class="separator:ac24313d1e4f061cf3bebbbfc6412e051"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95b5001923f4b5d1ae37478eea8b1160"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a95b5001923f4b5d1ae37478eea8b1160">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
-<tr class="memdesc:a95b5001923f4b5d1ae37478eea8b1160"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#a95b5001923f4b5d1ae37478eea8b1160">More...</a><br /></td></tr>
-<tr class="separator:a95b5001923f4b5d1ae37478eea8b1160"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39448dd296e33f84fab7260f25103352"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a39448dd296e33f84fab7260f25103352">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
+<tr class="memdesc:a39448dd296e33f84fab7260f25103352"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize message processing and return the hash code.  <a href="#a39448dd296e33f84fab7260f25103352">More...</a><br /></td></tr>
+<tr class="separator:a39448dd296e33f84fab7260f25103352"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3a0f04e2b16ba9b7614875acdb09888"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#ad3a0f04e2b16ba9b7614875acdb09888">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:ad3a0f04e2b16ba9b7614875acdb09888"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of threads allocated when using multi-threaded tree hashing processing.  <a href="#ad3a0f04e2b16ba9b7614875acdb09888">More...</a><br /></td></tr>
 <tr class="separator:ad3a0f04e2b16ba9b7614875acdb09888"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f5ac8228acb347db4f59052da8b75c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a4f5ac8228acb347db4f59052da8b75c7">Reset</a> () override</td></tr>
-<tr class="memdesc:a4f5ac8228acb347db4f59052da8b75c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#a4f5ac8228acb347db4f59052da8b75c7">More...</a><br /></td></tr>
+<tr class="memdesc:a4f5ac8228acb347db4f59052da8b75c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the message-digests internal state  <a href="#a4f5ac8228acb347db4f59052da8b75c7">More...</a><br /></td></tr>
 <tr class="separator:a4f5ac8228acb347db4f59052da8b75c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7998c9c596033af1433f106153759d97"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a7998c9c596033af1433f106153759d97">Update</a> (byte Input) override</td></tr>
 <tr class="memdesc:a7998c9c596033af1433f106153759d97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the digest with a single byte  <a href="#a7998c9c596033af1433f106153759d97">More...</a><br /></td></tr>
 <tr class="separator:a7998c9c596033af1433f106153759d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8a6801acfab91f73954cd42afda54f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#af8a6801acfab91f73954cd42afda54f2">Update</a> (uint Input) override</td></tr>
+<tr class="memdesc:af8a6801acfab91f73954cd42afda54f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single unsigned 32-bit integer  <a href="#af8a6801acfab91f73954cd42afda54f2">More...</a><br /></td></tr>
+<tr class="separator:af8a6801acfab91f73954cd42afda54f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e18f0c0a49a04a880ed289493c2b1c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a7e18f0c0a49a04a880ed289493c2b1c7">Update</a> (ulong Input) override</td></tr>
+<tr class="memdesc:a7e18f0c0a49a04a880ed289493c2b1c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single unsigned 64-bit integer  <a href="#a7e18f0c0a49a04a880ed289493c2b1c7">More...</a><br /></td></tr>
+<tr class="separator:a7e18f0c0a49a04a880ed289493c2b1c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8290c921d5fba05aec8ee02f5fec4566"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak1024.html#a8290c921d5fba05aec8ee02f5fec4566">Update</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, size_t Length) override</td></tr>
-<tr class="memdesc:a8290c921d5fba05aec8ee02f5fec4566"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the buffer  <a href="#a8290c921d5fba05aec8ee02f5fec4566">More...</a><br /></td></tr>
+<tr class="memdesc:a8290c921d5fba05aec8ee02f5fec4566"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a vector using offset and length parameters.  <a href="#a8290c921d5fba05aec8ee02f5fec4566">More...</a><br /></td></tr>
 <tr class="separator:a8290c921d5fba05aec8ee02f5fec4566"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_digest"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_digest')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_digest.html">IDigest</a></td></tr>
 <tr class="memitem:a3efc443269eb9737fac182ec2c6998b6 inherit pub_methods_class_i_digest"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_digest.html#a3efc443269eb9737fac182ec2c6998b6">IDigest</a> (const <a class="el" href="class_i_digest.html">IDigest</a> &amp;)=delete</td></tr>
@@ -156,8 +162,16 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6b8e518f2f788f6a755548e95d0985e0 inherit pub_methods_class_i_digest"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the SHA-3 Keccak digest </p>
-<p>Example using an <code>IDigest</code> interface: </p><div class="fragment"><div class="line"><a class="code" href="class_keccak1024.html">Keccak1024</a> digest;</div><div class="line">std::vector&lt;byte&gt; hash(digest.<a class="code" href="class_keccak1024.html#a690af0c1305b60ecc831275ed8c9ca22">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">digest.<a class="code" href="class_keccak1024.html#ac24313d1e4f061cf3bebbbfc6412e051">Compute</a>(Input, hash);</div></div><!-- fragment --> <p>Implementation Notes: </p><ul>
+<div class="textblock"><p>An implementation of the SHA-3 Keccak sequential and parallel message-digests with a 1024-bit hash code </p>
+<p>Example using an <code>IDigest</code> interface: </p><div class="fragment"><div class="line"><a class="code" href="class_keccak1024.html">Keccak1024</a> dgt;</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_keccak1024.html#a7998c9c596033af1433f106153759d97">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_keccak1024.html#a39448dd296e33f84fab7260f25103352">Finalize</a>(Output, 0);</div></div><!-- fragment --> <p>Tree Hashing Description: </p>
+<p>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter. <br />
+ The default number of threads is 8, this can be changed using the ParallelMaxDegree(size_t) function, but not directly through the ParallelProfile accessor, (state sizes must be recalculated when the thread count changes). Changing the thread count from the default, will produce a different hash output. <br />
+The thread count must be an even number less or equal to the number of processing cores. <br />
+For best performance in tree hashing mode, the message input block-size (Length parameter of an Update call), should be ParallelBlockSize in length. <br />
+The ideal parallel block-size is calculated automatically based on the hardware profile and algorithm requirments. <br />
+The parallel mode uses multi-threaded parallel processing, with each thread maintaining a single unique state. <br />
+The hash finalizer processes each leaf state as contiguous message input for the root hash; i.e. R = H(S0 || S1 || S2 || ...Sn).</p>
+<p>Implementation Notes: </p><ul>
 <li>
 The 1024bit version of Keccak is an extension, and should be considered as only for experimental use. </li>
 <li>
@@ -167,9 +181,15 @@ The output hash size is 128 bytes (1024 bits). </li>
 <li>
 The input block size is 72 bytes (576 bits). </li>
 <li>
-The Compute(byte[]) method wraps the Update(byte[], int, int) and Finalize methods./&gt; </li>
+The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data)./&gt; </li>
 <li>
-The Finalize(byte[], int) method resets the internal state. </li>
+The Update functions process message input, this can be a byte, 32&ndash;bit or 64-bit unsigned integer, or a vector of bytes. </li>
+<li>
+The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state. </li>
+<li>
+Setting Parallel to true in the constructor instantiates the multi-threaded variant. </li>
+<li>
+Multi-threaded and sequential versions produce a different output hash for a message, this is expected. </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -343,7 +363,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The Digests internal blocksize in bytes </p>
+<p>Read Only: The message-digests internal block size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#ab1e4146c28b3623c488214ef37d8530a">IDigest</a>.</p>
 
@@ -383,11 +403,18 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Get the Hash value </p>
+<p>Compute the hash value in a single-step using the input message and the output vector receiving the hash code. </p>
+<p>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Input data</td></tr>
-    <tr><td class="paramname">Output</td><td>The hash output value array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input message byte-vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector receiving the final hash code; must be at least DigestSize in length</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoDigestException</td><td>Thrown if the output buffer is too short</td></tr>
   </table>
   </dd>
 </dl>
@@ -419,7 +446,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Size of returned digest in bytes </p>
+<p>Read Only: The message-digests output hash-size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#ace4a6bf16017c688f77c7ea9b31f189e">IDigest</a>.</p>
 
@@ -448,14 +475,14 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The digests type name </p>
+<p>Read Only: The message-digests enumeration type-name </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a01058025d9343eeacb5935561edf5059">IDigest</a>.</p>
 
 </div>
 </div>
-<a id="a95b5001923f4b5d1ae37478eea8b1160"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a95b5001923f4b5d1ae37478eea8b1160">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="a39448dd296e33f84fab7260f25103352"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39448dd296e33f84fab7260f25103352">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -464,7 +491,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t Keccak1024::Finalize </td>
+          <td class="memname">void Keccak1024::Finalize </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -488,15 +515,15 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Do final processing and get the hash value </p>
+<p>Finalize message processing and return the hash code. </p>
+<p>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The Hash output value array</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector receiving the final hash code; must be at least DigestSize in length</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Size of Hash value</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoDigestException</td><td>Thrown if the output buffer is too short</td></tr>
@@ -504,7 +531,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_digest.html#af2aec1dc5f826b4a958f15d1487dacae">IDigest</a>.</p>
+<p>Implements <a class="el" href="class_i_digest.html#a4e3f2a685739584bb3db22a92ba83b9c">IDigest</a>.</p>
 
 </div>
 </div>
@@ -561,7 +588,7 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The digests class name </p>
+<p>Read Only: The message-digests formal class name </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a34f2a2b026e092d2c93f71885a3202ea">IDigest</a>.</p>
 
@@ -721,14 +748,14 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Reset the internal state </p>
+<p>Reset the message-digests internal state </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a473c1fba5959334b7c3bc1d694677aa9">IDigest</a>.</p>
 
 </div>
 </div>
 <a id="a7998c9c596033af1433f106153759d97"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7998c9c596033af1433f106153759d97">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7998c9c596033af1433f106153759d97">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -763,8 +790,80 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 
 </div>
 </div>
+<a id="af8a6801acfab91f73954cd42afda54f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8a6801acfab91f73954cd42afda54f2">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Keccak1024::Update </td>
+          <td>(</td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>Input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the message digest with a single unsigned 32-bit integer </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The 32-bit integer to process</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_digest.html#ad3003018823ef568235dab88e795e87c">IDigest</a>.</p>
+
+</div>
+</div>
+<a id="a7e18f0c0a49a04a880ed289493c2b1c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e18f0c0a49a04a880ed289493c2b1c7">&#9670;&nbsp;</a></span>Update() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Keccak1024::Update </td>
+          <td>(</td>
+          <td class="paramtype">ulong&#160;</td>
+          <td class="paramname"><em>Input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the message digest with a single unsigned 64-bit integer </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The 64-bit integer to process</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_digest.html#aa33d3d44c85563b68dfb8bfbaba1d72b">IDigest</a>.</p>
+
+</div>
+</div>
 <a id="a8290c921d5fba05aec8ee02f5fec4566"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8290c921d5fba05aec8ee02f5fec4566">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8290c921d5fba05aec8ee02f5fec4566">&#9670;&nbsp;</a></span>Update() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -803,12 +902,13 @@ Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a
 </table>
 </div><div class="memdoc">
 
-<p>Update the buffer </p>
+<p>Update the message digest with a vector using offset and length parameters. </p>
+<p>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Input data</td></tr>
-    <tr><td class="paramname">InOffset</td><td>The starting offset within the Input array</td></tr>
-    <tr><td class="paramname">Length</td><td>Amount of data to process in bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input message byte-vector</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to process</td></tr>
   </table>
   </dd>
 </dl>

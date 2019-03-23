@@ -40,8 +40,7 @@ namespace Test
 
 	SHA2Test::SHA2Test()
 		:
-		m_exp256(0),
-		m_exp512(0),
+		m_expected(0),
 		m_message(0),
 		m_progressEvent()
 	{
@@ -50,9 +49,8 @@ namespace Test
 
 	SHA2Test::~SHA2Test()
 	{
-		IntegerTools::Clear(m_exp256);
-		IntegerTools::Clear(m_exp512);
-		(m_message);
+		IntegerTools::Clear(m_expected);
+		IntegerTools::Clear(m_message);
 	}
 
 	//~~~Accessors~~~//
@@ -73,51 +71,46 @@ namespace Test
 	{
 		try
 		{
-			CpuDetect detect;
-
 			Exception();
 			OnProgress(std::string("SHA2Test: Passed SHA2-256/512 exception handling tests.."));
 
-			SHA256* dgt256s = new SHA256();
-			Kat(dgt256s, m_message[0], m_exp256[0]);
-			Kat(dgt256s, m_message[1], m_exp256[1]);
-			Kat(dgt256s, m_message[2], m_exp256[2]);
-			Kat(dgt256s, m_message[3], m_exp256[3]);
-			OnProgress(std::string("SHA2Test: Passed SHA-256 bit digest vector tests.."));/**/
+			// test sequential modes
 
-			SHA512* dgt512s = new SHA512();
-			Kat(dgt512s, m_message[0], m_exp512[0]);
-			Kat(dgt512s, m_message[1], m_exp512[1]);
-			Kat(dgt512s, m_message[2], m_exp512[2]);
-			Kat(dgt512s, m_message[3], m_exp512[3]);
-			OnProgress(std::string("SHA2Test: Passed SHA-512 bit digest vector tests.."));
+			SHA256* dgt256s = new SHA256(false);
+			SHA512* dgt512s = new SHA512(false);
+
+			Kat(dgt256s, m_message[0], m_expected[0]);
+			Kat(dgt256s, m_message[1], m_expected[1]);
+			Kat(dgt256s, m_message[2], m_expected[2]);
+			Kat(dgt256s, m_message[3], m_expected[3]);
+			OnProgress(std::string("SHA2Test: Passed sequential SHA-256 bit digest vector tests.."));
+
+			Kat(dgt512s, m_message[0], m_expected[4]);
+			Kat(dgt512s, m_message[1], m_expected[5]);
+			Kat(dgt512s, m_message[2], m_expected[6]);
+			Kat(dgt512s, m_message[3], m_expected[7]);
+			OnProgress(std::string("SHA2Test: Passed sequential SHA-512 bit digest vector tests.."));
 
 			Stress(dgt256s);
-			delete dgt256s;
 			OnProgress(std::string("SHA2Test: Passed SHA-256 sequential stress tests.."));
 
 			Stress(dgt512s);
-			delete dgt512s;
 			OnProgress(std::string("SHA2Test: Passed SHA-512 sequential stress tests.."));
 
-			if (detect.VirtualCores() >= 2)
-			{
-				SHA256* dgt256p = new SHA256(true);
-				Stress(dgt256p);
-				OnProgress(std::string("SHA2Test: Passed SHA-256 parallel stress tests.."));
+			delete dgt256s;
+			delete dgt512s;
 
-				SHA512* dgt512p = new SHA512(true);
-				Stress(dgt256p);
-				OnProgress(std::string("SHA2Test: Passed SHA-512 parallel stress tests.."));
+			SHA256* dgt256p = new SHA256(true);
+			SHA512* dgt512p = new SHA512(true);
 
-				Parallel(dgt256p);
-				delete dgt256p;
-				OnProgress(std::string("SHA2Test: Passed SHA-256 parallel integrity tests.."));
+			Parallel(dgt256p);
+			OnProgress(std::string("SHA2Test: Passed SHA-256 parallel integrity tests.."));
+			
+			Parallel(dgt512p);
+			OnProgress(std::string("SHA2Test: Passed SHA-512 parallel integrity tests.."));
 
-				Parallel(dgt512p);
-				delete dgt512p;
-				OnProgress(std::string("SHA2Test: Passed SHA-512 parallel integrity tests.."));
-			}
+			delete dgt256p;
+			delete dgt512p;
 
 			PermutationR64();
 			OnProgress(std::string("SHA2Test: Passed Sha2-256 permutation variants equivalence test.."));
@@ -475,23 +468,19 @@ namespace Test
 		};
 		HexConverter::Decode(message, 4, m_message);
 
-		const std::vector<std::string> exp256 =
+		const std::vector<std::string> expected =
 		{
 			std::string("BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD"),
 			std::string("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"),
 			std::string("248D6A61D20638B8E5C026930C3E6039A33CE45964FF2167F6ECEDD419DB06C1"),
-			std::string("CF5B16A778AF8380036CE59E7B0492370B249B11E8F07A51AFAC45037AFEE9D1")
-		};
-		HexConverter::Decode(exp256, 4, m_exp256);
-
-		const std::vector<std::string> exp512 =
-		{
+			std::string("CF5B16A778AF8380036CE59E7B0492370B249B11E8F07A51AFAC45037AFEE9D1"),
 			std::string("DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"),
 			std::string("CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E"),
 			std::string("204A8FC6DDA82F0A0CED7BEB8E08A41657C16EF468B228A8279BE331A703C33596FD15C13B1B07F9AA1D3BEA57789CA031AD85C7A71DD70354EC631238CA3445"),
-			std::string("8E959B75DAE313DA8CF4F72814FC143F8F7779C6EB9F7FA17299AEADB6889018501D289E4900F7E4331B99DEC4B5433AC7D329EEB6DD26545E96E55B874BE909")
+			std::string("8E959B75DAE313DA8CF4F72814FC143F8F7779C6EB9F7FA17299AEADB6889018501D289E4900F7E4331B99DEC4B5433AC7D329EEB6DD26545E96E55B874BE909"),
 		};
-		HexConverter::Decode(exp512, 4, m_exp512);
+		HexConverter::Decode(expected, 8, m_expected);
+
 		/*lint -restore */
 	}
 

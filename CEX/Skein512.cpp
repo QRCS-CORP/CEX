@@ -6,22 +6,27 @@
 
 NAMESPACE_DIGEST
 
+using Enumeration::DigestConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 using Utility::ParallelTools;
 
-const std::string Skein512::CLASS_NAME("Skein512");
-
-struct Skein512::Skein512State
+class Skein512::Skein512State
 {
+public:
+
 	// state
-	std::array<ulong, 8> S;
-	// tweak
-	std::array<ulong, 2> T;
+	std::array<ulong, 8> S = { 0 };
 	// config
-	std::array<ulong, 8> V;
+	std::array<ulong, 8> V = { 0 };
+	// tweak
+	std::array<ulong, 2> T = { 0 };
 
 	Skein512State()
+	{
+	}
+
+	~Skein512State()
 	{
 		Reset();
 	}
@@ -44,87 +49,45 @@ struct Skein512::Skein512State
 Skein512::Skein512(bool Parallel)
 	:
 	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_msgBuffer(Parallel ? MIN_PRLBLOCK : BLOCK_SIZE, 0),
+	m_msgBuffer(Parallel ? DEF_PRLDEGREE * Skein::SKEIN512_RATE_SIZE : 
+		Skein::SKEIN512_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeDestroy(true),
-	m_treeParams(Parallel ? SkeinParams(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : SkeinParams(DIGEST_SIZE, 0, 0))
+	m_parallelProfile(Skein::SKEIN512_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_treeParams(Parallel ? SkeinParams(Skein::SKEIN512_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN512_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) : 
+		SkeinParams(Skein::SKEIN512_DIGEST_SIZE, 0x00, 0x00))
 {
-	// TODO: implement parallel alternate for single core cpu
-	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
-
-	Initialize();
+	Initialize(m_dgtState, m_treeParams);
 }
 
 Skein512::Skein512(SkeinParams &Params)
 	:
-	m_dgtState(1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_msgBuffer(BLOCK_SIZE),
+	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? Params.FanOut() :
+		throw CryptoDigestException(DigestConvert::ToName(Digests::Skein512), std::string("Constructor"), std::string("The FanOut parameter can not be zero or exceed the maximum of 64!"), ErrorCodes::IllegalOperation)),
+	m_msgBuffer(Skein::SKEIN512_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
-	m_treeDestroy(false),
+	m_parallelProfile(Skein::SKEIN512_RATE_SIZE, static_cast<bool>(Params.FanOut() > 1), false, STATE_PRECACHED, false, Params.FanOut()),
 	m_treeParams(Params)
 {
-	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::NotSupported);
-	}
-	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The tree parameters are invalid!"), ErrorCodes::InvalidParam);
-	}
-
-	if (m_treeParams.FanOut() > 1)
-	{
-		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
-	}
-	else if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = false;
-	}
-
-	Initialize();
+	Initialize(m_dgtState, m_treeParams);
 }
 
 Skein512::~Skein512()
 {
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_msgLength = 0;
-
-		if (m_treeDestroy)
-		{
-			m_treeParams.Reset();
-			m_treeDestroy = false;
-		}
-
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
-		{
-			m_dgtState[i].Reset();
-		}
-
-		IntegerTools::Clear(m_dgtState);
-		IntegerTools::Clear(m_msgBuffer);
-	}
+	m_msgLength = 0;
+	IntegerTools::Clear(m_dgtState);
+	IntegerTools::Clear(m_msgBuffer);
 }
 
 //~~~Accessors~~~//
 
 size_t Skein512::BlockSize()
 {
-	return BLOCK_SIZE;
+	return Skein::SKEIN512_RATE_SIZE;
 }
 
 size_t Skein512::DigestSize()
 {
-	return DIGEST_SIZE;
+	return Skein::SKEIN512_DIGEST_SIZE;
 }
 
 const Digests Skein512::Enumeral()
@@ -141,13 +104,13 @@ const std::string Skein512::Name()
 {
 	std::string name;
 
-	if (m_parallelProfile.IsParallel())
+	if (m_treeParams.FanOut() > 1)
 	{
-		name = CLASS_NAME + "-P" + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
+		name = DigestConvert::ToName(Digests::Skein512) + std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 	else
 	{
-		name = CLASS_NAME;
+		name = DigestConvert::ToName(Digests::Skein512);
 	}
 
 	return name;
@@ -167,14 +130,24 @@ ParallelOptions &Skein512::ParallelProfile()
 
 void Skein512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Output.resize(DIGEST_SIZE);
+	if (Output.size() < Skein::SKEIN512_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Compute"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-size_t Skein512::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void Skein512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
+	if (Output.size() - OutOffset < Skein::SKEIN512_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Finalize"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
+	size_t bctr;
+	size_t i;
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -187,35 +160,35 @@ size_t Skein512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		// process buffer
 		if (m_msgLength != 0)
 		{
-			size_t blkCtr = 0;
+			bctr = 0;
 
 			while (m_msgLength != 0)
 			{
-				const size_t MSGRMD = (m_msgLength >= BLOCK_SIZE) ? BLOCK_SIZE : m_msgLength;
-				HashFinal(m_msgBuffer, blkCtr * BLOCK_SIZE, MSGRMD, m_dgtState, blkCtr);
+				const size_t MSGRMD = (m_msgLength >= Skein::SKEIN512_RATE_SIZE) ? Skein::SKEIN512_RATE_SIZE : m_msgLength;
+				HashFinal(m_msgBuffer, bctr * Skein::SKEIN512_RATE_SIZE, MSGRMD, m_dgtState[bctr]);
 				m_msgLength -= MSGRMD;
-				++blkCtr;
+				++bctr;
 			}
 		}
 
 		// initialize a linear-mode hash config
-		std::vector<Skein512State> rootState(1);
-		SkeinParams rootParams{ DIGEST_SIZE };
-		std::vector<ulong> tmp = rootParams.GetConfig();
+		Skein512State proot;
+		SkeinParams rparam{ Skein::SKEIN512_DIGEST_SIZE };
+		std::vector<ulong> tmp = rparam.GetConfig();
 		std::array<ulong, 8> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
 		// load the initial state
-		LoadState(rootState[0], cfg);
+		LoadState(proot, cfg);
 
 		// add state blocks as contiguous message input
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		for (i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntegerTools::LeULL512ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * BLOCK_SIZE);
-			m_msgLength += BLOCK_SIZE;
+			IntegerTools::LeULL512ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * Skein::SKEIN512_RATE_SIZE);
+			m_msgLength += Skein::SKEIN512_RATE_SIZE;
 		}
 
 		// finalize and store
-		HashFinal(m_msgBuffer, 0, m_msgLength, rootState, 0);
-		IntegerTools::LeULL512ToBlock(rootState[0].S, 0, Output, OutOffset);
+		HashFinal(m_msgBuffer, 0, m_msgLength, proot);
+		IntegerTools::LeULL512ToBlock(proot.S, 0, Output, OutOffset);
 	}
 	else
 	{
@@ -226,18 +199,16 @@ size_t Skein512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		}
 
 		// finalize and store
-		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState, 0);
+		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
 		IntegerTools::LeULL512ToBlock(m_dgtState[0].S, 0, Output, OutOffset);
 	}
 
 	Reset();
-
-	return DIGEST_SIZE;
 }
 
 void Skein512::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	if (Degree == 0 || Degree % 2 != 0 || Degree > MAX_PRLDEGREE)
 	{
 		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
@@ -246,15 +217,17 @@ void Skein512::ParallelMaxDegree(size_t Degree)
 	m_dgtState.clear();
 	m_dgtState.resize(Degree);
 	m_msgBuffer.clear();
-	m_msgBuffer.resize(Degree * BLOCK_SIZE);
-	m_treeParams = { DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), static_cast<byte>(Degree) };
+	m_msgBuffer.resize(Degree * Skein::SKEIN512_RATE_SIZE);
+	m_treeParams = { Skein::SKEIN512_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN512_RATE_SIZE), static_cast<byte>(Degree) };
 
-	Initialize();
+	Initialize(m_dgtState, m_treeParams);
 }
 
 void Skein512::Reset()
 {
-	for (size_t i = 0; i < m_dgtState.size(); ++i)
+	size_t i;
+
+	for (i = 0; i < m_dgtState.size(); ++i)
 	{
 		// copy the configuration value to the state
 		m_dgtState[i].S = m_dgtState[i].V;
@@ -264,13 +237,26 @@ void Skein512::Reset()
 	// reset bytes filled
 	MemoryTools::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
-	m_isInitialized = false;
 }
 
 void Skein512::Update(byte Input)
 {
 	std::vector<byte> one(1, Input);
 	Update(one, 0, 1);
+}
+
+void Skein512::Update(uint Input)
+{
+	std::vector<byte> tmp(sizeof(uint));
+	IntegerTools::Le32ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
+}
+
+void Skein512::Update(ulong Input)
+{
+	std::vector<byte> tmp(sizeof(ulong));
+	IntegerTools::Le64ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
 }
 
 void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
@@ -293,7 +279,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				// empty the message buffer
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
-					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_dgtState, i);
+					ProcessBlock(m_msgBuffer, i * Skein::SKEIN512_RATE_SIZE, m_dgtState[i], Skein::SKEIN512_RATE_SIZE);
 				});
 
 				m_msgLength = 0;
@@ -309,7 +295,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				// process large blocks
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRCLEN);
+					ProcessLeaf(Input, InOffset + (i * Skein::SKEIN512_RATE_SIZE), m_dgtState[i], PRCLEN);
 				});
 
 				Length -= PRCLEN;
@@ -322,7 +308,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRMLEN);
+					ProcessLeaf(Input, InOffset + (i * Skein::SKEIN512_RATE_SIZE), m_dgtState[i], PRMLEN);
 				});
 
 				Length -= PRMLEN;
@@ -331,26 +317,26 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		}
 		else
 		{
-			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
+			if (m_msgLength != 0 && (m_msgLength + Length >= Skein::SKEIN512_RATE_SIZE))
 			{
-				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				const size_t RMDLEN = Skein::SKEIN512_RATE_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
 					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
-				ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
+				ProcessBlock(m_msgBuffer, 0, m_dgtState[0], Skein::SKEIN512_RATE_SIZE);
 				m_msgLength = 0;
 				InOffset += RMDLEN;
 				Length -= RMDLEN;
 			}
 
 			// sequential loop through blocks
-			while (Length > BLOCK_SIZE)
+			while (Length > Skein::SKEIN512_RATE_SIZE)
 			{
-				ProcessBlock(Input, InOffset, m_dgtState, 0);
-				InOffset += BLOCK_SIZE;
-				Length -= BLOCK_SIZE;
+				ProcessBlock(Input, InOffset, m_dgtState[0], Skein::SKEIN512_RATE_SIZE);
+				InOffset += Skein::SKEIN512_RATE_SIZE;
+				Length -= Skein::SKEIN512_RATE_SIZE;
 			}
 		}
 
@@ -365,49 +351,53 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Skein512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<Skein512State> &State, size_t StateOffset)
+void Skein512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Skein512State &State)
 {
 	// process message block
-	SkeinUbiTweak::IsFinalBlock(State[StateOffset].T, true);
+	SkeinUbiTweak::IsFinalBlock(State.T, true);
 	while (Length != 0)
 	{
-		const size_t MSGRMD = (Length >= BLOCK_SIZE) ? BLOCK_SIZE : Length;
-		ProcessBlock(Input, InOffset, State, StateOffset, MSGRMD);
+		const size_t MSGRMD = (Length >= Skein::SKEIN512_RATE_SIZE) ? Skein::SKEIN512_RATE_SIZE : Length;
+		ProcessBlock(Input, InOffset, State, MSGRMD);
 		Length -= MSGRMD;
 		InOffset += MSGRMD;
 	}
 
 	// finalize block
-	SkeinUbiTweak::StartNewBlockType(State[StateOffset].T, SkeinUbiType::Out);
-	SkeinUbiTweak::IsFinalBlock(State[StateOffset].T, true);
-	std::vector<byte> tmp(BLOCK_SIZE);
-	ProcessBlock(tmp, 0, State, StateOffset, 8);
+	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Out);
+	SkeinUbiTweak::IsFinalBlock(State.T, true);
+	std::vector<byte> tmp(Skein::SKEIN512_RATE_SIZE);
+	ProcessBlock(tmp, 0, State, 8);
 }
 
-void Skein512::Initialize()
+void Skein512::Initialize(std::vector<Skein512State> &State, SkeinParams &Params)
 {
-	std::vector<ulong> tmp = m_treeParams.GetConfig();
+	std::vector<ulong> tmp = Params.GetConfig();
 	std::array<ulong, 8> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
-	LoadState(m_dgtState[0], cfg);
+	size_t i;
 
-	if (m_parallelProfile.IsParallel())
+	LoadState(State[0], cfg);
+
+	for (i = 1; i < State.size(); ++i)
 	{
-		for (size_t i = 1; i < m_dgtState.size(); ++i)
-		{
-			// create unique state for each node
-			SkeinUbiTweak::StartNewBlockType(m_dgtState[i].T, SkeinUbiType::Config);
-			SkeinUbiTweak::IsFinalBlock(m_dgtState[i].T, true);
-			m_dgtState[i].Increase(32);
-			// compress previous state
-			Permute(m_dgtState[i - 1].V, m_dgtState[i]);
-			// store the new state in V for reset
-			MemoryTools::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
-			// mix config with state
-			MemoryTools::XOR512(cfg, 0, m_dgtState[i].V, 0);
-		}
+		// create unique state for each node
+		SkeinUbiTweak::StartNewBlockType(State[i].T, SkeinUbiType::Config);
+		SkeinUbiTweak::IsFinalBlock(State[i].T, true);
+		State[i].Increase(32);
+		// compress previous state
+		Permute(State[i - 1].V, State[i]);
+		// store the new state in V for reset
+		MemoryTools::Copy(State[i].S, 0, State[i].V, 0, State[i].V.size() * sizeof(ulong));
+		// mix config with state
+		MemoryTools::XOR512(cfg, 0, State[i].V, 0);
 	}
 
-	Reset();
+	for (i = 0; i < State.size(); ++i)
+	{
+		// copy the configuration value to the state
+		State[i].S = State[i].V;
+		SkeinUbiTweak::StartNewBlockType(State[i].T, SkeinUbiType::Message);
+	}
 }
 
 void Skein512::LoadState(Skein512State &State, std::array<ulong, 8> &Config)
@@ -436,32 +426,32 @@ void Skein512::Permute(std::array<ulong, 8> &Message, Skein512State &State)
 #endif
 }
 
-void Skein512::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein512State> &State, size_t StateOffset, size_t Length)
+void Skein512::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, Skein512State &State, size_t Length)
 {
-	// update length
-	State[StateOffset].Increase(Length);
-	// encrypt block
 	std::array<ulong, 8> msg;
+
+	// update length
+	State.Increase(Length);
+	// encrypt block
 	IntegerTools::LeBytesToULL512(Input, InOffset, msg, 0);
-	Permute(msg, State[StateOffset]);
+	Permute(msg, State);
 
 	// feed-forward input with state
-	MemoryTools::XOR512(msg, 0, State[StateOffset].S, 0);
+	MemoryTools::XOR512(msg, 0, State.S, 0);
 
 	// clear first flag
-	if (!m_isInitialized && StateOffset == 0)
+	if (SkeinUbiTweak::IsFirstBlock(State.T))
 	{
-		SkeinUbiTweak::IsFirstBlock(m_dgtState[0].T, false);
-		m_isInitialized = true;
+		SkeinUbiTweak::IsFirstBlock(State.T, false);
 	}
 }
 
-void Skein512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein512State> &State, size_t StateOffset, ulong Length)
+void Skein512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Skein512State &State, ulong Length)
 {
 	do
 	{
 		// process message offset by lane size
-		ProcessBlock(Input, InOffset, State, StateOffset);
+		ProcessBlock(Input, InOffset, State, Skein::SKEIN512_RATE_SIZE);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
 	} 

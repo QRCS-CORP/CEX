@@ -9,95 +9,92 @@
 
 NAMESPACE_DIGEST
 
+using Enumeration::DigestConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 using Utility::ParallelTools;
 
-const std::string SHA256::CLASS_NAME("SHA256");
+class SHA256::SHA256State
+{
+public:
+
+	std::array<uint, 8> H;
+	ulong T;
+
+	SHA256State()
+		:
+		T(0)
+	{
+	}
+
+	~SHA256State()
+	{
+		MemoryTools::Clear(H, 0, H.size() * sizeof(uint));
+		T = 0;
+	}
+
+	void Increase(size_t Length)
+	{
+		T += Length;
+	}
+
+	void Reset()
+	{
+		T = 0;
+		H[0] = 0x6A09E667UL;
+		H[1] = 0xBB67AE85UL;
+		H[2] = 0x3C6EF372UL;
+		H[3] = 0xA54FF53AUL;
+		H[4] = 0x510E527FUL;
+		H[5] = 0x9B05688CUL;
+		H[6] = 0x1F83D9ABUL;
+		H[7] = 0x5BE0CD19UL;
+	}
+};
 
 //~~~Constructor~~~//
 
 SHA256::SHA256(bool Parallel)
 	:
 	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_isDestroyed(false),
-	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
+	m_msgBuffer(Parallel ? DEF_PRLDEGREE * SHA2::SHA256_RATE_SIZE : SHA2::SHA256_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeDestroy(true),
-	m_treeParams(Parallel ? SHA2Params(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : SHA2Params(DIGEST_SIZE, 0, 0))
+	m_parallelProfile(SHA2::SHA256_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_treeParams(Parallel ? SHA2Params(SHA2::SHA256_DIGEST_SIZE, static_cast<byte>(SHA2::SHA256_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) :
+		SHA2Params(SHA2::SHA256_DIGEST_SIZE, 0UL, 0x00))
 {
-	// TODO: implement parallel alternate for single core cpu
-	m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
-
 	Reset();
 }
 
 SHA256::SHA256(SHA2Params &Params)
 	:
-	m_dgtState(1),
-	m_isDestroyed(false),
-	m_msgBuffer(BLOCK_SIZE),
+	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? Params.FanOut() :
+		throw CryptoDigestException(DigestConvert::ToName(Digests::SHA256), std::string("Constructor"), std::string("The FanOut parameter can not be zero or exceed the maximum of 64!"), ErrorCodes::IllegalOperation)),
+	m_msgBuffer(Params.FanOut() * SHA2::SHA256_RATE_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
-	m_treeDestroy(false),
+	m_parallelProfile(SHA2::SHA256_RATE_SIZE, static_cast<bool>(Params.FanOut() > 1), false, STATE_PRECACHED, false, Params.FanOut()),
 	m_treeParams(Params)
 {
-	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("Cpu does not support parallel processing!"), ErrorCodes::NotSupported);
-	}
-	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
-	{
-		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The tree parameters are invalid!"), ErrorCodes::InvalidParam);
-	}
-
-	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
-	{
-		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
-	}
-	else if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = false;
-	}
-
 	Reset();
 }
 
 SHA256::~SHA256()
 {
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_msgLength = 0;
-
-		if (m_treeDestroy)
-		{
-			m_treeParams.Reset();
-			m_treeDestroy = false;
-		}
-
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
-		{
-			m_dgtState[i].Reset();
-		}
-
-		IntegerTools::Clear(m_msgBuffer);
-		IntegerTools::Clear(m_dgtState);
-	}
+	m_msgLength = 0;
+	IntegerTools::Clear(m_msgBuffer);
+	IntegerTools::Clear(m_dgtState);
 }
 
 //~~~Accessors~~~//
 
 size_t SHA256::BlockSize() 
 { 
-	return BLOCK_SIZE; 
+	return SHA2::SHA256_RATE_SIZE; 
 }
 
 size_t SHA256::DigestSize() 
 { 
-	return DIGEST_SIZE;
+	return SHA2::SHA256_DIGEST_SIZE;
 }
 
 const Digests SHA256::Enumeral() 
@@ -114,13 +111,13 @@ const std::string SHA256::Name()
 { 
 	std::string name;
 
-	if (m_parallelProfile.IsParallel())
+	if (m_treeParams.FanOut() > 1)
 	{
-		name = CLASS_NAME + "-P" + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
+		name = DigestConvert::ToName(Enumeral()) + std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 	else
 	{
-		name = CLASS_NAME;
+		name = DigestConvert::ToName(Enumeral());
 	}
 
 	return name;
@@ -140,14 +137,25 @@ ParallelOptions &SHA256::ParallelProfile()
 
 void SHA256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Output.resize(DIGEST_SIZE);
+	if (Output.size() < SHA2::SHA256_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Compute"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-size_t SHA256::Finalize(std::vector<byte> &Output, size_t OutOffset)
+void SHA256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
+	if (Output.size() - OutOffset < SHA2::SHA256_DIGEST_SIZE)
+	{
+		throw CryptoDigestException(Name(), std::string("Finalize"), std::string("The output vector is too small!"), ErrorCodes::InvalidSize);
+	}
+
+	size_t bctr;
+	size_t boff;
+	size_t i;
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -160,46 +168,46 @@ size_t SHA256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		// process buffer
 		if (m_msgLength != 0)
 		{
-			size_t blkCtr = 0;
+			bctr = 0;
 
 			while (m_msgLength != 0)
 			{
-				const size_t MSGRMD = (m_msgLength >= BLOCK_SIZE) ? BLOCK_SIZE : m_msgLength;
-				HashFinal(m_msgBuffer, blkCtr * BLOCK_SIZE, MSGRMD, m_dgtState[blkCtr]);
+				const size_t MSGRMD = (m_msgLength >= SHA2::SHA256_RATE_SIZE) ? SHA2::SHA256_RATE_SIZE : m_msgLength;
+				HashFinal(m_msgBuffer, bctr * SHA2::SHA256_RATE_SIZE, MSGRMD, m_dgtState[bctr]);
 				m_msgLength -= MSGRMD;
-				++blkCtr;
+				++bctr;
 			}
 		}
 
 		// initialize root state
-		SHA256State rootState;
-		rootState.Reset();
+		SHA256State proot;
+		proot.Reset();
 
 		// add state blocks as contiguous message input
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		for (i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntegerTools::BeUL256ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * BLOCK_SIZE);
-			m_msgLength += DIGEST_SIZE;
+			IntegerTools::BeUL256ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * SHA2::SHA256_RATE_SIZE);
+			m_msgLength += SHA2::SHA256_DIGEST_SIZE;
 		}
 
 		// compress full blocks
-		size_t blkOff = 0;
-		if (m_msgLength > BLOCK_SIZE)
+		boff = 0;
+		if (m_msgLength > SHA2::SHA256_RATE_SIZE)
 		{
-			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
+			const size_t BLKRMD = m_msgLength - (m_msgLength % SHA2::SHA256_RATE_SIZE);
 
-			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
+			for (i = 0; i < BLKRMD / SHA2::SHA256_RATE_SIZE; ++i)
 			{
-				Permute(m_msgBuffer, i * BLOCK_SIZE, rootState);
+				Permute(m_msgBuffer, i * SHA2::SHA256_RATE_SIZE, proot);
 			}
 
 			m_msgLength -= BLKRMD;
-			blkOff = BLKRMD;
+			boff = BLKRMD;
 		}
 
 		// finalize and store
-		HashFinal(m_msgBuffer, blkOff, m_msgLength, rootState);
-		IntegerTools::BeUL256ToBlock(rootState.H, 0, Output, OutOffset);
+		HashFinal(m_msgBuffer, boff, m_msgLength, proot);
+		IntegerTools::BeUL256ToBlock(proot.H, 0, Output, OutOffset);
 	}
 	else
 	{
@@ -209,13 +217,11 @@ size_t SHA256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 
 	Reset();
-
-	return DIGEST_SIZE;
 }
 
 void SHA256::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	if (Degree == 0 || Degree % 2 != 0 || Degree > MAX_PRLDEGREE)
 	{
 		throw CryptoDigestException(Name(), std::string("ParallelMaxDegree"), std::string("Degree setting is invalid!"), ErrorCodes::NotSupported);
 	}
@@ -227,12 +233,12 @@ void SHA256::ParallelMaxDegree(size_t Degree)
 
 void SHA256::Reset()
 {
-	std::vector<byte> params(BLOCK_SIZE);
+	std::vector<byte> params(SHA2::SHA256_RATE_SIZE);
 
 	m_dgtState.clear();
 	m_dgtState.resize(m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelMaxDegree() : 1);
 	m_msgBuffer.clear();
-	m_msgBuffer.resize(m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelMaxDegree() * BLOCK_SIZE : BLOCK_SIZE);
+	m_msgBuffer.resize(m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelMaxDegree() * SHA2::SHA256_RATE_SIZE : SHA2::SHA256_RATE_SIZE);
 	m_msgLength = 0;
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -248,10 +254,24 @@ void SHA256::Reset()
 	}
 }
 
-void SHA256::Update(byte Input)
+void SHA256::Update(byte Input) // Note: expand or remove? ushort, uint, ulong..?
 {
 	std::vector<byte> inp(1, Input);
 	Update(inp, 0, 1);
+}
+
+void SHA256::Update(uint Input)
+{
+	std::vector<byte> tmp(sizeof(uint));
+	IntegerTools::Le32ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
+}
+
+void SHA256::Update(ulong Input)
+{
+	std::vector<byte> tmp(sizeof(ulong));
+	IntegerTools::Le64ToBytes(Input, tmp, 0);
+	Update(tmp, 0, tmp.size());
 }
 
 void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
@@ -266,6 +286,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 			{
 				// fill buffer
 				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+
 				if (RMDLEN != 0)
 				{
 					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
@@ -274,7 +295,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 				// empty the message buffer
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
-					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
+					Permute(m_msgBuffer, i * SHA2::SHA256_RATE_SIZE, m_dgtState[i]);
 				});
 
 				m_msgLength = 0;
@@ -290,7 +311,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 				// process large blocks
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
+					ProcessLeaf(Input, InOffset + (i * SHA2::SHA256_RATE_SIZE), m_dgtState[i], PRCLEN);
 				});
 
 				Length -= PRCLEN;
@@ -303,7 +324,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 
 				ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
-					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
+					ProcessLeaf(Input, InOffset + (i * SHA2::SHA256_RATE_SIZE), m_dgtState[i], PRMLEN);
 				});
 
 				Length -= PRMLEN;
@@ -312,9 +333,9 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 		}
 		else
 		{
-			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
+			if (m_msgLength != 0 && (m_msgLength + Length >= SHA2::SHA256_RATE_SIZE))
 			{
-				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				const size_t RMDLEN = SHA2::SHA256_RATE_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
 					MemoryTools::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
@@ -327,11 +348,11 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 			}
 
 			// sequential loop through blocks
-			while (Length >= BLOCK_SIZE)
+			while (Length >= SHA2::SHA256_RATE_SIZE)
 			{
 				Permute(Input, InOffset, m_dgtState[0]);
-				InOffset += BLOCK_SIZE;
-				Length -= BLOCK_SIZE;
+				InOffset += SHA2::SHA256_RATE_SIZE;
+				Length -= SHA2::SHA256_RATE_SIZE;
 			}
 		}
 
@@ -351,7 +372,7 @@ void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	State.T += Length;
 	ulong bitLen = (State.T << 3);
 
-	if (Length == BLOCK_SIZE)
+	if (Length == SHA2::SHA256_RATE_SIZE)
 	{
 		Permute(Input, InOffset, State);
 		Length = 0;
@@ -361,15 +382,15 @@ void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	++Length;
 
 	// padding
-	if (Length < BLOCK_SIZE)
+	if (Length < SHA2::SHA256_RATE_SIZE)
 	{
-		MemoryTools::Clear(Input, InOffset + Length, BLOCK_SIZE - Length);
+		MemoryTools::Clear(Input, InOffset + Length, SHA2::SHA256_RATE_SIZE - Length);
 	}
 
 	if (Length > 56)
 	{
 		Permute(Input, InOffset, State);
-		MemoryTools::Clear(Input, 0, BLOCK_SIZE);
+		MemoryTools::Clear(Input, 0, SHA2::SHA256_RATE_SIZE);
 	}
 
 	// finalize state with counter and last compression
@@ -393,7 +414,7 @@ void SHA256::Permute(const std::vector<byte> &Input, size_t InOffset, SHA256Stat
 #endif
 	}
 
-	State.Increase(BLOCK_SIZE);
+	State.Increase(SHA2::SHA256_RATE_SIZE);
 }
 
 void SHA256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA256State &State, ulong Length)

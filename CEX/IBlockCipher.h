@@ -41,7 +41,8 @@ using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
 
 /// <summary>
-/// The Block Cipher Interface class
+/// The block-cipher virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented block-cipher instances as a parameter.</para>
 /// </summary> 
 class IBlockCipher
 {

@@ -1,17 +1,12 @@
 #include "ACS.h"
-
-#if defined(__AVX__)
-#	include "CpuDetect.h"
-#	include "IntegerTools.h"
-#	include "MacFromName.h"
-#	include "MemoryTools.h"
-#	include "SHAKE.h"
-#	include <wmmintrin.h>
-#endif
+#include "CpuDetect.h"
+#include "IntegerTools.h"
+#include "MacFromName.h"
+#include "MemoryTools.h"
+#include "SHAKE.h"
+#include <wmmintrin.h>
 
 NAMESPACE_STREAM
-
-#if defined(__AVX__)
 
 using Utility::IntegerTools;
 using Utility::MemoryTools;
@@ -19,6 +14,8 @@ using Enumeration::ShakeModes;
 using Enumeration::StreamCipherConvert;
 
 const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x61 };
+const __m128i ACS::BLEND_MASK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
+const __m128i ACS::SHIFT_MASK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
 
 class ACS::AcsState
 {
@@ -90,6 +87,9 @@ ACS::ACS(StreamAuthenticators AuthenticatorType)
 		Helper::MacFromName::GetInstance(AuthenticatorType)),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
+#if !defined(CEX_AVX_INTRINSICS)
+	throw CryptoSymmetricException(StreamCipherConvert::ToName(StreamCiphers::RCS), std::string("Constructor"), std::string("AVX is not supported on this system!"), ErrorCodes::NotSupported);
+#endif
 }
 
 ACS::~ACS()
@@ -392,24 +392,39 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		// stagger counters and process 8 blocks with avx512
 		while (bctr != PBKALN)
 		{
-			IntegerTools::LeIncrease8(Counter, tmpc, 0, 32);
-			IntegerTools::LeIncrease8(Counter, tmpc, 32, 64);
-			IntegerTools::LeIncrease8(Counter, tmpc, 64, 96);
-			IntegerTools::LeIncrease8(Counter, tmpc, 96, 128);
-			IntegerTools::LeIncrease8(Counter, tmpc, 128, 160);
-			IntegerTools::LeIncrease8(Counter, tmpc, 160, 192);
-			IntegerTools::LeIncrease8(Counter, tmpc, 192, 224);
-			IntegerTools::LeIncrease8(Counter, tmpc, 224, 256);
-			IntegerTools::LeIncrease8(Counter, tmpc, 256, 288);
-			IntegerTools::LeIncrease8(Counter, tmpc, 288, 320);
-			IntegerTools::LeIncrease8(Counter, tmpc, 320, 352);
-			IntegerTools::LeIncrease8(Counter, tmpc, 352, 384);
-			IntegerTools::LeIncrease8(Counter, tmpc, 384, 416);
-			IntegerTools::LeIncrease8(Counter, tmpc, 416, 448);
-			IntegerTools::LeIncrease8(Counter, tmpc, 448, 480);
-			IntegerTools::LeIncrease8(Counter, tmpc, 480, 512);
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 256, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 288, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 320, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 352, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 384, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 416, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 448, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 480, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
 			Transform4096(tmpc, 0, Output, OutOffset + bctr);
-			IntegerTools::LeIncrease8(Counter, static_cast<uint>(AVX512BLK));
 			bctr += AVX512BLK;
 		}
 	}
@@ -423,17 +438,23 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		// stagger counters and process 8 blocks with avx2
 		while (bctr != PBKALN)
 		{
-			IntegerTools::LeIncrease8(Counter, tmpc, 0, 32);
-			IntegerTools::LeIncrease8(Counter, tmpc, 32, 64);
-			IntegerTools::LeIncrease8(Counter, tmpc, 64, 96);
-			IntegerTools::LeIncrease8(Counter, tmpc, 96, 128);
-			IntegerTools::LeIncrease8(Counter, tmpc, 128, 160);
-			IntegerTools::LeIncrease8(Counter, tmpc, 160, 192);
-			IntegerTools::LeIncrease8(Counter, tmpc, 192, 224);
-			IntegerTools::LeIncrease8(Counter, tmpc, 224, 256);
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
 			Transform2048(tmpc, 0, Output, OutOffset + bctr);
-			IntegerTools::LeIncrease8(Counter, static_cast<uint>(AVX2BLK));
-			MemoryTools::Copy(tmpc, 224, Counter, 0, BLOCK_SIZE);
 			bctr += AVX2BLK;
 		}
 	}
@@ -447,12 +468,15 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		// 4 blocks with avx
 		while (bctr != PBKALN)
 		{
-			IntegerTools::LeIncrease8(Counter, tmpc, 0, 32);
-			IntegerTools::LeIncrease8(Counter, tmpc, 32, 64);
-			IntegerTools::LeIncrease8(Counter, tmpc, 64, 96);
-			IntegerTools::LeIncrease8(Counter, tmpc, 96, 128);
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
 			Transform1024(tmpc, 0, Output, OutOffset + bctr);
-			IntegerTools::LeIncrease8(Counter, static_cast<uint>(AVXBLK));
 			bctr += AVXBLK;
 		}
 	}
@@ -461,16 +485,16 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	const size_t BLKALN = Length - (Length % BLOCK_SIZE);
 	while (bctr != BLKALN)
 	{
-		IntegerTools::LeIncrease8(Counter, static_cast<uint>(BLOCK_SIZE));
 		Transform256(Counter, 0, Output, OutOffset + bctr);
+		IntegerTools::LeIncrement(Counter, 16);
 		bctr += BLOCK_SIZE;
 	}
 
 	if (bctr != Length)
 	{
 		std::vector<byte> otp(BLOCK_SIZE);
-		IntegerTools::LeIncrease8(Counter, static_cast<uint>(BLOCK_SIZE));
 		Transform256(Counter, 0, otp, 0);
+		IntegerTools::LeIncrement(Counter, 16);
 		const size_t RMDLEN = Length % BLOCK_SIZE;
 		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - RMDLEN), RMDLEN);
 	}
@@ -507,20 +531,22 @@ void ACS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<b
 
 void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	const size_t OTPLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
+	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
-	std::vector<byte> tmpc(m_rcsState->Nonce.size());
+	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
+	std::vector<byte> tmpc(BLOCK_SIZE);
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN](size_t i)
+	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<byte> thdc(m_rcsState->Nonce.size());
+		std::vector<byte> thdc(BLOCK_SIZE);
 		// offset counter by chunk size / block size  
-		IntegerTools::LeIncrease8(m_rcsState->Nonce, thdc, static_cast<uint>(CNKLEN * i));
+		IntegerTools::LeIncrease8(m_rcsState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
+		const size_t STMPOS = i * CNKLEN;
 		// generate random at output offset
-		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdc);
+		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);
 		// xor with input at offsets
-		MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+		MemoryTools::XOR(Input, InOffset + STMPOS, Output, OutOffset + STMPOS, CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
@@ -534,12 +560,12 @@ void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 
 	// last block processing
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
-	if (ALNLEN < OTPLEN)
+	if (ALNLEN < OUTLEN)
 	{
-		const size_t RMDLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, RMDLEN, m_rcsState->Nonce);
+		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
+		Generate(Output, ALNLEN, FNLLEN, m_rcsState->Nonce);
 
-		for (size_t i = ALNLEN; i < OTPLEN; i++)
+		for (size_t i = ALNLEN; i < OUTLEN; i++)
 		{
 			Output[i] ^= Input[i];
 		}
@@ -588,8 +614,6 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	const size_t RNDCNT = m_rcsState->RoundKeys.size() - 3;
 	size_t kctr;
 
-	__m128i BLDMSK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
-	__m128i RJDMSK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
 	__m128i blk1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
 	__m128i blk2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + HLFBLK]));
 	__m128i tmp1;
@@ -603,11 +627,11 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	while (kctr != RNDCNT)
 	{
 		// mix the blocks
-		tmp1 = _mm_blendv_epi8(blk1, blk2, BLDMSK);
-		tmp2 = _mm_blendv_epi8(blk2, blk1, BLDMSK);
+		tmp1 = _mm_blendv_epi8(blk1, blk2, BLEND_MASK);
+		tmp2 = _mm_blendv_epi8(blk2, blk1, BLEND_MASK);
 		// shuffle
-		tmp1 = _mm_shuffle_epi8(tmp1, RJDMSK);
-		tmp2 = _mm_shuffle_epi8(tmp2, RJDMSK);
+		tmp1 = _mm_shuffle_epi8(tmp1, SHIFT_MASK);
+		tmp2 = _mm_shuffle_epi8(tmp2, SHIFT_MASK);
 		++kctr;
 		// encrypt the first half-block
 		blk1 = _mm_aesenc_si128(tmp1, m_rcsState->RoundKeys[kctr]);
@@ -617,10 +641,10 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	}
 
 	// final block
-	tmp1 = _mm_blendv_epi8(blk1, blk2, BLDMSK);
-	tmp2 = _mm_blendv_epi8(blk2, blk1, BLDMSK);
-	tmp1 = _mm_shuffle_epi8(tmp1, RJDMSK);
-	tmp2 = _mm_shuffle_epi8(tmp2, RJDMSK);
+	tmp1 = _mm_blendv_epi8(blk1, blk2, BLEND_MASK);
+	tmp2 = _mm_blendv_epi8(blk2, blk1, BLEND_MASK);
+	tmp1 = _mm_shuffle_epi8(tmp1, SHIFT_MASK);
+	tmp2 = _mm_shuffle_epi8(tmp2, SHIFT_MASK);
 	++kctr;
 	blk1 = _mm_aesenclast_si128(tmp1, m_rcsState->RoundKeys[kctr]);
 	++kctr;
@@ -651,5 +675,4 @@ void ACS::Transform4096(const std::vector<byte> &Input, size_t InOffset, std::ve
 	Transform2048(Input, InOffset + 256, Output, OutOffset + 256);
 }
 
-#endif
 NAMESPACE_STREAMEND

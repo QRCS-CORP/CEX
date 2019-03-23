@@ -26,8 +26,8 @@
 // Written by John G. Underhill, July 31, 2016
 // Updated March 20, 2017
 // Updated April 18, 2017
+// Updated March 19, 2019
 // Contact: develop@vtdev.com
-
 
 #ifndef CEX_SHA512_H
 #define CEX_SHA512_H
@@ -38,24 +38,23 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// An implementation of the SHA-2 digest with a 512 bit digest return size
+/// An implementation of the SHA-2 sequential and parallel message-digests with a 512-bit hash code
 /// </summary> 
 /// 
 /// <example>
 /// <description>Using the Compute method:</description>
 /// <code>
 /// SHA512 dgt;
-/// std::vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
 /// dgt.Update(Input, 0, Input.size());
-/// dgt.Finalize(hash, 0);
-/// dgt.Reset();
+/// dgt.Finalize(Output, 0);
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description>Tree Hashing Description:</description>
-/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter. \n 
+/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter, 
+/// or by setting the FanOut accessor to the number of desired threads when using the SHA2Params constructor. \n 
 /// The default number of threads is 8, this can be changed using the ParallelMaxDegree(size_t) function, but not directly through the ParallelProfile accessor,
 /// (state sizes must be recalculated when the thread count changes).
 /// Changing the thread count from the default, will produce a different hash output. \n
@@ -69,9 +68,9 @@ NAMESPACE_DIGEST
 /// <list type="bullet">
 /// <item><description>State block size is 128 bytes, (1024 bits), in parallel mode the ParallelBlockSize() is used (P * B * 4).</description></item>
 /// <item><description>Digest output size is 64 bytes, (512 bits).</description></item>
-/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], size_t, size_t)"/> and Finalize methods; (suitable for small data).</description>/></item>
-/// <item><description>The <see cref="Update(byte)"/> and <see cref="Update(byte[], size_t, size_t)"/> methods process message input.</description></item>
-/// <item><description>The <see cref="Finalize(byte[], size_t)"/> method returns the hash or MAC code and resets the internal state.</description></item>
+/// <item><description>The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data).</description>/></item>
+/// <item><description>The Update functions process message input, this can be a byte, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
+/// <item><description>The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
 /// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant.</description></item>
 /// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, this is expected.</description></item>
 /// </list>
@@ -93,54 +92,16 @@ class SHA512 final : public IDigest
 {
 private:
 
-	static const size_t BLOCK_SIZE = 128; // TODO: replace with SHA2 class constants
-	static const std::string CLASS_NAME;
-	static const size_t DIGEST_SIZE = 64;
-	static const ulong DEF_PRLDEGREE = 8;
+	static const size_t DEF_PRLDEGREE = 8;
+	static const size_t MAX_PRLDEGREE = 64;
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	struct SHA512State
-	{
-		std::array<ulong, 8> H;
-		std::array<ulong, 2> T;
-
-		SHA512State()
-		{
-		}
-
-		void Increase(size_t Length)
-		{
-			T[0] += Length;
-
-			if (T[0] > 0x1FFFFFFFFFFFFFFFULL)
-			{
-				T[1] += (int64_t)(T[0] >> 61);
-				T[0] &= 0x1FFFFFFFFFFFFFFFULL;
-			}
-		}
-
-		void Reset()
-		{
-			T[0] = 0;
-			T[1] = 0;
-			H[0] = 0x6A09E667F3BCC908ULL;
-			H[1] = 0xBB67AE8584CAA73BULL;
-			H[2] = 0x3C6EF372FE94F82BULL;
-			H[3] = 0xA54FF53A5F1D36F1ULL;
-			H[4] = 0x510E527FADE682D1ULL;
-			H[5] = 0x9B05688C2B3E6C1FULL;
-			H[6] = 0x1F83D9ABFB41BD6BULL;
-			H[7] = 0x5BE0CD19137E2179ULL;
-		}
-	};
-
+	class SHA512State;
 	std::vector<SHA512State> m_dgtState;
-	bool m_isDestroyed;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	bool m_treeDestroy;
 	SHA2Params m_treeParams;
 
 public:
@@ -187,17 +148,17 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Digests internal blocksize in bytes
+	/// Read Only: The message-digests internal block size in bytes
 	/// </summary>
 	size_t BlockSize() override;
 
 	/// <summary>
-	/// Read Only: Size of returned digest in bytes
+	/// Read Only: The message-digests output hash-size in bytes
 	/// </summary>
 	size_t DigestSize() override;
 
 	/// <summary>
-	/// Read Only: The digests type name
+	/// Read Only: The message-digests enumeration type-name
 	/// </summary>
 	const Digests Enumeral() override;
 
@@ -209,7 +170,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: The digests class name
+	/// Read Only: The message-digests formal class name
 	/// </summary>
 	const std::string Name() override;
 
@@ -231,24 +192,26 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Get the hash code for a message input array
+	/// Compute the hash value in a single-step using the input message and the output vector receiving the hash code.
+	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="Output">The hash output code array</param>
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	///
+	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Finalize processing and get the hash code
+	/// Finalize message processing and return the hash code.
+	/// <para>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The hash output code array</param>
-	/// <param name="OutOffset">The starting offset within the output array</param>
-	/// 
-	/// <returns>The byte size of the hash code</returns>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output array is too short</exception>
-	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	void Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -262,7 +225,7 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
-	/// Reset the internal state
+	/// Reset the message-digests internal state
 	/// </summary>
 	void Reset() override;
 
@@ -274,19 +237,33 @@ public:
 	void Update(byte Input) override;
 
 	/// <summary>
-	/// Update the buffer with a block of bytes
+	/// Update the message digest with a single unsigned 32-bit integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The 32-bit integer to process</param>
+	void Update(uint Input) override;
+
+	/// <summary>
+	/// Update the message digest with a single unsigned 64-bit integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The 64-bit integer to process</param>
+	void Update(ulong Input) override;
+
+	/// <summary>
+	/// Update the message digest with a vector using offset and length parameters.
+	/// <para>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
 	/// <param name="Length">The number of message bytes to process</param>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	void Destroy();
-	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State);
-	void Permute(const std::vector<byte> &Input, size_t InOffset, SHA512State &State);
+	static void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State);
+	static void Permute(const std::vector<byte> &Input, size_t InOffset, SHA512State &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length);
 };
 

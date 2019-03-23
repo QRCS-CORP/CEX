@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Stream Cipher virtual interface class  
+<p>The stream-cipher virtual interface class.  
  <a href="class_i_stream_cipher.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_i_stream_cipher_8h_source.html">IStreamCipher.h</a>&gt;</code></p>
@@ -81,13 +81,14 @@ Inheritance diagram for IStreamCipher:</div>
  <div class="center">
   <img src="class_i_stream_cipher.png" usemap="#IStreamCipher_map" alt=""/>
   <map id="IStreamCipher_map" name="IStreamCipher_map">
-<area href="class_c_s_x256.html" title="A parallelized and vectorized ChaCha-256 20-round stream cipher [CSX256] implementation. " alt="CSX256" shape="rect" coords="0,56,92,80"/>
-<area href="class_c_s_x512.html" title="A parallelized and vectorized ChaCha-512 80-round stream cipher [CSX512] implementation. " alt="CSX512" shape="rect" coords="102,56,194,80"/>
-<area href="class_m_c_s.html" title="An Encrypt and Authenticate AEAD stream cipher implementation (Modular Cipher Stream). " alt="MCS" shape="rect" coords="204,56,296,80"/>
-<area href="class_r_c_s.html" title="An implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counte..." alt="RCS" shape="rect" coords="306,56,398,80"/>
-<area href="class_t_s_x1024.html" title="A vectorized and optionally parallelized Threefish-1024 120-round stream cipher [TSX1024] implementat..." alt="TSX1024" shape="rect" coords="408,56,500,80"/>
-<area href="class_t_s_x256.html" title="A vectorized and optionally parallelized Threefish-256 72-round stream cipher [TSX256] implementation..." alt="TSX256" shape="rect" coords="510,56,602,80"/>
-<area href="class_t_s_x512.html" title="A vectorized and optionally parallelized Threefish-512 96-round stream cipher [TSX512] implementation..." alt="TSX512" shape="rect" coords="612,56,704,80"/>
+<area href="class_a_c_s.html" title="An AES-NI implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian..." alt="ACS" shape="rect" coords="102,56,194,80"/>
+<area href="class_c_s_x256.html" title="A parallelized and vectorized ChaCha-256 20-round stream cipher [CSX256] implementation. " alt="CSX256" shape="rect" coords="102,112,194,136"/>
+<area href="class_c_s_x512.html" title="A parallelized and vectorized ChaCha-512 80-round stream cipher [CSX512] implementation. " alt="CSX512" shape="rect" coords="102,168,194,192"/>
+<area href="class_m_c_s.html" title="An Encrypt and Authenticate AEAD stream cipher implementation (Modular Cipher Stream). " alt="MCS" shape="rect" coords="102,224,194,248"/>
+<area href="class_r_c_s.html" title="An implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counte..." alt="RCS" shape="rect" coords="102,280,194,304"/>
+<area href="class_t_s_x1024.html" title="A vectorized and optionally parallelized Threefish-1024 120-round stream cipher [TSX1024] implementat..." alt="TSX1024" shape="rect" coords="102,336,194,360"/>
+<area href="class_t_s_x256.html" title="A vectorized and optionally parallelized Threefish-256 72-round stream cipher [TSX256] implementation..." alt="TSX256" shape="rect" coords="102,392,194,416"/>
+<area href="class_t_s_x512.html" title="A vectorized and optionally parallelized Threefish-512 96-round stream cipher [TSX512] implementation..." alt="TSX512" shape="rect" coords="102,448,194,472"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -156,7 +157,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a719e0915e31c51c8c5bf886064c56ea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Stream Cipher virtual interface class </p>
+<div class="textblock"><p>The stream-cipher virtual interface class. </p>
+<p>This class can be used to create functions that will accept any of the implemented stream-cipher instances as a parameter.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aab5703da1dc45a1b920469dae8cd8ccf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aab5703da1dc45a1b920469dae8cd8ccf">&#9670;&nbsp;</a></span>IStreamCipher() <span class="overload">[1/2]</span></h2>
@@ -266,7 +268,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The stream ciphers type name </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#af62619c6675adcf6453d17125b0e3fcf">MCS</a>, <a class="el" href="class_c_s_x512.html#ad005a7c89f5c115b9741da8b4d9ee2bc">CSX512</a>, <a class="el" href="class_r_c_s.html#a5156ec5e72e03a3afe094e76d7a00ff9">RCS</a>, <a class="el" href="class_c_s_x256.html#a59523bbd477bb9330e55970f349ccbb0">CSX256</a>, <a class="el" href="class_t_s_x256.html#a2b647e1ef30c9047630ab50fa8d8714a">TSX256</a>, <a class="el" href="class_t_s_x512.html#a33d2747d14b182854ccbd29497949270">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a425e072e61f698c83a4075b068efacfc">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#af62619c6675adcf6453d17125b0e3fcf">MCS</a>, <a class="el" href="class_c_s_x512.html#ad005a7c89f5c115b9741da8b4d9ee2bc">CSX512</a>, <a class="el" href="class_c_s_x256.html#a59523bbd477bb9330e55970f349ccbb0">CSX256</a>, <a class="el" href="class_a_c_s.html#a7e52df0647436d4776e72f50ce1d0225">ACS</a>, <a class="el" href="class_r_c_s.html#a5156ec5e72e03a3afe094e76d7a00ff9">RCS</a>, <a class="el" href="class_t_s_x256.html#a2b647e1ef30c9047630ab50fa8d8714a">TSX256</a>, <a class="el" href="class_t_s_x512.html#a33d2747d14b182854ccbd29497949270">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a425e072e61f698c83a4075b068efacfc">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -320,7 +322,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#acd508e0e9ce5130a50449127d378c54e">MCS</a>, <a class="el" href="class_c_s_x512.html#ade02d05b8348bbd268ee9833c6ac4594">CSX512</a>, <a class="el" href="class_r_c_s.html#aeca6ca7b4f949d4fea718ae58e63f33c">RCS</a>, <a class="el" href="class_c_s_x256.html#a145cdb919139e93086b248e37f8dd49c">CSX256</a>, <a class="el" href="class_t_s_x256.html#aa7cb148c0829b237ab0e3a2884e9d8a2">TSX256</a>, <a class="el" href="class_t_s_x512.html#a0e6eccf4ec35cee762dae2f9d252b8d5">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#ad5c3fb36e6a9ae2419a48eb05c02eaaa">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#acd508e0e9ce5130a50449127d378c54e">MCS</a>, <a class="el" href="class_c_s_x512.html#ade02d05b8348bbd268ee9833c6ac4594">CSX512</a>, <a class="el" href="class_c_s_x256.html#a145cdb919139e93086b248e37f8dd49c">CSX256</a>, <a class="el" href="class_a_c_s.html#a53b5e26622b8ff816293bcb8a99ae504">ACS</a>, <a class="el" href="class_r_c_s.html#aeca6ca7b4f949d4fea718ae58e63f33c">RCS</a>, <a class="el" href="class_t_s_x256.html#aa7cb148c0829b237ab0e3a2884e9d8a2">TSX256</a>, <a class="el" href="class_t_s_x512.html#a0e6eccf4ec35cee762dae2f9d252b8d5">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#ad5c3fb36e6a9ae2419a48eb05c02eaaa">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -349,7 +351,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Cipher has authentication enabled </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#a78a8819d087197f1089e0a93d6ef74c6">MCS</a>, <a class="el" href="class_c_s_x512.html#a0b4ef5b6f8a6f763e7ac380c7b224f67">CSX512</a>, <a class="el" href="class_r_c_s.html#a4a2a2e8f8896ac89baad455ef3482310">RCS</a>, <a class="el" href="class_c_s_x256.html#a86e602277d9b81f83603bfb025c77620">CSX256</a>, <a class="el" href="class_t_s_x256.html#a56429cd515aa649f86564345f2cdfce6">TSX256</a>, <a class="el" href="class_t_s_x512.html#aade653e1248f5e131e3314b63f7c2afa">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a46ac2911a4b773f745ada56b739691e6">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#a78a8819d087197f1089e0a93d6ef74c6">MCS</a>, <a class="el" href="class_c_s_x512.html#a0b4ef5b6f8a6f763e7ac380c7b224f67">CSX512</a>, <a class="el" href="class_c_s_x256.html#a86e602277d9b81f83603bfb025c77620">CSX256</a>, <a class="el" href="class_a_c_s.html#a5e39c3eae3b603b2125cb2c6970262b1">ACS</a>, <a class="el" href="class_r_c_s.html#a4a2a2e8f8896ac89baad455ef3482310">RCS</a>, <a class="el" href="class_t_s_x256.html#a56429cd515aa649f86564345f2cdfce6">TSX256</a>, <a class="el" href="class_t_s_x512.html#aade653e1248f5e131e3314b63f7c2afa">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a46ac2911a4b773f745ada56b739691e6">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -378,7 +380,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher has been initialized for encryption </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#aa1b0039b86b9c4132978cf7503277f19">MCS</a>, <a class="el" href="class_c_s_x512.html#acb2de5d304fb2dca66f92d2d66ce6dd0">CSX512</a>, <a class="el" href="class_r_c_s.html#ad6d87da5f031e5aecbb11a6f299530d6">RCS</a>, <a class="el" href="class_c_s_x256.html#ab5197cd04672139f5ce8f45b012f5660">CSX256</a>, <a class="el" href="class_t_s_x256.html#aba62e177093a8a3b6856f56d04d3de5c">TSX256</a>, <a class="el" href="class_t_s_x512.html#a2ca18658154021ee96275e5ab4d8360a">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a884090c5735582b0a8fa201f5964d9ea">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#aa1b0039b86b9c4132978cf7503277f19">MCS</a>, <a class="el" href="class_c_s_x512.html#acb2de5d304fb2dca66f92d2d66ce6dd0">CSX512</a>, <a class="el" href="class_c_s_x256.html#ab5197cd04672139f5ce8f45b012f5660">CSX256</a>, <a class="el" href="class_a_c_s.html#a80c9202779527a550185c8e87291a18c">ACS</a>, <a class="el" href="class_r_c_s.html#ad6d87da5f031e5aecbb11a6f299530d6">RCS</a>, <a class="el" href="class_t_s_x256.html#aba62e177093a8a3b6856f56d04d3de5c">TSX256</a>, <a class="el" href="class_t_s_x512.html#a2ca18658154021ee96275e5ab4d8360a">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a884090c5735582b0a8fa201f5964d9ea">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -407,7 +409,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Cipher is ready to transform data </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#aa66027bf2d40e9cf956913cd79cb17e0">MCS</a>, <a class="el" href="class_c_s_x512.html#af4f7b7c4767c6261fba87b6d71a10c09">CSX512</a>, <a class="el" href="class_r_c_s.html#a0a1df168ea185a05ae02a743845917cd">RCS</a>, <a class="el" href="class_c_s_x256.html#acd92d5b1565aca9c2661c099fd78b7dc">CSX256</a>, <a class="el" href="class_t_s_x256.html#a313d6aaf2353067d706d48ec21ca0288">TSX256</a>, <a class="el" href="class_t_s_x512.html#a4948ff32ebe840630d3eec28d58bf1bb">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a2876bf17cd41996125308edac89a61ed">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#aa66027bf2d40e9cf956913cd79cb17e0">MCS</a>, <a class="el" href="class_c_s_x512.html#af4f7b7c4767c6261fba87b6d71a10c09">CSX512</a>, <a class="el" href="class_c_s_x256.html#acd92d5b1565aca9c2661c099fd78b7dc">CSX256</a>, <a class="el" href="class_a_c_s.html#a3a079424acc9ff6c425711e147b4f09a">ACS</a>, <a class="el" href="class_r_c_s.html#a0a1df168ea185a05ae02a743845917cd">RCS</a>, <a class="el" href="class_t_s_x256.html#a313d6aaf2353067d706d48ec21ca0288">TSX256</a>, <a class="el" href="class_t_s_x512.html#a4948ff32ebe840630d3eec28d58bf1bb">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a2876bf17cd41996125308edac89a61ed">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -437,7 +439,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: Processor parallelization availability. </p>
 <p>Indicates whether parallel processing is available with this mode. If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#ae370420bad701dc45bbb07bfa1a4bf54">MCS</a>, <a class="el" href="class_c_s_x512.html#adcc50f16705174136d89dce9620ee36c">CSX512</a>, <a class="el" href="class_r_c_s.html#a6e9a977e9891ae22d65c3c9732c80ed6">RCS</a>, <a class="el" href="class_c_s_x256.html#a2bbde619956d1728af1338fe1771afd1">CSX256</a>, <a class="el" href="class_t_s_x256.html#a52a62f240cb2bd051703fdd84c62abb4">TSX256</a>, <a class="el" href="class_t_s_x512.html#a8179fcd54d0ecace0a022088f1175a83">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a934e06f66f92952d3ef2ab2b6804a8e8">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#ae370420bad701dc45bbb07bfa1a4bf54">MCS</a>, <a class="el" href="class_c_s_x512.html#adcc50f16705174136d89dce9620ee36c">CSX512</a>, <a class="el" href="class_c_s_x256.html#a2bbde619956d1728af1338fe1771afd1">CSX256</a>, <a class="el" href="class_a_c_s.html#a6bce29c181dcc63893c5d17747cc5ee8">ACS</a>, <a class="el" href="class_r_c_s.html#a6e9a977e9891ae22d65c3c9732c80ed6">RCS</a>, <a class="el" href="class_t_s_x256.html#a52a62f240cb2bd051703fdd84c62abb4">TSX256</a>, <a class="el" href="class_t_s_x512.html#a8179fcd54d0ecace0a022088f1175a83">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a934e06f66f92952d3ef2ab2b6804a8e8">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -466,7 +468,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: A vector of SymmetricKeySize containers, containing legal cipher input-key sizes </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#a4b901d57671d30b2c41051972985f9be">MCS</a>, <a class="el" href="class_c_s_x512.html#a898fd8304d1ba52d7d32339a2f53f905">CSX512</a>, <a class="el" href="class_r_c_s.html#a15fa46b11dab9d36793aae381da00852">RCS</a>, <a class="el" href="class_c_s_x256.html#a9ea4d5dd3715eb1c61236864d427717b">CSX256</a>, <a class="el" href="class_t_s_x256.html#afd728aa8e6be10526fe32b7ef0565af5">TSX256</a>, <a class="el" href="class_t_s_x512.html#a24d7c82a309cd5836cea94755a0f6be4">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a73ab0e46f404f17608cb158fd000452b">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#a4b901d57671d30b2c41051972985f9be">MCS</a>, <a class="el" href="class_c_s_x512.html#a898fd8304d1ba52d7d32339a2f53f905">CSX512</a>, <a class="el" href="class_c_s_x256.html#a9ea4d5dd3715eb1c61236864d427717b">CSX256</a>, <a class="el" href="class_a_c_s.html#a4e5a7d44f20af92731572b1793696a3a">ACS</a>, <a class="el" href="class_r_c_s.html#a15fa46b11dab9d36793aae381da00852">RCS</a>, <a class="el" href="class_t_s_x256.html#afd728aa8e6be10526fe32b7ef0565af5">TSX256</a>, <a class="el" href="class_t_s_x512.html#a24d7c82a309cd5836cea94755a0f6be4">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a73ab0e46f404f17608cb158fd000452b">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -495,7 +497,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The stream ciphers formal implementation name </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#ae548da183fb5c0777b030410edfc7c6e">MCS</a>, <a class="el" href="class_c_s_x512.html#aa99f419a57d6dc45f8fa0e25b15d6d86">CSX512</a>, <a class="el" href="class_r_c_s.html#afff568de05ea07eddff78766326cbf23">RCS</a>, <a class="el" href="class_c_s_x256.html#abb6fff87edcf79a7f797f5c99d0c7e2d">CSX256</a>, <a class="el" href="class_t_s_x256.html#a5688490beaa65b2dd00df6aab32a06e5">TSX256</a>, <a class="el" href="class_t_s_x512.html#a2d3f926807b9b1fd220aa36591afa314">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a4f3ccf879ae0bd7c46e1040970646370">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#ae548da183fb5c0777b030410edfc7c6e">MCS</a>, <a class="el" href="class_c_s_x512.html#aa99f419a57d6dc45f8fa0e25b15d6d86">CSX512</a>, <a class="el" href="class_c_s_x256.html#abb6fff87edcf79a7f797f5c99d0c7e2d">CSX256</a>, <a class="el" href="class_a_c_s.html#a6063d1035a15c0352c55ee48ea48c3a9">ACS</a>, <a class="el" href="class_r_c_s.html#afff568de05ea07eddff78766326cbf23">RCS</a>, <a class="el" href="class_t_s_x256.html#a5688490beaa65b2dd00df6aab32a06e5">TSX256</a>, <a class="el" href="class_t_s_x512.html#a2d3f926807b9b1fd220aa36591afa314">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a4f3ccf879ae0bd7c46e1040970646370">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -553,7 +555,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing. </p>
 <p>This value can be changed through the ParallelProfile class, but must be a multiple of the ParallelMinimumSize().</p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#a18f6245c31805d4800d1cd4a387ac7cb">MCS</a>, <a class="el" href="class_c_s_x512.html#a012b71dad6ad8779209d74512881a547">CSX512</a>, <a class="el" href="class_r_c_s.html#a70259bff15f3b8ce81c315463a8af2c4">RCS</a>, <a class="el" href="class_c_s_x256.html#ad1174e75f4905c3dc3b2de341c7e2b9d">CSX256</a>, <a class="el" href="class_t_s_x256.html#a8da60e045733878aaf27fdea147750c4">TSX256</a>, <a class="el" href="class_t_s_x512.html#a2e249f0fa7d3ff3de47f26f6faed67bd">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a389fa61ed633746e843e3aa5b0d10918">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#a18f6245c31805d4800d1cd4a387ac7cb">MCS</a>, <a class="el" href="class_c_s_x512.html#a012b71dad6ad8779209d74512881a547">CSX512</a>, <a class="el" href="class_c_s_x256.html#ad1174e75f4905c3dc3b2de341c7e2b9d">CSX256</a>, <a class="el" href="class_a_c_s.html#a97ac02129c2cdc34928e72cc2074be16">ACS</a>, <a class="el" href="class_r_c_s.html#a70259bff15f3b8ce81c315463a8af2c4">RCS</a>, <a class="el" href="class_t_s_x256.html#a8da60e045733878aaf27fdea147750c4">TSX256</a>, <a class="el" href="class_t_s_x512.html#a2e249f0fa7d3ff3de47f26f6faed67bd">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a389fa61ed633746e843e3aa5b0d10918">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -596,7 +598,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#a41da79e371dac5ab5c4eb4f3d3c0c308">MCS</a>, <a class="el" href="class_c_s_x512.html#af41fff5146cb41c9829186dd56b315b7">CSX512</a>, <a class="el" href="class_r_c_s.html#ae4dc3b1b1bcd84a4ff4e97d105b4df46">RCS</a>, <a class="el" href="class_c_s_x256.html#a407e2747af0b592d9b739f02b9698448">CSX256</a>, <a class="el" href="class_t_s_x256.html#aed18542001fadc72f7af899aba848528">TSX256</a>, <a class="el" href="class_t_s_x512.html#a5857030565d15d81295c43c48e69934a">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#af455357a7e0c0c37c140b381728781c0">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#a41da79e371dac5ab5c4eb4f3d3c0c308">MCS</a>, <a class="el" href="class_c_s_x512.html#af41fff5146cb41c9829186dd56b315b7">CSX512</a>, <a class="el" href="class_c_s_x256.html#a407e2747af0b592d9b739f02b9698448">CSX256</a>, <a class="el" href="class_a_c_s.html#a19b57c241848823aad21d9f92adead21">ACS</a>, <a class="el" href="class_r_c_s.html#ae4dc3b1b1bcd84a4ff4e97d105b4df46">RCS</a>, <a class="el" href="class_t_s_x256.html#aed18542001fadc72f7af899aba848528">TSX256</a>, <a class="el" href="class_t_s_x512.html#a5857030565d15d81295c43c48e69934a">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#af455357a7e0c0c37c140b381728781c0">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -626,7 +628,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Parallel and SIMD capability flags and sizes </p>
 <p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(bool, ISymmetricKey) function is called.</p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#a887589ea59c310d47fa22e28d391aaac">MCS</a>, <a class="el" href="class_c_s_x512.html#a4a1b52c958370560168893eb0a11f19d">CSX512</a>, <a class="el" href="class_r_c_s.html#a82cf83b7347709f495547ccb58b5b7c8">RCS</a>, <a class="el" href="class_c_s_x256.html#a1857db741aa63b50534c17e6dff65204">CSX256</a>, <a class="el" href="class_t_s_x256.html#a5ce6b3b112da9ddb0cf5b4ba13751294">TSX256</a>, <a class="el" href="class_t_s_x512.html#a0d6fedb6a4566e4434a65ea40eb9e2c1">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#af4166a3a8a029c2b208752577d387914">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#a887589ea59c310d47fa22e28d391aaac">MCS</a>, <a class="el" href="class_c_s_x512.html#a4a1b52c958370560168893eb0a11f19d">CSX512</a>, <a class="el" href="class_c_s_x256.html#a1857db741aa63b50534c17e6dff65204">CSX256</a>, <a class="el" href="class_a_c_s.html#a88368933d044894cb440c0493859fad2">ACS</a>, <a class="el" href="class_r_c_s.html#a82cf83b7347709f495547ccb58b5b7c8">RCS</a>, <a class="el" href="class_t_s_x256.html#a5ce6b3b112da9ddb0cf5b4ba13751294">TSX256</a>, <a class="el" href="class_t_s_x512.html#a0d6fedb6a4566e4434a65ea40eb9e2c1">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#af4166a3a8a029c2b208752577d387914">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -688,7 +690,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#a09ebbc14ad86ca8248e4749d47f0e71b">MCS</a>, <a class="el" href="class_c_s_x512.html#a81d9a4a147236829ca734890ef423f04">CSX512</a>, <a class="el" href="class_r_c_s.html#abc780d616f4a1c0b1b8f7079b3838ffb">RCS</a>, <a class="el" href="class_c_s_x256.html#a27db196d3d0c1318586e47df64da1ccc">CSX256</a>, <a class="el" href="class_t_s_x256.html#a69249d70caa928434d3f0de31d25ba7c">TSX256</a>, <a class="el" href="class_t_s_x512.html#a3db13cef76b3c357d0129dc233de6d9b">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a1d0245458c9b91161b8aa42f86468489">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#a09ebbc14ad86ca8248e4749d47f0e71b">MCS</a>, <a class="el" href="class_c_s_x512.html#a81d9a4a147236829ca734890ef423f04">CSX512</a>, <a class="el" href="class_c_s_x256.html#a27db196d3d0c1318586e47df64da1ccc">CSX256</a>, <a class="el" href="class_a_c_s.html#ac64a34cfb5f823b1fd31313b90473d03">ACS</a>, <a class="el" href="class_r_c_s.html#abc780d616f4a1c0b1b8f7079b3838ffb">RCS</a>, <a class="el" href="class_t_s_x256.html#a69249d70caa928434d3f0de31d25ba7c">TSX256</a>, <a class="el" href="class_t_s_x512.html#a3db13cef76b3c357d0129dc233de6d9b">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a1d0245458c9b91161b8aa42f86468489">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -717,7 +719,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The current MAC tag value </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#ad2c68830582f6f8015577b8ed1cbb60b">MCS</a>, <a class="el" href="class_c_s_x512.html#a505cd483cd4d32c924ec38cf99ac275d">CSX512</a>, <a class="el" href="class_r_c_s.html#a768fde15cae048ca737fa5d86fd13222">RCS</a>, <a class="el" href="class_c_s_x256.html#a5f7f330dd4563949d24c9c205c059e42">CSX256</a>, <a class="el" href="class_t_s_x256.html#aa6cffe6cd2e30ec91538f4580bce6fe2">TSX256</a>, <a class="el" href="class_t_s_x512.html#a9d4671d77bc66623dbc8cfe776b0fcf0">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#abb342604bcb6f8eb8f4578e6e2d311df">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#ad2c68830582f6f8015577b8ed1cbb60b">MCS</a>, <a class="el" href="class_c_s_x512.html#a505cd483cd4d32c924ec38cf99ac275d">CSX512</a>, <a class="el" href="class_c_s_x256.html#a5f7f330dd4563949d24c9c205c059e42">CSX256</a>, <a class="el" href="class_a_c_s.html#ac46baa53fd59ce0a2c0b17881164b16f">ACS</a>, <a class="el" href="class_r_c_s.html#a768fde15cae048ca737fa5d86fd13222">RCS</a>, <a class="el" href="class_t_s_x256.html#aa6cffe6cd2e30ec91538f4580bce6fe2">TSX256</a>, <a class="el" href="class_t_s_x512.html#a9d4671d77bc66623dbc8cfe776b0fcf0">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#abb342604bcb6f8eb8f4578e6e2d311df">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -753,7 +755,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#af4dc85bcbd2bce122f8ea30fcaa6e3eb">MCS</a>, <a class="el" href="class_c_s_x512.html#a13135b50e84a4b78d63e9fae2060954b">CSX512</a>, <a class="el" href="class_r_c_s.html#aee4330a8c101094f873c6371ea8b00c1">RCS</a>, <a class="el" href="class_c_s_x256.html#ad8c1a2a16e24bbce8e929f4ded75ea50">CSX256</a>, <a class="el" href="class_t_s_x256.html#aa136875f24db88c737a27efd214a6f03">TSX256</a>, <a class="el" href="class_t_s_x512.html#a51d0dea6718067b439bd5499e3c63b3c">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a9c0026f8950e1ac25a4deeff09cbf783">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#af4dc85bcbd2bce122f8ea30fcaa6e3eb">MCS</a>, <a class="el" href="class_c_s_x512.html#a13135b50e84a4b78d63e9fae2060954b">CSX512</a>, <a class="el" href="class_c_s_x256.html#ad8c1a2a16e24bbce8e929f4ded75ea50">CSX256</a>, <a class="el" href="class_a_c_s.html#adeec101be1d27a85d34eab76a8880053">ACS</a>, <a class="el" href="class_r_c_s.html#aee4330a8c101094f873c6371ea8b00c1">RCS</a>, <a class="el" href="class_t_s_x256.html#aa136875f24db88c737a27efd214a6f03">TSX256</a>, <a class="el" href="class_t_s_x512.html#a51d0dea6718067b439bd5499e3c63b3c">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a9c0026f8950e1ac25a4deeff09cbf783">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -782,7 +784,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The legal MAC tag length in bytes </p>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#ae3d533fa0f7807445382d964cf0e8890">MCS</a>, <a class="el" href="class_c_s_x512.html#a4a9f62ba268235caa5ac14882a8885eb">CSX512</a>, <a class="el" href="class_r_c_s.html#a5231148ebbbff0bd6f2d6ce786957a17">RCS</a>, <a class="el" href="class_c_s_x256.html#a44e378674b0110e34bdbf945a6d2f48d">CSX256</a>, <a class="el" href="class_t_s_x256.html#abd7cffc9f1e81dd2c239b9e51ee66fb9">TSX256</a>, <a class="el" href="class_t_s_x512.html#a8dc7de5f778807017175eb5cb3be3481">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a7f72b8ec39e4b03c730ceb3eb5c67d73">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#ae3d533fa0f7807445382d964cf0e8890">MCS</a>, <a class="el" href="class_c_s_x512.html#a4a9f62ba268235caa5ac14882a8885eb">CSX512</a>, <a class="el" href="class_c_s_x256.html#a44e378674b0110e34bdbf945a6d2f48d">CSX256</a>, <a class="el" href="class_a_c_s.html#a059f15659fd29e05616a2c90b1413b92">ACS</a>, <a class="el" href="class_r_c_s.html#a5231148ebbbff0bd6f2d6ce786957a17">RCS</a>, <a class="el" href="class_t_s_x256.html#abd7cffc9f1e81dd2c239b9e51ee66fb9">TSX256</a>, <a class="el" href="class_t_s_x512.html#a8dc7de5f778807017175eb5cb3be3481">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a7f72b8ec39e4b03c730ceb3eb5c67d73">TSX1024</a>.</p>
 
 </div>
 </div>
@@ -851,7 +853,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_m_c_s.html#a25ce0dab837670eef0e5d90b123b931a">MCS</a>, <a class="el" href="class_c_s_x512.html#acbfcd1f89fd0714c19efd91abb4b9b64">CSX512</a>, <a class="el" href="class_r_c_s.html#a46e953089fad50897c80ecab1d5fb779">RCS</a>, <a class="el" href="class_c_s_x256.html#ad15ef673a8829b1dab7d453382ebff49">CSX256</a>, <a class="el" href="class_t_s_x256.html#a4758e90090b9b7512dcdd2a1e85ac0c2">TSX256</a>, <a class="el" href="class_t_s_x512.html#abf1a2db25ccdba4ae78e7016121dfd42">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a1429d2eba1ed6f9b7191249155d119ab">TSX1024</a>.</p>
+<p>Implemented in <a class="el" href="class_m_c_s.html#a25ce0dab837670eef0e5d90b123b931a">MCS</a>, <a class="el" href="class_c_s_x512.html#acbfcd1f89fd0714c19efd91abb4b9b64">CSX512</a>, <a class="el" href="class_c_s_x256.html#ad15ef673a8829b1dab7d453382ebff49">CSX256</a>, <a class="el" href="class_a_c_s.html#ad0fa7d963454edd0cadfd6075895adb4">ACS</a>, <a class="el" href="class_r_c_s.html#a46e953089fad50897c80ecab1d5fb779">RCS</a>, <a class="el" href="class_t_s_x256.html#a4758e90090b9b7512dcdd2a1e85ac0c2">TSX256</a>, <a class="el" href="class_t_s_x512.html#abf1a2db25ccdba4ae78e7016121dfd42">TSX512</a>, and <a class="el" href="class_t_s_x1024.html#a1429d2eba1ed6f9b7191249155d119ab">TSX1024</a>.</p>
 
 </div>
 </div>

@@ -1,6 +1,6 @@
 #include "Blake2Test.h"
 #include "HexConverter.h"
-#include "../CEX/Blake2.h"
+#include "../CEX/Blake.h"
 #include "../CEX/Blake256.h"
 #include "../CEX/Blake512.h"
 #include "../CEX/CpuDetect.h"
@@ -23,7 +23,7 @@
 
 namespace Test
 {
-	using Digest::Blake2;
+	using Digest::Blake;
 	using Digest::Blake256;
 	using Digest::Blake512;
 	using Digest::BlakeParams;
@@ -269,12 +269,12 @@ namespace Test
 		MemoryTools::Clear(state2, 0, 8 * sizeof(uint));
 		MemoryTools::Clear(state3, 0, 8 * sizeof(uint));
 
-		Blake2::PermuteR10P512C(input, 0, state1, iv);
-		Blake2::PermuteR10P512U(input, 0, state2, iv);
+		Blake::PermuteR10P512C(input, 0, state1, iv);
+		Blake::PermuteR10P512U(input, 0, state2, iv);
 
 #if defined(__AVX2__)
 
-		Blake2::PermuteR10P512V(input, 0, state3, iv);
+		Blake::PermuteR10P512V(input, 0, state3, iv);
 
 		if (state1 != state3)
 		{
@@ -294,7 +294,7 @@ namespace Test
 		std::vector<UInt256> iv256{ UInt256(0), UInt256(1), UInt256(2), UInt256(3), UInt256(4), UInt256(5), UInt256(6), UInt256(7) };
 		std::vector<UInt256> state256(8, UInt256(0));
 
-		Blake2::PermuteR10P8x512H(input256, 0, state256, iv256);
+		Blake::PermuteR10P8x512H(input256, 0, state256, iv256);
 
 		std::vector<uint> state256ul(32);
 		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
@@ -315,7 +315,7 @@ namespace Test
 		std::vector<UInt512> iv512{ UInt512(0), UInt512(1), UInt512(2), UInt512(3), UInt512(4), UInt512(5), UInt512(6), UInt512(7) };
 		std::vector<UInt512> state512(8, UInt512(0));
 
-		Blake2::PermuteR10P16x512H(input512, 0, state512, iv512);
+		Blake::PermuteR10P16x512H(input512, 0, state512, iv512);
 
 		std::vector<uint> state512ul(64);
 		std::memcpy(state512ul.data(), state512.data(), 64 * sizeof(uint));
@@ -343,12 +343,12 @@ namespace Test
 		std::memset(state2.data(), 0, 8 * sizeof(ulong));
 		std::memset(state3.data(), 0, 8 * sizeof(ulong));
 
-		Blake2::PermuteR12P1024C(input, 0, state1, iv);
-		Blake2::PermuteR12P1024U(input, 0, state2, iv);
+		Blake::PermuteR12P1024C(input, 0, state1, iv);
+		Blake::PermuteR12P1024U(input, 0, state2, iv);
 
 #if defined(__AVX2__)
 
-		Blake2::PermuteR12P1024V(input, 0, state3, iv);
+		Blake::PermuteR12P1024V(input, 0, state3, iv);
 
 		if (state1 != state3)
 		{
@@ -368,7 +368,7 @@ namespace Test
 		std::vector<ULong256> iv256{ ULong256(0), ULong256(1), ULong256(2), ULong256(3), ULong256(4), ULong256(5), ULong256(6), ULong256(7) };
 		std::vector<ULong256> state256(8, ULong256(0));
 
-		Blake2::PermuteR12P4x1024H(input256, 0, state256, iv256);
+		Blake::PermuteR12P4x1024H(input256, 0, state256, iv256);
 
 		std::vector<ulong> state256ull(32);
 		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
@@ -389,7 +389,7 @@ namespace Test
 		std::vector<ULong512> iv512{ ULong512(0), ULong512(1), ULong512(2), ULong512(3), ULong512(4), ULong512(5), ULong512(6), ULong512(7) };
 		std::vector<ULong512> state512(8, ULong512(0));
 
-		Blake2::PermuteR12P8x1024H(input512, 0, state512, iv512);
+		Blake::PermuteR12P8x1024H(input512, 0, state512, iv512);
 
 		std::vector<ulong> state512ull(64);
 		MemoryTools::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));

@@ -39,6 +39,38 @@ ParallelOptions::ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t Res
 	StoreDefaults();
 }
 
+ParallelOptions::ParallelOptions(size_t BlockSize, bool Parallel, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t ParallelMaxDegree)
+	:
+	m_autoInit(true),
+	m_blockSize(BlockSize != 0 && BlockSize % 2 == 0 ? BlockSize :
+		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("The BlockSize must be a positive even number!"), ErrorCodes::InvalidParam)),
+	m_hasPrefetch(false),
+	m_hasSHA2(false),
+	m_hasSimd128(false),
+	m_hasSimd256(false),
+	m_hasSimd512(false),
+	m_isParallel(Parallel),
+	m_l1DataCacheReserved(ReservedCache),
+	m_l1DataCacheTotal(0),
+	m_overrideMaxDegree(false),
+	m_parallelBlockSize(0),
+	m_parallelMaxDegree(ParallelMaxDegree),
+	m_parallelMinimumSize(0),
+	m_physicalCores(0),
+	m_processorCount(0),
+	m_simdDetected(SimdProfiles::None),
+	m_simdMultiply(SimdMultiply),
+	m_splitChannel(SplitChannel),
+	m_virtualCores(0),
+	m_wideBlock(false)
+{
+	Detect();
+	Calculate();
+	StoreDefaults();
+	// override parallel capability
+	m_isParallel = Parallel;
+}
+
 ParallelOptions::ParallelOptions(size_t BlockSize, bool Parallel, size_t ParallelBlockSize, size_t ParallelMaxDegree, bool SimdMultiply, size_t ReservedCache, bool SplitChannel)
 	:
 	m_autoInit(false),

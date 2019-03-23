@@ -63,6 +63,10 @@ $(function() {
 
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="class_a_e_s128-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">AES128 Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___numeric.html">Numeric</a></div></div>  </div>
 </div><!--header-->
@@ -72,9 +76,654 @@ $(function() {
  <a href="class_a_e_s128.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_a_e_s128_8h_source.html">AES128.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a3ef039a15d52884925c11fc0f494a7ec"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:a3ef039a15d52884925c11fc0f494a7ec"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a3ef039a15d52884925c11fc0f494a7ec">Store</a> (__m128i &amp;Input, Array &amp;Output, size_t Offset) const</td></tr>
+<tr class="memdesc:a3ef039a15d52884925c11fc0f494a7ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store register in an integer array  <a href="#a3ef039a15d52884925c11fc0f494a7ec">More...</a><br /></td></tr>
+<tr class="separator:a3ef039a15d52884925c11fc0f494a7ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2463716827d4befeeaf80d442cc266ca"><td class="memItemLeft" align="right" valign="top">__m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a2463716827d4befeeaf80d442cc266ca">Load</a> (const byte *X)</td></tr>
+<tr class="memdesc:a2463716827d4befeeaf80d442cc266ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load an array into a register in Little Endian format  <a href="#a2463716827d4befeeaf80d442cc266ca">More...</a><br /></td></tr>
+<tr class="separator:a2463716827d4befeeaf80d442cc266ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a8ed90f69523c904c3a7609c7dbf6a688"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:a8ed90f69523c904c3a7609c7dbf6a688"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a8ed90f69523c904c3a7609c7dbf6a688">Load</a> (const Array &amp;Input, size_t Offset, __m128i &amp;Output)</td></tr>
+<tr class="memdesc:a8ed90f69523c904c3a7609c7dbf6a688"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load an array into a register in Little Endian format  <a href="#a8ed90f69523c904c3a7609c7dbf6a688">More...</a><br /></td></tr>
+<tr class="separator:a8ed90f69523c904c3a7609c7dbf6a688"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56280c5295767de38147c79eead4bbf8"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a56280c5295767de38147c79eead4bbf8">RotL</a> (__m128i &amp;V, const int Shift)</td></tr>
+<tr class="memdesc:a56280c5295767de38147c79eead4bbf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the 32 bit left rotation of four unsigned integers  <a href="#a56280c5295767de38147c79eead4bbf8">More...</a><br /></td></tr>
+<tr class="separator:a56280c5295767de38147c79eead4bbf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b4c26891e4cf5e0eb83014f1014a3d2"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a2b4c26891e4cf5e0eb83014f1014a3d2">InverseMixColumn</a> (__m128i &amp;V)</td></tr>
+<tr class="memdesc:a2b4c26891e4cf5e0eb83014f1014a3d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the InverseMixColumn operation on the source m128i and stores the result into m128i destination  <a href="#a2b4c26891e4cf5e0eb83014f1014a3d2">More...</a><br /></td></tr>
+<tr class="separator:a2b4c26891e4cf5e0eb83014f1014a3d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab163d174de90297314960ff3cffdcf84"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#ab163d174de90297314960ff3cffdcf84">Store</a> (const __m128i V, byte *X)</td></tr>
+<tr class="memdesc:ab163d174de90297314960ff3cffdcf84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store a register in an integer array  <a href="#ab163d174de90297314960ff3cffdcf84">More...</a><br /></td></tr>
+<tr class="separator:ab163d174de90297314960ff3cffdcf84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a666f26b7cd95831422c6d225f9f8aa59"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a666f26b7cd95831422c6d225f9f8aa59">DecryptFinal</a> (const __m128i V, const __m128i K)</td></tr>
+<tr class="memdesc:a666f26b7cd95831422c6d225f9f8aa59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs one round of AES decryption  <a href="#a666f26b7cd95831422c6d225f9f8aa59">More...</a><br /></td></tr>
+<tr class="separator:a666f26b7cd95831422c6d225f9f8aa59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a861138cd09fb7a46f587327f8b736181"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a861138cd09fb7a46f587327f8b736181">DecryptRound</a> (const __m128i V, const __m128i K)</td></tr>
+<tr class="memdesc:a861138cd09fb7a46f587327f8b736181"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the last round of AES decryption  <a href="#a861138cd09fb7a46f587327f8b736181">More...</a><br /></td></tr>
+<tr class="separator:a861138cd09fb7a46f587327f8b736181"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3d1694046a80dfd51cf5661df0776dc"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#ad3d1694046a80dfd51cf5661df0776dc">EncryptFinal</a> (const __m128i V, const __m128i K)</td></tr>
+<tr class="memdesc:ad3d1694046a80dfd51cf5661df0776dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the last round of AES encryption  <a href="#ad3d1694046a80dfd51cf5661df0776dc">More...</a><br /></td></tr>
+<tr class="separator:ad3d1694046a80dfd51cf5661df0776dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47ccee87af86ee08ce863f33c53dd140"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a47ccee87af86ee08ce863f33c53dd140">EncryptRound</a> (const __m128i V, const __m128i K)</td></tr>
+<tr class="memdesc:a47ccee87af86ee08ce863f33c53dd140"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs one round of AES encryption  <a href="#a47ccee87af86ee08ce863f33c53dd140">More...</a><br /></td></tr>
+<tr class="separator:a47ccee87af86ee08ce863f33c53dd140"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affac4c25407c43f9eab3db79028b57c0"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#affac4c25407c43f9eab3db79028b57c0">KeyGenerate</a> (const __m128i K, const int R)</td></tr>
+<tr class="memdesc:affac4c25407c43f9eab3db79028b57c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wraps the keygenassist api  <a href="#affac4c25407c43f9eab3db79028b57c0">More...</a><br /></td></tr>
+<tr class="separator:affac4c25407c43f9eab3db79028b57c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33aef19ea645671d150358db5c467ec9"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#a33aef19ea645671d150358db5c467ec9">CMUL64</a> (const __m128i V1, const __m128i V2, const int P)</td></tr>
+<tr class="memdesc:a33aef19ea645671d150358db5c467ec9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs carry-less integer multiplication of 64-bit halves of 128-bit input operands  <a href="#a33aef19ea645671d150358db5c467ec9">More...</a><br /></td></tr>
+<tr class="separator:a33aef19ea645671d150358db5c467ec9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9e6f6ec211dfb56d4599c45508ba93f"><td class="memItemLeft" align="right" valign="top">static __m128i&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_e_s128.html#ab9e6f6ec211dfb56d4599c45508ba93f">XOR</a> (const __m128i X, const __m128i Y)</td></tr>
+<tr class="memdesc:ab9e6f6ec211dfb56d4599c45508ba93f"><td class="mdescLeft">&#160;</td><td class="mdescRight">XOR two vectors  <a href="#ab9e6f6ec211dfb56d4599c45508ba93f">More...</a><br /></td></tr>
+<tr class="separator:ab9e6f6ec211dfb56d4599c45508ba93f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An AES intrinsics wrapper </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a33aef19ea645671d150358db5c467ec9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33aef19ea645671d150358db5c467ec9">&#9670;&nbsp;</a></span>CMUL64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::CMUL64 </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>V1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>V2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>P</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs carry-less integer multiplication of 64-bit halves of 128-bit input operands </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V1</td><td>The first vector</td></tr>
+    <tr><td class="paramname">V2</td><td>The second vector</td></tr>
+    <tr><td class="paramname">P</td><td>Indicates which half of the vector to multiply</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The multiplied product</dd></dl>
+
+</div>
+</div>
+<a id="a666f26b7cd95831422c6d225f9f8aa59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a666f26b7cd95831422c6d225f9f8aa59">&#9670;&nbsp;</a></span>DecryptFinal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::DecryptFinal </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>K</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs one round of AES decryption </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V</td><td>The encrypted vector</td></tr>
+    <tr><td class="paramname">K</td><td>The round key</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The decrypted vector</dd></dl>
+
+</div>
+</div>
+<a id="a861138cd09fb7a46f587327f8b736181"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a861138cd09fb7a46f587327f8b736181">&#9670;&nbsp;</a></span>DecryptRound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::DecryptRound </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>K</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs the last round of AES decryption </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V</td><td>The encrypted vector</td></tr>
+    <tr><td class="paramname">K</td><td>The round key</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The decrypted vector</dd></dl>
+
+</div>
+</div>
+<a id="ad3d1694046a80dfd51cf5661df0776dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3d1694046a80dfd51cf5661df0776dc">&#9670;&nbsp;</a></span>EncryptFinal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::EncryptFinal </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>K</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs the last round of AES encryption </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V</td><td>The plain-text vector</td></tr>
+    <tr><td class="paramname">K</td><td>The round key</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The encrypted vector</dd></dl>
+
+</div>
+</div>
+<a id="a47ccee87af86ee08ce863f33c53dd140"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47ccee87af86ee08ce863f33c53dd140">&#9670;&nbsp;</a></span>EncryptRound()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::EncryptRound </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>K</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs one round of AES encryption </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V</td><td>The plain-text vector</td></tr>
+    <tr><td class="paramname">K</td><td>The round key</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The encrypted vector</dd></dl>
+
+</div>
+</div>
+<a id="a2b4c26891e4cf5e0eb83014f1014a3d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b4c26891e4cf5e0eb83014f1014a3d2">&#9670;&nbsp;</a></span>InverseMixColumn()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::InverseMixColumn </td>
+          <td>(</td>
+          <td class="paramtype">__m128i &amp;&#160;</td>
+          <td class="paramname"><em>V</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Performs the InverseMixColumn operation on the source m128i and stores the result into m128i destination </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V</td><td>The source vector</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The mixed vector</dd></dl>
+
+</div>
+</div>
+<a id="affac4c25407c43f9eab3db79028b57c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affac4c25407c43f9eab3db79028b57c0">&#9670;&nbsp;</a></span>KeyGenerate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::KeyGenerate </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>K</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>R</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wraps the keygenassist api </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">K</td><td>The key vector</td></tr>
+    <tr><td class="paramname">R</td><td>The byte round constant</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a8ed90f69523c904c3a7609c7dbf6a688"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ed90f69523c904c3a7609c7dbf6a688">&#9670;&nbsp;</a></span>Load() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void AES128::Load </td>
+          <td>(</td>
+          <td class="paramtype">const Array &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">__m128i &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Load an array into a register in Little Endian format </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The source integer array; must be at least 128 bits in length</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset within the Input array</td></tr>
+    <tr><td class="paramname">Output</td><td>The 128-bit integer output</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a2463716827d4befeeaf80d442cc266ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2463716827d4befeeaf80d442cc266ca">&#9670;&nbsp;</a></span>Load() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">__m128i AES128::Load </td>
+          <td>(</td>
+          <td class="paramtype">const byte *&#160;</td>
+          <td class="paramname"><em>X</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Load an array into a register in Little Endian format </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">X</td><td>The source integer array; must be at least 128 bits in length</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a56280c5295767de38147c79eead4bbf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56280c5295767de38147c79eead4bbf8">&#9670;&nbsp;</a></span>RotL()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::RotL </td>
+          <td>(</td>
+          <td class="paramtype">__m128i &amp;&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>Shift</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Computes the 32 bit left rotation of four unsigned integers </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V</td><td>The 128-bit vector</td></tr>
+    <tr><td class="paramname">Shift</td><td>The shift degree; maximum is 32</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3ef039a15d52884925c11fc0f494a7ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ef039a15d52884925c11fc0f494a7ec">&#9670;&nbsp;</a></span>Store() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void AES128::Store </td>
+          <td>(</td>
+          <td class="paramtype">__m128i &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Array &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Store register in an integer array </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The source 128-bit integer</td></tr>
+    <tr><td class="paramname">Output</td><td>The destination integer array; must be at least 128 bits in length</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset within the Output array</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab163d174de90297314960ff3cffdcf84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab163d174de90297314960ff3cffdcf84">&#9670;&nbsp;</a></span>Store() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void AES128::Store </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>V</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">byte *&#160;</td>
+          <td class="paramname"><em>X</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Store a register in an integer array </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">V</td><td>The source 128-bit register</td></tr>
+    <tr><td class="paramname">X</td><td>The destination integer array</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab9e6f6ec211dfb56d4599c45508ba93f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e6f6ec211dfb56d4599c45508ba93f">&#9670;&nbsp;</a></span>XOR()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static __m128i AES128::XOR </td>
+          <td>(</td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>X</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const __m128i&#160;</td>
+          <td class="paramname"><em>Y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>XOR two vectors </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">X</td><td>The first vector to multiply</td></tr>
+    <tr><td class="paramname">Y</td><td>The second vector to multiply</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The multiplied vector</dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/Users/John/Documents/GitHub/CEX/CEX/<a class="el" href="_a_e_s128_8h_source.html">AES128.h</a></li>
 </ul>
 </div><!-- contents -->

@@ -23,6 +23,7 @@
 // An implementation of the Skein digest with a 512 bit digest size. 
 // Written by John G. Underhill, January 13, 2015
 // Updated July 2, 2018
+// Updated March 19, 2019
 // Contact: develop@vtdev.com
 
 
@@ -36,24 +37,22 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// An implementation of the Skein message digest with a 512 bit digest return size
+/// An implementation of the Skein sequential and parallel message-digests with a 512-bit hash code
 /// </summary> 
 /// 
 /// <example>
 /// <description>Example using the Update method:</description>
 /// <code>
 /// Skein512 dgt;
-/// std::vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
 /// dgt.Update(Input, 0, Input.size());
-/// dgt.Finalize(hash, 0);
-/// dgt.Reset();
+/// dgt.Finalize(Output, 0);
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description>Tree Hashing Description:</description>
-/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through one of the two constructors. \n 
+/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through one of the two constructors parameters. \n 
 /// The default settings are applied when using the Skein512(bool) constructor, or a manually defined configuration when using the Skein512(SkeinParams) constructor. \n
 /// The SkeinParams structure contains property accessors that are initialized by the boolean constructor at their defaults; 
 /// Schema(83,72,65,51) OuputSize(64), Version(1), FanOut(Parallel ? 8 : 0), and LeafSize(64). \n
@@ -73,9 +72,9 @@ NAMESPACE_DIGEST
 /// <list type="bullet">
 /// <item><description>The input message block-size is 64 bytes, (512 bits).</description></item>
 /// <item><description>Digest output size is 64 bytes, (512 bits).</description></item>
-/// <item><description>The <see cref="ComputeHash(byte[])"/> method wraps the <see cref="Update(byte[], size_t, size_t)"/> and <see cref="Finalize(byte[], size_t)"/> methods; (suitable for small data).</description>/></item>
-/// <item><description>The <see cref="Update(byte)"/> and <see cref="Update(byte[], size_t, size_t)"/> methods process message input.</description></item>
-/// <item><description>The <see cref="Finalize(byte[], size_t)"/> method returns the hash or MAC code but does not reset the internal state, call <see cref="Reset()"/> to reinitialize to default state.</description></item>
+/// <item><description>The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data).</description>/></item>
+/// <item><description>The Update functions process message input, this can be a byte, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
+/// <item><description>The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
 /// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant using a default FanOut of 8 threads.</description></item>
 /// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, and changing the Fanout property from the default of 8, will also change the output hash.</description></item>
 /// <item><description>The supported tree hashing mode in this implementation is a sequential chain (hash list); intermediate hashes are finalized as contiguous message input to the root hash in the finalizer.</description></item>
@@ -93,24 +92,16 @@ class Skein512 final : public IDigest
 {
 private:
 
-	static const size_t BLOCK_SIZE = 64; // TODO: replace with Skein class constants
-	static const std::string CLASS_NAME;
-	static const byte DEF_PRLDEGREE = 8;
-	static const size_t DIGEST_SIZE = 64;
-	static const size_t MAX_PRLBLOCK = 1024 * 1000 * DEF_PRLDEGREE * 100;
-	static const size_t MIN_PRLBLOCK = BLOCK_SIZE * DEF_PRLDEGREE;
-	static const size_t STATE_SIZE = 8;
+	static const size_t DEF_PRLDEGREE = 8;
+	static const size_t MAX_PRLDEGREE = 64;
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	struct Skein512State;
+	class Skein512State;
 	std::vector<Skein512State> m_dgtState;
-	bool m_isDestroyed;
-	bool m_isInitialized;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	bool m_treeDestroy;
 	SkeinParams m_treeParams;
 
 public:
@@ -157,17 +148,17 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Digests internal blocksize in bytes
+	/// Read Only: The message-digests internal block size in bytes
 	/// </summary>
 	size_t BlockSize() override;
 
 	/// <summary>
-	/// Read Only: Size of returned digest in bytes
+	/// Read Only: The message-digests output hash-size in bytes
 	/// </summary>
 	size_t DigestSize() override;
 
 	/// <summary>
-	/// Read Only: The digests type name
+	/// Read Only: The message-digests enumeration type-name
 	/// </summary>
 	const Digests Enumeral() override;
 
@@ -179,7 +170,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: The digests class name
+	/// Read Only: The message-digests formal class name
 	/// </summary>
 	const std::string Name() override;
 
@@ -201,24 +192,26 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Get the Hash value
+	/// Compute the hash value in a single-step using the input message and the output vector receiving the hash code.
+	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="Output">The hash output value array</param>
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	///
+	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Do final processing and get the hash value
+	/// Finalize message processing and return the hash code.
+	/// <para>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The Hash output value array</param>
-	/// <param name="OutOffset">The starting offset within the Output array</param>
-	/// 
-	/// <returns>Size of Hash value</returns>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	void Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -232,7 +225,7 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
-	/// Reset the internal state
+	/// Reset the message-digests internal state
 	/// </summary>
 	void Reset() override;
 
@@ -244,24 +237,39 @@ public:
 	void Update(byte Input) override;
 
 	/// <summary>
-	/// Update the buffer
+	/// Update the message digest with a single unsigned 32-bit integer
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">Amount of data to process in bytes</param>
+	/// <param name="Input">The 32-bit integer to process</param>
+	void Update(uint Input) override;
+
+	/// <summary>
+	/// Update the message digest with a single unsigned 64-bit integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The 64-bit integer to process</param>
+	void Update(ulong Input) override;
+
+	/// <summary>
+	/// Update the message digest with a vector using offset and length parameters.
+	/// <para>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<Skein512State> &State, size_t StateOffset);
-	void Initialize();
-	void LoadState(Skein512State &State, std::array<ulong, 8> &Config);
-	void Permute(std::array<ulong, 8> &Message, Skein512State &State);
-	void ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein512State> &State, size_t StateOffset, size_t Length = BLOCK_SIZE);
-	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein512State> &State, size_t StateOffset, ulong Length);
+	static void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Skein512State &State);
+	static void Initialize(std::vector<Skein512State> &State, SkeinParams &Params);
+	static void LoadState(Skein512State &State, std::array<ulong, 8> &Config);
+	static void Permute(std::array<ulong, 8> &Message, Skein512State &State);
+	static void ProcessBlock(const std::vector<byte> &Input, size_t InOffset, Skein512State &State, size_t Length);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Skein512State &State, ulong Length);
 };
 
 NAMESPACE_DIGESTEND

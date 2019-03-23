@@ -181,7 +181,7 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	shk256.Generate(kr, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// overwrite pre-k with z on re-encryption failure
-	IntegerTools::CMov(kr, 0, m_privateKey->Polynomial(), m_privateKey->Polynomial().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
+	IntegerTools::CMov(m_privateKey->Polynomial(), m_privateKey->Polynomial().size() - MLWEQ7681N256::MLWE_SEED_SIZE, kr, 0, MLWEQ7681N256::MLWE_SEED_SIZE, result);
 
 	// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 	shk256.Initialize(kr, m_domainKey);

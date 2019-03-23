@@ -48,12 +48,12 @@ class Skein
 {
 public:
 
-	static const size_t SKEIN_RATE256_SIZE = 32;
-	static const size_t SKEIN_RATE512_SIZE = 64;
-	static const size_t SKEIN_RATE1024_SIZE = 128;
-	static const size_t SKEIN_MESSAGE256_SIZE = 32;
-	static const size_t SKEIN_MESSAGE512_SIZE = 64;
-	static const size_t SKEIN_MESSAGE1024_SIZE = 128;
+	static const size_t SKEIN256_DIGEST_SIZE = 32;
+	static const size_t SKEIN512_DIGEST_SIZE = 64;
+	static const size_t SKEIN1024_DIGEST_SIZE = 128;
+	static const size_t SKEIN256_RATE_SIZE = 32;
+	static const size_t SKEIN512_RATE_SIZE = 64;
+	static const size_t SKEIN1024_RATE_SIZE = 128;
 
 	//~~~Skein-256~~~//
 

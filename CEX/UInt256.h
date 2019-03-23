@@ -20,11 +20,8 @@
 #define CEX_UINT256_H
 
 #include "CexDomain.h"
+#include "Intrinsics.h"
 #include "SimdIntegers.h"
-
-#if defined(__AVX2__)
-#	include "Intrinsics.h"
-#endif
 
 NAMESPACE_NUMERIC
 
@@ -36,8 +33,6 @@ using Enumeration::SimdIntegers;
 /// </summary>
 class UInt256
 {
-#if defined(__AVX2__)
-
 public:
 
 	/// <summary>
@@ -806,8 +801,6 @@ private:
 		Xl = _mm256_permute2x128_si256(X0, X1, _MM_SHUFFLE(0, 2, 0, 0));
 		Xh = _mm256_permute2x128_si256(X0, X1, _MM_SHUFFLE(0, 3, 0, 1));
 	}
-
-#endif
 };
 
 NAMESPACE_NUMERICEND

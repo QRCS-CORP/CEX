@@ -526,10 +526,11 @@ void TSX512::Process(const std::vector<byte> &Input, size_t InOffset, std::vecto
 			std::array<ulong, NONCE_SIZE> thdCtr;
 			// offset counter by chunk size
 			IntegerTools::LeIncreaseW(m_tsx512State->Nonce, thdCtr, (CTROFT * i));
+			const size_t STMPOS = i * CNKLEN;
 			// create random at offset position
-			this->Generate(m_tsx512State, thdCtr, Output, OutOffset + (i * CNKLEN), CNKLEN);
+			this->Generate(m_tsx512State, thdCtr, Output, OutOffset + STMPOS, CNKLEN);
 			// xor with input at offset
-			MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+			MemoryTools::XOR(Input, InOffset + STMPOS, Output, OutOffset + STMPOS, CNKLEN);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{

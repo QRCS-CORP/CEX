@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['recd_5fbytes',['RECD_BYTES',['../class_f_f_t_q12289_n1024.html#a727ed171bff5784695da727bd8adeff3',1,'FFTQ12289N1024::RECD_BYTES()'],['../class_f_f_t_q12289_n512.html#aba76f3edef13781bf5b623a9231a3b89',1,'FFTQ12289N512::RECD_BYTES()']]]
+  ['xmm',['xmm',['../class_u_int128.html#a060a06951cc8343dc087aa48219c072e',1,'UInt128::xmm()'],['../class_u_short128.html#a9afa89a05c88c284878dfaf3a83c1d63',1,'UShort128::xmm()']]]
 ];

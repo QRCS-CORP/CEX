@@ -20,11 +20,8 @@
 #define CEX_ULONG256_H
 
 #include "CexDomain.h"
+#include "Intrinsics.h"
 #include "SimdIntegers.h"
-
-#if defined(__AVX2__)
-#	include "Intrinsics.h"
-#endif
 
 NAMESPACE_NUMERIC
 
@@ -36,8 +33,6 @@ using Enumeration::SimdIntegers;
 /// </summary>
 class ULong256
 {
-#if defined(__AVX2__)
-
 public:
 
 	/// <summary>
@@ -184,7 +179,7 @@ public:
 	/// Store register in an integer array
 	/// </summary>
 	///
-	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Output">The source integer array; must be at least 256 bits long</param>
 	/// <param name="Offset">The starting offset within the Output array</param>
 	template<typename Array>
 	inline void Store(Array &Output, size_t Offset) const
@@ -679,8 +674,6 @@ public:
 	{
 		return ~ULong256(_mm256_cmpeq_epi64(ymm, X.ymm));
 	}
-
-#endif
 };
 
 NAMESPACE_NUMERICEND

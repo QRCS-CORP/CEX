@@ -22,7 +22,7 @@ namespace Test
 		static const bool HAS_AESNI;
 
 		TestEventHandler m_progressEvent;
-		bool m_testNI;
+		bool m_aesniTest;
 
     public:
 

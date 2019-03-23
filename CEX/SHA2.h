@@ -48,7 +48,7 @@ NAMESPACE_DIGEST
 /// (enabled in the hash function by adding the CEX_DIGEST_COMPACT to the CexConfig file). \n
 /// The Unrolled forms are optimized for speed and timing neutrality (suffix U), and the vertically vectorized functions have the V suffix. \n
 /// The H suffix denotes functions that take an SIMD wrapper class (ULongXXX) as the state values, and process state in SIMD parallel blocks.</para>
-/// <para>This class contains wide forms of the functions; PermuteR64P8x512H and PermuteR80P4x1024H uses AVX2. \n
+/// <para>This class contains wide forms of the functions; PermuteR64P8x512H and PermuteR80P4x1024H use AVX2. \n
 /// Experimental functions using AVX512 instructions are also implemented; PermuteR64P16x512H and PermuteR80P8x1024H. \n
 /// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitly declared.</para>
 /// </summary>
@@ -104,10 +104,10 @@ private:
 
 public:
 
-	static const size_t SHA2_RATE256_SIZE = 64;
-	static const size_t SHA2_RATE512_SIZE = 128;
-	static const size_t SHA2_MESSAGE256_SIZE = 32;
-	static const size_t SHA2_MESSAGE512_SIZE = 64;
+	static const size_t SHA256_DIGEST_SIZE = 32;
+	static const size_t SHA512_DIGEST_SIZE = 64;
+	static const size_t SHA256_RATE_SIZE = 64;
+	static const size_t SHA512_RATE_SIZE = 128;
 
 	//~~~SHA2-256~~~//
 

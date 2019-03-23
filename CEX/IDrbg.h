@@ -25,7 +25,8 @@ using Cipher::SymmetricKeySize;
 using Cipher::SymmetricSecureKey;
 
 /// <summary>
-/// Deterministic Random Byte Generator (DRBG) interface class
+/// The DRBG virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented DRBG instances as a parameter.</para>
 /// </summary>
 class IDrbg
 {

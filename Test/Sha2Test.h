@@ -23,8 +23,7 @@ namespace Test
 		static const size_t MAXM_ALLOC = 262140;
 		static const size_t TEST_CYCLES = 25;
 
-		std::vector<std::vector<byte>> m_exp256;
-		std::vector<std::vector<byte>> m_exp512;
+		std::vector<std::vector<byte>> m_expected;
 		std::vector<std::vector<byte>> m_message;
 		TestEventHandler m_progressEvent;
 

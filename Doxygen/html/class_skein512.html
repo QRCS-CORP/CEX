@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the Skein message digest with a 512 bit digest return size  
+<p>An implementation of the Skein sequential and parallel message-digests with a 512-bit hash code  
  <a href="class_skein512.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_skein512_8h_source.html">Skein512.h</a>&gt;</code></p>
@@ -81,7 +81,7 @@ Inheritance diagram for Skein512:</div>
  <div class="center">
   <img src="class_skein512.png" usemap="#Skein512_map" alt=""/>
   <map id="Skein512_map" name="Skein512_map">
-<area href="class_i_digest.html" title="Hash Digest Interface " alt="IDigest" shape="rect" coords="0,0,64,24"/>
+<area href="class_i_digest.html" title="The message digest virtualnterface class. " alt="IDigest" shape="rect" coords="0,0,64,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -103,19 +103,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:aeb7047f8cd474f166b5ebcaa9d203963"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#aeb7047f8cd474f166b5ebcaa9d203963">More...</a><br /></td></tr>
 <tr class="separator:aeb7047f8cd474f166b5ebcaa9d203963"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae29e5caea25501230f92574d86b66837"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ae29e5caea25501230f92574d86b66837">BlockSize</a> () override</td></tr>
-<tr class="memdesc:ae29e5caea25501230f92574d86b66837"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Digests internal blocksize in bytes  <a href="#ae29e5caea25501230f92574d86b66837">More...</a><br /></td></tr>
+<tr class="memdesc:ae29e5caea25501230f92574d86b66837"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests internal block size in bytes  <a href="#ae29e5caea25501230f92574d86b66837">More...</a><br /></td></tr>
 <tr class="separator:ae29e5caea25501230f92574d86b66837"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec138c19015ccc4c9ae4316bb30aa7a0"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#aec138c19015ccc4c9ae4316bb30aa7a0">DigestSize</a> () override</td></tr>
-<tr class="memdesc:aec138c19015ccc4c9ae4316bb30aa7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Size of returned digest in bytes  <a href="#aec138c19015ccc4c9ae4316bb30aa7a0">More...</a><br /></td></tr>
+<tr class="memdesc:aec138c19015ccc4c9ae4316bb30aa7a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests output hash-size in bytes  <a href="#aec138c19015ccc4c9ae4316bb30aa7a0">More...</a><br /></td></tr>
 <tr class="separator:aec138c19015ccc4c9ae4316bb30aa7a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5160ec09444e5675efdf268cbd54af74"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#a5160ec09444e5675efdf268cbd54af74">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a5160ec09444e5675efdf268cbd54af74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The digests type name  <a href="#a5160ec09444e5675efdf268cbd54af74">More...</a><br /></td></tr>
+<tr class="memdesc:a5160ec09444e5675efdf268cbd54af74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests enumeration type-name  <a href="#a5160ec09444e5675efdf268cbd54af74">More...</a><br /></td></tr>
 <tr class="separator:a5160ec09444e5675efdf268cbd54af74"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae05f3cc9d83b178c4c7991af6f2d6bca"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ae05f3cc9d83b178c4c7991af6f2d6bca">IsParallel</a> () override</td></tr>
 <tr class="memdesc:ae05f3cc9d83b178c4c7991af6f2d6bca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#ae05f3cc9d83b178c4c7991af6f2d6bca">More...</a><br /></td></tr>
 <tr class="separator:ae05f3cc9d83b178c4c7991af6f2d6bca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c1d708abb290deed8d0d00102991180"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#a2c1d708abb290deed8d0d00102991180">Name</a> () override</td></tr>
-<tr class="memdesc:a2c1d708abb290deed8d0d00102991180"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The digests class name  <a href="#a2c1d708abb290deed8d0d00102991180">More...</a><br /></td></tr>
+<tr class="memdesc:a2c1d708abb290deed8d0d00102991180"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests formal class name  <a href="#a2c1d708abb290deed8d0d00102991180">More...</a><br /></td></tr>
 <tr class="separator:a2c1d708abb290deed8d0d00102991180"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad36ade9de39e10a6ded4b105508c42b6"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ad36ade9de39e10a6ded4b105508c42b6">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:ad36ade9de39e10a6ded4b105508c42b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.  <a href="#ad36ade9de39e10a6ded4b105508c42b6">More...</a><br /></td></tr>
@@ -124,22 +124,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ab45c44c6a9cccad402c28589b0b98ff6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.  <a href="#ab45c44c6a9cccad402c28589b0b98ff6">More...</a><br /></td></tr>
 <tr class="separator:ab45c44c6a9cccad402c28589b0b98ff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1211110785912aeab6fe0ff923c0b65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ab1211110785912aeab6fe0ff923c0b65">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:ab1211110785912aeab6fe0ff923c0b65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Hash value  <a href="#ab1211110785912aeab6fe0ff923c0b65">More...</a><br /></td></tr>
+<tr class="memdesc:ab1211110785912aeab6fe0ff923c0b65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the hash value in a single-step using the input message and the output vector receiving the hash code.  <a href="#ab1211110785912aeab6fe0ff923c0b65">More...</a><br /></td></tr>
 <tr class="separator:ab1211110785912aeab6fe0ff923c0b65"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab18472b81fdc36fddd6d9a6ad7128d78"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ab18472b81fdc36fddd6d9a6ad7128d78">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
-<tr class="memdesc:ab18472b81fdc36fddd6d9a6ad7128d78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do final processing and get the hash value  <a href="#ab18472b81fdc36fddd6d9a6ad7128d78">More...</a><br /></td></tr>
-<tr class="separator:ab18472b81fdc36fddd6d9a6ad7128d78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a131be717031a6bce867e72fcb5999174"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#a131be717031a6bce867e72fcb5999174">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
+<tr class="memdesc:a131be717031a6bce867e72fcb5999174"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize message processing and return the hash code.  <a href="#a131be717031a6bce867e72fcb5999174">More...</a><br /></td></tr>
+<tr class="separator:a131be717031a6bce867e72fcb5999174"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0bf547d55d5185613f27d91645b1e33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ab0bf547d55d5185613f27d91645b1e33">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:ab0bf547d55d5185613f27d91645b1e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of threads allocated when using multi-threaded tree hashing processing.  <a href="#ab0bf547d55d5185613f27d91645b1e33">More...</a><br /></td></tr>
 <tr class="separator:ab0bf547d55d5185613f27d91645b1e33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace229195ac8d705bd2b956bf72dc1da6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ace229195ac8d705bd2b956bf72dc1da6">Reset</a> () override</td></tr>
-<tr class="memdesc:ace229195ac8d705bd2b956bf72dc1da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#ace229195ac8d705bd2b956bf72dc1da6">More...</a><br /></td></tr>
+<tr class="memdesc:ace229195ac8d705bd2b956bf72dc1da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the message-digests internal state  <a href="#ace229195ac8d705bd2b956bf72dc1da6">More...</a><br /></td></tr>
 <tr class="separator:ace229195ac8d705bd2b956bf72dc1da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2169bc4516086c740e6c97f9b554d55a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#a2169bc4516086c740e6c97f9b554d55a">Update</a> (byte Input) override</td></tr>
 <tr class="memdesc:a2169bc4516086c740e6c97f9b554d55a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single byte  <a href="#a2169bc4516086c740e6c97f9b554d55a">More...</a><br /></td></tr>
 <tr class="separator:a2169bc4516086c740e6c97f9b554d55a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeca838aed51cdd7900665a2e3e940dc8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#aeca838aed51cdd7900665a2e3e940dc8">Update</a> (uint Input) override</td></tr>
+<tr class="memdesc:aeca838aed51cdd7900665a2e3e940dc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single unsigned 32-bit integer  <a href="#aeca838aed51cdd7900665a2e3e940dc8">More...</a><br /></td></tr>
+<tr class="separator:aeca838aed51cdd7900665a2e3e940dc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8c3426f39f25baa474766ee6c3ca179"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#ac8c3426f39f25baa474766ee6c3ca179">Update</a> (ulong Input) override</td></tr>
+<tr class="memdesc:ac8c3426f39f25baa474766ee6c3ca179"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single unsigned 64-bit integer  <a href="#ac8c3426f39f25baa474766ee6c3ca179">More...</a><br /></td></tr>
+<tr class="separator:ac8c3426f39f25baa474766ee6c3ca179"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90b2cf76212eba294dad9931a2e18d81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_skein512.html#a90b2cf76212eba294dad9931a2e18d81">Update</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, size_t Length) override</td></tr>
-<tr class="memdesc:a90b2cf76212eba294dad9931a2e18d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the buffer  <a href="#a90b2cf76212eba294dad9931a2e18d81">More...</a><br /></td></tr>
+<tr class="memdesc:a90b2cf76212eba294dad9931a2e18d81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a vector using offset and length parameters.  <a href="#a90b2cf76212eba294dad9931a2e18d81">More...</a><br /></td></tr>
 <tr class="separator:a90b2cf76212eba294dad9931a2e18d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_digest"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_digest')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_digest.html">IDigest</a></td></tr>
 <tr class="memitem:a3efc443269eb9737fac182ec2c6998b6 inherit pub_methods_class_i_digest"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_digest.html#a3efc443269eb9737fac182ec2c6998b6">IDigest</a> (const <a class="el" href="class_i_digest.html">IDigest</a> &amp;)=delete</td></tr>
@@ -156,9 +162,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6b8e518f2f788f6a755548e95d0985e0 inherit pub_methods_class_i_digest"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the Skein message digest with a 512 bit digest return size </p>
-<p>Example using the Update method: </p><div class="fragment"><div class="line"><a class="code" href="class_skein512.html">Skein512</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(digest.<a class="code" href="class_keccak512.html#a962018e8b134cf29aa8b5b680c165030">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_skein512.html#a2169bc4516086c740e6c97f9b554d55a">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_skein512.html#ab18472b81fdc36fddd6d9a6ad7128d78">Finalize</a>(hash, 0);</div><div class="line">dgt.<a class="code" href="class_skein512.html#ace229195ac8d705bd2b956bf72dc1da6">Reset</a>();</div></div><!-- fragment --> <p>Tree Hashing Description: </p>
-<p>The tree hashing mode is instantiated when the parallel mechanism is engaged through one of the two constructors. <br />
+<div class="textblock"><p>An implementation of the Skein sequential and parallel message-digests with a 512-bit hash code </p>
+<p>Example using the Update method: </p><div class="fragment"><div class="line"><a class="code" href="class_skein512.html">Skein512</a> dgt;</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_skein512.html#a2169bc4516086c740e6c97f9b554d55a">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_skein512.html#a131be717031a6bce867e72fcb5999174">Finalize</a>(Output, 0);</div></div><!-- fragment --> <p>Tree Hashing Description: </p>
+<p>The tree hashing mode is instantiated when the parallel mechanism is engaged through one of the two constructors parameters. <br />
  The default settings are applied when using the Skein512(bool) constructor, or a manually defined configuration when using the Skein512(SkeinParams) constructor. <br />
 The SkeinParams structure contains property accessors that are initialized by the boolean constructor at their defaults; Schema(83,72,65,51) OuputSize(64), Version(1), FanOut(Parallel ? 8 : 0), and LeafSize(64). <br />
 The SkeinParams structure when passed to the constructor, can be used to change the FanOut property (which corresponds to the number of threads used in parallel mode), which must be an even number less or equal to the number of processing cores. <br />
@@ -175,11 +181,11 @@ The input message block-size is 64 bytes, (512 bits). </li>
 <li>
 Digest output size is 64 bytes, (512 bits). </li>
 <li>
-The ComputeHash(byte[]) method wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) methods; (suitable for small data)./&gt; </li>
+The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data)./&gt; </li>
 <li>
-The <a class="el" href="class_skein512.html#a2169bc4516086c740e6c97f9b554d55a" title="Update the message digest with a single byte ">Update(byte)</a> and Update(byte[], size_t, size_t) methods process message input. </li>
+The Update functions process message input, this can be a byte, 32&ndash;bit or 64-bit unsigned integer, or a vector of bytes. </li>
 <li>
-The Finalize(byte[], size_t) method returns the hash or MAC code but does not reset the internal state, call <a class="el" href="class_skein512.html#ace229195ac8d705bd2b956bf72dc1da6" title="Reset the internal state ">Reset()</a> to reinitialize to default state. </li>
+The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state. </li>
 <li>
 Setting Parallel to true in the constructor instantiates the multi-threaded variant using a default FanOut of 8 threads. </li>
 <li>
@@ -353,7 +359,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The Digests internal blocksize in bytes </p>
+<p>Read Only: The message-digests internal block size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#ab1e4146c28b3623c488214ef37d8530a">IDigest</a>.</p>
 
@@ -393,11 +399,18 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Get the Hash value </p>
+<p>Compute the hash value in a single-step using the input message and the output vector receiving the hash code. </p>
+<p>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Input data</td></tr>
-    <tr><td class="paramname">Output</td><td>The hash output value array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input message byte-vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector receiving the final hash code; must be at least DigestSize in length</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoDigestException</td><td>Thrown if the output buffer is too short</td></tr>
   </table>
   </dd>
 </dl>
@@ -429,7 +442,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Size of returned digest in bytes </p>
+<p>Read Only: The message-digests output hash-size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#ace4a6bf16017c688f77c7ea9b31f189e">IDigest</a>.</p>
 
@@ -458,14 +471,14 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The digests type name </p>
+<p>Read Only: The message-digests enumeration type-name </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a01058025d9343eeacb5935561edf5059">IDigest</a>.</p>
 
 </div>
 </div>
-<a id="ab18472b81fdc36fddd6d9a6ad7128d78"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab18472b81fdc36fddd6d9a6ad7128d78">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="a131be717031a6bce867e72fcb5999174"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a131be717031a6bce867e72fcb5999174">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -474,7 +487,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t Skein512::Finalize </td>
+          <td class="memname">void Skein512::Finalize </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -498,15 +511,15 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Do final processing and get the hash value </p>
+<p>Finalize message processing and return the hash code. </p>
+<p>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The Hash output value array</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector receiving the final hash code; must be at least DigestSize in length</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Size of Hash value</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoDigestException</td><td>Thrown if the output buffer is too short</td></tr>
@@ -514,7 +527,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_digest.html#af2aec1dc5f826b4a958f15d1487dacae">IDigest</a>.</p>
+<p>Implements <a class="el" href="class_i_digest.html#a4e3f2a685739584bb3db22a92ba83b9c">IDigest</a>.</p>
 
 </div>
 </div>
@@ -571,7 +584,7 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The digests class name </p>
+<p>Read Only: The message-digests formal class name </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a34f2a2b026e092d2c93f71885a3202ea">IDigest</a>.</p>
 
@@ -731,14 +744,14 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Reset the internal state </p>
+<p>Reset the message-digests internal state </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a473c1fba5959334b7c3bc1d694677aa9">IDigest</a>.</p>
 
 </div>
 </div>
 <a id="a2169bc4516086c740e6c97f9b554d55a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2169bc4516086c740e6c97f9b554d55a">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2169bc4516086c740e6c97f9b554d55a">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -773,8 +786,80 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 
 </div>
 </div>
+<a id="aeca838aed51cdd7900665a2e3e940dc8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeca838aed51cdd7900665a2e3e940dc8">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Skein512::Update </td>
+          <td>(</td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>Input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the message digest with a single unsigned 32-bit integer </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The 32-bit integer to process</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_digest.html#ad3003018823ef568235dab88e795e87c">IDigest</a>.</p>
+
+</div>
+</div>
+<a id="ac8c3426f39f25baa474766ee6c3ca179"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8c3426f39f25baa474766ee6c3ca179">&#9670;&nbsp;</a></span>Update() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Skein512::Update </td>
+          <td>(</td>
+          <td class="paramtype">ulong&#160;</td>
+          <td class="paramname"><em>Input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the message digest with a single unsigned 64-bit integer </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The 64-bit integer to process</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_digest.html#aa33d3d44c85563b68dfb8bfbaba1d72b">IDigest</a>.</p>
+
+</div>
+</div>
 <a id="a90b2cf76212eba294dad9931a2e18d81"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90b2cf76212eba294dad9931a2e18d81">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a90b2cf76212eba294dad9931a2e18d81">&#9670;&nbsp;</a></span>Update() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -813,12 +898,13 @@ NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Th
 </table>
 </div><div class="memdoc">
 
-<p>Update the buffer </p>
+<p>Update the message digest with a vector using offset and length parameters. </p>
+<p>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>Input data</td></tr>
-    <tr><td class="paramname">InOffset</td><td>The starting offset within the Input array</td></tr>
-    <tr><td class="paramname">Length</td><td>Amount of data to process in bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input message byte-vector</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to process</td></tr>
   </table>
   </dd>
 </dl>

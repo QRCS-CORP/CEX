@@ -107,32 +107,29 @@ namespace Test
 			OnProgress(std::string("SkeinTest: Passed Skein-1024 sequential stress tests.."));
 			delete dgt1024s;
 
-			if (detect.VirtualCores() >= 2)
-			{
-				Skein256* dgt256p = new Skein256(true);
-				Stress(dgt256p);
-				OnProgress(std::string("SkeinTest: Passed Skein-256 parallel stress tests.."));
+			Skein256* dgt256p = new Skein256(true);
+			Stress(dgt256p);
+			OnProgress(std::string("SkeinTest: Passed Skein-256 parallel stress tests.."));
 
-				Skein512* dgt512p = new Skein512(true);
-				Stress(dgt512p);
-				OnProgress(std::string("SkeinTest: Passed Skein-512 parallel stress tests.."));
+			Skein512* dgt512p = new Skein512(true);
+			Stress(dgt512p);
+			OnProgress(std::string("SkeinTest: Passed Skein-512 parallel stress tests.."));
 
-				Skein1024* dgt1024p = new Skein1024(true);
-				Stress(dgt1024p);
-				OnProgress(std::string("SkeinTest: Passed Skein-1024 parallel stress tests.."));
+			Skein1024* dgt1024p = new Skein1024(true);
+			Stress(dgt1024p);
+			OnProgress(std::string("SkeinTest: Passed Skein-1024 parallel stress tests.."));
 
-				Parallel(dgt256p);
-				OnProgress(std::string("SkeinTest: Passed Skein-256 parallel integrity tests.."));
-				delete dgt256p;
+			Parallel(dgt256p);
+			OnProgress(std::string("SkeinTest: Passed Skein-256 parallel integrity tests.."));
+			delete dgt256p;
 
-				Parallel(dgt512p);
-				delete dgt512p;
-				OnProgress(std::string("SkeinTest: Passed Skein-512 parallel integrity tests.."));
+			Parallel(dgt512p);
+			delete dgt512p;
+			OnProgress(std::string("SkeinTest: Passed Skein-512 parallel integrity tests.."));
 
-				Parallel(dgt1024p);
-				delete dgt1024p;
-				OnProgress(std::string("SkeinTest: Passed Skein-1024 parallel integrity tests.."));
-			}
+			Parallel(dgt1024p);
+			delete dgt1024p;
+			OnProgress(std::string("SkeinTest: Passed Skein-1024 parallel integrity tests.."));
 
 			PermutationR72();
 			OnProgress(std::string("SkeinTest: Passed Skein 72 round permutation variants equivalence test.."));

@@ -27,11 +27,10 @@
 
 #include "IStreamCipher.h"
 #include "IMac.h"
+#include "Intrinsics.h"
 #include "StreamAuthenticators.h"
 
 NAMESPACE_STREAM
-
-#if defined(__AVX__)
 
 using Mac::IMac;
 using Enumeration::StreamAuthenticators;
@@ -136,6 +135,8 @@ private:
 	static const std::vector<byte> OMEGA_INFO;
 	static const size_t STATE_PRECACHED = 2048;
 	static const byte UPDATE_PREFIX = 0x80;
+	static const __m128i BLEND_MASK;
+	static const __m128i SHIFT_MASK;
 
 	class AcsState;
 	std::unique_ptr<AcsState> m_rcsState;
@@ -310,6 +311,5 @@ private:
 	void Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 };
 
-#endif
 NAMESPACE_STREAMEND
 #endif

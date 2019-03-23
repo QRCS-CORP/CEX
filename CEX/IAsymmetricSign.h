@@ -40,7 +40,8 @@ using Prng::IPrng;
 using Enumeration::Prngs;
 
 /// <summary>
-/// The Asymmetric cipher interface
+/// The asymmetric signature scheme virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented asymmetric signature scheme instances as a parameter.</para>
 /// </summary>
 class IAsymmetricSign
 {

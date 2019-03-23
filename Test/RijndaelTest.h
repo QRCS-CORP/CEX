@@ -33,7 +33,7 @@ namespace Test
         std::vector<std::vector<byte>> m_keys;
         std::vector<std::vector<byte>> m_plainText;
 		TestEventHandler m_progressEvent;
-		bool m_testAesNi;
+		bool m_aesniTest;
 
     public:
 

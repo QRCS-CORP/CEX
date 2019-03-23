@@ -90,6 +90,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7314b0e59babe79723983a9b7952d0e1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_parallel_options.html#a7314b0e59babe79723983a9b7952d0e1">ParallelOptions</a> (size_t <a class="el" href="class_parallel_options.html#a70485a3b161c13acb027259973e9dd7a">BlockSize</a>, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t <a class="el" href="class_parallel_options.html#af66f9e6ccfea343709793b4b8f9c2535">ParallelMaxDegree</a>=0)</td></tr>
 <tr class="memdesc:a7314b0e59babe79723983a9b7952d0e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using automated calculation of recommended values based on the hardware profile.  <a href="#a7314b0e59babe79723983a9b7952d0e1">More...</a><br /></td></tr>
 <tr class="separator:a7314b0e59babe79723983a9b7952d0e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1341dd416788186547cb3dc2e45239c2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_parallel_options.html#a1341dd416788186547cb3dc2e45239c2">ParallelOptions</a> (size_t <a class="el" href="class_parallel_options.html#a70485a3b161c13acb027259973e9dd7a">BlockSize</a>, bool Parallel, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t <a class="el" href="class_parallel_options.html#af66f9e6ccfea343709793b4b8f9c2535">ParallelMaxDegree</a>=0)</td></tr>
+<tr class="memdesc:a1341dd416788186547cb3dc2e45239c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using automated calculation of recommended values based on the hardware profile, and a parallel override for cross-compliant functions.  <a href="#a1341dd416788186547cb3dc2e45239c2">More...</a><br /></td></tr>
+<tr class="separator:a1341dd416788186547cb3dc2e45239c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37f6c6cec00e5773d9fed8323e172547"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_parallel_options.html#a37f6c6cec00e5773d9fed8323e172547">ParallelOptions</a> (size_t <a class="el" href="class_parallel_options.html#a70485a3b161c13acb027259973e9dd7a">BlockSize</a>, bool Parallel, size_t <a class="el" href="class_parallel_options.html#a39b5b081f84db508076ef9ec8fa25082">ParallelBlockSize</a>, size_t <a class="el" href="class_parallel_options.html#af66f9e6ccfea343709793b4b8f9c2535">ParallelMaxDegree</a>, bool SimdMultiply, size_t ReservedCache, bool SplitChannel)</td></tr>
 <tr class="memdesc:a37f6c6cec00e5773d9fed8323e172547"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class, setting each value manually.  <a href="#a37f6c6cec00e5773d9fed8323e172547">More...</a><br /></td></tr>
 <tr class="separator:a37f6c6cec00e5773d9fed8323e172547"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -171,7 +174,7 @@ Public Member Functions</h2></td></tr>
 <p>Contains system available intrinsics options, and parallel processing information.</p>
 <p>Populating a ParallelOptions structure: </p><div class="fragment"><div class="line"><a class="code" href="class_parallel_options.html">ParallelOptions</a> prl(</div><div class="line">    16,          <span class="comment">// a base block size of 16 bytes</span></div><div class="line">    <span class="keyword">false</span>,       <span class="comment">// parallel not using simd block multiplier</span></div><div class="line">    1024,        <span class="comment">// subtract pre-cached elements</span></div><div class="line">    <span class="keyword">true</span>);       <span class="comment">// dual channel algorithm (in/out)</span></div></div><!-- fragment --> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a2fe4b54bf9baa26ce3dc1b42589e24e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2fe4b54bf9baa26ce3dc1b42589e24e0">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[1/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fe4b54bf9baa26ce3dc1b42589e24e0">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -199,7 +202,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a26b823cedb798863e5b81d0bbd452fa7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26b823cedb798863e5b81d0bbd452fa7">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[2/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a26b823cedb798863e5b81d0bbd452fa7">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[2/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -226,7 +229,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="a7314b0e59babe79723983a9b7952d0e1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7314b0e59babe79723983a9b7952d0e1">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[3/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7314b0e59babe79723983a9b7952d0e1">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -290,8 +293,80 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a1341dd416788186547cb3dc2e45239c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1341dd416788186547cb3dc2e45239c2">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ParallelOptions::ParallelOptions </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>BlockSize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>Parallel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>SimdMultiply</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>ReservedCache</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>SplitChannel</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>ParallelMaxDegree</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class using automated calculation of recommended values based on the hardware profile, and a parallel override for cross-compliant functions. </p>
+<p>Initializes and calculates the default recommended values. Sizes are auto-calculated based on processor cache sizes, cpu core count, and SIMD availability, to favour a high-performance profile.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">BlockSize</td><td>The calling algorithms base input block-size in bytes</td></tr>
+    <tr><td class="paramname">Parallel</td><td>Multi threaded execution of the algorithm is enabled</td></tr>
+    <tr><td class="paramname">SimdMultiply</td><td>The calling algorithm supports SIMD pipelining; engages a multiplier used to calculate the optimum parallel block size.</td></tr>
+    <tr><td class="paramname">ReservedCache</td><td>The amount of L1 cache in bytes to reserve for arrays and working variables used by the calling algorithm. </td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Setting this value to the sum size (or greater) of the classes state variables, can reduce the frequency of L1 cache eviction of that state, which in turn provides faster run-times and resiliance against some forms of timing attacks.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">SplitChannel</td><td>The calling algorithm uses two channels of equal size Input and Output when processing data</td></tr>
+    <tr><td class="paramname">ParallelMaxDegree</td><td>The maximum number of processor cores used by the algorithm during parallel processing; if set to zero, uses total number of processor cores</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a37f6c6cec00e5773d9fed8323e172547"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a37f6c6cec00e5773d9fed8323e172547">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[4/4]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a37f6c6cec00e5773d9fed8323e172547">&#9670;&nbsp;</a></span>ParallelOptions() <span class="overload">[5/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">

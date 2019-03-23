@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the Blake2S and Blake2SP digests with a 256 bit digest output size  
+<p>An implementation of the Blake2S and Blake2SP sequential and parallel message-digests with a 256-bit hash code  
  <a href="class_blake256.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_blake256_8h_source.html">Blake256.h</a>&gt;</code></p>
@@ -81,7 +81,7 @@ Inheritance diagram for Blake256:</div>
  <div class="center">
   <img src="class_blake256.png" usemap="#Blake256_map" alt=""/>
   <map id="Blake256_map" name="Blake256_map">
-<area href="class_i_digest.html" title="Hash Digest Interface " alt="IDigest" shape="rect" coords="0,0,64,24"/>
+<area href="class_i_digest.html" title="The message digest virtualnterface class. " alt="IDigest" shape="rect" coords="0,0,64,24"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -103,19 +103,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af1afbae3da5348f3090d86f889d7dbb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#af1afbae3da5348f3090d86f889d7dbb3">More...</a><br /></td></tr>
 <tr class="separator:af1afbae3da5348f3090d86f889d7dbb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae97d70df144de5f3541fa7542e5f4a28"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#ae97d70df144de5f3541fa7542e5f4a28">BlockSize</a> () override</td></tr>
-<tr class="memdesc:ae97d70df144de5f3541fa7542e5f4a28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Digests internal blocksize in bytes  <a href="#ae97d70df144de5f3541fa7542e5f4a28">More...</a><br /></td></tr>
+<tr class="memdesc:ae97d70df144de5f3541fa7542e5f4a28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests internal block size in bytes  <a href="#ae97d70df144de5f3541fa7542e5f4a28">More...</a><br /></td></tr>
 <tr class="separator:ae97d70df144de5f3541fa7542e5f4a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4dcd9d1ca0371fce1b26d47afe093e14"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a4dcd9d1ca0371fce1b26d47afe093e14">DigestSize</a> () override</td></tr>
-<tr class="memdesc:a4dcd9d1ca0371fce1b26d47afe093e14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Size of returned digest in bytes  <a href="#a4dcd9d1ca0371fce1b26d47afe093e14">More...</a><br /></td></tr>
+<tr class="memdesc:a4dcd9d1ca0371fce1b26d47afe093e14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests output hash-size in bytes  <a href="#a4dcd9d1ca0371fce1b26d47afe093e14">More...</a><br /></td></tr>
 <tr class="separator:a4dcd9d1ca0371fce1b26d47afe093e14"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4755475b3aa835b4fe6aa57d7aed819b"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a4755475b3aa835b4fe6aa57d7aed819b">Enumeral</a> () override</td></tr>
-<tr class="memdesc:a4755475b3aa835b4fe6aa57d7aed819b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The digests type name  <a href="#a4755475b3aa835b4fe6aa57d7aed819b">More...</a><br /></td></tr>
+<tr class="memdesc:a4755475b3aa835b4fe6aa57d7aed819b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests enumeration type-name  <a href="#a4755475b3aa835b4fe6aa57d7aed819b">More...</a><br /></td></tr>
 <tr class="separator:a4755475b3aa835b4fe6aa57d7aed819b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7df84749e8111332b9170e34a3d1bd4a"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a7df84749e8111332b9170e34a3d1bd4a">IsParallel</a> () override</td></tr>
 <tr class="memdesc:a7df84749e8111332b9170e34a3d1bd4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#a7df84749e8111332b9170e34a3d1bd4a">More...</a><br /></td></tr>
 <tr class="separator:a7df84749e8111332b9170e34a3d1bd4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d7813f41667f50aebb42dc72a04f75d"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a7d7813f41667f50aebb42dc72a04f75d">Name</a> () override</td></tr>
-<tr class="memdesc:a7d7813f41667f50aebb42dc72a04f75d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The digests class name  <a href="#a7d7813f41667f50aebb42dc72a04f75d">More...</a><br /></td></tr>
+<tr class="memdesc:a7d7813f41667f50aebb42dc72a04f75d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The message-digests formal class name  <a href="#a7d7813f41667f50aebb42dc72a04f75d">More...</a><br /></td></tr>
 <tr class="separator:a7d7813f41667f50aebb42dc72a04f75d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a833009639b43ec3d667d8cd5890e2fe8"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a833009639b43ec3d667d8cd5890e2fe8">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:a833009639b43ec3d667d8cd5890e2fe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.  <a href="#a833009639b43ec3d667d8cd5890e2fe8">More...</a><br /></td></tr>
@@ -124,11 +124,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a32743a0d3f437a1cafdcfd1272299f56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.  <a href="#a32743a0d3f437a1cafdcfd1272299f56">More...</a><br /></td></tr>
 <tr class="separator:a32743a0d3f437a1cafdcfd1272299f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2464773ba54a40deab1bf2629192d7b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#ae2464773ba54a40deab1bf2629192d7b">Compute</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:ae2464773ba54a40deab1bf2629192d7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process the message data and return the Hash value  <a href="#ae2464773ba54a40deab1bf2629192d7b">More...</a><br /></td></tr>
+<tr class="memdesc:ae2464773ba54a40deab1bf2629192d7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the hash value in a single-step using the input message and the output vector receiving the hash code.  <a href="#ae2464773ba54a40deab1bf2629192d7b">More...</a><br /></td></tr>
 <tr class="separator:ae2464773ba54a40deab1bf2629192d7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abaaf42de844e5ffb51c9b033e565b5ea"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#abaaf42de844e5ffb51c9b033e565b5ea">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
-<tr class="memdesc:abaaf42de844e5ffb51c9b033e565b5ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform final processing and return the hash value  <a href="#abaaf42de844e5ffb51c9b033e565b5ea">More...</a><br /></td></tr>
-<tr class="separator:abaaf42de844e5ffb51c9b033e565b5ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90bb1ad4e7c71e23f7d82a17256e0268"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a90bb1ad4e7c71e23f7d82a17256e0268">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</td></tr>
+<tr class="memdesc:a90bb1ad4e7c71e23f7d82a17256e0268"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize message processing and return the hash code.  <a href="#a90bb1ad4e7c71e23f7d82a17256e0268">More...</a><br /></td></tr>
+<tr class="separator:a90bb1ad4e7c71e23f7d82a17256e0268"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefc9d7dbc31200b09735bba9377577c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#aefc9d7dbc31200b09735bba9377577c9">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;MacKey)</td></tr>
 <tr class="memdesc:aefc9d7dbc31200b09735bba9377577c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the digest as a MAC code generator  <a href="#aefc9d7dbc31200b09735bba9377577c9">More...</a><br /></td></tr>
 <tr class="separator:aefc9d7dbc31200b09735bba9377577c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,13 +136,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a7d720c1a77767c4e46282472192c48d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of threads allocated when using multi-threaded tree hashing processing.  <a href="#a7d720c1a77767c4e46282472192c48d6">More...</a><br /></td></tr>
 <tr class="separator:a7d720c1a77767c4e46282472192c48d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e33c56e5831a3bbddc9b80eaf6fa646"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a8e33c56e5831a3bbddc9b80eaf6fa646">Reset</a> () override</td></tr>
-<tr class="memdesc:a8e33c56e5831a3bbddc9b80eaf6fa646"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state to sequential defaults  <a href="#a8e33c56e5831a3bbddc9b80eaf6fa646">More...</a><br /></td></tr>
+<tr class="memdesc:a8e33c56e5831a3bbddc9b80eaf6fa646"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the message-digests internal state  <a href="#a8e33c56e5831a3bbddc9b80eaf6fa646">More...</a><br /></td></tr>
 <tr class="separator:a8e33c56e5831a3bbddc9b80eaf6fa646"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeae893f1cb552f5906f054b8b02b0003"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#aeae893f1cb552f5906f054b8b02b0003">Update</a> (byte Input) override</td></tr>
 <tr class="memdesc:aeae893f1cb552f5906f054b8b02b0003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single byte  <a href="#aeae893f1cb552f5906f054b8b02b0003">More...</a><br /></td></tr>
 <tr class="separator:aeae893f1cb552f5906f054b8b02b0003"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcdba99fb4d3dfba332eed96c7606aa5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#adcdba99fb4d3dfba332eed96c7606aa5">Update</a> (uint Input) override</td></tr>
+<tr class="memdesc:adcdba99fb4d3dfba332eed96c7606aa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single unsigned 32-bit integer  <a href="#adcdba99fb4d3dfba332eed96c7606aa5">More...</a><br /></td></tr>
+<tr class="separator:adcdba99fb4d3dfba332eed96c7606aa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37ff40bbbc8dc5b5146c60ac1f56b025"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a37ff40bbbc8dc5b5146c60ac1f56b025">Update</a> (ulong Input) override</td></tr>
+<tr class="memdesc:a37ff40bbbc8dc5b5146c60ac1f56b025"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a single unsigned 64-bit integer  <a href="#a37ff40bbbc8dc5b5146c60ac1f56b025">More...</a><br /></td></tr>
+<tr class="separator:a37ff40bbbc8dc5b5146c60ac1f56b025"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5428dac06692981c038d1cf787735f1b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_blake256.html#a5428dac06692981c038d1cf787735f1b">Update</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, size_t Length) override</td></tr>
-<tr class="memdesc:a5428dac06692981c038d1cf787735f1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message buffer  <a href="#a5428dac06692981c038d1cf787735f1b">More...</a><br /></td></tr>
+<tr class="memdesc:a5428dac06692981c038d1cf787735f1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the message digest with a vector using offset and length parameters.  <a href="#a5428dac06692981c038d1cf787735f1b">More...</a><br /></td></tr>
 <tr class="separator:a5428dac06692981c038d1cf787735f1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_digest"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_digest')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_digest.html">IDigest</a></td></tr>
 <tr class="memitem:a3efc443269eb9737fac182ec2c6998b6 inherit pub_methods_class_i_digest"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_digest.html#a3efc443269eb9737fac182ec2c6998b6">IDigest</a> (const <a class="el" href="class_i_digest.html">IDigest</a> &amp;)=delete</td></tr>
@@ -159,10 +165,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6b8e518f2f788f6a755548e95d0985e0 inherit pub_methods_class_i_digest"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the Blake2S and Blake2SP digests with a 256 bit digest output size </p>
+<div class="textblock"><p>An implementation of the Blake2S and Blake2SP sequential and parallel message-digests with a 256-bit hash code </p>
 <p>Example using the Compute method: </p>
 <p>Use the Compute method for small to medium data sizes.</p>
-<div class="fragment"><div class="line"><a class="code" href="class_blake256.html">Blake256</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(dgt.<a class="code" href="class_blake256.html#a4dcd9d1ca0371fce1b26d47afe093e14">DigestSize</a>(), 0);</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_blake256.html#ae2464773ba54a40deab1bf2629192d7b">Compute</a>(input, hash);</div></div><!-- fragment --> <p>Use the Update method for large data sizes: </p><div class="fragment"><div class="line"><a class="code" href="class_blake256.html">Blake256</a> dgt;</div><div class="line">std::vector&lt;byte&gt; hash(dgt.<a class="code" href="class_blake256.html#a4dcd9d1ca0371fce1b26d47afe093e14">DigestSize</a>(), 0);</div><div class="line">int64_t len = (int64_t)input.size();</div><div class="line"></div><div class="line"><span class="comment">// update blocks</span></div><div class="line"><span class="keywordflow">while</span> (len &gt; dgt.<a class="code" href="class_blake256.html#a4dcd9d1ca0371fce1b26d47afe093e14">DigestSize</a>())</div><div class="line">{</div><div class="line">    dgt.<a class="code" href="class_blake256.html#aeae893f1cb552f5906f054b8b02b0003">Update</a>(input, offset, len);</div><div class="line">    offset += dgt.<a class="code" href="class_blake256.html#a4dcd9d1ca0371fce1b26d47afe093e14">DigestSize</a>();</div><div class="line">    len -= dgt.<a class="code" href="class_blake256.html#a4dcd9d1ca0371fce1b26d47afe093e14">DigestSize</a>();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (len &gt; 0)</div><div class="line">    dgt.<a class="code" href="class_blake256.html#aeae893f1cb552f5906f054b8b02b0003">Update</a>(input, offset, len);</div><div class="line"></div><div class="line">dgt.<a class="code" href="class_blake256.html#abaaf42de844e5ffb51c9b033e565b5ea">Finalize</a>(hash, 0);</div></div><!-- fragment --> <p>Implementation Notes: </p><ul>
+<div class="fragment"><div class="line"><a class="code" href="class_blake256.html">Blake256</a> dgt;</div><div class="line"><span class="comment">// compute a hash</span></div><div class="line">dgt.<a class="code" href="class_blake256.html#aeae893f1cb552f5906f054b8b02b0003">Update</a>(Input, 0, Input.size());</div><div class="line">dgt.<a class="code" href="class_blake256.html#a90bb1ad4e7c71e23f7d82a17256e0268">Finalize</a>(Output, 0);</div></div><!-- fragment --> <p>Implementation Notes: </p><ul>
 <li>
 Algorithm is selected through the constructor (2S or 2SP), parallel version is selected through either the Parallel flag, or via the BlakeParams ThreadCount() configuration parameter. </li>
 <li>
@@ -178,9 +184,15 @@ The number of threads used in parallel mode can be user defined through the Blak
 <li>
 Digest output size is fixed at 32 bytes, (256 bits). </li>
 <li>
-The Compute(byte[]) method wraps the Update(byte[], size_t, size_t) and Finalize methods/&gt; </li>
+The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data)./&gt; </li>
 <li>
-The Finalize(byte[], size_t) method resets the internal state. </li>
+The Update functions process message input, this can be a byte, 32&ndash;bit or 64-bit unsigned integer, or a vector of bytes. </li>
+<li>
+The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state. </li>
+<li>
+Setting Parallel to true in the constructor instantiates the multi-threaded variant. </li>
+<li>
+Multi-threaded and sequential versions produce a different output hash for a message, this is expected. </li>
 <li>
 Optional intrinsics are runtime enabled automatically based on cpu support. </li>
 <li>
@@ -356,7 +368,7 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The Digests internal blocksize in bytes </p>
+<p>Read Only: The message-digests internal block size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#ab1e4146c28b3623c488214ef37d8530a">IDigest</a>.</p>
 
@@ -396,11 +408,18 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Process the message data and return the Hash value </p>
+<p>Compute the hash value in a single-step using the input message and the output vector receiving the hash code. </p>
+<p>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The message input data</td></tr>
-    <tr><td class="paramname">Output</td><td>The hash value output array</td></tr>
+    <tr><td class="paramname">Input</td><td>The input message byte-vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector receiving the final hash code; must be at least DigestSize in length</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoDigestException</td><td>Thrown if the output buffer is too short</td></tr>
   </table>
   </dd>
 </dl>
@@ -432,7 +451,7 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: Size of returned digest in bytes </p>
+<p>Read Only: The message-digests output hash-size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#ace4a6bf16017c688f77c7ea9b31f189e">IDigest</a>.</p>
 
@@ -461,14 +480,14 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The digests type name </p>
+<p>Read Only: The message-digests enumeration type-name </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a01058025d9343eeacb5935561edf5059">IDigest</a>.</p>
 
 </div>
 </div>
-<a id="abaaf42de844e5ffb51c9b033e565b5ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abaaf42de844e5ffb51c9b033e565b5ea">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="a90bb1ad4e7c71e23f7d82a17256e0268"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90bb1ad4e7c71e23f7d82a17256e0268">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -477,7 +496,7 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">size_t Blake256::Finalize </td>
+          <td class="memname">void Blake256::Finalize </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -501,15 +520,15 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Perform final processing and return the hash value </p>
+<p>Finalize message processing and return the hash code. </p>
+<p>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The Hash output value array</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset within the Output array</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector receiving the final hash code; must be at least DigestSize in length</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Size of Hash value</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">CryptoDigestException</td><td>Thrown if the output buffer is too short</td></tr>
@@ -517,7 +536,7 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_digest.html#af2aec1dc5f826b4a958f15d1487dacae">IDigest</a>.</p>
+<p>Implements <a class="el" href="class_i_digest.html#a4e3f2a685739584bb3db22a92ba83b9c">IDigest</a>.</p>
 
 </div>
 </div>
@@ -607,7 +626,7 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The digests class name </p>
+<p>Read Only: The message-digests formal class name </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a34f2a2b026e092d2c93f71885a3202ea">IDigest</a>.</p>
 
@@ -767,14 +786,14 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Reset the internal state to sequential defaults </p>
+<p>Reset the message-digests internal state </p>
 
 <p>Implements <a class="el" href="class_i_digest.html#a473c1fba5959334b7c3bc1d694677aa9">IDigest</a>.</p>
 
 </div>
 </div>
 <a id="aeae893f1cb552f5906f054b8b02b0003"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeae893f1cb552f5906f054b8b02b0003">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aeae893f1cb552f5906f054b8b02b0003">&#9670;&nbsp;</a></span>Update() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -809,8 +828,80 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 
 </div>
 </div>
+<a id="adcdba99fb4d3dfba332eed96c7606aa5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcdba99fb4d3dfba332eed96c7606aa5">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Blake256::Update </td>
+          <td>(</td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>Input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the message digest with a single unsigned 32-bit integer </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The 32-bit integer to process</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_digest.html#ad3003018823ef568235dab88e795e87c">IDigest</a>.</p>
+
+</div>
+</div>
+<a id="a37ff40bbbc8dc5b5146c60ac1f56b025"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37ff40bbbc8dc5b5146c60ac1f56b025">&#9670;&nbsp;</a></span>Update() <span class="overload">[3/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Blake256::Update </td>
+          <td>(</td>
+          <td class="paramtype">ulong&#160;</td>
+          <td class="paramname"><em>Input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Update the message digest with a single unsigned 64-bit integer </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The 64-bit integer to process</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_digest.html#aa33d3d44c85563b68dfb8bfbaba1d72b">IDigest</a>.</p>
+
+</div>
+</div>
 <a id="a5428dac06692981c038d1cf787735f1b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5428dac06692981c038d1cf787735f1b">&#9670;&nbsp;</a></span>Update() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5428dac06692981c038d1cf787735f1b">&#9670;&nbsp;</a></span>Update() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -849,13 +940,13 @@ SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c
 </table>
 </div><div class="memdoc">
 
-<p>Update the message buffer </p>
-<p>For best performance in parallel mode, use block sizes that are evenly divisible by ParallelMinimumSize() to reduce caching. Block size for parallel mode should be in a range of minimum 32KiB to 25MiB, larger block sizes reduce the impact of parallel loop creation.</p>
+<p>Update the message digest with a vector using offset and length parameters. </p>
+<p>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The Input message data</td></tr>
-    <tr><td class="paramname">InOffset</td><td>The starting offset within the Input array</td></tr>
-    <tr><td class="paramname">Length</td><td>The amount of data to process in bytes</td></tr>
+    <tr><td class="paramname">Input</td><td>The input message byte-vector</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to process</td></tr>
   </table>
   </dd>
 </dl>

@@ -398,10 +398,11 @@ void ICM::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 		std::vector<ulong> thdc(2, 0);
 		// offset counter by chunk size / block size  
 		IntegerTools::LeIncreaseW(m_icmState->Nonce, thdc, CTRLEN * i);
+		const size_t STMPOS = i * CNKLEN;
 		// generate random at output array offset
-		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdc);
+		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);
 		// xor with input at offsets
-		MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+		MemoryTools::XOR(Input, InOffset + STMPOS, Output, OutOffset + STMPOS, CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)

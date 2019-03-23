@@ -102,45 +102,45 @@ CSG::CSG(ShakeModes ShakeModeType, Providers ProviderType, bool Parallel)
 			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::CSG), std::string("Constructor"), std::string("The SHAKE mode can not be none!"), ErrorCodes::InvalidParam)),
 		std::vector<SymmetricKeySize> {
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
 				0,
 				0),
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
 				0),
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE))},
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE))},
 		MAX_OUTPUT,
 		MAX_REQUEST,
 		MAX_THRESHOLD),
 	m_csgProvider(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
 	m_csgState(new CsgState(
 		ShakeModeType,
-		((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK_RATE128_SIZE :
-			(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_RATE256_SIZE :
-			(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK_RATE512_SIZE :
-			Keccak::KECCAK_RATE1024_SIZE), 
+		((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK128_RATE_SIZE :
+			(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK256_RATE_SIZE :
+			(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK512_RATE_SIZE :
+			Keccak::KECCAK1024_RATE_SIZE), 
 		DEF_RESEED, 
 		Parallel && HasMultiLane())),
 	m_isDestroyed(true),
@@ -156,35 +156,35 @@ CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::CSG), std::string("Constructor"), std::string("The SHAKE mode can not be none!"), ErrorCodes::InvalidParam)),
 		std::vector<SymmetricKeySize> {
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
 				0,
 				0),
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
 				0,
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE)),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE)),
 			SymmetricKeySize(
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE),
-				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK_MESSAGE256_SIZE :
-					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK_MESSAGE512_SIZE :
-					Keccak::KECCAK_MESSAGE1024_SIZE))},
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE),
+				(ShakeModeType == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE256 ? Keccak::KECCAK256_DIGEST_SIZE :
+					ShakeModeType == ShakeModes::SHAKE512 ? Keccak::KECCAK512_DIGEST_SIZE :
+					Keccak::KECCAK1024_DIGEST_SIZE))},
 		MAX_OUTPUT,
 		MAX_REQUEST,
 		MAX_THRESHOLD),
@@ -194,10 +194,10 @@ CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::CSG), std::string("Constructor"), std::string("The provider can not be null!"), ErrorCodes::IllegalOperation)),
 		m_csgState(new CsgState(
 			ShakeModeType,
-			((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK_RATE128_SIZE :
-				(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK_RATE256_SIZE :
-				(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK_RATE512_SIZE :
-				Keccak::KECCAK_RATE1024_SIZE), 
+			((ShakeModeType == ShakeModes::SHAKE128) ? Keccak::KECCAK128_RATE_SIZE :
+				(ShakeModeType == ShakeModes::SHAKE256) ? Keccak::KECCAK256_RATE_SIZE :
+				(ShakeModeType == ShakeModes::SHAKE512) ? Keccak::KECCAK512_RATE_SIZE :
+				Keccak::KECCAK1024_RATE_SIZE), 
 			DEF_RESEED, 
 			Parallel && HasMultiLane()))
 {
@@ -270,10 +270,10 @@ size_t &CSG::ReseedThreshold()
 
 const size_t CSG::SecurityStrength()
 {
-	return (m_csgState->ShakeMode == ShakeModes::SHAKE128 ? Keccak::KECCAK_MESSAGE128_SIZE :
-		(m_csgState->ShakeMode == ShakeModes::SHAKE256) ? Keccak::KECCAK_MESSAGE256_SIZE :
-		(m_csgState->ShakeMode == ShakeModes::SHAKE512) ? Keccak::KECCAK_MESSAGE512_SIZE : 
-		Keccak::KECCAK_MESSAGE1024_SIZE);
+	return (m_csgState->ShakeMode == ShakeModes::SHAKE128 ? Keccak::KECCAK128_DIGEST_SIZE :
+		(m_csgState->ShakeMode == ShakeModes::SHAKE256) ? Keccak::KECCAK256_DIGEST_SIZE :
+		(m_csgState->ShakeMode == ShakeModes::SHAKE512) ? Keccak::KECCAK512_DIGEST_SIZE : 
+		Keccak::KECCAK1024_DIGEST_SIZE);
 }
 
 //~~~Public Functions~~~//

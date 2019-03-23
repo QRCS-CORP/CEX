@@ -222,7 +222,7 @@ void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 
 void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, MLWE_N>>> &A, const std::vector<byte> &Seed, bool Transposed)
 {
-	std::vector<byte> buf(Keccak::KECCAK_RATE128_SIZE * 4);
+	std::vector<byte> buf(Keccak::KECCAK128_RATE_SIZE * 4);
 	std::vector<byte> tmpK(Seed.size() + 2);
 	byte i;
 	byte j;
@@ -250,7 +250,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 				tmpK[Seed.size()] = j;
 			}
 
-			XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE128_SIZE);
+			XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK128_RATE_SIZE);
 
 			while (ctr < MLWE_N)
 			{
@@ -266,7 +266,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 
 				if (pos > buf.size() - 2)
 				{
-					XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE128_SIZE);
+					XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK128_RATE_SIZE);
 					pos = 0;
 				}
 			}
@@ -296,7 +296,7 @@ void MLWEQ7681N256::PolyGetNoise(std::array<ushort, MLWE_N> &R, size_t Eta, cons
 	cust[6] = static_cast<byte>(Nonce & 0xFF);
 	cust[7] = static_cast<byte>(Nonce >> 8);
 
-	XOF(Seed, 0, Seed.size(), buf, 0, buf.size(), Keccak::KECCAK_RATE256_SIZE);
+	XOF(Seed, 0, Seed.size(), buf, 0, buf.size(), Keccak::KECCAK256_RATE_SIZE);
 
 	Cbd(R, buf, Eta);
 }

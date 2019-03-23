@@ -1,7 +1,5 @@
 #include "RijndaelTest.h"
-#if defined(__AVX__)
-#	include "../CEX/AHX.h"
-#endif
+#include "../CEX/AHX.h"
 #include "../CEX/CpuDetect.h"
 #include "../CEX/CTR.h"
 #include "../CEX/IntegerTools.h"
@@ -22,13 +20,13 @@ namespace Test
 
 	//~~~Constructor~~~//
 
-	RijndaelTest::RijndaelTest(bool TestNI)
+	RijndaelTest::RijndaelTest(bool TestAesNi)
 		:
 		m_cipherText(0),
 		m_keys(0),
 		m_plainText(0),
 		m_progressEvent(),
-		m_testAesNi(TestNI)
+		m_aesniTest(TestAesNi && HAS_AESNI)
 	{
 		Initialize();
 	}
@@ -38,7 +36,7 @@ namespace Test
 		IntegerTools::Clear(m_cipherText);
 		IntegerTools::Clear(m_keys);
 		IntegerTools::Clear(m_plainText);
-		m_testAesNi = false;
+		m_aesniTest = false;
 	}
 
 	//~~~Accessors~~~//
@@ -62,8 +60,7 @@ namespace Test
 			Exception();
 			OnProgress(std::string("RijndaelTest: Passed Rijndael exception handling tests.."));
 
-#if defined(__AVX__)
-			if (m_testAesNi)
+			if (m_aesniTest)
 			{
 				AHX* cpr1 = new AHX();
 				Kat(cpr1, m_keys[0], m_plainText[0], m_cipherText[0]);
@@ -94,7 +91,6 @@ namespace Test
 				delete cpr5;
 			}
 			else
-#endif
 			{
 				RHX* cpr1 = new RHX();
 				Kat(cpr1, m_keys[0], m_plainText[0], m_cipherText[0]);
@@ -110,7 +106,6 @@ namespace Test
 				Kat(cpr1, m_keys[10], m_plainText[10], m_cipherText[10]);
 				Kat(cpr1, m_keys[11], m_plainText[11], m_cipherText[11]);
 				delete cpr1;
-
 
 				RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
 				Kat(cpr2, m_keys[24], m_plainText[0], m_cipherText[24]);
@@ -128,8 +123,7 @@ namespace Test
 
 			OnProgress(std::string("RijndaelTest: Passed Rijndael FIPS 197 KAT tests.."));
 
-#if defined(__AVX__)
-			if (m_testAesNi)
+			if (m_aesniTest)
 			{
 				AHX* cpr1 = new AHX();
 				MonteCarlo(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
@@ -160,7 +154,6 @@ namespace Test
 				delete cpr5;
 			}
 			else
-#endif
 			{
 				RHX* cpr1 = new RHX();
 				MonteCarlo(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
@@ -193,8 +186,7 @@ namespace Test
 
 			OnProgress(std::string("RijndaelTest: Passed Rijndael extended Monte Carlo tests.."));
 
-#if defined(__AVX__)
-			if (m_testAesNi)
+			if (m_aesniTest)
 			{
 				CTR* cpr1 = new CTR(BlockCiphers::AES);
 				Parallel(cpr1);
@@ -205,7 +197,6 @@ namespace Test
 				delete cpr1;
 			}
 			else
-#endif
 			{
 				CTR* cpr2 = new CTR(BlockCiphers::AES);
 				Parallel(cpr2);
@@ -424,9 +415,13 @@ namespace Test
 
 	bool RijndaelTest::HasAESNI()
 	{
+#if defined(__AVX__)
 		CpuDetect dtc;
 
-		return dtc.AESNI() && dtc.AVX();
+		return dtc.AVX() && dtc.AESNI();
+#else
+		return false;
+#endif
 	}
 
 	void RijndaelTest::Initialize()

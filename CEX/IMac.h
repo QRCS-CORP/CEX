@@ -21,7 +21,8 @@ using Cipher::SymmetricKeySize;
 
 
 /// <summary>
-/// Message Authentication Code (MAC) Interface
+/// The MAC virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented MAC instances as a parameter.</para>
 /// </summary>
 class IMac
 {

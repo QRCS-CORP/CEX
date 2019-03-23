@@ -19,7 +19,8 @@ using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
 
 /// <summary>
-/// Key Derivation Function (KDF) interface class
+/// The KDF virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented KDF instances as a parameter.</para>
 /// </summary>
 class IKdf
 {

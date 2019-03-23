@@ -34,7 +34,8 @@ using Enumeration::ErrorCodes;
 using Enumeration::Providers;
 
 /// <summary>
-/// Entropy source collectors and concentrators interface
+/// The entropy providers virtual interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented entropy provider instances as a parameter.</para>
 /// </summary>
 class IProvider
 {

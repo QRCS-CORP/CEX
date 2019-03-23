@@ -375,9 +375,9 @@ void CTR::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	{
 		std::vector<byte> otp(BLOCK_SIZE);
 		m_blockCipher->EncryptBlock(Counter, otp);
-		const size_t FNLLEN = Length % BLOCK_SIZE;
-		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
 		IntegerTools::BeIncrement8(Counter);
+		const size_t RMDLEN = Length % BLOCK_SIZE;
+		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - RMDLEN), RMDLEN);
 	}
 }
 
@@ -391,13 +391,14 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<byte> thdc(m_ctrState->Nonce.size());
+		std::vector<byte> thdc(BLOCK_SIZE);
 		// offset counter by chunk size / block size  
 		IntegerTools::BeIncrease8(m_ctrState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
+		const size_t STMPOS = i * CNKLEN;
 		// generate random at output offset
-		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdc);
+		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);
 		// xor with input at offsets
-		MemoryTools::XOR(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
+		MemoryTools::XOR(Input, InOffset + STMPOS, Output, OutOffset + STMPOS, CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)

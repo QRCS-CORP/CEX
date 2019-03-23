@@ -29,6 +29,7 @@
 // Written by John G. Underhill, June 19, 2016
 // Updated March 1, 2017
 // Updated April 18, 2017
+// Updated March 19, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_BLAKE256_H
@@ -43,7 +44,7 @@ NAMESPACE_DIGEST
 using Cipher::ISymmetricKey;
 
 /// <summary>
-/// An implementation of the Blake2S and Blake2SP digests with a 256 bit digest output size
+/// An implementation of the Blake2S and Blake2SP sequential and parallel message-digests with a 256-bit hash code
 /// </summary> 
 /// 
 /// <example>
@@ -51,31 +52,9 @@ using Cipher::ISymmetricKey;
 /// <para>Use the Compute method for small to medium data sizes.</para>
 /// <code>
 /// Blake256 dgt;
-/// std::vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
 /// // compute a hash
-/// dgt.Compute(input, hash);
-/// </code>
-/// </example>
-///
-/// <example>
-/// <description>Use the Update method for large data sizes:</description>
-/// <code>
-/// Blake256 dgt;
-/// std::vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
-/// int64_t len = (int64_t)input.size();
-///
-/// // update blocks
-/// while (len > dgt.DigestSize())
-/// {
-///		dgt.Update(input, offset, len);
-///		offset += dgt.DigestSize();
-///		len -= dgt.DigestSize();
-/// }
-///
-/// if (len > 0)
-///		dgt.Update(input, offset, len);
-///
-/// dgt.Finalize(hash, 0);
+/// dgt.Update(Input, 0, Input.size());
+/// dgt.Finalize(Output, 0);
 /// </code>
 /// </example>
 /// 
@@ -89,8 +68,11 @@ using Cipher::ISymmetricKey;
 /// <item><description>Best performance for parallel mode is to use a large input block size to minimize parallel loop creation cost, block size should be in a range of 32KiB to 25MiB.</description></item>
 /// <item><description>The number of threads used in parallel mode can be user defined through the BlakeParams->ThreadCount property to any even number of threads; note that hash value will change with threadcount.</description></item>
 /// <item><description>Digest output size is fixed at 32 bytes, (256 bits).</description></item>
-/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], size_t, size_t)"/> and Finalize methods</description>/></item>
-/// <item><description>The <see cref="Finalize(byte[], size_t)"/> method resets the internal state.</description></item>
+/// <item><description>The ComputeHash(byte[], byte[]) function wraps the Update(byte[], size_t, size_t) and Finalize(byte[], size_t) functions; (suitable for small data).</description>/></item>
+/// <item><description>The Update functions process message input, this can be a byte, 32--bit or 64-bit unsigned integer, or a vector of bytes.</description></item>
+/// <item><description>The Finalize(byte[], size_t) function returns the hash code but does not reset the internal state, call Reset() to reinitialize to default state.</description></item>
+/// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant.</description></item>
+/// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, this is expected.</description></item>
 /// <item><description>Optional intrinsics are runtime enabled automatically based on cpu support.</description></item>
 /// <item><description>SIMD implementation requires compilation with SSE3 or higher.</description></item>
 /// </list>
@@ -109,30 +91,17 @@ class Blake256 final : public IDigest
 {
 private:
 
-	static const size_t BLOCK_SIZE = 64; // TODO: replace with Blake2 class constants
-	static const uint CHAIN_SIZE = 8;
-	static const std::string CLASS_NAME;
-	static const uint COUNTER_SIZE = 2;
-	static const uint DEF_PRLDEGREE = 8;
-	static const uint DEF_LEAFSIZE = 16384;
-	static const size_t DIGEST_SIZE = 32;
-	static const uint FLAG_SIZE = 2;
-	static const uint MAX_PRLBLOCK = 5120000;
-	static const uint MIN_PRLBLOCK = 256;
-	static const size_t ROUND_COUNT = 10;
+	static const size_t CONFIG_SIZE = 8;
+	static const size_t DEF_PRLDEGREE = 8;
+	static const size_t MAX_PRLDEGREE = 64;
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	struct Blake2sState;
-
+	class Blake2sState;
 	std::vector<Blake2sState> m_dgtState;
-	bool m_isDestroyed;
-	uint m_leafSize;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	//std::vector<uint> m_treeConfig;
-	bool m_treeDestroy;
 	BlakeParams m_treeParams;
 
 public:
@@ -179,17 +148,17 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Digests internal blocksize in bytes
+	/// Read Only: The message-digests internal block size in bytes
 	/// </summary>
 	size_t BlockSize() override;
 
 	/// <summary>
-	/// Read Only: Size of returned digest in bytes
+	/// Read Only: The message-digests output hash-size in bytes
 	/// </summary>
 	size_t DigestSize() override;
 
 	/// <summary>
-	/// Read Only: The digests type name
+	/// Read Only: The message-digests enumeration type-name
 	/// </summary>
 	const Digests Enumeral() override;
 
@@ -201,7 +170,7 @@ public:
 	const bool IsParallel() override;
 
 	/// <summary>
-	/// Read Only: The digests class name
+	/// Read Only: The message-digests formal class name
 	/// </summary>
 	const std::string Name() override;
 
@@ -223,24 +192,26 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Process the message data and return the Hash value
+	/// Compute the hash value in a single-step using the input message and the output vector receiving the hash code.
+	/// <para>Not recommended for vector sizes exceeding 1MB, use the Update/Finalize api to loop in large data.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The message input data</param>
-	/// <param name="Output">The hash value output array</param>
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	///
+	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Perform final processing and return the hash value
+	/// Finalize message processing and return the hash code.
+	/// <para>Used in conjunction with the Update api to process a message, and then return the finalized hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The Hash output value array</param>
-	/// <param name="OutOffset">The starting offset within the Output array</param>
-	/// 
-	/// <returns>Size of Hash value</returns>
+	/// <param name="Output">The output vector receiving the final hash code; must be at least DigestSize in length</param>
+	/// <param name="OutOffset">The starting offset within the output vector</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
+	void Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the digest as a MAC code generator
@@ -266,7 +237,7 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
-	/// Reset the internal state to sequential defaults
+	/// Reset the message-digests internal state
 	/// </summary>
 	void Reset() override;
 
@@ -278,24 +249,34 @@ public:
 	void Update(byte Input) override;
 
 	/// <summary>
-	/// Update the message buffer
+	/// Update the message digest with a single unsigned 32-bit integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The 32-bit integer to process</param>
+	void Update(uint Input) override;
+
+	/// <summary>
+	/// Update the message digest with a single unsigned 64-bit integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The 64-bit integer to process</param>
+	void Update(ulong Input) override;
+
+	/// <summary>
+	/// Update the message digest with a vector using offset and length parameters.
+	/// <para>Used in conjunction with the Finalize function, processes message data used to generate the hash code.</para>
 	/// </summary>
 	///
-	/// <remarks>
-	/// <para>For best performance in parallel mode, use block sizes that are evenly divisible by ParallelMinimumSize() to reduce caching.
-	/// Block size for parallel mode should be in a range of minimum 32KiB to 25MiB, larger block sizes reduce the impact of parallel loop creation.</para>
-	/// </remarks>
-	/// 
-	/// <param name="Input">The Input message data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">The amount of data to process in bytes</param>
+	/// <param name="Input">The input message byte-vector</param>
+	/// <param name="InOffset">The starting offset within the input vector</param>
+	/// <param name="Length">The number of bytes to process</param>
 	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 
-	void LoadState(Blake2sState &State, BlakeParams &Params, std::vector<uint> &Config);
-	void Permute(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, size_t Length);
-	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, ulong Length);
+	static void LoadState(BlakeParams &Params, std::vector<uint> &Config, Blake2sState &State);
+	static void Permute(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, size_t Length, Blake2sState &State);
 };
 
 NAMESPACE_DIGESTEND

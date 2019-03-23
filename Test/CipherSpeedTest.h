@@ -2,9 +2,6 @@
 #define CEXTEST_CIPHERSPEEDTEST_H
 
 #include "ITest.h"
-#include "../CEX/IAeadMode.h"
-#include "../CEX/ICipherMode.h"
-#include "../CEX/IStreamCipher.h"
 
 namespace Test
 {
@@ -27,9 +24,8 @@ namespace Test
 		static const uint64_t DEF_ITERATIONS = 10;
 		static const uint64_t DEF_IVSIZE = 16;
 		static const uint64_t DEF_KEYSIZE = 32;
+		static const bool HAS_AESNI;
 
-		bool m_hasAESNI;
-		bool m_hasAVX;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -64,94 +60,113 @@ namespace Test
 		template<typename T>
 		static void ParallelBlockLoop(T* Cipher, bool Encrypt, bool Parallel, size_t SampleSize, size_t KeySize, size_t IvSize, size_t Loops, TestEventHandler &Handler)
 		{
-			size_t blkSze = Parallel ? Cipher->ParallelBlockSize() : Cipher->BlockSize();
-			std::vector<byte> buffer1(blkSze, 0);
-			std::vector<byte> buffer2(blkSze, 0);
+			const size_t BLKLEN = Parallel ? Cipher->ParallelBlockSize() : Cipher->BlockSize();
+			const size_t ALNLEN = SampleSize - (SampleSize % BLKLEN);
+			std::vector<byte> buffer1(BLKLEN, 0x00);
+			std::vector<byte> buffer2(BLKLEN, 0x00);
+			std::string glen;
+			std::string mbps;
+			std::string resp;
+			std::string secs;
+			uint64_t dur;
+			uint64_t len;
+			uint64_t lstart;
+			uint64_t rate;
+			uint64_t start;
+			size_t i;
+			size_t lctr;
 
 			Cipher::SymmetricKey* keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
 			Cipher->Initialize(Encrypt, *keyParam);
 			Cipher->ParallelProfile().IsParallel() = Parallel;
-			uint64_t start = TestUtils::GetTimeMs64();
+			start = TestUtils::GetTimeMs64();
 
-			for (size_t i = 0; i < Loops; ++i)
+			for (i = 0; i < Loops; ++i)
 			{
-				size_t counter = 0;
-				uint64_t lstart = TestUtils::GetTimeMs64();
+				lctr = 0;
+				lstart = TestUtils::GetTimeMs64();
 
-				while (counter < SampleSize)
+				while (lctr < ALNLEN)
 				{
 					Cipher->Transform(buffer1, 0, buffer2, 0, buffer1.size());
-					counter += buffer1.size();
+					lctr += buffer1.size();
 				}
-				std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				Handler(calc);
 			}
 
-			uint64_t dur = TestUtils::GetTimeMs64() - start;
-			uint64_t len = Loops * SampleSize;
-			uint64_t rate = GetBytesPerSecond(dur, len);
-			std::string glen = TestUtils::ToString(len / GB1);
-			std::string mbps = TestUtils::ToString((rate / MB1));
-			std::string secs = TestUtils::ToString((double)dur / 1000.0);
-			std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
+			dur = TestUtils::GetTimeMs64() - start;
+			len = Loops * SampleSize;
+			rate = GetBytesPerSecond(dur, len);
+			glen = TestUtils::ToString(len / GB1);
+			mbps = TestUtils::ToString((rate / MB1));
+			secs = TestUtils::ToString((double)dur / 1000.0);
+			resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 			Handler(resp);
 			Handler(std::string(""));
+			delete keyParam;
 		}
 
 		template<typename T>
 		void ParallelStreamLoop(T* Cipher, size_t KeySize, size_t IvSize, size_t Loops, TestEventHandler &Handler)
 		{
+			const size_t ALNLEN = DATA_SIZE - (DATA_SIZE % Cipher->ParallelBlockSize());
+			std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0x00);
+			std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0x00);
+			std::string mbps;
+			std::string resp;
+			std::string secs;
+			uint64_t dur;
+			uint64_t len;
+			uint64_t lstart;
+			uint64_t rate;
+			uint64_t start;
+			size_t counter;
+			size_t i;
+
 			Cipher::SymmetricKey* keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
 			Cipher->Initialize(true, *keyParam);
 			Cipher->ParallelProfile().IsParallel() = true;
-			std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
-			std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);
-			uint64_t start = TestUtils::GetTimeMs64();
+			start = TestUtils::GetTimeMs64();
 
-			for (size_t i = 0; i < Loops; ++i)
+			for (i = 0; i < Loops; ++i)
 			{
-				size_t counter = 0;
-				uint64_t lstart = TestUtils::GetTimeMs64();
+				counter = 0;
+				lstart = TestUtils::GetTimeMs64();
 
-				while (counter < DATA_SIZE)
+				while (counter < ALNLEN)
 				{
 					Cipher->Transform(buffer1, 0, buffer2, 0, buffer1.size());
 					counter += buffer1.size();
 				}
-				std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				Handler(const_cast<char*>(calc.c_str()));
 			}
 
-			delete keyParam;
-			uint64_t dur = TestUtils::GetTimeMs64() - start;
-			uint64_t len = Loops * DATA_SIZE;
-			uint64_t rate = GetBytesPerSecond(dur, len);
-			std::string mbps = TestUtils::ToString((rate / MB1));
-			std::string secs = TestUtils::ToString((double)dur / 1000.0);
-			std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
+			dur = TestUtils::GetTimeMs64() - start;
+			len = Loops * DATA_SIZE;
+			rate = GetBytesPerSecond(dur, len);
+			mbps = TestUtils::ToString((rate / MB1));
+			secs = TestUtils::ToString((double)dur / 1000.0);
+			resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 			Handler(const_cast<char*>(resp.c_str()));
 			Handler("");
+			delete keyParam;
 		}
 
-#if defined(__AVX__)
-		void AHXSpeedTest();
-#endif
-		void MCSSpeedTest();
-		void CBCSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void CFBSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void CTRSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		static bool HasAESNI();
+		void CBCSpeedTest(bool Encrypt, bool Parallel);
+		void CFBSpeedTest(bool Encrypt, bool Parallel);
+		void CTRSpeedTest(bool Encrypt, bool Parallel);
 		void CSX256SpeedTest();
 		void CSX512SpeedTest();
-		void Threefish256SpeedTest();
-		void Threefish512SpeedTest();
-		void Threefish1024SpeedTest();
+		void MCSSpeedTest();
+		void RCSSpeedTest();
+		void TSX256SpeedTest();
+		void TSX512SpeedTest();
+		void TSX1024SpeedTest();
 		void CounterSpeedTest();
-		void EAXSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void GCMSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		void EAXSpeedTest(bool Encrypt, bool Parallel);
+		void GCMSpeedTest(bool Encrypt, bool Parallel);
 		static uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
-		void ICMSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void Initialize();
-		void OFBSpeedTest(Cipher::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		void ICMSpeedTest(bool Encrypt, bool Parallel);
+		void OFBSpeedTest(bool Encrypt, bool Parallel);
 		void OnProgress(const std::string &Data);
 		void RHXSpeedTest(size_t KeySize = 32);
 		void SHXSpeedTest(size_t KeySize = 32);

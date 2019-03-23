@@ -13,7 +13,8 @@ using Enumeration::PaddingModes;
 using Enumeration::ErrorCodes;
 
 /// <summary>
-/// Padding Mode Interface
+/// The block-cipher padding mode interface class.
+/// <para>This class can be used to create functions that will accept any of the implemented block-cipher padding mode instances as a parameter.</para>
 /// </summary>
 class IPadding
 {

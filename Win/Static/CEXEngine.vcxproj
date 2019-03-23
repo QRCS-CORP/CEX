@@ -211,7 +211,7 @@
     <ClInclude Include="..\..\CEX\AsymmetricTransforms.h" />
     <ClInclude Include="..\..\CEX\BitConverter.h" />
     <ClInclude Include="..\..\CEX\Blake256.h" />
-    <ClInclude Include="..\..\CEX\Blake2.h" />
+    <ClInclude Include="..\..\CEX\Blake.h" />
     <ClInclude Include="..\..\CEX\Blake512.h" />
     <ClInclude Include="..\..\CEX\BlakeParams.h" />
     <ClInclude Include="..\..\CEX\BlockCipherFromName.h" />
@@ -424,7 +424,7 @@
     <ClCompile Include="..\..\CEX\AsymmetricSecureKey.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricTransforms.cpp" />
     <ClCompile Include="..\..\CEX\BitConverter.cpp" />
-    <ClCompile Include="..\..\CEX\Blake2.cpp" />
+    <ClCompile Include="..\..\CEX\Blake.cpp" />
     <ClCompile Include="..\..\CEX\Blake256.cpp" />
     <ClCompile Include="..\..\CEX\Blake512.cpp" />
     <ClCompile Include="..\..\CEX\BlakeParams.cpp" />

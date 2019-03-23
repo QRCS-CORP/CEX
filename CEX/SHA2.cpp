@@ -61,6 +61,7 @@ void SHA2::PermuteR64P512C(const std::vector<byte> &Input, size_t InOffset, std:
 	}
 
 	j = 0;
+
 	for (i = 0; i < 8; ++i)
 	{
 		Round256(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K256[j], W[j]);
