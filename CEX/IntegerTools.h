@@ -1818,8 +1818,8 @@ public:
 	inline static void CMov(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset, size_t Length, byte Condition)
 	{
 		CEXASSERT(!std::is_signed<Array::value_type>::value, "Input must be an unsigned integer vector");
-		CEXASSERT(Input.size() != 0, "Input size can not be zero");
-		CEXASSERT(Output.size() >= Input.size(), "Output size is too small");
+		CEXASSERT(Input.size() >= Length, "Input size can not be zero");
+		CEXASSERT(Output.size() >= Length, "Output size is too small");
 
 		size_t i;
 
