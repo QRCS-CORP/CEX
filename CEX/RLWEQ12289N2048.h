@@ -41,8 +41,8 @@ private:
 	static const std::array<ushort, 2048> PsisInvMontgomery;
 	static const std::array<ushort, 2048> BitRevTable;
 
-	static const uint RLWE_QINV = 12287;
-	static const uint RLWE_RLOG = 18;
+	static const uint RLWE_QINV = 0x00002FFFUL;
+	static const uint RLWE_RLOG = 0x00000012UL;
 
 public:
 
@@ -56,7 +56,7 @@ public:
 	/// <summary>
 	/// The modulus factor
 	/// </summary>
-	static const int RLWE_Q = 12289;
+	static const uint RLWE_Q = 0x00003001UL;
 
 	/// <summary>
 	/// The byte size of A's public key polynomial
@@ -76,7 +76,7 @@ public:
 	/// <summary>
 	/// The byte size of the secret seed array
 	/// </summary>
-	static const size_t RLWE_SEED_SIZE = 32;
+	static const size_t RLWE_SEED_SIZE = 32; //64?
 
 	/// <summary>
 	/// The byte size of the CPA cipher-text
@@ -163,7 +163,7 @@ private:
 
 	static byte HammimgWeight(byte A);
 
-	static ushort MontgomeryReduce(uint A);
+	static ushort MontgomeryReduce(uint X);
 
 	static void MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::array<ushort, RLWE_N> &Factors);
 
@@ -191,9 +191,11 @@ private:
 
 	static void PolyToBytes(std::vector<byte> &R, const std::array<ushort, RLWE_N> &P);
 
-	static void PolyTomessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X);
+	static void PolyToMessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X);
 
 	static void PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed);
+
+	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 };
 
 NAMESPACE_RINGLWEEND

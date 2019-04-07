@@ -15,19 +15,19 @@ CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.7p</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.7q</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   v1.0.0.7p
-\date      March 23, 2019
+\version   v1.0.0.7q
+\date      April 07, 2019
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.7p (A7 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.7q (A7 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.7p (version A7):</B> \n
+<B>Current Release v1.0.0.7q (version A7):</B> \n
 
 The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
 The Dilithium asymmetric signature scheme \n
@@ -107,9 +107,8 @@ CEX++ on Github: https://github.com/Steppenwolfe65/CEX  \n
 CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET  \n
 The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 */
+
 // end doxygen main //
-
-
 
 /*!
 *  \addtogroup CEX

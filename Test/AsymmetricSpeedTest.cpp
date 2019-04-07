@@ -55,73 +55,82 @@ namespace Test
 	{
 		try
 		{
-			std::string itrCnt = TestUtils::ToString(DEF_TEST_ITER);
+			std::string ctr = TestUtils::ToString(DEF_TEST_ITER);
 			Prngs rngType = Prngs::BCR;
 
 			// RingLWE
-			OnProgress(std::string("***Generating " + itrCnt + " Keypairs using RingLWE RLWES1Q12289N1024***"));
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using RingLWE RLWES1Q12289N1024***"));
 			RlweGenerateLoop(RLWEParameters::RLWES1Q12289N1024, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Encrypting " + itrCnt + " messages using RingLWE RLWES1Q12289N1024***"));
+			OnProgress(std::string("***Encrypting " + ctr + " messages using RingLWE RLWES1Q12289N1024***"));
 			RlweEncryptLoop(RLWEParameters::RLWES1Q12289N1024, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Decrypting " + itrCnt + " messages using RingLWE RLWES1Q12289N1024***"));
+			OnProgress(std::string("***Decrypting " + ctr + " messages using RingLWE RLWES1Q12289N1024***"));
 			RlweDecryptLoop(RLWEParameters::RLWES1Q12289N1024, DEF_TEST_ITER, rngType);
 
 			// McEliece
-			OnProgress(std::string("***Generating " + itrCnt + " Keypairs using McEliece MPKCS1M12T62***"));
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using McEliece MPKCS1M12T62***"));
 			MpkcGenerateLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Encrypting " + itrCnt + " messages using McEliece MPKCS1M12T62***"));
+			OnProgress(std::string("***Encrypting " + ctr + " messages using McEliece MPKCS1M12T62***"));
 			MpkcEncryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Decrypting " + itrCnt + " messages using McEliece MPKCS1M12T62***"));
+			OnProgress(std::string("***Decrypting " + ctr + " messages using McEliece MPKCS1M12T62***"));
 			MpkcDecryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
 
 			// ModuleLWE
-			OnProgress(std::string("***Generating " + itrCnt + " Keypairs using ModuleLWE MLWES3Q7681N256***"));
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using ModuleLWE MLWES3Q7681N256***"));
 			MlweGenerateLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Encrypting " + itrCnt + " messages using ModuleLWE MLWES3Q7681N256***"));
+			OnProgress(std::string("***Encrypting " + ctr + " messages using ModuleLWE MLWES3Q7681N256***"));
 			MlweEncryptLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Decrypting " + itrCnt + " messages using ModuleLWE MLWES3Q7681N256***"));
+			OnProgress(std::string("***Decrypting " + ctr + " messages using ModuleLWE MLWES3Q7681N256***"));
 			MlweDecryptLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngType);
 
 			// NTRU
-			OnProgress(std::string("***Generating " + itrCnt + " Keypairs using NTRU NTRUS1LQ4591N761***"));
-			MpkcGenerateLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using NTRU NTRUS1LQ4591N761***"));
+			NtruGenerateLoop(NTRUParameters::NTRUS1LQ4591N761, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Encrypting " + itrCnt + " messages using NTRU NTRUS1LQ4591N761***"));
-			MpkcEncryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Encrypting " + ctr + " messages using NTRU NTRUS1LQ4591N761***"));
+			NtruEncryptLoop(NTRUParameters::NTRUS1LQ4591N761, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Decrypting " + itrCnt + " messages using NTRU NTRUS1LQ4591N761***"));
-			MpkcDecryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Decrypting " + ctr + " messages using NTRU NTRUS1LQ4591N761***"));
+			NtruDecryptLoop(NTRUParameters::NTRUS1LQ4591N761, DEF_TEST_ITER, rngType);
+
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using NTRU NTRUS2SQ4591N761***"));
+			NtruGenerateLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
+
+			OnProgress(std::string("***Encrypting " + ctr + " messages using NTRU NTRUS2SQ4591N761***"));
+			NtruEncryptLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
+
+			OnProgress(std::string("***Decrypting " + ctr + " messages using NTRU NTRUS2SQ4591N761***"));
+			NtruDecryptLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
 
 			OnProgress(std::string("### Asymmetric Signature Scheme Speed Tests:"));
 			OnProgress(std::string(""));
 
 			// Dilithium
-			OnProgress(std::string("***Generating " + itrCnt + " Keypairs using Dilithium DLMS2N256Q8380417***"));
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using Dilithium DLMS2N256Q8380417***"));
 			DlmGenerateLoop(DilithiumParameters::DLMS2N256Q8380417, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Signing " + itrCnt + " messages using Dilithium DLMS2N256Q8380417***"));
+			OnProgress(std::string("***Signing " + ctr + " messages using Dilithium DLMS2N256Q8380417***"));
 			DlmSignLoop(DilithiumParameters::DLMS2N256Q8380417, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Verifying " + itrCnt + " messages using Dilithium DLMS2N256Q8380417***"));
+			OnProgress(std::string("***Verifying " + ctr + " messages using Dilithium DLMS2N256Q8380417***"));
 			DlmVerifyLoop(DilithiumParameters::DLMS2N256Q8380417, DEF_TEST_ITER, rngType);
 
 			OnProgress(std::string("### Asymmetric Cipher Speed Tests in sequential and parallel modes:"));
 			OnProgress(std::string(""));
 
 			// SPHINCS+
-			OnProgress(std::string("***Generating " + itrCnt + " Keypairs using SPHINCS+ SPXS128F256***"));
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using SPHINCS+ SPXS128F256***"));
 			SpxGenerateLoop(SphincsParameters::SPXS128F256, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Signing " + itrCnt + " messages using SPHINCS+ SPXS128F256***"));
+			OnProgress(std::string("***Signing " + ctr + " messages using SPHINCS+ SPXS128F256***"));
 			SpxSignLoop(SphincsParameters::SPXS128F256, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Verifying " + itrCnt + " messages using SPHINCS+ SPXS128F256***"));
+			OnProgress(std::string("***Verifying " + ctr + " messages using SPHINCS+ SPXS128F256***"));
 			SpxVerifyLoop(SphincsParameters::SPXS128F256, DEF_TEST_ITER, rngType);
 
 			return MESSAGE;

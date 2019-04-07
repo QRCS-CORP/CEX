@@ -287,7 +287,6 @@
     <ClInclude Include="..\..\CEX\GCM.h" />
     <ClInclude Include="..\..\CEX\GMAC.h" />
     <ClInclude Include="..\..\CEX\IAsymmetricParameters.h" />
-    <ClInclude Include="..\..\CEX\IAuthenticate.h" />
     <ClInclude Include="..\..\CEX\KeccakState.h" />
     <ClInclude Include="..\..\CEX\KMAC.h" />
     <ClInclude Include="..\..\CEX\McElieceUtils.h" />
@@ -325,7 +324,6 @@
     <ClInclude Include="..\..\CEX\NTRUParameters.h" />
     <ClInclude Include="..\..\CEX\ParallelOptions.h" />
     <ClInclude Include="..\..\CEX\Poly1305.h" />
-    <ClInclude Include="..\..\CEX\PolyMath.h" />
     <ClInclude Include="..\..\CEX\RingLWE.h" />
     <ClInclude Include="..\..\CEX\RLWEParameters.h" />
     <ClInclude Include="..\..\CEX\RLWEQ12289N2048.h" />

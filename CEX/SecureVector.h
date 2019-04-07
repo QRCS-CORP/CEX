@@ -21,7 +21,7 @@ class SecureAllocator
 {
 public:
 
-#if !defined(_ITERATOR_DEBUG_LEVEL) || _ITERATOR_DEBUG_LEVEL == 0
+#if (!defined(_ITERATOR_DEBUG_LEVEL) || (_ITERATOR_DEBUG_LEVEL == 0))
 	static_assert(std::is_integral<T>::value, "SecureAllocator supports only integer types");
 #endif
 

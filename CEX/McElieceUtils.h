@@ -53,7 +53,9 @@ public:
 	template<typename Array>
 	inline static void Add(Array &A, const Array &B)
 	{
-		for (size_t i = 0; i < A.size(); i++)
+		size_t i;
+
+		for (i = 0; i < A.size(); ++i)
 		{
 			A[i] ^= B[i];
 		}
@@ -62,7 +64,9 @@ public:
 	template<typename Array>
 	inline static void Add(Array &Output, const Array &A, const Array &B)
 	{
-		for (size_t i = 0; i < Output.size(); i++)
+		size_t i;
+
+		for (i = 0; i < Output.size(); ++i)
 		{
 			Output[i] = A[i] ^ B[i];
 		}
@@ -71,10 +75,13 @@ public:
 	template<typename Array>
 	inline static void AddCarry(Array &A, ulong N)
 	{
-		ulong carry = N;
+		ulong carry;
 		ulong t;
+		size_t i;
 
-		for (size_t i = 0; i < 8; i++)
+		carry = N;
+
+		for (i = 0; i < 8; ++i)
 		{
 			t = A[i] ^ carry;
 			carry = A[i] & carry;
@@ -85,70 +92,88 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	static void BenesCompact(ArrayA &Output, const ArrayB &Condition, int Reverse)
 	{
-		size_t condPos;
-		int inc, low;
+		size_t cpos;
+		uint low;
+		int32_t inc;
 
 		if (Reverse == 0)
 		{
 			inc = 32;
-			condPos = 0;
+			cpos = 0;
 		}
 		else
 		{
 			inc = -32;
-			condPos = 704;
+			cpos = 704;
 		}
 
-		for (low = 0; low <= 5; low++)
+		low = 0;
+
+		while (low < 6)
 		{
-			BenesHelp(Output, Condition, condPos, low);
-			condPos += inc;
+			BenesHelp(Output, Condition, cpos, low);
+			cpos += inc;
+			++low;
 		}
 
 		TransposeCompact64x64(Output);
+		low = 0;
 
-		for (low = 0; low <= 5; low++)
+		while (low < 6)
 		{
-			BenesHelp(Output, Condition, condPos, low);
-			condPos += inc;
+			BenesHelp(Output, Condition, cpos, low);
+			cpos += inc;
+			++low;
 		}
 
-		for (low = 4; low >= 0; low--)
+		low = 5;
+
+		do
 		{
-			BenesHelp(Output, Condition, condPos, low);
-			condPos += inc;
-		}
+			--low;
+			BenesHelp(Output, Condition, cpos, low);
+			cpos += inc;
+		} 
+		while (low != 0);
 
 		TransposeCompact64x64(Output);
+		low = 6;
 
-		for (low = 5; low >= 0; low--)
+		do
 		{
-			BenesHelp(Output, Condition, condPos, low);
-			condPos += inc;
-		}
+			--low;
+			BenesHelp(Output, Condition, cpos, low);
+			cpos += inc;
+		} 
+		while (low != 0);
 	}
 
 	template<typename ArrayA, typename ArrayB>
-	static void BenesHelp(ArrayA &Output, const ArrayB &Condition, size_t CondOffset, int Low)
+	static void BenesHelp(ArrayA &Output, const ArrayB &Condition, size_t CondOffset, uint Low)
 	{
-		int i, j, x, y;
-		int high = 5 - Low;
 		ulong diff;
+		uint i;
+		uint j;
+		uint x;
+		uint y;
+		uint high;
 
-		for (j = 0; j < (1 << Low); j++)
+		high = 5 - Low;
+
+		for (j = 0; j < (1UL << Low); ++j)
 		{
-			x = (0 << Low) + j;
-			y = (1 << Low) + j;
+			x = j;
+			y = (1UL << Low) + j;
 
-			for (i = 0; i < (1 << high); i++)
+			for (i = 0; i < (1UL << high); ++i)
 			{
 				diff = Output[x] ^ Output[y];
 				diff &= Condition[CondOffset];
 				++CondOffset;
 				Output[x] ^= diff;
 				Output[y] ^= diff;
-				x += (1 << (Low + 1));
-				y += (1 << (Low + 1));
+				x += (1UL << (Low + 1));
+				y += (1UL << (Low + 1));
 			}
 		}
 	}
@@ -156,7 +181,9 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void CMov(const ArrayB &Input, ArrayA &Output, ulong Mask)
 	{
-		for (size_t i = 0; i < Output.size(); i++)
+		size_t i;
+
+		for (i = 0; i < Output.size(); i++)
 		{
 			Output[i] = (Input[i] & Mask) | (Output[i] & ~Mask);
 		}
@@ -165,7 +192,9 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void Copy(const ArrayB &Input, ArrayA &Output)
 	{
-		for (size_t i = 0; i < Output.size(); i++)
+		size_t i;
+
+		for (i = 0; i < Output.size(); i++)
 		{
 			Output[i] = Input[i];
 		}
@@ -174,7 +203,9 @@ public:
 	template<typename Array>
 	inline static void Insert(Array &Output, const ushort N)
 	{
-		for (size_t i = 0; i < Output.size(); i++)
+		size_t i;
+
+		for (i = 0; i < Output.size(); i++)
 		{
 			Output[i] = (N >> i) & 1;
 			Output[i] = ~Output[i] + 1;
@@ -184,242 +215,244 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	static void Multiply(ArrayA &Output, const ArrayA &A, const ArrayB &B)
 	{
-		ulong t1 = A[11] & B[11];
-		ulong t2 = A[11] & B[9];
-		ulong t3 = A[11] & B[10];
-		ulong t4 = A[9] & B[11];
-		ulong t5 = A[10] & B[11];
-		ulong t6 = A[10] & B[10];
-		ulong t7 = A[10] & B[9];
-		ulong t8 = A[9] & B[10];
-		ulong t9 = A[9] & B[9];
-		ulong t10 = t8 ^ t7;
-		ulong t11 = t6 ^ t4;
-		ulong t12 = t11 ^ t2;
-		ulong t13 = t5 ^ t3;
-		ulong t14 = A[8] & B[8];
-		ulong t15 = A[8] & B[6];
-		ulong t16 = A[8] & B[7];
-		ulong t17 = A[6] & B[8];
-		ulong t18 = A[7] & B[8];
-		ulong t19 = A[7] & B[7];
-		ulong t20 = A[7] & B[6];
-		ulong t21 = A[6] & B[7];
-		ulong t22 = A[6] & B[6];
-		ulong t23 = t21 ^ t20;
-		ulong t24 = t19 ^ t17;
-		ulong t25 = t24 ^ t15;
-		ulong t26 = t18 ^ t16;
-		ulong t27 = A[5] & B[5];
-		ulong t28 = A[5] & B[3];
-		ulong t29 = A[5] & B[4];
-		ulong t30 = A[3] & B[5];
-		ulong t31 = A[4] & B[5];
-		ulong t32 = A[4] & B[4];
-		ulong t33 = A[4] & B[3];
-		ulong t34 = A[3] & B[4];
-		ulong t35 = A[3] & B[3];
-		ulong t36 = t34 ^ t33;
-		ulong t37 = t32 ^ t30;
-		ulong t38 = t37 ^ t28;
-		ulong t39 = t31 ^ t29;
-		ulong t40 = A[2] & B[2];
-		ulong t41 = A[2] & B[0];
-		ulong t42 = A[2] & B[1];
-		ulong t43 = A[0] & B[2];
-		ulong t44 = A[1] & B[2];
-		ulong t45 = A[1] & B[1];
-		ulong t46 = A[1] & B[0];
-		ulong t47 = A[0] & B[1];
-		ulong t48 = A[0] & B[0];
-		ulong t49 = t47 ^ t46;
-		ulong t50 = t45 ^ t43;
-		ulong t51 = t50 ^ t41;
-		ulong t52 = t44 ^ t42;
-		ulong t53 = t52 ^ t35;
-		ulong t54 = t40 ^ t36;
-		ulong t55 = t39 ^ t22;
-		ulong t56 = t27 ^ t23;
-		ulong t57 = t26 ^ t9;
-		ulong t58 = t14 ^ t10;
-		ulong t59 = B[6] ^ B[9];
-		ulong t60 = B[7] ^ B[10];
-		ulong t61 = B[8] ^ B[11];
-		ulong t62 = A[6] ^ A[9];
-		ulong t63 = A[7] ^ A[10];
-		ulong t64 = A[8] ^ A[11];
-		ulong t65 = t64 & t61;
-		ulong t66 = t64 & t59;
-		ulong t67 = t64 & t60;
-		ulong t68 = t62 & t61;
-		ulong t69 = t63 & t61;
-		ulong t70 = t63 & t60;
-		ulong t71 = t63 & t59;
-		ulong t72 = t62 & t60;
-		ulong t73 = t62 & t59;
-		ulong t74 = t72 ^ t71;
-		ulong t75 = t70 ^ t68;
-		ulong t76 = t75 ^ t66;
-		ulong t77 = t69 ^ t67;
-		ulong t78 = B[0] ^ B[3];
-		ulong t79 = B[1] ^ B[4];
-		ulong t80 = B[2] ^ B[5];
-		ulong t81 = A[0] ^ A[3];
-		ulong t82 = A[1] ^ A[4];
-		ulong t83 = A[2] ^ A[5];
-		ulong t84 = t83 & t80;
-		ulong t85 = t83 & t78;
-		ulong t86 = t83 & t79;
-		ulong t87 = t81 & t80;
-		ulong t88 = t82 & t80;
-		ulong t89 = t82 & t79;
-		ulong t90 = t82 & t78;
-		ulong t91 = t81 & t79;
-		ulong t92 = t81 & t78;
-		ulong t93 = t91 ^ t90;
-		ulong t94 = t89 ^ t87;
-		ulong t95 = t94 ^ t85;
-		ulong t96 = t88 ^ t86;
-		ulong t97 = t53 ^ t48;
-		ulong t98 = t54 ^ t49;
-		ulong t99 = t38 ^ t51;
-		ulong t100 = t55 ^ t53;
-		ulong t101 = t56 ^ t54;
-		ulong t102 = t25 ^ t38;
-		ulong t103 = t57 ^ t55;
-		ulong t104 = t58 ^ t56;
-		ulong t105 = t12 ^ t25;
-		ulong t106 = t13 ^ t57;
-		ulong t107 = t1 ^ t58;
-		ulong t108 = t97 ^ t92;
-		ulong t109 = t98 ^ t93;
-		ulong t110 = t99 ^ t95;
-		ulong t111 = t100 ^ t96;
-		ulong t112 = t101 ^ t84;
-		ulong t113 = t103 ^ t73;
-		ulong t114 = t104 ^ t74;
-		ulong t115 = t105 ^ t76;
-		ulong t116 = t106 ^ t77;
-		ulong t117 = t107 ^ t65;
-		ulong t118 = B[3] ^ B[9];
-		ulong t119 = B[4] ^ B[10];
-		ulong t120 = B[5] ^ B[11];
-		ulong t121 = B[0] ^ B[6];
-		ulong t122 = B[1] ^ B[7];
-		ulong t123 = B[2] ^ B[8];
-		ulong t124 = A[3] ^ A[9];
-		ulong t125 = A[4] ^ A[10];
-		ulong t126 = A[5] ^ A[11];
-		ulong t127 = A[0] ^ A[6];
-		ulong t128 = A[1] ^ A[7];
-		ulong t129 = A[2] ^ A[8];
-		ulong t130 = t129 & t123;
-		ulong t131 = t129 & t121;
-		ulong t132 = t129 & t122;
-		ulong t133 = t127 & t123;
-		ulong t134 = t128 & t123;
-		ulong t135 = t128 & t122;
-		ulong t136 = t128 & t121;
-		ulong t137 = t127 & t122;
-		ulong t138 = t127 & t121;
-		ulong t139 = t137 ^ t136;
-		ulong t140 = t135 ^ t133;
-		ulong t141 = t140 ^ t131;
-		ulong t142 = t134 ^ t132;
-		ulong t143 = t126 & t120;
-		ulong t144 = t126 & t118;
-		ulong t145 = t126 & t119;
-		ulong t146 = t124 & t120;
-		ulong t147 = t125 & t120;
-		ulong t148 = t125 & t119;
-		ulong t149 = t125 & t118;
-		ulong t150 = t124 & t119;
-		ulong t151 = t124 & t118;
-		ulong t152 = t150 ^ t149;
-		ulong t153 = t148 ^ t146;
-		ulong t154 = t153 ^ t144;
-		ulong t155 = t147 ^ t145;
-		ulong t156 = t121 ^ t118;
-		ulong t157 = t122 ^ t119;
-		ulong t158 = t123 ^ t120;
-		ulong t159 = t127 ^ t124;
-		ulong t160 = t128 ^ t125;
-		ulong t161 = t129 ^ t126;
-		ulong t162 = t161 & t158;
-		ulong t163 = t161 & t156;
-		ulong t164 = t161 & t157;
-		ulong t165 = t159 & t158;
-		ulong t166 = t160 & t158;
-		ulong t167 = t160 & t157;
-		ulong t168 = t160 & t156;
-		ulong t169 = t159 & t157;
-		ulong t170 = t159 & t156;
-		ulong t171 = t169 ^ t168;
-		ulong t172 = t167 ^ t165;
-		ulong t173 = t172 ^ t163;
-		ulong t174 = t166 ^ t164;
-		ulong t175 = t142 ^ t151;
-		ulong t176 = t130 ^ t152;
-		ulong t177 = t170 ^ t175;
-		ulong t178 = t171 ^ t176;
-		ulong t179 = t173 ^ t154;
-		ulong t180 = t174 ^ t155;
-		ulong t181 = t162 ^ t143;
-		ulong t182 = t177 ^ t138;
-		ulong t183 = t178 ^ t139;
-		ulong t184 = t179 ^ t141;
-		ulong t185 = t180 ^ t175;
-		ulong t186 = t181 ^ t176;
-		ulong t187 = t111 ^ t48;
-		ulong t188 = t112 ^ t49;
-		ulong t189 = t102 ^ t51;
-		ulong t190 = t113 ^ t108;
-		ulong t191 = t114 ^ t109;
-		ulong t192 = t115 ^ t110;
-		ulong t193 = t116 ^ t111;
-		ulong t194 = t117 ^ t112;
-		ulong t195 = t12 ^ t102;
-		ulong t196 = t13 ^ t113;
-		ulong t197 = t1 ^ t114;
-		ulong t198 = t187 ^ t138;
-		ulong t199 = t188 ^ t139;
-		ulong t200 = t189 ^ t141;
-		ulong t201 = t190 ^ t182;
-		ulong t202 = t191 ^ t183;
-		ulong t203 = t192 ^ t184;
-		ulong t204 = t193 ^ t185;
-		ulong t205 = t194 ^ t186;
-		ulong t206 = t195 ^ t154;
-		ulong t207 = t196 ^ t155;
-		ulong t208 = t197 ^ t143;
-
 		const size_t OUTLEN = Output.size();
 		std::vector<ulong> sum(2 * OUTLEN - 1);
-		sum[0] = t48;
-		sum[1] = t49;
-		sum[2] = t51;
-		sum[3] = t108;
-		sum[4] = t109;
-		sum[5] = t110;
-		sum[6] = t198;
-		sum[7] = t199;
-		sum[8] = t200;
-		sum[9] = t201;
-		sum[10] = t202;
-		sum[11] = t203;
-		sum[12] = t204;
-		sum[13] = t205;
-		sum[14] = t206;
-		sum[15] = t207;
-		sum[16] = t208;
-		sum[17] = t115;
-		sum[18] = t116;
-		sum[19] = t117;
-		sum[20] = t12;
-		sum[21] = t13;
-		sum[22] = t1;
+		std::array<ulong, 208> t;
+		size_t i;
 
-		for (size_t i = 2 * OUTLEN - 2; i >= OUTLEN; i--)
+		t[0] = A[11] & B[11];
+		t[1] = A[11] & B[9];
+		t[2] = A[11] & B[10];
+		t[3] = A[9] & B[11];
+		t[4] = A[10] & B[11];
+		t[5] = A[10] & B[10];
+		t[6] = A[10] & B[9];
+		t[7] = A[9] & B[10];
+		t[8] = A[9] & B[9];
+		t[9] = t[7] ^ t[6];
+		t[10] = t[5] ^ t[3];
+		t[11] = t[10] ^ t[1];
+		t[12] = t[4] ^ t[2];
+		t[13] = A[8] & B[8];
+		t[14] = A[8] & B[6];
+		t[15] = A[8] & B[7];
+		t[16] = A[6] & B[8];
+		t[17] = A[7] & B[8];
+		t[18] = A[7] & B[7];
+		t[19] = A[7] & B[6];
+		t[20] = A[6] & B[7];
+		t[21] = A[6] & B[6];
+		t[22] = t[20] ^ t[19];
+		t[23] = t[18] ^ t[16];
+		t[24] = t[23] ^ t[14];
+		t[25] = t[17] ^ t[15];
+		t[26] = A[5] & B[5];
+		t[27] = A[5] & B[3];
+		t[28] = A[5] & B[4];
+		t[29] = A[3] & B[5];
+		t[30] = A[4] & B[5];
+		t[31] = A[4] & B[4];
+		t[32] = A[4] & B[3];
+		t[33] = A[3] & B[4];
+		t[34] = A[3] & B[3];
+		t[35] = t[33] ^ t[32];
+		t[36] = t[31] ^ t[29];
+		t[37] = t[36] ^ t[27];
+		t[38] = t[30] ^ t[28];
+		t[39] = A[2] & B[2];
+		t[40] = A[2] & B[0];
+		t[41] = A[2] & B[1];
+		t[42] = A[0] & B[2];
+		t[43] = A[1] & B[2];
+		t[44] = A[1] & B[1];
+		t[45] = A[1] & B[0];
+		t[46] = A[0] & B[1];
+		t[47] = A[0] & B[0];
+		t[48] = t[46] ^ t[45];
+		t[49] = t[44] ^ t[42];
+		t[50] = t[49] ^ t[40];
+		t[51] = t[43] ^ t[41];
+		t[52] = t[51] ^ t[34];
+		t[53] = t[39] ^ t[35];
+		t[54] = t[38] ^ t[21];
+		t[55] = t[26] ^ t[22];
+		t[56] = t[25] ^ t[8];
+		t[57] = t[13] ^ t[9];
+		t[58] = B[6] ^ B[9];
+		t[59] = B[7] ^ B[10];
+		t[60] = B[8] ^ B[11];
+		t[61] = A[6] ^ A[9];
+		t[62] = A[7] ^ A[10];
+		t[63] = A[8] ^ A[11];
+		t[64] = t[63] & t[60];
+		t[65] = t[63] & t[58];
+		t[66] = t[63] & t[59];
+		t[67] = t[61] & t[60];
+		t[68] = t[62] & t[60];
+		t[69] = t[62] & t[59];
+		t[70] = t[62] & t[58];
+		t[71] = t[61] & t[59];
+		t[72] = t[61] & t[58];
+		t[73] = t[71] ^ t[70];
+		t[74] = t[69] ^ t[67];
+		t[75] = t[74] ^ t[65];
+		t[76] = t[68] ^ t[66];
+		t[77] = B[0] ^ B[3];
+		t[78] = B[1] ^ B[4];
+		t[79] = B[2] ^ B[5];
+		t[80] = A[0] ^ A[3];
+		t[81] = A[1] ^ A[4];
+		t[82] = A[2] ^ A[5];
+		t[83] = t[82] & t[79];
+		t[84] = t[82] & t[77];
+		t[85] = t[82] & t[78];
+		t[86] = t[80] & t[79];
+		t[87] = t[81] & t[79];
+		t[88] = t[81] & t[78];
+		t[89] = t[81] & t[77];
+		t[90] = t[80] & t[78];
+		t[91] = t[80] & t[77];
+		t[92] = t[90] ^ t[89];
+		t[93] = t[88] ^ t[86];
+		t[94] = t[93] ^ t[84];
+		t[95] = t[87] ^ t[85];
+		t[96] = t[52] ^ t[47];
+		t[97] = t[53] ^ t[48];
+		t[98] = t[37] ^ t[50];
+		t[99] = t[54] ^ t[52];
+		t[100] = t[55] ^ t[53];
+		t[101] = t[24] ^ t[37];
+		t[102] = t[56] ^ t[54];
+		t[103] = t[57] ^ t[55];
+		t[104] = t[11] ^ t[24];
+		t[105] = t[12] ^ t[56];
+		t[106] = t[0] ^ t[57];
+		t[107] = t[96] ^ t[91];
+		t[108] = t[97] ^ t[92];
+		t[109] = t[98] ^ t[94];
+		t[110] = t[99] ^ t[95];
+		t[111] = t[100] ^ t[83];
+		t[112] = t[102] ^ t[72];
+		t[113] = t[103] ^ t[73];
+		t[114] = t[104] ^ t[75];
+		t[115] = t[105] ^ t[76];
+		t[116] = t[106] ^ t[64];
+		t[117] = B[3] ^ B[9];
+		t[118] = B[4] ^ B[10];
+		t[119] = B[5] ^ B[11];
+		t[120] = B[0] ^ B[6];
+		t[121] = B[1] ^ B[7];
+		t[122] = B[2] ^ B[8];
+		t[123] = A[3] ^ A[9];
+		t[124] = A[4] ^ A[10];
+		t[125] = A[5] ^ A[11];
+		t[126] = A[0] ^ A[6];
+		t[127] = A[1] ^ A[7];
+		t[128] = A[2] ^ A[8];
+		t[129] = t[128] & t[122];
+		t[130] = t[128] & t[120];
+		t[131] = t[128] & t[121];
+		t[132] = t[126] & t[122];
+		t[133] = t[127] & t[122];
+		t[134] = t[127] & t[121];
+		t[135] = t[127] & t[120];
+		t[136] = t[126] & t[121];
+		t[137] = t[126] & t[120];
+		t[138] = t[136] ^ t[135];
+		t[139] = t[134] ^ t[132];
+		t[140] = t[139] ^ t[130];
+		t[141] = t[133] ^ t[131];
+		t[142] = t[125] & t[119];
+		t[143] = t[125] & t[117];
+		t[144] = t[125] & t[118];
+		t[145] = t[123] & t[119];
+		t[146] = t[124] & t[119];
+		t[147] = t[124] & t[118];
+		t[148] = t[124] & t[117];
+		t[149] = t[123] & t[118];
+		t[150] = t[123] & t[117];
+		t[151] = t[149] ^ t[148];
+		t[152] = t[147] ^ t[145];
+		t[153] = t[152] ^ t[143];
+		t[154] = t[146] ^ t[144];
+		t[155] = t[120] ^ t[117];
+		t[156] = t[121] ^ t[118];
+		t[157] = t[122] ^ t[119];
+		t[158] = t[126] ^ t[123];
+		t[159] = t[127] ^ t[124];
+		t[160] = t[128] ^ t[125];
+		t[161] = t[160] & t[157];
+		t[162] = t[160] & t[155];
+		t[163] = t[160] & t[156];
+		t[164] = t[158] & t[157];
+		t[165] = t[159] & t[157];
+		t[166] = t[159] & t[156];
+		t[167] = t[159] & t[155];
+		t[168] = t[158] & t[156];
+		t[169] = t[158] & t[155];
+		t[170] = t[168] ^ t[167];
+		t[171] = t[166] ^ t[164];
+		t[172] = t[171] ^ t[162];
+		t[173] = t[165] ^ t[163];
+		t[174] = t[141] ^ t[150];
+		t[175] = t[129] ^ t[151];
+		t[176] = t[169] ^ t[174];
+		t[177] = t[170] ^ t[175];
+		t[178] = t[172] ^ t[153];
+		t[179] = t[173] ^ t[154];
+		t[180] = t[161] ^ t[142];
+		t[181] = t[176] ^ t[137];
+		t[182] = t[177] ^ t[138];
+		t[183] = t[178] ^ t[140];
+		t[184] = t[179] ^ t[174];
+		t[185] = t[180] ^ t[175];
+		t[186] = t[110] ^ t[47];
+		t[187] = t[111] ^ t[48];
+		t[188] = t[101] ^ t[50];
+		t[189] = t[112] ^ t[107];
+		t[190] = t[113] ^ t[108];
+		t[191] = t[114] ^ t[109];
+		t[192] = t[115] ^ t[110];
+		t[193] = t[116] ^ t[111];
+		t[194] = t[11] ^ t[101];
+		t[195] = t[12] ^ t[112];
+		t[196] = t[0] ^ t[113];
+		t[197] = t[186] ^ t[137];
+		t[198] = t[187] ^ t[138];
+		t[199] = t[188] ^ t[140];
+		t[200] = t[189] ^ t[181];
+		t[201] = t[190] ^ t[182];
+		t[202] = t[191] ^ t[183];
+		t[203] = t[192] ^ t[184];
+		t[204] = t[193] ^ t[185];
+		t[205] = t[194] ^ t[153];
+		t[206] = t[195] ^ t[154];
+		t[207] = t[196] ^ t[142];
+		sum[0] = t[47];
+		sum[1] = t[48];
+		sum[2] = t[50];
+		sum[3] = t[107];
+		sum[4] = t[108];
+		sum[5] = t[109];
+		sum[6] = t[197];
+		sum[7] = t[198];
+		sum[8] = t[199];
+		sum[9] = t[200];
+		sum[10] = t[201];
+		sum[11] = t[202];
+		sum[12] = t[203];
+		sum[13] = t[204];
+		sum[14] = t[205];
+		sum[15] = t[206];
+		sum[16] = t[207];
+		sum[17] = t[114];
+		sum[18] = t[115];
+		sum[19] = t[116];
+		sum[20] = t[11];
+		sum[21] = t[12];
+		sum[22] = t[0];
+
+		for (i = 2 * OUTLEN - 2; i >= OUTLEN; i--)
 		{
 			sum[i - 9] ^= sum[i];
 			sum[i - OUTLEN] ^= sum[i];

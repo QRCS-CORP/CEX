@@ -48,6 +48,11 @@ namespace Test
 		~SHAKETest();
 
 		/// <summary>
+		/// Tests the Keccak component functions
+		/// </summary>
+		void Ancillary();
+
+		/// <summary>
 		/// Get: The test description
 		/// </summary>
 		const std::string Description() override;

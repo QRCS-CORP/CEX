@@ -249,7 +249,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 64</param>
-	inline void RotL64(const int Shift)
+	inline void RotL64(int Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
 		ymm = _mm256_or_si256(_mm256_slli_epi64(ymm, static_cast<int>(Shift)), _mm256_srli_epi64(ymm, static_cast<int>(64 - Shift)));
@@ -274,7 +274,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 64</param>
-	inline void RotR64(const int Shift)
+	inline void RotR64(int Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
 		RotL64(64 - Shift);
@@ -554,7 +554,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (const int Shift)
+	inline void operator <<= (int Shift)
 	{
 		ymm = _mm256_slli_epi64(ymm, Shift);
 	}
@@ -564,7 +564,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline ULong256 operator << (const int Shift) const
+	inline ULong256 operator << (int Shift) const
 	{
 		return ULong256(_mm256_slli_epi64(ymm, Shift));
 	}
@@ -574,7 +574,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (const int Shift)
+	inline void operator >>= (int Shift)
 	{
 		ymm = _mm256_srli_epi64(ymm, Shift);
 	}
@@ -584,7 +584,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline ULong256 operator >> (const int Shift) const
+	inline ULong256 operator >> (int Shift) const
 	{
 		return ULong256(_mm256_srli_epi64(ymm, Shift));
 	}

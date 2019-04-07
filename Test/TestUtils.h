@@ -63,44 +63,162 @@ namespace Test
 		static void PrintHex(byte* Data, size_t Size);
 
 		/// <summary>
-		/// Outputs a delineated, formatted hex byte array to console
+		/// Prints a hex-formatted 8-bit unsigned integer array
 		/// </summary>
 		/// 
 		/// <param name="Data">The array to convert</param>
-		/// <param name="Length">The number of bytes to write</param>
-		/// <param name="LineSize">The bumber of bytes to print in each line</param>
-		template<typename Array>
-		static void PrintHex8(const Array &Data, size_t Length, size_t LineSize)
+		/// <param name="Prefix">The integer prefix</param>
+		/// <param name="Suffix">The integer suffix</param>
+		/// <param name="RowLength">The number of integers in each row</param>
+		static void PrintHex8(const std::vector<uint> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 32)
 		{
-			for (size_t i = 0; i < Length; ++i)
+			const size_t ZERLEN = 2;
+			std::string tmp = "";
+			size_t i;
+			size_t j;
+
+			for (i = 1; i < Data.size() + 1; ++i)
 			{
-				if (i != 0 && i % LineSize == 0)
+				std::ostringstream oss;
+				oss << std::hex << std::uppercase << Data[i - 1];
+				tmp = oss.str();
+
+				if (tmp.size() < ZERLEN)
+				{
+					for (j = tmp.size(); j < ZERLEN; ++j)
+					{
+						tmp = std::string("0") + tmp;
+					}
+				}
+
+				tmp = Prefix + tmp + Suffix;
+				printf(tmp.c_str());
+				tmp.clear();
+
+				if (i % RowLength == 0)
 				{
 					printf("\n");
 				}
-
-				printf("0x%02X, ", Data[i]);
 			}
 		}
 
 		/// <summary>
-		/// Outputs a delineated, formatted hex byte array to console
+		/// Prints a hex-formatted 16-bit unsigned integer array
 		/// </summary>
 		/// 
 		/// <param name="Data">The array to convert</param>
-		/// <param name="Length">The number of bytes to write</param>
-		/// <param name="LineSize">The bumber of bytes to print in each line</param>
-		template<typename Array>
-		static void PrintHex16(const Array &Data, size_t Length, size_t LineSize)
+		/// <param name="Prefix">The integer prefix</param>
+		/// <param name="Suffix">The integer suffix</param>
+		/// <param name="RowLength">The number of integers in each row</param>
+		static void PrintHex16(const std::vector<uint> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 16)
 		{
-			for (size_t i = 0; i < Length; ++i)
+			const size_t ZERLEN = 4;
+			std::string tmp = "";
+			size_t i;
+			size_t j;
+
+			for (i = 1; i < Data.size() + 1; ++i)
 			{
-				if (i != 0 && i % LineSize == 0)
+				std::ostringstream oss;
+				oss << std::hex << std::uppercase << Data[i - 1];
+				tmp = oss.str();
+
+				if (tmp.size() < ZERLEN)
+				{
+					for (j = tmp.size(); j < ZERLEN; ++j)
+					{
+						tmp = std::string("0") + tmp;
+					}
+				}
+
+				tmp = Prefix + tmp + Suffix;
+				printf(tmp.c_str());
+				tmp.clear();
+
+				if (i % RowLength == 0)
 				{
 					printf("\n");
 				}
+			}
+		}
 
-				printf("0x%04X, ", Data[i]);
+		/// <summary>
+		/// Prints a hex-formatted 32-bit unsigned integer array
+		/// </summary>
+		/// 
+		/// <param name="Data">The array to convert</param>
+		/// <param name="Prefix">The integer prefix</param>
+		/// <param name="Suffix">The integer suffix</param>
+		/// <param name="RowLength">The number of integers in each row</param>
+		static void PrintHex32(const std::vector<uint> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 8)
+		{
+			const size_t ZERLEN = 8;
+			std::string tmp = "";
+			size_t i;
+			size_t j;
+
+			for (i = 1; i < Data.size() + 1; ++i)
+			{
+				std::ostringstream oss;
+				oss << std::hex << std::uppercase << Data[i - 1];
+				tmp = oss.str();
+
+				if (tmp.size() < ZERLEN)
+				{
+					for (j = tmp.size(); j < ZERLEN; ++j)
+					{
+						tmp = std::string("0") + tmp;
+					}
+				}
+
+				tmp = Prefix + tmp + Suffix;
+				printf(tmp.c_str());
+				tmp.clear();
+
+				if (i % RowLength == 0)
+				{
+					printf("\n");
+				}
+			}
+		}
+
+		/// <summary>
+		/// Prints a hex-formatted 64-bit unsigned integer array
+		/// </summary>
+		/// 
+		/// <param name="Data">The array to convert</param>
+		/// <param name="Prefix">The integer prefix</param>
+		/// <param name="Suffix">The integer suffix</param>
+		/// <param name="RowLength">The number of integers in each row</param>
+		static void PrintHex64(const std::vector<ulong> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 4)
+		{
+			const size_t ZERLEN = 16;
+			std::string tmp = "";
+			size_t i;
+			size_t j;
+
+			for (i = 1; i < Data.size() + 1; ++i)
+			{
+				std::ostringstream oss;
+				oss << std::hex << std::uppercase << Data[i - 1];
+				tmp = oss.str();
+
+				if (tmp.size() < ZERLEN)
+				{
+					for (j = tmp.size(); j < ZERLEN; ++j)
+					{
+						tmp = std::string("0") + tmp;
+					}
+				}
+
+				tmp = Prefix + tmp + Suffix;
+				printf(tmp.c_str());
+				tmp.clear();
+
+				if (i % RowLength == 0)
+				{
+					printf("\n");
+				}
 			}
 		}
 
@@ -144,28 +262,6 @@ namespace Test
 			for (size_t i = 0; i < Size; ++i)
 			{
 				oss << std::hex << std::uppercase << std::string("0x") << Data[i] << Suffix;
-				ret += oss.str();
-			}
-
-			return ret;
-		}
-
-		/// <summary>
-		/// Outputs formatted hex integer array to a string
-		/// </summary>
-		/// 
-		/// <param name="Data">The array to convert</param>
-		/// <param name="Size">The number of integers to convert</param>
-		/// <param name="Suffix">The integer type suffix</param>
-		template<typename Array>
-		static std::string ToHex(const Array &Data, size_t Size, std::string &Prefix, const std::string &Suffix)
-		{
-			std::string ret = "";
-			std::ostringstream oss;
-
-			for (size_t i = 0; i < Size; ++i)
-			{
-				oss << std::hex << std::uppercase << Prefix << Data[i] << Suffix;
 				ret += oss.str();
 			}
 

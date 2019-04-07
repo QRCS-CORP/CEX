@@ -1,14 +1,16 @@
 #include "MLWEQ7681N256.h"
+#include "IntegerTools.h"
 #include "MemoryTools.h"
 #include "Keccak.h"
 
 NAMESPACE_MODULELWE
 
+using Utility::IntegerTools;
 using Digest::Keccak;
 
 //~~~Constants~~~//
 
-const std::array<ushort, 256> MLWEQ7681N256::Zetas =
+const std::vector<ushort> MLWEQ7681N256::Zetas =
 {
 	0x03DEU, 0x1D03U, 0x0A4AU, 0x1AA3U, 0x0242U, 0x0CD1U, 0x085FU, 0x0447U,
 	0x01E4U, 0x18DAU, 0x0D08U, 0x1506U, 0x17C6U, 0x0EEFU, 0x036DU, 0x1618U,
@@ -44,7 +46,7 @@ const std::array<ushort, 256> MLWEQ7681N256::Zetas =
 	0x1B23U, 0x086FU, 0x028EU, 0x1C9FU, 0x0AD0U, 0x1A14U, 0x03DBU, 0x08A6U
 };
 
-const std::array<ushort, 128> MLWEQ7681N256::OmegasInvMontgomery =
+const std::vector<ushort> MLWEQ7681N256::OmegasInvMontgomery =
 {
 	0x03DEU, 0x00FEU, 0x035EU, 0x13B7U, 0x19BAU, 0x15A2U, 0x1130U, 0x1BBFU,
 	0x07E9U, 0x1A94U, 0x0F12U, 0x063BU, 0x08FBU, 0x10F9U, 0x0527U, 0x1C1DU,
@@ -64,7 +66,7 @@ const std::array<ushort, 128> MLWEQ7681N256::OmegasInvMontgomery =
 	0x0008U, 0x0FB5U, 0x0026U, 0x161AU, 0x0BC9U, 0x17FFU, 0x0379U, 0x1078U
 };
 
-const std::array<ushort, 256> MLWEQ7681N256::PsisInvMontgomery =
+const std::vector<ushort> MLWEQ7681N256::PsisInvMontgomery =
 {
 	0x0400U, 0x136CU, 0x1693U, 0x1AFBU, 0x134FU, 0x1048U, 0x013BU, 0x15CCU,
 	0x005AU, 0x01F1U, 0x0463U, 0x008EU, 0x1266U, 0x1597U, 0x098BU, 0x1307U,
@@ -104,9 +106,9 @@ const std::array<ushort, 256> MLWEQ7681N256::PsisInvMontgomery =
 
 void MLWEQ7681N256::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey)
 {
-	const size_t K = (CipherText.size() - (3 * MLWEQ7681N256::MLWE_SEED_SIZE)) / MLWEQ7681N256::MLWE_PUBPOLY_SIZE;
-	std::vector<std::array<ushort, MLWE_N>> bp(K);
-	std::vector<std::array<ushort, MLWE_N>> skpv(K);
+	const size_t KLEN = (CipherText.size() - (3 * MLWEQ7681N256::MLWE_SEED_SIZE)) / MLWEQ7681N256::MLWE_PUBPOLY_SIZE;
+	std::vector<std::array<ushort, MLWE_N>> bp(KLEN);
+	std::vector<std::array<ushort, MLWE_N>> skpv(KLEN);
 	std::array<ushort, MLWE_N> mp;
 	std::array<ushort, MLWE_N> v;
 
@@ -122,18 +124,18 @@ void MLWEQ7681N256::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &
 
 void MLWEQ7681N256::Encrypt(std::vector<byte> &CipherText, const std::vector<byte> &Message, const std::vector<byte> &PublicKey, const std::vector<byte> &Seed)
 {
-	const size_t K = (CipherText.size() - (3 * MLWEQ7681N256::MLWE_SEED_SIZE)) / MLWEQ7681N256::MLWE_PUBPOLY_SIZE;
-	std::vector<std::vector<std::array<ushort, MLWE_N>>> at(K, std::vector<std::array<ushort, MLWE_N>>(K));
+	const size_t KLEN = (CipherText.size() - (3 * MLWEQ7681N256::MLWE_SEED_SIZE)) / MLWEQ7681N256::MLWE_PUBPOLY_SIZE;
+	std::vector<std::vector<std::array<ushort, MLWE_N>>> at(KLEN, std::vector<std::array<ushort, MLWE_N>>(KLEN));
 	std::vector<byte> seed(MLWE_SEED_SIZE);
-	std::vector<std::array<ushort, MLWE_N>> bp(K);
-	std::vector<std::array<ushort, MLWE_N>> ep(K);
-	std::vector<std::array<ushort, MLWE_N>> pkpv(K);
-	std::vector<std::array<ushort, MLWE_N>> sp(K);
+	std::vector<std::array<ushort, MLWE_N>> bp(KLEN);
+	std::vector<std::array<ushort, MLWE_N>> ep(KLEN);
+	std::vector<std::array<ushort, MLWE_N>> pkpv(KLEN);
+	std::vector<std::array<ushort, MLWE_N>> sp(KLEN);
 	std::array<ushort, MLWE_N> epp;
 	std::array<ushort, MLWE_N> k;
 	std::array<ushort, MLWE_N> v;
-	size_t i;
 	size_t eta;
+	size_t i;
 	ushort nonce;
 
 	UnpackPublicKey(pkpv, seed, PublicKey);
@@ -141,10 +143,10 @@ void MLWEQ7681N256::Encrypt(std::vector<byte> &CipherText, const std::vector<byt
 	PolyVecNTT(pkpv);
 
 	GenerateMatrix(at, seed, true);
-	eta = (K == 3) ? 4 : (K == 4) ? 3 : 5;
+	eta = (KLEN == 3) ? 4 : (KLEN == 4) ? 3 : 5;
 	nonce = 1;
 
-	for (i = 0; i < K; i++)
+	for (i = 0; i < KLEN; ++i)
 	{
 		PolyGetNoise(sp[i], eta, Seed, nonce);
 		++nonce;
@@ -152,13 +154,13 @@ void MLWEQ7681N256::Encrypt(std::vector<byte> &CipherText, const std::vector<byt
 
 	PolyVecNTT(sp);
 
-	for (i = 0; i < K; i++)
+	for (i = 0; i < KLEN; ++i)
 	{
 		PolyGetNoise(ep[i], eta, Seed, nonce);
 		++nonce;
 	}
 
-	for (i = 0; i < K; i++)
+	for (i = 0; i < KLEN; ++i)
 	{
 		PolyVecPointwiseAcc(bp[i], sp, at[i]);
 	}
@@ -176,33 +178,33 @@ void MLWEQ7681N256::Encrypt(std::vector<byte> &CipherText, const std::vector<byt
 
 void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
-	const size_t K = (PublicKey.size() - MLWEQ7681N256::MLWE_SEED_SIZE) / MLWEQ7681N256::MLWE_PUBPOLY_SIZE;
-	std::vector<std::vector<std::array<ushort, MLWE_N>>> a(K, std::vector<std::array<ushort, MLWE_N>>(K));
-	std::vector<std::array<ushort, MLWE_N>> e(K);
-	std::vector<std::array<ushort, MLWE_N>> pkpv(K);
-	std::vector<std::array<ushort, MLWE_N>> skpv(K);
+	const size_t KLEN = (PublicKey.size() - MLWEQ7681N256::MLWE_SEED_SIZE) / MLWEQ7681N256::MLWE_PUBPOLY_SIZE;
+	std::vector<std::vector<std::array<ushort, MLWE_N>>> a(KLEN, std::vector<std::array<ushort, MLWE_N>>(KLEN));
+	std::vector<std::array<ushort, MLWE_N>> e(KLEN);
+	std::vector<std::array<ushort, MLWE_N>> pkpv(KLEN);
+	std::vector<std::array<ushort, MLWE_N>> skpv(KLEN);
 	std::vector<byte> seed(MLWE_SEED_SIZE);
 	size_t eta;
 	size_t i;
 
 	Rng->Generate(seed);
 	GenerateMatrix(a, seed, false);
-	eta = (K == 3) ? 4 : (K == 4) ? 3 : 5;
+	eta = (KLEN == 3) ? 4 : (KLEN == 4) ? 3 : 5;
 
-	for (i = 0; i < K; i++)
+	for (i = 0; i < KLEN; ++i)
 	{
 		GetNoise(skpv[i], eta, Rng);
 	}
 
 	PolyVecNTT(skpv);
 
-	for (i = 0; i < K; i++)
+	for (i = 0; i < KLEN; ++i)
 	{
 		GetNoise(e[i], eta, Rng);
 	}
 
 	// matrix-vector multiplication
-	for (i = 0; i < K; i++)
+	for (i = 0; i < KLEN; ++i)
 	{
 		PolyVecPointwiseAcc(pkpv[i], skpv, a[i]);
 	}
@@ -212,9 +214,9 @@ void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 	PackSecretKey(PrivateKey, skpv);
 	PackPublicKey(PublicKey, pkpv, seed);
 
-	for (i = 0; i < ((K * MLWE_PUBPOLY_SIZE) + MLWE_SEED_SIZE); i++)
+	for (i = 0; i < ((KLEN * MLWE_PUBPOLY_SIZE) + MLWE_SEED_SIZE); ++i)
 	{
-		PrivateKey[i + (K * MLWE_PRIPOLY_SIZE)] = PublicKey[i];
+		PrivateKey[i + (KLEN * MLWE_PRIPOLY_SIZE)] = PublicKey[i];
 	}
 }
 
@@ -223,34 +225,34 @@ void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, MLWE_N>>> &A, const std::vector<byte> &Seed, bool Transposed)
 {
 	std::vector<byte> buf(Keccak::KECCAK128_RATE_SIZE * 4);
-	std::vector<byte> tmpK(Seed.size() + 2);
+	std::vector<byte> tmpk(Seed.size() + 2);
 	byte i;
 	byte j;
 	ushort val;
 	size_t ctr;
 	size_t pos;
 
-	Utility::MemoryTools::Copy(Seed, 0, tmpK, 0, Seed.size());
+	Utility::MemoryTools::Copy(Seed, 0, tmpk, 0, Seed.size());
 
-	for (i = 0; i < A.size(); i++)
+	for (i = 0; i < A.size(); ++i)
 	{
-		for (j = 0; j < A.size(); j++)
+		for (j = 0; j < A.size(); ++j)
 		{
 			ctr = 0;
 			pos = 0;
 
 			if (Transposed)
 			{
-				tmpK[Seed.size()] = i;
-				tmpK[Seed.size() + 1] = j;
+				tmpk[Seed.size()] = i;
+				tmpk[Seed.size() + 1] = j;
 			}
 			else
 			{
-				tmpK[Seed.size() + 1] = i;
-				tmpK[Seed.size()] = j;
+				tmpk[Seed.size() + 1] = i;
+				tmpk[Seed.size()] = j;
 			}
 
-			XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK128_RATE_SIZE);
+			XOF(tmpk, 0, tmpk.size(), buf, 0, buf.size(), Keccak::KECCAK128_RATE_SIZE);
 
 			while (ctr < MLWE_N)
 			{
@@ -266,7 +268,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 
 				if (pos > buf.size() - 2)
 				{
-					XOF(tmpK, 0, tmpK.size(), buf, 0, buf.size(), Keccak::KECCAK128_RATE_SIZE);
+					XOF(tmpk, 0, tmpk.size(), buf, 0, buf.size(), Keccak::KECCAK128_RATE_SIZE);
 					pos = 0;
 				}
 			}
@@ -304,18 +306,20 @@ void MLWEQ7681N256::PolyGetNoise(std::array<ushort, MLWE_N> &R, size_t Eta, cons
 void MLWEQ7681N256::InvNTT(std::array<ushort, MLWE_N> &P)
 {
 	// TODO: vectorize
-	ushort level;
-	ushort tmp;
-	ushort W;
 	uint j;
 	uint jTwiddle;
 	uint start;
 	uint t;
+	ushort level;
+	ushort tmp;
 	ushort tpos;
+	ushort W;
 
-	for (level = 0; level < 8; level++)
+	level = 0;
+
+	while (level != 8)
 	{
-		for (start = 0; start < (1U << level); start++)
+		for (start = 0; start < (1U << level); ++start)
 		{
 			jTwiddle = 0;
 
@@ -339,9 +343,11 @@ void MLWEQ7681N256::InvNTT(std::array<ushort, MLWE_N> &P)
 				P[tpos] = MontgomeryReduce(t);
 			}
 		}
+
+		++level;
 	}
 
-	for (j = 0; j < MLWE_N; j++)
+	for (j = 0; j < MLWE_N; ++j)
 	{
 		P[j] = MontgomeryReduce(static_cast<uint>(P[j]) * PsisInvMontgomery[j]);
 	}
@@ -350,19 +356,22 @@ void MLWEQ7681N256::InvNTT(std::array<ushort, MLWE_N> &P)
 void MLWEQ7681N256::FwdNTT(std::array<ushort, MLWE_N> &P)
 {
 	// TODO: vectorize
-	short level;
-	ushort start;
-	ushort t;
-	ushort tpos;
 	uint j;
 	uint k;
 	uint zeta;
+	ushort level;
+	ushort start;
+	ushort t;
+	ushort tpos;
 
 	j = 0;
 	k = 1;
+	level = 8;
 
-	for (level = 7; level >= 0; level--)
+	do
 	{
+		--level;
+
 		for (start = 0; start < MLWE_N; start = j + (1U << level))
 		{
 			zeta = Zetas[k];
@@ -385,14 +394,14 @@ void MLWEQ7681N256::FwdNTT(std::array<ushort, MLWE_N> &P)
 				}
 			}
 		}
-	}
+	} 
+	while (level != 0);
 }
 
 void MLWEQ7681N256::Cbd(std::array<ushort, MLWE_N> &R, const std::vector<byte> &Buffer, size_t Eta)
 {
 	// TODO: vectorize
 	size_t i;
-	size_t j;
 
 	if (Eta == 3)
 	{
@@ -401,23 +410,21 @@ void MLWEQ7681N256::Cbd(std::array<ushort, MLWE_N> &R, const std::vector<byte> &
 		uint d;
 		uint t;
 
-		for (i = 0; i < MLWE_N / 4; i++)
+		for (i = 0; i < MLWE_N / 4; ++i)
 		{
-			t = LeBytesTo32(Buffer, 3 * i, 3);
+			t = IntegerTools::LeBytesTo32(Buffer, 3 * i, 3);
 			d = 0;
-
-			for (j = 0; j < 3; j++)
-			{
-				d += (t >> j) & 0x249249UL;
-			}
+			d += t & 0x249249UL;
+			d += (t >> 1) & 0x249249UL; 
+			d += (t >> 2) & 0x249249UL;
 
 			a[0] = (d & 0x7);
-			b[0] = ((d >> 3) & 0x7);
-			a[1] = ((d >> 6) & 0x7);
-			b[1] = ((d >> 9) & 0x7);
-			a[2] = ((d >> 12) & 0x7);
-			b[2] = ((d >> 15) & 0x7);
-			a[3] = ((d >> 18) & 0x7);
+			a[1] = ((d >> 6) & 0x07);
+			a[2] = ((d >> 12) & 0x07);
+			a[3] = ((d >> 18) & 0x07);
+			b[0] = ((d >> 3) & 0x07);
+			b[1] = ((d >> 9) & 0x07);
+			b[2] = ((d >> 15) & 0x07);
 			b[3] = (d >> 21);
 
 			R[4 * i] = a[0] + (MLWE_Q - b[0]);
@@ -433,23 +440,22 @@ void MLWEQ7681N256::Cbd(std::array<ushort, MLWE_N> &R, const std::vector<byte> &
 		uint d;
 		uint t;
 
-		for (i = 0; i < MLWE_N / 4; i++)
+		for (i = 0; i < MLWE_N / 4; ++i)
 		{
-			t = LeBytesTo32(Buffer, 4 * i, 4);
+			t = IntegerTools::LeBytesTo32(Buffer, 4 * i, 4);
 			d = 0;
-
-			for (j = 0; j < 4; j++)
-			{
-				d += (t >> j) & 0x11111111UL;
-			}
+			d += t & 0x11111111UL;
+			d += (t >> 1) & 0x11111111UL;
+			d += (t >> 2) & 0x11111111UL;
+			d += (t >> 3) & 0x11111111UL;
 
 			a[0] = (d & 0xF);
-			b[0] = ((d >> 4) & 0xF);
-			a[1] = ((d >> 8) & 0xF);
-			b[1] = ((d >> 12) & 0xF);
-			a[2] = ((d >> 16) & 0xF);
-			b[2] = ((d >> 20) & 0xF);
-			a[3] = ((d >> 24) & 0xF);
+			a[1] = ((d >> 8) & 0x0F);
+			a[2] = ((d >> 16) & 0x0F);
+			a[3] = ((d >> 24) & 0x0F);
+			b[0] = ((d >> 4) & 0x0F);
+			b[1] = ((d >> 12) & 0x0F);
+			b[2] = ((d >> 20) & 0x0F);
 			b[3] = (d >> 28);
 
 			R[4 * i] = a[0] + (MLWE_Q - b[0]);
@@ -465,23 +471,23 @@ void MLWEQ7681N256::Cbd(std::array<ushort, MLWE_N> &R, const std::vector<byte> &
 		ulong d;
 		ulong t;
 
-		for (i = 0; i < MLWE_N / 4; i++)
+		for (i = 0; i < MLWE_N / 4; ++i)
 		{
-			t = LeBytesTo64(Buffer, (5 * i), 5);
+			t = IntegerTools::LeBytesTo64(Buffer, (5 * i), 5);
 			d = 0;
-
-			for (j = 0; j < 5; j++)
-			{
-				d += (t >> j) & 0x0842108421ULL;
-			}
+			d += t & 0x0842108421ULL;
+			d += (t >> 1) & 0x0842108421ULL;
+			d += (t >> 2) & 0x0842108421ULL;
+			d += (t >> 3) & 0x0842108421ULL;
+			d += (t >> 4) & 0x0842108421ULL;
 
 			a[0] = (d & 0x1F);
-			b[0] = ((d >> 5) & 0x1F);
 			a[1] = ((d >> 10) & 0x1F);
-			b[1] = ((d >> 15) & 0x1F);
 			a[2] = ((d >> 20) & 0x1F);
-			b[2] = ((d >> 25) & 0x1F);
 			a[3] = ((d >> 30) & 0x1F);
+			b[0] = ((d >> 5) & 0x1F);
+			b[1] = ((d >> 15) & 0x1F);
+			b[2] = ((d >> 25) & 0x1F);
 			b[3] = (d >> 35);
 
 			R[4 * i] = a[0] + (MLWE_Q - b[0]);
@@ -504,7 +510,7 @@ void MLWEQ7681N256::PackPublicKey(std::vector<byte> &R, const std::vector<std::a
 
 	PolyVecCompress(R, 0, Pk);
 
-	for (i = 0; i < MLWE_SEED_SIZE; i++)
+	for (i = 0; i < MLWE_SEED_SIZE; ++i)
 	{
 		R[i + (Pk.size() * MLWE_PUBPOLY_SIZE)] = Seed[i];
 	}
@@ -519,7 +525,7 @@ void MLWEQ7681N256::PolyAdd(std::array<ushort, MLWE_N> &R, const std::array<usho
 {
 	size_t i;
 
-	for (i = 0; i < MLWE_N; i++)
+	for (i = 0; i < MLWE_N; ++i)
 	{
 		R[i] = BarrettReduce(A[i] + B[i]);
 	}
@@ -530,22 +536,24 @@ void MLWEQ7681N256::PolyCompress(std::vector<byte> &R, size_t Offset, const std:
 	std::array<uint, 8> t;
 	size_t i;
 	size_t j;
-	size_t k;
 
-	k = 0;
+	j = 0;
 
 	for (i = 0; i < MLWE_N; i += 8)
 	{
-		for (j = 0; j < 8; j++)
-		{
-			t[j] = ((((Freeze(A[i + j]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7);
-		}
+		t[0] = (((Freeze(A[i]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
+		t[1] = (((Freeze(A[i + 1]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
+		t[2] = (((Freeze(A[i + 2]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
+		t[3] = (((Freeze(A[i + 3]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
+		t[4] = (((Freeze(A[i + 4]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
+		t[5] = (((Freeze(A[i + 5]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
+		t[6] = (((Freeze(A[i + 6]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
+		t[7] = (((Freeze(A[i + 7]) << 3) + (MLWE_Q / 2)) / MLWE_Q) & 7;
 
-		R[Offset + k] = t[0] | (t[1] << 3) | (t[2] << 6);
-		R[Offset + k + 1] = (t[2] >> 2) | (t[3] << 1) | (t[4] << 4) | (t[5] << 7);
-		R[Offset + k + 2] = (t[5] >> 1) | (t[6] << 2) | (t[7] << 5);
-
-		k += 3;
+		R[Offset + j] = t[0] | (t[1] << 3) | (t[2] << 6);
+		R[Offset + j + 1] = (t[2] >> 2) | (t[3] << 1) | (t[4] << 4) | (t[5] << 7);
+		R[Offset + j + 2] = (t[5] >> 1) | (t[6] << 2) | (t[7] << 5);
+		j += 3;
 	}
 }
 
@@ -574,7 +582,7 @@ void MLWEQ7681N256::PolyFrombytes(std::array<ushort, MLWE_N> &R, const std::vect
 {
 	size_t i;
 
-	for (i = 0; i < MLWE_N / 8; i++)
+	for (i = 0; i < MLWE_N / 8; ++i)
 	{
 		R[8 * i] = (A[Offset + (13 * i)] | ((static_cast<ushort>(A[Offset + (13 * i) + 1]) & 0x1F) << 8));
 		R[(8 * i) + 1] = ((A[Offset + (13 * i) + 1] >> 5) | ((static_cast<ushort>(A[Offset + (13 * i) + 2])) << 3) | ((static_cast<ushort>(A[Offset + (13 * i) + 3]) & 0x03) << 11));
@@ -591,7 +599,7 @@ void MLWEQ7681N256::PolySub(std::array<ushort, MLWE_N> &R, const std::array<usho
 {
 	size_t i;
 
-	for (i = 0; i < MLWE_N; i++)
+	for (i = 0; i < MLWE_N; ++i)
 	{
 		R[i] = BarrettReduce(A[i] + ((3 * MLWE_Q) - B[i]));
 	}
@@ -599,16 +607,19 @@ void MLWEQ7681N256::PolySub(std::array<ushort, MLWE_N> &R, const std::array<usho
 
 void MLWEQ7681N256::PolyToBytes(std::vector<byte> &R, size_t Offset, const std::array<ushort, MLWE_N> &A)
 {
-	ushort t[8];
+	std::array<ushort, 8> t;
 	size_t i;
-	size_t j;
 
-	for (i = 0; i < MLWE_N / 8; i++)
+	for (i = 0; i < MLWE_N / 8; ++i)
 	{
-		for (j = 0; j < 8; j++)
-		{
-			t[j] = Freeze(A[(8 * i) + j]);
-		}
+		t[0] = Freeze(A[8 * i]);
+		t[1] = Freeze(A[(8 * i) + 1]);
+		t[2] = Freeze(A[(8 * i) + 2]);
+		t[3] = Freeze(A[(8 * i) + 3]);
+		t[4] = Freeze(A[(8 * i) + 4]);
+		t[5] = Freeze(A[(8 * i) + 5]);
+		t[6] = Freeze(A[(8 * i) + 6]);
+		t[7] = Freeze(A[(8 * i) + 7]);
 
 		R[Offset + (13 * i)] = (t[0] & 0xFF);
 		R[Offset + (13 * i) + 1] = ((t[0] >> 8) | ((t[1] & 0x07) << 5));
@@ -624,24 +635,33 @@ void MLWEQ7681N256::PolyToBytes(std::vector<byte> &R, size_t Offset, const std::
 		R[Offset + (13 * i) + 11] = ((t[6] >> 10) | ((t[7] & 0x1F) << 3));
 		R[Offset + (13 * i) + 12] = (t[7] >> 5);
 	}
-
 }
 
 void MLWEQ7681N256::PolyToMsg(std::vector<byte> &Message, const std::array<ushort, MLWE_N> &A)
 {
 	size_t i;
-	size_t j;
 	ushort t;
+	const size_t HLFQ = MLWE_Q / 2;
 
-	for (i = 0; i < MLWE_SEED_SIZE; i++)
+	for (i = 0; i < MLWE_SEED_SIZE; ++i)
 	{
 		Message[i] = 0;
-
-		for (j = 0; j < 8; j++)
-		{
-			t = ((((Freeze(A[(8 * i) + j]) << 1) + MLWE_Q / 2) / MLWE_Q) & 1);
-			Message[i] |= (t << j);
-		}
+		t = ((((Freeze(A[8 * i]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= t;
+		t = ((((Freeze(A[(8 * i) + 1]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= (t << 1);
+		t = ((((Freeze(A[(8 * i) + 2]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= (t << 2);
+		t = ((((Freeze(A[(8 * i) + 3]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= (t << 3);
+		t = ((((Freeze(A[(8 * i) + 4]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= (t << 4);
+		t = ((((Freeze(A[(8 * i) + 5]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= (t << 5);
+		t = ((((Freeze(A[(8 * i) + 6]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= (t << 6);
+		t = ((((Freeze(A[(8 * i) + 7]) << 1) + HLFQ) / MLWE_Q) & 1);
+		Message[i] |= (t << 7);
 	}
 }
 
@@ -649,7 +669,7 @@ void MLWEQ7681N256::PolyVecAdd(std::vector<std::array<ushort, MLWE_N>> &R, const
 {
 	size_t i;
 
-	for (i = 0; i < R.size(); i++)
+	for (i = 0; i < R.size(); ++i)
 	{
 		PolyAdd(R[i], A[i], B[i]);
 	}
@@ -657,22 +677,25 @@ void MLWEQ7681N256::PolyVecAdd(std::vector<std::array<ushort, MLWE_N>> &R, const
 
 void MLWEQ7681N256::PolyVecCompress(std::vector<byte> &R, size_t Offset, const std::vector<std::array<ushort, MLWE_N>> &A)
 {
-	ushort t[8];
+	std::array<ushort, 8> t;
 	size_t i;
 	size_t j;
-	size_t k;
 	size_t pos;
 
 	pos = Offset;
 
-	for (i = 0; i < A.size(); i++)
+	for (i = 0; i < A.size(); ++i)
 	{
-		for (j = 0; j < MLWE_N / 8; j++)
+		for (j = 0; j < MLWE_N / 8; ++j)
 		{
-			for (k = 0; k < 8; k++)
-			{
-				t[k] = (((static_cast<uint>(Freeze(A[i][(8 * j) + k])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x7FF;
-			}
+			t[0] = (((static_cast<uint>(Freeze(A[i][8 * j])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[1] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 1])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[2] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 2])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[3] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 3])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[4] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 4])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[5] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 5])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[6] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 6])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[7] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 7])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
 
 			R[pos + (11 * j)] = (t[0] & 0xFF);
 			R[pos + (11 * j) + 1] = ((t[0] >> 8) | ((t[1] & 0x1F) << 3));
@@ -686,6 +709,7 @@ void MLWEQ7681N256::PolyVecCompress(std::vector<byte> &R, size_t Offset, const s
 			R[pos + (11 * j) + 9] = ((t[6] >> 6) | ((t[7] & 0x07) << 5));
 			R[pos + (11 * j) + 10] = (t[7] >> 3);
 		}
+
 		pos += MLWE_PUBPOLY_SIZE;
 	}
 }
@@ -693,37 +717,51 @@ void MLWEQ7681N256::PolyVecCompress(std::vector<byte> &R, size_t Offset, const s
 void MLWEQ7681N256::PolyFromMessage(std::array<ushort, MLWE_N> &R, const std::vector<byte> &Message)
 {
 	size_t i;
-	size_t j;
 	ushort mask;
 
-	for (i = 0; i < MLWE_SEED_SIZE; i++)
+	for (i = 0; i < MLWE_SEED_SIZE; ++i)
 	{
-		for (j = 0; j < 8; j++)
-		{
-			mask = ~((Message[i] >> j) & 1) + 1;
-			R[(8 * i) + j] = (mask & ((MLWE_Q + 1) / 2));
-		}
+		mask = ~(Message[i] & 1) + 1;
+		R[8 * i] = (mask & ((MLWE_Q + 1) / 2));
+		mask = ~((Message[i] >> 1) & 1) + 1;
+		R[(8 * i) + 1] = (mask & ((MLWE_Q + 1) / 2));
+		mask = ~((Message[i] >> 2) & 1) + 1;
+		R[(8 * i) + 2] = (mask & ((MLWE_Q + 1) / 2));
+		mask = ~((Message[i] >> 3) & 1) + 1;
+		R[(8 * i) + 3] = (mask & ((MLWE_Q + 1) / 2));
+		mask = ~((Message[i] >> 4) & 1) + 1;
+		R[(8 * i) + 4] = (mask & ((MLWE_Q + 1) / 2));
+		mask = ~((Message[i] >> 5) & 1) + 1;
+		R[(8 * i) + 5] = (mask & ((MLWE_Q + 1) / 2));
+		mask = ~((Message[i] >> 6) & 1) + 1;
+		R[(8 * i) + 6] = (mask & ((MLWE_Q + 1) / 2));
+		mask = ~((Message[i] >> 7) & 1) + 1;
+		R[(8 * i) + 7] = (mask & ((MLWE_Q + 1) / 2));
+
 	}
 }
 
 void MLWEQ7681N256::PolyVecCompress(std::vector<byte> &R, const std::vector<std::array<ushort, MLWE_N>> &A)
 {
-	ushort t[8];
+	std::array<ushort, 8> t;
 	size_t i;
 	size_t j;
-	size_t k;
 	size_t pos;
 
 	pos = 0;
 
-	for (i = 0; i < A.size(); i++)
+	for (i = 0; i < A.size(); ++i)
 	{
-		for (j = 0; j < MLWE_N / 8; j++)
+		for (j = 0; j < MLWE_N / 8; ++j)
 		{
-			for (k = 0; k < 8; k++)
-			{
-				t[k] = (((static_cast<uint>(Freeze(A[i][(8 * j) + k])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x7FF;
-			}
+			t[0] = (((static_cast<uint>(Freeze(A[i][8 * j])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[1] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 1])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[2] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 2])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[3] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 3])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[4] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 4])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[5] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 5])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[6] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 6])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
+			t[7] = (((static_cast<uint>(Freeze(A[i][(8 * j) + 7])) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x07FF;
 
 			R[pos + (11 * j)] = (t[0] & 0xFF);
 			R[pos + (11 * j) + 1] = ((t[0] >> 8) | ((t[1] & 0x1F) << 3));
@@ -737,6 +775,7 @@ void MLWEQ7681N256::PolyVecCompress(std::vector<byte> &R, const std::vector<std:
 			R[pos + (11 * j) + 9] = ((t[6] >> 6) | ((t[7] & 0x07) << 5));
 			R[pos + (11 * j) + 10] = (t[7] >> 3);
 		}
+
 		pos += MLWE_PUBPOLY_SIZE;
 	}
 }
@@ -748,9 +787,10 @@ void MLWEQ7681N256::PolyVecDecompress(std::vector<std::array<ushort, MLWE_N>> &R
 	size_t pos;
 
 	pos = 0;
-	for (i = 0; i < R.size(); i++)
+
+	for (i = 0; i < R.size(); ++i)
 	{
-		for (j = 0; j < MLWE_N / 8; j++)
+		for (j = 0; j < MLWE_N / 8; ++j)
 		{
 			R[i][8 * j] = ((((A[pos + (11 * j)] | ((static_cast<uint>(A[pos + (11 * j) + 1]) & 0x07) << 8)) * MLWE_Q) + 1024) >> 11);
 			R[i][(8 * j) + 1] = (((((A[pos + (11 * j) + 1] >> 3) | ((static_cast<uint>(A[pos + (11 * j) + 2]) & 0x3F) << 5)) * MLWE_Q) + 1024) >> 11);
@@ -761,6 +801,7 @@ void MLWEQ7681N256::PolyVecDecompress(std::vector<std::array<ushort, MLWE_N>> &R
 			R[i][(8 * j) + 6] = (((((A[pos + (11 * j) + 8] >> 2) | ((static_cast<uint>(A[pos + (11 * j) + 9]) & 0x1F) << 6)) * MLWE_Q) + 1024) >> 11);
 			R[i][(8 * j) + 7] = (((((A[pos + (11 * j) + 9] >> 5) | ((static_cast<uint>(A[pos + (11 * j) + 10]) & 0xFF) << 3)) * MLWE_Q) + 1024) >> 11);
 		}
+
 		pos += MLWE_PUBPOLY_SIZE;
 	}
 }
@@ -769,7 +810,7 @@ void MLWEQ7681N256::PolyVecFrombytes(std::vector<std::array<ushort, MLWE_N>> &R,
 {
 	size_t i;
 
-	for (i = 0; i < R.size(); i++)
+	for (i = 0; i < R.size(); ++i)
 	{
 		PolyFrombytes(R[i], A, (i * MLWE_PRIPOLY_SIZE));
 	}
@@ -779,7 +820,7 @@ void MLWEQ7681N256::PolyVecInvNTT(std::vector<std::array<ushort, MLWE_N>> &R)
 {
 	size_t i;
 
-	for (i = 0; i < R.size(); i++)
+	for (i = 0; i < R.size(); ++i)
 	{
 		InvNTT(R[i]);
 	}
@@ -789,7 +830,7 @@ void MLWEQ7681N256::PolyVecNTT(std::vector<std::array<ushort, MLWE_N>> &R)
 {
 	size_t i;
 
-	for (i = 0; i < R.size(); i++)
+	for (i = 0; i < R.size(); ++i)
 	{
 		FwdNTT(R[i]);
 	}
@@ -802,12 +843,12 @@ void MLWEQ7681N256::PolyVecPointwiseAcc(std::array<ushort, MLWE_N> &R, const std
 	size_t j;
 	ushort t;
 
-	for (j = 0; j < MLWE_N; j++)
+	for (j = 0; j < MLWE_N; ++j)
 	{
 		t = MontgomeryReduce(0x1205UL * static_cast<uint>(B[0][j]));
 		R[j] = MontgomeryReduce(A[0][j] * t);
 
-		for (i = 1; i < A.size(); i++)
+		for (i = 1; i < A.size(); ++i)
 		{
 			t = MontgomeryReduce(0x1205UL * static_cast<uint>(B[i][j]));
 			R[j] += MontgomeryReduce(A[i][j] * t);
@@ -821,7 +862,7 @@ void MLWEQ7681N256::PolyVecToBytes(std::vector<byte> &R, const std::vector<std::
 {
 	size_t i;
 
-	for (i = 0; i < A.size(); i++)
+	for (i = 0; i < A.size(); ++i)
 	{
 		PolyToBytes(R, (i * MLWE_PRIPOLY_SIZE), A[i]);
 	}
@@ -840,7 +881,7 @@ void MLWEQ7681N256::UnpackPublicKey(std::vector<std::array<ushort, MLWE_N>> &Pk,
 
 	PolyVecDecompress(Pk, PackedPk);
 
-	for (i = 0; i < MLWE_SEED_SIZE; i++)
+	for (i = 0; i < MLWE_SEED_SIZE; ++i)
 	{
 		Seed[i] = PackedPk[i + (Pk.size() * MLWE_PUBPOLY_SIZE)];
 	}

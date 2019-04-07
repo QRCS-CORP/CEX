@@ -157,7 +157,7 @@ The next planned release (1.0.0.8) is planned for February 2019.
 
 ## History
   
-### Version 1.0.0.7, December 04, 2018
+### Version 1.0.0.7q, April 07, 2019
 * The Dilithium asymmetric signature scheme
 * The SPHINCS+ asymmetric signature scheme
 * The NTRU Prime asymmetric cipher

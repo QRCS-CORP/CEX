@@ -99,16 +99,10 @@ class RingLWE final : public IAsymmetricCipher
 {
 private:
 
-	static const std::string CLASS_NAME;
-
-	bool m_destroyEngine;
-	std::vector<byte> m_domainKey;
-	bool m_isDestroyed;
-	bool m_isEncryption;
-	bool m_isInitialized;
+	class RlweState;
+	std::unique_ptr<RlweState> m_rlweState;
 	std::unique_ptr<AsymmetricKey> m_privateKey;
 	std::unique_ptr<AsymmetricKey> m_publicKey;
-	RLWEParameters m_rlweParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -222,10 +216,6 @@ public:
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Throws on invalid key or configuration error</exception>
 	void Initialize(AsymmetricKey* Key) override;
-
-private:
-
-	int32_t Verify(const std::vector<byte> &A, const std::vector<byte> &B, size_t Length);
 };
 
 NAMESPACE_RINGLWEEND

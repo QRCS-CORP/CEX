@@ -20,7 +20,6 @@
 #define CEX_MLWEQ7681N256_H
 
 #include "CexDomain.h"
-#include "BCG.h"
 #include "IntegerTools.h"
 #include "IPrng.h"
 #include "SHAKE.h"
@@ -42,9 +41,9 @@ private:
 	static const uint QINV = 7679;
 	static const uint RLOG = 18;
 
-	static const std::array<ushort, 128> OmegasInvMontgomery;
-	static const std::array<ushort, 256> PsisInvMontgomery;
-	static const std::array<ushort, 256> Zetas;
+	static const std::vector<ushort> OmegasInvMontgomery;
+	static const std::vector<ushort> PsisInvMontgomery;
+	static const std::vector<ushort> Zetas;
 
 public:
 
@@ -120,36 +119,6 @@ private:
 		c = m;
 		c >>= 15;
 		r = m ^ ((r ^ m) & c);
-
-		return r;
-	}
-
-	inline static uint LeBytesTo32(const std::vector<byte> &A, size_t Offset, size_t Length)
-	{
-		size_t i;
-		uint r;
-
-		r = A[Offset];
-
-		for (i = 1; i < Length; i++)
-		{
-			r |= static_cast<uint>(A[Offset + i]) << (8 * i);
-		}
-
-		return r;
-	}
-
-	inline static ulong LeBytesTo64(const std::vector<byte> &A, size_t Offset, size_t Length)
-	{
-		size_t i;
-		ulong r;
-
-		r = A[Offset];
-
-		for (i = 1; i < Length; i++)
-		{
-			r |= static_cast<ulong>(A[Offset + i]) << (8 * i);
-		}
 
 		return r;
 	}

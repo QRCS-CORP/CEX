@@ -108,7 +108,91 @@ public:
 	static const size_t KECCAK_STATE_SIZE = 25;
 
 	/// <summary>
-	/// The Keccak absorb function; copy bytes from a byte array to the state array.
+	/// The Keccak 24-round absorb function; copy bytes from a byte array to the state array.
+	/// <para>Input length must be 64-bit aligned, domain code terminates the input.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename Array>
+	static void AbsorbR24(const Array &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	{
+		std::array<byte, 200> msg = { 0 };
+
+		while (InLength >= Rate)
+		{
+			Keccak::FastAbsorb(Input, InOffset, Rate, State);
+
+#if defined(CEX_DIGEST_COMPACT)
+			Keccak::PermuteR24P1600C(State);
+#else
+			Keccak::PermuteR24P1600U(State);
+#endif
+
+			InLength -= Rate;
+			InOffset += Rate;
+		}
+
+		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
+		msg[InLength] = Domain;
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemoryTools::XOR(msg, 0, State, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			State[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+	}
+
+	/// <summary>
+	/// The Keccak 48-round absorb function; copy bytes from a byte array to the state array.
+	/// <para>Input length must be 64-bit aligned, domain code terminates the input.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename Array>
+	static void AbsorbR48(const Array &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	{
+		std::array<byte, 200> msg = { 0 };
+
+		while (InLength >= Rate)
+		{
+			Keccak::FastAbsorb(Input, InOffset, Rate, State);
+
+#if defined(CEX_DIGEST_COMPACT)
+			Keccak::PermuteR48P1600C(State);
+#else
+			Keccak::PermuteR48P1600U(State);
+#endif
+
+			InLength -= Rate;
+			InOffset += Rate;
+		}
+
+		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
+		msg[InLength] = Domain;
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemoryTools::XOR(msg, 0, State, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			State[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+	}
+
+	/// <summary>
+	/// The fast absorb function; XOR an input byte array with the state array, no other processing is performed.
 	/// <para>Input length must be 64-bit aligned.</para>
 	/// </summary>
 	/// 
@@ -117,7 +201,7 @@ public:
 	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
 	/// <param name="State">The permutations uint64 state array</param>
 	template<typename Array>
-	static void Absorb(const Array &Input, size_t InOffset, size_t InLength, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	static void FastAbsorb(const Array &Input, size_t InOffset, size_t InLength, std::array<ulong, KECCAK_STATE_SIZE> &State)
 	{
 		CEXASSERT(InLength % sizeof(ulong) == 0, "The input length is not 64-bit aligned");
 
@@ -198,7 +282,7 @@ public:
 
 			OutOffset += Rate;
 			--Blocks;
-			}
+		}
 	}
 
 	/// <summary>
@@ -223,7 +307,7 @@ public:
 
 		while (InLength >= Rate)
 		{
-			Keccak::Absorb(Input, InOffset, Rate, state);
+			Keccak::FastAbsorb(Input, InOffset, Rate, state);
 #if defined(CEX_DIGEST_COMPACT)
 			Keccak::PermuteR24P1600C(state);
 #else
@@ -293,7 +377,7 @@ public:
 
 		while (InLength >= Rate)
 		{
-			Keccak::Absorb(Input, InOffset, Rate, state);
+			Keccak::FastAbsorb(Input, InOffset, Rate, state);
 #if defined(CEX_DIGEST_COMPACT)
 			Keccak::PermuteR48P1600C(state);
 #else

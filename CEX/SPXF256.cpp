@@ -92,12 +92,12 @@ void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std:
 		// pick the right or left neighbor, depending on parity of the node
 		if (LeafOffset & 1)
 		{
-			THash(buf1, SPX_N, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
+			TreeHash(buf1, SPX_N, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
 			MemoryTools::Copy(AuthPath, AuthOffset, buf1, 0, SPX_N);
 		}
 		else
 		{
-			THash(buf1, 0, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
+			TreeHash(buf1, 0, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
 			MemoryTools::Copy(AuthPath, AuthOffset, buf1, SPX_N, SPX_N);
 		}
 
@@ -109,7 +109,7 @@ void SPXF256::ComputeRoot(std::vector<byte> &Root, size_t RootOffset, const std:
 	IdxOffset >>= 1;
 	SphincsUtils::SetTreeHeight(Address, TreeHeight);
 	SphincsUtils::SetTreeIndex(Address, LeafOffset + IdxOffset);
-	THash(Root, RootOffset, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
+	TreeHash(Root, RootOffset, buf1, 0, 2, PkSeed, Address, buf2, mask, Rate);
 }
 
 void SPXF256::ForsGenLeaf(std::vector<byte> &Leaf, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, uint AddressIdx, const std::array<uint, 8> &TreeAddress, size_t Rate)
@@ -164,7 +164,7 @@ void SPXF256::ForsPkFromSig(std::vector<byte> &PublicKey, size_t PubKeyOffset, c
 	// hash horizontally across all tree roots to derive the public key
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + SPX_FORS_TREES * SPX_N);
 	std::vector<byte> mask(SPX_FORS_TREES * SPX_N);
-	THash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Rate);
+	TreeHash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Rate);
 }
 
 void SPXF256::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vector<byte> &PublicKey, const std::array<byte, SPX_FORS_MSG_BYTES> &Message, const std::vector<byte> &SecretSeed, const std::vector<byte> &PublicSeed, const std::array<uint, 8> &ForsAddress, size_t Rate)
@@ -203,7 +203,7 @@ void SPXF256::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vect
 	// hash horizontally across all tree roots to derive the public key
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + (SPX_FORS_TREES * SPX_N));
 	std::vector<byte> mask(SPX_FORS_TREES * SPX_N);
-	THash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Rate);
+	TreeHash(PublicKey, 0, roots, 0, SPX_FORS_TREES, PublicSeed, forspkaddr, buf, mask, Rate);
 }
 
 void SPXF256::ForsSkToLeaf(std::vector<byte> &Leaf, const std::vector<byte> &SecretKey, size_t KeyOffset, const std::vector<byte> &PublicSeed, std::array<uint, 8> &LeafAddress, size_t Rate)
@@ -211,7 +211,7 @@ void SPXF256::ForsSkToLeaf(std::vector<byte> &Leaf, const std::vector<byte> &Sec
 	std::vector<byte> buf(SPX_N + SPX_ADDR_BYTES + 1 * SPX_N);
 	std::vector<byte> mask(SPX_N);
 
-	THash(Leaf, 0, SecretKey, KeyOffset, 1, PublicSeed, LeafAddress, buf, mask, Rate);
+	TreeHash(Leaf, 0, SecretKey, KeyOffset, 1, PublicSeed, LeafAddress, buf, mask, Rate);
 }
 
 void SPXF256::GenChain(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, uint Start, uint Steps, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, size_t Rate)
@@ -227,7 +227,7 @@ void SPXF256::GenChain(std::vector<byte> &Output, size_t OutOffset, const std::v
 	for (idx = Start; idx < (Start + Steps) && idx < SPX_WOTS_W; ++idx)
 	{
 		SphincsUtils::SetHashAddress(Address, idx);
-		THash(Output, OutOffset, Output, OutOffset, 1, PkSeed, Address, buf, mask, Rate);
+		TreeHash(Output, OutOffset, Output, OutOffset, 1, PkSeed, Address, buf, mask, Rate);
 	}
 }
 
@@ -277,6 +277,7 @@ void SPXF256::MessageToIndices(std::vector<uint> &Indices, const std::array<byte
 	for (i = 0; i < SPX_FORS_TREES; i++)
 	{
 		Indices[i] = 0;
+
 		for (j = 0; j < SPX_FORS_HEIGHT; j++)
 		{
 			Indices[i] <<= 1;
@@ -299,7 +300,7 @@ void SPXF256::PrfAddress(std::vector<byte> &Output, size_t Offset, const std::ve
 	XOF(k, 0, k.size(), Output, Offset, SPX_N, Rate);
 }
 
-void SPXF256::THash(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, const uint InputBlocks, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::vector<byte> &Buffer, std::vector<byte> &Mask, size_t Rate)
+void SPXF256::TreeHash(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, const uint InputBlocks, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::vector<byte> &Buffer, std::vector<byte> &Mask, size_t Rate)
 {
 	size_t i;
 
@@ -359,7 +360,7 @@ void SPXF256::TreeHashF(std::vector<byte> &Root, size_t RootOffset, std::vector<
 			SphincsUtils::SetTreeHeight(TreeAddress, Heights[offset - 1] + 1);
 			SphincsUtils::SetTreeIndex(TreeAddress, treeidx + (IndexOffset >> (Heights[offset - 1] + 1)));
 			// hash the top-most nodes from the stack together
-			THash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Rate);
+			TreeHash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Rate);
 			--offset;
 			// note that the top-most node is now one layer higher
 			++Heights[offset - 1];
@@ -408,8 +409,8 @@ void SPXF256::TreeHashW(std::vector<byte> &Root, std::vector<byte> &Authpath, si
 			SphincsUtils::SetTreeHeight(TreeAddress, Heights[offset - 1] + 1);
 			SphincsUtils::SetTreeIndex(TreeAddress, treeidx + (IndexOffset >> (Heights[offset - 1] + 1)));
 			// hash the top-most nodes from the stack together
-			THash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Rate);
-			offset--;
+			TreeHash(Stack, ((offset - 2) * SPX_N), Stack, ((offset - 2) * SPX_N), 2, PkSeed, TreeAddress, buf, mask, Rate);
+			--offset;
 			// note that the top-most node is now one layer higher
 			Heights[offset - 1]++;
 
@@ -462,7 +463,7 @@ void SPXF256::WotsGenLeaf(std::vector<byte> &Leaf, size_t LeafOffset, const std:
 
 	WotsGenPk(pk, SkSeed, PkSeed, wotsaddr, Rate);
 	SphincsUtils::CopyKeypairAddress(wotsaddr, wotspkaddr);
-	THash(Leaf, LeafOffset, pk, 0, SPX_WOTS_LEN, PkSeed, wotspkaddr, buf, mask, Rate);
+	TreeHash(Leaf, LeafOffset, pk, 0, SPX_WOTS_LEN, PkSeed, wotspkaddr, buf, mask, Rate);
 }
 
 void SPXF256::WotsGenPk(std::vector<byte> &PublicKey, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, size_t Rate)
@@ -572,10 +573,10 @@ size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 	std::array<uint, 8> treeaddr = { 0 };
 	std::array<uint, 8> wotsaddr = { 0 };
 	ulong tree;
+	size_t rate;
 	uint idx;
 	uint idxleaf;
 	uint idxsm;
-	size_t rate;
 
 	rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
 	MemoryTools::Copy(PrivateKey, 0, skseed, 0, SPX_N);
@@ -631,7 +632,7 @@ size_t SPXF256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Mess
 	return SPX_BYTES + Message.size();
 }
 
-uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, SphincsParameters Parameters)
+bool SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, SphincsParameters Parameters)
 {
 	// verifies a given signature-message pair under a given public key
 
@@ -651,77 +652,81 @@ uint SPXF256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signat
 	ulong tree;
 	size_t idxsig;
 	size_t msglen;
+	size_t rate;
 	uint idx;
 	uint idxleaf;
-	size_t rate;
+	bool res;
 
-	rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
-	idxsig = 0;
-	MemoryTools::Copy(PublicKey, SPX_N, pkroot, 0, SPX_N);
-	MemoryTools::Copy(PublicKey, 0, pkseed, 0, SPX_N);
-	SphincsUtils::SetType(wotsaddr, SPX_ADDR_TYPE_WOTS);
-	SphincsUtils::SetType(treeaddr, SPX_ADDR_TYPE_HASHTREE);
-	SphincsUtils::SetType(wotspkaddr, SPX_ADDR_TYPE_WOTSPK);
-	msglen = Signature.size() - SPX_BYTES;
+	res = false;
 
-	// the API caller does not necessarily know what size a signature 
-	// should be but SPHINCS+ signatures are always exactly SPX_BYTES
-	if (Signature.size() < SPX_BYTES)
+	if (Signature.size() >= SPX_BYTES)
 	{
-		return 0;
-	}
+		rate = (Parameters == SphincsParameters::SPXS128F256) ? 168 : (Parameters == SphincsParameters::SPXS256F256) ? 136 : 72;
+		idxsig = 0;
+		MemoryTools::Copy(PublicKey, SPX_N, pkroot, 0, SPX_N);
+		MemoryTools::Copy(PublicKey, 0, pkseed, 0, SPX_N);
+		SphincsUtils::SetType(wotsaddr, SPX_ADDR_TYPE_WOTS);
+		SphincsUtils::SetType(treeaddr, SPX_ADDR_TYPE_HASHTREE);
+		SphincsUtils::SetType(wotspkaddr, SPX_ADDR_TYPE_WOTSPK);
+		msglen = Signature.size() - SPX_BYTES;
 
-	// put the message all the way at the end of the m buffer, so that we can
-	// prepend the required other inputs for the hash function
-	MemoryTools::Copy(Signature, SPX_BYTES, tmsg, SPX_BYTES, msglen);
-	// create a copy of the signature so that m = sm is not an issue
-	MemoryTools::Copy(Signature, 0, sig, 0, SPX_BYTES);
-	// derive the message digest and leaf index from R || PK || M
-	// the additional SPX_N is a result of the hash domain separator
-	HashMessage(mhash, tree, idxleaf, sig, PublicKey, tmsg, SPX_BYTES, msglen, rate);
-	idxsig += SPX_N;
+		// the API caller does not necessarily know what size a signature 
+		// should be but SPHINCS+ signatures are always exactly SPX_BYTES
 
-	// layer correctly defaults to 0, so no need to set layer address
-	SphincsUtils::SetTreeAddress(wotsaddr, tree);
-	SphincsUtils::SetKeypairAddress(wotsaddr, idxleaf);
-	ForsPkFromSig(root, 0, Signature, idxsig, mhash, pkseed, wotsaddr, rate);
-	idxsig += SPX_FORS_BYTES;
 
-	// for each subtree
-	for (idx = 0; idx < SPX_D; ++idx)
-	{
-		SphincsUtils::SetLayerAddress(treeaddr, idx);
-		SphincsUtils::SetTreeAddress(treeaddr, tree);
-		SphincsUtils::CopySubtreeAddress(treeaddr, wotsaddr);
+		// put the message all the way at the end of the m buffer, so that we can
+		// prepend the required other inputs for the hash function
+		MemoryTools::Copy(Signature, SPX_BYTES, tmsg, SPX_BYTES, msglen);
+		// create a copy of the signature so that m = sm is not an issue
+		MemoryTools::Copy(Signature, 0, sig, 0, SPX_BYTES);
+		// derive the message digest and leaf index from R || PK || M
+		// the additional SPX_N is a result of the hash domain separator
+		HashMessage(mhash, tree, idxleaf, sig, PublicKey, tmsg, SPX_BYTES, msglen, rate);
+		idxsig += SPX_N;
+
+		// layer correctly defaults to 0, so no need to set layer address
+		SphincsUtils::SetTreeAddress(wotsaddr, tree);
 		SphincsUtils::SetKeypairAddress(wotsaddr, idxleaf);
-		SphincsUtils::CopyKeypairAddress(wotsaddr, wotspkaddr);
-		// the WOTS public key is only correct if the signature was correct
-		WotsPkFromSig(wotspk, sig, idxsig, root, pkseed, wotsaddr, rate);
-		idxsig += SPX_WOTS_BYTES;
-		// compute the leaf node using the WOTS public key
-		THash(leaf, 0, wotspk, 0, SPX_WOTS_LEN, pkseed, wotspkaddr, buf, mask, rate);
-		// compute the root node of this subtree
-		ComputeRoot(root, 0, leaf, idxleaf, 0, sig, idxsig, SPX_TREE_HEIGHT, pkseed, treeaddr, rate);
-		idxsig += SPX_TREE_HEIGHT * SPX_N;
-		// update the indices for the next layer
-		idxleaf = (tree & ((1 << SPX_TREE_HEIGHT) - 1));
-		tree = tree >> SPX_TREE_HEIGHT;
+		ForsPkFromSig(root, 0, Signature, idxsig, mhash, pkseed, wotsaddr, rate);
+		idxsig += SPX_FORS_BYTES;
+
+		// for each subtree
+		for (idx = 0; idx < SPX_D; ++idx)
+		{
+			SphincsUtils::SetLayerAddress(treeaddr, idx);
+			SphincsUtils::SetTreeAddress(treeaddr, tree);
+			SphincsUtils::CopySubtreeAddress(treeaddr, wotsaddr);
+			SphincsUtils::SetKeypairAddress(wotsaddr, idxleaf);
+			SphincsUtils::CopyKeypairAddress(wotsaddr, wotspkaddr);
+			// the WOTS public key is only correct if the signature was correct
+			WotsPkFromSig(wotspk, sig, idxsig, root, pkseed, wotsaddr, rate);
+			idxsig += SPX_WOTS_BYTES;
+			// compute the leaf node using the WOTS public key
+			TreeHash(leaf, 0, wotspk, 0, SPX_WOTS_LEN, pkseed, wotspkaddr, buf, mask, rate);
+			// compute the root node of this subtree
+			ComputeRoot(root, 0, leaf, idxleaf, 0, sig, idxsig, SPX_TREE_HEIGHT, pkseed, treeaddr, rate);
+			idxsig += SPX_TREE_HEIGHT * SPX_N;
+			// update the indices for the next layer
+			idxleaf = (tree & ((1 << SPX_TREE_HEIGHT) - 1));
+			tree = tree >> SPX_TREE_HEIGHT;
+		}
+
+		res = true;
 	}
 
 	// check if the root node equals the root node in the public key
 	if (!IntegerTools::Compare(root, 0, pkroot, 0, SPX_N))
 	{
-		// if not, zero the message
+		// if failed, zero the signature
 		MemoryTools::Clear(tmsg, 0, tmsg.size());
-
-		return 0;
+		res = false;
 	}
 
 	// if verification was successful, resize and move the message
 	Message.resize(msglen);
 	MemoryTools::Copy(tmsg, SPX_BYTES, Message, 0, msglen);
 
-	return 1;
+	return res;
 }
 
 NAMESPACE_SPHINCSEND

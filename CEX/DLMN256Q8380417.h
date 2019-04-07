@@ -22,43 +22,42 @@ class DLMN256Q8380417
 {
 private:
 
-	static const uint SEEDBYTES = 32UL;
-	static const uint CRHBYTES = 48UL;
-	static const uint N = 256UL;
-	static const uint Q = 8380417UL;
-	static const uint QBITS = 23UL;
-	static const uint ROOT_OF_UNITY = 1753UL;
-	static const uint D = 14UL;
-	static const uint GAMMA1 = ((Q - 1U) / 16U);
-	static const uint GAMMA2 = (GAMMA1 / 2U);
-	static const uint ALPHA = (2U * GAMMA2);
-	static const uint POL_SIZE_PACKED = ((N * QBITS) / 8);
-	static const uint POLT1_SIZE_PACKED = ((N * (QBITS - D)) / 8);
-	static const uint POLT0_SIZE_PACKED = ((N * D) / 8);
-	static const uint POLZ_SIZE_PACKED = ((N * (QBITS - 3)) / 8);
-	static const uint POLW1_SIZE_PACKED = ((N * 4) / 8);
-	// 2^32 % Q
-	static const uint MONT = 4193792UL;
+	static const uint DLM_SEED_SIZE = 32UL;
+	static const uint DLM_CHR_SIZE = 48UL;
+	static const uint DLM_N = 256UL;
+	static const uint DLM_Q = 8380417UL;
+	static const uint DLM_QBITS = 23UL;
+	static const uint DLM_UNITY_ROOT = 1753UL;
+	static const uint DLM_D = 14UL;
+	static const uint DLM_GAMMA1 = ((DLM_Q - 1U) / 16U);
+	static const uint DLM_GAMMA2 = (DLM_GAMMA1 / 2U);
+	static const uint DLM_ALPHA = (2U * DLM_GAMMA2);
+	static const uint DLM_POL_PACKED = ((DLM_N * DLM_QBITS) / 8);
+	static const uint DLM_POLT1_PACKED = ((DLM_N * (DLM_QBITS - DLM_D)) / 8);
+	static const uint DLM_POLT0_PACKED = ((DLM_N * DLM_D) / 8);
+	static const uint DLM_POLZ_PACKED = ((DLM_N * (DLM_QBITS - 3)) / 8);
+	static const uint DLM_POLW1_PACKED = ((DLM_N * 4) / 8);
+	// 2^32 % q
+	static const uint DLM_MONT = 4193792UL;
 	// -q^(-1) mod 2^32
-	static const uint QINV = 4236238847UL;
-	static const size_t SHAKE128_BLOCKSIZE = 168;
-	static const size_t SHAKE256_BLOCKSIZE = 136;
+	static const uint DLM_QINV = 4236238847UL;
 
 public:
 
 	class DlmParams
 	{
 	public:
-		size_t POLETAPACK;
+
+		size_t PolEtaPack;
 		size_t PublicKeySize;
 		size_t PrivateKeySize;
 		size_t SignatureSize;
 		size_t K;
 		size_t L;
-		uint ETA;
-		uint SETABITS;
-		uint BETA;
-		uint OMEGA;
+		uint Eta;
+		uint SetABits;
+		uint Beta;
+		uint Omega;
 
 		DlmParams(DilithiumParameters ParamType)
 		{
@@ -68,20 +67,20 @@ public:
 				{
 					K = 4U;
 					L = 3U;
-					ETA = 6U;
-					SETABITS = 4U;
-					BETA = 325U;
-					OMEGA = 80U;
+					Eta = 6U;
+					SetABits = 4U;
+					Beta = 325U;
+					Omega = 80U;
 					break;
 				}
 				case DilithiumParameters::DLMS2N256Q8380417:
 				{
 					K = 5U;
 					L = 4U;
-					ETA = 5U;
-					SETABITS = 4U;
-					BETA = 275U;
-					OMEGA = 96U;
+					Eta = 5U;
+					SetABits = 4U;
+					Beta = 275U;
+					Omega = 96U;
 					break;
 				}
 				default:
@@ -89,31 +88,31 @@ public:
 					// DLMS3N256Q8380417
 					K = 6U;
 					L = 5U;
-					ETA = 3U;
-					SETABITS = 3U;
-					BETA = 175U;
-					OMEGA = 120U;
+					Eta = 3U;
+					SetABits = 3U;
+					Beta = 175U;
+					Omega = 120U;
 				}
 			}
 
-			POLETAPACK = ((N * SETABITS) / 8);
-			PublicKeySize = (SEEDBYTES + K * POLT1_SIZE_PACKED);
-			PrivateKeySize = (2 * SEEDBYTES + (L + K) * POLETAPACK + CRHBYTES + K * POLT0_SIZE_PACKED);
-			SignatureSize = (L * POLZ_SIZE_PACKED + (OMEGA + K) + (N / 8 + 8));
+			PolEtaPack = ((DLM_N * SetABits) / 8);
+			PublicKeySize = (DLM_SEED_SIZE + K * DLM_POLT1_PACKED);
+			PrivateKeySize = (2 * DLM_SEED_SIZE + (L + K) * PolEtaPack + DLM_CHR_SIZE + K * DLM_POLT0_PACKED);
+			SignatureSize = (L * DLM_POLZ_PACKED + (Omega + K) + (DLM_N / 8 + 8));
 		}
 
 		~DlmParams()
 		{
-			POLETAPACK = 0;
+			PolEtaPack = 0;
 			PublicKeySize = 0;
 			PrivateKeySize = 0;
 			SignatureSize = 0;
 			K = 0;
 			L = 0;
-			ETA = 0;
-			SETABITS = 0;
-			BETA = 0;
-			OMEGA = 0;
+			Eta = 0;
+			SetABits = 0;
+			Beta = 0;
+			Omega = 0;
 		}
 	};
 
@@ -121,7 +120,7 @@ private:
 
 	typedef struct
 	{
-		std::array<uint, N> coeffs;
+		std::array<uint, DLM_N> coeffs;
 	} Poly;
 
 	struct PolyVec
@@ -153,8 +152,8 @@ private:
 		}
 	};
 
-	static const std::array<uint, 256> Zetas;
-	static const std::array<uint, 256> ZetasInv;
+	static const std::vector<uint> Zetas;
+	static const std::vector<uint> ZetasInv;
 
 	template<typename Vector>
 	inline static void PolyVecAdd(Vector &W, const Vector &U, const Vector &V)
@@ -324,6 +323,8 @@ private:
 		}
 	}
 
+	static void Absorb(const std::vector<byte> &Input, std::array<ulong, 25> &State);
+
 	static void Challenge(Poly &C, const std::vector<byte> &Mu, const PolyVec &W1);
 
 	static uint CSubQ(uint A);
@@ -334,9 +335,9 @@ private:
 
 	static uint Freeze(uint A);
 
-	static void InvNttFromInvMont(std::array<uint, N> &P);
+	static void InvNttFromInvMont(std::array<uint, DLM_N> &P);
 
-	static uint MakeHint(const uint A, const uint B);
+	static uint MakeHint(uint A, const uint B);
 
 	static uint MontgomeryReduce(ulong A);
 
@@ -406,15 +407,19 @@ private:
 
 	static uint RejEta(std::array<uint, 256> &A, size_t AOffset, size_t ALength, const std::vector<byte> &Input, size_t InLength, uint Eta);
 
-	static uint RejGamma1M1(std::array<uint, 256> &A, size_t AOffset, size_t ALength, const std::vector<byte> &Buffer);
+	static uint RejGamma1M1(std::array<uint, 256> &A, size_t Offset, size_t ALength, const std::vector<byte> &Buffer, size_t BufLength);
+
+	static void Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size_t Blocks);
 
 	static void UnPackPk(std::vector<byte> &Rho, PolyVec &T1, const std::vector<byte> &Pk);
 
-	static int32_t UnPackSig(PolyVec &Z, PolyVec &H, Poly &C, const std::vector<byte> &Signature, uint Omega);
+	static bool UnPackSig(PolyVec &Z, PolyVec &H, Poly &C, const std::vector<byte> &Signature, uint Omega);
 
 	static void UnPackSk(std::vector<byte> &Rho, std::vector<byte> &Key, std::vector<byte> &Tr, PolyVec &S1, PolyVec &S2, PolyVec &T0, const std::vector<byte> &Sk, uint Eta, size_t EtaPack);
 
-	static uint UseHint(const uint A, const uint Hint);
+	static uint UseHint(uint A, uint Hint);
+
+	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 
 public:
 
@@ -424,7 +429,7 @@ public:
 
 	static size_t Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, DilithiumParameters Params);
 
-	static uint Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, DilithiumParameters Params);
+	static bool Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey, DilithiumParameters Params);
 };
 
 NAMESPACE_DILITHIUMEND

@@ -229,6 +229,8 @@ private:
 	static void Swap32(int32_t &X, int32_t &Y, int32_t Mask);
 
 	static int32_t Verify32(const std::vector<byte> &X, const std::vector<byte> &Y);
+
+	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 };
 
 NAMESPACE_NTRUEND

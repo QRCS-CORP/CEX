@@ -1,5 +1,4 @@
 #include "KeccakTest.h"
-#include "../CEX/CpuDetect.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/Keccak.h"
 #include "../CEX/Keccak256.h"
@@ -72,7 +71,8 @@ namespace Test
 	{
 		try
 		{
-			CpuDetect detect;
+			Ancillary();
+			OnProgress(std::string("KeccakTest: Passed Keccak component functions tests.."));
 
 			Exception();
 			OnProgress(std::string("KeccakTest: Passed Keccak-256/512/1024 exception handling tests.."));
@@ -82,63 +82,64 @@ namespace Test
 			PermutationR48();
 			OnProgress(std::string("KeccakTest: Passed Keccak 48-round permutation variants equivalence test.."));
 
-			Kat256(m_message[0], m_expected[0]);
-			Kat256(m_message[1], m_expected[1]);
-			Kat256(m_message[2], m_expected[2]);
-			Kat256(m_message[3], m_expected[3]);
-			OnProgress(std::string("KeccakTest: Passed SHA3-256 bit digest vector tests.."));
-			Kat512(m_message[0], m_expected[4]);
-			Kat512(m_message[1], m_expected[5]);
-			Kat512(m_message[2], m_expected[6]);
-			Kat512(m_message[3], m_expected[7]);
-			OnProgress(std::string("KeccakTest: Passed SHA3-512 bit digest vector tests.."));
-			Kat1024(m_message[0], m_expected[8]);
-			Kat1024(m_message[1], m_expected[9]);
-			Kat1024(m_message[2], m_expected[10]);
-			Kat1024(m_message[3], m_expected[11]);
-			OnProgress(std::string("KeccakTest: Passed Keccak-1024 bit digest vector tests.."));
-
 			Keccak256* dgt256s = new Keccak256(false);
-			Stress(dgt256s);
-			delete dgt256s;
-			OnProgress(std::string("KeccakTest: Passed Keccak-256 sequential stress tests.."));
+			Kat(dgt256s, m_message[0], m_expected[0]);
+			Kat(dgt256s, m_message[1], m_expected[1]);
+			Kat(dgt256s, m_message[2], m_expected[2]);
+			Kat(dgt256s, m_message[3], m_expected[3]);
+			OnProgress(std::string("KeccakTest: Passed SHA3-256 bit digest vector tests.."));
 
 			Keccak512* dgt512s = new Keccak512(false);
-			Stress(dgt512s);
-			delete dgt512s;
-			OnProgress(std::string("KeccakTest: Passed Keccak-512 sequential stress tests.."));
+			Kat(dgt512s, m_message[0], m_expected[4]);
+			Kat(dgt512s, m_message[1], m_expected[5]);
+			Kat(dgt512s, m_message[2], m_expected[6]);
+			Kat(dgt512s, m_message[3], m_expected[7]);
+			OnProgress(std::string("KeccakTest: Passed SHA3-512 bit digest vector tests.."));
 
 			Keccak1024* dgt1024s = new Keccak1024(false);
+			Kat(dgt1024s, m_message[0], m_expected[8]);
+			Kat(dgt1024s, m_message[1], m_expected[9]);
+			Kat(dgt1024s, m_message[2], m_expected[10]);
+			Kat(dgt1024s, m_message[3], m_expected[11]);
+			OnProgress(std::string("KeccakTest: Passed Keccak-1024 bit digest vector tests.."));
+
+			Stress(dgt256s);
+			OnProgress(std::string("KeccakTest: Passed Keccak-256 sequential stress tests.."));
+
+			Stress(dgt512s);
+			OnProgress(std::string("KeccakTest: Passed Keccak-512 sequential stress tests.."));
+
 			Stress(dgt1024s);
-			delete dgt1024s;
 			OnProgress(std::string("KeccakTest: Passed Keccak-1024 sequential stress tests.."));
 
-			if (detect.VirtualCores() >= 2)
-			{
-				Keccak256* dgt256p = new Keccak256(true);
-				Stress(dgt256p);
-				OnProgress(std::string("KeccakTest: Passed Keccak-256 parallel stress tests.."));
+			delete dgt256s;
+			delete dgt512s;
+			delete dgt1024s;
 
-				Keccak512* dgt512p = new Keccak512(true);
-				Stress(dgt512p);
-				OnProgress(std::string("KeccakTest: Passed Keccak-512 parallel stress tests.."));
+			Keccak256* dgt256p = new Keccak256(true);
+			Stress(dgt256p);
+			OnProgress(std::string("KeccakTest: Passed Keccak-256 parallel stress tests.."));
 
-				Keccak1024* dgt1024p = new Keccak1024(true);
-				Stress(dgt1024p);
-				OnProgress(std::string("KeccakTest: Passed Keccak-1024 parallel stress tests.."));
+			Keccak512* dgt512p = new Keccak512(true);
+			Stress(dgt512p);
+			OnProgress(std::string("KeccakTest: Passed Keccak-512 parallel stress tests.."));
 
-				Parallel(dgt256p);
-				delete dgt256p;
-				OnProgress(std::string("KeccakTest: Passed Keccak-256 parallel tests.."));
+			Keccak1024* dgt1024p = new Keccak1024(true);
+			Stress(dgt1024p);
+			OnProgress(std::string("KeccakTest: Passed Keccak-1024 parallel stress tests.."));
 
-				Parallel(dgt512p);
-				delete dgt512p;
-				OnProgress(std::string("KeccakTest: Passed Keccak-512 parallel tests.."));
+			Parallel(dgt256p);
+			OnProgress(std::string("KeccakTest: Passed Keccak-256 parallel tests.."));
 
-				Parallel(dgt1024p);
-				delete dgt1024p;
-				OnProgress(std::string("KeccakTest: Passed Keccak-1024 parallel tests.."));
-			}
+			Parallel(dgt512p);
+			OnProgress(std::string("KeccakTest: Passed Keccak-512 parallel tests.."));
+
+			Parallel(dgt1024p);
+			OnProgress(std::string("KeccakTest: Passed Keccak-1024 parallel tests.."));
+
+			delete dgt256p;
+			delete dgt512p;
+			delete dgt1024p;
 
 			TreeParams();
 			OnProgress(std::string("KeccakTest: Passed KeccakParams parameter serialization test.."));
@@ -156,6 +157,47 @@ namespace Test
 		catch (std::exception const &ex)
 		{
 			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
+		}
+	}
+
+	void KeccakTest::Ancillary()
+	{
+		std::array<ulong, 25> state = { 0 };
+		std::vector<byte> otp(0);
+
+		// SHA3-256
+		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
+		otp.resize(Keccak::KECCAK256_RATE_SIZE);
+		Keccak::AbsorbR24(m_message[3], 0, m_message[3].size(), Keccak::KECCAK256_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
+		Keccak::SqueezeR24(state, otp, 0, 1, Keccak::KECCAK256_RATE_SIZE);
+
+		if (!IntegerTools::Compare(m_expected[3], 0, otp, 0, Keccak::KECCAK256_DIGEST_SIZE))
+		{
+			throw TestException(std::string("Exception"), std::string("SHA3-256"), std::string("Exception handling failure! -SA2"));
+		}
+
+		// SHA3-512
+		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(Keccak::KECCAK512_RATE_SIZE);
+		Keccak::AbsorbR24(m_message[3], 0, m_message[3].size(), Keccak::KECCAK512_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
+		Keccak::SqueezeR24(state, otp, 0, 1, Keccak::KECCAK512_RATE_SIZE);
+
+		if (!IntegerTools::Compare(m_expected[7], 0, otp, 0, Keccak::KECCAK512_DIGEST_SIZE))
+		{
+			throw TestException(std::string("Exception"), std::string("SHA3-512"), std::string("Exception handling failure! -SA3"));
+		}
+
+		// SHA3-1024
+		MemoryTools::Clear(state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(Keccak::KECCAK1024_RATE_SIZE * 2);
+		Keccak::AbsorbR48(m_message[3], 0, m_message[3].size(), Keccak::KECCAK1024_RATE_SIZE, Keccak::KECCAK_SHA3_DOMAIN, state);
+		Keccak::SqueezeR48(state, otp, 0, 2, Keccak::KECCAK1024_RATE_SIZE);
+
+		if (!IntegerTools::Compare(m_expected[11], 0, otp, 0, Keccak::KECCAK1024_DIGEST_SIZE))
+		{
+			throw TestException(std::string("Exception"), std::string("SHA3-1024"), std::string("Exception handling failure! -SA4"));
 		}
 	}
 
@@ -264,45 +306,16 @@ namespace Test
 		}
 	}
 
-	void KeccakTest::Kat256(std::vector<byte> &Message, std::vector<byte> &Expected)
+	void KeccakTest::Kat(IDigest* Digest, std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
-		std::vector<byte> otp(32);
-		Keccak256 dgt(false);
+		std::vector<byte> otp(Digest->DigestSize());
 
-		dgt.Update(Message, 0, Message.size());
-		dgt.Finalize(otp, 0);
+		Digest->Update(Message, 0, Message.size());
+		Digest->Finalize(otp, 0);
 
 		if (otp != Expected)
 		{
-			throw TestException(std::string("Kat256"), dgt.Name(), std::string("Expected hash is not equal! -KK1"));
-		}
-	}
-
-	void KeccakTest::Kat512(std::vector<byte> &Message, std::vector<byte> &Expected)
-	{
-		std::vector<byte> otp(64);
-		Keccak512 dgt(false);
-
-		dgt.Update(Message, 0, Message.size());
-		dgt.Finalize(otp, 0);
-
-		if (otp != Expected)
-		{
-			throw TestException(std::string("Kat512"), dgt.Name(), std::string("Expected hash is not equal! -KK2"));
-		}
-	}
-
-	void KeccakTest::Kat1024(std::vector<byte> &Message, std::vector<byte> &Expected)
-	{
-		std::vector<byte> otp(128);
-		Keccak1024 dgt(false);
-
-		dgt.Update(Message, 0, Message.size());
-		dgt.Finalize(otp, 0);
-
-		if (otp != Expected)
-		{
-			throw TestException(std::string("Kat1024"), dgt.Name(), std::string("Expected hash is not equal! -KK3"));
+			throw TestException(std::string("Kat1024"), Digest->Name(), std::string("Expected hash is not equal! -KK1"));
 		}
 	}
 
@@ -536,30 +549,18 @@ namespace Test
 			std::string("3A985DA74FE225B2045C172D6BD390BD855F086E3E9D525B46BFE24511431532"),
 			std::string("41C0DBA2A9D6240849100376A8235E2C82E1B9998A999E21DB32DD97496D3376"),
 			std::string("79F38ADEC5C20307A98EF76E8324AFBFD46CFD81B22E3973C65FA1BD9DE31787"),
-			std::string("A69F73CCA23A9AC5C8B567DC185A756E97C982164FE25859E0D1DCC1475C80A6"
-				"15B2123AF1F5F94C11E3E9402C3AC558F500199D95B6D3E301758586281DCD26"),
-			std::string("B751850B1A57168A5693CD924B6B096E08F621827444F70D884F5D0240D2712E"
-				"10E116E9192AF3C91A7EC57647E3934057340B4CF408D5A56592F8274EEC53F0"),
-			std::string("04A371E84ECFB5B8B77CB48610FCA8182DD457CE6F326A0FD3D7EC2F1E91636D"
-				"EE691FBE0C985302BA1B0D8DC78C086346B533B49C030D99A27DAF1139D6E75E"),
-			std::string("E76DFAD22084A8B1467FCF2FFA58361BEC7628EDF5F3FDC0E4805DC48CAEECA8"
-				"1B7C13C30ADF52A3659584739A2DF46BE589C51CA1A4A8416DF6545A1CE8BA00"),
-			std::string("8865E419509F0CFBB8366F0AE6742BCB2B519FB490E2D0B65E553BBFAF109631"
-				"4F85EA9D571963ADF4FE178C62402AE4C19D890C58547A12A5EA54EE256B9295"
-				"4F20257829A51A3F4AE039D699CA7DD280849DE3CD0EFDF53CC4306D22D98172"
-				"BE81D5A2ED864AF9FE66962D25A992212D1841493D5B705DDD9A7015B1D7F77F"),
-			std::string("FDF6E604576AC811ED4C56B622ED96DB05DB69009CBE6BC1F3FD6290E28DC45E"
-				"618C5B121F21A104007763F42A845FE07717D5397C926E15C1358A0145BAE19A"
-				"6A9C686095C6AEDDC82A694B822BD7196611F6FF47097D26FCCF6E6FC0A62F43"
-				"3B61B879B1E455AECEF8CBF05877B064951DF191DF7C7F03B650A7BA97DC364C"),
-			std::string("7A249A8B16A498972251B3E1505AE7643E11298D3906A9109D8B8879C9FB2780"
-				"0A99E7D1E35DAEBA15EC8E5F197050EEE06A754DA93CA734756363DC7C71587C"
-				"2532479B27AD5C98B943293397AB0D18AE2CEA7650E6F3F5768EAC6724943BBD"
-				"118FF0D90F09C56391DAE15F3F09D0D42480EA9F55CD1E2A308CA915E9D1F7CA"),
-			std::string("8AB191D915937401AD20EA293A5CC133D701E3D6839589BF817DE4974B2636AC"
-				"9D9028BBE219B62F02CDB2862182CD252712C4886D7165F627E3D43487EDBBD5"
-				"7ECE1F528B7BF214F0168BA89DDD91880A1EFEFF29AFB7EAFF3E62D5BCE43D24"
-				"BA3A2659C2843D22D6A183C68E7432F28C34DC2597B958D80452B22F21AA9D40")
+			std::string("A69F73CCA23A9AC5C8B567DC185A756E97C982164FE25859E0D1DCC1475C80A615B2123AF1F5F94C11E3E9402C3AC558F500199D95B6D3E301758586281DCD26"),
+			std::string("B751850B1A57168A5693CD924B6B096E08F621827444F70D884F5D0240D2712E10E116E9192AF3C91A7EC57647E3934057340B4CF408D5A56592F8274EEC53F0"),
+			std::string("04A371E84ECFB5B8B77CB48610FCA8182DD457CE6F326A0FD3D7EC2F1E91636DEE691FBE0C985302BA1B0D8DC78C086346B533B49C030D99A27DAF1139D6E75E"),
+			std::string("E76DFAD22084A8B1467FCF2FFA58361BEC7628EDF5F3FDC0E4805DC48CAEECA81B7C13C30ADF52A3659584739A2DF46BE589C51CA1A4A8416DF6545A1CE8BA00"),
+			std::string("8865E419509F0CFBB8366F0AE6742BCB2B519FB490E2D0B65E553BBFAF1096314F85EA9D571963ADF4FE178C62402AE4C19D890C58547A12A5EA54EE256B9295"
+				"4F20257829A51A3F29EF4010FC7EB7D8E616FE6670A672B15DBB626F88D3EF000692904FDE65E683D103FE869EAA0D144ABE506B63F0EDA81200BC78C607F2B1"),
+			std::string("FDF6E604576AC811ED4C56B622ED96DB05DB69009CBE6BC1F3FD6290E28DC45E618C5B121F21A104007763F42A845FE07717D5397C926E15C1358A0145BAE19A"
+				"6A9C686095C6AEDD0E9EC7C395361FBF14B725B2EAEC38A2938CBE258367F6EDDE042636260B4043C163C5BAEA6E10A2A6F093F43B4D094D99BF6099E7B5B2D2"),
+			std::string("7A249A8B16A498972251B3E1505AE7643E11298D3906A9109D8B8879C9FB27800A99E7D1E35DAEBA15EC8E5F197050EEE06A754DA93CA734756363DC7C71587C"
+				"2532479B27AD5C98C8A9B904450D324864ECD998F8F12173E764A4E5EF423D39CCC7E9829FEEC90143BCE0143EDEE7D7F72A4315BCE46A7D474AB953D5A73E9C"),
+			std::string("8AB191D915937401AD20EA293A5CC133D701E3D6839589BF817DE4974B2636AC9D9028BBE219B62F02CDB2862182CD252712C4886D7165F627E3D43487EDBBD5"
+				"7ECE1F528B7BF214FF506C2089948A2886EA59C9A1F12FADE4CCA30AD0BA4F19B89CA341D94F84160E96C1BB68CE6717C8B958B3FD29A78B9F48ABFB5DF5DFD5")
 		};
 		HexConverter::Decode(expected, 12, m_expected);
 

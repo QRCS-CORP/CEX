@@ -265,7 +265,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotL32(const int Shift)
+	inline void RotL32(int Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		xmm = _mm_or_si128(_mm_slli_epi32(xmm, static_cast<int>(Shift)), _mm_srli_epi32(xmm, static_cast<int>(32 - Shift)));
@@ -290,7 +290,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	inline void RotR32(const int Shift)
+	inline void RotR32(int Shift)
 	{
 		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
@@ -678,7 +678,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt128 operator << (const int Shift) const
+	inline UInt128 operator << (int Shift) const
 	{
 		return UInt128(_mm_slli_epi32(xmm, static_cast<int>(Shift)));
 	}
@@ -688,7 +688,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (const int Shift)
+	inline void operator <<= (int Shift)
 	{
 		xmm = _mm_slli_epi32(xmm, Shift);
 	}
@@ -698,7 +698,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline UInt128 operator >> (const int Shift) const
+	inline UInt128 operator >> (int Shift) const
 	{
 		return UInt128(_mm_srli_epi32(xmm, static_cast<int>(Shift)));
 	}
@@ -708,7 +708,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (const int Shift)
+	inline void operator >>= (int Shift)
 	{
 		xmm = _mm_srli_epi32(xmm, Shift);
 	}

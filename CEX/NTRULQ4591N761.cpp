@@ -1,10 +1,14 @@
 #include "NTRULQ4591N761.h"
+#include "IntegerTools.h"
+#include "Keccak.h"
 #include "Keccak512.h"
 #include "MemoryTools.h"
-#include "SHAKE.h"
 
 NAMESPACE_NTRU
 
+using Utility::IntegerTools;
+using Digest::Keccak;
+using Digest::Keccak512;
 using Utility::MemoryTools;
 
 //~~~Public Functions~~~//
@@ -89,13 +93,13 @@ void NTRULQ4591N761::Generate(std::vector<byte> &PublicKey, std::vector<byte> &P
 
 //~~~Internal Functions~~~//
 
-void NTRULQ4591N761::Hide(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &Key, size_t KeyOffset, const std::vector<byte> &Rand)
+void NTRULQ4591N761::Hide(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &Key, size_t KeyOffset, const std::vector<byte> &Seed)
 {
 	std::array<int16_t, NTRU_P> G;
 	std::array<int16_t, NTRU_P> A;
 	std::array<int16_t, NTRU_P> B;
 	std::array<int16_t, NTRU_P> C;
-	std::array<int8_t, NTRU_P> b;
+	std::array<int8_t, NTRU_P> tmpb;
 	std::vector<byte> k12(64);
 	std::vector<byte> k34(64);
 	size_t i;
@@ -104,31 +108,41 @@ void NTRULQ4591N761::Hide(std::vector<byte> &CipherText, std::vector<byte> &Secr
 	RqFromSeed(G, Key, KeyOffset);
 	RqDecodeRounded(A, Key, KeyOffset);
 
-	Digest::Keccak512 dgt;
-	dgt.Compute(Rand, k12);
+	Keccak512 dgt;
+	// compute k12 from s
+	dgt.Update(Seed, 0, NTRU_SEED_SIZE);
+	dgt.Finalize(k12, 0);
 
-	SeededWeightW(b, k12);
+	// exp w
+	SeededWeightW(tmpb, k12);
+	// hash top of k12
 	dgt.Update(k12, NTRU_SEED_SIZE, NTRU_SEED_SIZE);
 	dgt.Finalize(k34, 0);
 
-	RqMult(B, G, b);
+	// mult
+	RqMult(B, G, tmpb);
 	RqRound3(B, B);
-	RqMult(C, A, b);
+	RqMult(C, A, tmpb);
 
+	// calc c
 	for (i = 0; i < 256; ++i)
 	{
 		x = C[i];
-		x = ModqSum(x, 2295 * (1 & (Rand[i / 8] >> (i & 7))));
+		x = ModqSum(x, 2295 * (1 & (Seed[i / 8] >> (i & 7))));
 		x = (((x + 2156) * 114) + 16384) >> 15;
 		// between 0 and 15
 		C[i] = x;
 	}
 
+	// copy k34 to sec and cpt
 	MemoryTools::Copy(k34, 0, CipherText, 0, NTRU_SEED_SIZE);
 	MemoryTools::Copy(k34, NTRU_SEED_SIZE, Secret, 0, NTRU_SEED_SIZE);
+	// encode b to cpt
 	RqEncodeRounded(CipherText, B);
 
+	// copy c to cpt
 	const size_t CTOFT = NTRU_RQENCODEROUNDED_SIZE + NTRU_SEED_SIZE;
+
 	for (i = 0; i < 128; ++i)
 	{
 		CipherText[CTOFT + i] = C[2 * i] + (C[(2 * i) + 1] << 4);
@@ -157,21 +171,23 @@ void NTRULQ4591N761::MinMax(int32_t &X, int32_t &Y)
 int16_t NTRULQ4591N761::ModqFreeze(int32_t A)
 {
 	// input between -9000000 and 9000000 output between -2295 and 2295
-	A -= 4591 * ((228 * A) >> 20);
-	A -= 4591 * (((58470 * A) + 134217728) >> 28);
+
+	A -= NTRU_Q * ((0x000000E4L * A) >> 20);
+	A -= NTRU_Q * (((0x0000E466L * A) + 0x08000000L) >> 28);
 
 	return A;
 }
 
 int16_t NTRULQ4591N761::ModqFromUL(uint A)
 {
-	// input between 0 and 4294967295 output = (input % 4591) - 2295
+	// input between 0 and 4294967295 output = (input % NTRU_Q) - 2295
+
 	int32_t r;
 
 	// <= 8010861
-	r = (A & 524287) + (A >> 19) * 914;
+	r = (A & 0x0007FFFFUL) + (A >> 19) * 0x00000392UL;
 
-	return ModqFreeze(r - 2295);
+	return ModqFreeze(r - 0x000008F7UL);
 }
 
 int16_t NTRULQ4591N761::ModqPlusProduct(int16_t A, int16_t B, int16_t C)
@@ -209,12 +225,11 @@ void NTRULQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 		c1 = Key[NTRU_SEED_SIZE + KeyOffset + (i * 4) + 1];
 		c2 = Key[NTRU_SEED_SIZE + KeyOffset + (i * 4) + 2];
 		c3 = Key[NTRU_SEED_SIZE + KeyOffset + (i * 4) + 3];
-		f2 = ((14913081 * c3) + (58254 * c2) + (228 * (c1 + 2))) >> 21;
+		f2 = ((0x00E38E39UL * c3) + (0x0000E38EUL * c2) + (0x000000E4L * (c1 + 2))) >> 21;
 
 		c2 += c3 << 8;
 		c2 -= (f2 * 9) << 2;
-		f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
-
+		f1 = ((0x05555555UL * c2) + (0x00055555UL * c1) + (0x00000555UL * (c0 + 1))) >> 21;
 		c1 += c2 << 8;
 		c1 -= (f1 * 3) << 1;
 		c0 += c1 << 8;
@@ -228,7 +243,7 @@ void NTRULQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 	c0 = Key[NTRU_SEED_SIZE + KeyOffset + (i * 4)];
 	c1 = Key[NTRU_SEED_SIZE + KeyOffset + (i * 4) + 1];
 	c2 = Key[NTRU_SEED_SIZE + KeyOffset + (i * 4) + 2];
-	f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
+	f1 = ((0x05555555UL * c2) + (0x00055555UL * c1) + (0x00000555UL * (c0 + 1))) >> 21;
 
 	c1 += c2 << 8;
 	c1 -= (f1 * 3) << 1;
@@ -251,9 +266,9 @@ void NTRULQ4591N761::RqEncodeRounded(std::vector<byte> &C, const std::array<int1
 		f0 = Key[(i * 3)] + NTRU_QSHIFT;
 		f1 = Key[(i * 3) + 1] + NTRU_QSHIFT;
 		f2 = Key[(i * 3) + 2] + NTRU_QSHIFT;
-		f0 = (21846 * f0) >> 16;
-		f1 = (21846 * f1) >> 16;
-		f2 = (21846 * f2) >> 16;
+		f0 = (0x5556 * f0) >> 16;
+		f1 = (0x5556 * f1) >> 16;
+		f2 = (0x5556 * f2) >> 16;
 
 		// now want f0 + f1*1536 + f2*1536^2 as a 32-bit integer
 		f2 *= 3;
@@ -273,8 +288,8 @@ void NTRULQ4591N761::RqEncodeRounded(std::vector<byte> &C, const std::array<int1
 	// using p mod 3 = 2
 	f0 = NTRU_QSHIFT + Key[(i * 3)];
 	f1 = NTRU_QSHIFT + Key[(i * 3) + 1];
-	f0 = (21846 * f0) >> 16;
-	f1 = (21846 * f1) >> 16;
+	f0 = (0x5556 * f0) >> 16;
+	f1 = (0x5556 * f1) >> 16;
 	f1 *= 3;
 	f0 += f1 << 9;
 
@@ -288,17 +303,12 @@ void NTRULQ4591N761::RqEncodeRounded(std::vector<byte> &C, const std::array<int1
 void NTRULQ4591N761::RqFromSeed(std::array<int16_t, NTRU_P> &H, const std::vector<byte> &Key, size_t KeyOffset)
 {
 	std::array<uint, NTRU_P> buf;
-	std::vector<byte> btbuf(NTRU_P * sizeof(uint));
-	std::vector<byte> tmpK(NTRU_SEED_SIZE);
+	std::vector<byte> btbuf(buf.size() * sizeof(uint));
 	std::vector<byte> n(16, 0);
 	size_t i;
 
-	MemoryTools::Copy(Key, KeyOffset, tmpK, 0, NTRU_SEED_SIZE);
-
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(tmpK, n);
-	gen.Generate(btbuf, 0, btbuf.size());
-
+	// changed from aes-ctr to shake
+	XOF(Key, KeyOffset, NTRU_SEED_SIZE, btbuf, 0, btbuf.size(), Keccak::KECCAK256_RATE_SIZE);
 	MemoryTools::Copy(btbuf, 0, buf, 0, btbuf.size());
 
 	for (i = 0; i < NTRU_P; ++i)
@@ -356,28 +366,24 @@ void NTRULQ4591N761::RqRound3(std::array<int16_t, NTRU_P> &H, const std::array<i
 
 	for (i = 0; i < NTRU_P; ++i)
 	{
-		H[i] = (((21846 * (F[i] + 2295) + 32768) >> 16) * 3) - 2295;
+		H[i] = (((0x5556 * (F[i] + 0x08F7) + 0x8000) >> 16) * 3) - 0x08F7;
 	}
 }
 
 void NTRULQ4591N761::SeededWeightW(std::array<int8_t, NTRU_P> &F, const std::vector<byte> &K)
 {
 	std::array<int32_t, NTRU_P> r;
-	std::vector<byte> tmpK(NTRU_SEED_SIZE);
-	std::vector<byte> tmpR(NTRU_P * sizeof(int32_t));
+	std::vector<byte> tmpk(NTRU_SEED_SIZE);
+	std::vector<byte> tmpr(r.size() * sizeof(int32_t));
 	size_t i;
 
-	MemoryTools::Copy(K, 0, tmpK, 0, NTRU_SEED_SIZE);
-
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(tmpK);
-	gen.Generate(tmpR);
-
-	MemoryTools::Copy(tmpR, 0, r, 0, tmpR.size());
+	// changed from aes-ctr to shake
+	XOF(K, 0, NTRU_SEED_SIZE, tmpr, 0, tmpr.size(), Keccak::KECCAK256_RATE_SIZE);
+	MemoryTools::Copy(tmpr, 0, r, 0, tmpr.size());
 
 	for (i = 0; i < NTRU_P; ++i)
 	{
-		r[i] ^= 0x80000000;
+		r[i] ^= 0x80000000L;
 	}
 
 	for (i = 0; i < NTRU_W; ++i)
@@ -401,22 +407,22 @@ void NTRULQ4591N761::SeededWeightW(std::array<int8_t, NTRU_P> &F, const std::vec
 void NTRULQ4591N761::SmallDecode(std::array<int8_t, NTRU_P> &F, const std::vector<byte> &C)
 {
 	size_t i;
-	byte c0;
+	int8_t c0;
 
 	for (i = 0; i < NTRU_P / 4; ++i)
 	{
 		c0 = C[i];
-		F[(i * 4)] = (static_cast<int8_t>(c0) & 3) - 1;
+		F[(i * 4)] = (c0 & 3) - 1;
 		c0 >>= 2;
-		F[(i * 4) + 1] = (static_cast<int8_t>(c0) & 3) - 1;
+		F[(i * 4) + 1] = (c0 & 3) - 1;
 		c0 >>= 2;
-		F[(i * 4) + 2] = (static_cast<int8_t>(c0) & 3) - 1;
+		F[(i * 4) + 2] = (c0 & 3) - 1;
 		c0 >>= 2;
-		F[(i * 4) + 3] = (static_cast<int8_t>(c0) & 3) - 1;
+		F[(i * 4) + 3] = (c0 & 3) - 1;
 	}
 
-	c0 = C[i];
-	F[i * 4] = (static_cast<int8_t>(c0) & 3) - 1;
+	c0 = static_cast<int8_t>(C[i]);
+	F[i * 4] = (c0 & 3) - 1;
 }
 
 void NTRULQ4591N761::SmallEncode(std::vector<byte> &C, const std::array<int8_t, NTRU_P> &F)
@@ -440,18 +446,14 @@ void NTRULQ4591N761::SmallEncode(std::vector<byte> &C, const std::array<int8_t, 
 
 void NTRULQ4591N761::Sort(std::array<int32_t, NTRU_P> &X)
 {
-	const int32_t TOP = 512;
-
+	const int32_t SRTTOP = 512;
 	int32_t i;
 	int32_t p;
 	int32_t q;
-	int32_t n;
 
-	n = NTRU_P;
-
-	for (p = TOP; p > 0; p >>= 1)
+	for (p = SRTTOP; p > 0; p >>= 1)
 	{
-		for (i = 0; i < n - p; ++i)
+		for (i = 0; i < NTRU_P - p; ++i)
 		{
 			if (!(i & p))
 			{
@@ -459,9 +461,9 @@ void NTRULQ4591N761::Sort(std::array<int32_t, NTRU_P> &X)
 			}
 		}
 
-		for (q = TOP; q > p; q >>= 1)
+		for (q = SRTTOP; q > p; q >>= 1)
 		{
-			for (i = 0; i < n - q; ++i)
+			for (i = 0; i < NTRU_P - q; ++i)
 			{
 				if (!(i & p))
 				{
@@ -485,6 +487,15 @@ int32_t NTRULQ4591N761::Verify(const std::vector<byte> &X, const std::vector<byt
 	}
 
 	return (1 & ((diff - 1) >> 8)) - 1;
+}
+
+void NTRULQ4591N761::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+{
+#if defined(CEX_SHAKE_STRONG)
+	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#else
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#endif
 }
 
 NAMESPACE_NTRUEND

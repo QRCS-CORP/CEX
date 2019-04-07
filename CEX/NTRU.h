@@ -97,17 +97,10 @@ class NTRU final : public IAsymmetricCipher
 {
 private:
 
-	static const std::string CLASS_NAME;
-
-	bool m_destroyEngine;
-	std::vector<byte> m_domainKey;
-	bool m_isDestroyed;
-	bool m_isEncryption;
-	bool m_isInitialized;
-	std::vector<byte> m_keyTag;
+	class NtruState;
+	std::unique_ptr<NtruState> m_ntruState;
 	std::unique_ptr<AsymmetricKey> m_privateKey;
 	std::unique_ptr<AsymmetricKey> m_publicKey;
-	NTRUParameters m_ntruParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:

@@ -42,9 +42,9 @@ private:
 	static const size_t MPKC_IRR_SIZE = (12 * 8);
 	static const size_t MPKC_CND_SIZE = ((MPKC_PKN_ROWS - 8) * 8);
 	static const size_t MPKC_GEN_MAXR = 10000;
-	static const std::array<std::array<ulong, 12>, 63> ButterflyConsts;
-	static const std::array<std::array<ulong, 12>, 64> GfPoints;
-	static const std::array<std::array<std::array<ulong, 12>, 2>, 5> RadixTrScalar;
+	static const std::vector<std::vector<ulong>> ButterflyConsts;
+	static const std::vector<std::vector<ulong>> GfPoints;
+	static const std::vector<std::vector<std::vector<ulong>>> RadixTrScalar;
 
 public:
 
@@ -71,6 +71,11 @@ public:
 	static const size_t MPKC_SEED_SIZE = 64;
 
 	/// <summary>
+	/// The matrix column dimension
+	/// </summary>
+	static const size_t MPKC_COLUMN_SIZE = 64;
+
+	/// <summary>
 	/// The tag size in bytes
 	/// </summary>
 	static const size_t MPKC_TAG_SIZE = 16;
@@ -88,7 +93,7 @@ public:
 	/// <summary>
 	/// The public key size in bytes
 	/// </summary>
-	static const size_t MPKC_CPAPUBLICKEY_SIZE = (MPKC_PKN_ROWS * ((64 - MPKC_M) * 8)) + (MPKC_PKN_ROWS * (8 - ((MPKC_PKN_ROWS & 63) >> 3)));
+	static const size_t MPKC_CPAPUBLICKEY_SIZE = (MPKC_PKN_ROWS * ((MPKC_COLUMN_SIZE - MPKC_M) * 8)) + (MPKC_PKN_ROWS * (8 - ((MPKC_PKN_ROWS & 63) >> 3)));
 
 	/// <summary>
 	/// The byte size of the CCA cipher-text
@@ -147,9 +152,9 @@ private:
 
 	static void PreProcess(std::vector<ulong> &Received, const std::vector<byte> &S);
 
-	static void Scaling(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received);
+	static void Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received);
 
-	static void ScalingInverse(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Inverse, std::array<ulong, 64> &Received);
+	static void ScalingInverse(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, std::array<ulong, MPKC_COLUMN_SIZE> &Received);
 
 	static void SyndromeAdjust(std::array<std::array<ulong, MPKC_M>, 2> &Output);
 
@@ -181,11 +186,11 @@ private:
 	{
 	public:
 
-		static void Transform(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<ulong, MPKC_M> &Input);
+		static void Transform(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input);
 
 	private:
 
-		static void Butterflies(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<ulong, MPKC_M> &Input);
+		static void Butterflies(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input);
 
 		static void RadixConversions(std::array<ulong, MPKC_M> &Output);
 	};
@@ -194,11 +199,11 @@ private:
 	{
 	public:
 
-		static void Transform(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Input);
+		static void Transform(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input);
 
 	private:
 
-		static void Butterflies(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Input);
+		static void Butterflies(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input);
 
 		static void RadixConversions(std::array<std::array<ulong, MPKC_M>, 2> &Output);
 	};

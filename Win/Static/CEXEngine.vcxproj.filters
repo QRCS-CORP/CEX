@@ -241,9 +241,6 @@
     <Filter Include="Header Files\Asymmetric\Encrypt\ModuleLWE\Support">
       <UniqueIdentifier>{e6761720-0098-4cee-9e0b-f62d8fced8bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\Authenticate">
-      <UniqueIdentifier>{858f71b5-e698-455d-998b-9b9580a6bfbd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Asymmetric\Encrypt\NTRU">
       <UniqueIdentifier>{de7c0483-f3e9-4fb0-bca3-c54eeab893d9}</UniqueIdentifier>
     </Filter>
@@ -276,9 +273,6 @@
     </Filter>
     <Filter Include="Source Files\Asymmetric\Encrypt\NTRU\Support">
       <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\Authenticate">
-      <UniqueIdentifier>{23b7915d-375a-4bf6-a34d-57018c9d9c55}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Provider\Base">
       <UniqueIdentifier>{584a7655-8c0b-4923-9255-0283a7d16ec8}</UniqueIdentifier>
@@ -690,9 +684,6 @@
     <ClInclude Include="..\..\CEX\ModuleLWE.h">
       <Filter>Header Files\Asymmetric\Encrypt\ModuleLWE</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\IAuthenticate.h">
-      <Filter>Header Files\Asymmetric\Encrypt\Authenticate</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\ShakeModes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -748,9 +739,6 @@
       <Filter>Header Files\Kdf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h">
-      <Filter>Header Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\PolyMath.h">
       <Filter>Header Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2Digests.h">

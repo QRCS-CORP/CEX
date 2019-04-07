@@ -35,14 +35,14 @@ class RLWEQ12289N1024
 {
 private:
 
-	static const std::array<ushort, 512> OmegasMontgomery;
-	static const std::array<ushort, 512> OmegasInvMontgomery;
-	static const std::array<ushort, 1024> PsisBitrevMontgomery;
-	static const std::array<ushort, 1024> PsisInvMontgomery;
-	static const std::array<ushort, 1024> BitRevTable;
+	static const std::vector<ushort> OmegasMontgomery;
+	static const std::vector<ushort> OmegasInvMontgomery;
+	static const std::vector<ushort> PsisBitrevMontgomery;
+	static const std::vector<ushort> PsisInvMontgomery;
+	static const std::vector<ushort> BitRevTable;
 
-	static const uint RLWE_QINV = 12287;
-	static const uint RLWE_RLOG = 18;
+	static const uint RLWE_QINV = 0x00002FFFUL;
+	static const uint RLWE_RLOG = 0x00000012UL;
 
 public:
 
@@ -56,7 +56,7 @@ public:
 	/// <summary>
 	/// The modulus factor
 	/// </summary>
-	static const int RLWE_Q = 12289;
+	static const uint RLWE_Q = 0x00003001UL;
 
 	/// <summary>
 	/// The byte size of A's public key polynomial
@@ -163,11 +163,11 @@ private:
 
 	static byte HammimgWeight(byte A);
 
-	static ushort MontgomeryReduce(uint A);
+	static ushort MontgomeryReduce(uint X);
 
-	static void MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::array<ushort, RLWE_N> &Factors);
+	static void MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::vector<ushort> &Factors);
 
-	static void Ntt(std::array<ushort, RLWE_N> &A, const std::array<ushort, 512> &Omega);
+	static void Ntt(std::array<ushort, RLWE_N> &A, const std::vector<ushort> &Omega);
 
 	static void PolyAdd(std::array<ushort, RLWE_N> &R, const std::array<ushort, RLWE_N> &A, const std::array<ushort, RLWE_N> &B);
 
@@ -191,9 +191,11 @@ private:
 
 	static void PolyToBytes(std::vector<byte> &R, const std::array<ushort, RLWE_N> &P);
 
-	static void PolyTomessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X);
+	static void PolyToMessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X);
 
 	static void PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed);
+
+	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 };
 
 NAMESPACE_RINGLWEEND

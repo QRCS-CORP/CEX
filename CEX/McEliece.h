@@ -97,14 +97,8 @@ class McEliece final : public IAsymmetricCipher
 {
 private:
 
-	static const std::string CLASS_NAME;
-
-	bool m_destroyEngine;
-	std::vector<byte> m_domainKey;
-	bool m_isDestroyed;
-	bool m_isEncryption;
-	bool m_isInitialized;
-	MPKCParameters m_mpkcParameters;
+	class MpkcState;
+	std::unique_ptr<MpkcState> m_mpkcState;
 	std::unique_ptr<AsymmetricKey> m_privateKey;
 	std::unique_ptr<AsymmetricKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;

@@ -2,7 +2,7 @@
 // TRAJECTORY
 //
 // ##SCHEDULE FOR 1.0.0.8 RELEASE ###
-// ##ETA is February 14, 2019 ##
+// ##Eta is February 14, 2019 ##
 //
 // Authenticated stream ciphers MCS,ThreeFish-256/512/1024, and CSX256/512	- done
 // Update secure key mechanisms and integrate internally						- started
@@ -51,21 +51,19 @@
 // global variable: Camel Case, with the prefix 'g_', ex. g_globalState
 // class variable: Camel Case, with the prefix 'm_', ex. m_classState
 // function variable: a single word or 2 Camel case words in abbreviated form, ex. ctr, or, bctr
-// global constant: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
-// class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
-// function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
+// global const: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
+// class const: All Caps, a total of two words, ex. CLASS_CONSTANT
+// function const: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
 //
 // 1.0.0.8 TODOs
-// rewrite poadding modes for constant time						-done
-// Rewrite the symmetric scure key with authentication (TFX)	-
-// Add an asymmetric secure key									-
-// Reorganize the namespace (key and cipher)					-
-// Rewrite CipherStream to use stream ciphers exclusively		-
-// Review all classes for constant time operations				-
-// Update all documentation to current implementations			-
-// Add *nix random provider functions							-
+// rewrite padding modes for constant time						-done
+// Rewrite the symmetric secure key with authentication			-done
+// Add an asymmetric secure key									-done
+// Reorganize the namespace (key and cipher)					-done
+// Review all classes for constant time operations				-done
+// Update all documentation to current implementations			-done
+// Add *nix random provider functions							-done
 
-#include <fstream>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -233,9 +231,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7p (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7q (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      March 23, 2019                    *");
+	ConsoleUtils::WriteLine("* Date:      April 07, 2019                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -295,22 +293,22 @@ void RunTest(ITest* Test)
 // Everything migrated to SecureVector:									-
 // if standard vector is called, that will make unlocked copy
 // Requires: moving digests to templates for mac, start eta: Sunday
-// Second migration is ciphers and modes, (big job!)					-
+// Second migration is ciphers and modes, (big job!)					-deffered
 // 
 // Stream Ciphers
 // 1) Update all the stream ciphers										-done
-// 2) Stream cipher using CTR(Rijndael-256)(RCS?)						-
+// 2) Stream cipher using CTR(Rijndael-256)(RCS?)						-done
 // 
 // Block Ciphers
 // 1) change the distribution code to formal Name() + default string	-done
-// 2) move AES instructions to AES128 class (look at assembly options)	-maybe
+// 2) move AES instructions to AES128 class (look at assembly options)	-deffered
 // 3) update cipher standard modes										-done
-// 4) update AEAD modes													-
+// 4) update AEAD modes													-done
 //
 // Digests
-// 1) internal pointers and templates?									-
-// 2) move blake simd to UIntxxx										-
-// 3) add parallel fallback												-
+// 1) internal pointers and templates?									-deffered
+// 2) move blake simd to UIntxxx										-no
+// 3) add parallel fallback												-done
 // 4) ...
 //
 // Asymmetric

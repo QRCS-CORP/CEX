@@ -318,7 +318,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 		{
 			if (offset == State->BlockSize)
 			{
-				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Keccak::FastAbsorb(pad, 0, State->BlockSize, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -336,7 +336,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 		{
 			if (offset == State->BlockSize)
 			{
-				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Keccak::FastAbsorb(pad, 0, State->BlockSize, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -373,7 +373,7 @@ void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &Sta
 		{
 			if (offset == State->BlockSize)
 			{
-				Keccak::Absorb(pad, 0, State->BlockSize, State->State);
+				Keccak::FastAbsorb(pad, 0, State->BlockSize, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -418,7 +418,7 @@ void KMAC::Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 {
 	size_t i;
 	
-	while (Length > State->BlockSize)
+	while (Length >= State->BlockSize)
 	{
 		Permute(State);
 
@@ -431,7 +431,7 @@ void KMAC::Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		Length -= State->BlockSize;
 	}
 
-	if (Length > 0)
+	if (Length != 0)
 	{
 		Permute(State);
 

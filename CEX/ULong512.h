@@ -270,7 +270,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 64</param>
-	inline void RotL64(const int Shift)
+	inline void RotL64(int Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
 		zmm = _mm512_or_si512(_mm512_slli_epi64(zmm, static_cast<int>(Shift)), _mm512_srli_epi64(zmm, static_cast<int>(64 - Shift)));
@@ -295,7 +295,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 64</param>
-	inline void RotR64(const int Shift)
+	inline void RotR64(int Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
 		RotL64(64 - Shift);
@@ -626,7 +626,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline ULong512 operator << (const int Shift) const
+	inline ULong512 operator << (int Shift) const
 	{
 		return ULong512(_mm512_slli_epi64(zmm, static_cast<int>(Shift)));
 	}
@@ -636,7 +636,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator <<= (const int Shift)
+	inline void operator <<= (int Shift)
 	{
 		zmm = _mm512_slli_epi64(zmm, Shift);
 	}
@@ -646,7 +646,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline ULong512 operator >> (const int Shift) const
+	inline ULong512 operator >> (int Shift) const
 	{
 		return ULong512(_mm512_srli_epi64(zmm, static_cast<int>(Shift)));
 	}
@@ -656,7 +656,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift position</param>
-	inline void operator >>= (const int Shift)
+	inline void operator >>= (int Shift)
 	{
 		zmm = _mm512_srli_epi64(zmm, Shift);
 	}

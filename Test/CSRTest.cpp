@@ -122,7 +122,7 @@ namespace Test
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
 
-				//gen.Generate(msg);
+				gen.Generate(msg);
 				gen.Reset();
 			}
 			catch (const std::exception&)

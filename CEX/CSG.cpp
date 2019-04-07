@@ -546,7 +546,7 @@ void CSG::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length,
 	// sequential loop through blocks
 	while (Length >= State->Rate)
 	{
-		Keccak::Absorb(Input, InOffset, State->Rate, State->State[State->Index]);
+		Keccak::FastAbsorb(Input, InOffset, State->Rate, State->State[State->Index]);
 		Permute(State);
 		InOffset += State->Rate;
 		Length -= State->Rate;
@@ -563,7 +563,7 @@ void CSG::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length,
 	++Length;
 	MemoryTools::Clear(msg, Length, State->Rate - Length);
 	msg[State->Rate - 1] |= 0x80;
-	Keccak::Absorb(msg, 0, State->Rate, State->State[State->Index]);
+	Keccak::FastAbsorb(msg, 0, State->Rate, State->State[State->Index]);
 }
 
 void CSG::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<CsgState> &State)
@@ -584,7 +584,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 			// absorb and permute full blocks
 			if (offset == State->Rate)
 			{
-				Keccak::Absorb(pad, 0, State->Rate, State->State[State->Index]);
+				Keccak::FastAbsorb(pad, 0, State->Rate, State->State[State->Index]);
 				Permute(State);
 				offset = 0;
 			}
@@ -603,7 +603,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 			// absorb and permute the block
 			if (offset == State->Rate)
 			{
-				Keccak::Absorb(pad, 0, State->Rate, State->State[State->Index]);
+				Keccak::FastAbsorb(pad, 0, State->Rate, State->State[State->Index]);
 				Permute(State);
 				offset = 0;
 			}

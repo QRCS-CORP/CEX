@@ -92,16 +92,11 @@ class Sphincs final : public IAsymmetricSign
 {
 private:
 
-	static const std::string CLASS_NAME;
-
-	bool m_isDestroyed;
-	bool m_destroyEngine;
-	bool m_isInitialized;
-	bool m_isSigner;
+	class SphincsState;
+	std::unique_ptr<SphincsState> m_sphincsState;
 	std::unique_ptr<AsymmetricKey> m_privateKey;
 	std::unique_ptr<AsymmetricKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
-	SphincsParameters m_spxParameters;
 
 public:
 

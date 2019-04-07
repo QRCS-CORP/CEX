@@ -83,6 +83,8 @@ namespace Test
 		SecureRandom rnd;
 		bool ret;
 
+		rnd.Generate(msg1);
+
 		AsymmetricKeyPair* kp = sgn1.Generate();
 		sgn1.Initialize(kp->PrivateKey());
 		sgn1.Sign(msg1, sig);

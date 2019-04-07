@@ -1,16 +1,13 @@
 #include "MPKCM12T62.h"
-#include "IAeadMode.h"
 #include "IntegerTools.h"
 #include "McElieceUtils.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_MCELIECE
 
-using Cipher::Block::Mode::IAeadMode;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 
-const std::array<std::array<ulong, 12>, 63> MPKCM12T62::ButterflyConsts =
+const std::vector<std::vector<ulong>> MPKCM12T62::ButterflyConsts =
 { 
 	{
 		{
@@ -331,7 +328,7 @@ const std::array<std::array<ulong, 12>, 63> MPKCM12T62::ButterflyConsts =
 	}
 };
 
-const std::array<std::array<ulong, 12>, 64> MPKCM12T62::GfPoints =
+const std::vector<std::vector<ulong>> MPKCM12T62::GfPoints =
 {
 	{
 		{
@@ -657,7 +654,7 @@ const std::array<std::array<ulong, 12>, 64> MPKCM12T62::GfPoints =
 	}
 };
 
-const std::array<std::array<std::array<ulong, 12>, 2>, 5> MPKCM12T62::RadixTrScalar =
+const std::vector<std::vector<std::vector<ulong>>> MPKCM12T62::RadixTrScalar =
 {
 	{
 		{
@@ -737,20 +734,19 @@ const std::array<std::array<std::array<ulong, 12>, 2>, 5> MPKCM12T62::RadixTrSca
 
 bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S)
 {
-	size_t i;
+	std::array<ulong, MPKC_CND_SIZE / sizeof(ulong)> cond;
 	ulong diff;
 	ulong t;
-
-	std::array<ulong, MPKC_CND_SIZE / 8> cond;
+	size_t i;
 
 	IntegerTools::BlockToLe(PrivateKey, MPKC_IRR_SIZE, cond, 0, MPKC_CND_SIZE);
-	std::vector<ulong> recv(64);
+	std::vector<ulong> recv(MPKC_COLUMN_SIZE);
 	PreProcess(recv, S);
-	McElieceUtils::BenesCompact(recv, cond, 1);
+	McElieceUtils::BenesCompact(recv, cond, 1UL);
 
 	// scaling
-	std::array<std::array<ulong, MPKC_M>, 64> inverse;
-	std::array<std::array<ulong, MPKC_M>, 64> scaled;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> inverse;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> scaled;
 	Scaling(scaled, inverse, PrivateKey, recv);
 
 	// transposed FFT
@@ -759,16 +755,16 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 	SyndromeAdjust(sPriv);
 
 	// Berlekamp Massey
-	std::array<ulong, MPKC_M> locator;
-	Utility::MemoryTools::Clear(locator, 0, locator.size() * sizeof(ulong));
+	std::array<ulong, MPKC_M> locator{ 0 };
 	BerlekampMassey(locator, sPriv);
 
 	// additive FFT
-	std::array<std::array<ulong, MPKC_M>, 64> eval;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> eval;
 	AdditiveFFT::Transform(eval, locator);
 
-	std::array<ulong, 64> error;
-	for (i = 0; i < 64; i++)
+	std::array<ulong, MPKC_COLUMN_SIZE> error;
+
+	for (i = 0; i < error.size(); ++i)
 	{
 		error[i] = McElieceUtils::Or(eval[i], MPKC_M);
 		error[i] = ~error[i];
@@ -776,6 +772,7 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 
 	// re-encrypt
 	ScalingInverse(scaled, inverse, error);
+
 	std::array<std::array<ulong, MPKC_M>, 2> sPrivCmp;
 	TransposedFFT::Transform(sPrivCmp, scaled);
 	SyndromeAdjust(sPrivCmp);
@@ -835,7 +832,7 @@ bool MPKCM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Priva
 	{
 		SkGen(PrivateKey, Rng);
 
-		if (PkGen(PublicKey, PrivateKey)) 
+		if (PkGen(PublicKey, PrivateKey) == true) 
 		{
 			break;
 		}
@@ -857,99 +854,99 @@ void MPKCM12T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array<s
 	ushort mask16b;
 	ushort N;
 	ushort r;
-	ulong maskLeq;
-	ulong maskNz;
-	std::array<ulong, MPKC_M> B;
+	ulong maskleq;
+	ulong masknz;
+	std::array<ulong, MPKC_M> tmpb;
 	std::array<ulong, MPKC_M> prod;
-	std::array<ulong, MPKC_M> tmpIn;
-	std::array<ulong, MPKC_M> rVec;
-	std::array<ulong, MPKC_M> tmpC;
+	std::array<ulong, MPKC_M> inp;
+	std::array<ulong, MPKC_M> rvec;
+	std::array<ulong, MPKC_M> tmpc;
 
 	Output[0] = 1;
-	MemoryTools::Copy(Output, 0, B, 0, MPKC_M * sizeof(ulong));
+	MemoryTools::Copy(Output, 0, tmpb, 0, MPKC_M * sizeof(ulong));
 	Output[0] <<= 63;
-	B[0] <<= 62;
+	tmpb[0] <<= 62;
 	b = 1;
 	L = 0;
 
-	for (N = 0; N < MPKC_T * 2; N++)
+	for (N = 0; N < MPKC_T * 2; ++N)
 	{
 		// computing d
 		if (N < 64)
 		{
-			tmpIn[0] = Input[0][0] << (63 - N);
-			tmpIn[1] = Input[0][1] << (63 - N);
-			tmpIn[2] = Input[0][2] << (63 - N);
-			tmpIn[3] = Input[0][3] << (63 - N);
-			tmpIn[4] = Input[0][4] << (63 - N);
-			tmpIn[5] = Input[0][5] << (63 - N);
-			tmpIn[6] = Input[0][6] << (63 - N);
-			tmpIn[7] = Input[0][7] << (63 - N);
-			tmpIn[8] = Input[0][8] << (63 - N);
-			tmpIn[9] = Input[0][9] << (63 - N);
-			tmpIn[10] = Input[0][10] << (63 - N);
-			tmpIn[11] = Input[0][11] << (63 - N);
+			inp[0] = Input[0][0] << (63 - N);
+			inp[1] = Input[0][1] << (63 - N);
+			inp[2] = Input[0][2] << (63 - N);
+			inp[3] = Input[0][3] << (63 - N);
+			inp[4] = Input[0][4] << (63 - N);
+			inp[5] = Input[0][5] << (63 - N);
+			inp[6] = Input[0][6] << (63 - N);
+			inp[7] = Input[0][7] << (63 - N);
+			inp[8] = Input[0][8] << (63 - N);
+			inp[9] = Input[0][9] << (63 - N);
+			inp[10] = Input[0][10] << (63 - N);
+			inp[11] = Input[0][11] << (63 - N);
 		}
 		else
 		{
-			tmpIn[0] = (Input[0][0] >> (N - 63)) | (Input[1][0] << (127 - N));
-			tmpIn[1] = (Input[0][1] >> (N - 63)) | (Input[1][1] << (127 - N));
-			tmpIn[2] = (Input[0][2] >> (N - 63)) | (Input[1][2] << (127 - N));
-			tmpIn[3] = (Input[0][3] >> (N - 63)) | (Input[1][3] << (127 - N));
-			tmpIn[4] = (Input[0][4] >> (N - 63)) | (Input[1][4] << (127 - N));
-			tmpIn[5] = (Input[0][5] >> (N - 63)) | (Input[1][5] << (127 - N));
-			tmpIn[6] = (Input[0][6] >> (N - 63)) | (Input[1][6] << (127 - N));
-			tmpIn[7] = (Input[0][7] >> (N - 63)) | (Input[1][7] << (127 - N));
-			tmpIn[8] = (Input[0][8] >> (N - 63)) | (Input[1][8] << (127 - N));
-			tmpIn[9] = (Input[0][9] >> (N - 63)) | (Input[1][9] << (127 - N));
-			tmpIn[10] = (Input[0][10] >> (N - 63)) | (Input[1][10] << (127 - N));
-			tmpIn[11] = (Input[0][11] >> (N - 63)) | (Input[1][11] << (127 - N));
+			inp[0] = (Input[0][0] >> (N - 63)) | (Input[1][0] << (127 - N));
+			inp[1] = (Input[0][1] >> (N - 63)) | (Input[1][1] << (127 - N));
+			inp[2] = (Input[0][2] >> (N - 63)) | (Input[1][2] << (127 - N));
+			inp[3] = (Input[0][3] >> (N - 63)) | (Input[1][3] << (127 - N));
+			inp[4] = (Input[0][4] >> (N - 63)) | (Input[1][4] << (127 - N));
+			inp[5] = (Input[0][5] >> (N - 63)) | (Input[1][5] << (127 - N));
+			inp[6] = (Input[0][6] >> (N - 63)) | (Input[1][6] << (127 - N));
+			inp[7] = (Input[0][7] >> (N - 63)) | (Input[1][7] << (127 - N));
+			inp[8] = (Input[0][8] >> (N - 63)) | (Input[1][8] << (127 - N));
+			inp[9] = (Input[0][9] >> (N - 63)) | (Input[1][9] << (127 - N));
+			inp[10] = (Input[0][10] >> (N - 63)) | (Input[1][10] << (127 - N));
+			inp[11] = (Input[0][11] >> (N - 63)) | (Input[1][11] << (127 - N));
 		}
 
-		McElieceUtils::Multiply(prod, Output, tmpIn);
+		McElieceUtils::Multiply(prod, Output, inp);
 		d = McElieceUtils::Reduce(prod, MPKC_M);
 
 		// 3 cases
 		bInv = McElieceUtils::Invert(b, MPKC_M);
 		r = McElieceUtils::Multiply(d, bInv, MPKC_M);
-		McElieceUtils::Insert(rVec, r);
-		McElieceUtils::Multiply(tmpC, rVec, B);
+		McElieceUtils::Insert(rvec, r);
+		McElieceUtils::Multiply(tmpc, rvec, tmpb);
 
-		tmpC[0] ^= Output[0];
-		tmpC[1] ^= Output[1];
-		tmpC[2] ^= Output[2];
-		tmpC[3] ^= Output[3];
-		tmpC[4] ^= Output[4];
-		tmpC[5] ^= Output[5];
-		tmpC[6] ^= Output[6];
-		tmpC[7] ^= Output[7];
-		tmpC[8] ^= Output[8];
-		tmpC[9] ^= Output[9];
-		tmpC[10] ^= Output[10];
-		tmpC[11] ^= Output[11];
+		tmpc[0] ^= Output[0];
+		tmpc[1] ^= Output[1];
+		tmpc[2] ^= Output[2];
+		tmpc[3] ^= Output[3];
+		tmpc[4] ^= Output[4];
+		tmpc[5] ^= Output[5];
+		tmpc[6] ^= Output[6];
+		tmpc[7] ^= Output[7];
+		tmpc[8] ^= Output[8];
+		tmpc[9] ^= Output[9];
+		tmpc[10] ^= Output[10];
+		tmpc[11] ^= Output[11];
 
-		maskNz = McElieceUtils::MaskNonZero64(d);
-		maskLeq = McElieceUtils::MaskLeq64(L * 2, N);
-		mask16b = (maskNz & maskLeq) & 0xFFFF;
+		masknz = McElieceUtils::MaskNonZero64(d);
+		maskleq = McElieceUtils::MaskLeq64(L * 2, N);
+		mask16b = (masknz & maskleq) & 0xFFFF;
 
-		McElieceUtils::CMov(Output, B, maskNz & maskLeq);
-		McElieceUtils::Copy(tmpC, Output);
+		McElieceUtils::CMov(Output, tmpb, masknz & maskleq);
+		McElieceUtils::Copy(tmpc, Output);
 
 		b = (d & mask16b) | (b & ~mask16b);
 		L = ((N + 1 - L) & mask16b) | (L & ~mask16b);
 
-		B[0] >>= 1;
-		B[1] >>= 1;
-		B[2] >>= 1;
-		B[3] >>= 1;
-		B[4] >>= 1;
-		B[5] >>= 1;
-		B[6] >>= 1;
-		B[7] >>= 1;
-		B[8] >>= 1;
-		B[9] >>= 1;
-		B[10] >>= 1;
-		B[11] >>= 1;
+		tmpb[0] >>= 1;
+		tmpb[1] >>= 1;
+		tmpb[2] >>= 1;
+		tmpb[3] >>= 1;
+		tmpb[4] >>= 1;
+		tmpb[5] >>= 1;
+		tmpb[6] >>= 1;
+		tmpb[7] >>= 1;
+		tmpb[8] >>= 1;
+		tmpb[9] >>= 1;
+		tmpb[10] >>= 1;
+		tmpb[11] >>= 1;
 	}
 
 	Output[0] >>= 64 - (MPKC_T + 1);
@@ -982,36 +979,40 @@ void MPKCM12T62::PreProcess(std::vector<ulong> &Received, const std::vector<byte
 	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8)];
 }
 
-void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received)
+void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received)
 {
-	std::array<ulong, MPKC_M> skInt;
-	std::array<std::array<ulong, MPKC_M>, 64> eval;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> eval;
+	std::array<ulong, MPKC_M> skint;
 	std::array<ulong, MPKC_M> tmp;
+	size_t ctr;
 	size_t i;
 
 	// computing inverses
-	MemoryTools::Copy(PrivateKey, 0, skInt, 0, MPKC_M * sizeof(ulong));
-	AdditiveFFT::Transform(eval, skInt);
+	MemoryTools::Copy(PrivateKey, 0, skint, 0, MPKC_M * sizeof(ulong));
+	AdditiveFFT::Transform(eval, skint);
 	Square(eval[0], eval[0]);
 	McElieceUtils::Copy(eval[0], Inverse[0]);
 
-	for (i = 1; i < 64; i++)
+	for (i = 1; i < MPKC_COLUMN_SIZE; ++i)
 	{
 		Square(eval[i], eval[i]);
 		McElieceUtils::Multiply(Inverse[i], Inverse[i - 1], eval[i]);
 	}
 
 	Invert(tmp, Inverse[63]);
+	ctr = 63;
 
-	for (int cnt = 62; cnt >= 0; cnt--)
+	do
 	{
-		McElieceUtils::Multiply(Inverse[cnt + 1], tmp, Inverse[cnt]);
-		McElieceUtils::Multiply(tmp, tmp, eval[cnt + 1]);
-	}
+		McElieceUtils::Multiply(Inverse[ctr], tmp, Inverse[ctr - 1]);
+		McElieceUtils::Multiply(tmp, tmp, eval[ctr]);
+		--ctr;
+	} 
+	while (ctr != 0);
 
 	McElieceUtils::Copy(tmp, Inverse[0]);
 
-	for (i = 0; i < 64; i++)
+	for (i = 0; i < MPKC_COLUMN_SIZE; ++i)
 	{
 		Output[i][0] = Inverse[i][0] & Received[i];
 		Output[i][1] = Inverse[i][1] & Received[i];
@@ -1028,9 +1029,11 @@ void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, 64> &Output, std:
 	}
 }
 
-void MPKCM12T62::ScalingInverse(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Inverse, std::array<ulong, 64> &Received)
+void MPKCM12T62::ScalingInverse(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, std::array<ulong, MPKC_COLUMN_SIZE> &Received)
 {
-	for (size_t i = 0; i < 64; i++)
+	size_t i;
+
+	for (i = 0; i < MPKC_COLUMN_SIZE; ++i)
 	{
 		Output[i][0] = Inverse[i][0] & Received[i];
 		Output[i][1] = Inverse[i][1] & Received[i];
@@ -1081,25 +1084,26 @@ void MPKCM12T62::SyndromeAdjust(std::array<std::array<ulong, MPKC_M>, 2> &Output
 
 void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 {
+	std::vector<ushort> ind(MPKC_T);
+	ulong mask;
 	size_t i;
 	size_t j;
 	size_t eq;
-	ulong mask;
-	std::vector<ushort> ind(MPKC_T);
 
-	while (1)
+	while (true)
 	{
 		IntegerTools::Fill(ind, 0, ind.size(), Rng.get());
 
-		for (i = 0; i < MPKC_T; i++) 
+		for (i = 0; i < MPKC_T; ++i) 
 		{
 			ind[i] &= (static_cast<ushort>(1) << MPKC_M) - 1;
 		}
 
 		eq = 0;
-		for (i = 1; i < MPKC_T; i++)
+
+		for (i = 1; i < MPKC_T; ++i)
 		{
-			for (j = 0; j < i; j++)
+			for (j = 0; j < i; ++j)
 			{
 				if (ind[i] == ind[j])
 				{
@@ -1115,73 +1119,84 @@ void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 	}
 
 	std::array<ulong, MPKC_T> val;
-	for (j = 0; j < MPKC_T; j++)
+
+	for (j = 0; j < MPKC_T; ++j)
 	{
 		val[j] = (static_cast<ulong>(1) << (ind[j] & 63));
 	}
 
-	std::array<ulong, 64> eInt;
-	for (i = 0; i < 64; i++)
+	std::array<ulong, 64> eint;
+
+	for (i = 0; i < 64; ++i)
 	{
-		eInt[i] = 0;
-		for (j = 0; j < MPKC_T; j++)
+		eint[i] = 0;
+
+		for (j = 0; j < MPKC_T; ++j)
 		{
 			mask = i ^ (ind[j] >> 6);
 			mask -= 1;
 			mask >>= 63;
 			mask = ~mask + 1;
-			eInt[i] |= val[j] & mask;
+			eint[i] |= val[j] & mask;
 		}
 	}
 
-	IntegerTools::LeToBlock(eInt, 0, E, 0, eInt.size() * sizeof(ulong));
+	IntegerTools::LeToBlock(eint, 0, E, 0, eint.size() * sizeof(ulong));
 }
 
 void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKey, const std::vector<byte> &E)
 {
-	const size_t ARRLEN = ((MPKC_PKN_COLS + 63) / 64); // TODO: intrinsics
-	const size_t COLLEN = MPKC_PKN_COLS / 8;
+	const size_t ARRLEN = ((MPKC_PKN_COLS + 63) / MPKC_COLUMN_SIZE);
+	const size_t COLLEN = MPKC_PKN_COLS / sizeof(ulong);
 
-	std::array<ulong, ARRLEN> eInt;
-	MemoryTools::Copy(E, MPKC_CPACIPHERTEXT_SIZE, eInt, 0, COLLEN);
-	std::array<ulong, ARRLEN> rowInt;
+	std::array<ulong, ARRLEN> eint;
+	std::array<ulong, ARRLEN> rowint;
 	std::array<ulong, 8> tmp;
+	size_t ctr;
 	size_t i;
 	size_t j;
-	int cnt;
-	byte b;
+	byte tmpb;
+
+	MemoryTools::Copy(E, MPKC_CPACIPHERTEXT_SIZE, eint, 0, COLLEN);
 
 	for (i = 0; i < MPKC_PKN_ROWS; i += 8)
 	{
-		for (cnt = 0; cnt < 8; cnt++)
+		for (ctr = 0; ctr < 8; ++ctr)
 		{
-			rowInt[ARRLEN - 1] = 0;
-			MemoryTools::Copy(PublicKey, ((i + cnt) * COLLEN), rowInt, 0, COLLEN);
-			tmp[cnt] = 0;
+			rowint[ARRLEN - 1] = 0;
+			MemoryTools::Copy(PublicKey, ((i + ctr) * COLLEN), rowint, 0, COLLEN);
+			tmp[ctr] = 0;
 
-			for (j = 0; j < ARRLEN; j++)
+			for (j = 0; j < ARRLEN; ++j)
 			{
-				tmp[cnt] ^= eInt[j] & rowInt[j];
+				tmp[ctr] ^= eint[j] & rowint[j];
 			}
 		}
 
-		b = 0;
+		ctr = tmp.size();
 
-		for (cnt = 7; cnt >= 0; cnt--)
+		do
 		{
-			tmp[cnt] ^= (tmp[cnt] >> 32);
-			tmp[cnt] ^= (tmp[cnt] >> 16);
-			tmp[cnt] ^= (tmp[cnt] >> 8);
-			tmp[cnt] ^= (tmp[cnt] >> 4);
-		}
+			--ctr;
+			tmp[ctr] ^= (tmp[ctr] >> 32);
+			tmp[ctr] ^= (tmp[ctr] >> 16);
+			tmp[ctr] ^= (tmp[ctr] >> 8);
+			tmp[ctr] ^= (tmp[ctr] >> 4);
+		} 
+		while (ctr != 0);
 
-		for (cnt = 7; cnt >= 0; cnt--)
+		ctr = tmp.size();
+		tmpb = 0;
+
+		do
 		{
-			b <<= 1;
-			b |= (0x6996 >> (tmp[cnt] & 0xF)) & 1;
-		}
+			--ctr;
+			tmpb <<= 1;
+			tmpb |= static_cast<byte>(0x6996UL >> (tmp[ctr] & 0x0F)) & 0x01;
+		} 
+		while (ctr != 0);
 
-		S[i / 8] = E[i / 8] ^ b;
+		S[i / 8] = E[i / 8] ^ tmpb;
 	}
 }
 
@@ -1189,6 +1204,7 @@ void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicK
 
 bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<ushort> &F)
 {
+	std::array<std::array<ushort, MPKC_T>, MPKC_T + 1> mat;
 	size_t c;
 	size_t i;
 	size_t j;
@@ -1197,33 +1213,33 @@ bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<usho
 	ushort mask;
 	ushort t;
 	bool status;
-	std::array<std::array<ushort, MPKC_T>, MPKC_T + 1> mat;
 
 	// fill matrix
 	mat[0][0] = 1;
-	for (i = 1; i < MPKC_T; i++)
+
+	for (i = 1; i < MPKC_T; ++i)
 	{
 		mat[0][i] = 0;
 	}
 
-	for (i = 0; i < MPKC_T; i++)
+	for (i = 0; i < MPKC_T; ++i)
 	{
 		mat[1][i] = F[i];
 	}
 
-	for (j = 2; j <= MPKC_T; j++) 
+	for (j = 2; j <= MPKC_T; ++j) 
 	{
 		MatrixMultiply(mat[j], mat[j - 1], F);
 	}
 
 	// gaussian
-	for (j = 0; j < MPKC_T; j++)
+	for (j = 0; j < MPKC_T; ++j)
 	{
-		for (k = j + 1; k < MPKC_T; k++)
+		for (k = j + 1; k < MPKC_T; ++k)
 		{
 			mask = McElieceUtils::Diff(mat[j][j], mat[j][k]);
 
-			for (c = 0; c < MPKC_T + 1; c++) 
+			for (c = 0; c < MPKC_T + 1; ++c) 
 			{
 				mat[c][j] ^= mat[c][k] & mask;
 			}
@@ -1231,7 +1247,8 @@ bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<usho
 
 		// not invertible
 		status = (mat[j][j] != 0);
-		if (!status)
+
+		if (status == false)
 		{
 			break;
 		}
@@ -1239,18 +1256,18 @@ bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<usho
 		// compute inverse
 		inverse = McElieceUtils::Invert(mat[j][j], MPKC_M);
 
-		for (c = 0; c < MPKC_T + 1; c++) 
+		for (c = 0; c < MPKC_T + 1; ++c) 
 		{
 			mat[c][j] = McElieceUtils::Multiply(mat[c][j], inverse, MPKC_M);
 		}
 
-		for (k = 0; k < MPKC_T; k++)
+		for (k = 0; k < MPKC_T; ++k)
 		{
 			t = mat[j][k];
 
 			if (k != j)
 			{
-				for (c = 0; c < MPKC_T + 1; c++)
+				for (c = 0; c < MPKC_T + 1; ++c)
 				{
 					mat[c][k] ^= McElieceUtils::Multiply(mat[c][j], t, MPKC_M);
 				}
@@ -1258,9 +1275,9 @@ bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<usho
 		}
 	}
 
-	if (status)
+	if (status == true)
 	{
-		for (i = 0; i < MPKC_T; i++)
+		for (i = 0; i < MPKC_T; ++i)
 		{
 			Output[i] = mat[MPKC_T][i];
 		}
@@ -1273,15 +1290,16 @@ bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<usho
 
 void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
-	size_t i;
 	std::array<ushort, MPKC_T + 1> irr;
 	std::vector<ushort> f(MPKC_T);
+	size_t ctr;
+	size_t i;
 
-	while (1)
+	while (true)
 	{
 		IntegerTools::Fill(f, 0, f.size(), Rng.get());
 
-		for (i = 0; i < MPKC_T; i++) 
+		for (i = 0; i < MPKC_T; ++i) 
 		{
 			f[i] &= (static_cast<ushort>(1) << MPKC_M) - 1;
 		}
@@ -1292,53 +1310,60 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 		}
 	}
 
-	std::array<ulong, MPKC_M> skInt;
+	std::array<ulong, MPKC_M> skint;
+
 	for (i = 0; i < MPKC_M; i++)
 	{
-		skInt[i] = 0;
-		for (int cnt = static_cast<int>(irr.size() - 1); cnt >= 0; cnt--)
-		{
-			skInt[i] <<= 1;
-			skInt[i] |= (irr[cnt] >> i) & 1;
-		}
+		skint[i] = 0;
+		ctr = irr.size();
 
-		IntegerTools::Le64ToBytes(skInt[i], PrivateKey, i * 8);
+		do
+		{
+			--ctr;
+			skint[i] <<= 1;
+			skint[i] |= (irr[ctr] >> i) & 1;
+		} 
+		while (ctr != 0);
+
+		IntegerTools::Le64ToBytes(skint[i], PrivateKey, i * 8);
 	}
 
-	std::vector<ulong> cond(MPKC_CND_SIZE / 8);
+	std::vector<ulong> cond(MPKC_CND_SIZE / sizeof(ulong));
 	IntegerTools::Fill(cond, 0, cond.size(), Rng.get());
 
-	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
+	for (i = 0; i < MPKC_CND_SIZE / sizeof(ulong); ++i)
 	{
-		IntegerTools::Le64ToBytes(cond[i], PrivateKey, MPKC_IRR_SIZE + i * 8);
+		IntegerTools::Le64ToBytes(cond[i], PrivateKey, MPKC_IRR_SIZE + i * sizeof(ulong));
 	}
 }
 
 bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey)
 {
+	std::array<ulong, MPKC_M> skint;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> eval;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> inverse;
+	ulong mask;
+	ulong u;
 	size_t c;
+	size_t ctr;
 	size_t i;
 	size_t j;
 	size_t k;
+	size_t pos;
 	size_t row;
 	size_t tail;
-	ulong mask;
-	ulong u;
 	bool status;
-	std::array<ulong, MPKC_M> skInt;
 
 	// compute the inverses
-	for (i = 0; i < MPKC_M; i++)
+	for (i = 0; i < MPKC_M; ++i)
 	{
-		skInt[i] = IntegerTools::LeBytesTo64(PrivateKey, i * 8);
+		skint[i] = IntegerTools::LeBytesTo64(PrivateKey, i * 8);
 	}
 
-	std::array<std::array<ulong, MPKC_M>, 64> eval;
-	std::array<std::array<ulong, MPKC_M>, 64> inverse;
-	AdditiveFFT::Transform(eval, skInt);
+	AdditiveFFT::Transform(eval, skint);
 	McElieceUtils::Copy(eval[0], inverse[0]);
 
-	for (i = 1; i < 64; i++) 
+	for (i = 1; i < MPKC_COLUMN_SIZE; ++i)
 	{
 		McElieceUtils::Multiply(inverse[i], inverse[i - 1], eval[i]);
 	}
@@ -1346,31 +1371,35 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 	std::array<ulong, MPKC_M> tmp;
 	Invert(tmp, inverse[63]);
 
-	for (int cnt = 62; cnt >= 0; --cnt)
+	ctr = 63;
+
+	do
 	{
-		McElieceUtils::Multiply(inverse[cnt + 1], tmp, inverse[cnt]);
-		McElieceUtils::Multiply(tmp, tmp, eval[cnt + 1]);
-	}
+		McElieceUtils::Multiply(inverse[ctr], tmp, inverse[ctr - 1]);
+		McElieceUtils::Multiply(tmp, tmp, eval[ctr]);
+		--ctr;
+	} 
+	while (ctr != 0);
 
 	McElieceUtils::Copy(tmp, inverse[0]);
-	std::array<std::array<ulong, 64>, MPKC_PKN_ROWS> mat;
+	std::array<std::array<ulong, MPKC_COLUMN_SIZE>, MPKC_PKN_ROWS> mat;
 
 	// fill matrix 
-	for (j = 0; j < 64; j++)
+	for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 	{
-		for (k = 0; k < MPKC_M; k++) 
+		for (k = 0; k < MPKC_M; ++k) 
 		{
 			mat[k][j] = inverse[j][k];
 		}
 	}
 
-	for (i = 1; i < MPKC_T; i++)
+	for (i = 1; i < MPKC_T; ++i)
 	{
-		for (j = 0; j < 64; j++)
+		for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 		{
 			McElieceUtils::Multiply(inverse[j], inverse[j], GfPoints[j]);
 
-			for (k = 0; k < MPKC_M; k++)
+			for (k = 0; k < MPKC_M; ++k)
 			{
 				mat[i * MPKC_M + k][j] = inverse[j][k];
 			}
@@ -1379,36 +1408,37 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 
 	// permute 
 	std::array<ulong, MPKC_CND_SIZE / 8> cond;
-	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
+
+	for (i = 0; i < MPKC_CND_SIZE / 8; ++i)
 	{
 		cond[i] = IntegerTools::LeBytesTo64(PrivateKey, MPKC_IRR_SIZE + i * 8);
 	}
 
-	for (i = 0; i < MPKC_PKN_ROWS; i++)
+	for (i = 0; i < MPKC_PKN_ROWS; ++i)
 	{
 		McElieceUtils::BenesCompact(mat[i], cond, 0);
 	}
 
 	// gaussian elimination 
-	for (i = 0; i < MPKC_M; i++)
+	for (i = 0; i < MPKC_M; ++i)
 	{
-		for (j = 0; j < 64; j++)
+		for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 		{
-			row = i * 64 + j;
+			row = (i * MPKC_COLUMN_SIZE) + j;
 
 			if (row >= MPKC_PKN_ROWS)
 			{
 				break;
 			}
 
-			for (k = row + 1; k < MPKC_PKN_ROWS; k++)
+			for (k = row + 1; k < MPKC_PKN_ROWS; ++k)
 			{
 				mask = mat[row][i] ^ mat[k][i];
 				mask >>= j;
 				mask &= 1;
 				mask = ~mask + 1;
 
-				for (c = 0; c < 64; c++)
+				for (c = 0; c < MPKC_COLUMN_SIZE; ++c)
 				{
 					mat[row][c] ^= mat[k][c] & mask;
 				}
@@ -1416,12 +1446,13 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 
 			// not invertible
 			status = (((mat[row][i] >> j) & 1) != 0);
-			if (!status)
+
+			if (status == false)
 			{
 				break;
 			}
 
-			for (k = 0; k < MPKC_PKN_ROWS; k++)
+			for (k = 0; k < MPKC_PKN_ROWS; ++k)
 			{
 				if (k != row)
 				{
@@ -1429,7 +1460,7 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 					mask &= 1;
 					mask = ~mask + 1;
 
-					for (c = 0; c < 64; c++)
+					for (c = 0; c < MPKC_COLUMN_SIZE; ++c)
 					{
 						mat[k][c] ^= mat[row][c] & mask;
 					}
@@ -1437,33 +1468,33 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 			}
 		}
 
-		if (!status)
+		if (status == false)
 		{
 			break;
 		}
 	}
 
-	if (status)
+	if (status == true)
 	{
 		// store pk
 		tail = (MPKC_PKN_ROWS & 63) >> 3;
-		size_t pos = 0;
+		pos = 0;
 
-		for (i = 0; i < MPKC_PKN_ROWS; i++)
+		for (i = 0; i < MPKC_PKN_ROWS; ++i)
 		{
-			u = mat[i][(MPKC_PKN_ROWS + 63) / 64 - 1];
+			u = mat[i][(MPKC_PKN_ROWS + 63) / MPKC_COLUMN_SIZE - 1];
 
-			for (k = tail; k < 8; k++)
+			for (k = tail; k < 8; ++k)
 			{
 				PublicKey[pos + (k - tail)] = (u >> (8 * k)) & 0xFF;
 			}
 
 			pos += 8 - tail;
 
-			for (j = MPKC_M; j < 64; j++)
+			for (j = MPKC_M; j < MPKC_COLUMN_SIZE; ++j)
 			{
 				IntegerTools::Le64ToBytes(mat[i][j], PublicKey, pos);
-				pos += 8;
+				pos += sizeof(ulong);
 			}
 		}
 	}
@@ -1473,13 +1504,13 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 
 //~~~FFT~~~//
 
-void MPKCM12T62::AdditiveFFT::Transform(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<ulong, MPKC_M> &Input)
+void MPKCM12T62::AdditiveFFT::Transform(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
 {
 	RadixConversions(Input);
 	Butterflies(Output, Input);
 }
 
-void MPKCM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<ulong, MPKC_M> &Input)
+void MPKCM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
 {
 	size_t b;
 	size_t i;
@@ -1501,7 +1532,7 @@ void MPKCM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 
 	};
 
 	// broadcast
-	for (j = 0; j < 64; j++)
+	for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 	{
 		Output[j][0] = (Input[0] >> ButterflyReverse[j]) & 1;
 		Output[j][0] = ~Output[j][0] + 1;
@@ -1533,46 +1564,46 @@ void MPKCM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 
 	std::array<ulong, MPKC_M> tmp;
 
 	// butterflies
-	for (i = 0; i <= 5; i++)
+	for (i = 0; i <= 5; ++i)
 	{
 		s = static_cast<size_t>(1) << i;
 
 		// butterflies
-		for (i = 0; i <= 5; i++)
+		for (i = 0; i <= 5; ++i)
 		{
 			s = static_cast<size_t>(1) << i;
 
-			for (j = 0; j < 64; j += 2 * s)
+			for (j = 0; j < MPKC_COLUMN_SIZE; j += 2 * s)
 			{
-				for (k = j; k < j + s; k++)
+				for (k = j; k < j + s; ++k)
 				{
 					McElieceUtils::Multiply(tmp, Output[k + s], ButterflyConsts[pos + (k - j)]);
 
 					// memory tiling
-					for (b = 0; b < MPKC_M; b++)
+					for (b = 0; b < MPKC_M; ++b)
 					{
 						Output[k][b] ^= tmp[b];
 					}
 
-					for (b = 0; b < MPKC_M; b++)
+					for (b = 0; b < MPKC_M; ++b)
 					{
 						Output[k + s][b] ^= Output[k][b];
 					}
 				}
 			}
 
-			pos += (static_cast<size_t>(1) << i);
+			pos += (1ULL << i);
 		}
 
-		pos += (static_cast<size_t>(1) << i);
+		pos += (1ULL << i);
 	}
 }
 
 void MPKCM12T62::AdditiveFFT::RadixConversions(std::array<ulong, MPKC_M> &Output)
 {
+	size_t ctr;
 	size_t i;
 	size_t j;
-	int cnt;
 
 	static const std::array<std::array<ulong, 2>, 5> RadixMask =
 	{
@@ -1617,53 +1648,62 @@ void MPKCM12T62::AdditiveFFT::RadixConversions(std::array<ulong, MPKC_M> &Output
 	};
 
 	// scaling
-	for (i = 0; i <= 4; i++)
+	for (i = 0; i < RadixMask.size(); ++i)
 	{
-		for (j = 0; j < MPKC_M; j++)
+		for (j = 0; j < MPKC_M; ++j)
 		{
-			for (cnt = 4; cnt >= static_cast<int>(i); --cnt)
+			ctr = RadixMask.size();
+
+			do 
 			{
-				Output[j] ^= (Output[j] & RadixMask[cnt][0]) >> (static_cast<int>(1) << cnt);
-				Output[j] ^= (Output[j] & RadixMask[cnt][1]) >> (static_cast<int>(1) << cnt);
-			}
+				--ctr;
+				Output[j] ^= (Output[j] & RadixMask[ctr][0]) >> (1UL << ctr);
+				Output[j] ^= (Output[j] & RadixMask[ctr][1]) >> (1UL << ctr);
+			} 
+			while(ctr != i);
+
 		}
 
 		McElieceUtils::Multiply(Output, Output, RadixScalar[i]);
 	}
 }
 
-void MPKCM12T62::TransposedFFT::Transform(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Input)
+void MPKCM12T62::TransposedFFT::Transform(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input)
 {
 	Butterflies(Output, Input);
 	RadixConversions(Output);
 }
 
-void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Input)
+void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input)
 {
+	std::array<ulong, MPKC_M> tmp;
 	size_t i;
 	size_t j;
 	size_t k;
-	size_t s;
-	size_t pos = 63;
-	int cnt;
-	std::array<ulong, MPKC_M> tmp;
+	size_t pos;
+	uint s;
 
 	// butterflies
-	for (cnt = 5; cnt >= 0; --cnt)
+	i = 6;
+	pos = MPKC_COLUMN_SIZE -  1;
+
+	do
 	{
-		s = static_cast<size_t>(1) << cnt;
+		--i;
+		s = 1UL << i;
 		pos -= s;
 
-		for (j = 0; j < 64; j += 2 * s)
+		for (j = 0; j < MPKC_COLUMN_SIZE; j += 2 * s)
 		{
-			for (k = j; k < j + s; k++)
+			for (k = j; k < j + s; ++k)
 			{
 				McElieceUtils::Add(Input[k], Input[k + s]);
 				McElieceUtils::Multiply(tmp, Input[k], ButterflyConsts[pos + (k - j)]);
 				McElieceUtils::Add(Input[k + s], tmp);
 			}
 		}
-	}
+	} 
+	while (i != 0);
 
 	// transpose
 	static const std::array<byte, 64> ButterflyReverse =
@@ -1678,17 +1718,18 @@ void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>
 		0x07, 0x27, 0x17, 0x37, 0x0F, 0x2F, 0x1F, 0x3F
 	};
 
-	std::array<ulong, 64> buf;
-	for (i = 0; i < MPKC_M; i++)
+	std::array<ulong, MPKC_COLUMN_SIZE> buf;
+
+	for (i = 0; i < MPKC_M; ++i)
 	{
-		for (j = 0; j < 64; j++) 
+		for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 		{
 			buf[ButterflyReverse[j]] = Input[j][i];
 		}
 
 		McElieceUtils::TransposeCompact64x64(buf);
 
-		for (j = 0; j < 64; j++)
+		for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 		{
 			Input[j][i] = buf[j];
 		}
@@ -1696,6 +1737,7 @@ void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>
 
 	// broadcast
 	std::array<std::array<ulong, MPKC_M>, 6> pre;
+
 	McElieceUtils::Copy(Input[32], pre[0]);
 	McElieceUtils::Add(Input[33], Input[32]);
 	McElieceUtils::Copy(Input[33], pre[1]);
@@ -1823,24 +1865,24 @@ void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>
 	McElieceUtils::Add(pre[0], Input[1]);
 	McElieceUtils::Add(Output[0], Input[0], Input[1]);
 
-	const ushort beta[6] =
+	const ushort Beta[6] =
 	{
-		8, 1300, 3408, 1354, 2341, 1154
+		0x0008U, 0x0514U, 0x0D50U, 0x054AU, 0x0925U, 0x0482U
 	};
 
-	for (j = 0; j < MPKC_M; j++)
+	for (j = 0; j < MPKC_M; ++j)
 	{
-		tmp[j] = (beta[0] >> j) & 1;
+		tmp[j] = (Beta[0] >> j) & 1;
 		tmp[j] = ~tmp[j] + 1;
 	}
 
 	McElieceUtils::Multiply(Output[1], pre[0], tmp);
 
-	for (i = 1; i < 6; i++)
+	for (i = 1; i < 6; ++i)
 	{
-		for (j = 0; j < MPKC_M; j++)
+		for (j = 0; j < MPKC_M; ++j)
 		{
-			tmp[j] = (beta[i] >> j) & 1;
+			tmp[j] = (Beta[i] >> j) & 1;
 			tmp[j] = ~tmp[j] + 1;
 		}
 
@@ -1851,9 +1893,9 @@ void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>
 
 void MPKCM12T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, MPKC_M>, 2> &Output)
 {
+	size_t ctr;
 	size_t i;
 	size_t j;
-	int cnt;
 
 	static const std::array<std::array<ulong, 2>, 6> RadixTrMask =
 	{
@@ -1867,54 +1909,59 @@ void MPKCM12T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, MP
 		}
 	};
 
-	for (cnt = 5; cnt >= 0; --cnt)
+	ctr = RadixTrMask.size();
+
+	do
 	{
-		if (cnt < 5)
+		--ctr;
+
+		if (ctr < 5)
 		{
-			McElieceUtils::Multiply(Output[0], Output[0], RadixTrScalar[cnt][0]);
-			McElieceUtils::Multiply(Output[1], Output[1], RadixTrScalar[cnt][1]);
+			McElieceUtils::Multiply(Output[0], Output[0], RadixTrScalar[ctr][0]);
+			McElieceUtils::Multiply(Output[1], Output[1], RadixTrScalar[ctr][1]);
 		}
 
-		for (i = 0; i < MPKC_M; i++)
+		for (i = 0; i < MPKC_M; ++i)
 		{
-			for (j = static_cast<size_t>(cnt); j <= 4; j++)
+			for (j = ctr; j <= 4; ++j)
 			{
-				Output[0][i] ^= (Output[0][i] & RadixTrMask[j][0]) << (static_cast<int>(1) << j);
-				Output[0][i] ^= (Output[0][i] & RadixTrMask[j][1]) << (static_cast<int>(1) << j);
-				Output[1][i] ^= (Output[1][i] & RadixTrMask[j][0]) << (static_cast<int>(1) << j);
-				Output[1][i] ^= (Output[1][i] & RadixTrMask[j][1]) << (static_cast<int>(1) << j);
+				Output[0][i] ^= (Output[0][i] & RadixTrMask[j][0]) << (1UL << j);
+				Output[0][i] ^= (Output[0][i] & RadixTrMask[j][1]) << (1UL << j);
+				Output[1][i] ^= (Output[1][i] & RadixTrMask[j][0]) << (1UL << j);
+				Output[1][i] ^= (Output[1][i] & RadixTrMask[j][1]) << (1UL << j);
 			}
 		}
 
-		for (i = 0; i < MPKC_M; i++)
+		for (i = 0; i < MPKC_M; ++i)
 		{
 			Output[1][i] ^= (Output[0][i] & RadixTrMask[5][0]) >> 32;
 			Output[1][i] ^= (Output[1][i] & RadixTrMask[5][1]) << 32;
 		}
-	}
+	} 
+	while (ctr != 0);
 }
 
 //~~~Utils~~~//
 
 void MPKCM12T62::Invert(std::array<ulong, MPKC_M> &Output, const std::array<ulong, MPKC_M> &Input)
 {
-	std::array<ulong, MPKC_M> tmpA;
-	std::array<ulong, MPKC_M> tmpB;
+	std::array<ulong, MPKC_M> tmpa;
+	std::array<ulong, MPKC_M> tmpb;
 
 	McElieceUtils::Copy(Input, Output);
 	Square(Output, Output);
-	McElieceUtils::Multiply(tmpA, Output, Input);
-	Square(Output, tmpA);
+	McElieceUtils::Multiply(tmpa, Output, Input);
+	Square(Output, tmpa);
 	Square(Output, Output);
-	McElieceUtils::Multiply(tmpB, Output, tmpA);
-	Square(Output, tmpB);
-	Square(Output, Output);
-	Square(Output, Output);
-	Square(Output, Output);
-	McElieceUtils::Multiply(Output, Output, tmpB);
+	McElieceUtils::Multiply(tmpb, Output, tmpa);
+	Square(Output, tmpb);
 	Square(Output, Output);
 	Square(Output, Output);
-	McElieceUtils::Multiply(Output, Output, tmpA);
+	Square(Output, Output);
+	McElieceUtils::Multiply(Output, Output, tmpb);
+	Square(Output, Output);
+	Square(Output, Output);
+	McElieceUtils::Multiply(Output, Output, tmpa);
 	Square(Output, Output);
 	McElieceUtils::Multiply(Output, Output, Input);
 	Square(Output, Output);
@@ -1927,22 +1974,22 @@ void MPKCM12T62::MatrixMultiply(std::array<ushort, MPKC_T> &Output, std::array<u
 
 	std::vector<ushort> tmp(123, 0);
 
-	for (i = 0; i < 62; i++)
+	for (i = 0; i < 62; ++i)
 	{
-		for (j = 0; j < 62; j++)
+		for (j = 0; j < 62; ++j)
 		{
 			tmp[i + j] ^= McElieceUtils::Multiply(A[i], B[j], MPKC_M);
 		}
 	}
 
-	for (i = 122; i >= 62; i--)
+	for (i = 122; i >= 62; --i)
 	{
-		tmp[i - 55] ^= McElieceUtils::Multiply(tmp[i], static_cast<ushort>(1763), MPKC_M);
-		tmp[i - 61] ^= McElieceUtils::Multiply(tmp[i], static_cast<ushort>(1722), MPKC_M);
-		tmp[i - 62] ^= McElieceUtils::Multiply(tmp[i], static_cast<ushort>(4033), MPKC_M);
+		tmp[i - 55] ^= McElieceUtils::Multiply(tmp[i], 0x06E3U, MPKC_M);
+		tmp[i - 61] ^= McElieceUtils::Multiply(tmp[i], 0x06BAU, MPKC_M);
+		tmp[i - 62] ^= McElieceUtils::Multiply(tmp[i], 0x0FC1U, MPKC_M);
 	}
 
-	for (i = 0; i < 62; i++) 
+	for (i = 0; i < 62; ++i) 
 	{
 		Output[i] = tmp[i];
 	}

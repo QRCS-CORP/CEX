@@ -96,13 +96,8 @@ class Dilithium final : public IAsymmetricSign
 {
 private:
 
-	static const std::string CLASS_NAME;
-
-	bool m_isDestroyed;
-	bool m_destroyEngine;
-	DilithiumParameters m_dlmParameters;
-	bool m_isInitialized;
-	bool m_isSigner;
+	class DilithiumState;
+	std::unique_ptr<DilithiumState> m_dilithiumState;
 	std::unique_ptr<AsymmetricKey> m_privateKey;
 	std::unique_ptr<AsymmetricKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;

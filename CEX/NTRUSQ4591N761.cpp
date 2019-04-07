@@ -1,7 +1,11 @@
 #include "NTRUSQ4591N761.h"
-#include "SHAKE.h"
+#include "Keccak.h"
+#include "MemoryTools.h"
 
 NAMESPACE_NTRU
+
+using Digest::Keccak;
+using Utility::MemoryTools;
 
 const std::string NTRUSQ4591N761::Name = "NTRUSQ4591N761";
 
@@ -36,15 +40,15 @@ int NTRUSQ4591N761::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &
 
 	R3Mult(r, t3, grecip);
 	R3Mult(r, t3, grecip);
-
 	weight = 0;
+
 	for (i = 0; i < NTRU_P; ++i)
 	{
 		weight += (1 & r[i]);
 	}
-	weight -= NTRU_W;
 
 	// XXX: puts limit on p
+	weight -= NTRU_W;
 	result = 0;
 	result |= ModqNonZeroMask(weight);
 	RqMult(hr, h, r);
@@ -57,10 +61,7 @@ int NTRUSQ4591N761::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &
 
 	SmallEncode(rstr, 0, r);
 
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(rstr);
-	gen.Generate(hash);
-
+	XOF(rstr, 0, rstr.size(), hash, 0, hash.size(), Keccak::KECCAK256_RATE_SIZE);
 	result |= Verify32(hash, CipherText);
 
 	for (i = 0; i < 32; ++i)
@@ -76,22 +77,20 @@ void NTRUSQ4591N761::Encrypt(std::vector<byte> &Secret, std::vector<byte> &Ciphe
 	std::array<int16_t, NTRU_P> h;
 	std::array<int16_t, NTRU_P> c;
 	std::array<int8_t, NTRU_P> r;
-	std::vector<uint8_t> rstr(NTRU_SMALLENCODE_SIZE);
-	std::vector<uint8_t> hash(64);
+	std::vector<byte> rstr(NTRU_SMALLENCODE_SIZE);
+	std::vector<byte> hash(64);
 
 	SmallRandomWeightW(r, Rng);
 	SmallEncode(rstr, 0, r);
 
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(rstr);
-	gen.Generate(hash);
+	XOF(rstr, 0, rstr.size(), hash, 0, hash.size(), Keccak::KECCAK256_RATE_SIZE);
 
 	RqDecode(h, PublicKey);
 	RqMult(c, h, r);
 	RqRound3(c, c);
 
-	std::memcpy(Secret.data(), hash.data() + 32, 32);
-	std::memcpy(CipherText.data(), hash.data(), 32);
+	MemoryTools::Copy(hash, 0, CipherText, 0, 32);
+	MemoryTools::Copy(hash, 32, Secret, 0, 32);
 
 	RqEncodeRounded(CipherText, 32, c);
 }
@@ -107,7 +106,8 @@ void NTRUSQ4591N761::Generate(std::vector<byte> &PublicKey, std::vector<byte> &P
 	do
 	{
 		SmallRandom(g, Rng);
-	} while (R3Recip(grecip, g) != 0);
+	} 
+	while (R3Recip(grecip, g) != 0);
 
 	SmallRandomWeightW(f, Rng);
 	RqRecip3(f3recip, f);
@@ -116,7 +116,8 @@ void NTRUSQ4591N761::Generate(std::vector<byte> &PublicKey, std::vector<byte> &P
 	RqEncode(PublicKey, h);
 	SmallEncode(PrivateKey, 0, f);
 	SmallEncode(PrivateKey, NTRU_SMALLENCODE_SIZE, grecip);
-	std::memcpy((uint8_t*)PrivateKey.data() + 2 * NTRU_SMALLENCODE_SIZE, (uint8_t*)PublicKey.data(), NTRU_RQENCODE_SIZE);
+
+	MemoryTools::Copy(PublicKey, 0, PrivateKey, 2 * NTRU_SMALLENCODE_SIZE, NTRU_RQENCODE_SIZE);
 }
 
 //~~~Prikvate Functions~~~//
@@ -144,33 +145,33 @@ int8_t NTRUSQ4591N761::Mod3Freeze(int32_t a)
 {
 	// input between -100000 and 100000
 	// output between -1 and 1
-	a -= 3 * ((10923 * a) >> 15);
-	a -= 3 * (((89478485 * a) + 134217728) >> 28);
+	a -= 3 * ((0x00002AABL * a) >> 15); // 10923
+	a -= 3 * (((0x05555555L * a) + 0x08000000L) >> 28);
 
 	return a;
 }
 
 int8_t NTRUSQ4591N761::Mod3MinusProduct(int8_t A, int8_t B, int8_t C)
 {
-	int32_t a = A;
-	int32_t b = B;
-	int32_t c = C;
+	int32_t sum;
 
-	return Mod3Freeze(a - b * c);
+	sum = A - B * C;
+
+	return Mod3Freeze(sum);
 }
 
 int32_t NTRUSQ4591N761::Mod3NonZeroMask(int8_t X)
 {
-	return -X * X;
+	return static_cast<int32_t>(-X * X);
 }
 
 int8_t NTRUSQ4591N761::Mod3PlusProduct(int8_t A, int8_t B, int8_t C)
 {
-	int32_t a = A;
-	int32_t b = B;
-	int32_t c = C;
+	int32_t sum;
 
-	return Mod3Freeze(a + b * c);
+	sum = A + B * C;
+
+	return Mod3Freeze(sum);
 }
 
 int8_t NTRUSQ4591N761::Mod3Product(int8_t A, int8_t B)
@@ -180,7 +181,7 @@ int8_t NTRUSQ4591N761::Mod3Product(int8_t A, int8_t B)
 
 int8_t NTRUSQ4591N761::Mod3Quotient(int8_t Num, int8_t Den)
 {
-	return Mod3Product(Num, Mod3Reciprocal(Den)); // fix
+	return Mod3Product(Num, Mod3Reciprocal(Den));
 }
 
 int8_t NTRUSQ4591N761::Mod3Reciprocal(int8_t A1)
@@ -190,28 +191,30 @@ int8_t NTRUSQ4591N761::Mod3Reciprocal(int8_t A1)
 
 int8_t NTRUSQ4591N761::Mod3Sum(int8_t A, int8_t B)
 {
-	int32_t a = A;
-	int32_t b = B;
+	int32_t sum;
 
-	return Mod3Freeze(a + b);
+	sum = A + B;
+
+	return Mod3Freeze(sum);
 }
 
 int16_t NTRUSQ4591N761::ModqFreeze(int32_t A)
 {
 	// input between -9000000 and 9000000 output between -2295 and 2295
-	A -= 4591 * ((228 * A) >> 20);
-	A -= 4591 * ((58470 * A + 134217728) >> 28);
+
+	A -= NTRU_Q * ((0x000000E4L * A) >> 20);
+	A -= NTRU_Q * (((0x0000E466L * A) + 0x08000000L) >> 28);
 
 	return A;
 }
 
 int16_t NTRUSQ4591N761::ModqMinusProduct(int16_t A, int16_t B, int16_t C)
 {
-	int32_t a = A;
-	int32_t b = B;
-	int32_t c = C;
+	int32_t sum;
 
-	return ModqFreeze(a - b * c);
+	sum = A - B * C;
+
+	return ModqFreeze(sum);
 }
 
 void NTRUSQ4591N761::ModqMinusProductVector(std::vector<int16_t> &Z, const std::vector<int16_t> &X, const std::vector<int16_t> &Y, size_t Length, const int16_t C)
@@ -250,18 +253,20 @@ void NTRUSQ4591N761::ModqProductVector(std::array<int16_t, NTRU_P> &Z, const std
 
 int16_t NTRUSQ4591N761::ModqProduct(int16_t A, int16_t B)
 {
-	int32_t a = A;
-	int32_t b = B;
+	int32_t sum;
 
-	return ModqFreeze(a * b);
+	sum = A * B;
+
+	return ModqFreeze(sum);
 }
 
-int NTRUSQ4591N761::ModqNonZeroMask(int16_t X)
+int32_t NTRUSQ4591N761::ModqNonZeroMask(int16_t X)
 {
 	// -1 if x is nonzero, 0 otherwise
+
 	int32_t r;
 
-	r = (ushort)X;
+	r = static_cast<ushort>(X);
 	r = -r;
 	r >>= 30;
 
@@ -270,11 +275,11 @@ int NTRUSQ4591N761::ModqNonZeroMask(int16_t X)
 
 int16_t NTRUSQ4591N761::ModqPlusProduct(int16_t A, int16_t B, int16_t C)
 {
-	int32_t a = A;
-	int32_t b = B;
-	int32_t c = C;
+	int32_t sum;
 
-	return ModqFreeze(a + b * c);
+	sum = A + B * C;
+
+	return ModqFreeze(sum);
 }
 
 int16_t NTRUSQ4591N761::ModqQuotient(int16_t Num, int16_t Den)
@@ -284,32 +289,50 @@ int16_t NTRUSQ4591N761::ModqQuotient(int16_t Num, int16_t Den)
 
 int16_t NTRUSQ4591N761::ModqReciprocal(int16_t A1)
 {
-	int16_t a2 = ModqSquare(A1);
-	int16_t a3 = ModqProduct(a2, A1);
-	int16_t a4 = ModqSquare(a2);
-	int16_t a8 = ModqSquare(a4);
-	int16_t a16 = ModqSquare(a8);
-	int16_t a32 = ModqSquare(a16);
-	int16_t a35 = ModqProduct(a32, a3);
-	int16_t a70 = ModqSquare(a35);
-	int16_t a140 = ModqSquare(a70);
-	int16_t a143 = ModqProduct(a140, a3);
-	int16_t a286 = ModqSquare(a143);
-	int16_t a572 = ModqSquare(a286);
-	int16_t a1144 = ModqSquare(a572);
-	int16_t a1147 = ModqProduct(a1144, a3);
-	int16_t a2294 = ModqSquare(a1147);
-	int16_t a4588 = ModqSquare(a2294);
-	int16_t a4589 = ModqProduct(a4588, A1);
+	int16_t a2;
+	int16_t a3;
+	int16_t a4;
+	int16_t a8;
+	int16_t a16;
+	int16_t a32;
+	int16_t a35;
+	int16_t a70;
+	int16_t a140;
+	int16_t a143;
+	int16_t a286;
+	int16_t a572;
+	int16_t a1144;
+	int16_t a1147;
+	int16_t a2294;
+	int16_t a4588;
+	int16_t a4589;
+
+	a2 = ModqSquare(A1);
+	a3 = ModqProduct(a2, A1);
+	a4 = ModqSquare(a2);
+	a8 = ModqSquare(a4);
+	a16 = ModqSquare(a8);
+	a32 = ModqSquare(a16);
+	a35 = ModqProduct(a32, a3);
+	a70 = ModqSquare(a35);
+	a140 = ModqSquare(a70);
+	a143 = ModqProduct(a140, a3);
+	a286 = ModqSquare(a143);
+	a572 = ModqSquare(a286);
+	a1144 = ModqSquare(a572);
+	a1147 = ModqProduct(a1144, a3);
+	a2294 = ModqSquare(a1147);
+	a4588 = ModqSquare(a2294);
+	a4589 = ModqProduct(a4588, A1);
 
 	return a4589;
 }
 
 void NTRUSQ4591N761::ModqShiftVector(std::vector<int16_t> &Z, size_t ZOffset, size_t Length)
 {
-	int32_t i;
+	size_t i;
 
-	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
+	for (i = Length - 1; i > 0; --i)
 	{
 		Z[ZOffset + i] = Z[ZOffset + i - 1];
 	}
@@ -319,16 +342,20 @@ void NTRUSQ4591N761::ModqShiftVector(std::vector<int16_t> &Z, size_t ZOffset, si
 
 int16_t NTRUSQ4591N761::ModqSquare(int16_t A)
 {
-	int32_t a = A;
+	int32_t sum;
 
-	return ModqFreeze(a * a);
+	sum = A * A;
+
+	return ModqFreeze(sum);
 }
 
 int16_t NTRUSQ4591N761::ModqSum(int16_t A, int16_t B)
 {
-	int32_t s = A + B;
+	int32_t sum;
 
-	return ModqFreeze(s);
+	sum = A + B;
+
+	return ModqFreeze(sum);
 }
 
 void NTRUSQ4591N761::Mod3ProductVector(std::array<int8_t, NTRU_P> &Z, const std::vector<int8_t> &X, size_t XOffset, const int8_t C, size_t Length)
@@ -365,9 +392,9 @@ void NTRUSQ4591N761::Mod3MinusProductVector(std::vector<int8_t> &Z, const std::v
 
 void NTRUSQ4591N761::Mod3ShiftVector(std::vector<int8_t> &Z, size_t ZOffset, size_t Length)
 {
-	int32_t i;
+	size_t i;
 
-	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
+	for (i = Length - 1; i > 0; --i)
 	{
 		Z[ZOffset + i] = Z[ZOffset + i - 1];
 	}
@@ -393,6 +420,7 @@ void NTRUSQ4591N761::R3Mult(std::array<int8_t, NTRU_P> &H, const std::array<int8
 
 		fg[i] = result;
 	}
+
 	for (i = NTRU_P; i < NTRU_P + NTRU_P - 1; ++i)
 	{
 		result = 0;
@@ -423,8 +451,8 @@ int NTRUSQ4591N761::R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8
 
 	std::vector<int8_t> f(NTRU_P + 1);
 	std::vector<int8_t> g(NTRU_P + 1);
-	std::vector<int8_t> u(2 * NTRU_P + 2);
-	std::vector<int8_t> v(2 * NTRU_P + 2);
+	std::vector<int8_t> u((2 * NTRU_P) + 2);
+	std::vector<int8_t> v((2 * NTRU_P) + 2);
 	size_t i;
 	size_t loop;
 	int32_t d;
@@ -460,7 +488,6 @@ int NTRUSQ4591N761::R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8
 		// v has degree <=loop (so it fits in loop+1 coefficients)
 		// v[i]==0 for i < p-e
 		// v[i]==0 for i < loop-p (so can look at just p+1 coefficients)
-
 		c = Mod3Quotient(g[NTRU_P], f[NTRU_P]);
 		Mod3MinusProductVector(g, g, f, c, NTRU_P + 1);
 		Mod3ShiftVector(g, 0, NTRU_P + 1);
@@ -484,7 +511,6 @@ int NTRUSQ4591N761::R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8
 
 		++loop;
 		e -= 1;
-
 		swapmask = SmallerMask(e, d) & Mod3NonZeroMask(g[NTRU_P]);
 		Swap32(e, d, swapmask);
 		Swap(f, 0, g, 0, NTRU_P + 1, swapmask);
@@ -512,6 +538,7 @@ int NTRUSQ4591N761::R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8
 
 void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
 {
+	size_t i;
 	uint c0;
 	uint c1;
 	uint c2;
@@ -525,7 +552,6 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 	uint f2;
 	uint f3;
 	uint f4;
-	size_t i;
 
 	for (i = 0; i < NTRU_P / 5; ++i)
 	{
@@ -549,7 +575,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f4 = (76/81)c6 + (37/81)c5 + 405 - (32768/81)[0,1] + 2^19[0,0.75]
 		// at least 405 - 32768/81 > 0
 		// at most (76/81)23241 + (37/81)255 + 405 + 2^19 0.75 < 2^19
-		f4 = (103564 * c6 + 405 * (c5 + 1)) >> 19;
+		f4 = ((0x0001948CUL * c6) + (0x00000195UL * (c5 + 1))) >> 19;
 		c5 += c6 << 8;
 		c5 -= (f4 * 81) << 4;
 		c4 += c5 << 8;
@@ -563,7 +589,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f3 = 19418 - (1/27)c4 - (262144/27)[0,1] + 2^19[0,0.75]
 		// at least 19418 - 247914/27 - 262144/27 > 0
 		// at most 19418 + 2^19 0.75 < 2^19
-		f3 = (9709 * (c4 + 2)) >> 19;
+		f3 = (0x000025EDUL * (c4 + 2)) >> 19;
 		c4 -= (f3 * 27) << 1;
 		c3 += c4 << 8;
 
@@ -576,7 +602,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f2 = 1820 + (1/9)c3 - (2/9)c2 - (32/9)c1 - (1/72)c0 + 2^19[0,0.75]
 		// at least 1820 - (2/9)255 - (32/9)255 - (1/72)255 > 0
 		// at most 1820 + (1/9)10329 + 2^19 0.75 < 2^19
-		f2 = ((233017 * c3) + (910 * (c2 + 2))) >> 19;
+		f2 = ((0x00038E39UL * c3) + (0x0000038EUL * (c2 + 2))) >> 19;
 		c2 += c3 << 8;
 		c2 -= (f2 * 9) << 6;
 		c1 += c2 << 8;
@@ -590,7 +616,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f1 = 43690 - (1/3)c1 - (1/3)c0 + 2^19 [0,0.75]
 		// at least 43690 - (1/3)110184 - (1/3)255 > 0
 		// at most 43690 + 2^19 0.75 < 2^19
-		f1 = ((21845 * (c1 + 2)) + (85 * c0)) >> 19;
+		f1 = ((0x00005555UL * (c1 + 2)) + (0x00000055UL * c0)) >> 19;
 		c1 -= (f1 * 3) << 3;
 		c0 += c1 << 8;
 		f0 = c0;
@@ -610,6 +636,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 
 void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C)
 {
+	size_t i;
 	uint c0;
 	uint c1;
 	uint c2;
@@ -623,7 +650,6 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 	uint f2;
 	uint f3;
 	uint f4;
-	size_t i;
 
 	for (i = 0; i < NTRU_P / 5; ++i)
 	{
@@ -647,7 +673,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f4 = (76/81)c6 + (37/81)c5 + 405 - (32768/81)[0,1] + 2^19[0,0.75]
 		// at least 405 - 32768/81 > 0
 		// at most (76/81)23241 + (37/81)255 + 405 + 2^19 0.75 < 2^19
-		f4 = ((103564 * c6) + (405 * (c5 + 1))) >> 19;
+		f4 = ((0x0001948CUL * c6) + (0x00000195UL * (c5 + 1))) >> 19;
 		c5 += c6 << 8;
 		c5 -= (f4 * 81) << 4;
 		c4 += c5 << 8;
@@ -661,7 +687,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f3 = 19418 - (1/27)c4 - (262144/27)[0,1] + 2^19[0,0.75]
 		// at least 19418 - 247914/27 - 262144/27 > 0
 		// at most 19418 + 2^19 0.75 < 2^19
-		f3 = (9709 * (c4 + 2)) >> 19;
+		f3 = (0x000025EDUL * (c4 + 2)) >> 19;
 		c4 -= (f3 * 27) << 1;
 		c3 += c4 << 8;
 
@@ -674,7 +700,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f2 = 1820 + (1/9)c3 - (2/9)c2 - (32/9)c1 - (1/72)c0 + 2^19[0,0.75]
 		// at least 1820 - (2/9)255 - (32/9)255 - (1/72)255 > 0
 		// at most 1820 + (1/9)10329 + 2^19 0.75 < 2^19
-		f2 = ((233017 * c3) + (910 * (c2 + 2))) >> 19;
+		f2 = ((0x00038E39UL * c3) + (0x0000038EUL * (c2 + 2))) >> 19;
 		c2 += c3 << 8;
 		c2 -= (f2 * 9) << 6;
 		c1 += c2 << 8;
@@ -688,7 +714,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		// proof: x - 2^19 f1 = 43690 - (1/3)c1 - (1/3)c0 + 2^19 [0,0.75]
 		// at least 43690 - (1/3)110184 - (1/3)255 > 0
 		// at most 43690 + 2^19 0.75 < 2^19
-		f1 = ((21845 * (c1 + 2)) + (85 * c0)) >> 19;
+		f1 = ((0x00005555UL * (c1 + 2)) + (0x00000055UL * c0)) >> 19;
 		c1 -= (f1 * 3) << 3;
 		c0 += c1 << 8;
 		f0 = c0;
@@ -708,6 +734,7 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 
 void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
 {
+	size_t i;
 	uint c0;
 	uint c1;
 	uint c2;
@@ -715,7 +742,6 @@ void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 	uint f0;
 	uint f1;
 	uint f2;
-	size_t i;
 
 	for (i = 0; i < NTRU_P / 3; ++i)
 	{
@@ -733,7 +759,7 @@ void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 		// proof: x - 2^21 f2 = 456 - (8/9)c0 + (4/9)c1 - (2/9)c2 + (1/9)c3 + 2^21 [0,0.99675]
 		// at least 456 - (8/9)255 - (2/9)255 > 0
 		// at most 456 + (4/9)255 + (1/9)255 + 2^21 0.99675 < 2^21
-		f2 = ((14913081 * c3) + (58254 * c2) + (228 * (c1 + 2))) >> 21;
+		f2 = ((0x00E38E39UL * c3) + (0x0000E38EUL * c2) + (0x000000E4L * (c1 + 2))) >> 21;
 		c2 += c3 << 8;
 		c2 -= (f2 * 9) << 2;
 
@@ -746,7 +772,7 @@ void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 		// proof: x - 2^21 f1 = 1365 - (1/3)c2 - (1/3)c1 - (1/3)c0 + (4096/3)f0
 		// at least 1365 - (1/3)35 - (1/3)255 - (1/3)255 > 0
 		// at most 1365 + (4096/3)1530 < 2^21
-		f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
+		f1 = ((0x05555555UL * c2) + (0x00055555UL * c1) + (0x00000555UL * (c0 + 1))) >> 21;
 		c1 += c2 << 8;
 		c1 -= (f1 * 3) << 1;
 		c0 += c1 << 8;
@@ -760,7 +786,7 @@ void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 	c0 = C[COffset + (i * 4)];
 	c1 = C[COffset + (i * 4) + 1];
 	c2 = C[COffset + (i * 4) + 2];
-	f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
+	f1 = ((0x05555555UL * c2) + (0x00055555UL * c1) + (0x00000555UL * (c0 + 1))) >> 21;
 
 	c1 += c2 << 8;
 	c1 -= (f1 * 3) << 1;
@@ -773,12 +799,12 @@ void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 
 void NTRUSQ4591N761::RqEncode(std::vector<byte> &C, const std::array<int16_t, NTRU_P> &F)
 {
+	size_t  i;
 	int32_t f0;
 	int32_t f1;
 	int32_t f2;
 	int32_t f3;
 	int32_t f4;
-	size_t  i;
 
 	for (i = 0; i < NTRU_P / 5; ++i)
 	{
@@ -823,19 +849,19 @@ void NTRUSQ4591N761::RqEncode(std::vector<byte> &C, const std::array<int16_t, NT
 
 void NTRUSQ4591N761::RqEncodeRounded(std::vector<byte> &C, size_t COffset, const std::array<int16_t, NTRU_P> &F)
 {
+	size_t i;
 	int32_t f0;
 	int32_t f1;
 	int32_t f2;
-	size_t i;
 
 	for (i = 0; i < NTRU_P / 3; ++i)
 	{
 		f0 = F[(i * 3)] + NTRU_QSHIFT;
 		f1 = F[(i * 3) + 1] + NTRU_QSHIFT;
 		f2 = F[(i * 3) + 2] + NTRU_QSHIFT;
-		f0 = (21846 * f0) >> 16;
-		f1 = (21846 * f1) >> 16;
-		f2 = (21846 * f2) >> 16;
+		f0 = (0x00005556L * f0) >> 16;
+		f1 = (0x00005556L * f1) >> 16;
+		f2 = (0x00005556L * f2) >> 16;
 		// now want f0 + f1*1536 + f2*1536^2 as a 32-bit integer
 		f2 *= 3;
 		f1 += f2 << 9;
@@ -853,8 +879,8 @@ void NTRUSQ4591N761::RqEncodeRounded(std::vector<byte> &C, size_t COffset, const
 	// XXX: using p mod 3 = 2
 	f0 = F[(i * 3)] + NTRU_QSHIFT;
 	f1 = F[(i * 3) + 1] + NTRU_QSHIFT;
-	f0 = (21846 * f0) >> 16;
-	f1 = (21846 * f1) >> 16;
+	f0 = (0x00005556L * f0) >> 16;
+	f1 = (0x00005556L * f1) >> 16;
 	f1 *= 3;
 	f0 += f1 << 9;
 	C[COffset + (i * 4)] = f0;
@@ -917,8 +943,8 @@ int NTRUSQ4591N761::RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<in
 
 	std::vector<int16_t> f(NTRU_P + 1);
 	std::vector<int16_t> g(NTRU_P + 1);
-	std::vector<int16_t> u(2 * NTRU_P + 2);
-	std::vector<int16_t> v(2 * NTRU_P + 2);
+	std::vector<int16_t> u((2 * NTRU_P) + 2);
+	std::vector<int16_t> v((2 * NTRU_P) + 2);
 	size_t i;
 	size_t loop;
 	int32_t d;
@@ -1026,36 +1052,36 @@ void NTRUSQ4591N761::RqRound3(std::array<int16_t, NTRU_P> &H, const std::array<i
 
 	for (i = 0; i < NTRU_P; ++i)
 	{
-		H[i] = ((21846 * (F[i] + 2295) + 32768) >> 16) * 3 - 2295;
+		H[i] = (((0x5556 * (F[i] + 0x08F7) + 0x8000) >> 16) * 3) - 0x08F7;
 	}
 }
 
 void NTRUSQ4591N761::SmallDecode(std::array<int8_t, NTRU_P> &F, const std::vector<byte> &C, size_t COffset)
 {
 	size_t i;
-	uint8_t c0;
+	int8_t c0;
 
 	for (i = 0; i < NTRU_P / 4; ++i)
 	{
 		c0 = C[COffset + i];
-		F[(i * 4)] = ((int8_t)(c0 & 3)) - 1;
+		F[(i * 4)] = (c0 & 3) - 1;
 		c0 >>= 2;
-		F[(i * 4) + 1] = ((int8_t)(c0 & 3)) - 1;
+		F[(i * 4) + 1] = (c0 & 3) - 1;
 		c0 >>= 2;
-		F[(i * 4) + 2] = ((int8_t)(c0 & 3)) - 1;
+		F[(i * 4) + 2] = (c0 & 3) - 1;
 		c0 >>= 2;
-		F[(i * 4) + 3] = ((int8_t)(c0 & 3)) - 1;
+		F[(i * 4) + 3] = (c0 & 3) - 1;
 	}
 
-	c0 = C[COffset + i];
-	F[(i * 4)] = ((int8_t)(c0 & 3)) - 1;
+	c0 = static_cast<int8_t>(C[COffset + i]);
+	F[(i * 4)] = (c0 & 3) - 1;
 }
 
 void NTRUSQ4591N761::SmallEncode(std::vector<byte> &C, size_t COffset, const std::array<int8_t, NTRU_P> &F)
 {
 	// all coefficients in -1, 0, 1
 	size_t i;
-	uint8_t c0;
+	byte c0;
 
 	for (i = 0; i < NTRU_P / 4; ++i)
 	{
@@ -1078,11 +1104,12 @@ int NTRUSQ4591N761::SmallerMask(int32_t X, int32_t Y)
 void NTRUSQ4591N761::SmallRandom(std::array<int8_t, NTRU_P> &G, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	size_t i;
+	uint r;
 
 	for (i = 0; i < NTRU_P; ++i)
 	{
-		uint r = Rng->NextUInt32();
-		G[i] = (int8_t)(((1073741823 & r) * 3) >> 30) - 1;
+		r = Rng->NextUInt32();
+		G[i] = static_cast<int8_t>(((1073741823 & r) * 3) >> 30) - 1;
 	}
 }
 
@@ -1116,18 +1143,14 @@ void NTRUSQ4591N761::SmallRandomWeightW(std::array<int8_t, NTRU_P> &F, std::uniq
 
 void NTRUSQ4591N761::Sort(std::array<int32_t, NTRU_P> &X)
 {
-	const int32_t TOP = 512;
-
+	const int32_t SRTTOP = 512;
 	int32_t i;
 	int32_t p;
 	int32_t q;
-	int32_t n;
 
-	n = NTRU_P;
-
-	for (p = TOP; p > 0; p >>= 1)
+	for (p = SRTTOP; p > 0; p >>= 1)
 	{
-		for (i = 0; i < n - p; ++i)
+		for (i = 0; i < NTRU_P - p; ++i)
 		{
 			if (!(i & p))
 			{
@@ -1135,9 +1158,9 @@ void NTRUSQ4591N761::Sort(std::array<int32_t, NTRU_P> &X)
 			}
 		}
 
-		for (q = TOP; q > p; q >>= 1)
+		for (q = SRTTOP; q > p; q >>= 1)
 		{
-			for (i = 0; i < n - q; ++i)
+			for (i = 0; i < NTRU_P - q; ++i)
 			{
 				if (!(i & p))
 				{
@@ -1165,8 +1188,10 @@ void NTRUSQ4591N761::Swap32(int32_t &X, int32_t &Y, int32_t Mask)
 
 int32_t NTRUSQ4591N761::Verify32(const std::vector<byte> &X, const std::vector<byte> &Y)
 {
-	uint diff = 0;
+	uint diff;
 	size_t i;
+
+	diff = 0;
 
 	for (i = 0; i < 32; ++i)
 	{
@@ -1175,4 +1200,14 @@ int32_t NTRUSQ4591N761::Verify32(const std::vector<byte> &X, const std::vector<b
 
 	return (1 & ((diff - 1) >> 8)) - 1;
 }
+
+void NTRUSQ4591N761::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+{
+#if defined(CEX_SHAKE_STRONG)
+	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#else
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#endif
+}
+
 NAMESPACE_NTRUEND

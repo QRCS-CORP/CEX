@@ -1,28 +1,19 @@
 #include "RLWEQ12289N1024.h"
 #include "BCG.h"
 #include "GCM.h"
+#include "Keccak.h"
 #include "MemoryTools.h"
-#include "SHAKE.h"
-
-#if defined(__AVX512__)
-#	include "UInt512.h"
-#elif defined(__AVX2__)
-#	include "UInt256.h"
-#elif defined(__AVX__)
-#	include "UInt128.h"
-#endif
-#if defined(CEX_HAS_OPENMP) && defined(CEX_RLWE_PARALLEL)
-#	include <omp.h>
-#endif
 
 NAMESPACE_RINGLWE
+
+using Digest::Keccak;
 
 //~~~Constant Tables~~~//
 
 const std::string RLWEQ12289N1024::Name = "Q12289N1024";
 
 
-const std::array<ushort, 512> RLWEQ12289N1024::OmegasMontgomery =
+const std::vector<ushort> RLWEQ12289N1024::OmegasMontgomery =
 {
 	0x0FEBU, 0x1B3EU, 0x1CCDU, 0x1F1DU, 0x0CBEU, 0x13D7U, 0x020AU, 0x0879U, 0x18DCU, 0x03FAU, 0x0411U, 0x2247U, 0x0928U, 0x2B03U, 0x15C6U, 0x07B5U,
 	0x11B8U, 0x041AU, 0x1ABCU, 0x0F14U, 0x0EEAU, 0x17E6U, 0x0A7BU, 0x04A6U, 0x12B5U, 0x1E8EU, 0x1D74U, 0x1A60U, 0x1550U, 0x1161U, 0x0ECDU, 0x2F6EU,
@@ -58,7 +49,7 @@ const std::array<ushort, 512> RLWEQ12289N1024::OmegasMontgomery =
 	0x131FU, 0x2A35U, 0x0ADCU, 0x144BU, 0x0901U, 0x1C4FU, 0x25ACU, 0x0FD5U, 0x2968U, 0x0D24U, 0x0CC7U, 0x0FD9U, 0x113EU, 0x24E2U, 0x1EEDU, 0x087EU
 };
 
-const std::array<ushort, 512> RLWEQ12289N1024::OmegasInvMontgomery =
+const std::vector<ushort> RLWEQ12289N1024::OmegasInvMontgomery =
 {
 	0x0FEBU, 0x14C3U, 0x10E4U, 0x1334U, 0x2788U, 0x2DF7U, 0x1C2AU, 0x2343U, 0x284CU, 0x1A3BU, 0x04FEU, 0x26D9U, 0x0DBAU, 0x2BF0U, 0x2C07U, 0x1725U,
 	0x0093U, 0x2134U, 0x1EA0U, 0x1AB1U, 0x15A1U, 0x128DU, 0x1173U, 0x1D4CU, 0x2B5BU, 0x2586U, 0x181BU, 0x2117U, 0x20EDU, 0x1545U, 0x2BE7U, 0x1E49U,
@@ -94,7 +85,7 @@ const std::array<ushort, 512> RLWEQ12289N1024::OmegasInvMontgomery =
 	0x0663U, 0x2531U, 0x0499U, 0x1F62U, 0x008CU, 0x28C4U, 0x2D2BU, 0x1DFEU, 0x10E0U, 0x2C19U, 0x23EEU, 0x2FB0U, 0x0B93U, 0x1CE1U, 0x093EU, 0x2416U
 };
 
-const std::array<ushort, 1024> RLWEQ12289N1024::PsisBitrevMontgomery =
+const std::vector<ushort> RLWEQ12289N1024::PsisBitrevMontgomery =
 {
 	0x0FEBU, 0x1B3EU, 0x1CCDU, 0x1F1DU, 0x0CBEU, 0x13D7U, 0x020AU, 0x0879U, 0x18DCU, 0x03FAU, 0x0411U, 0x2247U, 0x0928U, 0x2B03U, 0x15C6U, 0x07B5U,
 	0x11B8U, 0x041AU, 0x1ABCU, 0x0F14U, 0x0EEAU, 0x17E6U, 0x0A7BU, 0x04A6U, 0x12B5U, 0x1E8EU, 0x1D74U, 0x1A60U, 0x1550U, 0x1161U, 0x0ECDU, 0x2F6EU,
@@ -162,7 +153,7 @@ const std::array<ushort, 1024> RLWEQ12289N1024::PsisBitrevMontgomery =
 	0x25D7U, 0x076DU, 0x1C03U, 0x2E0BU, 0x0F06U, 0x0625U, 0x17AFU, 0x0ED1U, 0x01D2U, 0x2BFBU, 0x2970U, 0x0EEDU, 0x18B0U, 0x1229U, 0x1877U, 0x0B71U
 };
 
-const std::array<ushort, 1024> RLWEQ12289N1024::PsisInvMontgomery =
+const std::vector<ushort> RLWEQ12289N1024::PsisInvMontgomery =
 {
 	0x0100U, 0x294AU, 0x05E6U, 0x1C46U, 0x040AU, 0x1C02U, 0x1893U, 0x1EF1U, 0x2D91U, 0x0D5EU, 0x0FA0U, 0x0917U, 0x0828U, 0x15BDU, 0x031BU, 0x2997U,
 	0x05F1U, 0x156CU, 0x09EBU, 0x1CD9U, 0x041FU, 0x1C05U, 0x1F6FU, 0x2DA3U, 0x0685U, 0x07CAU, 0x0ED4U, 0x16B1U, 0x10F5U, 0x24B6U, 0x2E64U, 0x2FC6U,
@@ -230,7 +221,7 @@ const std::array<ushort, 1024> RLWEQ12289N1024::PsisInvMontgomery =
 	0x2131U, 0x1275U, 0x02A3U, 0x073CU, 0x2A2EU, 0x2F2CU, 0x2907U, 0x0CB8U, 0x241BU, 0x0C04U, 0x0893U, 0x2A5FU, 0x2F33U, 0x2908U, 0x2F02U, 0x2901U
 };
 
-const std::array<ushort, 1024> RLWEQ12289N1024::BitRevTable =
+const std::vector<ushort> RLWEQ12289N1024::BitRevTable =
 {
 	0x0000U, 0x0200U, 0x0100U, 0x0300U, 0x0080U, 0x0280U, 0x0180U, 0x0380U, 0x0040U, 0x0240U, 0x0140U, 0x0340U, 0x00C0U, 0x02C0U, 0x01C0U, 0x03C0U,
 	0x0020U, 0x0220U, 0x0120U, 0x0320U, 0x00A0U, 0x02A0U, 0x01A0U, 0x03A0U, 0x0060U, 0x0260U, 0x0160U, 0x0360U, 0x00E0U, 0x02E0U, 0x01E0U, 0x03E0U,
@@ -314,7 +305,7 @@ void RLWEQ12289N1024::Decrypt(std::vector<byte> &Secret, const std::vector<byte>
 	PolyInvNtt(tmp);
 	PolySub(tmp, tmp, vprime);
 
-	PolyTomessage(Secret, tmp);
+	PolyToMessage(Secret, tmp);
 }
 
 void RLWEQ12289N1024::Encrypt(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, const std::vector<byte> &Coin)
@@ -360,25 +351,25 @@ void RLWEQ12289N1024::Generate(std::vector<byte> &PublicKey, std::vector<byte> &
 	std::array<ushort, RLWE_N> ahatshat;
 	std::array<ushort, RLWE_N> bhat;
 	std::array<ushort, RLWE_N> shat;
-	std::vector<byte> publicseed(RLWE_SEED_SIZE);
-	std::vector<byte>  noiseseed(RLWE_SEED_SIZE);
+	std::vector<byte> pubk(RLWE_SEED_SIZE);
+	std::vector<byte> noisek(RLWE_SEED_SIZE);
 
-	Rng->Generate(publicseed);
-	Rng->Generate(noiseseed);
+	Rng->Generate(pubk);
+	Rng->Generate(noisek);
 
-	PolyUniform(ahat, publicseed);
+	PolyUniform(ahat, pubk);
 
-	PolySample(shat, noiseseed, 0);
+	PolySample(shat, noisek, 0);
 	PolyNtt(shat);
 
-	PolySample(ehat, noiseseed, 1);
+	PolySample(ehat, noisek, 1);
 	PolyNtt(ehat);
 
 	PolyMulPointwise(ahatshat, shat, ahat);
 	PolyAdd(bhat, ehat, ahatshat);
 
 	PolyToBytes(PrivateKey, shat);
-	EncodePk(PublicKey, bhat, publicseed);
+	EncodePk(PublicKey, bhat, pubk);
 }
 
 //~~~Private Functions~~~//
@@ -404,7 +395,8 @@ void RLWEQ12289N1024::BitRevVector(std::array<ushort, RLWE_N> &P)
 
 void RLWEQ12289N1024::DecodeC(std::array<ushort, RLWE_N> &B, std::array<ushort, RLWE_N> &V, const std::vector<byte> &R)
 {
-	// de-serialize the ciphertext; inverse of encode_c
+	// De-serialize the ciphertext; inverse of encode_c
+
 	PolyFromBytes(B, R);
 	PolyDecompress(V, R);
 }
@@ -413,14 +405,8 @@ void RLWEQ12289N1024::DecodePk(std::array<ushort, RLWE_N> &PublicKey, std::vecto
 {
 	// De-serialize the public key; inverse of encodepk
 
-	size_t i;
-
 	PolyFromBytes(PublicKey, R);
-
-	for (i = 0; i < RLWE_SEED_SIZE; ++i)
-	{
-		Seed[i] = R[RLWE_POLY_SIZE + i];
-	}
+	MemoryTools::Copy(R, RLWE_POLY_SIZE, Seed, 0, RLWE_SEED_SIZE);
 }
 
 void RLWEQ12289N1024::EncodeC(std::vector<byte> &R, const std::array<ushort, RLWE_N> &B, const std::array<ushort, RLWE_N> &V)
@@ -439,19 +425,14 @@ void RLWEQ12289N1024::EncodePk(std::vector<byte> &R, const std::array<ushort, RL
 	// serialization of the polynomial pk and the public seed
 	// used to generete the polynomial a.
 
-	size_t i;
-
 	PolyToBytes(R, PublicKey);
-
-	for (i = 0; i < RLWE_SEED_SIZE; ++i)
-	{
-		R[RLWE_POLY_SIZE + i] = Seed[i];
-	}
+	MemoryTools::Copy(Seed, 0, R, RLWE_POLY_SIZE, RLWE_SEED_SIZE);
 }
 
 ushort RLWEQ12289N1024::FlipAbs(ushort X)
 {
 	// Computes |(x mod q) - Q/2|
+
 	int16_t m;
 	int16_t r;
 
@@ -465,6 +446,7 @@ ushort RLWEQ12289N1024::FlipAbs(ushort X)
 ushort RLWEQ12289N1024::Freeze(ushort X)
 {
 	// Fully reduces an integer modulo q in constant time
+
 	int16_t c;
 	ushort m;
 	ushort r;
@@ -482,61 +464,73 @@ byte RLWEQ12289N1024::HammimgWeight(byte A)
 {
 	// Compute the Hamming weight of a byte
 
-	uint8_t i;
-	uint8_t r;
+	byte r;
 
-	r = 0;
-
-	for (i = 0; i < 8; ++i)
-	{
-		r += (A >> i) & 1;
-	}
+	r = A & 1;
+	r += (A >> 1) & 1;
+	r += (A >> 2) & 1;
+	r += (A >> 3) & 1;
+	r += (A >> 4) & 1;
+	r += (A >> 5) & 1;
+	r += (A >> 6) & 1;
+	r += (A >> 7) & 1;
 
 	return r;
 }
 
-ushort RLWEQ12289N1024::MontgomeryReduce(uint A)
+ushort RLWEQ12289N1024::MontgomeryReduce(uint X)
 {
 	uint u;
 
-	u = (A * RLWE_QINV);
-	u &= ((1 << RLWE_RLOG) - 1);
+	u = X * RLWE_QINV;
+	u &= (1 << RLWE_RLOG) - 1;
 	u *= RLWE_Q;
-	A = A + u;
+	X += u;
 
-	return A >> 18;
+	return static_cast<ushort>(X >> RLWE_RLOG);
 }
 
-void RLWEQ12289N1024::MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::array<ushort, RLWE_N> &Factors)
+void RLWEQ12289N1024::MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::vector<ushort> &Factors)
 {
+	const uint RLSH = (1UL << RLWE_RLOG) - 1;
 	size_t i;
+	uint a;
+	uint u;
 
-	for (i = 0; i < RLWE_N; ++i)
+	for (i = 0; i < Poly.size(); ++i)
 	{
-		Poly[i] = MontgomeryReduce(Poly[i] * Factors[i]);
+		a = Poly[i] * Factors[i];
+		u = a * RLWE_QINV;
+		u &= RLSH;
+		u *= RLWE_Q;
+		a += u;
+		a >>= RLWE_RLOG;
+		Poly[i] = static_cast<ushort>(a);
 	}
 }
 
-void RLWEQ12289N1024::Ntt(std::array<ushort, RLWE_N> &A, const std::array<ushort, 512> &Omega)
+void RLWEQ12289N1024::Ntt(std::array<ushort, RLWE_N> &A, const std::vector<ushort> &Omega)
 {
-	size_t distance;
+	uint distance;
 	size_t start;
+	size_t i;
 	size_t j;
 	size_t jTwiddle;
-	int32_t i;
 	ushort temp;
 	ushort W;
 
 	for (i = 0; i < 10; i += 2)
 	{
 		// Even level
-		distance = ((size_t)1 << i);
+		distance = (1UL << i);
+
 		for (start = 0; start < distance; start++)
 		{
 			jTwiddle = 0;
 			for (j = start; j < RLWE_N - 1; j += 2 * distance)
 			{
-				W = Omega[jTwiddle++];
+				W = Omega[jTwiddle];
+				++jTwiddle;
 				temp = A[j];
 				A[j] = (temp + A[j + distance]);
 				A[j + distance] = MontgomeryReduce((W * (static_cast<uint>(temp) + (3 * RLWE_Q) - A[j + distance])));
@@ -544,13 +538,15 @@ void RLWEQ12289N1024::Ntt(std::array<ushort, RLWE_N> &A, const std::array<ushort
 		}
 
 		// Odd level
-		distance <<= 1;
+		distance <<= 1UL;
+
 		for (start = 0; start < distance; start++)
 		{
 			jTwiddle = 0;
 			for (j = start; j < RLWE_N - 1; j += 2 * distance)
 			{
-				W = Omega[jTwiddle++];
+				W = Omega[jTwiddle];
+				++jTwiddle;
 				temp = A[j];
 				A[j] = (temp + A[j + distance]) % RLWE_Q;
 				A[j + distance] = MontgomeryReduce((W * (static_cast<uint>(temp) + (3 * RLWE_Q) - A[j + distance])));
@@ -573,18 +569,28 @@ void RLWEQ12289N1024::PolyCompress(std::vector<byte> &R, const std::array<ushort
 {
 	std::array<uint, 8> t;
 	size_t i;
-	size_t j;
 	size_t k;
 
 	k = 0;
 
 	for (i = 0; i < RLWE_N; i += 8)
 	{
-		for (j = 0; j < 8; j++)
-		{
-			t[j] = Freeze(P[i + j]);
-			t[j] = (((t[j] << 3) + RLWE_Q / 2) / RLWE_Q) & 0x7;
-		}
+		t[0] = Freeze(P[i]);
+		t[0] = (((t[0] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
+		t[1] = Freeze(P[i + 1]);
+		t[1] = (((t[1] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
+		t[2] = Freeze(P[i + 2]);
+		t[2] = (((t[2] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
+		t[3] = Freeze(P[i + 3]);
+		t[3] = (((t[3] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
+		t[4] = Freeze(P[i + 4]);
+		t[4] = (((t[4] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
+		t[5] = Freeze(P[i + 5]);
+		t[5] = (((t[5] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
+		t[6] = Freeze(P[i + 6]);
+		t[6] = (((t[6] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
+		t[7] = Freeze(P[i + 7]);
+		t[7] = (((t[7] << 3) + RLWE_Q / 2) / RLWE_Q) & 7;
 
 		R[RLWE_POLY_SIZE + k] = t[0] | (t[1] << 3) | (t[2] << 6);
 		R[RLWE_POLY_SIZE + k + 1] = (t[2] >> 2) | (t[3] << 1) | (t[4] << 4) | (t[5] << 7);
@@ -596,7 +602,6 @@ void RLWEQ12289N1024::PolyCompress(std::vector<byte> &R, const std::array<ushort
 void RLWEQ12289N1024::PolyDecompress(std::array<ushort, RLWE_N> &R, const std::vector<byte> &A)
 {
 	size_t i;
-	size_t j;
 	size_t k;
 
 	k = 0;
@@ -613,10 +618,14 @@ void RLWEQ12289N1024::PolyDecompress(std::array<ushort, RLWE_N> &R, const std::v
 		R[i + 7] = (A[RLWE_POLY_SIZE + k + 2] >> 5);
 		k += 3;
 
-		for (j = 0; j < 8; ++j)
-		{
-			R[i + j] = (static_cast<uint>(R[i + j]) * RLWE_Q + 4) >> 3;
-		}
+		R[i] = (static_cast<uint>(R[i]) * RLWE_Q + 4) >> 3;
+		R[i + 1] = (static_cast<uint>(R[i + 1]) * RLWE_Q + 4) >> 3;
+		R[i + 2] = (static_cast<uint>(R[i + 2]) * RLWE_Q + 4) >> 3;
+		R[i + 3] = (static_cast<uint>(R[i + 3]) * RLWE_Q + 4) >> 3;
+		R[i + 4] = (static_cast<uint>(R[i + 4]) * RLWE_Q + 4) >> 3;
+		R[i + 5] = (static_cast<uint>(R[i + 5]) * RLWE_Q + 4) >> 3;
+		R[i + 6] = (static_cast<uint>(R[i + 6]) * RLWE_Q + 4) >> 3;
+		R[i + 7] = (static_cast<uint>(R[i + 7]) * RLWE_Q + 4) >> 3;
 	}
 }
 
@@ -645,7 +654,7 @@ void RLWEQ12289N1024::PolyFromMessage(std::array<ushort, RLWE_N> &R, const std::
 		{
 			mask = -((Message[i] >> j) & 1);
 			R[(8 * i) + j] = mask & (RLWE_Q / 2);
-			R[(8 * i) + j + 256] = mask & (RLWE_Q / 2); // end param 512
+			R[(8 * i) + j + 256] = mask & (RLWE_Q / 2);
 			R[(8 * i) + j + 512] = mask & (RLWE_Q / 2);
 			R[(8 * i) + j + 768] = mask & (RLWE_Q / 2);
 		}
@@ -667,7 +676,7 @@ void RLWEQ12289N1024::PolyMulPointwise(std::array<ushort, RLWE_N> &R, const std:
 	for (i = 0; i < RLWE_N; ++i)
 	{
 		// t is now in Montgomery domain
-		t = MontgomeryReduce(3186 * B[i]);
+		t = MontgomeryReduce(0x00000C72UL * B[i]);
 		// r->coeffs[i] is back in normal domain
 		R[i] = MontgomeryReduce(A[i] * t);
 	}
@@ -682,26 +691,20 @@ void RLWEQ12289N1024::PolyNtt(std::array<ushort, RLWE_N> &R)
 void RLWEQ12289N1024::PolySample(std::array<ushort, RLWE_N> &R, const std::vector<byte> &Seed, byte Nonce)
 {
 	std::vector<byte> buf(128);
-	std::vector<byte> extseed(RLWE_SEED_SIZE + 2);
+	std::vector<byte> tmpk(RLWE_SEED_SIZE + 2);
 	size_t i;
 	size_t j;
-	uint8_t a;
-	uint8_t b;
+	byte a;
+	byte b;
 
-	for (i = 0; i < RLWE_SEED_SIZE; ++i)
-	{
-		extseed[i] = Seed[i];
-	}
-
-	extseed[RLWE_SEED_SIZE] = Nonce;
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	MemoryTools::Copy(Seed, 0, tmpk, 0, RLWE_SEED_SIZE);
+	tmpk[RLWE_SEED_SIZE] = Nonce;
 
 	// Generate noise in blocks of 64 coefficients
 	for (i = 0; i < RLWE_N / 64; ++i)
 	{
-		extseed[RLWE_SEED_SIZE + 1] = static_cast<uint8_t>(i);
-		gen.Initialize(extseed);
-		gen.Generate(buf);
+		tmpk[RLWE_SEED_SIZE + 1] = static_cast<byte>(i);
+		XOF(tmpk, 0, tmpk.size(), buf, 0, buf.size(), Keccak::KECCAK256_RATE_SIZE);
 
 		for (j = 0; j < 64; j++)
 		{
@@ -737,7 +740,7 @@ void RLWEQ12289N1024::PolyToBytes(std::vector<byte> &R, const std::array<ushort,
 		t2 = Freeze(P[(4 * i) + 2]);
 		t3 = Freeze(P[(4 * i) + 3]);
 
-		R[(7 * i)] = t0 & 0xff;
+		R[(7 * i)] = t0 & 0xFF;
 		R[(7 * i) + 1] = (t0 >> 8) | (t1 << 6);
 		R[(7 * i) + 2] = (t1 >> 2);
 		R[(7 * i) + 3] = (t1 >> 10) | (t2 << 4);
@@ -747,15 +750,12 @@ void RLWEQ12289N1024::PolyToBytes(std::vector<byte> &R, const std::array<ushort,
 	}
 }
 
-void RLWEQ12289N1024::PolyTomessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X)
+void RLWEQ12289N1024::PolyToMessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X)
 {
 	size_t i;
 	ushort t;
 
-	for (i = 0; i < 32; ++i)
-	{
-		Message[i] = 0;
-	}
+	MemoryTools::Clear(Message, 0, RLWE_SEED_SIZE);
 
 	for (i = 0; i < 256; ++i)
 	{
@@ -771,34 +771,29 @@ void RLWEQ12289N1024::PolyTomessage(std::vector<byte> &Message, const std::array
 
 void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed)
 {
-	const size_t SHAKE128_RATE = 168;
-	std::vector<byte> buf(SHAKE128_RATE);
-	std::vector<byte> extseed(RLWE_SEED_SIZE + 1);
+	std::vector<byte> buf(Keccak::KECCAK256_RATE_SIZE);
+	std::vector<byte> tmpk(RLWE_SEED_SIZE + 1);
 	size_t ctr;
 	size_t i;
 	size_t j;
 	ushort val;
 
-	for (i = 0; i < RLWE_SEED_SIZE; ++i)
-	{
-		extseed[i] = Seed[i];
-	}
-
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE128);
+	MemoryTools::Copy(Seed, 0, tmpk, 0, RLWE_SEED_SIZE);
 	ctr = 0;
+
 	// generate a in blocks of 64 coefficients
 	for (i = 0; i < RLWE_N / 64; ++i)
 	{
 		ctr = 0;
 		// domain-separate the 16 independent calls
-		extseed[RLWE_SEED_SIZE] = (uint8_t)i;
-		gen.Initialize(extseed);
-		// very unlikely to run more than once
+		tmpk[RLWE_SEED_SIZE] = static_cast<byte>(i);
+
 		while (ctr < 64)
 		{
-			gen.Generate(buf);
+			//gen.Generate(buf);
+			XOF(tmpk, 0, tmpk.size(), buf, 0, buf.size(), Keccak::KECCAK256_RATE_SIZE);
 
-			for (j = 0; j < SHAKE128_RATE && ctr < 64; j += 2)
+			for (j = 0; j < Keccak::KECCAK256_RATE_SIZE && ctr < 64; j += 2)
 			{
 				val = (buf[j] | ((ushort)buf[j + 1] << 8));
 				if (val < 5 * RLWE_Q)
@@ -809,6 +804,15 @@ void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 			}
 		}
 	}
+}
+
+void RLWEQ12289N1024::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+{
+#if defined(CEX_SHAKE_STRONG)
+	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#else
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#endif
 }
 
 NAMESPACE_RINGLWEEND

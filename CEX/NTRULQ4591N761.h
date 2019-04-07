@@ -50,17 +50,17 @@ public:
 	/// <summary>
 	/// The P dimension
 	/// </summary>
-	static const int NTRU_P = 761;
+	static const int NTRU_P = 0x000002F9L;
 
 	/// <summary>
 	/// The modulus factor
 	/// </summary>
-	static const int NTRU_Q = 4591;
+	static const int NTRU_Q = 0x000011EFL;
 
 	/// <summary>
 	/// The W dimension
 	/// </summary>
-	static const int NTRU_W = 250;
+	static const int NTRU_W = 0x000000FAL;
 
 	/// <summary>
 	/// The byte size of the private key polynomial
@@ -119,7 +119,7 @@ public:
 
 	//~~~Internal Functions~~~//
 
-	static void Hide(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &Key, size_t KeyOffset, const std::vector<byte> &Rand);
+	static void Hide(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &Key, size_t KeyOffset, const std::vector<byte> &Seed);
 
 	static void MinMax(int32_t &X, int32_t &Y);
 
@@ -150,6 +150,8 @@ public:
 	static void Sort(std::array<int32_t, NTRU_P> &X);
 
 	static int32_t Verify(const std::vector<byte> &X, const std::vector<byte> &Y);
+
+	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 };
 
 NAMESPACE_NTRUEND

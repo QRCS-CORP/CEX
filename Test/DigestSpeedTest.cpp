@@ -74,13 +74,11 @@ namespace Test
 			OnProgress(std::string("***The parallel SHA2 512 digest***"));
 			DigestBlockLoop(Digests::SHA512, MB100, 10, true);
 
-			for (size_t i = 0; i < 5; ++i)
-			{
-				OnProgress(std::string("***The sequential Skein 256 digest***"));
-				DigestBlockLoop(Digests::Skein256, MB100);
-				OnProgress(std::string("***The parallel Skein 256 digest***"));
-				DigestBlockLoop(Digests::Skein256, MB100, 10, true);
-			}
+			OnProgress(std::string("***The sequential Skein 256 digest***"));
+			DigestBlockLoop(Digests::Skein256, MB100);
+			OnProgress(std::string("***The parallel Skein 256 digest***"));
+			DigestBlockLoop(Digests::Skein256, MB100, 10, true);
+
 			OnProgress(std::string("***The sequential Skein 512 digest***"));
 			DigestBlockLoop(Digests::Skein512, MB100);
 			OnProgress(std::string("***The parallel Skein 512 digest***"));

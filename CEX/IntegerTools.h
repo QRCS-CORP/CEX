@@ -467,7 +467,7 @@ public:
 	/// <param name="Output">The destination byte vector</param>
 	/// <param name="OutOffset">The starting offset within the destination vector</param>
 	template<typename Array>
-	inline static void Be16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
+	inline static void Be16ToBytes(ushort Value, Array &Output, size_t OutOffset)
 	{
 		CEXASSERT(Output.size() - OutOffset >= sizeof(ushort), "Length is larger than output size");
 
@@ -487,7 +487,7 @@ public:
 	/// <param name="Output">The destination byte vector</param>
 	/// <param name="OutOffset">The starting offset within the destination vector</param>
 	template<typename Array>
-	inline static void Be32ToBytes(const uint Value, Array &Output, size_t OutOffset)
+	inline static void Be32ToBytes(uint Value, Array &Output, size_t OutOffset)
 	{
 		CEXASSERT(Output.size() - OutOffset >= sizeof(uint), "Length is larger than output size");
 
@@ -509,7 +509,7 @@ public:
 	/// <param name="Output">The destination byte vector</param>
 	/// <param name="OutOffset">The starting offset within the destination vector</param>
 	template<typename Array>
-	inline static void Be64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
+	inline static void Be64ToBytes(ulong Value, Array &Output, size_t OutOffset)
 	{
 		CEXASSERT(Output.size() - OutOffset >= sizeof(ulong), "Length is larger than output size");
 
@@ -1050,7 +1050,7 @@ public:
 	/// <param name="Output">The destination byte vector</param>
 	/// <param name="OutOffset">The starting offset within the destination vector</param>
 	template<typename Array>
-	inline static void Le16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
+	inline static void Le16ToBytes(ushort Value, Array &Output, size_t OutOffset)
 	{
 		CEXASSERT(Output.size() - OutOffset >= sizeof(ushort), "Length is larger than input size");
 
@@ -1087,7 +1087,7 @@ public:
 	/// <param name="Output">The destination byte vector</param>
 	/// <param name="OutOffset">The starting offset within the destination vector</param>
 	template<typename Array>
-	inline static void Le32ToBytes(const uint Value, Array &Output, size_t OutOffset)
+	inline static void Le32ToBytes(uint Value, Array &Output, size_t OutOffset)
 	{
 		CEXASSERT(Output.size() - OutOffset >= sizeof(uint), "Length is larger than input size");
 
@@ -1126,7 +1126,7 @@ public:
 	/// <param name="Output">The destination byte vector</param>
 	/// <param name="OutOffset">The starting offset within the destination vector</param>
 	template<typename Array>
-	inline static void Le64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
+	inline static void Le64ToBytes(ulong Value, Array &Output, size_t OutOffset)
 	{
 		CEXASSERT(Output.size() - OutOffset >= sizeof(ulong), "Length is larger than input size");
 
@@ -1329,6 +1329,31 @@ public:
 	}
 
 	/// <summary>
+	/// Convert a byte vector to a Little Endian 32-bit word
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte vector</param>
+	/// <param name="InOffset">The starting offset within the source vector</param>
+	/// <param name="Length">The number of input bytes to use</param>
+	///
+	/// <returns>A 32-bit word in Little Endian format</returns>
+	template<typename Array>
+	inline static uint LeBytesTo32(const Array &Input, size_t Offset, size_t Length)
+	{
+		size_t i;
+		uint r;
+
+		r = Input[Offset];
+
+		for (i = 1; i < Length; ++i)
+		{
+			r |= static_cast<uint>(Input[Offset + i]) << (8 * i);
+		}
+
+		return r;
+	}
+
+	/// <summary>
 	/// Convert a byte vector to a Little Endian 64-bit dword
 	/// </summary>
 	/// 
@@ -1359,6 +1384,31 @@ public:
 			(static_cast<ulong>(Input[InOffset + 6]) << 48) |
 			(static_cast<ulong>(Input[InOffset + 7]) << 56);
 #endif
+	}
+
+	/// <summary>
+	/// Convert a byte vector to a Little Endian 64-bit word
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte vector</param>
+	/// <param name="InOffset">The starting offset within the source vector</param>
+	/// <param name="Length">The number of input bytes to use</param>
+	///
+	/// <returns>A 64-bit word in Little Endian format</returns>
+	template<typename Array>
+	inline static ulong LeBytesTo64(const Array &Input, size_t Offset, size_t Length)
+	{
+		size_t i;
+		ulong r;
+
+		r = Input[Offset];
+
+		for (i = 1; i < Length; ++i)
+		{
+			r |= static_cast<ulong>(Input[Offset + i]) << (8 * i);
+		}
+
+		return r;
 	}
 
 	/// <summary>
@@ -1862,8 +1912,8 @@ public:
 	inline static bool Compare(const ArrayA &A, size_t AOffset, const ArrayB &B, size_t BOffset, size_t Length)
 	{
 		CEXASSERT(!std::is_signed<ArrayA::value_type>::value, "Input must be an unsigned integer vector");
-		CEXASSERT(A.size() >= Length, "Input size can not be less than length");
-		CEXASSERT(B.size() >= Length, "Output size can not be less than length");
+		CEXASSERT(A.size() - AOffset >= Length, "Input size can not be less than length");
+		CEXASSERT(B.size() - BOffset >= Length, "Output size can not be less than length");
 
 		ArrayA::value_type delta;
 		size_t i;
@@ -2076,6 +2126,36 @@ public:
 	inline static V ValueOrZero(P Pred, V Value)
 	{
 		return Select<V>(ExpandMask<V>(Pred), Value, static_cast<V>(0));
+	}
+
+	/// <summary>
+	/// Constant time: value comparison between two arrays with offset and length parameters.
+	/// <para>Array container types can vary (standard vector, vector, or SecureVector), but vector elements must be of equal size.</para>
+	/// </summary>
+	/// 
+	/// <param name="A">The first vector to compare</param>
+	/// <param name="B">The second vector to compare</param>
+	/// <param name="Length">The number of elements to compare</param>
+	/// 
+	/// <returns>A positive integer for each different value, or zero if the arrays are identical</returns>
+	template <typename ArrayA, typename ArrayB>
+	inline static size_t Verify(const ArrayA &A, const ArrayB &B, size_t Length)
+	{
+		CEXASSERT(!std::is_signed<ArrayA::value_type>::value, "Input must be an unsigned integer vector");
+		CEXASSERT(A.size() >= Length, "Input size can not be less than length");
+		CEXASSERT(B.size() >= Length, "Output size can not be less than length");
+
+		size_t delta;
+		size_t i;
+
+		delta = 0;
+
+		for (i = 0; i < Length; ++i)
+		{
+			delta |= (A[i] ^ B[i]);
+		}
+
+		return delta;
 	}
 
 	//~~~Rotate~~~//

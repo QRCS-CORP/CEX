@@ -221,7 +221,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key)
 		Reset();
 	}
 
-	FastAbsorb(Key, 0, Key.size(), m_shakeState);
+	Absorb(Key, 0, Key.size(), m_shakeState);
 	m_isInitialized = true;
 }
 
@@ -300,7 +300,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Cu
 		Customize(Customization, tmpn, m_shakeState);
 	}
 
-	FastAbsorb(Key, 0, Key.size(), m_shakeState);
+	Absorb(Key, 0, Key.size(), m_shakeState);
 	m_isInitialized = true;
 }
 
@@ -338,7 +338,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Cu
 		Customize(Customization, Information, m_shakeState);
 	}
 
-	FastAbsorb(Key, 0, Key.size(), m_shakeState);
+	Absorb(Key, 0, Key.size(), m_shakeState);
 	m_isInitialized = true;
 }
 
@@ -354,6 +354,38 @@ void SHAKE::Reset()
 }
 
 //~~~Private Functions~~~//
+
+void SHAKE::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<ShakeState> &State)
+{
+	CEXASSERT(Input.size() - InOffset >= Length, "The output buffer is too short!");
+
+	std::array<byte, BUFFER_SIZE> msg;
+
+	if (Length != 0)
+	{
+		// sequential loop through blocks
+		while (Length >= State->Rate)
+		{
+			Keccak::FastAbsorb(Input, InOffset, State->Rate, State->State);
+			Permute(State);
+			InOffset += State->Rate;
+			Length -= State->Rate;
+		}
+
+		// store unaligned bytes
+		if (Length != 0)
+		{
+			MemoryTools::Copy(Input, InOffset, msg, 0, Length);
+		}
+
+		msg[Length] = State->Domain;
+		++Length;
+
+		MemoryTools::Clear(msg, Length, State->Rate - Length);
+		msg[State->Rate - 1] |= 0x80;
+		Keccak::FastAbsorb(msg, 0, State->Rate, State->State);
+	}
+}
 
 void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<ShakeState> &State)
 {
@@ -373,7 +405,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == State->Rate)
 			{
-				Keccak::Absorb(pad, 0, State->Rate, State->State);
+				Keccak::FastAbsorb(pad, 0, State->Rate, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -391,7 +423,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == State->Rate)
 			{
-				Keccak::Absorb(pad, 0, State->Rate, State->State);
+				Keccak::FastAbsorb(pad, 0, State->Rate, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -403,7 +435,6 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 
 	MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
 	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
-
 	MemoryTools::XOR(pad, 0, State->State, 0, offset);
 
 	Permute(State);
@@ -464,38 +495,6 @@ void SHAKE::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, 
 	{
 		Permute(State);
 		MemoryTools::Copy(State->State, 0, Output, OutOffset, Length);
-	}
-}
-
-void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<ShakeState> &State)
-{
-	CEXASSERT(Input.size() - InOffset >= Length, "The output buffer is too short!");
-
-	std::array<byte, BUFFER_SIZE> msg;
-
-	if (Length != 0)
-	{
-		// sequential loop through blocks
-		while (Length >= State->Rate)
-		{
-			Keccak::Absorb(Input, InOffset, State->Rate, State->State);
-			Permute(State);
-			InOffset += State->Rate;
-			Length -= State->Rate;
-		}
-
-		// store unaligned bytes
-		if (Length != 0)
-		{
-			MemoryTools::Copy(Input, InOffset, msg, 0, Length);
-		}
-
-		msg[Length] = State->Domain;
-		++Length;
-
-		MemoryTools::Clear(msg, Length, State->Rate - Length);
-		msg[State->Rate - 1] |= 0x80;
-		Keccak::Absorb(msg, 0, State->Rate, State->State);
 	}
 }
 
