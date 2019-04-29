@@ -116,6 +116,24 @@ public:
 	/// Reset the generator instance
 	/// </summary>
 	virtual void Reset() = 0;
+
+	/// <summary>
+	/// Fill a standard array or vector with pseudo-random bytes
+	/// </summary>
+	///
+	/// <param name="Output">The destination standard-vector to fill</param>
+	/// <param name="Offset">The starting offset withing the destination vector</param>
+	/// <param name="Elements">The number of elements to fill with pseudo-random values</param>
+	template<typename Array>
+	void Fill(Array &Output, size_t Offset, size_t Elements)
+	{
+		const size_t ELMSZE = sizeof(Array::value_type);
+		std::vector<byte> smp(ELMSZE * Elements);
+
+		Generate(smp, 0, smp.size());
+		MemoryTools::Copy(smp, 0, Output, Offset, smp.size());
+		MemoryTools::Clear(smp, 0, smp.size());
+	}
 };
 
 NAMESPACE_PRNGEND

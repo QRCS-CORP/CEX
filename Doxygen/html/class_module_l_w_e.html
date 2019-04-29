@@ -151,7 +151,7 @@ Public Member Functions</h2></td></tr>
 <p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fda780c8f20148c92a6bf24d5d7847b8174">MLWEParameters::MLWES3Q7681N256</a>);</div><div class="line">IAsymmetricKeyPair* kp = acpr.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; pk = pubK1-&gt;ToBytes();</div></div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(32);</div><div class="line">std::vector&lt;byte&gt; cpt(0);</div><div class="line"></div><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fda780c8f20148c92a6bf24d5d7847b8174">MLWEParameters::MLWES3Q7681N256</a>);</div><div class="line">acpr.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line"><span class="comment">// generate the ciphertext and shared secret</span></div><div class="line">acpr.Encapsulate(cpt, sec);</div></div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(32);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fda780c8f20148c92a6bf24d5d7847b8174">MLWEParameters::MLWES3Q7681N256</a>);</div><div class="line">acpr.Initialize(PrivateKey);</div><div class="line"><span class="comment">// decrypt the ciphertext and output the shared secret</span></div><div class="line">status = acpr.Decapsulate(cpt, sec);</div></div><!-- fragment --> <p>Implementation Notes: </p>
 <p>Module learning with errors (MLWE) is the Learning With Errors problem (a generalization of the parity learning problem), specialized to polynomial arrays over finite fields. <br />
 An important feature of the LWE problem is that the solution may be reducible to the NP-Hard Shortest Vector Problem (SVP) in a Lattice. <br />
-This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers.</p>
+This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers. The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</p>
 <ul>
 <li>
 The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MLWEPublicKey, or MLWEPublicKey), Public for encryption, Private for Decryption. </li>
@@ -160,9 +160,7 @@ The high-security MLWES3Q7681N256 parameter set is the default cipher configurat
 <li>
 The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng </li>
 <li>
-The secondary prng used to generate the public key (BCR), is an AES128/CTR-BE construction, (changed from SHAKE in the Kyber version) </li>
-<li>
-The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure </li>
+The message is authenticated using SHAKE, and throws CryptoAuthenticationFailure on decryption authentication failure </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>

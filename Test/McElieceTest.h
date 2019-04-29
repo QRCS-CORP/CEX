@@ -19,9 +19,14 @@ namespace Test
 #if defined (_DEBUG)
 		static const size_t TEST_CYCLES = 1;
 #else
-		static const size_t TEST_CYCLES = 10;
+		static const size_t TEST_CYCLES = 2;
 #endif
 
+		std::vector<byte> m_cprseed;
+		std::vector<std::vector<byte>> m_cptexp;
+		std::vector<std::vector<byte>> m_rngexp;
+		std::vector<byte> m_rngkey;
+		std::vector<std::vector<byte>> m_sskexp;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -67,6 +72,16 @@ namespace Test
 		void Exception();
 
 		/// <summary>
+		/// Compare known answer shared-secret and cipher-text vectors to cipher output
+		/// </summary>
+		void Kat();
+
+		/// <summary>
+		/// Verifies the Nist RNG implementation
+		/// </summary>
+		void NistRngKat();
+
+		/// <summary>
 		/// Tests the cipher for invalid public keys in a looping stress test
 		/// </summary>
 		void PublicKey();
@@ -83,6 +98,7 @@ namespace Test
 
 	private:
 
+		void Initialize();
 		void OnProgress(const std::string &Data);
 	};
 }

@@ -16,13 +16,17 @@ enum class MPKCParameters : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S1 parameters (Medium Security) A finite field of 12 and an error correction capability of 62
+	/// The S1 parameters (Medium Security) A field dimension of 4096 and an error correction capability of 62
 	/// </summary>
-	MPKCS1M12T62 = static_cast<byte>(AsymmetricTransforms::MPKCS1M12T62)
+	MPKCS1N4096T62 = static_cast<byte>(AsymmetricTransforms::MPKCS1N4096T62),
 	/// <summary>
-	/// A finite field of ?? and an error correction capability of ??
+	/// The S2 parameters (Medium-High Security) A field dimension of 6960 and an error correction capability of 119
 	/// </summary>
-	//G??T?? = 8
+	MPKCS1N6960T119 = static_cast<byte>(AsymmetricTransforms::MPKCS1N6960T119),
+	/// <summary>
+	/// The S3 parameters (High Security) A field dimension of 8192 and an error correction capability of 128
+	/// </summary>
+	MPKCS1N8192T128 = static_cast<byte>(AsymmetricTransforms::MPKCS1N8192T128)
 };
 
 class MPKCParameterConvert

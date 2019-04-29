@@ -5,7 +5,6 @@ var searchData=
   ['iasymmetrickey',['IAsymmetricKey',['../class_i_asymmetric_key.html',1,'']]],
   ['iasymmetricparameters',['IAsymmetricParameters',['../class_i_asymmetric_parameters.html',1,'']]],
   ['iasymmetricsign',['IAsymmetricSign',['../class_i_asymmetric_sign.html',1,'']]],
-  ['iauthenticate',['IAuthenticate',['../class_i_authenticate.html',1,'']]],
   ['iblockcipher',['IBlockCipher',['../class_i_block_cipher.html',1,'']]],
   ['ibytestream',['IByteStream',['../class_i_byte_stream.html',1,'']]],
   ['iciphermode',['ICipherMode',['../class_i_cipher_mode.html',1,'']]],

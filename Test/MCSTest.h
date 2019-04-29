@@ -35,9 +35,9 @@ namespace Test
 		std::vector<std::vector<byte>> m_code;
 		std::vector<std::vector<byte>> m_expected;
 		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_message;
-		std::vector<std::vector<byte>> m_monte;
-		std::vector<std::vector<byte>> m_nonce;
+		std::vector<byte> m_message;
+		std::vector<byte> m_monte;
+		std::vector<byte> m_nonce;
 		TestEventHandler m_progressEvent;
 
 	public:

@@ -69,14 +69,14 @@ namespace Test
 			RlweDecryptLoop(RLWEParameters::RLWES1Q12289N1024, DEF_TEST_ITER, rngType);
 
 			// McEliece
-			OnProgress(std::string("***Generating " + ctr + " Keypairs using McEliece MPKCS1M12T62***"));
-			MpkcGenerateLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using McEliece MPKCS1N4096T62***"));
+			MpkcGenerateLoop(MPKCParameters::MPKCS1N4096T62, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Encrypting " + ctr + " messages using McEliece MPKCS1M12T62***"));
-			MpkcEncryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Encrypting " + ctr + " messages using McEliece MPKCS1N4096T62***"));
+			MpkcEncryptLoop(MPKCParameters::MPKCS1N4096T62, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Decrypting " + ctr + " messages using McEliece MPKCS1M12T62***"));
-			MpkcDecryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Decrypting " + ctr + " messages using McEliece MPKCS1N4096T62***"));
+			MpkcDecryptLoop(MPKCParameters::MPKCS1N4096T62, DEF_TEST_ITER, rngType);
 
 			// ModuleLWE
 			OnProgress(std::string("***Generating " + ctr + " Keypairs using ModuleLWE MLWES3Q7681N256***"));

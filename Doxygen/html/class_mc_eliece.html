@@ -93,9 +93,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a67a093a8b81ac0782d9affffde8878e5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_mc_eliece.html">McEliece</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a67a093a8b81ac0782d9affffde8878e5">operator=</a> (const <a class="el" href="class_mc_eliece.html">McEliece</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a67a093a8b81ac0782d9affffde8878e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a67a093a8b81ac0782d9affffde8878e5">More...</a><br /></td></tr>
 <tr class="separator:a67a093a8b81ac0782d9affffde8878e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9977e8205b9a451ee8da3128cc46afe8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a9977e8205b9a451ee8da3128cc46afe8">McEliece</a> (<a class="el" href="group___enumeration.html#gac135819acdea6758fc6b361a25ceabf3">MPKCParameters</a> <a class="el" href="class_mc_eliece.html#ac258f9e721936e986d73be560c7c11ee">Parameters</a>=<a class="el" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a4b234b9463ea1428c68de9315bcdd4f4">MPKCParameters::MPKCS1M12T62</a>, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
-<tr class="memdesc:a9977e8205b9a451ee8da3128cc46afe8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the cipher with auto-initialized prng and digest functions  <a href="#a9977e8205b9a451ee8da3128cc46afe8">More...</a><br /></td></tr>
-<tr class="separator:a9977e8205b9a451ee8da3128cc46afe8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7486d44108e410fadeae0ce29c3e6c32"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a7486d44108e410fadeae0ce29c3e6c32">McEliece</a> (<a class="el" href="group___enumeration.html#gac135819acdea6758fc6b361a25ceabf3">MPKCParameters</a> <a class="el" href="class_mc_eliece.html#ac258f9e721936e986d73be560c7c11ee">Parameters</a>=<a class="el" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a7f115e30bfec6c0c05a8e017d69a3a6e">MPKCParameters::MPKCS1N4096T62</a>, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
+<tr class="memdesc:a7486d44108e410fadeae0ce29c3e6c32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the cipher with auto-initialized prng and digest functions  <a href="#a7486d44108e410fadeae0ce29c3e6c32">More...</a><br /></td></tr>
+<tr class="separator:a7486d44108e410fadeae0ce29c3e6c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af71ae49a1e546776a5bd864de1b62962"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#af71ae49a1e546776a5bd864de1b62962">McEliece</a> (<a class="el" href="group___enumeration.html#gac135819acdea6758fc6b361a25ceabf3">MPKCParameters</a> <a class="el" href="class_mc_eliece.html#ac258f9e721936e986d73be560c7c11ee">Parameters</a>, <a class="el" href="class_i_prng.html">IPrng</a> *Prng)</td></tr>
 <tr class="memdesc:af71ae49a1e546776a5bd864de1b62962"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using external Prng and Digest instances  <a href="#af71ae49a1e546776a5bd864de1b62962">More...</a><br /></td></tr>
 <tr class="separator:af71ae49a1e546776a5bd864de1b62962"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,27 +148,28 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Niederreiter dual form of the McEliece public key crypto-system </p>
-<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a4b234b9463ea1428c68de9315bcdd4f4">MPKCParameters::MPKCS1M12T62</a>, [PrngType], [CipherType]);</div><div class="line">IAsymmetricKeyPair* kp = cpr.Generate();</div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">MPKCPublicKey* pubK = (MPKCPublicKey*)kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; skey = pubK-&gt;ToBytes();</div></div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">create the shared secret</div><div class="line">std::vector&lt;byte&gt; cpt(0);</div><div class="line">std::vector&lt;byte&gt; sec(32);</div><div class="line"></div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a4b234b9463ea1428c68de9315bcdd4f4">MPKCParameters::MPKCS1M12T62</a>, [PrngType], [CipherType]);</div><div class="line">cpr.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line"><span class="comment">// encrypt the secret</span></div><div class="line">cpr.Encrypt(cpt, sec);</div></div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(32);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a4b234b9463ea1428c68de9315bcdd4f4">MPKCParameters::MPKCS1M12T62</a>, [PrngType], [CipherType]);</div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line">cpr.Initialize(PrivateKey);</div><div class="line"><span class="comment">// decrypt the secret, status returns authentication outcome, false for failure</span></div><div class="line">status = cpr.Decrypt(cpt, sec);</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a7f115e30bfec6c0c05a8e017d69a3a6e">MPKCParameters::MPKCS1N4096T62</a>, [PrngType], [CipherType]);</div><div class="line">IAsymmetricKeyPair* kp = cpr.Generate();</div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">MPKCPublicKey* pubK = (MPKCPublicKey*)kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; skey = pubK-&gt;ToBytes();</div></div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">create the shared secret</div><div class="line">std::vector&lt;byte&gt; cpt(0);</div><div class="line">std::vector&lt;byte&gt; ssk(32);</div><div class="line"></div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a7f115e30bfec6c0c05a8e017d69a3a6e">MPKCParameters::MPKCS1N4096T62</a>, Prng-Type);</div><div class="line">cpr.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line"><span class="comment">// encrypt the secret</span></div><div class="line">cpr.Encapsulate(cpt, ssk);</div></div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; ssk(32);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a7f115e30bfec6c0c05a8e017d69a3a6e">MPKCParameters::MPKCS1N4096T62</a>, Prng-Type);</div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line">cpr.Initialize(PrivateKey);</div><div class="line"><span class="comment">// decrypt the secret, status returns authentication outcome, false for failure</span></div><div class="line">status = cpr.Decapsulate(cpt, ssk);</div></div><!-- fragment --> <p>Implementation Notes: </p>
 <p>.</p>
-<p>This implementation is based on the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/.">'McBits'</a>. <br />
-The MPKCParameters enumeration member is passed to the constructor along with either an optional Prng and block-cipher enum type values, or uninitialized instances of a Prng and a block cipher. <br />
-The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key tag byte array. <br />
-The encryption method a standard encryption interface: CipherText = Encrypt(Message), the decryption method uses the inverse: Message = Decrypt(CipherText).</p>
+<p>This implementation is based on two different implementations of the asymmetric primitive; the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/.">'McBits'</a>, <br />
+and the NIST PQ Round 2 implementation by the same authors (using the recommended version contained in the SUPERCOP package). <br />
+The MPKCParameters enumeration member is passed to the constructor along with the Prng enum type value (required: the default is BCR), or an initialized instance of a Prng through the secondary advanced constructor option. <br />
+The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key-tag byte array. <br />
+The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</p>
 <ul>
 <li>
 The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MPKCPublicKey, or MPKCPublicKey), Public for encryption, Private for Decryption. </li>
 <li>
-The MPKCS1M12T62 parameter set is the default cipher configuration; as of (1.0.0.4), this is currently the only parameter set, but a modular construction is used anticipating future expansion </li>
+There are three parameters available: MPKCS1N4096T62 with medium security, MPKCS1N6960T119 with medium-high security, and MPKCS1N8192T128 with high-security </li>
 <li>
 The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng </li>
 <li>
-The primary pseudo-random function (message digest) can be set through the constructor (default is SHA2-256) </li>
-<li>
-The default prng used to generate the public key and private keys (default is BCR), is an AES256/CTR-BE construction </li>
-<li>
-The internal seed authentication engine is fixed as a GCM mode, which can use any of the implemented block ciphers, standard or extended </li>
+The default prng used to generate the public key and private keys (default is BCR), is an auto-seeded AES256/CTR-BE construction </li>
 </ul>
-<p>Guiding Publications:// </p><ol>
+<ol>
+<li>
+Guiding Publications://Classic McEliece: <a href="https://classic.mceliece.org/nist/mceliece-20171129.pdf">McEliece</a> conservatice code-based cryptography. </li>
+<li>
+Source code <a href="https://classic.mceliece.org/software.html">Classic McEliece</a> software. </li>
 <li>
 the Niederreiter dual form of the McEliece cipher: <a href="https://eprint.iacr.org/2015/610.pdf">McBits</a> a fast constant-time code based cryptography. </li>
 <li>
@@ -207,8 +208,8 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 
 </div>
 </div>
-<a id="a9977e8205b9a451ee8da3128cc46afe8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9977e8205b9a451ee8da3128cc46afe8">&#9670;&nbsp;</a></span>McEliece() <span class="overload">[2/3]</span></h2>
+<a id="a7486d44108e410fadeae0ce29c3e6c32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7486d44108e410fadeae0ce29c3e6c32">&#9670;&nbsp;</a></span>McEliece() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -217,7 +218,7 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
           <td class="memname">McEliece::McEliece </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gac135819acdea6758fc6b361a25ceabf3">MPKCParameters</a>&#160;</td>
-          <td class="paramname"><em>Parameters</em> = <code><a class="el" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a4b234b9463ea1428c68de9315bcdd4f4">MPKCParameters::MPKCS1M12T62</a></code>, </td>
+          <td class="paramname"><em>Parameters</em> = <code><a class="el" href="group___enumeration.html#ggac135819acdea6758fc6b361a25ceabf3a7f115e30bfec6c0c05a8e017d69a3a6e">MPKCParameters::MPKCS1N4096T62</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>

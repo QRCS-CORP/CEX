@@ -12,5 +12,7 @@ var searchData=
   ['mlweq7681n256',['MLWEQ7681N256',['../class_m_l_w_e_q7681_n256.html',1,'']]],
   ['modulelwe',['ModuleLWE',['../class_module_l_w_e.html',1,'']]],
   ['mpkcgenerate',['MPKCGenerate',['../class_m_p_k_c_generate.html',1,'']]],
-  ['mpkcm12t62',['MPKCM12T62',['../class_m_p_k_c_m12_t62.html',1,'']]]
+  ['mpkcn4096t62',['MPKCN4096T62',['../class_m_p_k_c_n4096_t62.html',1,'']]],
+  ['mpkcn6960t119',['MPKCN6960T119',['../class_m_p_k_c_n6960_t119.html',1,'']]],
+  ['mpkcn8192t128',['MPKCN8192T128',['../class_m_p_k_c_n8192_t128.html',1,'']]]
 ];

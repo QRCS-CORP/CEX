@@ -723,9 +723,6 @@
     <ClInclude Include="..\..\CEX\MLWEQ7681N256.h">
       <Filter>Header Files\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\MPKCM12T62.h">
-      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h">
       <Filter>Header Files\Asymmetric\Encrypt\NTRU\Support</Filter>
     </ClInclude>
@@ -950,6 +947,15 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\Blake.h">
       <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MPKCN8192T128.h">
+      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MPKCN6960T119.h">
+      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MPKCN4096T62.h">
+      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1202,9 +1208,6 @@
     <ClCompile Include="..\..\CEX\MLWEQ7681N256.cpp">
       <Filter>Source Files\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\MPKCM12T62.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp">
       <Filter>Source Files\Asymmetric\Encrypt\NTRU\Support</Filter>
     </ClCompile>
@@ -1450,6 +1453,15 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Blake.cpp">
       <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MPKCN6960T119.cpp">
+      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MPKCN8192T128.cpp">
+      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MPKCN4096T62.cpp">
+      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

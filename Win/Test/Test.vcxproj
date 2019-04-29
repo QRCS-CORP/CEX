@@ -306,6 +306,7 @@
     <ClInclude Include="..\..\Test\DilithiumTest.h" />
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\HCRTest.h" />
+    <ClInclude Include="..\..\Test\NistRng.h" />
     <ClInclude Include="..\..\Test\RandomUtils.h" />
     <ClInclude Include="..\..\Test\RCSTest.h" />
     <ClInclude Include="..\..\Test\RDPTest.h" />
@@ -375,6 +376,7 @@
     <ClCompile Include="..\..\Test\DilithiumTest.cpp" />
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
     <ClCompile Include="..\..\Test\HCRTest.cpp" />
+    <ClCompile Include="..\..\Test\NistRng.cpp" />
     <ClCompile Include="..\..\Test\RandomUtils.cpp" />
     <ClCompile Include="..\..\Test\RCSTest.cpp" />
     <ClCompile Include="..\..\Test\RDPTest.cpp" />

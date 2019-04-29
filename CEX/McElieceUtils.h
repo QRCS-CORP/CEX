@@ -34,7 +34,91 @@ class McElieceUtils
 {
 public:
 
-	//~~~Public Functions~~~//
+	//~~~N6090T13 and N8192T13~~~//
+
+	// benes.c //
+
+	static void LayerIn(ulong Data[2][64], const ulong* Bits, uint Lgs);
+
+	static void LayerEx(ulong* Data, const ulong* Bits, uint Lgs);
+
+	static void ApplyBenes(byte* R, const byte* Bits, bool Reverse);
+
+	// controlbits.c //
+
+	static void Compose(uint W, uint N, const uint* Pi, uint* P);
+
+	static void ComposeInv(uint N, uint* Y, const uint* X, const uint* Pi);
+
+	static void CSwap(uint &X, uint &Y, byte Swap);
+
+	static void CSwap63b(ulong &X, ulong &Y, byte Swap);
+
+	static void Flow(uint W, uint &X, const uint &Y, const uint T);
+
+	static void Invert(uint N, uint* Ip, const uint* Pi);
+
+	static byte IsSmaller(uint A, uint B);
+
+	static byte IsSmaller63b(ulong A, ulong B);
+
+	static void Merge(uint N, uint* X, uint Step);
+
+	static void Merge63b(uint N, ulong* X, uint Step);
+
+	static void MinMax(uint &X, uint &Y);
+
+	static void MinMax63b(ulong &X, ulong &Y);
+
+	static void Permute(uint W, uint N, uint Offset, uint Step, const uint* P, const uint* Pi, byte* C, uint* PiFlip);
+
+	static void PermuteBits(uint W, uint N, uint Step, uint Offset, byte* C, const uint* Pi);
+
+	static void Sort(uint N, uint* X);
+
+	static void Sort63b(uint N, ulong* X);
+
+	// transpose.c //
+
+	static void Transpose64x64(ulong* Output, const ulong* Input);
+
+	// util.c //
+
+	static ushort BitReverse(ushort A);
+
+	static void Clear8(byte* A, size_t Count);
+
+	static void Clear32(uint* A, size_t Count);
+
+	static void Clear64(ulong* A, size_t Count);
+
+	static uint Le8To32(const byte* Input);
+
+	static ulong Le8To64(const byte* Input);
+
+	static void Le32To8(byte* Output, uint Value);
+
+	static void Le64To8(byte* Output, ulong Value);
+
+	static ushort Load16(const byte* Input);
+
+	static ulong Load64(const byte* Input);
+
+	static uint Rotl32(uint Value, uint Shift);
+
+	static ulong Rotl64(ulong Value, uint Shift);
+
+	static uint Rotr32(uint Value, uint Shift);
+
+	static ulong Rotr64(ulong Value, uint Shift);
+
+	static void Store16(byte* Output, ushort A);
+
+	static void Store64(byte* Output, ulong Input);
+
+	static int32_t Verify(const byte* A, const byte* B, size_t Length);
+
+	//~~~N4096T12~~~//
 
 	static ushort Diff(ushort X, ushort Y);
 
@@ -601,8 +685,10 @@ public:
 	template<typename Array>
 	static int Weight(Array &Input)
 	{
-		size_t i;
 		std::array<ulong, 8> state;
+		size_t i;
+		int w;
+
 		std::memset(&state[0], 0, 64);
 
 		for (i = 0; i < 64; i++)
@@ -612,7 +698,8 @@ public:
 
 		Transpose8x64(state);
 
-		int w = 0;
+		w = 0;
+
 		for (i = 0; i < 64; i++)
 		{
 			w += ((byte*)state.data())[i];

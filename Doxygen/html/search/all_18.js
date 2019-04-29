@@ -44,7 +44,6 @@ var searchData=
   ['_7eiasymmetrickey',['~IAsymmetricKey',['../class_i_asymmetric_key.html#a07828a73fcff397b24d0ad378c5de1cc',1,'IAsymmetricKey']]],
   ['_7eiasymmetricparameters',['~IAsymmetricParameters',['../class_i_asymmetric_parameters.html#ae7a593c8d7eacbcc012f092818a32d93',1,'IAsymmetricParameters']]],
   ['_7eiasymmetricsign',['~IAsymmetricSign',['../class_i_asymmetric_sign.html#a15d6681f385e01d414ca3523121921d9',1,'IAsymmetricSign']]],
-  ['_7eiauthenticate',['~IAuthenticate',['../class_i_authenticate.html#aec926c7d101cd20a82c14e2cf6a6cfd7',1,'IAuthenticate']]],
   ['_7eiblockcipher',['~IBlockCipher',['../class_i_block_cipher.html#ad16af8e77a95711cf94416f3f080a259',1,'IBlockCipher']]],
   ['_7eibytestream',['~IByteStream',['../class_i_byte_stream.html#a8743b149618c6502cce2d2aaaad67f02',1,'IByteStream']]],
   ['_7eiciphermode',['~ICipherMode',['../class_i_cipher_mode.html#a3a3ec68d89511d48a38aff60937f9e67',1,'ICipherMode']]],

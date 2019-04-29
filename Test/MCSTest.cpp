@@ -84,24 +84,24 @@ namespace Test
 			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 exception handling tests.."));
 
 			// test 2 succesive finalization calls against mac output and expected ciphertext
-			Finalization(acsc256h256, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0], m_code[1]);
-			Finalization(acsc256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[2], m_code[3]);
-			Finalization(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[3], m_code[4], m_code[5]);
-			Finalization(acsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[4], m_code[6], m_code[7]);
-			Finalization(acsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[5], m_code[8], m_code[9]);
+			Finalization(acsc256h256, m_message, m_key[0], m_nonce, m_expected[1], m_code[0], m_code[1]);
+			Finalization(acsc256k256, m_message, m_key[0], m_nonce, m_expected[2], m_code[2], m_code[3]);
+			Finalization(acsc512h512, m_message, m_key[1], m_nonce, m_expected[3], m_code[4], m_code[5]);
+			Finalization(acsc512k512, m_message, m_key[1], m_nonce, m_expected[4], m_code[6], m_code[7]);
+			Finalization(acsc1024k1024, m_message, m_key[2], m_nonce, m_expected[5], m_code[8], m_code[9]);
 			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 known answer finalization tests."));
 
 			// original known answer test vectors generated with this implementation
-			Kat(acs256s, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(acsc256h256, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
-			Kat(acsc256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2]);
-			Kat(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[3]);
-			Kat(acsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[4]);
-			Kat(acsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[5]);
+			Kat(acs256s, m_message, m_key[0], m_nonce, m_expected[0]);
+			Kat(acsc256h256, m_message, m_key[0], m_nonce, m_expected[1]);
+			Kat(acsc256k256, m_message, m_key[0], m_nonce, m_expected[2]);
+			Kat(acsc512h512, m_message, m_key[1], m_nonce, m_expected[3]);
+			Kat(acsc512k512, m_message, m_key[1], m_nonce, m_expected[4]);
+			Kat(acsc1024k1024, m_message, m_key[2], m_nonce, m_expected[5]);
 			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 known answer cipher tests.."));
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
-			MonteCarlo(acs256s, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
+			MonteCarlo(acs256s, m_message, m_key[0], m_nonce, m_monte);
 			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 monte carlo tests.."));
 
 			// compare parallel output with sequential for equality
@@ -113,11 +113,11 @@ namespace Test
 			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 stress tests.."));
 
 			// verify ciphertext output, decryption, and mac code generation
-			Verification(acsc256h256, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0]);
-			Verification(acsc256k256, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[2]);
-			Verification(acsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[3], m_code[4]);
-			Verification(acsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[4], m_code[6]);
-			Verification(acsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[5], m_code[8]);
+			Verification(acsc256h256, m_message, m_key[0], m_nonce, m_expected[1], m_code[0]);
+			Verification(acsc256k256, m_message, m_key[0], m_nonce, m_expected[2], m_code[2]);
+			Verification(acsc512h512, m_message, m_key[1], m_nonce, m_expected[3], m_code[4]);
+			Verification(acsc512k512, m_message, m_key[1], m_nonce, m_expected[4], m_code[6]);
+			Verification(acsc1024k1024, m_message, m_key[2], m_nonce, m_expected[5], m_code[8]);
 			OnProgress(std::string("MCSTest: Passed MCS-256/512/1024 known answer authentication tests.."));
 
 			delete acs256s;
@@ -603,23 +603,23 @@ namespace Test
 		};
 		HexConverter::Decode(key, 3, m_key);
 
-		const std::vector<std::string> message =
+		const std::string message =
 		{
 			std::string("000102030405060708090A0B0C0D0E0F"),
 		};
-		HexConverter::Decode(message, 1, m_message);
+		HexConverter::Decode(message, m_message);
 
-		const std::vector<std::string> monte =
+		const std::string monte =
 		{
 			std::string("DCE8976A4A338FFC5DC7ED1C964C050E")
 		};
-		HexConverter::Decode(monte, 1, m_monte);
+		HexConverter::Decode(monte, m_monte);
 
-		const std::vector<std::string> nonce =
+		const std::string nonce =
 		{
 			std::string("FFFEFDFCFBFAF9F8F7F6F5F4F3F2F1F0")
 		};
-		HexConverter::Decode(nonce, 1, m_nonce);
+		HexConverter::Decode(nonce, m_nonce);
 
 		/*lint -restore */
 	}

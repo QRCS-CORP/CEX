@@ -156,7 +156,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <CompileAs>CompileAsCpp</CompileAs>
+      <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -271,7 +271,9 @@
     <ClInclude Include="..\..\CEX\MacBase.h" />
     <ClInclude Include="..\..\CEX\MacFromName.h" />
     <ClInclude Include="..\..\CEX\MemoryPool.h" />
-    <ClInclude Include="..\..\CEX\MPKCM12T62.h" />
+    <ClInclude Include="..\..\CEX\MPKCN4096T62.h" />
+    <ClInclude Include="..\..\CEX\MPKCN6960T119.h" />
+    <ClInclude Include="..\..\CEX\MPKCN8192T128.h" />
     <ClInclude Include="..\..\CEX\Mutex.h" />
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h" />
     <ClInclude Include="..\..\CEX\DilithiumParameters.h" />
@@ -483,7 +485,9 @@
     <ClCompile Include="..\..\CEX\Macs.cpp" />
     <ClCompile Include="..\..\CEX\MemoryPool.cpp" />
     <ClCompile Include="..\..\CEX\MLWEParameters.cpp" />
-    <ClCompile Include="..\..\CEX\MPKCM12T62.cpp" />
+    <ClCompile Include="..\..\CEX\MPKCN4096T62.cpp" />
+    <ClCompile Include="..\..\CEX\MPKCN6960T119.cpp" />
+    <ClCompile Include="..\..\CEX\MPKCN8192T128.cpp" />
     <ClCompile Include="..\..\CEX\MPKCParameters.cpp" />
     <ClCompile Include="..\..\CEX\NTRUParameters.cpp" />
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp" />

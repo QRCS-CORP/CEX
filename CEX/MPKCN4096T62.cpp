@@ -1,13 +1,17 @@
-#include "MPKCM12T62.h"
+#include "MPKCN4096T62.h"
+#include "CSX256.h"
 #include "IntegerTools.h"
+#include "Keccak.h"
 #include "McElieceUtils.h"
 
 NAMESPACE_MCELIECE
 
+using Cipher::Stream::CSX256;
+using Digest::Keccak;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 
-const std::vector<std::vector<ulong>> MPKCM12T62::ButterflyConsts =
+const std::vector<std::vector<ulong>> MPKCN4096T62::ButterflyConsts =
 { 
 	{
 		{
@@ -328,7 +332,7 @@ const std::vector<std::vector<ulong>> MPKCM12T62::ButterflyConsts =
 	}
 };
 
-const std::vector<std::vector<ulong>> MPKCM12T62::GfPoints =
+const std::vector<std::vector<ulong>> MPKCN4096T62::GfPoints =
 {
 	{
 		{
@@ -654,7 +658,7 @@ const std::vector<std::vector<ulong>> MPKCM12T62::GfPoints =
 	}
 };
 
-const std::vector<std::vector<std::vector<ulong>>> MPKCM12T62::RadixTrScalar =
+const std::vector<std::vector<std::vector<ulong>>> MPKCN4096T62::RadixTrScalar =
 {
 	{
 		{
@@ -732,103 +736,61 @@ const std::vector<std::vector<std::vector<ulong>>> MPKCM12T62::RadixTrScalar =
 
 //~~~Public Functions~~~//
 
-bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S)
+bool MPKCN4096T62::Decrypt(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	std::array<ulong, MPKC_CND_SIZE / sizeof(ulong)> cond;
-	ulong diff;
-	ulong t;
-	size_t i;
+	std::vector<byte> tmpk(32);
+	std::vector<byte> tmpn(8);
+	std::vector<byte> tmps(40);
+	std::vector<byte> e(1ULL << (MPKCN4096T62::MPKC_M - 3));
+	byte ret;
 
-	IntegerTools::BlockToLe(PrivateKey, MPKC_IRR_SIZE, cond, 0, MPKC_CND_SIZE);
-	std::vector<ulong> recv(MPKC_COLUMN_SIZE);
-	PreProcess(recv, S);
-	McElieceUtils::BenesCompact(recv, cond, 1UL);
+	ret = DecryptE(e, PrivateKey, CipherText);
 
-	// scaling
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> inverse;
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> scaled;
-	Scaling(scaled, inverse, PrivateKey, recv);
+	XOF(e, 0, e.size(), tmps, 0, tmps.size(), Keccak::KECCAK256_RATE_SIZE);
+	MemoryTools::Copy(tmps, 0, tmpk, 0, tmpk.size());
+	MemoryTools::Copy(tmps, tmpk.size(), tmpn, 0, tmpn.size());
 
-	// transposed FFT
-	std::array<std::array<ulong, MPKC_M>, 2> sPriv;
-	TransposedFFT::Transform(sPriv, scaled);
-	SyndromeAdjust(sPriv);
+	CSX256 cpr(Enumeration::StreamAuthenticators::Poly1305);
+	Cipher::SymmetricKey kp(tmpk, tmpn);
+	cpr.Initialize(false, kp);
 
-	// Berlekamp Massey
-	std::array<ulong, MPKC_M> locator{ 0 };
-	BerlekampMassey(locator, sPriv);
-
-	// additive FFT
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> eval;
-	AdditiveFFT::Transform(eval, locator);
-
-	std::array<ulong, MPKC_COLUMN_SIZE> error;
-
-	for (i = 0; i < error.size(); ++i)
+	try
 	{
-		error[i] = McElieceUtils::Or(eval[i], MPKC_M);
-		error[i] = ~error[i];
+		cpr.Transform(CipherText, MPKC_SYNDBYTES, SharedSecret, 0, SharedSecret.size());
+	}
+	catch (Exception::CryptoAuthenticationFailure)
+	{
+		ret = 1;
 	}
 
-	// re-encrypt
-	ScalingInverse(scaled, inverse, error);
-
-	std::array<std::array<ulong, MPKC_M>, 2> sPrivCmp;
-	TransposedFFT::Transform(sPrivCmp, scaled);
-	SyndromeAdjust(sPrivCmp);
-
-	diff = 0;
-	diff |= sPriv[0][0] ^ sPrivCmp[0][0];
-	diff |= sPriv[0][1] ^ sPrivCmp[0][1];
-	diff |= sPriv[0][2] ^ sPrivCmp[0][2];
-	diff |= sPriv[0][3] ^ sPrivCmp[0][3];
-	diff |= sPriv[0][4] ^ sPrivCmp[0][4];
-	diff |= sPriv[0][5] ^ sPrivCmp[0][5];
-	diff |= sPriv[0][6] ^ sPrivCmp[0][6];
-	diff |= sPriv[0][7] ^ sPrivCmp[0][7];
-	diff |= sPriv[0][8] ^ sPrivCmp[0][8];
-	diff |= sPriv[0][9] ^ sPrivCmp[0][9];
-	diff |= sPriv[0][10] ^ sPrivCmp[0][10];
-	diff |= sPriv[0][11] ^ sPrivCmp[0][11];
-	diff |= sPriv[1][0] ^ sPrivCmp[1][0];
-	diff |= sPriv[1][1] ^ sPrivCmp[1][1];
-	diff |= sPriv[1][2] ^ sPrivCmp[1][2];
-	diff |= sPriv[1][3] ^ sPrivCmp[1][3];
-	diff |= sPriv[1][4] ^ sPrivCmp[1][4];
-	diff |= sPriv[1][5] ^ sPrivCmp[1][5];
-	diff |= sPriv[1][6] ^ sPrivCmp[1][6];
-	diff |= sPriv[1][7] ^ sPrivCmp[1][7];
-	diff |= sPriv[1][8] ^ sPrivCmp[1][8];
-	diff |= sPriv[1][9] ^ sPrivCmp[1][9];
-	diff |= sPriv[1][10] ^ sPrivCmp[1][10];
-	diff |= sPriv[1][11] ^ sPrivCmp[1][11];
-	diff |= diff >> 32;
-	diff |= diff >> 16;
-	diff |= diff >> 8;
-	t = diff & 0xFF;
-
-	// compact and store
-	McElieceUtils::BenesCompact(error, cond, 0);
-	IntegerTools::LeToBlock(error, 0, E, 0, error.size() * sizeof(ulong));
-
-	t |= McElieceUtils::Weight(error) ^ MPKC_T;
-	t -= 1;
-	t >>= 63;
-
-	return (t - 1 == 0) ? true : false;
+	return (ret == 0);
 }
 
-void MPKCM12T62::Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Rng)
+void MPKCN4096T62::Encrypt(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng)
 {
-	GenE(E, Rng);
-	Syndrome(S, PublicKey, E);
+	std::vector<byte> tmpk(32);
+	std::vector<byte> tmpn(8);
+	std::vector<byte> tmps(40);
+	std::vector<byte> e(1ULL << (MPKCN4096T62::MPKC_M - 3));
+
+	EncryptE(CipherText, e, PublicKey, Rng);
+	Rng->Generate(SharedSecret);
+
+	XOF(e, 0, e.size(), tmps, 0, tmps.size(), Keccak::KECCAK256_RATE_SIZE);
+	MemoryTools::Copy(tmps, 0, tmpk, 0, tmpk.size());
+	MemoryTools::Copy(tmps, tmpk.size(), tmpn, 0, tmpn.size());
+
+	CSX256 cpr(Enumeration::StreamAuthenticators::Poly1305);
+	Cipher::SymmetricKey kp(tmpk, tmpn);
+	cpr.Initialize(true, kp);
+	cpr.Transform(SharedSecret, 0, CipherText, MPKC_SYNDBYTES, SharedSecret.size());
 }
 
-bool MPKCM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Rng)
+bool MPKCN4096T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Rng)
 {
-	size_t ctr;
+	size_t i;
 
-	for (ctr = 0; ctr < MPKC_GEN_MAXR; ++ctr)
+	for (i = 0; i < KEYGEN_RETRIES_MAX; ++i)
 	{
 		SkGen(PrivateKey, Rng);
 
@@ -838,14 +800,23 @@ bool MPKCM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Priva
 		}
 	}
 
-	return (ctr < MPKC_GEN_MAXR) ? true : false;
+	return (i < KEYGEN_RETRIES_MAX);
 }
 
 //~~~Private Functions~~~//
 
+void MPKCN4096T62::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+{
+#if defined(CEX_SHAKE_STRONG)
+	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#else
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+#endif
+}
+
 //~~~Decrypt~~~//
 
-void MPKCM12T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array<std::array<ulong, MPKC_M>, 2> &Input)
+void MPKCN4096T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array<std::array<ulong, MPKC_M>, 2> &Input)
 {
 	ushort b;
 	ushort bInv;
@@ -963,7 +934,93 @@ void MPKCM12T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array<s
 	Output[11] >>= 64 - (MPKC_T + 1);
 }
 
-void MPKCM12T62::PreProcess(std::vector<ulong> &Received, const std::vector<byte> &S)
+byte MPKCN4096T62::DecryptE(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S)
+{
+	std::array<ulong, MPKC_CND_SIZE / sizeof(ulong)> cond;
+	ulong diff;
+	ulong t;
+	size_t i;
+
+	IntegerTools::BlockToLe(PrivateKey, MPKC_IRR_SIZE, cond, 0, MPKC_CND_SIZE);
+	std::vector<ulong> recv(MPKC_COLUMN_SIZE);
+	PreProcess(recv, S);
+	McElieceUtils::BenesCompact(recv, cond, 1UL);
+
+	// scaling
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> inverse;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> scaled;
+	Scaling(scaled, inverse, PrivateKey, recv);
+
+	// transposed FFT
+	std::array<std::array<ulong, MPKC_M>, 2> sPriv;
+	TransposedFFT::Transform(sPriv, scaled);
+	SyndromeAdjust(sPriv);
+
+	// Berlekamp Massey
+	std::array<ulong, MPKC_M> locator{ 0 };
+	BerlekampMassey(locator, sPriv);
+
+	// additive FFT
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> Evaluate;
+	AdditiveFFT::Transform(Evaluate, locator);
+
+	std::array<ulong, MPKC_COLUMN_SIZE> error;
+
+	for (i = 0; i < error.size(); ++i)
+	{
+		error[i] = McElieceUtils::Or(Evaluate[i], MPKC_M);
+		error[i] = ~error[i];
+	}
+
+	// re-Encrypt
+	ScalingInverse(scaled, inverse, error);
+
+	std::array<std::array<ulong, MPKC_M>, 2> sPrivCmp;
+	TransposedFFT::Transform(sPrivCmp, scaled);
+	SyndromeAdjust(sPrivCmp);
+
+	diff = 0;
+	diff |= sPriv[0][0] ^ sPrivCmp[0][0];
+	diff |= sPriv[0][1] ^ sPrivCmp[0][1];
+	diff |= sPriv[0][2] ^ sPrivCmp[0][2];
+	diff |= sPriv[0][3] ^ sPrivCmp[0][3];
+	diff |= sPriv[0][4] ^ sPrivCmp[0][4];
+	diff |= sPriv[0][5] ^ sPrivCmp[0][5];
+	diff |= sPriv[0][6] ^ sPrivCmp[0][6];
+	diff |= sPriv[0][7] ^ sPrivCmp[0][7];
+	diff |= sPriv[0][8] ^ sPrivCmp[0][8];
+	diff |= sPriv[0][9] ^ sPrivCmp[0][9];
+	diff |= sPriv[0][10] ^ sPrivCmp[0][10];
+	diff |= sPriv[0][11] ^ sPrivCmp[0][11];
+	diff |= sPriv[1][0] ^ sPrivCmp[1][0];
+	diff |= sPriv[1][1] ^ sPrivCmp[1][1];
+	diff |= sPriv[1][2] ^ sPrivCmp[1][2];
+	diff |= sPriv[1][3] ^ sPrivCmp[1][3];
+	diff |= sPriv[1][4] ^ sPrivCmp[1][4];
+	diff |= sPriv[1][5] ^ sPrivCmp[1][5];
+	diff |= sPriv[1][6] ^ sPrivCmp[1][6];
+	diff |= sPriv[1][7] ^ sPrivCmp[1][7];
+	diff |= sPriv[1][8] ^ sPrivCmp[1][8];
+	diff |= sPriv[1][9] ^ sPrivCmp[1][9];
+	diff |= sPriv[1][10] ^ sPrivCmp[1][10];
+	diff |= sPriv[1][11] ^ sPrivCmp[1][11];
+	diff |= diff >> 32;
+	diff |= diff >> 16;
+	diff |= diff >> 8;
+	t = diff & 0xFF;
+
+	// compact and store
+	McElieceUtils::BenesCompact(error, cond, 0);
+	IntegerTools::LeToBlock(error, 0, E, 0, error.size() * sizeof(ulong));
+
+	t |= McElieceUtils::Weight(error) ^ MPKC_T;
+	t -= 1;
+	t >>= 63;
+
+	return static_cast<byte>(t - 1);
+}
+
+void MPKCN4096T62::PreProcess(std::vector<ulong> &Received, const std::vector<byte> &S)
 {
 	IntegerTools::BlockToLe(S, 0, Received, 0, MPKC_CPACIPHERTEXT_SIZE - 5);
 
@@ -979,9 +1036,9 @@ void MPKCM12T62::PreProcess(std::vector<ulong> &Received, const std::vector<byte
 	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8)];
 }
 
-void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received)
+void MPKCN4096T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received)
 {
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> eval;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> Evaluate;
 	std::array<ulong, MPKC_M> skint;
 	std::array<ulong, MPKC_M> tmp;
 	size_t ctr;
@@ -989,14 +1046,14 @@ void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE>
 
 	// computing inverses
 	MemoryTools::Copy(PrivateKey, 0, skint, 0, MPKC_M * sizeof(ulong));
-	AdditiveFFT::Transform(eval, skint);
-	Square(eval[0], eval[0]);
-	McElieceUtils::Copy(eval[0], Inverse[0]);
+	AdditiveFFT::Transform(Evaluate, skint);
+	Square(Evaluate[0], Evaluate[0]);
+	McElieceUtils::Copy(Evaluate[0], Inverse[0]);
 
 	for (i = 1; i < MPKC_COLUMN_SIZE; ++i)
 	{
-		Square(eval[i], eval[i]);
-		McElieceUtils::Multiply(Inverse[i], Inverse[i - 1], eval[i]);
+		Square(Evaluate[i], Evaluate[i]);
+		McElieceUtils::Multiply(Inverse[i], Inverse[i - 1], Evaluate[i]);
 	}
 
 	Invert(tmp, Inverse[63]);
@@ -1005,7 +1062,7 @@ void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE>
 	do
 	{
 		McElieceUtils::Multiply(Inverse[ctr], tmp, Inverse[ctr - 1]);
-		McElieceUtils::Multiply(tmp, tmp, eval[ctr]);
+		McElieceUtils::Multiply(tmp, tmp, Evaluate[ctr]);
 		--ctr;
 	} 
 	while (ctr != 0);
@@ -1029,7 +1086,7 @@ void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE>
 	}
 }
 
-void MPKCM12T62::ScalingInverse(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, std::array<ulong, MPKC_COLUMN_SIZE> &Received)
+void MPKCN4096T62::ScalingInverse(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, std::array<ulong, MPKC_COLUMN_SIZE> &Received)
 {
 	size_t i;
 
@@ -1050,7 +1107,7 @@ void MPKCM12T62::ScalingInverse(std::array<std::array<ulong, MPKC_M>, MPKC_COLUM
 	}
 }
 
-void MPKCM12T62::SyndromeAdjust(std::array<std::array<ulong, MPKC_M>, 2> &Output)
+void MPKCN4096T62::SyndromeAdjust(std::array<std::array<ulong, MPKC_M>, 2> &Output)
 {
 	const size_t SASHFT = (128 - MPKC_T * 2);
 
@@ -1082,7 +1139,13 @@ void MPKCM12T62::SyndromeAdjust(std::array<std::array<ulong, MPKC_M>, 2> &Output
 
 //~~~Encrypt~~~//
 
-void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
+void MPKCN4096T62::EncryptE(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Rng)
+{
+	GenE(E, Rng);
+	Syndrome(S, PublicKey, E);
+}
+
+void MPKCN4096T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 {
 	std::vector<ushort> ind(MPKC_T);
 	ulong mask;
@@ -1144,7 +1207,7 @@ void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 	IntegerTools::LeToBlock(eint, 0, E, 0, eint.size() * sizeof(ulong));
 }
 
-void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKey, const std::vector<byte> &E)
+void MPKCN4096T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKey, const std::vector<byte> &E)
 {
 	const size_t ARRLEN = ((MPKC_PKN_COLS + 63) / MPKC_COLUMN_SIZE);
 	const size_t COLLEN = MPKC_PKN_COLS / sizeof(ulong);
@@ -1202,7 +1265,7 @@ void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicK
 
 //~~~KeyGen~~~//
 
-bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<ushort> &F)
+bool MPKCN4096T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<ushort> &F)
 {
 	std::array<std::array<ushort, MPKC_T>, MPKC_T + 1> mat;
 	size_t c;
@@ -1288,7 +1351,7 @@ bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<usho
 	return status;
 }
 
-void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
+void MPKCN4096T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	std::array<ushort, MPKC_T + 1> irr;
 	std::vector<ushort> f(MPKC_T);
@@ -1337,10 +1400,10 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 	}
 }
 
-bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey)
+bool MPKCN4096T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey)
 {
 	std::array<ulong, MPKC_M> skint;
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> eval;
+	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> Evaluate;
 	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> inverse;
 	ulong mask;
 	ulong u;
@@ -1360,12 +1423,12 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 		skint[i] = IntegerTools::LeBytesTo64(PrivateKey, i * 8);
 	}
 
-	AdditiveFFT::Transform(eval, skint);
-	McElieceUtils::Copy(eval[0], inverse[0]);
+	AdditiveFFT::Transform(Evaluate, skint);
+	McElieceUtils::Copy(Evaluate[0], inverse[0]);
 
 	for (i = 1; i < MPKC_COLUMN_SIZE; ++i)
 	{
-		McElieceUtils::Multiply(inverse[i], inverse[i - 1], eval[i]);
+		McElieceUtils::Multiply(inverse[i], inverse[i - 1], Evaluate[i]);
 	}
 
 	std::array<ulong, MPKC_M> tmp;
@@ -1376,7 +1439,7 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 	do
 	{
 		McElieceUtils::Multiply(inverse[ctr], tmp, inverse[ctr - 1]);
-		McElieceUtils::Multiply(tmp, tmp, eval[ctr]);
+		McElieceUtils::Multiply(tmp, tmp, Evaluate[ctr]);
 		--ctr;
 	} 
 	while (ctr != 0);
@@ -1504,13 +1567,13 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 
 //~~~FFT~~~//
 
-void MPKCM12T62::AdditiveFFT::Transform(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
+void MPKCN4096T62::AdditiveFFT::Transform(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
 {
 	RadixConversions(Input);
 	Butterflies(Output, Input);
 }
 
-void MPKCM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
+void MPKCN4096T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
 {
 	size_t b;
 	size_t i;
@@ -1599,7 +1662,7 @@ void MPKCM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 
 	}
 }
 
-void MPKCM12T62::AdditiveFFT::RadixConversions(std::array<ulong, MPKC_M> &Output)
+void MPKCN4096T62::AdditiveFFT::RadixConversions(std::array<ulong, MPKC_M> &Output)
 {
 	size_t ctr;
 	size_t i;
@@ -1668,13 +1731,13 @@ void MPKCM12T62::AdditiveFFT::RadixConversions(std::array<ulong, MPKC_M> &Output
 	}
 }
 
-void MPKCM12T62::TransposedFFT::Transform(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input)
+void MPKCN4096T62::TransposedFFT::Transform(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input)
 {
 	Butterflies(Output, Input);
 	RadixConversions(Output);
 }
 
-void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input)
+void MPKCN4096T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, 2> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Input)
 {
 	std::array<ulong, MPKC_M> tmp;
 	size_t i;
@@ -1891,7 +1954,7 @@ void MPKCM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_M>
 	}
 }
 
-void MPKCM12T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, MPKC_M>, 2> &Output)
+void MPKCN4096T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, MPKC_M>, 2> &Output)
 {
 	size_t ctr;
 	size_t i;
@@ -1943,7 +2006,7 @@ void MPKCM12T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, MP
 
 //~~~Utils~~~//
 
-void MPKCM12T62::Invert(std::array<ulong, MPKC_M> &Output, const std::array<ulong, MPKC_M> &Input)
+void MPKCN4096T62::Invert(std::array<ulong, MPKC_M> &Output, const std::array<ulong, MPKC_M> &Input)
 {
 	std::array<ulong, MPKC_M> tmpa;
 	std::array<ulong, MPKC_M> tmpb;
@@ -1967,7 +2030,7 @@ void MPKCM12T62::Invert(std::array<ulong, MPKC_M> &Output, const std::array<ulon
 	Square(Output, Output);
 }
 
-void MPKCM12T62::MatrixMultiply(std::array<ushort, MPKC_T> &Output, std::array<ushort, MPKC_T> &A, std::vector<ushort> &B)
+void MPKCN4096T62::MatrixMultiply(std::array<ushort, MPKC_T> &Output, std::array<ushort, MPKC_T> &A, std::vector<ushort> &B)
 {
 	size_t i;
 	size_t j;
@@ -1995,7 +2058,7 @@ void MPKCM12T62::MatrixMultiply(std::array<ushort, MPKC_T> &Output, std::array<u
 	}
 }
 
-void MPKCM12T62::Square(std::array<ulong, MPKC_M> &Output, std::array<ulong, MPKC_M> &Input)
+void MPKCN4096T62::Square(std::array<ulong, MPKC_M> &Output, std::array<ulong, MPKC_M> &Input)
 {
 	std::array<ulong, MPKC_M> sum;
 

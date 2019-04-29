@@ -231,9 +231,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7q (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7r (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      April 07, 2019                    *");
+	ConsoleUtils::WriteLine("* Date:      April 29, 2019                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -282,43 +282,6 @@ void RunTest(ITest* Test)
 	}
 }
 
-// ### Schedule 1.1.0.7 ###
-// DRBGs..																-done
-// KDFs..																-done
-// MACs..																-done
-// PRNGs..																-done
-// Providers..															-done
-// SymmetricKeyGenerator												-done
-// Asymmetric secure keys and secure-vector								-done
-// Everything migrated to SecureVector:									-
-// if standard vector is called, that will make unlocked copy
-// Requires: moving digests to templates for mac, start eta: Sunday
-// Second migration is ciphers and modes, (big job!)					-deffered
-// 
-// Stream Ciphers
-// 1) Update all the stream ciphers										-done
-// 2) Stream cipher using CTR(Rijndael-256)(RCS?)						-done
-// 
-// Block Ciphers
-// 1) change the distribution code to formal Name() + default string	-done
-// 2) move AES instructions to AES128 class (look at assembly options)	-deffered
-// 3) update cipher standard modes										-done
-// 4) update AEAD modes													-done
-//
-// Digests
-// 1) internal pointers and templates?									-deffered
-// 2) move blake simd to UIntxxx										-no
-// 3) add parallel fallback												-done
-// 4) ...
-//
-// Asymmetric
-// 1) .
-// 2) ..
-// 3) ...
-// 4) ....
-//
-// External: (website, documentation, business-plan..)
-// April?
 int main()
 {
 	bool hasAes;

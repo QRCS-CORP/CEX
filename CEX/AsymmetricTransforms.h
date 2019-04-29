@@ -41,35 +41,43 @@ enum class AsymmetricTransforms : byte
 	/// <summary>
 	/// The S1 parameters (Medium Security) A finite field of 12 and an error correction capability of 62
 	/// </summary>
-	MPKCS1M12T62 = 7,
+	MPKCS1N4096T62 = 7,
+	/// <summary>
+	/// The S2 parameters (Medium-High Security) A finite field of 13 and an error correction capability of 119
+	/// </summary>
+	MPKCS1N6960T119 = 8,
+	/// <summary>
+	/// The S3 parameters (High Security) A finite field of 13 and an error correction capability of 128
+	/// </summary>
+	MPKCS1N8192T128 = 9,
 	/// <summary>
 	/// The S1 parameters; (High Security) The rounded product form L-Prime, modulus of 4591 with 761 coefficients
 	/// </summary>
-	NTRUS1LQ4591N761 = 8,
+	NTRUS1LQ4591N761 = 10,
 	/// <summary>
 	/// The S2 parameters; (High Security) The rounded quotient form S-Prime, modulus of 4591 with 761 coefficients
 	/// </summary>
-	NTRUS2SQ4591N761 = 9,
+	NTRUS2SQ4591N761 = 11,
 	/// <summary>
 	/// The S1 parameters; (High Security) A modulus of 12289 with 1024 coefficients
 	/// </summary>
-	RLWES1Q12289N1024 = 10,
+	RLWES1Q12289N1024 = 12,
 	/// <summary>
 	/// A modulus of 12289 with 2048 coefficients
 	/// </summary>
-	RLWES2Q12289N2048 = 11,
+	RLWES2Q12289N2048 = 13,
 	/// <summary>
 	/// The S1 parameters; (Medium Security) The Sphincs SHAKE128, F256 parameter set
 	/// </summary>
-	SPXS128F256 = 12,
+	SPXS128F256 = 14,
 	/// <summary>
 	/// The S2 parameters; (High Security) The Sphincs SHAKE256, F256 parameter set
 	/// </summary>
-	SPXS256F256 = 13,
+	SPXS256F256 = 15,
 	/// <summary>
 	/// The S3 parameters; (Highest Security) The experimental Sphincs SHAKE512, F256 parameter set
 	/// </summary>
-	SPXS512F256 = 14
+	SPXS512F256 = 16
 };
 
 class AsymmetricTransformConvert

@@ -69,14 +69,14 @@ using Enumeration::MLWEParameters;
 /// <description>Implementation Notes:</description>
 /// <para>Module learning with errors (MLWE) is the Learning With Errors problem (a generalization of the parity learning problem), specialized to polynomial arrays over finite fields. \n
 /// An important feature of the LWE problem is that the solution may be reducible to the NP-Hard Shortest Vector Problem (SVP) in a Lattice. \n
-/// This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers.</para>
+/// This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers.
+/// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
 /// 
 /// <list type="bullet">
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MLWEPublicKey, or MLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The high-security MLWES3Q7681N256 parameter set is the default cipher configuration; optional parameters of medium-security MLWES2Q7681N256, and highest-security MLWES4Q7681N256 are also available through the class constructor parameter</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
-/// <item><description>The secondary prng used to generate the public key (BCR), is an AES128/CTR-BE construction, (changed from SHAKE in the Kyber version)</description></item>
-/// <item><description>The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
+/// <item><description>The message is authenticated using SHAKE, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>

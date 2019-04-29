@@ -34,7 +34,7 @@ using Enumeration::MPKCParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// McEliece cpr(MPKCParameters::MPKCS1M12T62, [PrngType], [CipherType]);
+/// McEliece cpr(MPKCParameters::MPKCS1N4096T62, [PrngType], [CipherType]);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// // serialize the public key
 /// MPKCPublicKey* pubK = (MPKCPublicKey*)kp->PublicKey();
@@ -45,25 +45,25 @@ using Enumeration::MPKCParameters;
 /// <code>
 /// create the shared secret
 /// std::vector&lt;byte&gt; cpt(0);
-/// std::vector&lt;byte&gt; sec(32);
+/// std::vector&lt;byte&gt; ssk(32);
 ///
 /// // initialize the cipher
-/// McEliece cpr(MPKCParameters::MPKCS1M12T62, [PrngType], [CipherType]);
+/// McEliece cpr(MPKCParameters::MPKCS1N4096T62, Prng-Type);
 /// cpr.Initialize(PublicKey);
 /// // encrypt the secret
-/// cpr.Encrypt(cpt, sec);
+/// cpr.Encapsulate(cpt, ssk);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// std::vector&lt;byte&gt; sec(32);
+/// std::vector&lt;byte&gt; ssk(32);
 /// bool status;
 ///
-/// McEliece cpr(MPKCParameters::MPKCS1M12T62, [PrngType], [CipherType]);
+/// McEliece cpr(MPKCParameters::MPKCS1N4096T62, Prng-Type);
 /// // initialize the cipher
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the secret, status returns authentication outcome, false for failure
-/// status = cpr.Decrypt(cpt, sec);
+/// status = cpr.Decapsulate(cpt, ssk);
 /// </code>
 /// </example>
 /// 
@@ -71,22 +71,23 @@ using Enumeration::MPKCParameters;
 /// <description>Implementation Notes:</description>
 /// <para>.</para>
 ///
-/// <para>This implementation is based on the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/."> 'McBits'</a>. \n
-/// The MPKCParameters enumeration member is passed to the constructor along with either an optional Prng and block-cipher enum type values, or uninitialized instances of a Prng and a block cipher. \n
-/// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key tag byte array. \n
-/// The encryption method a standard encryption interface: CipherText = Encrypt(Message), the decryption method uses the inverse: Message = Decrypt(CipherText).</para>
+/// <para>This implementation is based on two different implementations of the asymmetric primitive; the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/."> 'McBits'</a>,  \n
+/// and the NIST PQ Round 2 implementation by the same authors (using the recommended version contained in the SUPERCOP package). \n
+/// The MPKCParameters enumeration member is passed to the constructor along with the Prng enum type value (required: the default is BCR), or an initialized instance of a Prng through the secondary advanced constructor option. \n
+/// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key-tag byte array. \n
+/// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
 /// 
 /// <list type="bullet">
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MPKCPublicKey, or MPKCPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>The MPKCS1M12T62 parameter set is the default cipher configuration; as of (1.0.0.4), this is currently the only parameter set, but a modular construction is used anticipating future expansion</description></item>
+/// <item><description>There are three parameters available: MPKCS1N4096T62 with medium security, MPKCS1N6960T119 with medium-high security, and MPKCS1N8192T128 with high-security</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
-/// <item><description>The primary pseudo-random function (message digest) can be set through the constructor (default is SHA2-256)</description></item>
-/// <item><description>The default prng used to generate the public key and private keys (default is BCR), is an AES256/CTR-BE construction</description></item>
-/// <item><description>The internal seed authentication engine is fixed as a GCM mode, which can use any of the implemented block ciphers, standard or extended</description></item>
+/// <item><description>The default prng used to generate the public key and private keys (default is BCR), is an auto-seeded AES256/CTR-BE construction</description></item>
 /// </list>
 /// 
-/// <description>Guiding Publications:</description>//
+/// <description>
 /// <list type="number">
+/// <item><description>Guiding Publications:</description>//Classic McEliece: <a href="https://classic.mceliece.org/nist/mceliece-20171129.pdf">McEliece</a> conservatice code-based cryptography.</description></item>
+/// <item><description>Source code <a href="https://classic.mceliece.org/software.html">Classic McEliece</a> software.</description></item>
 /// <item><description>the Niederreiter dual form of the McEliece cipher: <a href="https://eprint.iacr.org/2015/610.pdf">McBits</a> a fast constant-time code based cryptography.</description></item>
 /// <item><description>McEliece and <a href="https://www.iacr.org/archive/crypto2011/68410758/68410758.pdf">Niederreiter</a> Cryptosystems That Resist Quantum Fourier Sampling Attacks.</description></item>
 /// <item><description>Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEliece</a> cryptosystem.</description></item>
@@ -125,7 +126,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	McEliece(MPKCParameters Parameters = MPKCParameters::MPKCS1M12T62, Prngs PrngType = Prngs::BCR);
+	McEliece(MPKCParameters Parameters = MPKCParameters::MPKCS1N4096T62, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances

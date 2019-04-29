@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ymm',['ymm',['../class_u_int256.html#a3ef1b8044cbf39b715df2171e018fcd3',1,'UInt256::ymm()'],['../class_u_long256.html#a1f37f1372b2ec7d1d59dcff6e83b3bf6',1,'ULong256::ymm()']]]
+  ['xmm',['xmm',['../class_u_int128.html#a060a06951cc8343dc087aa48219c072e',1,'UInt128::xmm()'],['../class_u_short128.html#a9afa89a05c88c284878dfaf3a83c1d63',1,'UShort128::xmm()']]]
 ];

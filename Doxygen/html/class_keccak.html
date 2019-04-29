@@ -78,10 +78,18 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:abe7b9db73b946f4843dd7e7201e8b627"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:abe7b9db73b946f4843dd7e7201e8b627"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#abe7b9db73b946f4843dd7e7201e8b627">Absorb</a> (const Array &amp;Input, size_t InOffset, size_t InLength, std::array&lt; ulong, KECCAK_STATE_SIZE &gt; &amp;State)</td></tr>
-<tr class="memdesc:abe7b9db73b946f4843dd7e7201e8b627"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak absorb function; copy bytes from a byte array to the state array.  <a href="#abe7b9db73b946f4843dd7e7201e8b627">More...</a><br /></td></tr>
-<tr class="separator:abe7b9db73b946f4843dd7e7201e8b627"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4945a76a0a1dd369f29c8d8c66cc1d4"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:ae4945a76a0a1dd369f29c8d8c66cc1d4"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#ae4945a76a0a1dd369f29c8d8c66cc1d4">AbsorbR24</a> (const Array &amp;Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array&lt; ulong, KECCAK_STATE_SIZE &gt; &amp;State)</td></tr>
+<tr class="memdesc:ae4945a76a0a1dd369f29c8d8c66cc1d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak 24-round absorb function; copy bytes from a byte array to the state array.  <a href="#ae4945a76a0a1dd369f29c8d8c66cc1d4">More...</a><br /></td></tr>
+<tr class="separator:ae4945a76a0a1dd369f29c8d8c66cc1d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a175b12ad9d4c4459a1c075a42bc849be"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:a175b12ad9d4c4459a1c075a42bc849be"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a175b12ad9d4c4459a1c075a42bc849be">AbsorbR48</a> (const Array &amp;Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array&lt; ulong, KECCAK_STATE_SIZE &gt; &amp;State)</td></tr>
+<tr class="memdesc:a175b12ad9d4c4459a1c075a42bc849be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak 48-round absorb function; copy bytes from a byte array to the state array.  <a href="#a175b12ad9d4c4459a1c075a42bc849be">More...</a><br /></td></tr>
+<tr class="separator:a175b12ad9d4c4459a1c075a42bc849be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27d5f9b0b0e369a007a7c294e912fe28"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:a27d5f9b0b0e369a007a7c294e912fe28"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a27d5f9b0b0e369a007a7c294e912fe28">FastAbsorb</a> (const Array &amp;Input, size_t InOffset, size_t InLength, std::array&lt; ulong, KECCAK_STATE_SIZE &gt; &amp;State)</td></tr>
+<tr class="memdesc:a27d5f9b0b0e369a007a7c294e912fe28"><td class="mdescLeft">&#160;</td><td class="mdescRight">The fast absorb function; XOR an input byte array with the state array, no other processing is performed.  <a href="#a27d5f9b0b0e369a007a7c294e912fe28">More...</a><br /></td></tr>
+<tr class="separator:a27d5f9b0b0e369a007a7c294e912fe28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab73345cdf275dd0cab74ce9835ca41dc"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
 <tr class="memitem:ab73345cdf275dd0cab74ce9835ca41dc"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#ab73345cdf275dd0cab74ce9835ca41dc">SqueezeR24</a> (std::array&lt; ulong, KECCAK_STATE_SIZE &gt; &amp;State, Array &amp;Output, size_t OutOffset, size_t Blocks, size_t Rate)</td></tr>
 <tr class="memdesc:ab73345cdf275dd0cab74ce9835ca41dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak 24-round extraction function; extract blocks of state to an output 8-bit array  <a href="#ab73345cdf275dd0cab74ce9835ca41dc">More...</a><br /></td></tr>
@@ -124,8 +132,8 @@ The H suffix denotes functions that take an SIMD wrapper class as the state valu
 Experimental functions using AVX512 instructions are also implemented; PermuteR24P8x1600H and PermuteR48P8x1600H. <br />
 These extended functions are only visible at run-time on some development platforms (VS..), if the <b>AVX2</b> or <b>AVX512</b> compiler flags are declared explicitly.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="abe7b9db73b946f4843dd7e7201e8b627"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe7b9db73b946f4843dd7e7201e8b627">&#9670;&nbsp;</a></span>Absorb()</h2>
+<a id="ae4945a76a0a1dd369f29c8d8c66cc1d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4945a76a0a1dd369f29c8d8c66cc1d4">&#9670;&nbsp;</a></span>AbsorbR24()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -136,7 +144,155 @@ template&lt;typename Array &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void Keccak::Absorb </td>
+          <td class="memname">static void Keccak::AbsorbR24 </td>
+          <td>(</td>
+          <td class="paramtype">const Array &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>InOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>InLength</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Rate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>Domain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::array&lt; ulong, KECCAK_STATE_SIZE &gt; &amp;&#160;</td>
+          <td class="paramname"><em>State</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The Keccak 24-round absorb function; copy bytes from a byte array to the state array. </p>
+<p>Input length must be 64-bit aligned, domain code terminates the input.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input byte array, can be either an 8-bit array or vector</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset withing the input array</td></tr>
+    <tr><td class="paramname">InLength</td><td>The number of bytes to process; must be 64-bit aligned</td></tr>
+    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a175b12ad9d4c4459a1c075a42bc849be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a175b12ad9d4c4459a1c075a42bc849be">&#9670;&nbsp;</a></span>AbsorbR48()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void Keccak::AbsorbR48 </td>
+          <td>(</td>
+          <td class="paramtype">const Array &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>InOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>InLength</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Rate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>Domain</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::array&lt; ulong, KECCAK_STATE_SIZE &gt; &amp;&#160;</td>
+          <td class="paramname"><em>State</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The Keccak 48-round absorb function; copy bytes from a byte array to the state array. </p>
+<p>Input length must be 64-bit aligned, domain code terminates the input.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input byte array, can be either an 8-bit array or vector</td></tr>
+    <tr><td class="paramname">InOffset</td><td>The starting offset withing the input array</td></tr>
+    <tr><td class="paramname">InLength</td><td>The number of bytes to process; must be 64-bit aligned</td></tr>
+    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a27d5f9b0b0e369a007a7c294e912fe28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27d5f9b0b0e369a007a7c294e912fe28">&#9670;&nbsp;</a></span>FastAbsorb()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void Keccak::FastAbsorb </td>
           <td>(</td>
           <td class="paramtype">const Array &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -172,7 +328,7 @@ template&lt;typename Array &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>The Keccak absorb function; copy bytes from a byte array to the state array. </p>
+<p>The fast absorb function; XOR an input byte array with the state array, no other processing is performed. </p>
 <p>Input length must be 64-bit aligned.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

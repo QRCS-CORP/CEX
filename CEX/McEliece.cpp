@@ -1,5 +1,7 @@
 #include "McEliece.h"
-#include "MPKCM12T62.h"
+#include "MPKCN4096T62.h"
+#include "MPKCN6960T119.h"
+#include "MPKCN8192T128.h"
 #include "GCM.h"
 #include "IntegerTools.h"
 #include "PrngFromName.h"
@@ -122,9 +124,9 @@ const std::string McEliece::Name()
 {
 	std::string ret = AsymmetricPrimitiveConvert::ToName(Enumeral());
 
-	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1M12T62)
+	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N4096T62)
 	{
-		ret += "-MPKCS1M12T62";
+		ret += "-MPKCS1N4096T62";
 	}
 
 	return ret;
@@ -141,43 +143,23 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 {
 	CEXASSERT(m_mpkcState->Initialized, "The cipher has not been initialized");
 
-	std::vector<byte> e(0);
-	std::vector<byte> key(32);
-	std::vector<byte> iv(16);
-	std::vector<byte> coins(2 * MPKCM12T62::MPKC_COIN_SIZE);
-	std::vector<byte> tag(MPKCM12T62::MPKC_TAG_SIZE);
 	bool status;
 
-	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1M12T62)
+	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N4096T62)
 	{
-		CEXASSERT(CipherText.size() >= MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
-
-		e.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
-
-		status = MPKCM12T62::Decrypt(e, m_privateKey->Polynomial(), CipherText);
+		SharedSecret.resize(MPKCN4096T62::SECRET_SIZE);
+		status = MPKCN4096T62::Decrypt(m_privateKey->Polynomial(), CipherText, SharedSecret);
 	}
-
-	// copy hash of pk to coin 1
-	Utility::MemoryTools::Copy(m_privateKey->Polynomial(), MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
-
-	// hash ct to coin 2
-	SHAKE gen(ShakeModes::SHAKE256);
-	gen.Initialize(CipherText, 0, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE);
-	gen.Generate(coins, MPKCM12T62::MPKC_COIN_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
-
-	// H(e+cn+dk) to key GCM
-	gen.Initialize(e, coins, m_mpkcState->DomainKey);
-	gen.Generate(key);
-	gen.Generate(iv);
-
-	// decrypt the secret
-	SharedSecret.resize(CipherText.size() - MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE);
-	Cipher::Block::Mode::GCM cpr(BlockCiphers::AES);
-	Cipher::SymmetricKey kp(key, iv);
-	cpr.Initialize(false, kp);
-	cpr.Transform(CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret, 0, SharedSecret.size());
-	// verify the mac
-	status &= cpr.Verify(CipherText, CipherText.size() - MPKCM12T62::MPKC_TAG_SIZE, MPKCM12T62::MPKC_TAG_SIZE);
+	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N6960T119)
+	{
+		SharedSecret.resize(MPKCN6960T119::SECRET_SIZE);
+		status = MPKCN6960T119::Decrypt(m_privateKey->Polynomial(), CipherText, SharedSecret);
+	}
+	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N8192T128)
+	{
+		SharedSecret.resize(MPKCN8192T128::SECRET_SIZE);
+		status = MPKCN8192T128::Decrypt(m_privateKey->Polynomial(), CipherText, SharedSecret);
+	}
 
 	return status;
 }
@@ -188,41 +170,24 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
 	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
-	std::vector<byte> e(0);
-	std::vector<byte> key(32);
-	std::vector<byte> iv(16);
-	std::vector<byte> coins(2 * MPKCM12T62::MPKC_COIN_SIZE);
-
-	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1M12T62)
+	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N4096T62)
 	{
-		e.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
-		CipherText.resize(MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE + SharedSecret.size());
-		MPKCM12T62::Encrypt(CipherText, e, m_publicKey->Polynomial(), m_rndGenerator);
+		CipherText.resize(MPKCN4096T62::CIPHERTEXT_SIZE);
+		SharedSecret.resize(MPKCN4096T62::SECRET_SIZE);
+		MPKCN4096T62::Encrypt(m_publicKey->Polynomial(), CipherText, SharedSecret, m_rndGenerator);
 	}
-
-	// hash pk to coin 1
-	SHAKE gen(ShakeModes::SHAKE256);
-	gen.Initialize(m_publicKey->Polynomial());
-	gen.Generate(coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
-	// hash ct to coin 2
-	gen.Initialize(CipherText, 0, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE);
-	gen.Generate(coins, MPKCM12T62::MPKC_COIN_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
-
-	// H(e+cn+dk) to key GCM
-	gen.Initialize(e, coins, m_mpkcState->DomainKey);
-	gen.Generate(key);
-	gen.Generate(iv);
-
-	// generate the shared secret
-	m_rndGenerator->Generate(SharedSecret);
-
-	// encrypt the secret and add to ct
-	Cipher::Block::Mode::GCM cpr(BlockCiphers::AES);
-	Cipher::SymmetricKey kp(key, iv);
-	cpr.Initialize(true, kp);
-	cpr.Transform(SharedSecret, 0, CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret.size());
-	// add the mac code
-	cpr.Finalize(CipherText, CipherText.size() - MPKCM12T62::MPKC_TAG_SIZE, MPKCM12T62::MPKC_TAG_SIZE);
+	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N6960T119)
+	{
+		CipherText.resize(MPKCN6960T119::CIPHERTEXT_SIZE);
+		SharedSecret.resize(MPKCN6960T119::SECRET_SIZE);
+		MPKCN6960T119::Encrypt(m_publicKey->Polynomial(), CipherText, SharedSecret, m_rndGenerator);
+	}
+	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N8192T128)
+	{
+		CipherText.resize(MPKCN8192T128::CIPHERTEXT_SIZE);
+		SharedSecret.resize(MPKCN8192T128::SECRET_SIZE);
+		MPKCN8192T128::Encrypt(m_publicKey->Polynomial(), CipherText, SharedSecret, m_rndGenerator);
+	}
 }
 
 AsymmetricKeyPair* McEliece::Generate()
@@ -230,20 +195,35 @@ AsymmetricKeyPair* McEliece::Generate()
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
 
-	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1M12T62)
+	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N4096T62)
 	{
-		pk.resize(MPKCM12T62::MPKC_CCAPUBLICKEY_SIZE);
-		sk.resize(MPKCM12T62::MPKC_CCAPRIVATEKEY_SIZE);
+		pk.resize(MPKCN4096T62::PUBLICKEY_SIZE);
+		sk.resize(MPKCN4096T62::PRIVATEKEY_SIZE);
 
-		if (!MPKCM12T62::Generate(pk, sk, m_rndGenerator))
+		if (!MPKCN4096T62::Generate(pk, sk, m_rndGenerator))
 		{
-			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N4096T62"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
 		}
+	}
+	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N6960T119)
+	{
+		pk.resize(MPKCN6960T119::PUBLICKEY_SIZE);
+		sk.resize(MPKCN6960T119::PRIVATEKEY_SIZE);
 
-		// add H(pk) to private key
-		SHAKE gen(ShakeModes::SHAKE256);
-		gen.Initialize(pk);
-		gen.Generate(sk, MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
+		if (!MPKCN6960T119::Generate(pk, sk, m_rndGenerator))
+		{
+			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N6960T119"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+		}
+	}
+	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N8192T128)
+	{
+		pk.resize(MPKCN8192T128::PUBLICKEY_SIZE);
+		sk.resize(MPKCN8192T128::PRIVATEKEY_SIZE);
+
+		if (!MPKCN8192T128::Generate(pk, sk, m_rndGenerator))
+		{
+			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N8192T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+		}
 	}
 
 	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mpkcState->Parameters));

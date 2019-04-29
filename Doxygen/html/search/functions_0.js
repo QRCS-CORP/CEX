@@ -2,8 +2,9 @@ var searchData=
 [
   ['abm',['ABM',['../class_cpu_detect.html#ac84288d4b4e74fe16515731ecb2839e7',1,'CpuDetect']]],
   ['abs',['Abs',['../class_integer_tools.html#a7e0c5ada557282025b041b43eef809da',1,'IntegerTools::Abs()'],['../class_u_int128.html#a91c16897218c3ab973cb33ed0b995d7b',1,'UInt128::Abs()'],['../class_u_int256.html#ad6d4d195330e40641e66045ab7957984',1,'UInt256::Abs()'],['../class_u_long256.html#a643b9ad804ce72690c4bc839b811db3b',1,'ULong256::Abs()'],['../class_u_short128.html#ade917d872cad11ebb6b4901e512cc438',1,'UShort128::Abs()']]],
-  ['absorb',['Absorb',['../class_keccak.html#abe7b9db73b946f4843dd7e7201e8b627',1,'Keccak']]],
   ['absorbblock8to64',['AbsorbBlock8to64',['../class_array_tools.html#a765cc1043199ac5a23db0a21d523c18f',1,'ArrayTools']]],
+  ['absorbr24',['AbsorbR24',['../class_keccak.html#ae4945a76a0a1dd369f29c8d8c66cc1d4',1,'Keccak']]],
+  ['absorbr48',['AbsorbR48',['../class_keccak.html#a175b12ad9d4c4459a1c075a42bc849be',1,'Keccak']]],
   ['access',['Access',['../class_file_stream.html#ae8d76e7fdd4c1d9c98d65cbf9e75f0be',1,'FileStream']]],
   ['acp',['ACP',['../class_a_c_p.html#a3efca838c698165803a74ac8781e91f9',1,'ACP::ACP(const ACP &amp;)=delete'],['../class_a_c_p.html#ab785a09de9bade8012c3d60789a169d5',1,'ACP::ACP()']]],
   ['acs',['ACS',['../class_a_c_s.html#a720fdc18d0fbb93811c2fe461bdbf763',1,'ACS::ACS(const ACS &amp;)=delete'],['../class_a_c_s.html#a5f1e0015fc5b786c74f267f17ce2654b',1,'ACS::ACS(StreamAuthenticators AuthenticatorType=StreamAuthenticators::KMAC256)']]],

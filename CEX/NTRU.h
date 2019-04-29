@@ -52,8 +52,8 @@ using Enumeration::NTRUParameters;
 /// // initialize the cipher
 /// NTRU acpr(NTRUParameters::NTRUS1LQ4591N761);
 /// cpr.Initialize(PublicKey);
-/// // encrypt the secret
-/// status = cpr.Encrypt(cpt, sec);
+/// // generate the ciphertext and shared secret
+/// status = cpr.Encapsulate(cpt, sec);
 /// </code>
 ///
 /// <description>Decryption:</description>
@@ -64,8 +64,8 @@ using Enumeration::NTRUParameters;
 /// // initialize the cipher
 /// NTRU acpr(NTRUParameters::NTRUS1LQ4591N761);
 /// cpr.Initialize(PrivateKey);
-/// // decrypt the secret, status returns authentication outcome, false for failure
-/// status = cpr.Decrypt(cpt, sec);
+/// // decrypt the shared secret, status returns authentication outcome, false for failure
+/// status = cpr.Decapsulate(cpt, sec);
 /// </code>
 /// </example>
 /// 
@@ -76,13 +76,14 @@ using Enumeration::NTRUParameters;
 /// NTRU Prime tweaks NTRU to use rings without these structures.Here are two public - key cryptosystems in the NTRU Prime family, both designed for the standard goal of IND - CCA2 security:
 /// Streamlined NTRU Prime is optimized from an implementation perspective. \n
 /// NTRU LPRime (pronounced "ell-prime") is a variant offering different tradeoffs. \n
-/// Streamlined NTRU Prime 4591761 and NTRU LPRime 4591761 are Streamlined NTRU Prime and NTRU LPRime with high-security post-quantum parameters.</para>
+/// Streamlined NTRU Prime 4591761 and NTRU LPRime 4591761 are Streamlined NTRU Prime and NTRU LPRime with high-security post-quantum parameters.
+/// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
 ///
 /// <list type="bullet">
 /// <item><description>There are two available high-security parameter sets based upon the two rounding forms, L-Prime: NTRUS1LQ4591N761, and S-Prime NTRUS2SQ4591N761 selectable through the class constructor parameter</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: NTRUPublicKey, or NTRUPrivateKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
-/// <item><description>The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
+/// <item><description>The message is authenticated using SHAKE, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
