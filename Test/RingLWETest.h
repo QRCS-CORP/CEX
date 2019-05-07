@@ -7,7 +7,8 @@ namespace Test
 {
 	/// <summary>
 	/// The RingLWE asymmetric cipher test suite.
-	///  <para>Tests public-key and cipher-text integrity, exception handling, cipher authentication, and a looping stress-test</para>
+	/// <para>Tests public-key and cipher-text integrity, exception handling, cipher authentication, and a looping stress-test.
+	/// Includes NIST PQ Round 2 known answer tests for public and private keys, ciphertext, and shared secret output.</para>
 	/// </summary>
 	class RingLWETest final : public ITest
 	{
@@ -22,6 +23,11 @@ namespace Test
 		static const size_t TEST_CYCLES = 100;
 #endif
 
+		std::vector<byte> m_cprseed;
+		std::vector<std::vector<byte>> m_cptexp;
+		std::vector<std::vector<byte>> m_priexp;
+		std::vector<std::vector<byte>> m_pubexp;
+		std::vector<std::vector<byte>> m_sskexp;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -67,6 +73,11 @@ namespace Test
 		void Exception();
 
 		/// <summary>
+		/// Compare known answer shared-secret and cipher-text vectors to cipher output
+		/// </summary>
+		void Kat();
+
+		/// <summary>
 		/// Tests the cipher for invalid public keys in a looping stress test
 		/// </summary>
 		void PublicKey();
@@ -83,6 +94,7 @@ namespace Test
 
 	private:
 
+		void Initialize();
 		void OnProgress(const std::string &Data);
 	};
 }

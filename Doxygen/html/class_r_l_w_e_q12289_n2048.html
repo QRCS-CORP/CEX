@@ -79,12 +79,21 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a830e2bdeee4c566335f2110550dddc87"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a830e2bdeee4c566335f2110550dddc87">Decrypt</a> (std::vector&lt; byte &gt; &amp;Secret, const std::vector&lt; byte &gt; &amp;CipherText, const std::vector&lt; byte &gt; &amp;PrivateKey)</td></tr>
-<tr class="memdesc:a830e2bdeee4c566335f2110550dddc87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a cipher-text  <a href="#a830e2bdeee4c566335f2110550dddc87">More...</a><br /></td></tr>
-<tr class="separator:a830e2bdeee4c566335f2110550dddc87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0c622bc0051a9d9a51065874268497e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#ae0c622bc0051a9d9a51065874268497e">Encrypt</a> (std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;Secret, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, const std::vector&lt; byte &gt; &amp;Coin)</td></tr>
-<tr class="memdesc:ae0c622bc0051a9d9a51065874268497e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a message  <a href="#ae0c622bc0051a9d9a51065874268497e">More...</a><br /></td></tr>
-<tr class="separator:ae0c622bc0051a9d9a51065874268497e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acee738d30527915fb3036c1b35b69518"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#acee738d30527915fb3036c1b35b69518">CpaDecrypt</a> (std::vector&lt; byte &gt; &amp;Secret, const std::vector&lt; byte &gt; &amp;CipherText, const std::vector&lt; byte &gt; &amp;PrivateKey)</td></tr>
+<tr class="memdesc:acee738d30527915fb3036c1b35b69518"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a cipher-text  <a href="#acee738d30527915fb3036c1b35b69518">More...</a><br /></td></tr>
+<tr class="separator:acee738d30527915fb3036c1b35b69518"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac480c09d65bd4beb40c70ad4376ffc1c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#ac480c09d65bd4beb40c70ad4376ffc1c">CpaEncrypt</a> (std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;Secret, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, const std::vector&lt; byte &gt; &amp;Coin)</td></tr>
+<tr class="memdesc:ac480c09d65bd4beb40c70ad4376ffc1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a message  <a href="#ac480c09d65bd4beb40c70ad4376ffc1c">More...</a><br /></td></tr>
+<tr class="separator:ac480c09d65bd4beb40c70ad4376ffc1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abce4079a918436fb4ff0e84d3962de69"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#abce4079a918436fb4ff0e84d3962de69">CpaGenerate</a> (std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, std::vector&lt; byte &gt; &amp;PrivateKey, std::unique_ptr&lt; Prng::IPrng &gt; &amp;Rng)</td></tr>
+<tr class="memdesc:abce4079a918436fb4ff0e84d3962de69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#abce4079a918436fb4ff0e84d3962de69">More...</a><br /></td></tr>
+<tr class="separator:abce4079a918436fb4ff0e84d3962de69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f91e2322f9f3b363aa7d1b54c280eb3"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a8f91e2322f9f3b363aa7d1b54c280eb3">Decapsulate</a> (std::vector&lt; byte &gt; &amp;Secret, const std::vector&lt; byte &gt; &amp;CipherText, const std::vector&lt; byte &gt; &amp;PrivateKey)</td></tr>
+<tr class="memdesc:a8f91e2322f9f3b363aa7d1b54c280eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decapsulate and authenticate a cipher-text, generating a shared secret key  <a href="#a8f91e2322f9f3b363aa7d1b54c280eb3">More...</a><br /></td></tr>
+<tr class="separator:a8f91e2322f9f3b363aa7d1b54c280eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef628ae3c507a0f29310331b2977cc3a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#aef628ae3c507a0f29310331b2977cc3a">Encapsulate</a> (std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;Secret, const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, std::unique_ptr&lt; Prng::IPrng &gt; &amp;Rng)</td></tr>
+<tr class="memdesc:aef628ae3c507a0f29310331b2977cc3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encapsulate a message, generating a shared secret key  <a href="#aef628ae3c507a0f29310331b2977cc3a">More...</a><br /></td></tr>
+<tr class="separator:aef628ae3c507a0f29310331b2977cc3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4eb00ce3aa9449bf9ee70def56d9446d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a4eb00ce3aa9449bf9ee70def56d9446d">Generate</a> (std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, std::vector&lt; byte &gt; &amp;PrivateKey, std::unique_ptr&lt; Prng::IPrng &gt; &amp;Rng)</td></tr>
 <tr class="memdesc:a4eb00ce3aa9449bf9ee70def56d9446d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#a4eb00ce3aa9449bf9ee70def56d9446d">More...</a><br /></td></tr>
 <tr class="separator:a4eb00ce3aa9449bf9ee70def56d9446d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,8 +144,8 @@ Static Public Attributes</h2></td></tr>
 <div class="textblock"><p>The RingLWE FFT using a modulus of 12289 with 2048 coefficients </p>
 <p>internal </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a830e2bdeee4c566335f2110550dddc87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a830e2bdeee4c566335f2110550dddc87">&#9670;&nbsp;</a></span>Decrypt()</h2>
+<a id="acee738d30527915fb3036c1b35b69518"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acee738d30527915fb3036c1b35b69518">&#9670;&nbsp;</a></span>CpaDecrypt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -145,7 +154,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void RLWEQ12289N2048::Decrypt </td>
+          <td class="memname">void RLWEQ12289N2048::CpaDecrypt </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Secret</em>, </td>
@@ -187,8 +196,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ae0c622bc0051a9d9a51065874268497e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0c622bc0051a9d9a51065874268497e">&#9670;&nbsp;</a></span>Encrypt()</h2>
+<a id="ac480c09d65bd4beb40c70ad4376ffc1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac480c09d65bd4beb40c70ad4376ffc1c">&#9670;&nbsp;</a></span>CpaEncrypt()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -197,7 +206,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void RLWEQ12289N2048::Encrypt </td>
+          <td class="memname">void RLWEQ12289N2048::CpaEncrypt </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>CipherText</em>, </td>
@@ -240,6 +249,170 @@ Static Public Attributes</h2></td></tr>
     <tr><td class="paramname">Secret</td><td>The secret message</td></tr>
     <tr><td class="paramname">PublicKey</td><td>The public asymmetric key</td></tr>
     <tr><td class="paramname">Coin</td><td>The random provider</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abce4079a918436fb4ff0e84d3962de69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abce4079a918436fb4ff0e84d3962de69">&#9670;&nbsp;</a></span>CpaGenerate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RLWEQ12289N2048::CpaGenerate </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>PublicKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>PrivateKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::unique_ptr&lt; Prng::IPrng &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Rng</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generate a public/private key-pair </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">PublicKey</td><td>The public asymmetric key</td></tr>
+    <tr><td class="paramname">PrivateKey</td><td>The private asymmetric key</td></tr>
+    <tr><td class="paramname">Rng</td><td>The random provider</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a8f91e2322f9f3b363aa7d1b54c280eb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f91e2322f9f3b363aa7d1b54c280eb3">&#9670;&nbsp;</a></span>Decapsulate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool RLWEQ12289N2048::Decapsulate </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Secret</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>CipherText</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>PrivateKey</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decapsulate and authenticate a cipher-text, generating a shared secret key </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Secret</td><td>The shared secret</td></tr>
+    <tr><td class="paramname">CipherText</td><td>The private asymmetric key</td></tr>
+    <tr><td class="paramname">PrivateKey</td><td>The received ciphertext</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true for success, false for authentication failure</dd></dl>
+
+</div>
+</div>
+<a id="aef628ae3c507a0f29310331b2977cc3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef628ae3c507a0f29310331b2977cc3a">&#9670;&nbsp;</a></span>Encapsulate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RLWEQ12289N2048::Encapsulate </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>CipherText</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Secret</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>PublicKey</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::unique_ptr&lt; Prng::IPrng &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Rng</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Encapsulate a message, generating a shared secret key </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">CipherText</td><td>The ciphertext output</td></tr>
+    <tr><td class="paramname">Secret</td><td>The secret message</td></tr>
+    <tr><td class="paramname">PublicKey</td><td>The public asymmetric key</td></tr>
+    <tr><td class="paramname">Rng</td><td>The random generator instance</td></tr>
   </table>
   </dd>
 </dl>

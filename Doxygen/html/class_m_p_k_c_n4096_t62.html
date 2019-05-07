@@ -163,9 +163,9 @@ Static Public Attributes</h2></td></tr>
 <p>Decrypt an encrypted cipher-text and return the shared secret </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">E</td><td>The decrypted output array</td></tr>
     <tr><td class="paramname">PrivateKey</td><td>The private key array</td></tr>
-    <tr><td class="paramname">S</td><td>The ciphertext</td></tr>
+    <tr><td class="paramname">CipherText</td><td>The ciphertext input vector</td></tr>
+    <tr><td class="paramname">SharedSecret</td><td>The shared secret output</td></tr>
   </table>
   </dd>
 </dl>
@@ -222,9 +222,9 @@ Static Public Attributes</h2></td></tr>
 <p>Encrypt a message and return the shared secret and cipher-text </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">S</td><td>The output ciphertext</td></tr>
-    <tr><td class="paramname">E</td><td>The message array</td></tr>
     <tr><td class="paramname">PublicKey</td><td>The public key array</td></tr>
+    <tr><td class="paramname">CipherText</td><td>The ciphertext input vector</td></tr>
+    <tr><td class="paramname">SharedSecret</td><td>The shared secret output</td></tr>
     <tr><td class="paramname">Rng</td><td>The random generator instance</td></tr>
   </table>
   </dd>

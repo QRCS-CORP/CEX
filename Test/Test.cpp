@@ -231,9 +231,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7r (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7s (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      April 29, 2019                    *");
+	ConsoleUtils::WriteLine("* Date:      May 07, 2019                      *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -292,6 +292,11 @@ int main()
 
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
+
+
+	RunTest(new RingLWETest());
+
+
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");

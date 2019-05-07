@@ -1338,16 +1338,16 @@ public:
 	///
 	/// <returns>A 32-bit word in Little Endian format</returns>
 	template<typename Array>
-	inline static uint LeBytesTo32(const Array &Input, size_t Offset, size_t Length)
+	inline static uint LeBytesTo32(const Array &Input, size_t InOffset, size_t Length)
 	{
 		size_t i;
 		uint r;
 
-		r = Input[Offset];
+		r = Input[InOffset];
 
 		for (i = 1; i < Length; ++i)
 		{
-			r |= static_cast<uint>(Input[Offset + i]) << (8 * i);
+			r |= static_cast<uint>(Input[InOffset + i]) << (8 * i);
 		}
 
 		return r;
@@ -1396,16 +1396,16 @@ public:
 	///
 	/// <returns>A 64-bit word in Little Endian format</returns>
 	template<typename Array>
-	inline static ulong LeBytesTo64(const Array &Input, size_t Offset, size_t Length)
+	inline static ulong LeBytesTo64(const Array &Input, size_t InOffset, size_t Length)
 	{
 		size_t i;
 		ulong r;
 
-		r = Input[Offset];
+		r = Input[InOffset];
 
 		for (i = 1; i < Length; ++i)
 		{
-			r |= static_cast<ulong>(Input[Offset + i]) << (8 * i);
+			r |= static_cast<ulong>(Input[InOffset + i]) << (8 * i);
 		}
 
 		return r;

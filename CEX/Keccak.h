@@ -115,6 +115,8 @@ public:
 	/// <param name="Input">The input byte array, can be either an 8-bit array or vector</param>
 	/// <param name="InOffset">The starting offset withing the input array</param>
 	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
+	/// <param name="Rate">The Keccak aborbtion rate in bytes</param>
+	/// <param name="Domain">The Keccak implementation domain</param>
 	/// <param name="State">The permutations uint64 state array</param>
 	template<typename Array>
 	static void AbsorbR24(const Array &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
@@ -157,6 +159,8 @@ public:
 	/// <param name="Input">The input byte array, can be either an 8-bit array or vector</param>
 	/// <param name="InOffset">The starting offset withing the input array</param>
 	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
+	/// <param name="Rate">The Keccak aborbtion rate in bytes</param>
+	/// <param name="Domain">The Keccak implementation domain</param>
 	/// <param name="State">The permutations uint64 state array</param>
 	template<typename Array>
 	static void AbsorbR48(const Array &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)

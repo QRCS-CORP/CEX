@@ -1,12 +1,13 @@
 #include "RLWEQ12289N2048.h"
-#include "BCG.h"
-#include "GCM.h"
+#include "IntegerTools.h"
 #include "Keccak.h"
 #include "MemoryTools.h"
 
 NAMESPACE_RINGLWE
 
+using Utility::IntegerTools;
 using Digest::Keccak;
+using Utility::MemoryTools;
 
 //~~~Constant Tables~~~//
 
@@ -546,7 +547,7 @@ const std::array<ushort, 2048> RLWEQ12289N2048::BitRevTable =
 
 //~~~Public Functions~~~//
 
-void RLWEQ12289N2048::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey)
+void RLWEQ12289N2048::CpaDecrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey)
 {
 	std::array<ushort, RLWE_N> vprime;
 	std::array<ushort, RLWE_N> uhat;
@@ -563,7 +564,7 @@ void RLWEQ12289N2048::Decrypt(std::vector<byte> &Secret, const std::vector<byte>
 	PolyToMessage(Secret, tmp);
 }
 
-void RLWEQ12289N2048::Encrypt(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, const std::vector<byte> &Coin)
+void RLWEQ12289N2048::CpaEncrypt(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, const std::vector<byte> &Coin)
 {
 	std::array<ushort, RLWE_N> sprime;
 	std::array<ushort, RLWE_N> eprime;
@@ -599,7 +600,7 @@ void RLWEQ12289N2048::Encrypt(std::vector<byte> &CipherText, std::vector<byte> &
 	EncodeC(CipherText, uhat, vprime);
 }
 
-void RLWEQ12289N2048::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
+void RLWEQ12289N2048::CpaGenerate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	std::array<ushort, RLWE_N> ahat;
 	std::array<ushort, RLWE_N> ehat;
@@ -608,9 +609,12 @@ void RLWEQ12289N2048::Generate(std::vector<byte> &PublicKey, std::vector<byte> &
 	std::array<ushort, RLWE_N> shat;
 	std::vector<byte> pubk(RLWE_SEED_SIZE);
 	std::vector<byte> noisek(RLWE_SEED_SIZE);
+	std::vector<byte> tmpk(2 * RLWE_SEED_SIZE);
 
 	Rng->Generate(pubk);
-	Rng->Generate(noisek);
+	XOF(pubk, 0, pubk.size(), tmpk, 0, tmpk.size(), Keccak::KECCAK256_RATE_SIZE);
+	MemoryTools::Copy(tmpk, 0, pubk, 0, pubk.size());
+	MemoryTools::Copy(tmpk, pubk.size(), noisek, 0, noisek.size());
 
 	PolyUniform(ahat, pubk);
 
@@ -625,6 +629,82 @@ void RLWEQ12289N2048::Generate(std::vector<byte> &PublicKey, std::vector<byte> &
 
 	PolyToBytes(PrivateKey, shat);
 	EncodePk(PublicKey, bhat, pubk);
+}
+
+bool RLWEQ12289N2048::Decapsulate(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey)
+{
+	std::vector<byte> buf(2 * RLWE_SEED_SIZE);
+	std::vector<byte> ctcmp(RLWE_CCACIPHERTEXT_SIZE);
+	// contains key, coins, qrom-hash 
+	std::vector<byte> kcoinsd(3 * RLWE_SEED_SIZE);
+	std::vector<byte> tmpc(2 * RLWE_SEED_SIZE);
+	std::vector<byte> tmppk(RLWE_CCAPUBLICKEY_SIZE);
+	size_t result;
+
+	CpaDecrypt(buf, CipherText, PrivateKey);
+
+	// use hash of pk stored in sk
+	MemoryTools::Copy(PrivateKey, RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWE_SEED_SIZE), buf, RLWE_SEED_SIZE, RLWE_SEED_SIZE);
+	XOF(buf, 0, 2 * RLWE_SEED_SIZE, kcoinsd, 0, 3 * RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+
+	// coins are in kcoinsd+NEWHOPE_SYMBYTES 
+	MemoryTools::Copy(kcoinsd, RLWE_SEED_SIZE, tmpc, 0, 2 * RLWE_SEED_SIZE);
+	MemoryTools::Copy(PrivateKey, RLWE_CPAPRIVATEKEY_SIZE, tmppk, 0, RLWE_CCAPUBLICKEY_SIZE);
+	CpaEncrypt(ctcmp, buf, tmppk, tmpc);
+
+	MemoryTools::Copy(kcoinsd, 2 * RLWE_SEED_SIZE, ctcmp, RLWE_CPACIPHERTEXT_SIZE, RLWE_SEED_SIZE);
+	result = IntegerTools::Verify(CipherText, ctcmp, CipherText.size());
+
+	// overwrite coins in kcoinsd with h(c)  
+	XOF(CipherText, 0, RLWE_CCACIPHERTEXT_SIZE, kcoinsd, RLWE_SEED_SIZE, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+	// overwrite pre-k with z on re-encryption failure
+	IntegerTools::CMov(PrivateKey, RLWE_CCAPRIVATEKEY_SIZE - RLWE_SEED_SIZE, kcoinsd, 0, RLWE_SEED_SIZE, static_cast<byte>(result));
+	// hash concatenation of pre-k and h(c) to k 
+	XOF(kcoinsd, 0, 2 * RLWE_SEED_SIZE, Secret, 0, Secret.size(), Keccak::KECCAK256_RATE_SIZE);
+
+	return (result == 0);
+}
+
+void RLWEQ12289N2048::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, std::unique_ptr<Prng::IPrng> &Rng)
+{
+	// contains key, coins, qrom-hash 
+	std::vector<byte> kcoinsd(3 * RLWE_SEED_SIZE);
+	std::vector<byte> buf(2 * RLWE_SEED_SIZE);
+	std::vector<byte> tmps(2 * RLWE_SEED_SIZE);
+
+	Rng->Generate(buf, 0, RLWE_SEED_SIZE);
+	// don't release system RNG output directly
+	XOF(buf, 0, RLWE_SEED_SIZE, buf, 0, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+	// multitarget countermeasure for coins + contributory KEM 
+	XOF(PublicKey, 0, PublicKey.size(), buf, RLWE_SEED_SIZE, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+	XOF(buf, 0, buf.size(), kcoinsd, 0, kcoinsd.size(), Keccak::KECCAK256_RATE_SIZE);
+
+	// coins are in kcoinsd+NEWHOPE_SYMBYTES
+	MemoryTools::Copy(kcoinsd, RLWE_SEED_SIZE, tmps, 0, tmps.size());
+	CpaEncrypt(CipherText, buf, PublicKey, tmps);
+
+	// copy Targhi-Unruh hash into ct 
+	MemoryTools::Copy(kcoinsd, 2 * RLWE_SEED_SIZE, CipherText, RLWE_CPACIPHERTEXT_SIZE, RLWE_SEED_SIZE);
+	// overwrite coins in kcoinsd with h(c) 
+	XOF(CipherText, 0, RLWE_CCACIPHERTEXT_SIZE, kcoinsd, RLWE_SEED_SIZE, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+	XOF(kcoinsd, 0, 2 * RLWE_SEED_SIZE, Secret, 0, Secret.size(), Keccak::KECCAK256_RATE_SIZE);
+}
+
+void RLWEQ12289N2048::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
+{
+	std::vector<byte> coin(RLWE_SEED_SIZE * 2);
+
+	// generate the public and private keys
+	CpaGenerate(PublicKey, PrivateKey, Rng);
+
+	// generate H(pk)
+	XOF(PublicKey, 0, PublicKey.size(), coin, 0, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+	// value z for pseudo-random output on reject
+	Rng->Generate(coin, RLWE_SEED_SIZE, RLWE_SEED_SIZE);
+
+	// copy the puplic key + H(pk) to sk
+	MemoryTools::Copy(PublicKey, 0, PrivateKey, RLWE_CPAPRIVATEKEY_SIZE, RLWE_CCAPUBLICKEY_SIZE);
+	MemoryTools::Copy(coin, 0, PrivateKey, RLWE_CPAPRIVATEKEY_SIZE + RLWE_CPAPUBLICKEY_SIZE, 2 * RLWE_SEED_SIZE);
 }
 
 //~~~Private Functions~~~//
@@ -1036,7 +1116,7 @@ void RLWEQ12289N2048::PolyToMessage(std::vector<byte> &Message, const std::array
 
 void RLWEQ12289N2048::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed)
 {
-	std::vector<byte> buf(Keccak::KECCAK256_RATE_SIZE);
+	std::vector<byte> buf(Keccak::KECCAK128_RATE_SIZE);
 	std::vector<byte> tmpk(RLWE_SEED_SIZE + 1);
 	size_t ctr;
 	size_t i;
@@ -1056,9 +1136,9 @@ void RLWEQ12289N2048::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 		// very unlikely to run more than once
 		while (ctr < 64)
 		{
-			XOF(tmpk, 0, tmpk.size(), buf, 0, buf.size(), Keccak::KECCAK256_RATE_SIZE);
+			XOF(tmpk, 0, tmpk.size(), buf, 0, buf.size(), Keccak::KECCAK128_RATE_SIZE);
 
-			for (j = 0; j < Keccak::KECCAK256_RATE_SIZE && ctr < 64; j += 2)
+			for (j = 0; j < Keccak::KECCAK128_RATE_SIZE && ctr < 64; j += 2)
 			{
 				val = (buf[j] | (static_cast<ushort>(buf[j + 1]) << 8));
 

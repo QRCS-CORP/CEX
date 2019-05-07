@@ -70,7 +70,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex8(const std::vector<uint> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 32)
+		static void PrintHex8(const std::vector<byte> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 32)
 		{
 			const size_t ZERLEN = 2;
 			std::string tmp = "";
@@ -110,7 +110,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex16(const std::vector<uint> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 16)
+		static void PrintHex16(const std::vector<ushort> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 16)
 		{
 			const size_t ZERLEN = 4;
 			std::string tmp = "";

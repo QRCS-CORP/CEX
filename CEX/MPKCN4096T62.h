@@ -105,9 +105,9 @@ public:
 	/// Decrypt an encrypted cipher-text and return the shared secret
 	/// </summary>
 	/// 
-	/// <param name="E">The decrypted output array</param>
 	/// <param name="PrivateKey">The private key array</param>
-	/// <param name="S">The ciphertext</param>
+	/// <param name="CipherText">The ciphertext input vector</param>
+	/// <param name="SharedSecret">The shared secret output</param>
 	/// 
 	/// <returns>The message was decrypted succesfully</returns>
 	static bool Decrypt(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret);
@@ -116,9 +116,9 @@ public:
 	/// Encrypt a message and return the shared secret and cipher-text
 	/// </summary>
 	/// 
-	/// <param name="S">The output ciphertext</param>
-	/// <param name="E">The message array</param>
 	/// <param name="PublicKey">The public key array</param>
+	/// <param name="CipherText">The ciphertext input vector</param>
+	/// <param name="SharedSecret">The shared secret output</param>
 	/// <param name="Rng">The random generator instance</param>
 	static void Encrypt(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng);
 

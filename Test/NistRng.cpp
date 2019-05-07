@@ -66,9 +66,6 @@ namespace Test
 
 	void NistRng::Initialize(const std::vector<byte> &Seed)
 	{
-		std::vector<byte> tmps(Seed.size());
-
-		MemoryTools::Copy(Seed, 0, tmps, 0, Seed.size());
 		m_nistRngState->Reset();
 		Update(Seed, m_nistRngState->Key, m_nistRngState->Nonce);
 		m_nistRngState->ReseedCounter = 1;

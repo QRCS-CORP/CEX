@@ -22,6 +22,9 @@ namespace Test
 		static const size_t TEST_CYCLES = 100;
 #endif
 
+		std::vector<byte> m_cprseed;
+		std::vector<std::vector<byte>> m_cptexp;
+		std::vector<std::vector<byte>> m_sskexp;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -67,6 +70,11 @@ namespace Test
 		void Exception();
 
 		/// <summary>
+		/// Compare known answer shared-secret and cipher-text vectors to cipher output
+		/// </summary>
+		void Kat();
+
+		/// <summary>
 		/// Tests the cipher for invalid public keys in a looping stress test
 		/// </summary>
 		void PublicKey();
@@ -83,6 +91,7 @@ namespace Test
 
 	private:
 
+		void Initialize();
 		void OnProgress(const std::string &Data);
 	};
 }

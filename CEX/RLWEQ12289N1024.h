@@ -116,23 +116,25 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Decrypt a cipher-text
+	/// Decapsulate and authenticate a cipher-text, generating a shared secret key
 	/// </summary>
 	/// 
 	/// <param name="Secret">The shared secret</param>
 	/// <param name="CipherText">The private asymmetric key</param>
 	/// <param name="PrivateKey">The received ciphertext</param>
-	static void Decrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey);
+	/// 
+	/// <returns>Returns true for success, false for authentication failure</returns>
+	static bool Decapsulate(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey);
 
 	/// <summary>
-	/// Encrypt a message
+	/// Encapsulate a message, generating a shared secret key
 	/// </summary>
 	/// 
 	/// <param name="CipherText">The ciphertext output</param>
 	/// <param name="Secret">The secret message</param>
 	/// <param name="PublicKey">The public asymmetric key</param>
-	/// <param name="Coin">The random provider</param>
-	static void Encrypt(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, const std::vector<byte> &Coin);
+	/// <param name="Rng">The random generator instance</param>
+	static void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 	/// <summary>
 	/// Generate a public/private key-pair
@@ -142,6 +144,34 @@ public:
 	/// <param name="PrivateKey">The private asymmetric key</param>
 	/// <param name="Rng">The random provider</param>
 	static void Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
+
+	/// <summary>
+	/// Decrypt a cipher-text
+	/// </summary>
+	/// 
+	/// <param name="Secret">The shared secret</param>
+	/// <param name="CipherText">The private asymmetric key</param>
+	/// <param name="PrivateKey">The received ciphertext</param>
+	static void CpaDecrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey);
+
+	/// <summary>
+	/// Encrypt a message
+	/// </summary>
+	/// 
+	/// <param name="CipherText">The ciphertext output</param>
+	/// <param name="Secret">The secret message</param>
+	/// <param name="PublicKey">The public asymmetric key</param>
+	/// <param name="Coin">The random provider</param>
+	static void CpaEncrypt(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, const std::vector<byte> &Coin);
+
+	/// <summary>
+	/// Generate a CPA-Secure public/private key-pair
+	/// </summary>
+	///
+	/// <param name="PublicKey">The public asymmetric key</param>
+	/// <param name="PrivateKey">The private asymmetric key</param>
+	/// <param name="Rng">The random provider instance</param>
+	static void CpaGenerate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 private:
 
