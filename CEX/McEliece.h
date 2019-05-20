@@ -28,7 +28,7 @@ NAMESPACE_MCELIECE
 using Enumeration::MPKCParameters;
 
 /// <summary>
-/// An implementation of the Niederreiter dual form of the McEliece public key crypto-system
+/// An implementation of the Niederreiter dual form of the McEliece public key crypto-system (MPKC)
 /// </summary> 
 /// 
 /// <example>
@@ -86,6 +86,7 @@ using Enumeration::MPKCParameters;
 /// 
 /// <description>
 /// <list type="number">
+/// <item><description>This version of McEliece aligns with the authors recommended SUPERCOP implementation</description></item>
 /// <item><description>Guiding Publications:</description>//Classic McEliece: <a href="https://classic.mceliece.org/nist/mceliece-20171129.pdf">McEliece</a> conservatice code-based cryptography.</description></item>
 /// <item><description>Source code <a href="https://classic.mceliece.org/software.html">Classic McEliece</a> software.</description></item>
 /// <item><description>the Niederreiter dual form of the McEliece cipher: <a href="https://eprint.iacr.org/2015/610.pdf">McBits</a> a fast constant-time code based cryptography.</description></item>

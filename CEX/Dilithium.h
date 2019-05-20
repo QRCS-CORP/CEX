@@ -33,7 +33,7 @@ using Enumeration::DilithiumParameters;
 using Kdf::IKdf;
 
 /// <summary>
-/// An implementation of the Dilithium asymmetric signature scheme
+/// An implementation of the Dilithium asymmetric signature scheme (DILITHIUM)
 /// </summary> 
 /// 
 /// <example>

@@ -28,13 +28,13 @@ NAMESPACE_MODULELWE
 using Enumeration::MLWEParameters;
 
 /// <summary>
-/// An implementation of the Module Learning With Errors asymmetric cipher (ModuleLWE)
+/// An implementation of the Module Learning With Errors asymmetric cipher (KYBER)
 /// </summary> 
 /// 
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// ModuleLWE acpr(MLWEParameters::MLWES3Q7681N256);
+/// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
 /// IAsymmetricKeyPair* kp = acpr.Generate();
 /// 
 /// // serialize the public key
@@ -47,7 +47,7 @@ using Enumeration::MLWEParameters;
 /// std::vector&lt;byte&gt; sec(32);
 /// std::vector&lt;byte&gt; cpt(0);
 /// 
-/// ModuleLWE acpr(MLWEParameters::MLWES3Q7681N256);
+/// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
 /// acpr.Initialize(PublicKey);
 /// // generate the ciphertext and shared secret
 /// acpr.Encapsulate(cpt, sec);
@@ -58,7 +58,7 @@ using Enumeration::MLWEParameters;
 /// std::vector&lt;byte&gt; sec(32);
 /// bool status;
 /// 
-/// ModuleLWE acpr(MLWEParameters::MLWES3Q7681N256);
+/// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
 /// acpr.Initialize(PrivateKey);
 /// // decrypt the ciphertext and output the shared secret
 ///	status = acpr.Decapsulate(cpt, sec);
@@ -67,14 +67,15 @@ using Enumeration::MLWEParameters;
 /// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
-/// <para>Module learning with errors (MLWE) is the Learning With Errors problem (a generalization of the parity learning problem), specialized to polynomial arrays over finite fields. \n
+/// <para>This Module learning with errors (KYBER) is the Learning With Errors problem (a generalization of the parity learning problem), specialized to polynomial arrays over finite fields. \n
 /// An important feature of the LWE problem is that the solution may be reducible to the NP-Hard Shortest Vector Problem (SVP) in a Lattice. \n
 /// This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers.
 /// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
 /// 
 /// <list type="bullet">
+/// <item><description>This version of Kyber aligns with the NIST PQ round 2 implementation</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MLWEPublicKey, or MLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>The high-security MLWES3Q7681N256 parameter set is the default cipher configuration; optional parameters of medium-security MLWES2Q7681N256, and highest-security MLWES4Q7681N256 are also available through the class constructor parameter</description></item>
+/// <item><description>The high-security MLWES2Q3329N256 parameter set is the default cipher configuration; optional parameters of medium-security MLWES1Q3329N256, and highest-security MLWES3Q3329N256 are also available through the class constructor parameter</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The message is authenticated using SHAKE, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
 /// </list>
@@ -113,11 +114,11 @@ public:
 	/// Instantiate the cipher with auto-initialized prng and digest functions
 	/// </summary>
 	///
-	/// <param name="Parameters">The parameter set enumeration name</param>
+	/// <param name="Parameters">The parameter set enumeration name; the default is S2/K3</param>
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	ModuleLWE(MLWEParameters Parameters = MLWEParameters::MLWES3Q7681N256, Prngs PrngType = Prngs::BCR);
+	ModuleLWE(MLWEParameters Parameters = MLWEParameters::MLWES2Q3329N256, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances

@@ -27,6 +27,13 @@ namespace Test
 	public:
 
 		/// <summary>
+		/// Fill a string with random charactors
+		/// </summary>
+		/// 
+		/// <param name="Length">The number of random charactors</param>
+		static std::string GetRandomString(size_t Length);
+
+		/// <summary>
 		/// Outputs a string to console
 		/// </summary>
 		/// 
@@ -110,7 +117,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex16(const std::vector<ushort> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 16)
+		static void PrintHex16(const std::vector<ushort> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("U, "), size_t RowLength = 16)
 		{
 			const size_t ZERLEN = 4;
 			std::string tmp = "";
@@ -150,7 +157,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex32(const std::vector<uint> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 8)
+		static void PrintHex32(const std::vector<uint> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("UL, "), size_t RowLength = 8)
 		{
 			const size_t ZERLEN = 8;
 			std::string tmp = "";
@@ -190,7 +197,7 @@ namespace Test
 		/// <param name="Prefix">The integer prefix</param>
 		/// <param name="Suffix">The integer suffix</param>
 		/// <param name="RowLength">The number of integers in each row</param>
-		static void PrintHex64(const std::vector<ulong> &Data, const std::string &Prefix, const std::string &Suffix, size_t RowLength = 4)
+		static void PrintHex64(const std::vector<ulong> &Data, const std::string &Prefix = std::string("0x"), const std::string &Suffix = std::string("ULL, "), size_t RowLength = 4)
 		{
 			const size_t ZERLEN = 16;
 			std::string tmp = "";
@@ -283,6 +290,13 @@ namespace Test
 			return oss.str();
 		}
 
+		/// <summary>
+		/// Pause the console until user input is received
+		/// </summary>
+		static void WaitForInput();
+
+		/// Internal ///
+
 		static double ChiSquare(std::vector<byte> &Input);
 		static void CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length);
 		static bool IsEqual(std::vector<byte> &A, std::vector<byte> &B);
@@ -290,7 +304,7 @@ namespace Test
 		static SymmetricKey* GetRandomKey(size_t KeySize, size_t IvSize);
 		static void GetRandom(std::vector<byte> &Data);
 		static double MeanValue(std::vector<byte> &Input);
-		static bool OrderedRuns(const std::vector<byte> &Input, size_t Threshold = 4);
+		static bool OrderedRuns(const std::vector<byte> &Input, size_t Threshold = 6);
 		static std::string RandomReadableString(size_t Length);
 		static bool Read(const std::string &FilePath, std::string &Contents);
 		static std::vector<byte> Reduce(std::vector<byte> Seed);

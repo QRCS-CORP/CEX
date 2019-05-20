@@ -45,7 +45,7 @@ using Numeric::ULong512;
 /// The Unrolled forms are optimized for speed and timing neutrality (suffix U), and the vertically vectorized functions have the V suffix. \n
 /// The H suffix denotes functions that take an SIMD wrapper class (ULongXXX) as the state values, and process state in SIMD parallel blocks.</para>
 /// <para>This class contains wide forms of the functions; PemuteP4x256H, PemuteP4x512H, and PemuteP4x1024H use AVX2 instructions. \n
-/// Experimental functions using AVX512 instructions are also implemented; PemuteP4x512H, PemuteP8x512H, and PemuteP8x1024H. \n
+/// Experimental functions using AVX512 instructions are also implemented; PemuteP8x256H, PemuteP8x512H, and PemuteP8x1024H. \n
 /// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitly declared.</para>
 /// </summary>
 class Threefish
@@ -222,7 +222,7 @@ public:
 	/// <param name="Tweak">The cipher tweak array</param>
 	/// <param name="State">The permutations state array</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
-	static void PemuteP4x512H(const std::array<ulong, 4> &Key, const std::array<ulong, 16> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 32> &State, size_t Rounds);
+	static void PemuteP8x256H(const std::array<ulong, 4> &Key, const std::array<ulong, 16> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 32> &State, size_t Rounds);
 
 #endif
 

@@ -165,7 +165,7 @@ public:
 	{
 		if (Length < 8 * sizeof(Value))
 		{
-			return (Value & ((1L << Length) - 1));
+			return (Value & ((1ULL << Length) - 1ULL));
 		}
 		else
 		{
@@ -727,7 +727,6 @@ public:
 	template<typename Array>
 	inline static void BeIncrement8(Array &Output)
 	{
-		CEXASSERT(sizeof(Array::value_type) == sizeof(byte), "Output must be a vector of 8-bit integers");
 		CEXASSERT(!std::is_signed<Array::value_type>::value, "Output must be an unsigned integer vector");
 		CEXASSERT(Output.size() != 0, "Output size can not be zero");
 

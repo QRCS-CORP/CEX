@@ -22,33 +22,33 @@
     <ProjectGuid>{FF7AB9CB-BF7B-4E0E-A3EF-F4141810B24A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CEX</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>CEX</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -271,6 +271,7 @@
     <ClInclude Include="..\..\CEX\MacBase.h" />
     <ClInclude Include="..\..\CEX\MacFromName.h" />
     <ClInclude Include="..\..\CEX\MemoryPool.h" />
+    <ClInclude Include="..\..\CEX\MLWEQ3329N256.h" />
     <ClInclude Include="..\..\CEX\MPKCN4096T62.h" />
     <ClInclude Include="..\..\CEX\MPKCN6960T119.h" />
     <ClInclude Include="..\..\CEX\MPKCN8192T128.h" />
@@ -319,7 +320,6 @@
     <ClInclude Include="..\..\CEX\McEliece.h" />
     <ClInclude Include="..\..\CEX\MemoryTools.h" />
     <ClInclude Include="..\..\CEX\MLWEParameters.h" />
-    <ClInclude Include="..\..\CEX\MLWEQ7681N256.h" />
     <ClInclude Include="..\..\CEX\ModuleLWE.h" />
     <ClInclude Include="..\..\CEX\MPKCParameters.h" />
     <ClInclude Include="..\..\CEX\NTRU.h" />
@@ -485,6 +485,7 @@
     <ClCompile Include="..\..\CEX\Macs.cpp" />
     <ClCompile Include="..\..\CEX\MemoryPool.cpp" />
     <ClCompile Include="..\..\CEX\MLWEParameters.cpp" />
+    <ClCompile Include="..\..\CEX\MLWEQ3329N256.cpp" />
     <ClCompile Include="..\..\CEX\MPKCN4096T62.cpp" />
     <ClCompile Include="..\..\CEX\MPKCN6960T119.cpp" />
     <ClCompile Include="..\..\CEX\MPKCN8192T128.cpp" />
@@ -519,7 +520,6 @@
     <ClCompile Include="..\..\CEX\KMAC.cpp" />
     <ClCompile Include="..\..\CEX\McEliece.cpp" />
     <ClCompile Include="..\..\CEX\McElieceUtils.cpp" />
-    <ClCompile Include="..\..\CEX\MLWEQ7681N256.cpp" />
     <ClCompile Include="..\..\CEX\ModuleLWE.cpp" />
     <ClCompile Include="..\..\CEX\NTRU.cpp" />
     <ClCompile Include="..\..\CEX\ParallelOptions.cpp" />

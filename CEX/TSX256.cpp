@@ -413,7 +413,7 @@ void TSX256::Generate(std::unique_ptr<TSX256State> &State, std::array<ulong, 2> 
 			MemoryTools::Copy(Nonce, 0, ctr16, 7, 8);
 			MemoryTools::Copy(Nonce, 1, ctr16, 15, 8);
 			IntegerTools::LeIncrementW(Nonce);
-			Threefish::PemuteP4x512H(State->Key, ctr16, State->Tweak, tmp32, ROUND_COUNT);
+			Threefish::PemuteP8x256H(State->Key, ctr16, State->Tweak, tmp32, ROUND_COUNT);
 			MemoryTools::Copy(tmp32, 0, Output, OutOffset + ctr, AVX2BLK);
 			ctr += AVX512BLK;
 		}

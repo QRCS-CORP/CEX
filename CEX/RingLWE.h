@@ -28,7 +28,7 @@ NAMESPACE_RINGLWE
 using Enumeration::RLWEParameters;
 
 /// <summary>
-/// An implementation of the Ring Learning With Errors asymmetric cipher (NewHope RingLWE)
+/// An implementation of the Ring Learning With Errors asymmetric cipher (NewHope)
 /// </summary> 
 /// 
 /// <example>
@@ -80,6 +80,7 @@ using Enumeration::RLWEParameters;
 /// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
 /// 
 /// <list type="bullet">
+/// <item><description>This version of NewHope aligns with the NIST PQ round 2 implementation</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: RLWEPublicKey, or RLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The Q12289/N1024 parameter set is the default cipher configuration; an experimental Q12289/N2048 is also implemented</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>

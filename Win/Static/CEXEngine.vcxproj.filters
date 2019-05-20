@@ -220,60 +220,6 @@
     <Filter Include="Source Files\Asymmetric\Key">
       <UniqueIdentifier>{1412cd33-4500-4719-89ed-f98d97908acd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt">
-      <UniqueIdentifier>{39640886-cd1f-4352-97bd-da3f850b94ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\McEliece">
-      <UniqueIdentifier>{b59e605c-4096-4d7e-acd1-d39c119230ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\McEliece\Support">
-      <UniqueIdentifier>{28e04534-0f5a-4369-9c19-3e666e47b28e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\RingLWE">
-      <UniqueIdentifier>{046e42d0-5c8a-40d8-929c-fec0297d71eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\RingLWE\Support">
-      <UniqueIdentifier>{d6f55125-7c64-4ebd-84f5-317335929c13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\ModuleLWE">
-      <UniqueIdentifier>{5bb45a3e-efd7-4d50-876c-582e7f2dc3d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\ModuleLWE\Support">
-      <UniqueIdentifier>{e6761720-0098-4cee-9e0b-f62d8fced8bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\NTRU">
-      <UniqueIdentifier>{de7c0483-f3e9-4fb0-bca3-c54eeab893d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Encrypt\NTRU\Support">
-      <UniqueIdentifier>{4bd023cb-fab3-4d86-8d94-04017b3045e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt">
-      <UniqueIdentifier>{60af2114-8bce-4b8b-82cb-13a3c8e36f1c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\RingLWE">
-      <UniqueIdentifier>{a80898f3-6afc-4a1c-bfd4-4f19a584e69f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\RingLWE\Support">
-      <UniqueIdentifier>{2b081e58-9b0d-4b2a-9efc-a35b79f5ab15}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\McEliece">
-      <UniqueIdentifier>{d98aa6ce-c534-49cd-a0bc-b66dd7a4b7b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\McEliece\Support">
-      <UniqueIdentifier>{ab06a14a-2609-4f59-ba79-efcf1f62c296}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\ModuleLWE">
-      <UniqueIdentifier>{0048dfae-3e1d-4584-88d1-b696870447d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\ModuleLWE\Support">
-      <UniqueIdentifier>{676eba65-b1be-4edd-a465-b9f26c1164fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\NTRU">
-      <UniqueIdentifier>{6ca5da74-84a2-4866-8587-623982363cbd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Encrypt\NTRU\Support">
-      <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Provider\Base">
       <UniqueIdentifier>{584a7655-8c0b-4923-9255-0283a7d16ec8}</UniqueIdentifier>
     </Filter>
@@ -312,6 +258,60 @@
     </Filter>
     <Filter Include="Source Files\Asymmetric\KEX\DTM">
       <UniqueIdentifier>{d3fddbff-e594-4495-bb1a-4dd89036f68c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher">
+      <UniqueIdentifier>{60af2114-8bce-4b8b-82cb-13a3c8e36f1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\RingLWE">
+      <UniqueIdentifier>{a80898f3-6afc-4a1c-bfd4-4f19a584e69f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\RingLWE\Support">
+      <UniqueIdentifier>{2b081e58-9b0d-4b2a-9efc-a35b79f5ab15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\McEliece">
+      <UniqueIdentifier>{d98aa6ce-c534-49cd-a0bc-b66dd7a4b7b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\McEliece\Support">
+      <UniqueIdentifier>{ab06a14a-2609-4f59-ba79-efcf1f62c296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\ModuleLWE">
+      <UniqueIdentifier>{0048dfae-3e1d-4584-88d1-b696870447d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\ModuleLWE\Support">
+      <UniqueIdentifier>{676eba65-b1be-4edd-a465-b9f26c1164fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\NTRU">
+      <UniqueIdentifier>{6ca5da74-84a2-4866-8587-623982363cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\NTRU\Support">
+      <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher">
+      <UniqueIdentifier>{39640886-cd1f-4352-97bd-da3f850b94ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\McEliece">
+      <UniqueIdentifier>{b59e605c-4096-4d7e-acd1-d39c119230ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\McEliece\Support">
+      <UniqueIdentifier>{28e04534-0f5a-4369-9c19-3e666e47b28e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\RingLWE">
+      <UniqueIdentifier>{046e42d0-5c8a-40d8-929c-fec0297d71eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\RingLWE\Support">
+      <UniqueIdentifier>{d6f55125-7c64-4ebd-84f5-317335929c13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\ModuleLWE">
+      <UniqueIdentifier>{5bb45a3e-efd7-4d50-876c-582e7f2dc3d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\ModuleLWE\Support">
+      <UniqueIdentifier>{e6761720-0098-4cee-9e0b-f62d8fced8bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\NTRU">
+      <UniqueIdentifier>{de7c0483-f3e9-4fb0-bca3-c54eeab893d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\NTRU\Support">
+      <UniqueIdentifier>{4bd023cb-fab3-4d86-8d94-04017b3045e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -634,7 +634,7 @@
       <Filter>Header Files\Numeric</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\RingLWE.h">
-      <Filter>Header Files\Asymmetric\Encrypt\RingLWE</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\RingLWE</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\UShort128.h">
       <Filter>Header Files\Numeric</Filter>
@@ -655,7 +655,7 @@
       <Filter>Header Files\Prng</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\McEliece.h">
-      <Filter>Header Files\Asymmetric\Encrypt\McEliece</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\McEliece</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\TimeStamp.h">
       <Filter>Header Files\Utility</Filter>
@@ -670,7 +670,7 @@
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\McElieceUtils.h">
-      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoAuthenticationFailure.h">
       <Filter>Header Files\Exception</Filter>
@@ -682,7 +682,7 @@
       <Filter>Header Files\Mac</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ModuleLWE.h">
-      <Filter>Header Files\Asymmetric\Encrypt\ModuleLWE</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\ModuleLWE</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ShakeModes.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -718,16 +718,13 @@
       <Filter>Header Files\Numeric</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\NTRU.h">
-      <Filter>Header Files\Asymmetric\Encrypt\NTRU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MLWEQ7681N256.h">
-      <Filter>Header Files\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\NTRU</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h">
-      <Filter>Header Files\Asymmetric\Encrypt\NTRU\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\NTRU\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\NTRULQ4591N761.h">
-      <Filter>Header Files\Asymmetric\Encrypt\NTRU\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\NTRU\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CSR.h">
       <Filter>Header Files\Prng</Filter>
@@ -736,7 +733,7 @@
       <Filter>Header Files\Kdf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h">
-      <Filter>Header Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\RingLWE\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2Digests.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -748,7 +745,7 @@
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\RLWEQ12289N2048.h">
-      <Filter>Header Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\RingLWE\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Threefish.h">
       <Filter>Header Files\Cipher\Stream\Support</Filter>
@@ -949,13 +946,16 @@
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MPKCN8192T128.h">
-      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MPKCN6960T119.h">
-      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MPKCN4096T62.h">
-      <Filter>Header Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MLWEQ3329N256.h">
+      <Filter>Header Files\Asymmetric\Cipher\ModuleLWE\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1146,7 +1146,7 @@
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\RingLWE.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\RingLWE</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\RingLWE</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ACP.cpp">
       <Filter>Source Files\Provider</Filter>
@@ -1164,7 +1164,7 @@
       <Filter>Source Files\Prng</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\McEliece.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\McEliece</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\McEliece</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak1024.cpp">
       <Filter>Source Files\Digest</Filter>
@@ -1176,7 +1176,7 @@
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\McElieceUtils.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\BlakeParams.cpp">
       <Filter>Source Files\Digest\Support</Filter>
@@ -1194,7 +1194,7 @@
       <Filter>Source Files\Mac</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ModuleLWE.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\ModuleLWE</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\ModuleLWE</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CSG.cpp">
       <Filter>Source Files\Drbg</Filter>
@@ -1203,16 +1203,13 @@
       <Filter>Source Files\Mac</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\NTRU.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\NTRU</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\MLWEQ7681N256.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\NTRU</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\NTRU\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\NTRU\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\NTRU\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\NTRU\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CSR.cpp">
       <Filter>Source Files\Prng</Filter>
@@ -1221,7 +1218,7 @@
       <Filter>Source Files\Kdf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\RingLWE\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\TimeStamp.cpp">
       <Filter>Source Files\Utility</Filter>
@@ -1239,7 +1236,7 @@
       <Filter>Source Files\Cipher\Stream\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\RLWEQ12289N2048.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\RingLWE\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\RingLWE\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Threefish.cpp">
       <Filter>Source Files\Cipher\Stream\Support</Filter>
@@ -1455,13 +1452,16 @@
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MPKCN6960T119.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MPKCN8192T128.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MPKCN4096T62.cpp">
-      <Filter>Source Files\Asymmetric\Encrypt\McEliece\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MLWEQ3329N256.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\ModuleLWE\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

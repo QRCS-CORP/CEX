@@ -142,6 +142,14 @@ namespace Test
 		}
 	}
 
+	std::string TestUtils::GetRandomString(size_t Length)
+	{
+		std::string res;
+		res = TestUtils::RandomReadableString(Length);
+
+		return res;
+	}
+
 	double TestUtils::MeanValue(std::vector<byte> &Input)
 	{
 		double ret = 0;
@@ -402,5 +410,18 @@ namespace Test
 		}
 
 		return state;
+	}
+
+	void TestUtils::WaitForInput()
+	{
+		std::string resp = "";
+
+		try
+		{
+			std::getline(std::cin, resp);
+		}
+		catch (std::exception&)
+		{
+		}
 	}
 }

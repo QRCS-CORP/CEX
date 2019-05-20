@@ -134,14 +134,6 @@
 
 using namespace Test;
 
-std::string GetRandomString(size_t Length)
-{
-	std::string res;
-	res = TestUtils::RandomReadableString(Length);
-
-	return res;
-}
-
 void CpuCheck()
 {
 	CpuDetect detect;
@@ -171,6 +163,7 @@ void CpuCheck()
 std::string GetResponse()
 {
 	std::string resp = "";
+
 	try
 	{
 		std::getline(std::cin, resp);
@@ -191,23 +184,6 @@ std::string GetTime()
 	return std::string(str);
 }
 
-bool CanTest(std::string Message)
-{
-	ConsoleUtils::WriteLine(Message);
-	std::string resp = GetResponse();
-
-	const std::string CONFIRM = "y";
-	const std::string CONFIRML = "Y";
-	bool state = false;
-
-	if (resp.find(CONFIRM) != std::string::npos || resp.find(CONFIRML) != std::string::npos)
-	{
-		state = true;
-	}
-
-	return state;
-}
-
 void PrintHeader(std::string Data, std::string Decoration = "***")
 {
 	ConsoleUtils::WriteLine(Decoration + Data + Decoration);
@@ -219,7 +195,7 @@ void PrintRandom(size_t Lines)
 
 	for (size_t i = 0; i < Lines; ++i)
 	{
-		sample = GetRandomString(120);
+		sample = TestUtils::GetRandomString(120);
 		ConsoleUtils::WriteLine(sample);
 	}
 
@@ -231,22 +207,44 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7s (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7t (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      May 07, 2019                      *");
+	ConsoleUtils::WriteLine("* Date:      May 19, 2019                      *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
 }
 
-void CloseApp()
+bool TestConfirm(std::string Message)
 {
+	const std::string CONFIRM = "y";
+	const std::string CONFIRML = "Y";
+	std::string resp;
+	bool state;
+
+	ConsoleUtils::WriteLine(Message);
+
+	state = false;
+	resp = GetResponse();
+
+	if (resp.find(CONFIRM) != std::string::npos || resp.find(CONFIRML) != std::string::npos)
+	{
+		state = true;
+	}
+
+	return state;
+}
+
+void Terminate()
+{
+	std::string resp;
+
 	PrintHeader("An error has occurred! Press any key to close..", "");
-	GetResponse();
+	TestUtils::WaitForInput();
 	exit(0);
 }
 
-void RunTest(ITest* Test)
+void TestRun(ITest* Test)
 {
 	try
 	{
@@ -275,9 +273,9 @@ void RunTest(ITest* Test)
 
 		std::string resp;
 
-		if (!CanTest(resp))
+		if (!TestConfirm(resp))
 		{
-			CloseApp();
+			Terminate();
 		}
 	}
 }
@@ -293,15 +291,10 @@ int main()
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
 
-
-	RunTest(new RingLWETest());
-
-
-
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
 	PrintHeader("An error has occurred! Press any key to close..", "");
-	GetResponse();
+	TestUtils::WaitForInput();
 
 	return 0;
 #endif
@@ -322,7 +315,7 @@ int main()
 		PrintHeader("Warning! Could not find the cipher test vector KAT files!");
 		PrintHeader("The Win/Test/Vectors folder must be in the executables path.", "");
 		PrintHeader("An error has occurred! Press any key to close..", "");
-		GetResponse();
+		TestUtils::WaitForInput();
 
 		return 0;
 	}
@@ -346,7 +339,7 @@ int main()
 	catch (std::exception&)
 	{
 		PrintHeader("An error has occurred! This platform does not support cpudetect!", "");
-		GetResponse();
+		TestUtils::WaitForInput();
 
 		return 0;
 	}
@@ -357,7 +350,7 @@ int main()
 		PrintHeader("Warning! Compiling x86/Release on a 64bit system will cause memory alignment errors.", "");
 		PrintHeader("To test x86/Release, compile on a true x86 system, or run in x86/Debug mode.", "");
 		PrintHeader("Tests aborted! Press any key to close..", "");
-		GetResponse();
+		TestUtils::WaitForInput();
 
 		return 0;
 	}
@@ -404,96 +397,96 @@ int main()
 		PrintHeader("", "");
 #endif
 
-		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
+		if (TestConfirm("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
 
 			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
-				RunTest(new AesAvsTest(true));
+				TestRun(new AesAvsTest(true));
 			}
 
 			PrintHeader("Testing the AES software implementation (AES)");
-			RunTest(new AesAvsTest(false));
+			TestRun(new AesAvsTest(false));
 
 			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
-				RunTest(new RijndaelTest(true));
+				TestRun(new RijndaelTest(true));
 			}
 
 			PrintHeader("Testing the AES software implementation (RHX)");
-			RunTest(new RijndaelTest(false));
+			TestRun(new RijndaelTest(false));
 
 			PrintHeader("Testing the Serpent software implementation (SHX)");
-			RunTest(new SerpentTest());
+			TestRun(new SerpentTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
-			RunTest(new CipherModeTest());
+			TestRun(new CipherModeTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER AEAD MODES");
-			RunTest(new AeadTest());
+			TestRun(new AeadTest());
 			PrintHeader("TESTING PARALLEL CIPHER MODES");
-			RunTest(new ParallelModeTest());
+			TestRun(new ParallelModeTest());
 			PrintHeader("TESTING CIPHER PADDING MODES");
-			RunTest(new PaddingTest());
+			TestRun(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
-			RunTest(new ChaChaTest());
-			RunTest(new MCSTest());
-			RunTest(new RCSTest());
-			RunTest(new ThreefishTest());
+			TestRun(new ChaChaTest());
+			TestRun(new MCSTest());
+			TestRun(new RCSTest());
+			TestRun(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
-			RunTest(new CipherStreamTest());
-			RunTest(new DigestStreamTest());
-			RunTest(new MacStreamTest());
+			TestRun(new CipherStreamTest());
+			TestRun(new DigestStreamTest());
+			TestRun(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-			RunTest(new Blake2Test());
-			RunTest(new KeccakTest());
-			RunTest(new SHA2Test());
-			RunTest(new SkeinTest());
+			TestRun(new Blake2Test());
+			TestRun(new KeccakTest());
+			TestRun(new SHA2Test());
+			TestRun(new SkeinTest());
 			PrintHeader("TESTING MESSAGE AUTHENTICATION CODE GENERATORS");
-			RunTest(new CMACTest());
-			RunTest(new GMACTest());
-			RunTest(new HMACTest());
-			RunTest(new KMACTest());
-			RunTest(new Poly1305Test());
+			TestRun(new CMACTest());
+			TestRun(new GMACTest());
+			TestRun(new HMACTest());
+			TestRun(new KMACTest());
+			TestRun(new Poly1305Test());
 			PrintHeader("TESTING RANDOM ENTROPY PROVIDERS");
-			RunTest(new ACPTest());
-			RunTest(new CJPTest());
-			RunTest(new CSPTest());
-			RunTest(new ECPTest());
-			RunTest(new RDPTest());
+			TestRun(new ACPTest());
+			TestRun(new CJPTest());
+			TestRun(new CSPTest());
+			TestRun(new ECPTest());
+			TestRun(new RDPTest());
 			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
-			RunTest(new BCRTest());
-			RunTest(new CSRTest());
-			RunTest(new HCRTest());
+			TestRun(new BCRTest());
+			TestRun(new CSRTest());
+			TestRun(new HCRTest());
 			PrintHeader("TESTING KEY DERIVATION FUNCTIONS");
-			RunTest(new HKDFTest());
-			RunTest(new KDF2Test());
-			RunTest(new PBKDF2Test());
-			RunTest(new SCRYPTTest());
-			RunTest(new SHAKETest());
+			TestRun(new HKDFTest());
+			TestRun(new KDF2Test());
+			TestRun(new PBKDF2Test());
+			TestRun(new SCRYPTTest());
+			TestRun(new SHAKETest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
-			RunTest(new BCGTest());
-			RunTest(new CSGTest());
-			RunTest(new HCGTest());
+			TestRun(new BCGTest());
+			TestRun(new CSGTest());
+			TestRun(new HCGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
-			RunTest(new AsymmetricKeyTest());
-			RunTest(new SymmetricKeyGeneratorTest());
-			RunTest(new SecureStreamTest());
-			RunTest(new SymmetricKeyTest());
+			TestRun(new AsymmetricKeyTest());
+			TestRun(new SymmetricKeyGeneratorTest());
+			TestRun(new SecureStreamTest());
+			TestRun(new SymmetricKeyTest());
 			PrintHeader("TESTING VECTORIZED MEMORY FUNCTIONS");
-			RunTest(new MemUtilsTest());
-			RunTest(new SimdWrapperTest());
+			TestRun(new MemUtilsTest());
+			TestRun(new SimdWrapperTest());
 			PrintHeader("TESTING UTILITY CLASS FUNCTIONS");
-			RunTest(new UtilityTest());
+			TestRun(new UtilityTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
-			RunTest(new McElieceTest());
-			RunTest(new ModuleLWETest());
-			RunTest(new NTRUTest());
-			RunTest(new RingLWETest());
+			TestRun(new McElieceTest());
+			TestRun(new ModuleLWETest());
+			TestRun(new NTRUTest());
+			TestRun(new RingLWETest());
 			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
-			RunTest(new DilithiumTest());
-			RunTest(new SphincsTest());
+			TestRun(new DilithiumTest());
+			TestRun(new SphincsTest());
 		}
 		else
 		{
@@ -504,9 +497,9 @@ int main()
 		ConsoleUtils::WriteLine("");
 
 #if defined(__AVX__)
-		if (CanTest("Press 'Y' then Enter to run SIMD Memory operations Speed Tests, any other key to cancel: "))
+		if (TestConfirm("Press 'Y' then Enter to run SIMD Memory operations Speed Tests, any other key to cancel: "))
 		{
-			RunTest(new SimdSpeedTest());
+			TestRun(new SimdSpeedTest());
 		}
 		else
 		{
@@ -515,9 +508,9 @@ int main()
 		ConsoleUtils::WriteLine("");
 #endif
 
-		if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
+		if (TestConfirm("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
 		{
-			RunTest(new CipherSpeedTest());
+			TestRun(new CipherSpeedTest());
 		}
 		else
 		{
@@ -525,9 +518,9 @@ int main()
 		}
 		ConsoleUtils::WriteLine("");
 
-		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
+		if (TestConfirm("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
 		{
-			RunTest(new DigestSpeedTest());
+			TestRun(new DigestSpeedTest());
 		}
 		else
 		{
@@ -535,9 +528,9 @@ int main()
 		}
 		ConsoleUtils::WriteLine("");
 
-		if (CanTest("Press 'Y' then Enter to run Asymmetric Cipher Speed Tests, any other key to cancel: "))
+		if (TestConfirm("Press 'Y' then Enter to run Asymmetric Cipher Speed Tests, any other key to cancel: "))
 		{
-			RunTest(new AsymmetricSpeedTest());
+			TestRun(new AsymmetricSpeedTest());
 		}
 		else
 		{
@@ -546,14 +539,14 @@ int main()
 		ConsoleUtils::WriteLine("");
 
 		PrintHeader("Completed! Press any key to close..", "");
-		GetResponse();
+		TestUtils::WaitForInput();
 
 		return 0;
 	}
 	catch (std::exception&)
 	{
 		PrintHeader("An error has occurred! Press any key to close..", "");
-		GetResponse();
+		TestUtils::WaitForInput();
 
 		return 0;
 	}

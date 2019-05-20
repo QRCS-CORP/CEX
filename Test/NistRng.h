@@ -19,7 +19,7 @@ namespace Test
 	{
 	private:
 
-		static const std::string NistRng::CLASSNAME;
+		static std::string CLASSNAME;
 		static const size_t RNG_MAX_RESEED = 1000;
 		static const size_t RNG_SEED_SIZE = 48;
 		class NistRngState;

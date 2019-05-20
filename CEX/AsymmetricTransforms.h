@@ -27,17 +27,17 @@ enum class AsymmetricTransforms : byte
 	/// </summary>
 	DLMS3N256Q8380417 = 3,
 	/// <summary>
-	/// The S2 parameters; (Medium Security) A modulus of 7681 with 256 coefficients and K of 2
+	/// The S1 parameters; (Medium Security) A modulus of 7681 with 256 coefficients and K of 2
 	/// </summary>
-	MLWES2Q7681N256 = 4,
+	MLWES1Q3329N256 = 4,
 	/// <summary>
-	/// The S3 parameters; (High Security) A modulus of 7681 with 256 coefficients and K of 3
+	/// The S2 parameters; (High Security) A modulus of 7681 with 256 coefficients and K of 3
 	/// </summary>
-	MLWES3Q7681N256 = 5,
+	MLWES2Q3329N256 = 5,
 	/// <summary>
-	/// The S4 parameters; (Highest Security) A modulus of 7681 with 256 coefficients and K of 4
+	/// The S3 parameters; (Highest Security) A modulus of 7681 with 256 coefficients and K of 4
 	/// </summary>
-	MLWES4Q7681N256 = 6,
+	MLWES3Q3329N256 = 6,
 	/// <summary>
 	/// The S1 parameters (Medium Security) A finite field of 12 and an error correction capability of 62
 	/// </summary>

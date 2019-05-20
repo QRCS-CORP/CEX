@@ -79,14 +79,14 @@ namespace Test
 			MpkcDecryptLoop(MPKCParameters::MPKCS1N4096T62, DEF_TEST_ITER, rngType);
 
 			// ModuleLWE
-			OnProgress(std::string("***Generating " + ctr + " Keypairs using ModuleLWE MLWES3Q7681N256***"));
-			MlweGenerateLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using ModuleLWE MLWES2Q3329N256***"));
+			MlweGenerateLoop(MLWEParameters::MLWES2Q3329N256, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Encrypting " + ctr + " messages using ModuleLWE MLWES3Q7681N256***"));
-			MlweEncryptLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Encrypting " + ctr + " messages using ModuleLWE MLWES2Q3329N256***"));
+			MlweEncryptLoop(MLWEParameters::MLWES2Q3329N256, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Decrypting " + ctr + " messages using ModuleLWE MLWES3Q7681N256***"));
-			MlweDecryptLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Decrypting " + ctr + " messages using ModuleLWE MLWES2Q3329N256***"));
+			MlweDecryptLoop(MLWEParameters::MLWES2Q3329N256, DEF_TEST_ITER, rngType);
 
 			// NTRU
 			OnProgress(std::string("***Generating " + ctr + " Keypairs using NTRU NTRUS1LQ4591N761***"));

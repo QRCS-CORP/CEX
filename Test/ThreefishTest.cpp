@@ -359,7 +359,7 @@ namespace Test
 
 		MemoryTools::Clear(state4, 0, 32 * sizeof(ulong));
 
-		Threefish::PemuteP4x512H(key, counter16, tweak, state4, 72);
+		Threefish::PemuteP8x256H(key, counter16, tweak, state4, 72);
 
 		for (size_t i = 0; i < 32; i += 8)
 		{
@@ -367,7 +367,7 @@ namespace Test
 			{
 				if (state3[i + j] != state1[j])
 				{
-					throw TestException(std::string("CompareP256"), std::string("PemuteP4x512H"), std::string("Permutation output is not equal! -TP3"));
+					throw TestException(std::string("CompareP256"), std::string("PemuteP8x256H"), std::string("Permutation output is not equal! -TP3"));
 				}
 			}
 		}

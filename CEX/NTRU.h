@@ -29,7 +29,7 @@ using Enumeration::NTRUParameters;
 
 
 /// <summary>
-/// An implementation of the NTRU Prime asymmetric cipher (NTRU)
+/// An implementation of the NTRU Prime asymmetric cipher (NTRU-PRIME)
 /// </summary> 
 /// 
 /// <example>

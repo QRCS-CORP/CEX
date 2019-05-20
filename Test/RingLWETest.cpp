@@ -28,6 +28,11 @@ namespace Test
 
 	RingLWETest::RingLWETest()
 		:
+		m_cptexp(0),
+		m_priexp(0),
+		m_pubexp(0),
+		m_rngseed(0),
+		m_sskexp(0),
 		m_progressEvent()
 	{
 	}
@@ -52,8 +57,10 @@ namespace Test
 		{
 			Initialize();
 
+			Integrity();
+			OnProgress(std::string("RingLWETest: Passed NIST PQ Round 2 ciphertext, shared-secret, public and private key known answer tests.."));
 			Kat();
-			OnProgress(std::string("RingLWETest: Passed public and private key, cipher-text and shared-secret known answer tests.."));
+			OnProgress(std::string("RingLWETest: Passed NIST PQ Round 2 shared-secret known answer tests.."));
 			Authentication();
 			OnProgress(std::string("RingLWETest: Passed message authentication test.."));
 			CipherText();
@@ -178,7 +185,7 @@ namespace Test
 		delete kp2;
 	}
 
-	void RingLWETest::Kat()
+	void RingLWETest::Integrity()
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> ssk1(32);
@@ -187,7 +194,7 @@ namespace Test
 
 		// RLWES1Q12289N1024
 
-		gen.Initialize(m_cprseed);
+		gen.Initialize(m_rngseed[0]);
 
 		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024, &gen);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
@@ -234,7 +241,7 @@ namespace Test
 		ssk1.resize(32);
 		ssk2.clear();
 		ssk2.resize(32);
-		gen.Initialize(m_cprseed);
+		gen.Initialize(m_rngseed[0]);
 
 		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048, &gen);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
@@ -252,7 +259,7 @@ namespace Test
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
 
-		if (ssk1 != m_sskexp[1])
+		if (ssk1 != m_sskexp[10])
 		{
 			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Shared secret does not match expected! -RK9"));
 		}
@@ -269,9 +276,83 @@ namespace Test
 			throw TestException(std::string("Kat"), cpr2.Name(), std::string("Failed authentication test! -RK11"));
 		}
 
-		if (ssk2 != m_sskexp[1])
+		if (ssk2 != m_sskexp[10])
 		{
 			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Shared secret does not match expected! -RK12"));
+		}
+	}
+
+	void RingLWETest::Kat()
+	{
+		const size_t TSTCNT = m_rngseed.size();
+		std::vector<byte> cpt(0);
+		std::vector<byte> ssk1(32);
+		std::vector<byte> ssk2(32);
+		NistRng gen;
+		size_t i;
+
+		// RLWES1Q12289N1024
+
+		for (i = 0; i < TSTCNT; ++i)
+		{
+			gen.Initialize(m_rngseed[i]);
+
+			RingLWE cpr(RLWEParameters::RLWES1Q12289N1024, &gen);
+			AsymmetricKeyPair* kp = cpr.Generate();
+
+			cpr.Initialize(kp->PublicKey());
+			cpr.Encapsulate(cpt, ssk1);
+			cpr.Initialize(kp->PrivateKey());
+
+			if (!cpr.Decapsulate(cpt, ssk2))
+			{
+				throw TestException(std::string("Kat"), cpr.Name(), std::string("Failed authentication test! -RK1"));
+			}
+
+			if (ssk1 != ssk2)
+			{
+				throw TestException(std::string("Kat"), cpr.Name(), std::string("Shared secrets do not match! -RK2"));
+			}
+
+			if (ssk1 != m_sskexp[i])
+			{
+				throw TestException(std::string("Kat"), cpr.Name(), std::string("Shared secret does not match expected! -RK3"));
+			}
+		}
+
+		cpt.clear();
+		ssk1.clear();
+		ssk1.resize(32);
+		ssk2.clear();
+		ssk2.resize(32);
+
+		// RLWES1Q12289N2048
+
+		for (i = 0; i < TSTCNT; ++i)
+		{
+			gen.Initialize(m_rngseed[i]);
+
+			RingLWE cpr(RLWEParameters::RLWES2Q12289N2048, &gen);
+			AsymmetricKeyPair* kp = cpr.Generate();
+
+			cpr.Initialize(kp->PublicKey());
+			cpr.Encapsulate(cpt, ssk1);
+			cpr.Initialize(kp->PrivateKey());
+
+			if (!cpr.Decapsulate(cpt, ssk2))
+			{
+				throw TestException(std::string("Kat"), cpr.Name(), std::string("Failed authentication test! -RK1"));
+			}
+
+			if (ssk1 != ssk2)
+			{
+				throw TestException(std::string("Kat"), cpr.Name(), std::string("Shared secrets do not match! -RK2"));
+			}
+
+			if (ssk1 != m_sskexp[TSTCNT + i])
+			{
+				throw TestException(std::string("Kat"), cpr.Name(), std::string("Shared secret does not match expected! -RK3"));
+			}
 		}
 	}
 
@@ -440,16 +521,18 @@ namespace Test
 
 	void RingLWETest::Stress()
 	{
+		const size_t KEYLEN = 80;
 		std::vector<byte> msg(128);
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(64);
-		std::vector<byte> sec2(64);
+		std::vector<byte> sec1(KEYLEN);
+		std::vector<byte> sec2(KEYLEN);
 		SecureRandom gen;
+		size_t i;
 
 		// test param 1: RLWES1Q12289N1024
 		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
 
-		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
+		for (i = 0; i < TEST_CYCLES; ++i)
 		{
 			gen.Generate(msg);
 			AsymmetricKeyPair* kp = cpr1.Generate();
@@ -475,13 +558,13 @@ namespace Test
 		sec1.clear();
 		sec2.clear();
 		cpt.resize(0);
-		sec1.resize(64);
-		sec2.resize(64);
+		sec1.resize(KEYLEN);
+		sec2.resize(KEYLEN);
 
 		// test param 2: RLWES2Q12289N2048
 		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
 
-		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
+		for (i = 0; i < TEST_CYCLES; ++i)
 		{
 			gen.Generate(msg);
 			AsymmetricKeyPair* kp = cpr2.Generate();
@@ -509,11 +592,20 @@ namespace Test
 	{
 		/*lint -save -e417 */
 
-		const std::string cprseed =
+		const std::vector<std::string> rngseed =
 		{
 			std::string("061550234D158C5EC95595FE04EF7A25767F2E24CC2BC479D09D86DC9ABCFDE7056A8C266F9EF97ED08541DBD2E1FFA1"),
+			std::string("D81C4D8D734FCBFBEADE3D3F8A039FAA2A2C9957E835AD55B22E75BF57BB556AC81ADDE6AEEB4A5A875C3BFCADFA958F"),
+			std::string("64335BF29E5DE62842C941766BA129B0643B5E7121CA26CFC190EC7DC3543830557FDD5C03CF123A456D48EFEA43C868"),
+			std::string("225D5CE2CEAC61930A07503FB59F7C2F936A3E075481DA3CA299A80F8C5DF9223A073E7B90E02EBF98CA2227EBA38C1A"),
+			std::string("EDC76E7C1523E3862552133FEA4D2AB05C69FB54A9354F0846456A2A407E071DF4650EC0E0A5666A52CD09462DBC51F9"),
+			std::string("AA93649193C2C5985ACF8F9E6AC50C36AE16A2526D7C684F7A3BB4ABCD7B6FF790E82BADCE89BC7380D66251F97AAAAA"),
+			std::string("2E014DC7C2696B9F6D4AF555CBA4B931B34863FF60E2341D4FDFE472FEF2FE2C33E0813FC5CAFDE4E30277FE522A9049"),
+			std::string("AEFB28FDD34E0AB403A703B535296E3A545CA479C1D8148E2D501B3C8DD8B1034BD986F13F1A7B4671BE769359FD2AAB"),
+			std::string("CBE5161E8DE02DDA7DE204AEB0FBB4CA81344BA8C30FE357A4664E5D2988A03B64184D7DC69F8D367550E5FEA0876D41"),
+			std::string("B4663A7A9883386A2AE4CBD93787E247BF26087E3826D1B8DBEB679E49C0BB286E114F0E9F42F61F63DEC42B4F974846")
 		};
-		HexConverter::Decode(cprseed, m_cprseed);
+		HexConverter::Decode(rngseed, 10, m_rngseed);
 
 		const std::vector<std::string> cptexp =
 		{
@@ -894,10 +986,30 @@ namespace Test
 
 		const std::vector<std::string> sskexp =
 		{
+			// k2
 			std::string("B6327BC9F7C2556E6F06061F4A9C2CD2F7AE89EBE73C00D1CE8CB3F1D0128DCE"),
-			std::string("5F3BEDB6460749B46B03AAE8414A599120ECF4A3DE81E709128372E7F7CB4BE2")
+			std::string("5EF055E719AFB1177D9B1C930133EE39C5BC030A294B3742245DEFAE25350CD3"),
+			std::string("01E5FB1CF31284794949766443AD0568FF75A21518694A778B04095A78351674"),
+			std::string("63FDC0DB475CA95ADD057881AFA4645A1C3D7F9AEAA491250A73CA4BD1BC6F3C"),
+			std::string("564DD71B86110020B84B3EC54B3176DC0BFE809DC8A67A5108D6CB73DB479088"),
+			std::string("6A2248895B536C4D0F51D1EE030E741DFE21EABCAC01CEBFBEAE3E1A0221E433"),
+			std::string("FE957D8E1D32879A2AEA32EDDB4A4691B2DDE69519C5731D6B84E812C725BA66"),
+			std::string("00DE2879BF3F3974A2E3A20B8BD89546DD6971A8CE77A83C481849C9034D404A"),
+			std::string("189B3564B89B4296B8E209395323C1DEC4BCD33B8906BC237374F8F29DA5588C"),
+			std::string("9B4B34485EFB9A392FEB2620EA12475C6C548C0C9FCF0F58703E7757855EC813"),
+			// k3
+			std::string("5F3BEDB6460749B46B03AAE8414A599120ECF4A3DE81E709128372E7F7CB4BE2"),
+			std::string("682CBA0400D1FB01A8A00B15D1F1DB14D91C2BFEF388A7D5C7820492DCFD9862"),
+			std::string("0FA098FF1FE2C2B8A854E6D734CA1DE181635807904971306A4DE6FFCA0D21C9"),
+			std::string("23C9CD863B523D20882F7C38C512E783069C5984045177B7F1A9C8EDB2A110DE"),
+			std::string("719860F8B533806308D6D8E598368044831A4BF4E3832B799477D82AD88D13D1"),
+			std::string("FB5DF3E00DE9CF2C177C1ACED6FAFF1E540B42F5FAA19A2212528A6CADA39FD8"),
+			std::string("D6B57F5BB396DD4E02D9F897BF621EEBE1319C4EEEBAB0F58C645EA78D9D423B"),
+			std::string("39DEB21063B798854BA3A46F3F0E7D3EF3ED68FD09B8F428AFD0937904174C34"),
+			std::string("E95DBECEB7E25F8F401AAF99DA4F9810A5CBCA567A52E87A7DFA4F353348AD2E"),
+			std::string("E59D7B0427399558AF4F45D140D2BBCCDE41908313C448C334DF882ECC55DB70")
 		};
-		HexConverter::Decode(sskexp, 2, m_sskexp);
+		HexConverter::Decode(sskexp, 20, m_sskexp);
 
 		/*lint -restore */
 	}

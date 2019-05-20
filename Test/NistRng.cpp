@@ -9,7 +9,7 @@ namespace Test
 	using Utility::MemoryTools;
 	using Cipher::SymmetricKey;
 
-	const std::string NistRng::CLASSNAME = "NistRng";
+	std::string NistRng::CLASSNAME = "NistRng";
 
 	class NistRng::NistRngState
 	{
@@ -42,7 +42,7 @@ namespace Test
 
 	NistRng::NistRng()
 		:
-		PrngBase(Prngs::None, std::string("NistRng")),
+		PrngBase(Prngs::None, CLASSNAME),
 		m_nistRngState(new NistRngState()),
 		m_rngGenerator(new ECB(Enumeration::BlockCiphers::AES))
 	{
@@ -50,8 +50,15 @@ namespace Test
 
 	NistRng::~NistRng()
 	{
-		m_rngGenerator.reset(nullptr);
-		m_nistRngState.reset(nullptr);
+		if (m_rngGenerator != nullptr)
+		{
+			m_rngGenerator.reset(nullptr);
+		}
+
+		if (m_nistRngState != nullptr)
+		{
+			m_nistRngState.reset(nullptr);
+		}
 	}
 
 	const Prngs NistRng::Enumeral()
@@ -62,30 +69,6 @@ namespace Test
 	const std::string NistRng::Name()
 	{
 		return CLASSNAME;
-	}
-
-	void NistRng::Initialize(const std::vector<byte> &Seed)
-	{
-		m_nistRngState->Reset();
-		Update(Seed, m_nistRngState->Key, m_nistRngState->Nonce);
-		m_nistRngState->ReseedCounter = 1;
-	}
-
-	void NistRng::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Info)
-	{
-		std::vector<byte> tmps(Seed.size());
-
-		MemoryTools::Copy(Seed, 0, tmps, 0, Seed.size());
-
-		if (Info.size() != 0)
-		{
-			const size_t MIXLEN = IntegerTools::Min(Info.size(), Seed.size());
-			MemoryTools::XOR(Info, 0, tmps, 0, MIXLEN);
-		}
-
-		m_nistRngState->Reset();
-		Update(Seed, m_nistRngState->Key, m_nistRngState->Nonce);
-		m_nistRngState->ReseedCounter = 1;
 	}
 
 	void NistRng::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -142,6 +125,30 @@ namespace Test
 		std::vector<byte> tmpo(Output.size());
 		Generate(tmpo, 0, tmpo.size());
 		Move(tmpo, Output, 0);
+	}
+
+	void NistRng::Initialize(const std::vector<byte> &Seed)
+	{
+		m_nistRngState->Reset();
+		Update(Seed, m_nistRngState->Key, m_nistRngState->Nonce);
+		m_nistRngState->ReseedCounter = 1;
+	}
+
+	void NistRng::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Info)
+	{
+		std::vector<byte> tmps(Seed.size());
+
+		MemoryTools::Copy(Seed, 0, tmps, 0, Seed.size());
+
+		if (Info.size() != 0)
+		{
+			const size_t MIXLEN = IntegerTools::Min(Info.size(), Seed.size());
+			MemoryTools::XOR(Info, 0, tmps, 0, MIXLEN);
+		}
+
+		m_nistRngState->Reset();
+		Update(Seed, m_nistRngState->Key, m_nistRngState->Nonce);
+		m_nistRngState->ReseedCounter = 1;
 	}
 
 	ushort NistRng::NextUInt16()
@@ -217,6 +224,6 @@ namespace Test
 
 		// copy the new key and nonce to state
 		MemoryTools::Copy(tmps, 0, Key, 0, Key.size());
-		MemoryTools::Copy(tmps, 32, Nonce, 0, Nonce.size());
+		MemoryTools::Copy(tmps, Key.size(), Nonce, 0, Nonce.size());
 	}
 }

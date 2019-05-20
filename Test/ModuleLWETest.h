@@ -22,8 +22,10 @@ namespace Test
 		static const size_t TEST_CYCLES = 100;
 #endif
 
-		std::vector<byte> m_cprseed;
 		std::vector<std::vector<byte>> m_cptexp;
+		std::vector<std::vector<byte>> m_pubexp;
+		std::vector<std::vector<byte>> m_priexp;
+		std::vector<std::vector<byte>> m_rngseed;
 		std::vector<std::vector<byte>> m_sskexp;
 		TestEventHandler m_progressEvent;
 
@@ -70,7 +72,12 @@ namespace Test
 		void Exception();
 
 		/// <summary>
-		/// Compare known answer shared-secret and cipher-text vectors to cipher output
+		/// Compare the shared-secret, cipher-text, public and private key vectors to known answer outputs
+		/// </summary>
+		void Integrity();
+
+		/// <summary>
+		/// Compare the NIST PQ Round 2 known answers to the shared-secret output vectors
 		/// </summary>
 		void Kat();
 

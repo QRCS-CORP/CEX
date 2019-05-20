@@ -16,17 +16,17 @@ enum class MLWEParameters : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S2 parameters; (Medium Security) A modulus of 7681 with 256 coefficients and K of 2
+	/// The S1 parameters; (Medium Security) A modulus of 3329 with 256 coefficients and K of 2
 	/// </summary>
-	MLWES2Q7681N256 = static_cast<byte>(AsymmetricTransforms::MLWES2Q7681N256),
+	MLWES1Q3329N256 = static_cast<byte>(AsymmetricTransforms::MLWES1Q3329N256),
 	/// <summary>
-	/// The S3 parameters; (High Security) A modulus of 7681 with 256 coefficients and K of 3
+	/// The S2 parameters; (High Security) A modulus of 3329 with 256 coefficients and K of 3
 	/// </summary>
-	MLWES3Q7681N256 = static_cast<byte>(AsymmetricTransforms::MLWES3Q7681N256),
+	MLWES2Q3329N256 = static_cast<byte>(AsymmetricTransforms::MLWES2Q3329N256),
 	/// <summary>
-	/// The S4 parameters; (Highest Security) A modulus of 7681 with 256 coefficients and K of 4
+	/// The S3 parameters; (Highest Security) A modulus of 3329 with 256 coefficients and K of 4
 	/// </summary>
-	MLWES4Q7681N256 = static_cast<byte>(AsymmetricTransforms::MLWES4Q7681N256)
+	MLWES3Q3329N256 = static_cast<byte>(AsymmetricTransforms::MLWES3Q3329N256)
 };
 
 class MLWEParameterConvert

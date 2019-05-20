@@ -39,7 +39,7 @@ void Threefish::PemuteP256C(const std::array<ulong, 4> &Key, const std::array<ul
 		C[1] = IntegerTools::RotL64(C[1], 14) ^ C[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
-		C[3] += K[x] + (i * 2);
+		C[3] += K[x] + (static_cast<ulong>(i) * 2);
 		x > 0 ? x -= 1 : x += 4;
 		y != 2 ? y += 1 : y -= 2;
 		C[2] += C[3] + K[x] + T[y];
@@ -63,7 +63,7 @@ void Threefish::PemuteP256C(const std::array<ulong, 4> &Key, const std::array<ul
 		C[1] = IntegerTools::RotL64(C[1], 25) ^ C[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
-		C[3] += K[x] + (i * 2) + 1;
+		C[3] += K[x] + (static_cast<ulong>(i) * 2) + 1;
 		x != 0 ? x -= 1 : x += 4;
 		y != 2 ? y += 1 : y -= 2;
 		C[2] += C[3] + K[x] + T[y];
@@ -497,7 +497,7 @@ void Threefish::PemuteP4x256H(const std::array<ulong, 4> &Key, const std::array<
 		C[1] = ULong256::RotL64(C[1], 14) ^ C[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
-		C[3] += K[x] + ULong256(i * 2);
+		C[3] += K[x] + ULong256(static_cast<ulong>(i) * 2);
 		x > 0 ? x -= 1 : x += 4;
 		y != 2 ? y += 1 : y -= 2;
 		C[2] += C[3] + K[x] + T[y];
@@ -521,7 +521,7 @@ void Threefish::PemuteP4x256H(const std::array<ulong, 4> &Key, const std::array<
 		C[1] = ULong256::RotL64(C[1], 25) ^ C[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
-		C[3] += K[x] + ULong256((i * 2) + 1);
+		C[3] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
 		x != 0 ? x -= 1 : x += 4;
 		y != 2 ? y += 1 : y -= 2;
 		C[2] += C[3] + K[x] + T[y];
@@ -552,7 +552,7 @@ void Threefish::PemuteP4x256H(const std::array<ulong, 4> &Key, const std::array<
 
 #if defined(__AVX512__)
 
-void Threefish::PemuteP4x512H(const std::array<ulong, 4> &Key, const std::array<ulong, 16> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 32> &State, size_t Rounds)
+void Threefish::PemuteP8x256H(const std::array<ulong, 4> &Key, const std::array<ulong, 16> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 32> &State, size_t Rounds)
 {
 	std::array<ULong512, 4> C;
 	std::array<ULong512, 5> K;
@@ -683,7 +683,7 @@ void Threefish::PemuteP512C(const std::array<ulong, 8> &Key, const std::array<ul
 		C[5] = IntegerTools::RotL64(C[5], 19) ^ C[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
-		C[7] += K[x] + (i * 2);
+		C[7] += K[x] + (static_cast<ulong>(i) * 2);
 		x != 0 ? x -= 1 : x += 8;
 		y != 2 ? y += 1 : y -= 2;
 		C[6] += C[7] + K[x] + T[y];
@@ -730,7 +730,7 @@ void Threefish::PemuteP512C(const std::array<ulong, 8> &Key, const std::array<ul
 		C[5] = IntegerTools::RotL64(C[5], 34) ^ C[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
-		C[7] += K[x] + (i * 2) + 1;
+		C[7] += K[x] + (static_cast<ulong>(i) * 2) + 1;
 		x != 0 ? x -= 1 : x += 8;
 		y != 2 ? y += 1 : y -= 2;
 		C[6] += C[7] + K[x] + T[y];
@@ -1762,7 +1762,7 @@ void Threefish::PemuteP4x512H(const std::array<ulong, 8> &Key, const std::array<
 		C[5] = ULong256::RotL64(C[5], 19) ^ C[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
-		C[7] += K[x] + ULong256(i * 2);
+		C[7] += K[x] + ULong256(static_cast<ulong>(i) * 2);
 		x != 0 ? x -= 1 : x += 8;
 		y != 2 ? y += 1 : y -= 2;
 		C[6] += C[7] + K[x] + T[y];
@@ -1809,7 +1809,7 @@ void Threefish::PemuteP4x512H(const std::array<ulong, 8> &Key, const std::array<
 		C[5] = ULong256::RotL64(C[5], 34) ^ C[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
-		C[7] += K[x] + ULong256((i * 2) + 1);
+		C[7] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
 		x != 0 ? x -= 1 : x += 8;
 		y != 2 ? y += 1 : y -= 2;
 		C[6] += C[7] + K[x] + T[y];
@@ -2066,7 +2066,7 @@ void Threefish::PemuteP1024C(const std::array<ulong, 16> &Key, const std::array<
 		C[13] = IntegerTools::RotL64(C[13], 22) ^ C[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
-		C[15] += K[x] + (i * 2);
+		C[15] += K[x] + (static_cast<ulong>(i) * 2);
 		x != 0 ? x -= 1 : x += 16;
 		y != 2 ? y += 1 : y -= 2;
 		C[14] += C[15] + K[x] + T[y];
@@ -2157,7 +2157,7 @@ void Threefish::PemuteP1024C(const std::array<ulong, 16> &Key, const std::array<
 		C[13] = IntegerTools::RotL64(C[13], 44) ^ C[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
-		C[15] += K[x] + (i * 2) + 1;
+		C[15] += K[x] + (static_cast<ulong>(i) * 2) + 1;
 		x != 0 ? x -= 1 : x += 16;
 		y != 2 ? y += 1 : y -= 2;
 		C[14] += C[15] + K[x] + T[y];
@@ -4596,7 +4596,7 @@ void Threefish::PemuteP4x1024H(const std::array<ulong, 16> &Key, const std::arra
 		C[13] = ULong256::RotL64(C[13], 22) ^ C[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
-		C[15] += K[x] + ULong256(i * 2);
+		C[15] += K[x] + ULong256(static_cast<ulong>(i) * 2);
 		x != 0 ? x -= 1 : x += 16;
 		y != 2 ? y += 1 : y -= 2;
 		C[14] += C[15] + K[x] + T[y];
@@ -4687,7 +4687,7 @@ void Threefish::PemuteP4x1024H(const std::array<ulong, 16> &Key, const std::arra
 		C[13] = ULong256::RotL64(C[13], 44) ^ C[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
-		C[15] += K[x] + ULong256((i * 2) + 1);
+		C[15] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
 		x != 0 ? x -= 1 : x += 16;
 		y != 2 ? y += 1 : y -= 2;
 		C[14] += C[15] + K[x] + T[y];

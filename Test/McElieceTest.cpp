@@ -27,15 +27,15 @@ namespace Test
 
 	McElieceTest::McElieceTest()
 		:
-		m_progressEvent(),
 		m_cptexp(0),
 		m_sskexp(0),
 		m_cprseed(0),
 		m_rngexp(0),
-		m_rngkey(0)
+		m_rngkey(0),
+		m_progressEvent()
 	{
 	}
-
+	
 	McElieceTest::~McElieceTest()
 	{
 	}

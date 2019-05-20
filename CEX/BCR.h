@@ -72,7 +72,6 @@ private:
 	static const size_t BUFFER_DEF = 4096;
 	static const size_t BUFFER_MIN = 64;
 
-	bool m_isDestroyed;
 	bool m_isParallel;
 	Providers m_pvdType;
 	std::unique_ptr<IDrbg> m_rngGenerator;

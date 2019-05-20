@@ -29,7 +29,7 @@ NAMESPACE_SPHINCS
 using Enumeration::SphincsParameters;
 
 /// <summary>
-/// An implementation of the SPHINCS+ asymmetric signature scheme
+/// An implementation of the Sphincs-plus asymmetric signature scheme (SPHINCS+)
 /// </summary> 
 /// 
 /// <example>
