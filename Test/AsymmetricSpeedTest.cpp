@@ -6,7 +6,7 @@
 #include "../CEX/Dilithium.h"
 #include "../CEX/McEliece.h"
 #include "../CEX/ModuleLWE.h"
-#include "../CEX/NTRU.h"
+#include "../CEX/NTRUPrime.h"
 #include "../CEX/PrngFromName.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/SecureRandom.h"
@@ -20,7 +20,7 @@ namespace Test
 	using Asymmetric::Sign::DLM::Dilithium;
 	using Asymmetric::Encrypt::MPKC::McEliece;
 	using Asymmetric::Encrypt::MLWE::ModuleLWE;
-	using Asymmetric::Encrypt::NTRU::NTRU;
+	using Asymmetric::Encrypt::NTRUP::NTRUPrime;
 	using Enumeration::Prngs;
 	using Enumeration::Providers;
 	using Asymmetric::Encrypt::RLWE::RingLWE;
@@ -88,23 +88,23 @@ namespace Test
 			OnProgress(std::string("***Decrypting " + ctr + " messages using ModuleLWE MLWES2Q3329N256***"));
 			MlweDecryptLoop(MLWEParameters::MLWES2Q3329N256, DEF_TEST_ITER, rngType);
 
-			// NTRU
-			OnProgress(std::string("***Generating " + ctr + " Keypairs using NTRU NTRUS1LQ4591N761***"));
-			NtruGenerateLoop(NTRUParameters::NTRUS1LQ4591N761, DEF_TEST_ITER, rngType);
-
-			OnProgress(std::string("***Encrypting " + ctr + " messages using NTRU NTRUS1LQ4591N761***"));
-			NtruEncryptLoop(NTRUParameters::NTRUS1LQ4591N761, DEF_TEST_ITER, rngType);
-
-			OnProgress(std::string("***Decrypting " + ctr + " messages using NTRU NTRUS1LQ4591N761***"));
-			NtruDecryptLoop(NTRUParameters::NTRUS1LQ4591N761, DEF_TEST_ITER, rngType);
-
-			OnProgress(std::string("***Generating " + ctr + " Keypairs using NTRU NTRUS2SQ4591N761***"));
+			// NTRUPrime
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using NTRUPrime NTRUS1LQ4591N761***"));
 			NtruGenerateLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Encrypting " + ctr + " messages using NTRU NTRUS2SQ4591N761***"));
+			OnProgress(std::string("***Encrypting " + ctr + " messages using NTRUPrime NTRUS1LQ4591N761***"));
 			NtruEncryptLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Decrypting " + ctr + " messages using NTRU NTRUS2SQ4591N761***"));
+			OnProgress(std::string("***Decrypting " + ctr + " messages using NTRUPrime NTRUS1LQ4591N761***"));
+			NtruDecryptLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
+
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using NTRUPrime NTRUS2SQ4591N761***"));
+			NtruGenerateLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
+
+			OnProgress(std::string("***Encrypting " + ctr + " messages using NTRUPrime NTRUS2SQ4591N761***"));
+			NtruEncryptLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
+
+			OnProgress(std::string("***Decrypting " + ctr + " messages using NTRUPrime NTRUS2SQ4591N761***"));
 			NtruDecryptLoop(NTRUParameters::NTRUS2SQ4591N761, DEF_TEST_ITER, rngType);
 
 			OnProgress(std::string("### Asymmetric Signature Scheme Speed Tests:"));
@@ -397,7 +397,7 @@ namespace Test
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
-		NTRU asyCpr(Params, PrngType);
+		NTRUPrime asyCpr(Params, PrngType);
 		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
@@ -429,7 +429,7 @@ namespace Test
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
-		NTRU asyCpr(Params, PrngType);
+		NTRUPrime asyCpr(Params, PrngType);
 		AsymmetricKeyPair* kp;
 
 		kp = asyCpr.Generate();
@@ -457,7 +457,7 @@ namespace Test
 
 	void AsymmetricSpeedTest::NtruGenerateLoop(NTRUParameters Params, size_t Loops, Prngs PrngType)
 	{
-		NTRU asyCpr(Params, PrngType);
+		NTRUPrime asyCpr(Params, PrngType);
 		uint64_t start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)

@@ -7,7 +7,7 @@ using Utility::MemoryTools;
 
 //~~~Round Constants~~~//
 
-const std::array<ulong, 24> Keccak::RC24 =
+const std::array<ulong, 24> Keccak::KECCAK_RC24 =
 {
 	0x0000000000000001ULL, 0x0000000000008082ULL, 0x800000000000808AULL, 0x8000000080008000ULL,
 	0x000000000000808BULL, 0x0000000080000001ULL, 0x8000000080008081ULL, 0x8000000000008009ULL,
@@ -17,7 +17,7 @@ const std::array<ulong, 24> Keccak::RC24 =
 	0x8000000080008081ULL, 0x8000000000008080ULL, 0x0000000080000001ULL, 0x8000000080008008ULL
 };
 
-const std::array<ulong, 48> Keccak::RC48 =
+const std::array<ulong, 48> Keccak::KECCAK_RC48 =
 {
 	0x0000000000000001ULL, 0x0000000000008082ULL, 0x800000000000808AULL, 0x8000000080008000ULL,
 	0x000000000000808BULL, 0x0000000080000001ULL, 0x8000000080008081ULL, 0x8000000000008009ULL,
@@ -34,6 +34,32 @@ const std::array<ulong, 48> Keccak::RC48 =
 };
 
 //~~~Public Functions~~~//
+
+void Keccak::Permute(std::array<ulong, KECCAK_STATE_SIZE> &State)
+{
+#if defined(CEX_SHAKE_STRONG)
+#	if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600C(State);
+#	else
+		Keccak::PermuteR48P1600U(State);
+#	endif
+#else
+#	if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR24P1600C(State);
+#	else
+		Keccak::PermuteR24P1600U(State);
+#	endif
+#endif
+}
+
+void Keccak::PermuteR48(std::array<ulong, KECCAK_STATE_SIZE> &State)
+{
+#if defined(CEX_DIGEST_COMPACT)
+	Keccak::PermuteR48P1600C(State);
+#else
+	Keccak::PermuteR48P1600U(State);
+#endif
+}
 
 void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
 {
@@ -69,7 +95,7 @@ void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
 		A[24] ^= D[4];
 		C[4] = IntegerTools::RotFL64(A[24], 14);
 		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= RC24[i];
+		E[0] ^= KECCAK_RC24[i];
 		E[1] = C[1] ^ ((~C[2]) & C[3]);
 		E[2] = C[2] ^ ((~C[3]) & C[4]);
 		E[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -156,7 +182,7 @@ void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
 		E[24] ^= D[4];
 		C[4] = IntegerTools::RotFL64(E[24], 14);
 		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= RC24[i + 1];
+		A[0] ^= KECCAK_RC24[i + 1];
 		A[1] = C[1] ^ ((~C[2]) & C[3]);
 		A[2] = C[2] ^ ((~C[3]) & C[4]);
 		A[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -2467,7 +2493,7 @@ void Keccak::PermuteR24P4x1600H(std::vector<ULong256> &State)
 		A[24] ^= D[4];
 		C[4] = ULong256::RotL64(A[24], 14);
 		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= ULong256(RC24[i]);
+		E[0] ^= ULong256(KECCAK_RC24[i]);
 		E[1] = C[1] ^ ((~C[2]) & C[3]);
 		E[2] = C[2] ^ ((~C[3]) & C[4]);
 		E[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -2554,7 +2580,7 @@ void Keccak::PermuteR24P4x1600H(std::vector<ULong256> &State)
 		E[24] ^= D[4];
 		C[4] = ULong256::RotL64(E[24], 14);
 		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= ULong256(RC24[i + 1]);
+		A[0] ^= ULong256(KECCAK_RC24[i + 1]);
 		A[1] = C[1] ^ ((~C[2]) & C[3]);
 		A[2] = C[2] ^ ((~C[3]) & C[4]);
 		A[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -2662,7 +2688,7 @@ void Keccak::PermuteR24P8x1600H(std::vector<ULong512> &State)
 		A[24] ^= D[4];
 		C[4] = ULong512::RotL64(A[24], 14);
 		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= ULong512(RC24[i]);
+		E[0] ^= ULong512(KECCAK_RC24[i]);
 		E[1] = C[1] ^ ((~C[2]) & C[3]);
 		E[2] = C[2] ^ ((~C[3]) & C[4]);
 		E[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -2749,7 +2775,7 @@ void Keccak::PermuteR24P8x1600H(std::vector<ULong512> &State)
 		E[24] ^= D[4];
 		C[4] = ULong512::RotL64(E[24], 14);
 		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= ULong512(RC24[i + 1]);
+		A[0] ^= ULong512(KECCAK_RC24[i + 1]);
 		A[1] = C[1] ^ ((~C[2]) & C[3]);
 		A[2] = C[2] ^ ((~C[3]) & C[4]);
 		A[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -7148,7 +7174,7 @@ void Keccak::PermuteR48P1600C(std::array<ulong, 25> &State)
 		A[24] ^= D[4];
 		C[4] = IntegerTools::RotFL64(A[24], 14);
 		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= RC48[i];
+		E[0] ^= KECCAK_RC48[i];
 		E[1] = C[1] ^ ((~C[2]) & C[3]);
 		E[2] = C[2] ^ ((~C[3]) & C[4]);
 		E[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -7235,7 +7261,7 @@ void Keccak::PermuteR48P1600C(std::array<ulong, 25> &State)
 		E[24] ^= D[4];
 		C[4] = IntegerTools::RotFL64(E[24], 14);
 		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= RC48[i + 1];
+		A[0] ^= KECCAK_RC48[i + 1];
 		A[1] = C[1] ^ ((~C[2]) & C[3]);
 		A[2] = C[2] ^ ((~C[3]) & C[4]);
 		A[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -7341,7 +7367,7 @@ void Keccak::PermuteR48P4x1600H(std::vector<ULong256> &State)
 		A[24] ^= D[4];
 		C[4] = ULong256::RotL64(A[24], 14);
 		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= ULong256(RC48[i]);
+		E[0] ^= ULong256(KECCAK_RC48[i]);
 		E[1] = C[1] ^ ((~C[2]) & C[3]);
 		E[2] = C[2] ^ ((~C[3]) & C[4]);
 		E[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -7428,7 +7454,7 @@ void Keccak::PermuteR48P4x1600H(std::vector<ULong256> &State)
 		E[24] ^= D[4];
 		C[4] = ULong256::RotL64(E[24], 14);
 		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= ULong256(RC48[i + 1]);
+		A[0] ^= ULong256(KECCAK_RC48[i + 1]);
 		A[1] = C[1] ^ ((~C[2]) & C[3]);
 		A[2] = C[2] ^ ((~C[3]) & C[4]);
 		A[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -7536,7 +7562,7 @@ void Keccak::PermuteR48P8x1600H(std::vector<ULong512> &State)
 		A[24] ^= D[4];
 		C[4] = ULong512::RotL64(A[24], 14);
 		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= ULong512(RC48[i]);
+		E[0] ^= ULong512(KECCAK_RC48[i]);
 		E[1] = C[1] ^ ((~C[2]) & C[3]);
 		E[2] = C[2] ^ ((~C[3]) & C[4]);
 		E[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -7623,7 +7649,7 @@ void Keccak::PermuteR48P8x1600H(std::vector<ULong512> &State)
 		E[24] ^= D[4];
 		C[4] = ULong512::RotL64(E[24], 14);
 		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= ULong512(RC48[i + 1]);
+		A[0] ^= ULong512(KECCAK_RC48[i + 1]);
 		A[1] = C[1] ^ ((~C[2]) & C[3]);
 		A[2] = C[2] ^ ((~C[3]) & C[4]);
 		A[3] = C[3] ^ ((~C[4]) & C[0]);

@@ -35,11 +35,14 @@ std::string AsymmetricTransformConvert::ToName(AsymmetricTransforms Enumeral)
 	case AsymmetricTransforms::MPKCS1N8192T128:
 		name = std::string("MPKCS1N8192T128");
 		break;
-	case AsymmetricTransforms::NTRUS1LQ4591N761:
-		name = std::string("NTRUS1LQ4591N761");
+	case AsymmetricTransforms::NTRUS1SQ4621N653:
+		name = std::string("NTRUS1SQ4621N653");
 		break;
 	case AsymmetricTransforms::NTRUS2SQ4591N761:
 		name = std::string("NTRUS2SQ4591N761");
+		break;
+	case AsymmetricTransforms::NTRUS3SQ5167N857:
+		name = std::string("NTRUS3SQ5167N857");
 		break;
 	case AsymmetricTransforms::RLWES1Q12289N1024:
 		name = std::string("RLWES1Q12289N1024");
@@ -104,13 +107,17 @@ AsymmetricTransforms AsymmetricTransformConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricTransforms::MPKCS1N8192T128;
 	}
-	else if (Name == std::string("NTRUS1LQ4591N761"))
+	else if (Name == std::string("NTRUS1SQ4621N653"))
 	{
-		tname = AsymmetricTransforms::NTRUS1LQ4591N761;
+		tname = AsymmetricTransforms::NTRUS1SQ4621N653;
 	}
 	else if (Name == std::string("NTRUS2SQ4591N761"))
 	{
 		tname = AsymmetricTransforms::NTRUS2SQ4591N761;
+	}
+	else if (Name == std::string("NTRUS3SQ5167N857"))
+	{
+		tname = AsymmetricTransforms::NTRUS3SQ5167N857;
 	}
 	else if (Name == std::string("RLWES1Q12289N1024"))
 	{

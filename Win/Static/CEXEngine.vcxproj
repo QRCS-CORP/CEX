@@ -276,15 +276,17 @@
     <ClInclude Include="..\..\CEX\MPKCN6960T119.h" />
     <ClInclude Include="..\..\CEX\MPKCN8192T128.h" />
     <ClInclude Include="..\..\CEX\Mutex.h" />
-    <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h" />
+    <ClInclude Include="..\..\CEX\NTRUPolyMath.h" />
+    <ClInclude Include="..\..\CEX\NTRUSQ4591P761.h" />
     <ClInclude Include="..\..\CEX\DilithiumParameters.h" />
+    <ClInclude Include="..\..\CEX\NTRUSQ4621P653.h" />
+    <ClInclude Include="..\..\CEX\NTRUSQ5167P857.h" />
     <ClInclude Include="..\..\CEX\PrngBase.h" />
     <ClInclude Include="..\..\CEX\ProviderBase.h" />
     <ClInclude Include="..\..\CEX\DrandEngines.h" />
     <ClInclude Include="..\..\CEX\ProviderSelfTest.h" />
     <ClInclude Include="..\..\CEX\RCS.h" />
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h" />
-    <ClInclude Include="..\..\CEX\NTRULQ4591N761.h" />
     <ClInclude Include="..\..\CEX\FileStream.h" />
     <ClInclude Include="..\..\CEX\Drbgs.h" />
     <ClInclude Include="..\..\CEX\GCM.h" />
@@ -322,7 +324,7 @@
     <ClInclude Include="..\..\CEX\MLWEParameters.h" />
     <ClInclude Include="..\..\CEX\ModuleLWE.h" />
     <ClInclude Include="..\..\CEX\MPKCParameters.h" />
-    <ClInclude Include="..\..\CEX\NTRU.h" />
+    <ClInclude Include="..\..\CEX\NTRUPrime.h" />
     <ClInclude Include="..\..\CEX\NTRUParameters.h" />
     <ClInclude Include="..\..\CEX\ParallelOptions.h" />
     <ClInclude Include="..\..\CEX\Poly1305.h" />
@@ -491,7 +493,10 @@
     <ClCompile Include="..\..\CEX\MPKCN8192T128.cpp" />
     <ClCompile Include="..\..\CEX\MPKCParameters.cpp" />
     <ClCompile Include="..\..\CEX\NTRUParameters.cpp" />
-    <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp" />
+    <ClCompile Include="..\..\CEX\NTRUPolyMath.cpp" />
+    <ClCompile Include="..\..\CEX\NTRUSQ4591P761.cpp" />
+    <ClCompile Include="..\..\CEX\NTRUSQ4621P653.cpp" />
+    <ClCompile Include="..\..\CEX\NTRUSQ5167P857.cpp" />
     <ClCompile Include="..\..\CEX\PaddingModes.cpp" />
     <ClCompile Include="..\..\CEX\PrngBase.cpp" />
     <ClCompile Include="..\..\CEX\Prngs.cpp" />
@@ -501,7 +506,6 @@
     <ClCompile Include="..\..\CEX\RCS.cpp" />
     <ClCompile Include="..\..\CEX\RLWEParameters.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
-    <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
     <ClCompile Include="..\..\CEX\GCM.cpp" />
     <ClCompile Include="..\..\CEX\GMAC.cpp" />
@@ -521,7 +525,7 @@
     <ClCompile Include="..\..\CEX\McEliece.cpp" />
     <ClCompile Include="..\..\CEX\McElieceUtils.cpp" />
     <ClCompile Include="..\..\CEX\ModuleLWE.cpp" />
-    <ClCompile Include="..\..\CEX\NTRU.cpp" />
+    <ClCompile Include="..\..\CEX\NTRUPrime.cpp" />
     <ClCompile Include="..\..\CEX\ParallelOptions.cpp" />
     <ClCompile Include="..\..\CEX\Poly1305.cpp" />
     <ClCompile Include="..\..\CEX\RingLWE.cpp" />

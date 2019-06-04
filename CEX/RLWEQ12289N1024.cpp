@@ -378,31 +378,31 @@ void RLWEQ12289N1024::CpaGenerate(std::vector<byte> &PublicKey, std::vector<byte
 bool RLWEQ12289N1024::Decapsulate(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey)
 {
 	std::vector<byte> buf(2 * RLWE_SEED_SIZE);
-	std::vector<byte> ctcmp(RLWE_CCACIPHERTEXT_SIZE);
+	std::vector<byte> ctcmp(CIPHERTEXT_SIZE);
 	// contains key, coins, qrom-hash 
 	std::vector<byte> kcoinsd(3 * RLWE_SEED_SIZE);
 	std::vector<byte> tmpc(2 * RLWE_SEED_SIZE);
-	std::vector<byte> tmppk(RLWE_CCAPUBLICKEY_SIZE);
+	std::vector<byte> tmppk(PUBLICKEY_SIZE);
 	size_t result;
 
 	CpaDecrypt(buf, CipherText, PrivateKey);
 
 	// use hash of pk stored in sk
-	MemoryTools::Copy(PrivateKey, RLWE_CCAPRIVATEKEY_SIZE - (2 * RLWE_SEED_SIZE), buf, RLWE_SEED_SIZE, RLWE_SEED_SIZE);
+	MemoryTools::Copy(PrivateKey, PRIVATEKEY_SIZE - (2 * RLWE_SEED_SIZE), buf, RLWE_SEED_SIZE, RLWE_SEED_SIZE);
 	XOF(buf, 0, 2 * RLWE_SEED_SIZE, kcoinsd, 0, 3 * RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
 
 	// coins are in kcoinsd+NEWHOPE_SYMBYTES 
 	MemoryTools::Copy(kcoinsd, RLWE_SEED_SIZE, tmpc, 0, 2 * RLWE_SEED_SIZE);
-	MemoryTools::Copy(PrivateKey, RLWE_CPAPRIVATEKEY_SIZE, tmppk, 0, RLWE_CCAPUBLICKEY_SIZE);
+	MemoryTools::Copy(PrivateKey, RLWE_CPAPRIVATEKEY_SIZE, tmppk, 0, PUBLICKEY_SIZE);
 	CpaEncrypt(ctcmp, buf, tmppk, tmpc);
 
 	MemoryTools::Copy(kcoinsd, 2 * RLWE_SEED_SIZE, ctcmp, RLWE_CPACIPHERTEXT_SIZE, RLWE_SEED_SIZE);
 	result = IntegerTools::Verify(CipherText, ctcmp, CipherText.size());
 
 	// overwrite coins in kcoinsd with h(c)  
-	XOF(CipherText, 0, RLWE_CCACIPHERTEXT_SIZE, kcoinsd, RLWE_SEED_SIZE, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+	XOF(CipherText, 0, CIPHERTEXT_SIZE, kcoinsd, RLWE_SEED_SIZE, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
 	// overwrite pre-k with z on re-encryption failure
-	IntegerTools::CMov(PrivateKey, RLWE_CCAPRIVATEKEY_SIZE - RLWE_SEED_SIZE, kcoinsd, 0, RLWE_SEED_SIZE, static_cast<byte>(result));
+	IntegerTools::CMov(PrivateKey, PRIVATEKEY_SIZE - RLWE_SEED_SIZE, kcoinsd, 0, RLWE_SEED_SIZE, static_cast<byte>(result));
 	// hash concatenation of pre-k and h(c) to k 
 	XOF(kcoinsd, 0, 2 * RLWE_SEED_SIZE, Secret, 0, Secret.size(), Keccak::KECCAK256_RATE_SIZE);
 
@@ -430,7 +430,7 @@ void RLWEQ12289N1024::Encapsulate(std::vector<byte> &CipherText, std::vector<byt
 	// copy Targhi-Unruh hash into ct 
 	MemoryTools::Copy(kcoinsd, 2 * RLWE_SEED_SIZE, CipherText, RLWE_CPACIPHERTEXT_SIZE, RLWE_SEED_SIZE);
 	// overwrite coins in kcoinsd with h(c) 
-	XOF(CipherText, 0, RLWE_CCACIPHERTEXT_SIZE, kcoinsd, RLWE_SEED_SIZE, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
+	XOF(CipherText, 0, CIPHERTEXT_SIZE, kcoinsd, RLWE_SEED_SIZE, RLWE_SEED_SIZE, Keccak::KECCAK256_RATE_SIZE);
 	XOF(kcoinsd, 0, 2 * RLWE_SEED_SIZE, Secret, 0, Secret.size(), Keccak::KECCAK256_RATE_SIZE);
 }
 
@@ -447,7 +447,7 @@ void RLWEQ12289N1024::Generate(std::vector<byte> &PublicKey, std::vector<byte> &
 	Rng->Generate(coin, RLWE_SEED_SIZE, RLWE_SEED_SIZE);
 
 	// copy the puplic key + H(pk) to sk
-	MemoryTools::Copy(PublicKey, 0, PrivateKey, RLWE_CPAPRIVATEKEY_SIZE, RLWE_CCAPUBLICKEY_SIZE);
+	MemoryTools::Copy(PublicKey, 0, PrivateKey, RLWE_CPAPRIVATEKEY_SIZE, PUBLICKEY_SIZE);
 	MemoryTools::Copy(coin, 0, PrivateKey, RLWE_CPAPRIVATEKEY_SIZE + RLWE_CPAPUBLICKEY_SIZE, 2 * RLWE_SEED_SIZE);
 }
 
@@ -888,11 +888,7 @@ void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 
 void RLWEQ12289N1024::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
-#if defined(CEX_SHAKE_STRONG)
-	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#else
-	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#endif
+	Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
 NAMESPACE_RINGLWEEND

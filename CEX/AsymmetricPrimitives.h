@@ -23,9 +23,9 @@ enum class AsymmetricPrimitives : byte
 	/// </summary>
 	ModuleLWE = 2,
 	/// <summary>
-	/// An NTRU cipher implementation
+	/// An NTRUPrime cipher implementation
 	/// </summary>
-	NTRU = 3,
+	NTRUPrime = 3,
 	/// <summary>
 	/// The Dilithium asymmetric signature scheme
 	/// </summary>

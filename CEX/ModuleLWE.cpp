@@ -1,5 +1,6 @@
 #include "ModuleLWE.h"
 #include "IntegerTools.h"
+#include "Keccak.h"
 #include "MLWEQ3329N256.h"
 #include "PrngFromName.h"
 #include "SymmetricKey.h"
@@ -9,6 +10,8 @@ NAMESPACE_MODULELWE
 using Enumeration::AsymmetricPrimitiveConvert;
 using Enumeration::ErrorCodes;
 using Utility::IntegerTools;
+using Digest::Keccak;
+using Enumeration::MLWEParameterConvert;
 
 class ModuleLWE::MlweState
 {
@@ -116,24 +119,11 @@ const bool ModuleLWE::IsInitialized()
 
 const std::string ModuleLWE::Name()
 {
-	std::string ret = AsymmetricPrimitiveConvert::ToName(Enumeral());
+	std::string ret;
 
-	if (m_mlweState->Parameters == MLWEParameters::MLWES1Q3329N256)
-	{
-		ret += "-MLWES1Q3329N256";
-	}
-	else if (m_mlweState->Parameters == MLWEParameters::MLWES2Q3329N256)
-	{
-		ret += "-MLWES2Q3329N256";
-	}
-	else if (m_mlweState->Parameters == MLWEParameters::MLWES3Q3329N256)
-	{
-		ret += "-MLWES3Q3329N256";
-	}
-	else
-	{
-		ret += "-UNKNOWN";
-	}
+	ret = AsymmetricPrimitiveConvert::ToName(Enumeral()) +
+		std::string("-") +
+		MLWEParameterConvert::ToName(m_mlweState->Parameters);
 
 	return ret;
 }
@@ -143,33 +133,74 @@ const MLWEParameters ModuleLWE::Parameters()
 	return m_mlweState->Parameters;
 }
 
+const size_t ModuleLWE::SharedSecretSize()
+{
+	return SECRET_SIZE;
+}
+
 //~~~Public Functions~~~//
 
 bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
+	std::vector<byte> sec(SECRET_SIZE);
 	bool result;
 
-	result = MLWEQ3329N256::Decapsulate(SharedSecret, CipherText, m_privateKey->Polynomial());
+	result = MLWEQ3329N256::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
+
+	if (m_mlweState->DomainKey.size() != 0)
+	{
+		CXOF(m_mlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
+	}
+	else
+	{
+		SharedSecret.resize(sec.size());
+		MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
+	}
 
 	return result;
 }
 
 void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	if (m_mlweState->Parameters == MLWEParameters::MLWES1Q3329N256)
+	CEXASSERT(m_mlweState->Initialized, "The cipher has not been initialized");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
+
+	std::vector<byte> sec(SECRET_SIZE);
+
+	switch (m_mlweState->Parameters)
 	{
-		CipherText.resize(MLWEQ3329N256::CIPHERTEXTK2_SIZE);
+		case MLWEParameters::MLWES1Q3329N256:
+		{
+			CipherText.resize(MLWEQ3329N256::CIPHERTEXTK2_SIZE);
+			break;
+		}
+		case MLWEParameters::MLWES2Q3329N256:
+		{
+			CipherText.resize(MLWEQ3329N256::CIPHERTEXTK3_SIZE);
+			break;
+		}
+		case MLWEParameters::MLWES3Q3329N256:
+		{
+			CipherText.resize(MLWEQ3329N256::CIPHERTEXTK4_SIZE);
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
 	}
-	else if (m_mlweState->Parameters == MLWEParameters::MLWES2Q3329N256)
+
+	MLWEQ3329N256::Encapsulate(sec, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
+
+	if (m_mlweState->DomainKey.size() != 0)
 	{
-		CipherText.resize(MLWEQ3329N256::CIPHERTEXTK3_SIZE);
+		CXOF(m_mlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
 	}
 	else
 	{
-		CipherText.resize(MLWEQ3329N256::CIPHERTEXTK4_SIZE);
+		SharedSecret.resize(sec.size());
+		MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
 	}
-
-	MLWEQ3329N256::Encapsulate(SharedSecret, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
 }
 
 AsymmetricKeyPair* ModuleLWE::Generate()
@@ -226,6 +257,12 @@ void ModuleLWE::Initialize(AsymmetricKey* Key)
 	}
  
 	m_mlweState->Initialized = true;
+}
+
+void ModuleLWE::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
+{
+	std::vector<byte> tmpn(Name().begin(), Name().end());
+	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_MODULELWEEND

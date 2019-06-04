@@ -146,6 +146,7 @@ namespace Test
 		const size_t BLK128 = ((m_expected[0].size() % Keccak::KECCAK128_RATE_SIZE) != 0) ? (m_expected[0].size() / Keccak::KECCAK128_RATE_SIZE) + 1 : 
 			(m_expected[0].size() / Keccak::KECCAK128_RATE_SIZE);
 
+		// test the absorb/squeeze api
 		std::vector<byte> otp(BLK128 * Keccak::KECCAK128_RATE_SIZE);
 		std::array<ulong, 25> state = { 0 };
 		Keccak::AbsorbR24(m_key[0], 0, m_key[0].size(), Keccak::KECCAK128_RATE_SIZE, Keccak::KECCAK_SHAKE_DOMAIN, state);
@@ -154,6 +155,16 @@ namespace Test
 		if (!IntegerTools::Compare(m_expected[0], 0, otp, 0, m_expected[0].size()))
 		{
 			throw TestException(std::string("Exception"), std::string("SHAKE-128"), std::string("Exception handling failure! -SA1"));
+		}
+
+		// test the stand-alone XOF api
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[0].size());
+		Keccak::XOFP1600(m_key[0], 0, m_key[0].size(), otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
+
+		if (otp != m_expected[0])
+		{
+			throw TestException(std::string("Exception"), std::string("SHAKE-128"), std::string("Exception handling failure! -SA2"));
 		}
 
 		// SHAKE-256
@@ -168,7 +179,17 @@ namespace Test
 
 		if (!IntegerTools::Compare(m_expected[5], 0, otp, 0, m_expected[5].size()))
 		{
-			throw TestException(std::string("Exception"), std::string("SHAKE-256"), std::string("Exception handling failure! -SA2"));
+			throw TestException(std::string("Exception"), std::string("SHAKE-256"), std::string("Exception handling failure! -SA3"));
+		}
+
+		// test the SHAKE-256 XOF api
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[5].size());
+		Keccak::XOFP1600(m_key[5], 0, m_key[5].size(), otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
+
+		if (otp != m_expected[5])
+		{
+			throw TestException(std::string("Exception"), std::string("SHAKE-256"), std::string("Exception handling failure! -SA4"));
 		}
 
 		// SHAKE-512
@@ -183,7 +204,17 @@ namespace Test
 
 		if (!IntegerTools::Compare(m_expected[10], 0, otp, 0, m_expected[10].size()))
 		{
-			throw TestException(std::string("Exception"), std::string("SHAKE-512"), std::string("Exception handling failure! -SA3"));
+			throw TestException(std::string("Exception"), std::string("SHAKE-512"), std::string("Exception handling failure! -SA5"));
+		}
+
+		// test the SHAKE-512 XOF api
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[10].size());
+		Keccak::XOFP1600(m_key[10], 0, m_key[10].size(), otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
+
+		if (otp != m_expected[10])
+		{
+			throw TestException(std::string("Exception"), std::string("SHAKE-512"), std::string("Exception handling failure! -SA6"));
 		}
 
 		// SHAKE-1024
@@ -198,7 +229,60 @@ namespace Test
 
 		if (!IntegerTools::Compare(m_expected[15], 0, otp, 0, m_expected[15].size()))
 		{
-			throw TestException(std::string("Exception"), std::string("SHAKE-1024"), std::string("Exception handling failure! -SA4"));
+			throw TestException(std::string("Exception"), std::string("SHAKE-1024"), std::string("Exception handling failure! -SA7"));
+		}
+
+		// test the SHAKE-1024 XOF api
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[15].size());
+		Keccak::XOFPR481600(m_key[15], 0, m_key[15].size(), otp, 0, otp.size(), Keccak::KECCAK1024_RATE_SIZE);
+
+		if (otp != m_expected[15])
+		{
+			throw TestException(std::string("Exception"), std::string("SHAKE-1024"), std::string("Exception handling failure! -SA8"));
+		}
+
+		// cSHAKE compact-implementation tests //
+
+		const std::vector<byte> ZERO(0, 0x00);
+
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[20].size());
+		Keccak::CXOFP1600(m_key[0], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
+
+		if (otp != m_expected[20])
+		{
+			throw TestException(std::string("Exception"), std::string("cSHAKE-128"), std::string("Exception handling failure! -SA9"));
+		}
+
+		// cSHAKE-256
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[22].size());
+		Keccak::CXOFP1600(m_key[5], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
+
+		if (otp != m_expected[22])
+		{
+			throw TestException(std::string("Exception"), std::string("cSHAKE-256"), std::string("Exception handling failure! -SA10"));
+		}
+
+		// cSHAKE-512
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[24].size());
+		Keccak::CXOFP1600(m_key[10], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
+
+		if (otp != m_expected[24])
+		{
+			throw TestException(std::string("Exception"), std::string("cSHAKE-512"), std::string("Exception handling failure! -SA11"));
+		}
+
+		// cSHAKE-1024
+		MemoryTools::Clear(otp, 0, otp.size());
+		otp.resize(m_expected[25].size());
+		Keccak::CXOFPR481600(m_key[15], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK1024_RATE_SIZE);
+
+		if (otp != m_expected[25])
+		{
+			throw TestException(std::string("Exception"), std::string("cSHAKE-1024"), std::string("Exception handling failure! -SA12"));
 		}
 	}
 

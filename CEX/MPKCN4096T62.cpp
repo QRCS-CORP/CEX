@@ -736,7 +736,7 @@ const std::vector<std::vector<std::vector<ulong>>> MPKCN4096T62::RadixTrScalar =
 
 //~~~Public Functions~~~//
 
-bool MPKCN4096T62::Decrypt(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+bool MPKCN4096T62::Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	std::vector<byte> tmpk(32);
 	std::vector<byte> tmpn(8);
@@ -766,7 +766,7 @@ bool MPKCN4096T62::Decrypt(const std::vector<byte> &PrivateKey, const std::vecto
 	return (ret == 0);
 }
 
-void MPKCN4096T62::Encrypt(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng)
+void MPKCN4096T62::Encapsulate(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng)
 {
 	std::vector<byte> tmpk(32);
 	std::vector<byte> tmpn(8);
@@ -807,11 +807,7 @@ bool MPKCN4096T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pri
 
 void MPKCN4096T62::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
-#if defined(CEX_SHAKE_STRONG)
-	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#else
-	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#endif
+	Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
 //~~~Decrypt~~~//

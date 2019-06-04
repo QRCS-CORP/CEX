@@ -1,8 +1,8 @@
 #include "KMAC.h"
 #include "ArrayTools.h"
 #include "IntegerTools.h"
-#include "MemoryTools.h"
 #include "Keccak.h"
+#include "MemoryTools.h"
 
 NAMESPACE_MAC
 
@@ -309,8 +309,8 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 	ulong offset;
 
 	MemoryTools::Clear(pad, 0, pad.size());
-	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
-	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Name.size() * 8));
+	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
 
 	if (Name.size() != 0)
 	{
@@ -328,7 +328,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 		}
 	}
 
-	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
 
 	if (Customization.size() != 0)
 	{
@@ -364,8 +364,8 @@ void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &Sta
 	ulong offset;
 
 	MemoryTools::Clear(pad, 0, pad.size());
-	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
-	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Key.size() * 8));
+	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Key.size()) * 8);
 
 	if (Key.size() != 0)
 	{
@@ -398,19 +398,11 @@ void KMAC::Permute(std::unique_ptr<KmacState> &State)
 {
 	if (State->KmacMode != KmacModes::KMAC1024)
 	{
-#if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR24P1600C(State->State);
-#else
-		Keccak::PermuteR24P1600U(State->State);
-#endif
+		Keccak::Permute(State->State);
 	}
 	else
 	{
-#if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR48P1600C(State->State);
-#else
-		Keccak::PermuteR48P1600U(State->State);
-#endif
+		Keccak::PermuteR48(State->State);
 	}
 }
 

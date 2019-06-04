@@ -100,42 +100,18 @@ Static Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:ae744e2d41333a952058a68b491ace37d"><td class="memItemLeft" align="right" valign="top">static const uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#ae744e2d41333a952058a68b491ace37d">RLWE_N</a> = 2048</td></tr>
-<tr class="memdesc:ae744e2d41333a952058a68b491ace37d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of coefficients  <a href="#ae744e2d41333a952058a68b491ace37d">More...</a><br /></td></tr>
-<tr class="separator:ae744e2d41333a952058a68b491ace37d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a85d7aba745523fc40cefeaf812c8dfc9"><td class="memItemLeft" align="right" valign="top">static const uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a85d7aba745523fc40cefeaf812c8dfc9">RLWE_Q</a> = 0x00003001UL</td></tr>
-<tr class="memdesc:a85d7aba745523fc40cefeaf812c8dfc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The modulus factor  <a href="#a85d7aba745523fc40cefeaf812c8dfc9">More...</a><br /></td></tr>
-<tr class="separator:a85d7aba745523fc40cefeaf812c8dfc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a246fde7bb2b5beb28efcbfb856311216"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a246fde7bb2b5beb28efcbfb856311216">RLWE_POLY_SIZE</a> = ((14 * <a class="el" href="class_r_l_w_e_q12289_n2048.html#ae744e2d41333a952058a68b491ace37d">RLWE_N</a>) / 8)</td></tr>
-<tr class="memdesc:a246fde7bb2b5beb28efcbfb856311216"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of A's public key polynomial  <a href="#a246fde7bb2b5beb28efcbfb856311216">More...</a><br /></td></tr>
-<tr class="separator:a246fde7bb2b5beb28efcbfb856311216"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1a12df1efdc7ef4e13685dc9679aa95"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#ab1a12df1efdc7ef4e13685dc9679aa95">RLWE_POLYCOMPRESSED_SIZE</a> = ((3 * <a class="el" href="class_r_l_w_e_q12289_n2048.html#ae744e2d41333a952058a68b491ace37d">RLWE_N</a>) / 8)</td></tr>
-<tr class="memdesc:ab1a12df1efdc7ef4e13685dc9679aa95"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the compressed ciphertext polynomial  <a href="#ab1a12df1efdc7ef4e13685dc9679aa95">More...</a><br /></td></tr>
-<tr class="separator:ab1a12df1efdc7ef4e13685dc9679aa95"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf4027f4c399a6593212da9f794aac19"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#acf4027f4c399a6593212da9f794aac19">RLWE_RECEIVED_SIZE</a> = 256</td></tr>
-<tr class="memdesc:acf4027f4c399a6593212da9f794aac19"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of B's encrypted seed array  <a href="#acf4027f4c399a6593212da9f794aac19">More...</a><br /></td></tr>
-<tr class="separator:acf4027f4c399a6593212da9f794aac19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d9e09cebcdbe5bdfcc6ae305d95528b"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a5d9e09cebcdbe5bdfcc6ae305d95528b">RLWE_SEED_SIZE</a> = 32</td></tr>
-<tr class="memdesc:a5d9e09cebcdbe5bdfcc6ae305d95528b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the secret seed array  <a href="#a5d9e09cebcdbe5bdfcc6ae305d95528b">More...</a><br /></td></tr>
-<tr class="separator:a5d9e09cebcdbe5bdfcc6ae305d95528b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d194d942a593fbfc9157d40df2f5f85"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a3d194d942a593fbfc9157d40df2f5f85">RLWE_CPACIPHERTEXT_SIZE</a> = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a246fde7bb2b5beb28efcbfb856311216">RLWE_POLY_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#ab1a12df1efdc7ef4e13685dc9679aa95">RLWE_POLYCOMPRESSED_SIZE</a>)</td></tr>
-<tr class="memdesc:a3d194d942a593fbfc9157d40df2f5f85"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CPA cipher-text  <a href="#a3d194d942a593fbfc9157d40df2f5f85">More...</a><br /></td></tr>
-<tr class="separator:a3d194d942a593fbfc9157d40df2f5f85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa39a6d48ec35aa9062b27ba4d0b85f28"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#aa39a6d48ec35aa9062b27ba4d0b85f28">RLWE_CPAPUBLICKEY_SIZE</a> = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a246fde7bb2b5beb28efcbfb856311216">RLWE_POLY_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#a5d9e09cebcdbe5bdfcc6ae305d95528b">RLWE_SEED_SIZE</a>)</td></tr>
-<tr class="memdesc:aa39a6d48ec35aa9062b27ba4d0b85f28"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CPA public key polynomial  <a href="#aa39a6d48ec35aa9062b27ba4d0b85f28">More...</a><br /></td></tr>
-<tr class="separator:aa39a6d48ec35aa9062b27ba4d0b85f28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6801174fb52ed54b8b191eb9b4710999"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a6801174fb52ed54b8b191eb9b4710999">RLWE_CPAPRIVATEKEY_SIZE</a> = <a class="el" href="class_r_l_w_e_q12289_n2048.html#a246fde7bb2b5beb28efcbfb856311216">RLWE_POLY_SIZE</a></td></tr>
-<tr class="memdesc:a6801174fb52ed54b8b191eb9b4710999"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CPA private key polynomial  <a href="#a6801174fb52ed54b8b191eb9b4710999">More...</a><br /></td></tr>
-<tr class="separator:a6801174fb52ed54b8b191eb9b4710999"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13598e767b9bc7914343b0cdb142ec1e"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a13598e767b9bc7914343b0cdb142ec1e">RLWE_CCACIPHERTEXT_SIZE</a> = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a3d194d942a593fbfc9157d40df2f5f85">RLWE_CPACIPHERTEXT_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#a5d9e09cebcdbe5bdfcc6ae305d95528b">RLWE_SEED_SIZE</a>)</td></tr>
-<tr class="memdesc:a13598e767b9bc7914343b0cdb142ec1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CCA cipher-text  <a href="#a13598e767b9bc7914343b0cdb142ec1e">More...</a><br /></td></tr>
-<tr class="separator:a13598e767b9bc7914343b0cdb142ec1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a05fae8a7df6dda0a7e71bfb3eb900f"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a9a05fae8a7df6dda0a7e71bfb3eb900f">RLWE_CCAPUBLICKEY_SIZE</a> = <a class="el" href="class_r_l_w_e_q12289_n2048.html#aa39a6d48ec35aa9062b27ba4d0b85f28">RLWE_CPAPUBLICKEY_SIZE</a></td></tr>
-<tr class="memdesc:a9a05fae8a7df6dda0a7e71bfb3eb900f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CCA public key polynomial  <a href="#a9a05fae8a7df6dda0a7e71bfb3eb900f">More...</a><br /></td></tr>
-<tr class="separator:a9a05fae8a7df6dda0a7e71bfb3eb900f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73c3fa7ade929f2b0bdea91460100d5a"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a73c3fa7ade929f2b0bdea91460100d5a">RLWE_CCAPRIVATEKEY_SIZE</a> = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a6801174fb52ed54b8b191eb9b4710999">RLWE_CPAPRIVATEKEY_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#aa39a6d48ec35aa9062b27ba4d0b85f28">RLWE_CPAPUBLICKEY_SIZE</a> + (2 * <a class="el" href="class_r_l_w_e_q12289_n2048.html#a5d9e09cebcdbe5bdfcc6ae305d95528b">RLWE_SEED_SIZE</a>))</td></tr>
-<tr class="memdesc:a73c3fa7ade929f2b0bdea91460100d5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CCA private key polynomial  <a href="#a73c3fa7ade929f2b0bdea91460100d5a">More...</a><br /></td></tr>
-<tr class="separator:a73c3fa7ade929f2b0bdea91460100d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada7d69c336fc70a7b03239e884b601e1"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#ada7d69c336fc70a7b03239e884b601e1">SEED_SIZE</a> = RLWE_SEED_SIZE</td></tr>
+<tr class="memdesc:ada7d69c336fc70a7b03239e884b601e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the secret seed array  <a href="#ada7d69c336fc70a7b03239e884b601e1">More...</a><br /></td></tr>
+<tr class="separator:ada7d69c336fc70a7b03239e884b601e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49f0dcfea9c906bf7bf32d47ef3ffd43"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a49f0dcfea9c906bf7bf32d47ef3ffd43">CIPHERTEXT_SIZE</a> = (RLWE_CPACIPHERTEXT_SIZE + RLWE_SEED_SIZE)</td></tr>
+<tr class="memdesc:a49f0dcfea9c906bf7bf32d47ef3ffd43"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CCA cipher-text  <a href="#a49f0dcfea9c906bf7bf32d47ef3ffd43">More...</a><br /></td></tr>
+<tr class="separator:a49f0dcfea9c906bf7bf32d47ef3ffd43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3f841e9320ca7a599c5e8f4490e0a6a"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#ae3f841e9320ca7a599c5e8f4490e0a6a">PUBLICKEY_SIZE</a> = RLWE_CPAPUBLICKEY_SIZE</td></tr>
+<tr class="memdesc:ae3f841e9320ca7a599c5e8f4490e0a6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CCA public key polynomial  <a href="#ae3f841e9320ca7a599c5e8f4490e0a6a">More...</a><br /></td></tr>
+<tr class="separator:ae3f841e9320ca7a599c5e8f4490e0a6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cc2320cddfe06600dd081277c96fe09"><td class="memItemLeft" align="right" valign="top">static const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a7cc2320cddfe06600dd081277c96fe09">PRIVATEKEY_SIZE</a> = (RLWE_CPAPRIVATEKEY_SIZE + RLWE_CPAPUBLICKEY_SIZE + (2 * RLWE_SEED_SIZE))</td></tr>
+<tr class="memdesc:a7cc2320cddfe06600dd081277c96fe09"><td class="mdescLeft">&#160;</td><td class="mdescRight">The byte size of the CCA private key polynomial  <a href="#a7cc2320cddfe06600dd081277c96fe09">More...</a><br /></td></tr>
+<tr class="separator:a7cc2320cddfe06600dd081277c96fe09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fcedd172d5346634f5206c4c0b8cf8e"><td class="memItemLeft" align="right" valign="top">static const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_l_w_e_q12289_n2048.html#a9fcedd172d5346634f5206c4c0b8cf8e">Name</a> = &quot;Q12289N2048&quot;</td></tr>
 <tr class="memdesc:a9fcedd172d5346634f5206c4c0b8cf8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The parameter sets formal name  <a href="#a9fcedd172d5346634f5206c4c0b8cf8e">More...</a><br /></td></tr>
 <tr class="separator:a9fcedd172d5346634f5206c4c0b8cf8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -472,6 +448,30 @@ Static Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a49f0dcfea9c906bf7bf32d47ef3ffd43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49f0dcfea9c906bf7bf32d47ef3ffd43">&#9670;&nbsp;</a></span>CIPHERTEXT_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t RLWEQ12289N2048::CIPHERTEXT_SIZE = (RLWE_CPACIPHERTEXT_SIZE + RLWE_SEED_SIZE)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The byte size of the CCA cipher-text </p>
+
+</div>
+</div>
 <a id="a9fcedd172d5346634f5206c4c0b8cf8e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9fcedd172d5346634f5206c4c0b8cf8e">&#9670;&nbsp;</a></span>Name</h2>
 
@@ -496,8 +496,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a13598e767b9bc7914343b0cdb142ec1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13598e767b9bc7914343b0cdb142ec1e">&#9670;&nbsp;</a></span>RLWE_CCACIPHERTEXT_SIZE</h2>
+<a id="a7cc2320cddfe06600dd081277c96fe09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cc2320cddfe06600dd081277c96fe09">&#9670;&nbsp;</a></span>PRIVATEKEY_SIZE</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -506,31 +506,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_CCACIPHERTEXT_SIZE = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a3d194d942a593fbfc9157d40df2f5f85">RLWE_CPACIPHERTEXT_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#a5d9e09cebcdbe5bdfcc6ae305d95528b">RLWE_SEED_SIZE</a>)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The byte size of the CCA cipher-text </p>
-
-</div>
-</div>
-<a id="a73c3fa7ade929f2b0bdea91460100d5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73c3fa7ade929f2b0bdea91460100d5a">&#9670;&nbsp;</a></span>RLWE_CCAPRIVATEKEY_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_CCAPRIVATEKEY_SIZE = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a6801174fb52ed54b8b191eb9b4710999">RLWE_CPAPRIVATEKEY_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#aa39a6d48ec35aa9062b27ba4d0b85f28">RLWE_CPAPUBLICKEY_SIZE</a> + (2 * <a class="el" href="class_r_l_w_e_q12289_n2048.html#a5d9e09cebcdbe5bdfcc6ae305d95528b">RLWE_SEED_SIZE</a>))</td>
+          <td class="memname">const size_t RLWEQ12289N2048::PRIVATEKEY_SIZE = (RLWE_CPAPRIVATEKEY_SIZE + RLWE_CPAPUBLICKEY_SIZE + (2 * RLWE_SEED_SIZE))</td>
         </tr>
       </table>
   </td>
@@ -544,8 +520,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a9a05fae8a7df6dda0a7e71bfb3eb900f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a05fae8a7df6dda0a7e71bfb3eb900f">&#9670;&nbsp;</a></span>RLWE_CCAPUBLICKEY_SIZE</h2>
+<a id="ae3f841e9320ca7a599c5e8f4490e0a6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3f841e9320ca7a599c5e8f4490e0a6a">&#9670;&nbsp;</a></span>PUBLICKEY_SIZE</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -554,7 +530,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_CCAPUBLICKEY_SIZE = <a class="el" href="class_r_l_w_e_q12289_n2048.html#aa39a6d48ec35aa9062b27ba4d0b85f28">RLWE_CPAPUBLICKEY_SIZE</a></td>
+          <td class="memname">const size_t RLWEQ12289N2048::PUBLICKEY_SIZE = RLWE_CPAPUBLICKEY_SIZE</td>
         </tr>
       </table>
   </td>
@@ -568,8 +544,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a3d194d942a593fbfc9157d40df2f5f85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d194d942a593fbfc9157d40df2f5f85">&#9670;&nbsp;</a></span>RLWE_CPACIPHERTEXT_SIZE</h2>
+<a id="ada7d69c336fc70a7b03239e884b601e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada7d69c336fc70a7b03239e884b601e1">&#9670;&nbsp;</a></span>SEED_SIZE</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -578,199 +554,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_CPACIPHERTEXT_SIZE = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a246fde7bb2b5beb28efcbfb856311216">RLWE_POLY_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#ab1a12df1efdc7ef4e13685dc9679aa95">RLWE_POLYCOMPRESSED_SIZE</a>)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The byte size of the CPA cipher-text </p>
-
-</div>
-</div>
-<a id="a6801174fb52ed54b8b191eb9b4710999"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6801174fb52ed54b8b191eb9b4710999">&#9670;&nbsp;</a></span>RLWE_CPAPRIVATEKEY_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_CPAPRIVATEKEY_SIZE = <a class="el" href="class_r_l_w_e_q12289_n2048.html#a246fde7bb2b5beb28efcbfb856311216">RLWE_POLY_SIZE</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The byte size of the CPA private key polynomial </p>
-
-</div>
-</div>
-<a id="aa39a6d48ec35aa9062b27ba4d0b85f28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa39a6d48ec35aa9062b27ba4d0b85f28">&#9670;&nbsp;</a></span>RLWE_CPAPUBLICKEY_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_CPAPUBLICKEY_SIZE = (<a class="el" href="class_r_l_w_e_q12289_n2048.html#a246fde7bb2b5beb28efcbfb856311216">RLWE_POLY_SIZE</a> + <a class="el" href="class_r_l_w_e_q12289_n2048.html#a5d9e09cebcdbe5bdfcc6ae305d95528b">RLWE_SEED_SIZE</a>)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The byte size of the CPA public key polynomial </p>
-
-</div>
-</div>
-<a id="ae744e2d41333a952058a68b491ace37d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae744e2d41333a952058a68b491ace37d">&#9670;&nbsp;</a></span>RLWE_N</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint RLWEQ12289N2048::RLWE_N = 2048</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The number of coefficients </p>
-
-</div>
-</div>
-<a id="a246fde7bb2b5beb28efcbfb856311216"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a246fde7bb2b5beb28efcbfb856311216">&#9670;&nbsp;</a></span>RLWE_POLY_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_POLY_SIZE = ((14 * <a class="el" href="class_r_l_w_e_q12289_n2048.html#ae744e2d41333a952058a68b491ace37d">RLWE_N</a>) / 8)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The byte size of A's public key polynomial </p>
-
-</div>
-</div>
-<a id="ab1a12df1efdc7ef4e13685dc9679aa95"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab1a12df1efdc7ef4e13685dc9679aa95">&#9670;&nbsp;</a></span>RLWE_POLYCOMPRESSED_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_POLYCOMPRESSED_SIZE = ((3 * <a class="el" href="class_r_l_w_e_q12289_n2048.html#ae744e2d41333a952058a68b491ace37d">RLWE_N</a>) / 8)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The byte size of the compressed ciphertext polynomial </p>
-
-</div>
-</div>
-<a id="a85d7aba745523fc40cefeaf812c8dfc9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a85d7aba745523fc40cefeaf812c8dfc9">&#9670;&nbsp;</a></span>RLWE_Q</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const uint RLWEQ12289N2048::RLWE_Q = 0x00003001UL</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The modulus factor </p>
-
-</div>
-</div>
-<a id="acf4027f4c399a6593212da9f794aac19"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf4027f4c399a6593212da9f794aac19">&#9670;&nbsp;</a></span>RLWE_RECEIVED_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_RECEIVED_SIZE = 256</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The byte size of B's encrypted seed array </p>
-
-</div>
-</div>
-<a id="a5d9e09cebcdbe5bdfcc6ae305d95528b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5d9e09cebcdbe5bdfcc6ae305d95528b">&#9670;&nbsp;</a></span>RLWE_SEED_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const size_t RLWEQ12289N2048::RLWE_SEED_SIZE = 32</td>
+          <td class="memname">const size_t RLWEQ12289N2048::SEED_SIZE = RLWE_SEED_SIZE</td>
         </tr>
       </table>
   </td>

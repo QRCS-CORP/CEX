@@ -22,7 +22,7 @@ namespace Test
 	using Cipher::SymmetricKeySize;
 
 	const std::string RCSTest::CLASSNAME = "RCSTest";
-	const std::string RCSTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the RCS stream cipher.";
+	const std::string RCSTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the 256-bit-wide Rijndael (RCS) authenticated stream cipher.";
 	const std::string RCSTest::SUCCESS = "SUCCESS! All RCS tests have executed succesfully.";
 	const bool RCSTest::HAS_AESNI = HasAESNI();
 

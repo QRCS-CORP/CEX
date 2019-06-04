@@ -372,6 +372,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a3095a77895e2c5dd774295a1934b30f3"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a3095a77895e2c5dd774295a1934b30f3">ConditionalZeroMem</a> (T Condition, T *Array, size_t Length)</td></tr>
 <tr class="memdesc:a3095a77895e2c5dd774295a1934b30f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: conditional bit erase  <a href="#a3095a77895e2c5dd774295a1934b30f3">More...</a><br /></td></tr>
 <tr class="separator:a3095a77895e2c5dd774295a1934b30f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a6c4a4364921fd690520f8d15047731"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a9a6c4a4364921fd690520f8d15047731"><td class="memTemplItemLeft" align="right" valign="top">static int32_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a9a6c4a4364921fd690520f8d15047731">DiffMask</a> (const std::vector&lt; T &gt; &amp;A, const std::vector&lt; T &gt; &amp;B, size_t Length)</td></tr>
+<tr class="memdesc:a9a6c4a4364921fd690520f8d15047731"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: compare two integer arrays for equality in constant time  <a href="#a9a6c4a4364921fd690520f8d15047731">More...</a><br /></td></tr>
+<tr class="separator:a9a6c4a4364921fd690520f8d15047731"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81be3713bb02c897b6330f9d9d1ae13e"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a81be3713bb02c897b6330f9d9d1ae13e"><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_integer_tools.html#a81be3713bb02c897b6330f9d9d1ae13e">ExpandMask</a> (T X)</td></tr>
 <tr class="memdesc:a81be3713bb02c897b6330f9d9d1ae13e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time: expand an integer mask in constant time  <a href="#a81be3713bb02c897b6330f9d9d1ae13e">More...</a><br /></td></tr>
@@ -2037,6 +2041,61 @@ template&lt;typename T &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The cropped integer</dd></dl>
+
+</div>
+</div>
+<a id="a9a6c4a4364921fd690520f8d15047731"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a6c4a4364921fd690520f8d15047731">&#9670;&nbsp;</a></span>DiffMask()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static int32_t IntegerTools::DiffMask </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>B</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constant time: compare two integer arrays for equality in constant time </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The base array</td></tr>
+    <tr><td class="paramname">B</td><td>The comparison array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of integers to compare</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns zero if the arrays match, else -1</dd></dl>
 
 </div>
 </div>

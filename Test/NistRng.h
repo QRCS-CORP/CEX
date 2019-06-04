@@ -20,7 +20,7 @@ namespace Test
 	private:
 
 		static std::string CLASSNAME;
-		static const size_t RNG_MAX_RESEED = 1000;
+		static const size_t RNG_MAX_RESEED = 100000;
 		static const size_t RNG_SEED_SIZE = 48;
 		class NistRngState;
 		std::unique_ptr<NistRngState> m_nistRngState;

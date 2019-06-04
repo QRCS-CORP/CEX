@@ -280,12 +280,6 @@
     <Filter Include="Source Files\Asymmetric\Cipher\ModuleLWE\Support">
       <UniqueIdentifier>{676eba65-b1be-4edd-a465-b9f26c1164fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Asymmetric\Cipher\NTRU">
-      <UniqueIdentifier>{6ca5da74-84a2-4866-8587-623982363cbd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Cipher\NTRU\Support">
-      <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Asymmetric\Cipher">
       <UniqueIdentifier>{39640886-cd1f-4352-97bd-da3f850b94ac}</UniqueIdentifier>
     </Filter>
@@ -307,11 +301,17 @@
     <Filter Include="Header Files\Asymmetric\Cipher\ModuleLWE\Support">
       <UniqueIdentifier>{e6761720-0098-4cee-9e0b-f62d8fced8bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Asymmetric\Cipher\NTRU">
+    <Filter Include="Header Files\Asymmetric\Cipher\NTRUPrime">
       <UniqueIdentifier>{de7c0483-f3e9-4fb0-bca3-c54eeab893d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Asymmetric\Cipher\NTRU\Support">
+    <Filter Include="Header Files\Asymmetric\Cipher\NTRUPrime\Support">
       <UniqueIdentifier>{4bd023cb-fab3-4d86-8d94-04017b3045e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\NTRUPrime">
+      <UniqueIdentifier>{6ca5da74-84a2-4866-8587-623982363cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\NTRUPrime\Support">
+      <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -717,15 +717,6 @@
     <ClInclude Include="..\..\CEX\ULong512.h">
       <Filter>Header Files\Numeric</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\NTRU.h">
-      <Filter>Header Files\Asymmetric\Cipher\NTRU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h">
-      <Filter>Header Files\Asymmetric\Cipher\NTRU\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\NTRULQ4591N761.h">
-      <Filter>Header Files\Asymmetric\Cipher\NTRU\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\CSR.h">
       <Filter>Header Files\Prng</Filter>
     </ClInclude>
@@ -956,6 +947,21 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\MLWEQ3329N256.h">
       <Filter>Header Files\Asymmetric\Cipher\ModuleLWE\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUPrime.h">
+      <Filter>Header Files\Asymmetric\Cipher\NTRUPrime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUPolyMath.h">
+      <Filter>Header Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUSQ4591P761.h">
+      <Filter>Header Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUSQ4621P653.h">
+      <Filter>Header Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUSQ5167P857.h">
+      <Filter>Header Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1201,15 +1207,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\KMAC.cpp">
       <Filter>Source Files\Mac</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\NTRU.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\NTRU</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\NTRU\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\NTRU\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CSR.cpp">
       <Filter>Source Files\Prng</Filter>
@@ -1462,6 +1459,21 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\MLWEQ3329N256.cpp">
       <Filter>Source Files\Asymmetric\Cipher\ModuleLWE\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUPrime.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\NTRUPrime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUSQ5167P857.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUSQ4621P653.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUSQ4591P761.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUPolyMath.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

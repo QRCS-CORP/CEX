@@ -43,70 +43,39 @@ private:
 
 	static const uint RLWE_QINV = 0x00002FFFUL;
 	static const uint RLWE_RLOG = 0x00000012UL;
+	static const uint RLWE_N = 2048;
+	static const uint RLWE_Q = 0x00003001UL;
+	static const size_t RLWE_SEED_SIZE = 32;
+	static const size_t RLWE_POLY_SIZE = ((14 * RLWE_N) / 8);
+	static const size_t RLWE_POLYCOMPRESSED_SIZE = ((3 * RLWE_N) / 8);
+	static const size_t RLWE_RECEIVED_SIZE = 256;
+	static const size_t RLWE_CPACIPHERTEXT_SIZE = (RLWE_POLY_SIZE + RLWE_POLYCOMPRESSED_SIZE);
+	static const size_t RLWE_CPAPUBLICKEY_SIZE = (RLWE_POLY_SIZE + RLWE_SEED_SIZE);
+	static const size_t RLWE_CPAPRIVATEKEY_SIZE = RLWE_POLY_SIZE;
 
 public:
 
 	//~~~Public Constants~~~//
 
 	/// <summary>
-	/// The number of coefficients
-	/// </summary>
-	static const uint RLWE_N = 2048;
-
-	/// <summary>
-	/// The modulus factor
-	/// </summary>
-	static const uint RLWE_Q = 0x00003001UL;
-
-	/// <summary>
-	/// The byte size of A's public key polynomial
-	/// </summary>
-	static const size_t RLWE_POLY_SIZE = ((14 * RLWE_N) / 8);
-
-	/// <summary>
-	/// The byte size of the compressed ciphertext polynomial
-	/// </summary>
-	static const size_t RLWE_POLYCOMPRESSED_SIZE = ((3 * RLWE_N) / 8);
-
-	/// <summary>
-	/// The byte size of B's encrypted seed array
-	/// </summary>
-	static const size_t RLWE_RECEIVED_SIZE = 256;
-
-	/// <summary>
 	/// The byte size of the secret seed array
 	/// </summary>
-	static const size_t RLWE_SEED_SIZE = 32; //64?
-
-	/// <summary>
-	/// The byte size of the CPA cipher-text
-	/// </summary>
-	static const size_t RLWE_CPACIPHERTEXT_SIZE = (RLWE_POLY_SIZE + RLWE_POLYCOMPRESSED_SIZE);
-
-	/// <summary>
-	/// The byte size of the CPA public key polynomial
-	/// </summary>
-	static const size_t RLWE_CPAPUBLICKEY_SIZE = (RLWE_POLY_SIZE + RLWE_SEED_SIZE);
-
-	/// <summary>
-	/// The byte size of the CPA private key polynomial
-	/// </summary>
-	static const size_t RLWE_CPAPRIVATEKEY_SIZE = RLWE_POLY_SIZE;
+	static const size_t SEED_SIZE = RLWE_SEED_SIZE;
 
 	/// <summary>
 	/// The byte size of the CCA cipher-text
 	/// </summary>
-	static const size_t RLWE_CCACIPHERTEXT_SIZE = (RLWE_CPACIPHERTEXT_SIZE + RLWE_SEED_SIZE);
+	static const size_t CIPHERTEXT_SIZE = (RLWE_CPACIPHERTEXT_SIZE + RLWE_SEED_SIZE);
 
 	/// <summary>
 	/// The byte size of the CCA public key polynomial
 	/// </summary>
-	static const size_t RLWE_CCAPUBLICKEY_SIZE = RLWE_CPAPUBLICKEY_SIZE;
+	static const size_t PUBLICKEY_SIZE = RLWE_CPAPUBLICKEY_SIZE;
 
 	/// <summary>
 	/// The byte size of the CCA private key polynomial
 	/// </summary>
-	static const size_t RLWE_CCAPRIVATEKEY_SIZE = (RLWE_CPAPRIVATEKEY_SIZE + RLWE_CPAPUBLICKEY_SIZE + (2 * RLWE_SEED_SIZE));
+	static const size_t PRIVATEKEY_SIZE = (RLWE_CPAPRIVATEKEY_SIZE + RLWE_CPAPUBLICKEY_SIZE + (2 * RLWE_SEED_SIZE));
 
 	/// <summary>
 	/// The parameter sets formal name

@@ -14,8 +14,8 @@
 #define NAMESPACE_MCELIECEEND } } } }
 #define NAMESPACE_MODULELWE namespace CEX { namespace Asymmetric { namespace Encrypt { namespace MLWE {
 #define NAMESPACE_MODULELWEEND } } } }
-#define NAMESPACE_NTRU namespace CEX { namespace Asymmetric { namespace Encrypt { namespace NTRU {
-#define NAMESPACE_NTRUEND } } } }
+#define NAMESPACE_NTRUPRIME namespace CEX { namespace Asymmetric { namespace Encrypt { namespace NTRUP {
+#define NAMESPACE_NTRUPRIMEEND } } } }
 #define NAMESPACE_RINGLWE namespace CEX { namespace Asymmetric { namespace Encrypt { namespace RLWE {
 #define NAMESPACE_RINGLWEEND } } } }
 

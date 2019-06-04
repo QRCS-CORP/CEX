@@ -126,7 +126,7 @@ public:
 	/// <param name="Secret">The shared-secret message</param>
 	/// <param name="CipherText">The encapsulated keys ciphertext</param>
 	/// <param name="PublicKey">The asymmetric public key</param>
-	/// <param name="Seed">The random seed</param>
+	/// <param name="Rng">The random generator instance</param>
 	static void Encapsulate(std::vector<byte> &Secret, std::vector<byte> &CipherText, const std::vector<byte> &PublicKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 	/// <summary>
@@ -135,7 +135,7 @@ public:
 	///
 	/// <param name="PublicKey">The public asymmetric key</param>
 	/// <param name="PrivateKey">The private asymmetric key</param>
-	/// <param name="Rng">The random provider</param>
+	/// <param name="Rng">The random generator instance</param>
 	static void Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 private:

@@ -13,7 +13,7 @@
 // New in Current Release 1.0.0.7 (version A7):
 // The Dilithium asymmetric signature scheme
 // The SPHINCS + asymmetric signature scheme
-// The NTRU Prime asymmetric cipher
+// The NTRU-Prime asymmetric cipher
 // The cSHAKE XOF function added as an HX symmetric cipher key expansion option
 // Update of all base asymmetric ciphers and signature schemes to match NIST PQ entries
 // Message digests updated for performance and security
@@ -27,7 +27,7 @@
 // RingLWE							-added
 // McEliece							-added
 // ModuleLWE						-added
-// NTRU								-added
+// NTRUPrime						-added
 // SPHINCS+							-added
 // Dilithium						-added
 // Optimization						-started
@@ -207,9 +207,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7t (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7u (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      May 19, 2019                      *");
+	ConsoleUtils::WriteLine("* Date:      June 04, 2019                      *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -279,6 +279,12 @@ void TestRun(ITest* Test)
 		}
 	}
 }
+
+// TODO: 1.8
+// Add Permute and XOF functions to: Rijndael, Threefish, ChaCha, (SHA2 HMAC Drbg?).
+// ex. Rijndael: PermuteP256T([array[32]]input, [array[32]]output, rkeys, rounds) and PemuteP256H (T=table, H=intrinsics, 4x, x4, x8, x16).
+// Add counter based XOF functions to each, ex. XOFR30P256.
+// Use a define to add XOF option to asymmetric primitives.
 
 int main()
 {

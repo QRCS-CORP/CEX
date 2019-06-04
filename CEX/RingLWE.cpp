@@ -1,5 +1,6 @@
 #include "RingLWE.h"
 #include "IntegerTools.h"
+#include "Keccak.h"
 #include "MemoryTools.h"
 #include "PrngFromName.h"
 #include "RLWEQ12289N1024.h"
@@ -10,7 +11,9 @@ NAMESPACE_RINGLWE
 
 using Enumeration::AsymmetricPrimitiveConvert;
 using Utility::IntegerTools;
+using Digest::Keccak;
 using Utility::MemoryTools;
+using Enumeration::RLWEParameterConvert;
 
 class RingLWE::RlweState
 {
@@ -118,16 +121,11 @@ const bool RingLWE::IsInitialized()
 
 const std::string RingLWE::Name()
 {
-	std::string ret = AsymmetricPrimitiveConvert::ToName(Enumeral());
+	std::string ret;
 
-	if (m_rlweState->Parameters == RLWEParameters::RLWES1Q12289N1024)
-	{
-		ret += "-RLWES1Q12289N1024";
-	}
-	else if (m_rlweState->Parameters == RLWEParameters::RLWES2Q12289N2048)
-	{
-		ret += "-RLWES2Q12289N2048";
-	}
+	ret = AsymmetricPrimitiveConvert::ToName(Enumeral()) +
+		std::string("-") +
+		RLWEParameterConvert::ToName(m_rlweState->Parameters);
 
 	return ret;
 }
@@ -137,45 +135,47 @@ const RLWEParameters RingLWE::Parameters()
 	return m_rlweState->Parameters;
 }
 
+const size_t RingLWE::SharedSecretSize()
+{
+	return SECRET_SIZE;
+}
+
 //~~~Public Functions~~~//
 
 bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	std::vector<byte> sec(0);
-	std::vector<byte> cmp(0);
-	std::vector<byte> coin(0);
-	std::vector<byte> kcoins(0);
-	std::vector<byte> pk(0);
+	CEXASSERT(m_rlweState->Initialized, "The cipher has not been initialized");
+	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
+
+	std::vector<byte> sec(SECRET_SIZE);
 	bool result;
 
 	switch (m_rlweState->Parameters)
 	{
 		case (RLWEParameters::RLWES1Q12289N1024):
 		{
-			CEXASSERT(m_rlweState->Initialized, "The cipher has not been initialized");
-			CEXASSERT(CipherText.size() >= RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
-			CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
-			CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
-
-			result = RLWEQ12289N1024::Decapsulate(SharedSecret, CipherText, m_privateKey->Polynomial());
-
+			result = RLWEQ12289N1024::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
 		}
 		case (RLWEParameters::RLWES2Q12289N2048):
 		{
-			CEXASSERT(m_rlweState->Initialized, "The cipher has not been initialized");
-			CEXASSERT(CipherText.size() >= RLWEQ12289N2048::RLWE_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
-			CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
-			CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
-
-			result = RLWEQ12289N2048::Decapsulate(SharedSecret, CipherText, m_privateKey->Polynomial());
-
+			result = RLWEQ12289N2048::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
 		}
 		default:
 		{
-			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The asymmetric cipher parameter setting is invalid!"), ErrorCodes::InvalidParam);
+			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The RingLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
+	}
+
+	if (m_rlweState->DomainKey.size() != 0)
+	{
+		CXOF(m_rlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
+	}
+	else
+	{
+		SharedSecret.resize(sec.size());
+		MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
 	}
 
 	return result;
@@ -184,29 +184,38 @@ bool RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	CEXASSERT(m_rlweState->Initialized, "The cipher has not been initialized");
-	CEXASSERT(SharedSecret.size() > 0, "The shared secret size can not be zero");
 	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
+
+	std::vector<byte> sec(SECRET_SIZE);
 
 	switch (m_rlweState->Parameters)
 	{
 		case (RLWEParameters::RLWES1Q12289N1024):
 		{
-			CipherText.resize(RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE);
-			RLWEQ12289N1024::Encapsulate(CipherText, SharedSecret, m_publicKey->Polynomial(), m_rndGenerator);
-
+			CipherText.resize(RLWEQ12289N1024::CIPHERTEXT_SIZE);
+			RLWEQ12289N1024::Encapsulate(CipherText, sec, m_publicKey->Polynomial(), m_rndGenerator);
 			break;
 		}
 		case (RLWEParameters::RLWES2Q12289N2048):
 		{
-			CipherText.resize(RLWEQ12289N2048::RLWE_CCACIPHERTEXT_SIZE);
-			RLWEQ12289N2048::Encapsulate(CipherText, SharedSecret, m_publicKey->Polynomial(), m_rndGenerator);
-
+			CipherText.resize(RLWEQ12289N2048::CIPHERTEXT_SIZE);
+			RLWEQ12289N2048::Encapsulate(CipherText, sec, m_publicKey->Polynomial(), m_rndGenerator);
 			break;
 		}
 		default:
 		{
-			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The asymmetric cipher parameter setting is invalid!"), ErrorCodes::InvalidParam);
+			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The RingLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
+	}
+
+	if (m_rlweState->DomainKey.size() != 0)
+	{
+		CXOF(m_rlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
+	}
+	else
+	{
+		SharedSecret.resize(sec.size());
+		MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
 	}
 }
 
@@ -222,16 +231,16 @@ AsymmetricKeyPair* RingLWE::Generate()
 	{
 		case (RLWEParameters::RLWES1Q12289N1024):
 		{
-			pk.resize(RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);
-			sk.resize(RLWEQ12289N1024::RLWE_CCAPRIVATEKEY_SIZE);
+			pk.resize(RLWEQ12289N1024::PUBLICKEY_SIZE);
+			sk.resize(RLWEQ12289N1024::PRIVATEKEY_SIZE);
 			RLWEQ12289N1024::Generate(pk, sk, m_rndGenerator);
 
 			break;
 		}
 		case (RLWEParameters::RLWES2Q12289N2048):
 		{
-			pk.resize(RLWEQ12289N2048::RLWE_CCAPUBLICKEY_SIZE);
-			sk.resize(RLWEQ12289N2048::RLWE_CCAPRIVATEKEY_SIZE);
+			pk.resize(RLWEQ12289N2048::PUBLICKEY_SIZE);
+			sk.resize(RLWEQ12289N2048::PRIVATEKEY_SIZE);
 			RLWEQ12289N2048::Generate(pk, sk, m_rndGenerator);
 
 			break;
@@ -273,6 +282,12 @@ void RingLWE::Initialize(AsymmetricKey* Key)
 	}
 
 	m_rlweState->Initialized = true;
+}
+
+void RingLWE::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
+{
+	std::vector<byte> tmpn(Name().begin(), Name().end());
+	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_RINGLWEEND

@@ -38,7 +38,7 @@ namespace Test
 #endif
 
 	const std::string ThreefishTest::CLASSNAME = "ThreefishTest";
-	const std::string ThreefishTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the ThreeFish stream cipher.";
+	const std::string ThreefishTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of the ThreeFish stream cipher (TSX256, TSX512, TSX1024) authenticated stream ciphers.";
 	const std::string ThreefishTest::SUCCESS = "SUCCESS! All Threefish tests have executed succesfully.";
 
 	//~~~Constructor~~~//

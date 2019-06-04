@@ -261,7 +261,7 @@ public:
 private:
 
 	static void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak256State &State);
-	static void Permute(std::array<ulong, 25> &Hash);
+	static void Permute(std::array<ulong, 25> &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State, ulong Length);
 };
 

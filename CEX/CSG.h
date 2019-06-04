@@ -29,13 +29,11 @@
 
 #include "DrbgBase.h"
 #include "IProvider.h"
-#include "Keccak.h"
 #include "SHAKE.h"
 #include "ShakeModes.h"
 
 NAMESPACE_DRBG
 
-using Digest::Keccak;
 using Provider::IProvider;
 using Enumeration::Providers;
 using Kdf::SHAKE;
@@ -102,7 +100,7 @@ class CSG final : public DrbgBase
 private:
 
 	// the buffer size in bytes
-	static const size_t BUFFER_SIZE = Keccak::KECCAK_STATE_SIZE * sizeof(ulong);
+	static const size_t BUFFER_SIZE = 200;
 	// 100mb: default before reseeded internally
 	static const size_t DEF_RESEED = 102400000;
 	// 10gb: maximum before rekey is required

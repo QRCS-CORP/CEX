@@ -36,7 +36,7 @@ namespace Test
 #endif
 
 	const std::string ChaChaTest::CLASSNAME = "ChaChaTest";
-	const std::string ChaChaTest::DESCRIPTION = "Tests the 256 and 512 bit versions of the ChaCha stream cipher.";
+	const std::string ChaChaTest::DESCRIPTION = "Tests the 256 and 512 bit versions of the ChaCha stream cipher (CSX256 and CSX512) authenticated stream ciphers.";
 	const std::string ChaChaTest::SUCCESS = "SUCCESS! All ChaCha tests have executed succesfully.";
 
 	//~~~Constructor~~~//

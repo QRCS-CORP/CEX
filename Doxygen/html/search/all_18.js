@@ -69,7 +69,7 @@ var searchData=
   ['_7emcs',['~MCS',['../class_m_c_s.html#ae118641558bf19d4a2e168d7b9f2aa69',1,'MCS']]],
   ['_7ememorystream',['~MemoryStream',['../class_memory_stream.html#ac226b9c1eb36f0421a632a8209a7fcbe',1,'MemoryStream']]],
   ['_7emodulelwe',['~ModuleLWE',['../class_module_l_w_e.html#a196980bffb1533b19ccfd3508c4cd5f0',1,'ModuleLWE']]],
-  ['_7entru',['~NTRU',['../class_n_t_r_u.html#ae7c1c80ef5e53114bafd848cfb089b3f',1,'NTRU']]],
+  ['_7entruprime',['~NTRUPrime',['../class_n_t_r_u_prime.html#ad1ce7c906368f4cd8c42e530974a214f',1,'NTRUPrime']]],
   ['_7eofb',['~OFB',['../class_o_f_b.html#aadf2d5f24f673ea449cc269e477998a8',1,'OFB']]],
   ['_7eparalleloptions',['~ParallelOptions',['../class_parallel_options.html#ab9b68fc54d954e9f391815392a6efc6f',1,'ParallelOptions']]],
   ['_7epbkdf2',['~PBKDF2',['../class_p_b_k_d_f2.html#a4520611c9386a4e4b6a8e9721e7f4d64',1,'PBKDF2']]],

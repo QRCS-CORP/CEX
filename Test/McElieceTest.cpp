@@ -93,8 +93,8 @@ namespace Test
 	void McElieceTest::Authentication()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(32);
-		std::vector<byte> ssk2(32);
+		std::vector<byte> ssk1(0);
+		std::vector<byte> ssk2(0);
 
 		// MPKCS1N4096T62
 
@@ -103,7 +103,6 @@ namespace Test
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, ssk1);
 		cpr1.Initialize(kp1->PrivateKey());
-		delete kp1;
 
 		// decapsulate
 		if (!cpr1.Decapsulate(cpt, ssk2))
@@ -115,16 +114,14 @@ namespace Test
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
+		delete kp1;
 
 		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
 		cpr2.Initialize(kp2->PrivateKey());
-		delete kp2;
 
 		// decapsulate with altered ciphertext, throw if succesful
 		if (!cpr2.Decapsulate(cpt, ssk2))
@@ -136,29 +133,29 @@ namespace Test
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
+		delete kp2;
 
 		McEliece cpr3(MPKCParameters::MPKCS1N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 		cpr3.Initialize(kp3->PublicKey());
 		cpr3.Encapsulate(cpt, ssk1);
 		cpr3.Initialize(kp3->PrivateKey());
-		delete kp3;
 
 		// decapsulate with altered ciphertext, throw if succesful
 		if (!cpr3.Decapsulate(cpt, ssk2))
 		{
 			throw TestException(std::string("Authentication"), cpr3.Name(), std::string("Message authentication test failed! -MA3"));
 		}
+
+		delete kp3;
 	}
 
 	void McElieceTest::CipherText()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(32);
-		std::vector<byte> ssk2(32);
+		std::vector<byte> ssk1(0);
+		std::vector<byte> ssk2(0);
 		SecureRandom gen;
 
 		// MPKCS1N4096T62
@@ -170,7 +167,6 @@ namespace Test
 		// alter ciphertext
 		gen.Generate(cpt, 0, 4);
 		cpr1.Initialize(kp1->PrivateKey());
-		delete kp1;
 
 		// decapsulate with altered ciphertext, throw if succesful
 		if (cpr1.Decapsulate(cpt, ssk2))
@@ -182,9 +178,8 @@ namespace Test
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
+		delete kp1;
 
 		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
@@ -193,7 +188,6 @@ namespace Test
 		// alter ciphertext
 		gen.Generate(cpt, 0, 4);
 		cpr2.Initialize(kp2->PrivateKey());
-		delete kp2;
 
 		// decapsulate with altered ciphertext, throw if succesful
 		if (cpr2.Decapsulate(cpt, ssk2))
@@ -201,13 +195,13 @@ namespace Test
 			throw TestException(std::string("Authentication"), cpr2.Name(), std::string("Message authentication test failed! -MA2"));
 		}
 
+		delete kp2;
+
 		// MPKCS1N8192T128
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
 
 		McEliece cpr3(MPKCParameters::MPKCS1N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
@@ -216,13 +210,14 @@ namespace Test
 		// alter ciphertext
 		gen.Generate(cpt, 0, 4);
 		cpr3.Initialize(kp3->PrivateKey());
-		delete kp3;
 
 		// decapsulate with altered ciphertext, throw if succesful
 		if (cpr3.Decapsulate(cpt, ssk2))
 		{
 			throw TestException(std::string("Authentication"), cpr3.Name(), std::string("Message authentication test failed! -MA3"));
 		}
+
+		delete kp3;
 	}
 
 	void McElieceTest::Exception()
@@ -279,8 +274,8 @@ namespace Test
 	void McElieceTest::Kat()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(32);
-		std::vector<byte> ssk2(32);
+		std::vector<byte> ssk1(0);
+		std::vector<byte> ssk2(0);
 		NistRng gen;
 
 		// MPKCS1N4096T62
@@ -317,9 +312,9 @@ namespace Test
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
+		delete kp1;
+
 		gen.Initialize(m_cprseed);
 
 		McEliece cpr2(MPKCParameters::MPKCS1N6960T119, &gen);
@@ -352,9 +347,9 @@ namespace Test
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
+		delete kp2;
+
 		gen.Initialize(m_cprseed);
 
 		McEliece cpr3(MPKCParameters::MPKCS1N8192T128, &gen);
@@ -382,6 +377,8 @@ namespace Test
 		{
 			throw TestException(std::string("Kat"), cpr3.Name(), std::string("Cipher-text arrays do not match! -MK12"));
 		}
+
+		delete kp3;
 	}
 
 	void McElieceTest::NistRngKat()
@@ -408,8 +405,8 @@ namespace Test
 	void McElieceTest::PublicKey()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(64);
-		std::vector<byte> ssk2(64);
+		std::vector<byte> ssk1(0);
+		std::vector<byte> ssk2(0);
 		SecureRandom gen;
 
 		// MPKCS1N4096T62
@@ -425,7 +422,6 @@ namespace Test
 		cpr1.Initialize(ak1);
 		cpr1.Encapsulate(cpt, ssk1);
 		cpr1.Initialize(kp1->PrivateKey());
-		delete kp1;
 
 		// fail on decapsulation success
 		if (cpr1.Decapsulate(cpt, ssk2))
@@ -433,13 +429,14 @@ namespace Test
 			throw TestException(std::string("PublicKey"), cpr1.Name(), std::string("Public key integrity test failed! -MP1"));
 		}
 
+		delete kp1;
+		delete ak1;
+
 		// MPKCS1N6960T119
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
 
 		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
@@ -452,12 +449,14 @@ namespace Test
 		cpr2.Initialize(ak2);
 		cpr2.Encapsulate(cpt, ssk1);
 		cpr2.Initialize(kp2->PrivateKey());
-		delete kp2;
 
 		if (cpr2.Decapsulate(cpt, ssk2))
 		{
 			throw TestException(std::string("PublicKey"), cpr2.Name(), std::string("Public key integrity test failed! -MP2"));
 		}
+
+		delete kp2;
+		delete ak2;
 
 		// MPKCS1N8192T128
 
@@ -478,12 +477,13 @@ namespace Test
 		cpr3.Initialize(ak3);
 		cpr3.Encapsulate(cpt, ssk1);
 		cpr3.Initialize(kp3->PrivateKey());
-		delete kp3;
 
 		if (cpr3.Decapsulate(cpt, ssk2))
 		{
 			throw TestException(std::string("PublicKey"), cpr3.Name(), std::string("Public key integrity test failed! -MP3"));
 		}
+
+		delete kp3;
 	}
 
 	void McElieceTest::Serialization()
@@ -512,14 +512,16 @@ namespace Test
 
 		delete kp;
 		delete prik1;
+		delete prik2;
 		delete pubk1;
+		delete pubk2;
 	}
 
 	void McElieceTest::Stress()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(32);
-		std::vector<byte> ssk2(32);
+		std::vector<byte> ssk1(0);
+		std::vector<byte> ssk2(0);
 		McEliece cpr1(MPKCParameters::MPKCS1N4096T62);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
@@ -535,18 +537,17 @@ namespace Test
 				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test authentication has failed! -MS1"));
 			}
 
-			delete kp;
-
 			if (ssk1 != ssk2)
 			{
 				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test has failed! -MS2"));
 			}
+
+			delete kp;
 		}
 
 		ssk1.clear();
 		ssk2.clear();
-		ssk1.resize(32);
-		ssk2.resize(32);
+
 		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
@@ -562,18 +563,17 @@ namespace Test
 				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test authentication has failed! -MS3"));
 			}
 
-			delete kp;
-
 			if (ssk1 != ssk2)
 			{
 				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test has failed! -MS4"));
 			}
+
+			delete kp;
 		}
 
 		ssk1.clear();
 		ssk2.clear();
-		ssk1.resize(32);
-		ssk2.resize(32);
+
 		McEliece cpr3(MPKCParameters::MPKCS1N8192T128);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
@@ -589,12 +589,12 @@ namespace Test
 				throw TestException(std::string("Stress"), cpr3.Name(), std::string("Stress test authentication has failed! -MS5"));
 			}
 
-			delete kp;
-
 			if (ssk1 != ssk2)
 			{
 				throw TestException(std::string("Stress"), cpr3.Name(), std::string("Stress test has failed! -MS6"));
 			}
+
+			delete kp;
 		}
 	}
 
@@ -621,7 +621,7 @@ namespace Test
 		// C2F94289EBA9ACAF2C132D1D0130311CA9FB7712F7802536BF836AC8C94AC822
 		// 1F271CF0A51C89E8507368C4DF7CE2CFB864B17072B9FACBD7C2271756F24BF1
 
-		const std::vector<std::string> cprcpt =
+		const std::vector<std::string> cptexp =
 		{
 			std::string("9F5705C11979DE1F574BC3755BDF872FC218690E8092B6D764C968393D119DDB9AB0CDBA25CB16465617592F2256E0E5D9E2A61993BE4049E4266CE93E500386"
 				"39F976110549E8BC0F4F08F980FB71950815F99DCC100AAFE5FB454874C7350CA326448B4185AF1DE66C2C0A9129C9CDAEB126EBA1A0A5067CF0380A4640F1F0"
@@ -635,15 +635,15 @@ namespace Test
 				"966398F5EDAC38557D73A127816B06443BDE6524A936C2C0DA8EFDDDB3850F522F0A26FC3DC3BCBBFFB32A0AD0FD156A8F3192D45B10B48647C546F8C5DB3F0D"
 				"1AEAA192D88493AE6C1F1E9C253342551094F5643697600DCB99758E6D06375DCA20005FEBABBDC3A894CF676EB51992")
 		};
-		HexConverter::Decode(cprcpt, 3, m_cptexp);
+		HexConverter::Decode(cptexp, 3, m_cptexp);
 
-		const std::vector<std::string> cprexp =
+		const std::vector<std::string> sskexp =
 		{
 			std::string("9DF29F0FC955C8A1280752039E090DC1A27E5A829D435CEC247EB347AB897A67"),
 			std::string("179C2314367D02DCC0CF1C1CCF7055FB870CB26F529BBD4A393D6603FE70AE95"),
 			std::string("DD1A7EC5E1026D5A77210F1374219018FC1C6CFD6BADF848A860C4749424D344")
 		};
-		HexConverter::Decode(cprexp, 3, m_sskexp);
+		HexConverter::Decode(sskexp, 3, m_sskexp);
 
 		const std::string cprseed =
 		{

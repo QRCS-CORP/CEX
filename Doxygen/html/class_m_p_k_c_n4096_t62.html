@@ -79,12 +79,12 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a909099fa4c04e2e95b8a4a7108e83b92"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_p_k_c_n4096_t62.html#a909099fa4c04e2e95b8a4a7108e83b92">Decrypt</a> (const std::vector&lt; byte &gt; &amp;PrivateKey, const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)</td></tr>
-<tr class="memdesc:a909099fa4c04e2e95b8a4a7108e83b92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt an encrypted cipher-text and return the shared secret  <a href="#a909099fa4c04e2e95b8a4a7108e83b92">More...</a><br /></td></tr>
-<tr class="separator:a909099fa4c04e2e95b8a4a7108e83b92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a743c96b188739bd838885439388baf85"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_p_k_c_n4096_t62.html#a743c96b188739bd838885439388baf85">Encrypt</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret, std::unique_ptr&lt; <a class="el" href="class_i_prng.html">IPrng</a> &gt; &amp;Rng)</td></tr>
-<tr class="memdesc:a743c96b188739bd838885439388baf85"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a message and return the shared secret and cipher-text  <a href="#a743c96b188739bd838885439388baf85">More...</a><br /></td></tr>
-<tr class="separator:a743c96b188739bd838885439388baf85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24b0526e53b8409f8235af017273cc95"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_p_k_c_n4096_t62.html#a24b0526e53b8409f8235af017273cc95">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;PrivateKey, const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)</td></tr>
+<tr class="memdesc:a24b0526e53b8409f8235af017273cc95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt an encrypted cipher-text and return the shared secret  <a href="#a24b0526e53b8409f8235af017273cc95">More...</a><br /></td></tr>
+<tr class="separator:a24b0526e53b8409f8235af017273cc95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade05521c56958e73daf3a3caf69a7308"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_p_k_c_n4096_t62.html#ade05521c56958e73daf3a3caf69a7308">Encapsulate</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret, std::unique_ptr&lt; <a class="el" href="class_i_prng.html">IPrng</a> &gt; &amp;Rng)</td></tr>
+<tr class="memdesc:ade05521c56958e73daf3a3caf69a7308"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a message and return the shared secret and cipher-text  <a href="#ade05521c56958e73daf3a3caf69a7308">More...</a><br /></td></tr>
+<tr class="separator:ade05521c56958e73daf3a3caf69a7308"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1a7e26d3cb71faa636ed20ae70a4755"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_m_p_k_c_n4096_t62.html#ae1a7e26d3cb71faa636ed20ae70a4755">Generate</a> (std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>, std::vector&lt; byte &gt; &amp;PrivateKey, std::unique_ptr&lt; <a class="el" href="class_i_prng.html">IPrng</a> &gt; &amp;Rng)</td></tr>
 <tr class="memdesc:ae1a7e26d3cb71faa636ed20ae70a4755"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key pair  <a href="#ae1a7e26d3cb71faa636ed20ae70a4755">More...</a><br /></td></tr>
 <tr class="separator:ae1a7e26d3cb71faa636ed20ae70a4755"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,8 +120,8 @@ Static Public Attributes</h2></td></tr>
 <div class="textblock"><p>The McEliece MPKCS1N4096T62 FFT </p>
 <p>internal</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a909099fa4c04e2e95b8a4a7108e83b92"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a909099fa4c04e2e95b8a4a7108e83b92">&#9670;&nbsp;</a></span>Decrypt()</h2>
+<a id="a24b0526e53b8409f8235af017273cc95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24b0526e53b8409f8235af017273cc95">&#9670;&nbsp;</a></span>Decapsulate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -130,7 +130,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool MPKCN4096T62::Decrypt </td>
+          <td class="memname">bool MPKCN4096T62::Decapsulate </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>PrivateKey</em>, </td>
@@ -173,8 +173,8 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a743c96b188739bd838885439388baf85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a743c96b188739bd838885439388baf85">&#9670;&nbsp;</a></span>Encrypt()</h2>
+<a id="ade05521c56958e73daf3a3caf69a7308"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade05521c56958e73daf3a3caf69a7308">&#9670;&nbsp;</a></span>Encapsulate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +183,7 @@ Static Public Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void MPKCN4096T62::Encrypt </td>
+          <td class="memname">void MPKCN4096T62::Encapsulate </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>PublicKey</em>, </td>

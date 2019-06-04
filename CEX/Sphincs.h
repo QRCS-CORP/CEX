@@ -85,7 +85,7 @@ using Enumeration::SphincsParameters;
 /// <item><description>Software: SPHINCS+<a href="https://sphincs.org/software.html">Software</a> .</description></item>
 /// <item><description>Reference Paper : SPHINCS+ <a href="https://sphincs.org/data/sphincs+-specification.pdf">Specification</a>.</description></item>
 /// <item><description>Reference: <a href="https://eprint.iacr.org/2014/795.pdf">SPHINCS: practical stateless hash-based signatures</a>.</description></item>
-/// <item><description>Website: <a href="https://sphincs.org/">NTRU Prime Website</a></description></item>.
+/// <item><description>Website: <a href="https://sphincs.org/">NTRU-Prime Website</a></description></item>.
 /// </list>
 /// </remarks>
 class Sphincs final : public IAsymmetricSign

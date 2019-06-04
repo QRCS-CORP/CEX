@@ -15,24 +15,24 @@ CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.7t</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.7u</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
 \version   v1.0.0.7s
-\date      May 19, 2019
+\date      June 04, 2019
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.7t (A7 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.7u (A7 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.7t (version A7):</B> \n
+<B>Current Release v1.0.0.7u (version A7):</B> \n
 
 The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
 The Dilithium asymmetric signature scheme \n
 The SPHINCS+ asymmetric signature scheme \n
-The NTRU Prime asymmetric cipher \n
+The NTRU-Prime asymmetric cipher \n
 Authenticated Threefish-256/512/1024 stream ciphers \n
 Authenticated ChaCha-256/512 stream ciphers \n
 The cSHAKE option (RHX/SHX) integrated into HX symmetric ciphers \n
@@ -42,7 +42,7 @@ Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
 RingLWE \n
 McEliece \n
 ModuleLWE \n
-NTRU \n
+NTRUPrime \n
 Dilithium \n
 SPHINCS+ \n \n
 
@@ -55,7 +55,7 @@ DLL API \n \n
 <B>History</B> \n \n
 
 <B>Version 1.0.0.6, June 17, 2018 (with partial 1.0.0.7 release, Sept 27)</B> \n
-Added the NTRU Prime asymmetric cipher \n
+Added the NTRU-Prime asymmetric cipher \n
 Added the RSX symmetric cipher \n
 Added the Threefish 256/512/1024 symmetric ciphers \n
 Added CSX512-P80 symmetric cipher \n
@@ -160,13 +160,13 @@ NAMESPACE_ROOT
 			/*! @} */
 
 			/*!
-			*  \addtogroup NTRU
+			*  \addtogroup NTRUPrime
 			*  @{
-			*  @brief The NTRU Cipher Namespace
+			*  @brief The NTRUPrime Cipher Namespace
 			*/
-			NAMESPACE_NTRU
-				class NTRU {};
-			NAMESPACE_NTRUEND
+			NAMESPACE_NTRUPRIME
+				class NTRUPrime {};
+			NAMESPACE_NTRUPRIMEEND
 			/*! @} */
 
 			/*!

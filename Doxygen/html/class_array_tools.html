@@ -105,10 +105,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a2b3199d89a2952ba35c4dbebbd041b6f"><td class="memTemplItemLeft" align="right" valign="top">static bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_array_tools.html#a2b3199d89a2952ba35c4dbebbd041b6f">Contains</a> (const Array &amp;Container, T Value)</td></tr>
 <tr class="memdesc:a2b3199d89a2952ba35c4dbebbd041b6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the vector array contains the value  <a href="#a2b3199d89a2952ba35c4dbebbd041b6f">More...</a><br /></td></tr>
 <tr class="separator:a2b3199d89a2952ba35c4dbebbd041b6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a269cbac2320d0b3c42c3cb0bd7f03a33"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:a269cbac2320d0b3c42c3cb0bd7f03a33"><td class="memTemplItemLeft" align="right" valign="top">static ulong&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_array_tools.html#a269cbac2320d0b3c42c3cb0bd7f03a33">LeftEncode</a> (Array &amp;Output, size_t Offset, ulong Value)</td></tr>
-<tr class="memdesc:a269cbac2320d0b3c42c3cb0bd7f03a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keccak common function: Left encode a value onto an array  <a href="#a269cbac2320d0b3c42c3cb0bd7f03a33">More...</a><br /></td></tr>
-<tr class="separator:a269cbac2320d0b3c42c3cb0bd7f03a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ca64f08cc59fd4abdc2818c25ce058e"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
 <tr class="memitem:a9ca64f08cc59fd4abdc2818c25ce058e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_array_tools.html#a9ca64f08cc59fd4abdc2818c25ce058e">RandomShuffle</a> (Array &amp;Output)</td></tr>
 <tr class="memdesc:a9ca64f08cc59fd4abdc2818c25ce058e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shuffle array values to randomly chosen positions  <a href="#a9ca64f08cc59fd4abdc2818c25ce058e">More...</a><br /></td></tr>
@@ -494,61 +490,6 @@ template&lt;typename Array , typename T &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the value exists</dd></dl>
-
-</div>
-</div>
-<a id="a269cbac2320d0b3c42c3cb0bd7f03a33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a269cbac2320d0b3c42c3cb0bd7f03a33">&#9670;&nbsp;</a></span>LeftEncode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Array &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static ulong ArrayTools::LeftEncode </td>
-          <td>(</td>
-          <td class="paramtype">Array &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ulong&#160;</td>
-          <td class="paramname"><em>Value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Keccak common function: Left encode a value onto an array </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>The output integer array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The output array starting offest</td></tr>
-    <tr><td class="paramname">Value</td><td>The value to remove</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of encoded bits</dd></dl>
 
 </div>
 </div>

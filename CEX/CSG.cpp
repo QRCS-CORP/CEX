@@ -2,6 +2,7 @@
 #include "ArrayTools.h"
 #include "CpuDetect.h"
 #include "IntegerTools.h"
+#include "Keccak.h"
 #include "MemoryTools.h"
 #include "ProviderFromName.h"
 #if defined(__AVX2__)
@@ -16,6 +17,7 @@ NAMESPACE_DRBG
 using Utility::ArrayTools;
 using Enumeration::DrbgConvert;
 using Utility::IntegerTools;
+using Digest::Keccak;
 using Utility::MemoryTools;
 using Enumeration::ProviderConvert;
 using Enumeration::ShakeModeConvert;
@@ -574,8 +576,8 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 
 	// encode the buffer
 	MemoryTools::Clear(pad, 0, pad.size());
-	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
-	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Information.size() * 8));
+	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Information.size()) * 8);
 
 	if (Information.size() != 0)
 	{
@@ -594,7 +596,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 		}
 	}
 
-	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
 
 	if (Customization.size() != 0)
 	{

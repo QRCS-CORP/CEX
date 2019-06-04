@@ -120,6 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a528aa89314a4f01df0744083d77dca4d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga49fb964c989e25839109cb3b370c50fd">MLWEParameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a528aa89314a4f01df0744083d77dca4d">Parameters</a> ()</td></tr>
 <tr class="memdesc:a528aa89314a4f01df0744083d77dca4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#a528aa89314a4f01df0744083d77dca4d">More...</a><br /></td></tr>
 <tr class="separator:a528aa89314a4f01df0744083d77dca4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e3fb63861b5973328f9c1a6f5d286bf"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a4e3fb63861b5973328f9c1a6f5d286bf">SharedSecretSize</a> () override</td></tr>
+<tr class="memdesc:a4e3fb63861b5973328f9c1a6f5d286bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers shared secret output size.  <a href="#a4e3fb63861b5973328f9c1a6f5d286bf">More...</a><br /></td></tr>
+<tr class="separator:a4e3fb63861b5973328f9c1a6f5d286bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa08db36c2ee150018de5754d1dc635ba"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#aa08db36c2ee150018de5754d1dc635ba">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret) override</td></tr>
 <tr class="memdesc:aa08db36c2ee150018de5754d1dc635ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret.  <a href="#aa08db36c2ee150018de5754d1dc635ba">More...</a><br /></td></tr>
 <tr class="separator:aa08db36c2ee150018de5754d1dc635ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,10 +151,16 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Module Learning With Errors asymmetric cipher (KYBER) </p>
-<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fdaad493e5f5913531bfbe47d2c64c27a48">MLWEParameters::MLWES2Q3329N256</a>);</div><div class="line">IAsymmetricKeyPair* kp = acpr.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; pk = pubK1-&gt;ToBytes();</div></div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(32);</div><div class="line">std::vector&lt;byte&gt; cpt(0);</div><div class="line"></div><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fdaad493e5f5913531bfbe47d2c64c27a48">MLWEParameters::MLWES2Q3329N256</a>);</div><div class="line">acpr.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line"><span class="comment">// generate the ciphertext and shared secret</span></div><div class="line">acpr.Encapsulate(cpt, sec);</div></div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(32);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fdaad493e5f5913531bfbe47d2c64c27a48">MLWEParameters::MLWES2Q3329N256</a>);</div><div class="line">acpr.Initialize(PrivateKey);</div><div class="line"><span class="comment">// decrypt the ciphertext and output the shared secret</span></div><div class="line">status = acpr.Decapsulate(cpt, sec);</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fdaad493e5f5913531bfbe47d2c64c27a48">MLWEParameters::MLWES2Q3329N256</a>);</div><div class="line">IAsymmetricKeyPair* kp = acpr.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line">MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; pk = pubK1-&gt;ToBytes();</div></div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(0);</div><div class="line">std::vector&lt;byte&gt; cpt(0);</div><div class="line"></div><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fdaad493e5f5913531bfbe47d2c64c27a48">MLWEParameters::MLWES2Q3329N256</a>);</div><div class="line">acpr.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line"><span class="comment">// generate the ciphertext and shared secret</span></div><div class="line">acpr.Encapsulate(cpt, sec);</div></div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(0);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> acpr(<a class="code" href="group___enumeration.html#gga49fb964c989e25839109cb3b370c50fdaad493e5f5913531bfbe47d2c64c27a48">MLWEParameters::MLWES2Q3329N256</a>);</div><div class="line">acpr.Initialize(PrivateKey);</div><div class="line"><span class="comment">// decrypt the ciphertext and output the shared secret</span></div><div class="line">status = acpr.Decapsulate(cpt, sec);</div></div><!-- fragment --> <p>Implementation Notes: </p>
 <p>This Module learning with errors (KYBER) is the Learning With Errors problem (a generalization of the parity learning problem), specialized to polynomial arrays over finite fields. <br />
 An important feature of the LWE problem is that the solution may be reducible to the NP-Hard Shortest Vector Problem (SVP) in a Lattice. <br />
 This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers. The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</p>
+<p>Domain Key: </p>
+<p>This cipher utilizes an optional two-key system. The KEM shared-secret generated with the encapsulate and decapsulate methods, can be combined with a secondary key. <br />
+This second key can be provided to users within a domain, or as part of a two-key mechanism in which the server component provides one ephemeral key to each host, and the two hosts exchange the second key (the shared-secret) via a second asymmetric key exchange. <br />
+The domain key is used as the customization string in an instance of cSHAKE-512, the ciphers formal name (cipher-name + parameter-name), is used as the cSHAKE name parameter, and the shared secret is the primary seed. <br />
+Using the domain key, the shared secret output is equal to the initial size of the shared-secret array, this means that in this extended operating mode, secure output of up to 1KB is possible. <br />
+To enable the two-key form of the cipher, populate the DomainKey parameter with the secondary key, and size the shared-secret arrays used in encapsulate and decapsulate to the required output size. In standard operational mode (with a zero-sized domain-key), the output from the cipher is the 256-bit output expected from a standard instance of the cipher. </p>
 <ul>
 <li>
 This version of Kyber aligns with the NIST PQ round 2 implementation </li>
@@ -664,6 +673,36 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </div><div class="memdoc">
 
 <p>Read Only: The ciphers parameters enumeration name </p>
+
+</div>
+</div>
+<a id="a4e3fb63861b5973328f9c1a6f5d286bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e3fb63861b5973328f9c1a6f5d286bf">&#9670;&nbsp;</a></span>SharedSecretSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t ModuleLWE::SharedSecretSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The ciphers shared secret output size. </p>
+<p>When using the DomainKey parameter, the domain-key is added to the ciphers output shared-secret and used as seed material by a custom SHAKE-512, this allows for variable length output. In this operating mode, the shared secret can be any size. In standard operating mode, the output shared-secret is the expected output from the asymmetric cipher.</p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a3a4a447bce5ff752bdf9c09558a70678">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>

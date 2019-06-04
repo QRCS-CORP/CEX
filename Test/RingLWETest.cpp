@@ -57,16 +57,16 @@ namespace Test
 		{
 			Initialize();
 
-			Integrity();
-			OnProgress(std::string("RingLWETest: Passed NIST PQ Round 2 ciphertext, shared-secret, public and private key known answer tests.."));
-			Kat();
-			OnProgress(std::string("RingLWETest: Passed NIST PQ Round 2 shared-secret known answer tests.."));
 			Authentication();
 			OnProgress(std::string("RingLWETest: Passed message authentication test.."));
 			CipherText();
 			OnProgress(std::string("RingLWETest: Passed cipher-text integrity test.."));
 			Exception();
 			OnProgress(std::string("RingLWETest: Passed exception handling test.."));
+			Integrity();
+			OnProgress(std::string("RingLWETest: Passed NIST PQ Round 2 ciphertext, shared-secret, public and private key known answer tests.."));
+			Kat();
+			OnProgress(std::string("RingLWETest: Passed NIST PQ Round 2 shared-secret known answer tests.."));
 			PublicKey();
 			OnProgress(std::string("RingLWETest: Passed public key integrity test.."));
 			Serialization();
@@ -93,8 +93,8 @@ namespace Test
 	void RingLWETest::Authentication()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
+		std::vector<byte> sec1(0);
+		std::vector<byte> sec2(0);
 
 		// test param 1: RLWES1Q12289N1024
 		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
@@ -112,9 +112,6 @@ namespace Test
 		cpt.clear();
 		sec1.clear();
 		sec2.clear();
-		cpt.resize(0);
-		sec1.resize(64);
-		sec2.resize(64);
 		delete kp1;
 
 		// test param 2: RLWES2Q12289N2048
@@ -136,8 +133,8 @@ namespace Test
 	void RingLWETest::CipherText()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(64);
-		std::vector<byte> sec2(64);
+		std::vector<byte> sec1(0);
+		std::vector<byte> sec2(0);
 		SecureRandom gen;
 
 		// test param 1: RLWES1Q12289N1024
@@ -160,9 +157,6 @@ namespace Test
 		cpt.clear();
 		sec1.clear();
 		sec2.clear();
-		cpt.resize(0);
-		sec1.resize(64);
-		sec2.resize(64);
 		delete kp1;
 
 		// test param 2: RLWES2Q12289N2048
@@ -238,9 +232,9 @@ namespace Test
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
+		delete kp1;
+
 		gen.Initialize(m_rngseed[0]);
 
 		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048, &gen);
@@ -280,14 +274,16 @@ namespace Test
 		{
 			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Shared secret does not match expected! -RK12"));
 		}
+
+		delete kp2;
 	}
 
 	void RingLWETest::Kat()
 	{
 		const size_t TSTCNT = m_rngseed.size();
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(32);
-		std::vector<byte> ssk2(32);
+		std::vector<byte> ssk1(0);
+		std::vector<byte> ssk2(0);
 		NistRng gen;
 		size_t i;
 
@@ -318,13 +314,13 @@ namespace Test
 			{
 				throw TestException(std::string("Kat"), cpr.Name(), std::string("Shared secret does not match expected! -RK3"));
 			}
+
+			delete kp;
 		}
 
 		cpt.clear();
 		ssk1.clear();
-		ssk1.resize(32);
 		ssk2.clear();
-		ssk2.resize(32);
 
 		// RLWES1Q12289N2048
 
@@ -353,6 +349,8 @@ namespace Test
 			{
 				throw TestException(std::string("Kat"), cpr.Name(), std::string("Shared secret does not match expected! -RK3"));
 			}
+
+			delete kp;
 		}
 	}
 
@@ -410,8 +408,8 @@ namespace Test
 	void RingLWETest::PublicKey()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(64);
-		std::vector<byte> sec2(64);
+		std::vector<byte> sec1(0);
+		std::vector<byte> sec2(0);
 
 		// test param 1: RLWES1Q12289N1024
 		RingLWE cpr1(RLWEParameters::RLWES1Q12289N1024);
@@ -435,10 +433,8 @@ namespace Test
 		cpt.clear();
 		sec1.clear();
 		sec2.clear();
-		cpt.resize(0);
-		sec1.resize(64);
-		sec2.resize(64);
 		delete kp1;
+		delete pk2;
 
 		// test param 2: RLWES2Q12289N2048
 		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
@@ -460,6 +456,7 @@ namespace Test
 		}
 
 		delete kp2;
+		delete pk4;
 	}
 
 	void RingLWETest::Serialization()
@@ -489,9 +486,15 @@ namespace Test
 			{
 				throw TestException(std::string("Serialization"), std::string("RLWE"), std::string("Public key serialization test has failed! -RS2"));
 			}
+
+			delete kp;
+			delete prik1;
+			delete prik2;
+			delete pubk1;
+			delete pubk2;
 		}
 
-		skey.resize(0);
+		skey.clear();
 
 		// test param 2: RLWES2Q12289N2048
 		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
@@ -516,13 +519,19 @@ namespace Test
 			{
 				throw TestException(std::string("Serialization"), cpr2.Name(), std::string("Public key serialization test has failed! -RS2"));
 			}
+
+			delete kp;
+			delete prik1;
+			delete prik2;
+			delete pubk1;
+			delete pubk2;
 		}
 	}
 
 	void RingLWETest::Stress()
 	{
 		const size_t KEYLEN = 80;
-		std::vector<byte> msg(128);
+		std::vector<byte> msg(0);
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(KEYLEN);
 		std::vector<byte> sec2(KEYLEN);
@@ -546,20 +555,17 @@ namespace Test
 				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test authentication has failed! -RR1"));
 			}
 
-			delete kp;
-
 			if (sec1 != sec2)
 			{
 				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test has failed! -RR2"));
 			}
+
+			delete kp;
 		}
 
 		cpt.clear();
 		sec1.clear();
 		sec2.clear();
-		cpt.resize(0);
-		sec1.resize(KEYLEN);
-		sec2.resize(KEYLEN);
 
 		// test param 2: RLWES2Q12289N2048
 		RingLWE cpr2(RLWEParameters::RLWES2Q12289N2048);
@@ -579,12 +585,12 @@ namespace Test
 				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test authentication has failed! -RR3"));
 			}
 
-			delete kp;
-
 			if (sec1 != sec2)
 			{
 				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test has failed! -RR4"));
 			}
+
+			delete kp;
 		}
 	}
 

@@ -1968,6 +1968,33 @@ public:
 		}
 	}
 
+
+	/// <summary>
+	/// Constant time: compare two integer arrays for equality in constant time
+	/// </summary>
+	/// 
+	/// <param name="A">The base array</param>
+	/// <param name="B">The comparison array</param>
+	/// <param name="Length">The number of integers to compare</param>
+	/// 
+	/// <returns>Returns zero if the arrays match, else -1</returns>
+	template<typename T>
+	inline static int32_t DiffMask(const std::vector<T> &A, const std::vector<T> &B, size_t Length)
+	{
+		// 
+		size_t i;
+		ushort diff;
+
+		diff = 0;
+
+		for (i = 0; i < Length; ++i)
+		{
+			diff |= A[i] ^ B[i];
+		}
+
+		return (1 & ((diff - 1) >> 8)) - 1;
+	}
+
 	/// <summary>
 	/// Constant time: expand an integer mask in constant time
 	/// </summary>

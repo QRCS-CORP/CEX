@@ -83,7 +83,7 @@ Inheritance diagram for IAsymmetricCipher:</div>
   <map id="IAsymmetricCipher_map" name="IAsymmetricCipher_map">
 <area href="class_mc_eliece.html" title="An implementation of the Niederreiter dual form of the McEliece public key crypto-system (MPKC)" alt="McEliece" shape="rect" coords="0,56,118,80"/>
 <area href="class_module_l_w_e.html" title="An implementation of the Module Learning With Errors asymmetric cipher (KYBER)" alt="ModuleLWE" shape="rect" coords="128,56,246,80"/>
-<area href="class_n_t_r_u.html" title="An implementation of the NTRU Prime asymmetric cipher (NTRU-PRIME)" alt="NTRU" shape="rect" coords="256,56,374,80"/>
+<area href="class_n_t_r_u_prime.html" title="An implementation of the NTRU-Prime asymmetric cipher (NTRUPRIME)" alt="NTRUPrime" shape="rect" coords="256,56,374,80"/>
 <area href="class_ring_l_w_e.html" title="An implementation of the Ring Learning With Errors asymmetric cipher (NewHope)" alt="RingLWE" shape="rect" coords="384,56,502,80"/>
   </map>
 </div></div>
@@ -117,6 +117,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8dd58db657c1fb29b7bae9217c62ed42"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a8dd58db657c1fb29b7bae9217c62ed42">Name</a> ()=0</td></tr>
 <tr class="memdesc:a8dd58db657c1fb29b7bae9217c62ed42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers name  <a href="#a8dd58db657c1fb29b7bae9217c62ed42">More...</a><br /></td></tr>
 <tr class="separator:a8dd58db657c1fb29b7bae9217c62ed42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a4a447bce5ff752bdf9c09558a70678"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a3a4a447bce5ff752bdf9c09558a70678">SharedSecretSize</a> ()=0</td></tr>
+<tr class="memdesc:a3a4a447bce5ff752bdf9c09558a70678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers shared secret output size.  <a href="#a3a4a447bce5ff752bdf9c09558a70678">More...</a><br /></td></tr>
+<tr class="separator:a3a4a447bce5ff752bdf9c09558a70678"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81ad8df798e4333c2eb97b563a839574"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a81ad8df798e4333c2eb97b563a839574">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)=0</td></tr>
 <tr class="memdesc:a81ad8df798e4333c2eb97b563a839574"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret  <a href="#a81ad8df798e4333c2eb97b563a839574">More...</a><br /></td></tr>
 <tr class="separator:a81ad8df798e4333c2eb97b563a839574"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -261,7 +264,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns true if decryption is sucesssful</dd></dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a057079568ae36600dccfe9fd888cf2ab">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a166c01d8fc455250eb87929d4d04342e">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#aaf55426b803534071cb120820ea709cb">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#aa08db36c2ee150018de5754d1dc635ba">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a057079568ae36600dccfe9fd888cf2ab">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a166c01d8fc455250eb87929d4d04342e">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#ace8ab010767e794b3d50386d215ce888">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aa08db36c2ee150018de5754d1dc635ba">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -291,7 +294,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret. </p>
 <p>Changing this code will create a unique distribution of the cipher. The domain key can be used as a secondary secret shared between hosts in an authenticated domain. The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation. For best security, the key should be random, secret, and shared only between hosts within a secure domain.</p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a7c1f872e6d8f908a852db126231c2eb3">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a27a2788f999a472bc723539ad507a39f">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#aa77e831e1eb6a317f955df67ed5e517d">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#a4181a2c2ea05e46e014d4551ad5dfeca">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a7c1f872e6d8f908a852db126231c2eb3">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a27a2788f999a472bc723539ad507a39f">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#aca4ebe693bde39d774b2023504a1b06c">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#a4181a2c2ea05e46e014d4551ad5dfeca">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -338,7 +341,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a4f6861fd1351a04d62b0495355bd99f1">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#ac844374e285f3f3551741a871a1993b1">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#a2c92594b841f74c29502e69a38468f1b">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#aac191f0e7a41a9982d6b4f6988471b45">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a4f6861fd1351a04d62b0495355bd99f1">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#ac844374e285f3f3551741a871a1993b1">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a05104233aa3643b4a8a5fe5dc1fe61e4">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aac191f0e7a41a9982d6b4f6988471b45">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -367,7 +370,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher type-name </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#ab0209b13422f8b7f656a072ccbc1845c">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a48e74796f3ede2e617e06e3dd78d218f">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#a68db8149022104f4970153ee41346497">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#ac88c5eab3920eb90ad8e49be88594af2">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#ab0209b13422f8b7f656a072ccbc1845c">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a48e74796f3ede2e617e06e3dd78d218f">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a0d14c2bf2436bd95c67d7d9a89c359de">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#ac88c5eab3920eb90ad8e49be88594af2">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -396,7 +399,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Generate a public/private key-pair </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a2faf84b73497946c6b4e84b153cfbba4">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a02853162b092480b186c461e7e9c04e6">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#a6c25e95311676c18b934e559cb105e88">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#adb0d48c306832b224b317386773976b4">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a2faf84b73497946c6b4e84b153cfbba4">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a02853162b092480b186c461e7e9c04e6">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a874596e9ad5c437e6c6ff0a6525f1d9e">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#adb0d48c306832b224b317386773976b4">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -438,7 +441,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#abc67836600abcabf527cf36a0a43d256">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a6be0bb571b97b6de9184de3bd1b197cb">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#a0a07d85fc0e5811e586eb022f1da2ab6">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#a04ab2308d07970f350a690be21b570be">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#abc67836600abcabf527cf36a0a43d256">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a6be0bb571b97b6de9184de3bd1b197cb">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#aa606ae7ec8ac35a895aec44e7f4b7d56">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#a04ab2308d07970f350a690be21b570be">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -467,7 +470,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher is initialized for encryption </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#ac1ec03bf88cf09a030dd89ba324b06b7">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a0b8b55a26615c8ae6271b6bef39f4272">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#abe688c056b55203a5d41ea790806fd83">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#af079a2b3792e9107c9b06fc956eddeff">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#ac1ec03bf88cf09a030dd89ba324b06b7">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a0b8b55a26615c8ae6271b6bef39f4272">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a2a72df230b02b0961455ec433eb357d2">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#af079a2b3792e9107c9b06fc956eddeff">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -496,7 +499,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher has been initialized with a key </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a7f4a707111b95f3fe985db967e941ca5">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#aafd54e9639e9cc0dc2b6300fc24eb61e">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#afe62c34970cf8b334098d8996636ef01">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#aa8d9020c00294cb01298dcddff1f5b7e">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a7f4a707111b95f3fe985db967e941ca5">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#aafd54e9639e9cc0dc2b6300fc24eb61e">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a98364399612ed34916761174e9ceaafc">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aa8d9020c00294cb01298dcddff1f5b7e">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -525,7 +528,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The ciphers name </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a0c96e14e00fb46fa1798af3b628f1293">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a8a8de02edc94fcc5809215d9cc64cdfc">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#a50490f9ec5a32e75f71435047e45d0ca">NTRU</a>, and <a class="el" href="class_module_l_w_e.html#aec361dc87bf4a64eed1b8bb1e1a3c1ec">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a0c96e14e00fb46fa1798af3b628f1293">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a8a8de02edc94fcc5809215d9cc64cdfc">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a8a824662d92cb14aa720dc14cb207a75">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aec361dc87bf4a64eed1b8bb1e1a3c1ec">ModuleLWE</a>.</p>
 
 </div>
 </div>
@@ -554,6 +557,36 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Copy operator: copy is restricted, this function has been deleted </p>
+
+</div>
+</div>
+<a id="a3a4a447bce5ff752bdf9c09558a70678"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a4a447bce5ff752bdf9c09558a70678">&#9670;&nbsp;</a></span>SharedSecretSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAsymmetricCipher::SharedSecretSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The ciphers shared secret output size. </p>
+<p>When using the DomainKey parameter, the domain-key is added to the ciphers output shared-secret and used as seed material by a custom SHAKE-512, this allows for variable length output. In this operating mode, the shared secret can be any size. In standard operating mode, the output shared-secret is the expected output from the asymmetric cipher.</p>
+
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a39697911ed1c04de0c0d708c0b843405">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a3ea68f8849f95dcd8f6378018b0b9732">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a9c93da08cc2eaf1182d32ee07e60f52b">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#a4e3fb63861b5973328f9c1a6f5d286bf">ModuleLWE</a>.</p>
 
 </div>
 </div>

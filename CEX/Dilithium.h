@@ -89,7 +89,7 @@ using Kdf::IKdf;
 /// <item><description>Software: <a href="https://pq-crystals.org/dilithium/software.shtml">Dilithium</a> Software.</description></item>
 /// <item><description>Reference Paper : <a href="https://pq-crystals.org/dilithium/data/dilithium-specification.pdf">CRYSTALS-Dilithium</a>.</description></item>
 /// <item><description>Reference: <a href="https://pq-crystals.org/dilithium/data/dilithium-20180114.pdf">Dilithium</a>: A lattice-Based Digital Signature Scheme.</description></item>
-/// <item><description>Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a></description></item>.
+/// <item><description>Website: <a href="https://pq-crystals.org/dilithium/">Dilithium Website</a></description></item>.
 /// </list>
 /// </remarks>
 class Dilithium final : public IAsymmetricSign

@@ -7,7 +7,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// The NTRU parameter sets enumeration
+/// The NTRUPrime parameter sets enumeration
 /// </summary>
 enum class NTRUParameters : byte
 {
@@ -16,13 +16,17 @@ enum class NTRUParameters : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S1 parameters; (High Security) The rounded product form L-Prime, modulus of 4591 with 761 coefficients
+	/// The S1 parameters; (Medium Security) The rounded quotient form S-Prime, modulus of 4621 with 653 coefficients
 	/// </summary>
-	NTRUS1LQ4591N761 = static_cast<byte>(AsymmetricTransforms::NTRUS1LQ4591N761),
+	NTRUS1SQ4621N653 = static_cast<byte>(AsymmetricTransforms::NTRUS1SQ4621N653),
 	/// <summary>
 	/// The S2 parameters; (High Security) The rounded quotient form S-Prime, modulus of 4591 with 761 coefficients
 	/// </summary>
-	NTRUS2SQ4591N761 = static_cast<byte>(AsymmetricTransforms::NTRUS2SQ4591N761)
+	NTRUS2SQ4591N761 = static_cast<byte>(AsymmetricTransforms::NTRUS2SQ4591N761),
+	/// <summary>
+	/// The S3 parameters; (Highest Security) The rounded quotient form S-Prime, modulus of 5167 with 857 coefficients
+	/// </summary>
+	NTRUS3SQ5167N857 = static_cast<byte>(AsymmetricTransforms::NTRUS3SQ5167N857)
 };
 
 class NTRUParameterConvert

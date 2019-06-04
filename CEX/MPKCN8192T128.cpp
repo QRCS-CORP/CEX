@@ -8,7 +8,7 @@ NAMESPACE_MCELIECE
 using Digest::Keccak;
 using Utility::IntegerTools;
 
-bool MPKCN8192T128::Decrypt(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+bool MPKCN8192T128::Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	std::vector<byte> conf(SECRET_SIZE);
 	std::vector<byte> e2(1 + (MPKC_N / 8), 0x02);
@@ -53,7 +53,7 @@ bool MPKCN8192T128::Decrypt(const std::vector<byte> &PrivateKey, const std::vect
 	return static_cast<bool>(confirm == 0 && derr == 0);
 }
 
-void MPKCN8192T128::Encrypt(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng)
+void MPKCN8192T128::Encapsulate(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng)
 {
 	std::vector<byte> e2(1 + (MPKC_N / 8), 0x02);
 	std::vector<byte> ec1(1 + (MPKC_N / 8) + SYND_BYTES + SECRET_SIZE, 0x01);
@@ -88,11 +88,7 @@ bool MPKCN8192T128::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 
 void MPKCN8192T128::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
-#if defined(CEX_SHAKE_STRONG)
-	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#else
-	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#endif
+	Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
 // benes.c //

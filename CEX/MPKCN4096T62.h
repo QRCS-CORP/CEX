@@ -110,7 +110,7 @@ public:
 	/// <param name="SharedSecret">The shared secret output</param>
 	/// 
 	/// <returns>The message was decrypted succesfully</returns>
-	static bool Decrypt(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret);
+	static bool Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret);
 
 	/// <summary>
 	/// Encrypt a message and return the shared secret and cipher-text
@@ -120,7 +120,7 @@ public:
 	/// <param name="CipherText">The ciphertext input vector</param>
 	/// <param name="SharedSecret">The shared secret output</param>
 	/// <param name="Rng">The random generator instance</param>
-	static void Encrypt(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng);
+	static void Encapsulate(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng);
 
 	/// <summary>
 	/// Generate a public/private key pair

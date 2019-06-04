@@ -1469,11 +1469,7 @@ void DLMN256Q8380417::Squeeze(std::array<ulong, 25> &State, std::vector<byte> &O
 
 void DLMN256Q8380417::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
-#if defined(CEX_SHAKE_STRONG)
-	Keccak::XOFR48P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#else
-	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
-#endif
+	Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
 NAMESPACE_DILITHIUMEND

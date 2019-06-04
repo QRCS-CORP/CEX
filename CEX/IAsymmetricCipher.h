@@ -104,6 +104,14 @@ public:
 	/// </summary>
 	virtual const std::string Name() = 0;
 
+	/// <summary>
+	/// Read Only: The ciphers shared secret output size.
+	/// <para>When using the DomainKey parameter, the domain-key is added to the ciphers output shared-secret and used as seed material
+	/// by a custom SHAKE-512, this allows for variable length output. In this operating mode, the shared secret can be any size.
+	/// In standard operating mode, the output shared-secret is the expected output from the asymmetric cipher.</para>
+	/// </summary>
+	virtual const size_t SharedSecretSize() = 0;
+
 	//~~~Public Functions~~~//
 
 	/// <summary>

@@ -359,13 +359,9 @@ void Keccak1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t 
 
 //~~~Private Functions~~~//
 
-void Keccak1024::Permute(std::array<ulong, 25> &Hash)
+void Keccak1024::Permute(std::array<ulong, 25> &State)
 {
-#if defined(CEX_DIGEST_COMPACT)
-	Keccak::PermuteR48P1600C(Hash);
-#else
-	Keccak::PermuteR48P1600U(Hash);
-#endif
+	Keccak::PermuteR48(State);
 }
 
 void Keccak1024::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak1024State &State)

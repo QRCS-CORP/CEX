@@ -17,8 +17,8 @@ std::string AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives Enumeral)
 		case AsymmetricPrimitives::ModuleLWE:
 			name = std::string("ModuleLWE");
 			break;
-		case AsymmetricPrimitives::NTRU:
-			name = std::string("NTRU");
+		case AsymmetricPrimitives::NTRUPrime:
+			name = std::string("NTRUPrime");
 			break;
 		case AsymmetricPrimitives::RingLWE:
 			name = std::string("RingLWE");
@@ -50,9 +50,9 @@ AsymmetricPrimitives AsymmetricPrimitiveConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricPrimitives::ModuleLWE;
 	}
-	else if (Name == std::string("NTRU"))
+	else if (Name == std::string("NTRUPrime"))
 	{
-		tname = AsymmetricPrimitives::NTRU;
+		tname = AsymmetricPrimitives::NTRUPrime;
 	}
 	else if (Name == std::string("RingLWE"))
 	{

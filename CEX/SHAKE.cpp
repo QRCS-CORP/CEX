@@ -1,11 +1,9 @@
 #include "SHAKE.h"
-#include "ArrayTools.h"
 #include "IntegerTools.h"
 #include "MemoryTools.h"
 
 NAMESPACE_KDF
 
-using Utility::ArrayTools;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 using Enumeration::ShakeModeConvert;
@@ -389,13 +387,12 @@ void SHAKE::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Lengt
 
 void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<ShakeState> &State)
 {
-	std::array<byte, BUFFER_SIZE> pad;
+	std::array<byte, BUFFER_SIZE> pad = { 0 };
 	size_t i;
 	size_t offset;
 
-	MemoryTools::Clear(pad, 0, pad.size());
-	offset = ArrayTools::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
-	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Information.size() * 8));
+	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Information.size()) * 8);
 
 	State->Domain = Keccak::KECCAK_CSHAKE_DOMAIN;
 
@@ -415,7 +412,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		}
 	}
 
-	offset += ArrayTools::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
 
 	if (Customization.size() != 0)
 	{
@@ -502,19 +499,11 @@ void SHAKE::Permute(std::unique_ptr<ShakeState> &State)
 {
 	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
-#if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR24P1600C(State->State);
-#else
-		Keccak::PermuteR24P1600U(State->State);
-#endif
+		Keccak::Permute(State->State);
 	}
 	else
 	{
-#if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR48P1600C(State->State);
-#else
-		Keccak::PermuteR48P1600U(State->State);
-#endif
+		Keccak::PermuteR48(State->State);
 	}
 
 	++State->Counter;

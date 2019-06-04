@@ -44,7 +44,7 @@ using Enumeration::MLWEParameters;
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// std::vector&lt;byte&gt; sec(32);
+/// std::vector&lt;byte&gt; sec(0);
 /// std::vector&lt;byte&gt; cpt(0);
 /// 
 /// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
@@ -55,7 +55,7 @@ using Enumeration::MLWEParameters;
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// std::vector&lt;byte&gt; sec(32);
+/// std::vector&lt;byte&gt; sec(0);
 /// bool status;
 /// 
 /// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
@@ -71,7 +71,18 @@ using Enumeration::MLWEParameters;
 /// An important feature of the LWE problem is that the solution may be reducible to the NP-Hard Shortest Vector Problem (SVP) in a Lattice. \n
 /// This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers.
 /// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
-/// 
+///
+/// <description>Domain Key:</description>
+/// <para>This cipher utilizes an optional two-key system. The KEM shared-secret generated with the encapsulate and decapsulate methods, can be combined with a secondary key. \n
+/// This second key can be provided to users within a domain, or as part of a two-key mechanism in which the server component provides one ephemeral key to each host,
+/// and the two hosts exchange the second key (the shared-secret) via a second asymmetric key exchange. \n
+/// The domain key is used as the customization string in an instance of cSHAKE-512, the ciphers formal name (cipher-name + parameter-name), is used as the cSHAKE name parameter, 
+/// and the shared secret is the primary seed. \n
+/// Using the domain key, the shared secret output is equal to the initial size of the shared-secret array, this means that in this extended operating mode, secure output of up to 1KB is possible. \n
+/// To enable the two-key form of the cipher, populate the DomainKey parameter with the secondary key, and size the shared-secret arrays used in encapsulate and decapsulate to the required output size.
+/// In standard operational mode (with a zero-sized domain-key), the output from the cipher is the 256-bit output expected from a standard instance of the cipher.
+/// </para>
+///
 /// <list type="bullet">
 /// <item><description>This version of Kyber aligns with the NIST PQ round 2 implementation</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MLWEPublicKey, or MLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
@@ -90,6 +101,7 @@ class ModuleLWE final : public IAsymmetricCipher
 {
 private:
 
+	const size_t SECRET_SIZE = 32;
 	class MlweState;
 	std::unique_ptr<MlweState> m_mlweState;
 	std::unique_ptr<AsymmetricKey> m_privateKey;
@@ -172,6 +184,14 @@ public:
 	/// </summary>
 	const MLWEParameters Parameters();
 
+	/// <summary>
+	/// Read Only: The ciphers shared secret output size.
+	/// <para>When using the DomainKey parameter, the domain-key is added to the ciphers output shared-secret and used as seed material
+	/// by a custom SHAKE-512, this allows for variable length output. In this operating mode, the shared secret can be any size.
+	/// In standard operating mode, the output shared-secret is the expected output from the asymmetric cipher.</para>
+	/// </summary>
+	const size_t SharedSecretSize() override;
+
 	//~~~Public Functions~~~//
 
 	/// <summary>
@@ -211,6 +231,10 @@ public:
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Throws on invalid key or configuration error</exception>
 	void Initialize(AsymmetricKey* Key) override;
+
+private:
+
+	void CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate);
 };
 
 NAMESPACE_MODULELWEEND

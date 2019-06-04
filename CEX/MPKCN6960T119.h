@@ -107,7 +107,7 @@ public:
 	/// <param name="SharedSecret">The output shared-secret (a vector of MCELIECE_SECRET_SIZE bytes)</param>
 	/// 
 	/// <returns>The message was decrypted succesfully, fails on authentication failure</returns>
-	static bool Decrypt(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret);
+	static bool Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret);
 
 	/// <summary>
 	/// Generates the cipher-text and shared-secret for a given public key
@@ -117,7 +117,7 @@ public:
 	/// <param name="CipherText">The output cipher-text vector</param>
 	/// <param name="SharedSecret">The output shared-secret (an array of MCELIECE_SECRET_SIZE bytes)</param>
 	/// <param name="Rng">The random generator instance</param>
-	static void Encrypt(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng);
+	static void Encapsulate(const std::vector<byte> &PublicKey, std::vector<byte> &CipherText, std::vector<byte> &SharedSecret, std::unique_ptr<IPrng> &Rng);
 
 	/// <summary>
 	/// Generate a public/private key-pair
