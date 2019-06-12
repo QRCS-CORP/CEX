@@ -22,6 +22,11 @@ namespace Test
 		static const size_t TEST_CYCLES = 100;
 #endif
 
+		std::vector<std::vector<byte>> m_msgexp;
+		std::vector<std::vector<byte>> m_pubexp;
+		std::vector<std::vector<byte>> m_priexp;
+		std::vector<std::vector<byte>> m_rngseed;
+		std::vector<std::vector<byte>> m_sigexp;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -62,6 +67,16 @@ namespace Test
 		void Exception();
 
 		/// <summary>
+		/// Compare the shared-secret, cipher-text, public and private key vectors to known answer outputs
+		/// </summary>
+		void Integrity();
+
+		/// <summary>
+		/// Compare the NIST PQ Round 2 known answers to the shared-secret output vectors
+		/// </summary>
+		void Kat();
+
+		/// <summary>
 		/// Tests the for invalid private keys in a looping stress test
 		/// </summary>
 		void PrivateKey();
@@ -88,6 +103,7 @@ namespace Test
 
 	private:
 
+		void Initialize();
 		void OnProgress(const std::string &Data);
 	};
 }

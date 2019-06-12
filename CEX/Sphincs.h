@@ -39,8 +39,8 @@ using Enumeration::SphincsParameters;
 /// IAsymmetricKeyPair* kp = sgn.Generate();
 /// 
 /// // serialize the public key
-///	SphincsPrivateKey* prik = (SphincsPrivateKey*)kp->PrivateKey();
-/// std::vector&lt;byte&gt; pk = prik->ToBytes();
+///	IAsymmetricKey* pubk = kp->PublicKey();
+/// std::vector&lt;byte&gt; pk = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Sign:</description>

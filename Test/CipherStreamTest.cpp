@@ -32,6 +32,7 @@ namespace Test
 
 	CipherStreamTest::~CipherStreamTest()
 	{
+		m_processorCount = 0;
 	}
 
 	const std::string CipherStreamTest::Description()

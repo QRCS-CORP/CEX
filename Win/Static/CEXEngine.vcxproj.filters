@@ -768,9 +768,6 @@
     <ClInclude Include="..\..\CEX\Dilithium.h">
       <Filter>Header Files\Asymmetric\Sign\Dilithium</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\DLMN256Q8380417.h">
-      <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\DilithiumParameters.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -962,6 +959,18 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\NTRUSQ5167P857.h">
       <Filter>Header Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DLTMK5Q8380417N256.h">
+      <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DLTMK4Q8380417N256.h">
+      <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h">
+      <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DLMNPolyMath.h">
+      <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1253,9 +1262,6 @@
     <ClCompile Include="..\..\CEX\Dilithium.cpp">
       <Filter>Source Files\Asymmetric\Sign\Dilithium</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\DLMN256Q8380417.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\SecureMemory.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -1474,6 +1480,18 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\NTRUPolyMath.cpp">
       <Filter>Source Files\Asymmetric\Cipher\NTRUPrime\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DLTMK4Q8380417N256.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DLTMK5Q8380417N256.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DLMNPolyMath.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

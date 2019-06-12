@@ -37,8 +37,8 @@ using Enumeration::MPKCParameters;
 /// McEliece cpr(MPKCParameters::MPKCS1N4096T62, [PrngType], [CipherType]);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// // serialize the public key
-/// MPKCPublicKey* pubK = (MPKCPublicKey*)kp->PublicKey();
-/// std::vector&lt;byte&gt; skey = pubK->ToBytes();
+/// IAsymmetricKey* pubk = kp->PublicKey();
+/// std::vector&lt;byte&gt; skey = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>

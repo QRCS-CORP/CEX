@@ -196,6 +196,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\ACS.h" />
+    <ClInclude Include="..\..\CEX\DLMNPolyMath.h" />
+    <ClInclude Include="..\..\CEX\DLTMK4Q8380417N256.h" />
+    <ClInclude Include="..\..\CEX\DLTMK5Q8380417N256.h" />
+    <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\MCS.h" />
     <ClInclude Include="..\..\CEX\ACP.h" />
     <ClInclude Include="..\..\CEX\AeadModeFromName.h" />
@@ -254,7 +258,6 @@
     <ClInclude Include="..\..\CEX\Digests.h" />
     <ClInclude Include="..\..\CEX\DigestStream.h" />
     <ClInclude Include="..\..\CEX\Dilithium.h" />
-    <ClInclude Include="..\..\CEX\DLMN256Q8380417.h" />
     <ClInclude Include="..\..\CEX\Documentation.h" />
     <ClInclude Include="..\..\CEX\Donna128.h" />
     <ClInclude Include="..\..\CEX\DrbgBase.h" />
@@ -414,6 +417,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\ACS.cpp" />
+    <ClCompile Include="..\..\CEX\DLMNPolyMath.cpp" />
+    <ClCompile Include="..\..\CEX\DLTMK4Q8380417N256.cpp" />
+    <ClCompile Include="..\..\CEX\DLTMK5Q8380417N256.cpp" />
+    <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\MCS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp" />
@@ -467,7 +474,6 @@
     <ClCompile Include="..\..\CEX\DigestStream.cpp" />
     <ClCompile Include="..\..\CEX\Dilithium.cpp" />
     <ClCompile Include="..\..\CEX\DilithiumParameters.cpp" />
-    <ClCompile Include="..\..\CEX\DLMN256Q8380417.cpp" />
     <ClCompile Include="..\..\CEX\DrbgBase.cpp" />
     <ClCompile Include="..\..\CEX\DrbgFromName.cpp" />
     <ClCompile Include="..\..\CEX\Drbgs.cpp" />

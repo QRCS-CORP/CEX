@@ -8,8 +8,8 @@ std::string AsymmetricTransformConvert::ToName(AsymmetricTransforms Enumeral)
 
 	switch (Enumeral)
 	{
-	case AsymmetricTransforms::DLMS1256Q8380417:
-		name = std::string("DLMS1256Q8380417");
+	case AsymmetricTransforms::DLMS1N256Q8380417:
+		name = std::string("DLMS1N256Q8380417");
 		break;
 	case AsymmetricTransforms::DLMS2N256Q8380417:
 		name = std::string("DLMS2N256Q8380417");
@@ -71,9 +71,9 @@ AsymmetricTransforms AsymmetricTransformConvert::FromName(std::string &Name)
 {
 	AsymmetricTransforms tname;
 
-	if (Name == std::string("DLMS1256Q8380417"))
+	if (Name == std::string("DLMS1N256Q8380417"))
 	{
-		tname = AsymmetricTransforms::DLMS1256Q8380417;
+		tname = AsymmetricTransforms::DLMS1N256Q8380417;
 	}
 	else if (Name == std::string("DLMS2N256Q8380417"))
 	{

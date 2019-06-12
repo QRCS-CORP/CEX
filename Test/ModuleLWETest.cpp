@@ -3,6 +3,7 @@
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/CryptoAuthenticationFailure.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/ModuleLWE.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/SecureRandom.h"
@@ -16,6 +17,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricTransforms;
 	using Exception::CryptoAsymmetricException;
+	using Utility::IntegerTools;
 	using Enumeration::MLWEParameters;
 	using Asymmetric::Encrypt::MLWE::ModuleLWE;
 	using Test::NistRng;
@@ -38,6 +40,11 @@ namespace Test
 
 	ModuleLWETest::~ModuleLWETest()
 	{
+		IntegerTools::Clear(m_cptexp);
+		IntegerTools::Clear(m_priexp);
+		IntegerTools::Clear(m_pubexp);
+		IntegerTools::Clear(m_rngseed);
+		IntegerTools::Clear(m_sskexp);
 	}
 
 	const std::string ModuleLWETest::Description()

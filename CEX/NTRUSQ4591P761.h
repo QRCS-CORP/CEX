@@ -44,37 +44,37 @@ class NTRUSQ4591P761
 {
 private:
 
-	static const int NTRUP_P = 761;
-	static const int NTRUP_Q = 4591;
-	static const int NTRUP_W = 286;
-	static const int NTRUP_ROUNDED = 1007;
-	static const int NTRUP_SPOLY = ((NTRUP_P + 3) / 4);
-	static const int NTRUP_CPAPRIVATEKEY_SIZE = (2 * NTRUP_SPOLY);
-	static const int NTRUP_RQ = 1158;
-	static const int NTRUP_HASH_SIZE = 32;
-	static const int NTRUP_SEED_SIZE = 32;
+	static const int32_t NTRUP_P = 761;
+	static const int32_t NTRUP_Q = 4591;
+	static const int32_t NTRUP_W = 286;
+	static const int32_t NTRUP_ROUNDED = 1007;
+	static const int32_t NTRUP_SPOLY = ((NTRUP_P + 3) / 4);
+	static const int32_t NTRUP_CPAPRIVATEKEY_SIZE = (2 * NTRUP_SPOLY);
+	static const int32_t NTRUP_RQ = 1158;
+	static const int32_t NTRUP_HASH_SIZE = 32;
+	static const int32_t NTRUP_SEED_SIZE = 32;
 
 public:
 
 	/// <summary>
 	/// The byte size of the CCA cipher-text
 	/// </summary>
-	static const int CIPHERTEXT_SIZE = NTRUP_ROUNDED + NTRUP_HASH_SIZE;
+	static const int32_t CIPHERTEXT_SIZE = NTRUP_ROUNDED + NTRUP_HASH_SIZE;
 
 	/// <summary>
 	/// The byte size of the CCA private key polynomial
 	/// </summary>
-	static const int PRIVATEKEY_SIZE = NTRUP_RQ + NTRUP_CPAPRIVATEKEY_SIZE + NTRUP_SPOLY + NTRUP_HASH_SIZE;
+	static const int32_t PRIVATEKEY_SIZE = NTRUP_RQ + NTRUP_CPAPRIVATEKEY_SIZE + NTRUP_SPOLY + NTRUP_HASH_SIZE;
 
 	/// <summary>
 	/// The byte size of the CCA public key polynomial
 	/// </summary>
-	static const int PUBLICKEY_SIZE = NTRUP_RQ;
+	static const int32_t PUBLICKEY_SIZE = NTRUP_RQ;
 
 	/// <summary>
 	/// The byte size of the secret seed array
 	/// </summary>
-	static const int SEED_SIZE = NTRUP_SEED_SIZE;
+	static const int32_t SEED_SIZE = NTRUP_SEED_SIZE;
 
 	/// <summary>
 	/// Decapsulate a cipher-text and return the shared-secret
@@ -106,9 +106,9 @@ public:
 
 private:
 
-	static void Hash(std::vector<byte> &Output, size_t OutOffset, int B, const std::vector<byte> &Input);
+	static void Hash(std::vector<byte> &Output, size_t OutOffset, int32_t B, const std::vector<byte> &Input);
 	static void HashConfirm(std::vector<byte> &H, size_t HOffset, const std::vector<byte> &R, const std::vector<byte> &Pk, const std::vector<byte> &Cache);
-	static void HashSession(std::vector<byte> &K, int B, const std::vector<byte> &Y, const std::vector<byte> &Z);
+	static void HashSession(std::vector<byte> &K, int32_t B, const std::vector<byte> &Y, const std::vector<byte> &Z);
 	static void Hide(std::vector<byte> &C, std::vector<byte> &REnc, const std::vector<int8_t> &R, const std::vector<byte> &Pk, const std::vector<byte> &Cache);
 	static void KeyGen(std::vector<int16_t> &H, std::vector<int8_t> &F, std::vector<int8_t> &GInv, std::unique_ptr<Prng::IPrng> &Rng);
 	static void ShortFromList(std::vector<int8_t> &Output, const std::vector<uint> &Input);

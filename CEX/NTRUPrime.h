@@ -35,12 +35,12 @@ using Enumeration::NTRUParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// NTRUPrime acpr(NTRUParameters::NTRUS2SQ4591N761);
-/// IAsymmetricKeyPair* kp = acpr.Generate();
+/// NTRUPrime cpr(NTRUParameters::NTRUS2SQ4591N761);
+/// IAsymmetricKeyPair* kp = cpr.Generate();
 /// 
 /// // serialize the public key
-/// NTRUPublicKey* pubK1 = (NTRUPublicKey*)kp->PublicKey();
-/// std::vector&lt;byte&gt; pk = pubK1->ToBytes();
+/// IAsymmetricKey* pubk = kp->PublicKey();
+/// std::vector&lt;byte&gt; pk = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
@@ -50,7 +50,7 @@ using Enumeration::NTRUParameters;
 /// std::vector&lt;byte&gt; sec(0);
 ///
 /// // initialize the cipher
-/// NTRUPrime acpr(NTRUParameters::NTRUS2SQ4591N761);
+/// NTRUPrime cpr(NTRUParameters::NTRUS2SQ4591N761);
 /// cpr.Initialize(PublicKey);
 /// // generate the ciphertext and shared secret
 /// status = cpr.Encapsulate(cpt, sec);
@@ -62,7 +62,7 @@ using Enumeration::NTRUParameters;
 /// bool status;
 ///
 /// // initialize the cipher
-/// NTRUPrime acpr(NTRUParameters::NTRUS2LQ4591N761);
+/// NTRUPrime cpr(NTRUParameters::NTRUS2LQ4591N761);
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the shared secret, status returns authentication outcome, false for failure
 /// status = cpr.Decapsulate(cpt, sec);
@@ -89,6 +89,7 @@ using Enumeration::NTRUParameters;
 /// </para>
 ///
 /// <list type="bullet">
+/// <item><description>This version of NTRU-Prime aligns with the NIST PQ round 2 implementation</description></item>
 /// <item><description>There are three available parameter sets based upon the streamlined rounding form; Q4621P653, Q4591P761, and Q5167P857, selectable through the class constructor parameter</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: NTRUPublicKey, or NTRUPrivateKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>

@@ -499,11 +499,11 @@ void SHAKE::Permute(std::unique_ptr<ShakeState> &State)
 {
 	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
-		Keccak::Permute(State->State);
+		Keccak::PermuteR24P1600U(State->State);
 	}
 	else
 	{
-		Keccak::PermuteR48(State->State);
+		Keccak::PermuteR48P1600U(State->State);
 	}
 
 	++State->Counter;

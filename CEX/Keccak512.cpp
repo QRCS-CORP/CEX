@@ -357,7 +357,11 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 void Keccak512::Permute(std::array<ulong, 25> & State)
 {
-	Keccak::Permute(State);
+#if defined(CEX_DIGEST_COMPACT)
+	Keccak::PermuteR24P1600C(State);
+#else
+	Keccak::PermuteR24P1600U(State);
+#endif
 }
 
 void Keccak512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak512State &State)

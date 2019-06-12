@@ -398,11 +398,19 @@ void KMAC::Permute(std::unique_ptr<KmacState> &State)
 {
 	if (State->KmacMode != KmacModes::KMAC1024)
 	{
-		Keccak::Permute(State->State);
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR24P1600C(State->State);
+#else
+		Keccak::PermuteR24P1600U(State->State);
+#endif
 	}
 	else
 	{
-		Keccak::PermuteR48(State->State);
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600C(State->State);
+#else
+		Keccak::PermuteR48P1600U(State->State);
+#endif
 	}
 }
 

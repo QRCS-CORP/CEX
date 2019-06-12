@@ -2,6 +2,7 @@
 #include "NistRng.h"
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/McEliece.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/RHX.h"
@@ -16,6 +17,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricTransforms;
 	using Exception::CryptoAsymmetricException;
+	using Utility::IntegerTools;
 	using Asymmetric::Encrypt::MPKC::McEliece;
 	using Enumeration::MPKCParameters;
 	using Test::NistRng;
@@ -28,16 +30,21 @@ namespace Test
 	McElieceTest::McElieceTest()
 		:
 		m_cptexp(0),
-		m_sskexp(0),
 		m_cprseed(0),
 		m_rngexp(0),
 		m_rngkey(0),
+		m_sskexp(0),
 		m_progressEvent()
 	{
 	}
 	
 	McElieceTest::~McElieceTest()
 	{
+		IntegerTools::Clear(m_cptexp);
+		IntegerTools::Clear(m_cprseed);
+		IntegerTools::Clear(m_rngexp);
+		IntegerTools::Clear(m_rngkey);
+		IntegerTools::Clear(m_sskexp);
 	}
 
 	const std::string McElieceTest::Description()

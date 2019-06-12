@@ -34,12 +34,12 @@ using Enumeration::RLWEParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// RingLWE acpr(RLWEParameters::RLWES1Q12289N1024);
-/// IAsymmetricKeyPair* kp = acpr.Generate();
+/// RingLWE cpr(RLWEParameters::RLWES1Q12289N1024);
+/// IAsymmetricKeyPair* kp = cpr.Generate();
 /// 
 /// // serialize the public key
-/// RLWEPublicKey* pubK1 = (RLWEPublicKey*)kp->PublicKey();
-/// std::vector&lt;byte&gt; pk = pubK1->ToBytes();
+/// IAsymmetricKey* pubk = kp->PublicKey();
+/// std::vector&lt;byte&gt; pk = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
@@ -49,7 +49,7 @@ using Enumeration::RLWEParameters;
 /// std::vector&lt;byte&gt; sec(0);
 ///
 /// // initialize the cipher
-/// RingLWE acpr(RLWEParameters::RLWES1Q12289N1024);
+/// RingLWE cpr(RLWEParameters::RLWES1Q12289N1024);
 /// cpr.Initialize(PublicKey);
 /// // encrypt the secret
 /// cpr.Encapsulate(cpt, sec);
@@ -61,7 +61,7 @@ using Enumeration::RLWEParameters;
 /// bool status;
 ///
 /// // initialize the cipher
-/// RingLWE acpr(RLWEParameters::RLWES1Q12289N1024);
+/// RingLWE cpr(RLWEParameters::RLWES1Q12289N1024);
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the secret, status returns authentication outcome, false for failure
 /// status = cpr.Decapsulate(cpt, sec);

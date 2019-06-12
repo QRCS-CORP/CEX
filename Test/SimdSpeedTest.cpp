@@ -45,6 +45,9 @@ namespace Test
 
 	SimdSpeedTest::~SimdSpeedTest()
 	{
+		m_hasAVX = false;
+		m_hasAVX2 = false;
+		m_hasAVX512 = false;
 	}
 
 	const std::string SimdSpeedTest::Description()

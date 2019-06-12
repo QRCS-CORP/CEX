@@ -17,6 +17,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricTransforms;
 	using Exception::CryptoAsymmetricException;
+	using Utility::IntegerTools;
 	using Test::NistRng;
 	using Asymmetric::Encrypt::RLWE::RingLWE;
 	using Enumeration::RLWEParameters;
@@ -39,6 +40,11 @@ namespace Test
 
 	RingLWETest::~RingLWETest()
 	{
+		IntegerTools::Clear(m_cptexp);
+		IntegerTools::Clear(m_priexp);
+		IntegerTools::Clear(m_pubexp);
+		IntegerTools::Clear(m_rngseed);
+		IntegerTools::Clear(m_sskexp);
 	}
 
 	const std::string RingLWETest::Description()

@@ -34,12 +34,12 @@ using Enumeration::MLWEParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
-/// IAsymmetricKeyPair* kp = acpr.Generate();
+/// ModuleLWE cpr(MLWEParameters::MLWES2Q3329N256);
+/// IAsymmetricKeyPair* kp = cpr.Generate();
 /// 
 /// // serialize the public key
-/// MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
-/// std::vector&lt;byte&gt; pk = pubK1->ToBytes();
+/// IAsymmetricKey* pubk = kp->PublicKey();
+/// std::vector&lt;byte&gt; pk = pubk->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
@@ -47,10 +47,10 @@ using Enumeration::MLWEParameters;
 /// std::vector&lt;byte&gt; sec(0);
 /// std::vector&lt;byte&gt; cpt(0);
 /// 
-/// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
-/// acpr.Initialize(PublicKey);
+/// ModuleLWE cpr(MLWEParameters::MLWES2Q3329N256);
+/// cpr.Initialize(PublicKey);
 /// // generate the ciphertext and shared secret
-/// acpr.Encapsulate(cpt, sec);
+/// cpr.Encapsulate(cpt, sec);
 /// </code>
 ///
 /// <description>Decryption:</description>
@@ -58,10 +58,10 @@ using Enumeration::MLWEParameters;
 /// std::vector&lt;byte&gt; sec(0);
 /// bool status;
 /// 
-/// ModuleLWE acpr(MLWEParameters::MLWES2Q3329N256);
-/// acpr.Initialize(PrivateKey);
+/// ModuleLWE cpr(MLWEParameters::MLWES2Q3329N256);
+/// cpr.Initialize(PrivateKey);
 /// // decrypt the ciphertext and output the shared secret
-///	status = acpr.Decapsulate(cpt, sec);
+///	status = cpr.Decapsulate(cpt, sec);
 /// </code>
 /// </example>
 /// 

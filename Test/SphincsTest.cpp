@@ -9,7 +9,13 @@
 
 namespace Test
 {
-	using namespace Asymmetric;
+	using Asymmetric::AsymmetricKey;
+	using Asymmetric::AsymmetricKeyPair;
+	using Enumeration::AsymmetricKeyTypes;
+	using Enumeration::AsymmetricPrimitives;
+	using Enumeration::AsymmetricTransforms;
+	using Exception::CryptoAsymmetricException;
+	using Utility::IntegerTools;
 	using Asymmetric::Sign::SPX::Sphincs;
 	using Prng::SecureRandom;
 	using Enumeration::SphincsParameters;
@@ -20,12 +26,22 @@ namespace Test
 
 	SphincsTest::SphincsTest()
 		:
+		m_msgexp(0),
+		m_pubexp(0),
+		m_priexp(0),
+		m_rngseed(0),
+		m_sigexp(0),
 		m_progressEvent()
 	{
 	}
 
 	SphincsTest::~SphincsTest()
 	{
+		IntegerTools::Clear(m_msgexp);
+		IntegerTools::Clear(m_pubexp);
+		IntegerTools::Clear(m_priexp);
+		IntegerTools::Clear(m_rngseed);
+		IntegerTools::Clear(m_sigexp);
 	}
 
 	const std::string SphincsTest::Description()

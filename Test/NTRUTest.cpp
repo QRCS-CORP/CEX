@@ -3,6 +3,7 @@
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/CryptoAuthenticationFailure.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/NTRUPrime.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/SecureRandom.h"
@@ -16,6 +17,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricTransforms;
 	using Exception::CryptoAsymmetricException;
+	using Utility::IntegerTools;
 	using Test::NistRng;
 	using Asymmetric::Encrypt::NTRUP::NTRUPrime;
 	using Enumeration::NTRUParameters;
@@ -27,12 +29,22 @@ namespace Test
 
 	NTRUTest::NTRUTest()
 		:
+		m_cptexp(0),
+		m_priexp(0),
+		m_pubexp(0),
+		m_rngseed(0),
+		m_sskexp(0),
 		m_progressEvent()
 	{
 	}
 
 	NTRUTest::~NTRUTest()
 	{
+		IntegerTools::Clear(m_cptexp);
+		IntegerTools::Clear(m_priexp);
+		IntegerTools::Clear(m_pubexp);
+		IntegerTools::Clear(m_rngseed);
+		IntegerTools::Clear(m_sskexp);
 	}
 
 	const std::string NTRUTest::Description()
@@ -58,9 +70,9 @@ namespace Test
 			Exception();
 			OnProgress(std::string("NTRUTest: Passed exception handling test.."));
 			Integrity();
-			OnProgress(std::string("NTRUTest: Passed NIST PQ Round 2 ciphertext, shared-secret, public and private key known answer tests.."));
+			OnProgress(std::string("NTRUTest: Passed NIST PQ Round 2 cipher-text, shared-secret, public and private key known answer tests.."));
 			Kat();
-			OnProgress(std::string("NTRUTest: Passed cipher-text and shared-secret known answer tests.."));
+			OnProgress(std::string("NTRUTest: Passed NIST PQ Round 2 cipher-text and shared-secret known answer tests.."));
 			PublicKey();
 			OnProgress(std::string("NTRUTest: Passed public key integrity test.."));
 			Serialization();
@@ -701,7 +713,6 @@ namespace Test
 				"7A0F124F9348E1A570BA0D009B7B46E03CEB201B17114B935AA91691A7F830346636FD34ECE2CC295D0124AD8CA76CC81E942C1607699F0DFFD3BDB509392FAF"
 				"8212363F562554B05F756FF252765E6FCAFB04C6F2CF6A76F2E59E14F5BD4EA8E2ECF50B17E632F346D697FFB7AEB82ADDEF5B4DEC0DEE73D2D96B1A33C6AB4B"
 				"CF7A160B79114A48F224FA037315ADF0485AB63DC2BF09F02606DAD80F13F0ED0241E6F53B21BBBE584794F77D0B783A7093F53AC916A848FF0F9FA3FB08A053C4"),
-
 			std::string("84F327D38929039EF84366AB796A96E6CC268454D5AD8D05410D3E969B6D228B6CED2CBAD7BAB3B4B7EE453747D3331D43B21CD2ECC3BF557D696E81773EE69F"
 				"687FE1F61E63742AF913A35418575467118409D4FFDBBAC5CA062DFF3F04D76154D17EC34212DEBFCA967A91E461F73786D949D6A9765140B9DC7849639A4870"
 				"58F45DDA919576090D35E783804BA7B8B33B5C6A8C1EBB7C39F042696CF9F2B624D26EA5D6D101489E242CC35126B573928B6B8BF9945269AD22E7DA70CCB7DC"
@@ -737,12 +748,9 @@ namespace Test
 				"8C30F1524E781E7A5ED6C163C1C56F82DD0A95CD0D79B83BB6828181BB37F8A3A42769E7D4C33312D355225F9724C7933FDDEE105336002E854C43C28E145094"
 				"E5E8B14B4C92954FE5A289C60D496FF858DDEAA080946730DF6D32E9B45ED36AEE2FCBE2A9529A24BBE258696EB077F0D390BC4B0BADF6003FC6510251D27FFE"
 				"5C77FB601F37DF29F221AA840464D7E0791E060A25D143A9609F4D5A135F498C13AE098AA855FF7CFD03709BF40A3FF5E3F8ED6FC4692F9E3112337552D1391C"
-				"2B8D9F80D00D0E09C05372C6CF3CC7BB527A40AFC18343DBE9F15289A578832F"),
-			std::string(""),
-			std::string(""),
-			std::string("")
+				"2B8D9F80D00D0E09C05372C6CF3CC7BB527A40AFC18343DBE9F15289A578832F")
 		};
-		HexConverter::Decode(cprexp, 6, m_cptexp);
+		HexConverter::Decode(cprexp, 3, m_cptexp);
 
 		const std::vector<std::string> pubexp =
 		{
@@ -801,12 +809,9 @@ namespace Test
 				"965B75FE59A5AF2977D81A0FB7335D80AC2768BF022E27DAC66D2137A0B3A07EDF7102219D8C6198F0263E35093DFE97C2D8BB95793FB96023B6E6DDA85AAACF"
 				"8B87391B57E9BC8CFE7FE2D4AD98487A7963CD9C0AD80EEB3B8C73120DEF03EF3D3A43B15D8808F8A78D6A867AD9A0E87447B8D21BE0C27F30A1F5A222A4AC40"
 				"2E576CB90784CA05DE12FDCFE3EE1E4071B99D27F5143C97D303A56A387BFC4CB8CBDBBE0B68C467CA2C76DB00926DE21D1F7D29093E2FDCDDA99CFB37D6B99D"
-				"6AAFB37DCDC61F1F14BA57E331767D7507E1C1C5DC542349BA23836C71F4E0FEC6A813DED59D14A23010"),
-			std::string(""),
-			std::string(""),
-			std::string("")
+				"6AAFB37DCDC61F1F14BA57E331767D7507E1C1C5DC542349BA23836C71F4E0FEC6A813DED59D14A23010")
 		};
-		HexConverter::Decode(pubexp, 6, m_pubexp);
+		HexConverter::Decode(pubexp, 3, m_pubexp);
 
 		const std::vector<std::string> priexp =
 		{
@@ -893,12 +898,9 @@ namespace Test
 				"B3F9ADDB37C50A0FB90292F1460F700DCA44D9A865A35575EE454DFF4BE1DB605322E575017B2E269A9487C4508D4B1F2B96C77C107E300DACA9CF7BCFCDB47B"
 				"B468C5E7C7BC326543ED2210BFDC262674A269DB63DFADD23B71E60C8E3C4105E8D20C91B2B6F5AA44EF5DE056B12ED22E8837D868E7BD7A798861930D06E39E"
 				"54A65C4934BB236F5C53A886C032F90738FB7F4FA5F9A7B09691FD9C93492DA1C1641F0D01907237DBE963B45245C0D9395A11A720B85BC242F36F41091F26AB"
-				"19E134BE504E9CBCFAFF490E3C21A3"),
-			std::string(""),
-			std::string(""),
-			std::string("")
+				"19E134BE504E9CBCFAFF490E3C21A3")
 		};
-		HexConverter::Decode(priexp, 6, m_priexp);
+		HexConverter::Decode(priexp, 3, m_priexp);
 
 		const std::vector<std::string> sskexp =
 		{
@@ -933,42 +935,9 @@ namespace Test
 			std::string("45587A384942694FC34A5E655DFBF5D2D0BF77EA29EE314EA0AB33F33A61C325"),
 			std::string("AEB6C62FE939B9601E11C2A429AE18C55CCB76B476A5B0FD4794663FD8CB9B22"),
 			std::string("E49B3810A6414F96DD5063524AD4E576E8DBBD5A21249D866B6FD4E3678CD127"),
-			std::string("391D6845AE624AE7334B7106CEDD7F6D2BCABC4E3E7D9D5BF50B4D27807D5129"),
-
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string(""),
-			std::string("")
+			std::string("391D6845AE624AE7334B7106CEDD7F6D2BCABC4E3E7D9D5BF50B4D27807D5129")
 		};
-		HexConverter::Decode(sskexp, 60, m_sskexp);
+		HexConverter::Decode(sskexp, 30, m_sskexp);
 
 		const std::vector<std::string> rngseed =
 		{
