@@ -102,6 +102,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3615468a600346879f07a5e5833b6d0a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a3615468a600346879f07a5e5833b6d0a">~McEliece</a> () override</td></tr>
 <tr class="memdesc:a3615468a600346879f07a5e5833b6d0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a3615468a600346879f07a5e5833b6d0a">More...</a><br /></td></tr>
 <tr class="separator:a3615468a600346879f07a5e5833b6d0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c042e3145b628306183cef84bd8ea9f"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a9c042e3145b628306183cef84bd8ea9f">CipherTextSize</a> () override</td></tr>
+<tr class="memdesc:a9c042e3145b628306183cef84bd8ea9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected base cipher-text size in bytes  <a href="#a9c042e3145b628306183cef84bd8ea9f">More...</a><br /></td></tr>
+<tr class="separator:a9c042e3145b628306183cef84bd8ea9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c1f872e6d8f908a852db126231c2eb3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a7c1f872e6d8f908a852db126231c2eb3">DomainKey</a> ()</td></tr>
 <tr class="memdesc:a7c1f872e6d8f908a852db126231c2eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.  <a href="#a7c1f872e6d8f908a852db126231c2eb3">More...</a><br /></td></tr>
 <tr class="separator:a7c1f872e6d8f908a852db126231c2eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,6 +123,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac258f9e721936e986d73be560c7c11ee"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gac135819acdea6758fc6b361a25ceabf3">MPKCParameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#ac258f9e721936e986d73be560c7c11ee">Parameters</a> ()</td></tr>
 <tr class="memdesc:ac258f9e721936e986d73be560c7c11ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#ac258f9e721936e986d73be560c7c11ee">More...</a><br /></td></tr>
 <tr class="separator:ac258f9e721936e986d73be560c7c11ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac88bb24a41849b5bc25a8e8c8a32e0f0"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#ac88bb24a41849b5bc25a8e8c8a32e0f0">PrivateKeySize</a> () override</td></tr>
+<tr class="memdesc:ac88bb24a41849b5bc25a8e8c8a32e0f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key-size in bytes  <a href="#ac88bb24a41849b5bc25a8e8c8a32e0f0">More...</a><br /></td></tr>
+<tr class="separator:ac88bb24a41849b5bc25a8e8c8a32e0f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a69761a0514b3ecd27dc57273df545b"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a7a69761a0514b3ecd27dc57273df545b">PublicKeySize</a> () override</td></tr>
+<tr class="memdesc:a7a69761a0514b3ecd27dc57273df545b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key-size in bytes  <a href="#a7a69761a0514b3ecd27dc57273df545b">More...</a><br /></td></tr>
+<tr class="separator:a7a69761a0514b3ecd27dc57273df545b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a39697911ed1c04de0c0d708c0b843405"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a39697911ed1c04de0c0d708c0b843405">SharedSecretSize</a> () override</td></tr>
 <tr class="memdesc:a39697911ed1c04de0c0d708c0b843405"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers shared secret output size.  <a href="#a39697911ed1c04de0c0d708c0b843405">More...</a><br /></td></tr>
 <tr class="separator:a39697911ed1c04de0c0d708c0b843405"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -333,6 +342,35 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a9c042e3145b628306183cef84bd8ea9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c042e3145b628306183cef84bd8ea9f">&#9670;&nbsp;</a></span>CipherTextSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t McEliece::CipherTextSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected base cipher-text size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a6775d481795ca02f8d5fd55ea509dd70">IAsymmetricCipher</a>.</p>
+
+</div>
+</div>
 <a id="a057079568ae36600dccfe9fd888cf2ab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a057079568ae36600dccfe9fd888cf2ab">&#9670;&nbsp;</a></span>Decapsulate()</h2>
 
@@ -696,6 +734,64 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 </div><div class="memdoc">
 
 <p>Read Only: The ciphers parameters enumeration name </p>
+
+</div>
+</div>
+<a id="ac88bb24a41849b5bc25a8e8c8a32e0f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac88bb24a41849b5bc25a8e8c8a32e0f0">&#9670;&nbsp;</a></span>PrivateKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t McEliece::PrivateKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Private key-size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a72fcb30cc523473bed29daaa9f4ba5af">IAsymmetricCipher</a>.</p>
+
+</div>
+</div>
+<a id="a7a69761a0514b3ecd27dc57273df545b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a69761a0514b3ecd27dc57273df545b">&#9670;&nbsp;</a></span>PublicKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t McEliece::PublicKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Public key-size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#af11f32a507eb624d971071df30eea529">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>

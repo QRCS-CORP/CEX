@@ -346,7 +346,9 @@
     <ClInclude Include="..\..\CEX\SHA2Params.h" />
     <ClInclude Include="..\..\CEX\SHA512.h" />
     <ClInclude Include="..\..\CEX\SHAKE.h" />
-    <ClInclude Include="..\..\CEX\SPXF256.h" />
+    <ClInclude Include="..\..\CEX\SPXS192SHAKE.h" />
+    <ClInclude Include="..\..\CEX\SPXS256SHAKE.h" />
+    <ClInclude Include="..\..\CEX\SPXS128SHAKE.h" />
     <ClInclude Include="..\..\CEX\ShakeModes.h" />
     <ClInclude Include="..\..\CEX\SimdIntegers.h" />
     <ClInclude Include="..\..\CEX\SimdProfiles.h" />
@@ -556,7 +558,9 @@
     <ClCompile Include="..\..\CEX\Sphincs.cpp" />
     <ClCompile Include="..\..\CEX\SphincsParameters.cpp" />
     <ClCompile Include="..\..\CEX\SphincsUtils.cpp" />
-    <ClCompile Include="..\..\CEX\SPXF256.cpp" />
+    <ClCompile Include="..\..\CEX\SPXS192SHAKE.cpp" />
+    <ClCompile Include="..\..\CEX\SPXS256SHAKE.cpp" />
+    <ClCompile Include="..\..\CEX\SPXS128SHAKE.cpp" />
     <ClCompile Include="..\..\CEX\StreamAuthenticators.cpp" />
     <ClCompile Include="..\..\CEX\StreamCiphers.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricCiphers.cpp" />

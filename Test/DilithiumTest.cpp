@@ -63,7 +63,7 @@ namespace Test
 			Initialize();
 
 			Integrity();
-			OnProgress(std::string("DilithiumTest: Passed NIST PQ Round 2 signature cipher-text, message verification, public and private key known answer tests.."));
+			OnProgress(std::string("DilithiumTest: Passed NIST PQ Round 2 signature, message verification, public and private key known answer tests.."));
 			Kat();
 			OnProgress(std::string("DilithiumTest: Passed signature cipher-text and message verification known answer tests.."));
 			Authentication();

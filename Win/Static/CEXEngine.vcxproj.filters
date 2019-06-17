@@ -762,9 +762,6 @@
     <ClInclude Include="..\..\CEX\SphincsParameters.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SPXF256.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Dilithium.h">
       <Filter>Header Files\Asymmetric\Sign\Dilithium</Filter>
     </ClInclude>
@@ -971,6 +968,15 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\DLMNPolyMath.h">
       <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXS128SHAKE.h">
+      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXS192SHAKE.h">
+      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXS256SHAKE.h">
+      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1253,9 +1259,6 @@
     <ClCompile Include="..\..\CEX\Sphincs.cpp">
       <Filter>Source Files\Asymmetric\Sign\Sphincs</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\SPXF256.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\SphincsUtils.cpp">
       <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClCompile>
@@ -1492,6 +1495,15 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\DLMNPolyMath.cpp">
       <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXS128SHAKE.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXS192SHAKE.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXS256SHAKE.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -71,17 +71,17 @@ enum class AsymmetricTransforms : byte
 	/// </summary>
 	RLWES2Q12289N2048 = 17,
 	/// <summary>
-	/// The S1 parameters; (Medium Security) The Sphincs SHAKE128, F256 parameter set
+	/// The S1 parameters; (Medium Security) The Sphincs SHAKE256, S128 parameter set
 	/// </summary>
-	SPXS128F256 = 18,
+	SPXS1S128SHAKE = 18,
 	/// <summary>
-	/// The S2 parameters; (High Security) The Sphincs SHAKE256, F256 parameter set
+	/// The S2 parameters; (High Security) The Sphincs SHAKE256, S192 parameter set
 	/// </summary>
-	SPXS256F256 = 19,
+	SPXS2S192SHAKE = 19,
 	/// <summary>
-	/// The S3 parameters; (Highest Security) The experimental Sphincs SHAKE512, F256 parameter set
+	/// The S3 parameters; (Highest Security) The Sphincs SHAKE256, S256 parameter set
 	/// </summary>
-	SPXS512F256 = 20
+	SPXS3S256SHAKE = 20
 };
 
 class AsymmetricTransformConvert

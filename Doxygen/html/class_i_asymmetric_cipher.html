@@ -102,6 +102,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a97a138a5407f8e8cf9c0a65c8549e4c5"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">~IAsymmetricCipher</a> () noexcept</td></tr>
 <tr class="memdesc:a97a138a5407f8e8cf9c0a65c8549e4c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalizer: destroys the containers objects  <a href="#a97a138a5407f8e8cf9c0a65c8549e4c5">More...</a><br /></td></tr>
 <tr class="separator:a97a138a5407f8e8cf9c0a65c8549e4c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6775d481795ca02f8d5fd55ea509dd70"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a6775d481795ca02f8d5fd55ea509dd70">CipherTextSize</a> ()=0</td></tr>
+<tr class="memdesc:a6775d481795ca02f8d5fd55ea509dd70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected base cipher-text size in bytes  <a href="#a6775d481795ca02f8d5fd55ea509dd70">More...</a><br /></td></tr>
+<tr class="separator:a6775d481795ca02f8d5fd55ea509dd70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e384604c560a05d36d2473589a9a145"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a8e384604c560a05d36d2473589a9a145">DomainKey</a> ()=0</td></tr>
 <tr class="memdesc:a8e384604c560a05d36d2473589a9a145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret.  <a href="#a8e384604c560a05d36d2473589a9a145">More...</a><br /></td></tr>
 <tr class="separator:a8e384604c560a05d36d2473589a9a145"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -117,6 +120,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8dd58db657c1fb29b7bae9217c62ed42"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a8dd58db657c1fb29b7bae9217c62ed42">Name</a> ()=0</td></tr>
 <tr class="memdesc:a8dd58db657c1fb29b7bae9217c62ed42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers name  <a href="#a8dd58db657c1fb29b7bae9217c62ed42">More...</a><br /></td></tr>
 <tr class="separator:a8dd58db657c1fb29b7bae9217c62ed42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72fcb30cc523473bed29daaa9f4ba5af"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a72fcb30cc523473bed29daaa9f4ba5af">PrivateKeySize</a> ()=0</td></tr>
+<tr class="memdesc:a72fcb30cc523473bed29daaa9f4ba5af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key-size in bytes  <a href="#a72fcb30cc523473bed29daaa9f4ba5af">More...</a><br /></td></tr>
+<tr class="separator:a72fcb30cc523473bed29daaa9f4ba5af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af11f32a507eb624d971071df30eea529"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#af11f32a507eb624d971071df30eea529">PublicKeySize</a> ()=0</td></tr>
+<tr class="memdesc:af11f32a507eb624d971071df30eea529"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key-size in bytes  <a href="#af11f32a507eb624d971071df30eea529">More...</a><br /></td></tr>
+<tr class="separator:af11f32a507eb624d971071df30eea529"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a4a447bce5ff752bdf9c09558a70678"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a3a4a447bce5ff752bdf9c09558a70678">SharedSecretSize</a> ()=0</td></tr>
 <tr class="memdesc:a3a4a447bce5ff752bdf9c09558a70678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers shared secret output size.  <a href="#a3a4a447bce5ff752bdf9c09558a70678">More...</a><br /></td></tr>
 <tr class="separator:a3a4a447bce5ff752bdf9c09558a70678"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -220,6 +229,35 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a6775d481795ca02f8d5fd55ea509dd70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6775d481795ca02f8d5fd55ea509dd70">&#9670;&nbsp;</a></span>CipherTextSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAsymmetricCipher::CipherTextSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected base cipher-text size in bytes </p>
+
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a9c042e3145b628306183cef84bd8ea9f">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a5ea2c2ebf4f5b9c32a62559ff048379d">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#afc449e193470e15ff383432b35587d71">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aaad378e435a77a3daeb17b26223847cb">ModuleLWE</a>.</p>
+
+</div>
+</div>
 <a id="a81ad8df798e4333c2eb97b563a839574"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a81ad8df798e4333c2eb97b563a839574">&#9670;&nbsp;</a></span>Decapsulate()</h2>
 
@@ -557,6 +595,64 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Copy operator: copy is restricted, this function has been deleted </p>
+
+</div>
+</div>
+<a id="a72fcb30cc523473bed29daaa9f4ba5af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72fcb30cc523473bed29daaa9f4ba5af">&#9670;&nbsp;</a></span>PrivateKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAsymmetricCipher::PrivateKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Private key-size in bytes </p>
+
+<p>Implemented in <a class="el" href="class_mc_eliece.html#ac88bb24a41849b5bc25a8e8c8a32e0f0">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a191038dc4377ad8eac65ceb828b36287">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#adcc5401bb2b9d6b63bcc14fe077054b8">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#ad0c12dd9c61d2245362b01a709e9c341">ModuleLWE</a>.</p>
+
+</div>
+</div>
+<a id="af11f32a507eb624d971071df30eea529"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af11f32a507eb624d971071df30eea529">&#9670;&nbsp;</a></span>PublicKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAsymmetricCipher::PublicKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Public key-size in bytes </p>
+
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a7a69761a0514b3ecd27dc57273df545b">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a6aa7616131c43500f7b917c5bba2e066">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a27c2574b2009e0ce60a490820f78596d">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#add9de3deb76fcc1667b994dd0ed471f3">ModuleLWE</a>.</p>
 
 </div>
 </div>

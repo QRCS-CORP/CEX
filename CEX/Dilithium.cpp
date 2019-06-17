@@ -63,6 +63,7 @@ Dilithium::~Dilithium()
 	{
 		m_privateKey.release();
 	}
+
 	if (m_publicKey != nullptr)
 	{
 		m_publicKey.release();
@@ -78,9 +79,9 @@ Dilithium::~Dilithium()
 	}
 	else
 	{
+		// release the generator (received through ctor2) back to caller
 		if (m_rndGenerator != nullptr)
 		{
-			// release the generator (received through ctor2) back to caller
 			m_rndGenerator.release();
 		}
 	}
@@ -105,20 +106,9 @@ const std::string Dilithium::Name()
 {
 	std::string ret;
 
-	ret = AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium) + std::string("");
-
-	if (m_dilithiumState->Parameters == DilithiumParameters::DLMS1N256Q8380417)
-	{
-		ret += DilithiumParameterConvert::ToName(DilithiumParameters::DLMS1N256Q8380417);
-	}
-	else if (m_dilithiumState->Parameters == DilithiumParameters::DLMS2N256Q8380417)
-	{
-		ret += DilithiumParameterConvert::ToName(DilithiumParameters::DLMS2N256Q8380417);
-	}
-	else if (m_dilithiumState->Parameters == DilithiumParameters::DLMS3N256Q8380417)
-	{
-		ret += DilithiumParameterConvert::ToName(DilithiumParameters::DLMS3N256Q8380417);
-	}
+	ret = AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium) + 
+		std::string("") +
+		DilithiumParameterConvert::ToName(m_dilithiumState->Parameters);
 
 	return ret;
 }
@@ -127,21 +117,24 @@ const size_t Dilithium::PrivateKeySize()
 {
 	size_t klen;
 
-	if (m_dilithiumState->Parameters == DilithiumParameters::DLMS1N256Q8380417)
+	switch (m_dilithiumState->Parameters)
 	{
-		klen = DLTMK4Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
-	}
-	else if (m_dilithiumState->Parameters == DilithiumParameters::DLMS2N256Q8380417)
-	{
-		klen = DLTMK5Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
-	}
-	else if (m_dilithiumState->Parameters == DilithiumParameters::DLMS3N256Q8380417)
-	{
-		klen = DLTMK6Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
-	}
-	else
-	{
-		klen = 0;
+		case DilithiumParameters::DLMS1N256Q8380417:
+		{
+			klen = DLTMK4Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+		}
+		case DilithiumParameters::DLMS2N256Q8380417:
+		{
+			klen = DLTMK5Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+		}
+		case DilithiumParameters::DLMS3N256Q8380417:
+		{
+			klen = DLTMK6Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
 	}
 
 	return klen;
@@ -151,24 +144,57 @@ const size_t Dilithium::PublicKeySize()
 {
 	size_t klen;
 
-	if (m_dilithiumState->Parameters == DilithiumParameters::DLMS1N256Q8380417)
+	switch (m_dilithiumState->Parameters)
 	{
-		klen = DLTMK4Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
-	}
-	else if (m_dilithiumState->Parameters == DilithiumParameters::DLMS2N256Q8380417)
-	{
-		klen = DLTMK5Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
-	}
-	else if (m_dilithiumState->Parameters == DilithiumParameters::DLMS3N256Q8380417)
-	{
-		klen = DLTMK6Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
-	}
-	else
-	{
-		klen = 0;
+		case DilithiumParameters::DLMS1N256Q8380417:
+		{
+			klen = DLTMK4Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+		}
+		case DilithiumParameters::DLMS2N256Q8380417:
+		{
+			klen = DLTMK5Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+		}
+		case DilithiumParameters::DLMS3N256Q8380417:
+		{
+			klen = DLTMK6Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
 	}
 
 	return klen;
+}
+
+/// <summary>
+/// Read Only: The base signature size in bytes
+/// </summary>
+const size_t Dilithium::SignatureSize()
+{
+	size_t slen;
+
+	switch (m_dilithiumState->Parameters)
+	{
+		case DilithiumParameters::DLMS1N256Q8380417:
+		{
+			slen = DLTMK4Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+		}
+		case DilithiumParameters::DLMS2N256Q8380417:
+		{
+			slen = DLTMK5Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+		}
+		case DilithiumParameters::DLMS3N256Q8380417:
+		{
+			slen = DLTMK6Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("SignatureSize"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return slen;
 }
 
 AsymmetricKeyPair* Dilithium::Generate()
@@ -220,6 +246,7 @@ const void Dilithium::Initialize(AsymmetricKey* Key)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
 	}
+
 	if (Key->KeyClass() != AsymmetricKeyTypes::SignaturePublicKey && Key->KeyClass() != AsymmetricKeyTypes::SignaturePrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key type is invalid!"), ErrorCodes::InvalidKey);
@@ -247,10 +274,12 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
+
 	if (!m_dilithiumState->Signer)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::NotInitialized);
 	}
+
 	if (Message.size() == 0)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::InvalidParam);

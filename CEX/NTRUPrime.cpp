@@ -74,6 +74,7 @@ NTRUPrime::~NTRUPrime()
 	{
 		m_privateKey.release();
 	}
+
 	if (m_publicKey != nullptr)
 	{
 		m_publicKey.release();
@@ -98,6 +99,36 @@ NTRUPrime::~NTRUPrime()
 }
 
 //~~~Accessors~~~//
+
+const size_t NTRUPrime::CipherTextSize()
+{
+	size_t clen;
+
+	switch (m_ntruState->Parameters)
+	{
+		case (NTRUParameters::NTRUS1SQ4621N653):
+		{
+			clen = NTRUSQ4621P653::CIPHERTEXT_SIZE;
+			break;
+		}
+		case (NTRUParameters::NTRUS2SQ4591N761):
+		{
+			clen = NTRUSQ4591P761::CIPHERTEXT_SIZE;
+			break;
+		}
+		case (NTRUParameters::NTRUS3SQ5167N857):
+		{
+			clen = NTRUSQ5167P857::CIPHERTEXT_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return clen;
+}
 
 std::vector<byte> &NTRUPrime::DomainKey()
 {
@@ -133,6 +164,66 @@ const std::string NTRUPrime::Name()
 const NTRUParameters NTRUPrime::Parameters()
 {
 	return m_ntruState->Parameters;
+}
+
+const size_t NTRUPrime::PrivateKeySize()
+{
+	size_t klen;
+
+	switch (m_ntruState->Parameters)
+	{
+		case (NTRUParameters::NTRUS1SQ4621N653):
+		{
+			klen = NTRUSQ4621P653::PRIVATEKEY_SIZE;
+			break;
+		}
+		case (NTRUParameters::NTRUS2SQ4591N761):
+		{
+			klen = NTRUSQ4591P761::PRIVATEKEY_SIZE;
+			break;
+		}
+		case (NTRUParameters::NTRUS3SQ5167N857):
+		{
+			klen = NTRUSQ5167P857::PRIVATEKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
+}
+
+const size_t NTRUPrime::PublicKeySize()
+{
+	size_t klen;
+
+	switch (m_ntruState->Parameters)
+	{
+		case (NTRUParameters::NTRUS1SQ4621N653):
+		{
+			klen = NTRUSQ4621P653::PUBLICKEY_SIZE;
+			break;
+		}
+		case (NTRUParameters::NTRUS2SQ4591N761):
+		{
+			klen = NTRUSQ4591P761::PUBLICKEY_SIZE;
+			break;
+		}
+		case (NTRUParameters::NTRUS3SQ5167N857):
+		{
+			klen = NTRUSQ5167P857::PUBLICKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
 }
 
 const size_t NTRUPrime::SharedSecretSize()
@@ -278,6 +369,7 @@ void NTRUPrime::Initialize(AsymmetricKey* Key)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
+
 	if (Key->KeyClass() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);

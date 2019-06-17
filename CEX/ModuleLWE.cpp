@@ -72,6 +72,7 @@ ModuleLWE::~ModuleLWE()
 	{
 		m_privateKey.release();
 	}
+
 	if (m_publicKey != nullptr)
 	{
 		m_publicKey.release();
@@ -96,6 +97,36 @@ ModuleLWE::~ModuleLWE()
 }
 
 //~~~Accessors~~~//
+
+const size_t ModuleLWE::CipherTextSize()
+{
+	size_t clen;
+
+	switch (m_mlweState->Parameters)
+	{
+		case (MLWEParameters::MLWES1Q3329N256):
+		{
+			clen = MLWEQ3329N256::CIPHERTEXTK2_SIZE;
+			break;
+		}
+		case (MLWEParameters::MLWES2Q3329N256):
+		{
+			clen = MLWEQ3329N256::CIPHERTEXTK3_SIZE;
+			break;
+		}
+		case (MLWEParameters::MLWES3Q3329N256):
+		{
+			clen = MLWEQ3329N256::CIPHERTEXTK4_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return clen;
+}
 
 std::vector<byte> &ModuleLWE::DomainKey()
 {
@@ -133,6 +164,66 @@ const MLWEParameters ModuleLWE::Parameters()
 	return m_mlweState->Parameters;
 }
 
+const size_t ModuleLWE::PrivateKeySize()
+{
+	size_t klen;
+
+	switch (m_mlweState->Parameters)
+	{
+		case (MLWEParameters::MLWES1Q3329N256):
+		{
+			klen = MLWEQ3329N256::PRIVATEKEYK2_SIZE;
+			break;
+		}
+		case (MLWEParameters::MLWES2Q3329N256):
+		{
+			klen = MLWEQ3329N256::PRIVATEKEYK3_SIZE;
+			break;
+		}
+		case (MLWEParameters::MLWES3Q3329N256):
+		{
+			klen = MLWEQ3329N256::PRIVATEKEYK4_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
+}
+
+const size_t ModuleLWE::PublicKeySize()
+{
+	size_t klen;
+
+	switch (m_mlweState->Parameters)
+	{
+		case (MLWEParameters::MLWES1Q3329N256):
+		{
+			klen = MLWEQ3329N256::PUBLICKEYK2_SIZE;
+			break;
+		}
+		case (MLWEParameters::MLWES2Q3329N256):
+		{
+			klen = MLWEQ3329N256::PUBLICKEYK3_SIZE;
+			break;
+		}
+		case (MLWEParameters::MLWES3Q3329N256):
+		{
+			klen = MLWEQ3329N256::PUBLICKEYK4_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
+}
+
 const size_t ModuleLWE::SharedSecretSize()
 {
 	return SECRET_SIZE;
@@ -144,6 +235,20 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 {
 	std::vector<byte> sec(SECRET_SIZE);
 	bool result;
+
+	switch (m_mlweState->Parameters)
+	{
+		case MLWEParameters::MLWES1Q3329N256:
+		case MLWEParameters::MLWES2Q3329N256:
+		case MLWEParameters::MLWES3Q3329N256:
+		{
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
 
 	result = MLWEQ3329N256::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 
@@ -208,20 +313,33 @@ AsymmetricKeyPair* ModuleLWE::Generate()
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
 
-	if (m_mlweState->Parameters == MLWEParameters::MLWES1Q3329N256)
+	switch (m_mlweState->Parameters)
 	{
-		pk.resize(MLWEQ3329N256::PUBLICKEYK2_SIZE);
-		sk.resize(MLWEQ3329N256::PRIVATEKEYK2_SIZE);
-	}
-	else if (m_mlweState->Parameters == MLWEParameters::MLWES2Q3329N256)
-	{
-		pk.resize(MLWEQ3329N256::PUBLICKEYK3_SIZE);
-		sk.resize(MLWEQ3329N256::PRIVATEKEYK3_SIZE);
-	}
-	else
-	{
-		pk.resize(MLWEQ3329N256::PUBLICKEYK4_SIZE);
-		sk.resize(MLWEQ3329N256::PRIVATEKEYK4_SIZE);
+		case MLWEParameters::MLWES1Q3329N256:
+		{
+			pk.resize(MLWEQ3329N256::PUBLICKEYK2_SIZE);
+			sk.resize(MLWEQ3329N256::PRIVATEKEYK2_SIZE);
+
+			break;
+		}
+		case MLWEParameters::MLWES2Q3329N256:
+		{
+			pk.resize(MLWEQ3329N256::PUBLICKEYK3_SIZE);
+			sk.resize(MLWEQ3329N256::PRIVATEKEYK3_SIZE);
+
+			break;
+		}
+		case MLWEParameters::MLWES3Q3329N256:
+		{
+			pk.resize(MLWEQ3329N256::PUBLICKEYK4_SIZE);
+			sk.resize(MLWEQ3329N256::PRIVATEKEYK4_SIZE);
+
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
 	}
 
 	MLWEQ3329N256::Generate(pk, sk, m_rndGenerator);

@@ -29,13 +29,13 @@ NAMESPACE_SPHINCS
 using Enumeration::SphincsParameters;
 
 /// <summary>
-/// An implementation of the Sphincs-plus asymmetric signature scheme (SPHINCS+)
+/// An implementation of the Sphincs-Plus asymmetric signature scheme (SPHINCS+)
 /// </summary> 
 /// 
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// Sphincs sgn(SphincsParameters::SPXS128F256);
+/// Sphincs sgn(SphincsParameters::SPXS1S128SHAKE);
 /// IAsymmetricKeyPair* kp = sgn.Generate();
 /// 
 /// // serialize the public key
@@ -45,7 +45,7 @@ using Enumeration::SphincsParameters;
 ///
 /// <description>Sign:</description>
 /// <code>
-/// Sphincs sgn(SphincsParameters::SPXS128F256);
+/// Sphincs sgn(SphincsParameters::SPXS1S128SHAKE);
 /// sgn.Initialize(PrivateKey);
 /// 
 /// std::vector&lt;byte&gt; msg(32);
@@ -56,28 +56,32 @@ using Enumeration::SphincsParameters;
 ///
 /// <description>Verify:</description>
 /// <code>
-/// Sphincs sgn(SphincsParameters::SPXS128F256);
+/// Sphincs sgn(SphincsParameters::SPXS1S128SHAKE);
 /// sgn.Initialize(PublicKey);
 /// std::vector&lt;byte&gt; message(0);
-/// bool status;
 ///
-///	// if authentication fails, do something
-///	status = sgn.Verify(Signature, msg);
+///	// authenticate the signature
+///	if (!sgn.Verify(Signature, msg))
+/// {
+///		//  authentication failed, do something..
+/// }
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
-/// <para>SPHINCS+ is a high-security post-quantum stateless hash-based signature scheme that signs hundreds of messages per second on a modern 4-core 3.5GHz Intel CPU. \n
-/// Signatures are 41 KB, public keys are 1 KB, and private keys are 1 KB. \n
-/// SPHINCS-256 is designed to provide long-term 2128 security even against attackers equipped with quantum computers. \n
-/// Unlike most hash-based signature schemes, SPHINCS-256 is stateless, allowing it to be a drop-in replacement for current signature schemes.</para>
+/// <para>SPHINCS+ is a high-security post-quantum secure stateless hash-based signature scheme. \n
+/// Signature sizes vary depending on the parameters; 16KB (S128), 33KB (S192), to 58KB with the strongest parameter S256. \n
+/// Both the public and private keys are both less than 1KB in size. \n
+/// SPHINCS+ is designed to provide long-term security even against attackers equipped with quantum computers. \n
+/// Unlike most hash-based signature schemes, SPHINCS+ is stateless, allowing it to be a drop-in replacement for current signature schemes.</para>
 /// 
 /// <list type="bullet">
-/// <item><description>There are three available parameter sets using the 'fast' version of the algorithm dilineated by the core hashing function SHAKE; the SHAKE128 based SPXS128F256, SPXS256F256 using SHAKE256, and the experimental SPXS512F256 using SHAKE512, selectable through the class constructor parameter</description></item>
+/// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); SPXS1S128SHAKE, SPXS2S192SHAKE, and SPXS3S256SHAKE (strongest)</description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
-/// <item><description>The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
+/// <item><description>Use the Generate function to create a public/private key-pair, and the Sign function to sign a message</description></item>
+/// <item><description>The message-signature is tested using the Verify function, which checks the signature and returns false on authentication failure</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -114,11 +118,11 @@ public:
 	/// Constructor: Instantiate this class
 	/// </summary>
 	/// 
-	/// <param name="Parameters">The SPHINCS+ parameter set; default is SPXF256</param>
+	/// <param name="Parameters">The SPHINCS+ parameter set; default is SPXS2S192SHAKE</param>
 	/// <param name="PrngType">The random prng provider; default is Block-cipher Counter Rng (BCR)</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	Sphincs(SphincsParameters Parameters = SphincsParameters::SPXS256F256, Prngs PrngType = Prngs::BCR);
+	Sphincs(SphincsParameters Parameters = SphincsParameters::SPXS2S192SHAKE, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using an external Prng instance
@@ -148,24 +152,29 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: This class is initialized for Signing with the Private key
+	/// Read Only: This class has been initialized for Signing with the Private key
 	/// </summary>
 	const bool IsSigner() override;
 
 	/// <summary>
-	/// Read Only: The signature scheme name
+	/// Read Only: The signature scheme name, including the loaded parameter-set
 	/// </summary>
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: The expected Private key size in bytes
+	/// Read Only: The Private key-size in bytes
 	/// </summary>
 	const size_t PrivateKeySize() override;
 
 	/// <summary>
-	/// Read Only: The expected Public key size in bytes
+	/// Read Only: The Public key size in bytes
 	/// </summary>
 	const size_t PublicKeySize() override;
+
+	/// <summary>
+	/// Read Only: The base signature size in bytes
+	/// </summary>
+	const size_t SignatureSize() override;
 
 	//~~~Public Functions~~~//
 
@@ -177,7 +186,7 @@ public:
 	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
-	/// Initialize the signature scheme for signing (private key) or verifying (public key)
+	/// Initialize the signature scheme for signing (private-key) or verifying (public-key)
 	/// </summary>
 	/// 
 	/// <param name="Key">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
@@ -189,7 +198,7 @@ public:
 	/// Sign a message array and return the message and attached signature
 	/// </summary>
 	/// 
-	/// <param name="Message">The message byte array containing the data to process</param>
+	/// <param name="Message">The message byte array containing the message to sign</param>
 	/// <param name="Signature">The output signature array containing the signature and message</param>
 	/// 
 	/// <returns>Returns the size of the signed message</returns>
@@ -202,7 +211,7 @@ public:
 	/// <param name="Signature">The output signature array containing the signature and message</param>
 	/// <param name="Message">The message byte array containing the data to process</param>
 	/// 
-	/// <returns>Returns true if the signature matches</returns>
+	/// <returns>Returns true if the signature matches, false for authentication failure</returns>
 	bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) override;
 };
 

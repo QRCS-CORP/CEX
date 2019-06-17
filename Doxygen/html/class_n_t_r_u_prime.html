@@ -102,6 +102,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad1ce7c906368f4cd8c42e530974a214f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#ad1ce7c906368f4cd8c42e530974a214f">~NTRUPrime</a> ()</td></tr>
 <tr class="memdesc:ad1ce7c906368f4cd8c42e530974a214f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#ad1ce7c906368f4cd8c42e530974a214f">More...</a><br /></td></tr>
 <tr class="separator:ad1ce7c906368f4cd8c42e530974a214f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc449e193470e15ff383432b35587d71"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#afc449e193470e15ff383432b35587d71">CipherTextSize</a> () override</td></tr>
+<tr class="memdesc:afc449e193470e15ff383432b35587d71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected base cipher-text size in bytes  <a href="#afc449e193470e15ff383432b35587d71">More...</a><br /></td></tr>
+<tr class="separator:afc449e193470e15ff383432b35587d71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca4ebe693bde39d774b2023504a1b06c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#aca4ebe693bde39d774b2023504a1b06c">DomainKey</a> ()</td></tr>
 <tr class="memdesc:aca4ebe693bde39d774b2023504a1b06c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.  <a href="#aca4ebe693bde39d774b2023504a1b06c">More...</a><br /></td></tr>
 <tr class="separator:aca4ebe693bde39d774b2023504a1b06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,6 +123,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a10db0d673bced1b6a98e210010aeaf1a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e">NTRUParameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a10db0d673bced1b6a98e210010aeaf1a">Parameters</a> ()</td></tr>
 <tr class="memdesc:a10db0d673bced1b6a98e210010aeaf1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#a10db0d673bced1b6a98e210010aeaf1a">More...</a><br /></td></tr>
 <tr class="separator:a10db0d673bced1b6a98e210010aeaf1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcc5401bb2b9d6b63bcc14fe077054b8"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#adcc5401bb2b9d6b63bcc14fe077054b8">PrivateKeySize</a> () override</td></tr>
+<tr class="memdesc:adcc5401bb2b9d6b63bcc14fe077054b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key-size in bytes  <a href="#adcc5401bb2b9d6b63bcc14fe077054b8">More...</a><br /></td></tr>
+<tr class="separator:adcc5401bb2b9d6b63bcc14fe077054b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27c2574b2009e0ce60a490820f78596d"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a27c2574b2009e0ce60a490820f78596d">PublicKeySize</a> () override</td></tr>
+<tr class="memdesc:a27c2574b2009e0ce60a490820f78596d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key-size in bytes  <a href="#a27c2574b2009e0ce60a490820f78596d">More...</a><br /></td></tr>
+<tr class="separator:a27c2574b2009e0ce60a490820f78596d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c93da08cc2eaf1182d32ee07e60f52b"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a9c93da08cc2eaf1182d32ee07e60f52b">SharedSecretSize</a> () override</td></tr>
 <tr class="memdesc:a9c93da08cc2eaf1182d32ee07e60f52b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers shared secret output size.  <a href="#a9c93da08cc2eaf1182d32ee07e60f52b">More...</a><br /></td></tr>
 <tr class="separator:a9c93da08cc2eaf1182d32ee07e60f52b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -320,6 +329,35 @@ Website: <a href="https://ntruprime.cr.yp.to/">NTRU-Prime Website</a>. </li>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="afc449e193470e15ff383432b35587d71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc449e193470e15ff383432b35587d71">&#9670;&nbsp;</a></span>CipherTextSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t NTRUPrime::CipherTextSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected base cipher-text size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a6775d481795ca02f8d5fd55ea509dd70">IAsymmetricCipher</a>.</p>
+
+</div>
+</div>
 <a id="ace8ab010767e794b3d50386d215ce888"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ace8ab010767e794b3d50386d215ce888">&#9670;&nbsp;</a></span>Decapsulate()</h2>
 
@@ -677,6 +715,64 @@ Website: <a href="https://ntruprime.cr.yp.to/">NTRU-Prime Website</a>. </li>
 </div><div class="memdoc">
 
 <p>Read Only: The ciphers parameters enumeration name </p>
+
+</div>
+</div>
+<a id="adcc5401bb2b9d6b63bcc14fe077054b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcc5401bb2b9d6b63bcc14fe077054b8">&#9670;&nbsp;</a></span>PrivateKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t NTRUPrime::PrivateKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Private key-size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a72fcb30cc523473bed29daaa9f4ba5af">IAsymmetricCipher</a>.</p>
+
+</div>
+</div>
+<a id="a27c2574b2009e0ce60a490820f78596d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27c2574b2009e0ce60a490820f78596d">&#9670;&nbsp;</a></span>PublicKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t NTRUPrime::PublicKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Public key-size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#af11f32a507eb624d971071df30eea529">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>

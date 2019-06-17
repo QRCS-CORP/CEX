@@ -75,6 +75,7 @@ McEliece::~McEliece()
 	{
 		m_privateKey.release();
 	}
+
 	if (m_publicKey != nullptr)
 	{
 		m_publicKey.release();
@@ -99,6 +100,36 @@ McEliece::~McEliece()
 }
 
 //~~~Accessors~~~//
+
+const size_t McEliece::CipherTextSize()
+{
+	size_t clen;
+
+	switch (m_mpkcState->Parameters)
+	{
+		case (MPKCParameters::MPKCS1N4096T62):
+		{
+			clen = MPKCN4096T62::CIPHERTEXT_SIZE;
+			break;
+		}
+		case (MPKCParameters::MPKCS1N6960T119):
+		{
+			clen = MPKCN6960T119::CIPHERTEXT_SIZE;
+			break;
+		}
+		case (MPKCParameters::MPKCS1N8192T128):
+		{
+			clen = MPKCN8192T128::CIPHERTEXT_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return clen;
+}
 
 std::vector<byte> &McEliece::DomainKey()
 {
@@ -134,6 +165,66 @@ const std::string McEliece::Name()
 const MPKCParameters McEliece::Parameters()
 {
 	return m_mpkcState->Parameters;
+}
+
+const size_t McEliece::PrivateKeySize()
+{
+	size_t klen;
+
+	switch (m_mpkcState->Parameters)
+	{
+		case (MPKCParameters::MPKCS1N4096T62):
+		{
+			klen = MPKCN4096T62::PRIVATEKEY_SIZE;
+			break;
+		}
+		case (MPKCParameters::MPKCS1N6960T119):
+		{
+			klen = MPKCN6960T119::PRIVATEKEY_SIZE;
+			break;
+		}
+		case (MPKCParameters::MPKCS1N8192T128):
+		{
+			klen = MPKCN8192T128::PRIVATEKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
+}
+
+const size_t McEliece::PublicKeySize()
+{
+	size_t klen;
+
+	switch (m_mpkcState->Parameters)
+	{
+		case (MPKCParameters::MPKCS1N4096T62):
+		{
+			klen = MPKCN4096T62::PUBLICKEY_SIZE;
+			break;
+		}
+		case (MPKCParameters::MPKCS1N6960T119):
+		{
+			klen = MPKCN6960T119::PUBLICKEY_SIZE;
+			break;
+		}
+		case (MPKCParameters::MPKCS1N8192T128):
+		{
+			klen = MPKCN8192T128::PUBLICKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
 }
 
 const size_t McEliece::SharedSecretSize()
@@ -235,34 +326,47 @@ AsymmetricKeyPair* McEliece::Generate()
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
 
-	if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N4096T62)
+	switch (m_mpkcState->Parameters)
 	{
-		pk.resize(MPKCN4096T62::PUBLICKEY_SIZE);
-		sk.resize(MPKCN4096T62::PRIVATEKEY_SIZE);
-
-		if (!MPKCN4096T62::Generate(pk, sk, m_rndGenerator))
+		case MPKCParameters::MPKCS1N4096T62:
 		{
-			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N4096T62"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			pk.resize(MPKCN4096T62::PUBLICKEY_SIZE);
+			sk.resize(MPKCN4096T62::PRIVATEKEY_SIZE);
+
+			if (!MPKCN4096T62::Generate(pk, sk, m_rndGenerator))
+			{
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N4096T62"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			}
+
+			break;
 		}
-	}
-	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N6960T119)
-	{
-		pk.resize(MPKCN6960T119::PUBLICKEY_SIZE);
-		sk.resize(MPKCN6960T119::PRIVATEKEY_SIZE);
-
-		if (!MPKCN6960T119::Generate(pk, sk, m_rndGenerator))
+		case MPKCParameters::MPKCS1N6960T119:
 		{
-			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N6960T119"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			pk.resize(MPKCN6960T119::PUBLICKEY_SIZE);
+			sk.resize(MPKCN6960T119::PRIVATEKEY_SIZE);
+
+			if (!MPKCN6960T119::Generate(pk, sk, m_rndGenerator))
+			{
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N6960T119"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			}
+
+			break;
 		}
-	}
-	else if (m_mpkcState->Parameters == MPKCParameters::MPKCS1N8192T128)
-	{
-		pk.resize(MPKCN8192T128::PUBLICKEY_SIZE);
-		sk.resize(MPKCN8192T128::PRIVATEKEY_SIZE);
-
-		if (!MPKCN8192T128::Generate(pk, sk, m_rndGenerator))
+		case MPKCParameters::MPKCS1N8192T128:
 		{
-			throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N8192T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			pk.resize(MPKCN8192T128::PUBLICKEY_SIZE);
+			sk.resize(MPKCN8192T128::PRIVATEKEY_SIZE);
+
+			if (!MPKCN8192T128::Generate(pk, sk, m_rndGenerator))
+			{
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N8192T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+			}
+
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
 
@@ -278,6 +382,7 @@ void McEliece::Initialize(AsymmetricKey* Key)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
+
 	if (Key->KeyClass() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);

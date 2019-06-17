@@ -150,6 +150,11 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
+	/// Read Only: The expected base cipher-text size in bytes
+	/// </summary>
+	const size_t CipherTextSize() override;
+
+	/// <summary>
 	/// Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.
 	/// <para>Changing this code will create a unique distribution of the cipher.
 	/// The domain key can be used as a secondary secret shared between hosts in an authenticated domain.
@@ -183,6 +188,16 @@ public:
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
 	const MLWEParameters Parameters();
+
+	/// <summary>
+	/// Read Only: The expected Private key-size in bytes
+	/// </summary>
+	const size_t PrivateKeySize() override;
+
+	/// <summary>
+	/// Read Only: The expected Public key-size in bytes
+	/// </summary>
+	const size_t PublicKeySize() override;
 
 	/// <summary>
 	/// Read Only: The ciphers shared secret output size.

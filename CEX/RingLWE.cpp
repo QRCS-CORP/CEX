@@ -74,6 +74,7 @@ RingLWE::~RingLWE()
 	{
 		m_privateKey.release();
 	}
+
 	if (m_publicKey != nullptr)
 	{
 		m_publicKey.release();
@@ -98,6 +99,31 @@ RingLWE::~RingLWE()
 }
 
 //~~~Accessors~~~//
+
+const size_t RingLWE::CipherTextSize()
+{
+	size_t clen;
+
+	switch (m_rlweState->Parameters)
+	{
+		case (RLWEParameters::RLWES1Q12289N1024):
+		{
+			clen = RLWEQ12289N1024::CIPHERTEXT_SIZE;
+			break;
+		}
+		case (RLWEParameters::RLWES2Q12289N2048):
+		{
+			clen = RLWEQ12289N2048::CIPHERTEXT_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The RingLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return clen;
+}
 
 std::vector<byte> &RingLWE::DomainKey()
 {
@@ -133,6 +159,56 @@ const std::string RingLWE::Name()
 const RLWEParameters RingLWE::Parameters()
 {
 	return m_rlweState->Parameters;
+}
+
+const size_t RingLWE::PrivateKeySize()
+{
+	size_t klen;
+
+	switch (m_rlweState->Parameters)
+	{
+		case (RLWEParameters::RLWES1Q12289N1024):
+		{
+			klen = RLWEQ12289N1024::PRIVATEKEY_SIZE;
+			break;
+		}
+		case (RLWEParameters::RLWES2Q12289N2048):
+		{
+			klen = RLWEQ12289N2048::PRIVATEKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The RingLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
+}
+
+const size_t RingLWE::PublicKeySize()
+{
+	size_t klen;
+
+	switch (m_rlweState->Parameters)
+	{
+		case (RLWEParameters::RLWES1Q12289N1024):
+		{
+			klen = RLWEQ12289N1024::PUBLICKEY_SIZE;
+			break;
+		}
+		case (RLWEParameters::RLWES2Q12289N2048):
+		{
+			klen = RLWEQ12289N2048::PUBLICKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The RingLWE parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
 }
 
 const size_t RingLWE::SharedSecretSize()
@@ -263,6 +339,7 @@ void RingLWE::Initialize(AsymmetricKey* Key)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);
 	}
+
 	if (Key->KeyClass() != AsymmetricKeyTypes::CipherPublicKey && Key->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Initialize"), std::string("The key is invalid!"), ErrorCodes::InvalidKey);

@@ -124,14 +124,14 @@ namespace Test
 			OnProgress(std::string(""));
 
 			// SPHINCS+
-			OnProgress(std::string("***Generating " + ctr + " Keypairs using SPHINCS+ SPXS128F256***"));
-			SpxGenerateLoop(SphincsParameters::SPXS128F256, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Generating " + ctr + " Keypairs using SPHINCS+ SPXS1S128SHAKE***"));
+			SpxGenerateLoop(SphincsParameters::SPXS1S128SHAKE, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Signing " + ctr + " messages using SPHINCS+ SPXS128F256***"));
-			SpxSignLoop(SphincsParameters::SPXS128F256, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Signing " + ctr + " messages using SPHINCS+ SPXS1S128SHAKE***"));
+			SpxSignLoop(SphincsParameters::SPXS1S128SHAKE, DEF_TEST_ITER, rngType);
 
-			OnProgress(std::string("***Verifying " + ctr + " messages using SPHINCS+ SPXS128F256***"));
-			SpxVerifyLoop(SphincsParameters::SPXS128F256, DEF_TEST_ITER, rngType);
+			OnProgress(std::string("***Verifying " + ctr + " messages using SPHINCS+ SPXS1S128SHAKE***"));
+			SpxVerifyLoop(SphincsParameters::SPXS1S128SHAKE, DEF_TEST_ITER, rngType);
 
 			return MESSAGE;
 		}

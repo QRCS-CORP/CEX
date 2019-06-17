@@ -2,7 +2,9 @@
 #include "IntegerTools.h"
 
 #if defined(CEX_OS_WINDOWS)
-#	include <Windows.h>
+#	include <tchar.h>
+#	include <windows.h>
+#	include <Wincrypt.h>
 #elif defined (CEX_OS_ANDROID)
 #	include <sys/types.h>
 #	include <thread>
@@ -20,7 +22,7 @@ using Utility::IntegerTools;
 using Enumeration::ProviderConvert;
 
 #if defined(CEX_OS_WINDOWS)
-#	pragma comment(lib, "advapi32.lib")
+#	pragma comment(lib, "crypt32.lib")
 	HCRYPTPROV m_hProvider = 0;
 #elif defined (CEX_OS_POSIX)
 #	if !defined(O_NOCTTY)
@@ -125,27 +127,27 @@ void CSP::GetRandom(byte* Output, size_t Length)
 
 	if (Length != 0)
 	{
-		HCRYPTPROV hprov = NULL;
+		HCRYPTPROV hprov;
 
 		if (!CryptAcquireContextW(&hprov, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
 		{
 			throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
 		}
 
-		if (hprov != NULL)
+		if (hprov)
 		{
 			if (!::CryptGenRandom(hprov, static_cast<DWORD>(Length), static_cast<BYTE*>(Output)))
 			{
 				CryptReleaseContext(hprov, 0);
-				hprov = NULL;
+				hprov = 0;
 				throw CryptoRandomException(ProviderConvert::ToName(Providers::CSP), std::string("Generate"), std::string("Random provider is not available!"), ErrorCodes::NotFound);
 			}
 		}
 
-		if (hprov != NULL)
+		if (hprov)
 		{
 			CryptReleaseContext(hprov, 0);
-			hprov = NULL;
+			hprov = 0;
 		}
 	}
 

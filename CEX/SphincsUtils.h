@@ -32,7 +32,11 @@ NAMESPACE_SPHINCS
 /// </summary>
 class SphincsUtils
 {
+private:
+
 public:
+
+	//~~~Inlined~~~//
 
 	inline static void CopyKeypairAddress(const std::array<uint, 8> &Input, std::array<uint, 8> &Output)
 	{
@@ -92,6 +96,10 @@ public:
 	{
 		Address[4] = Type;
 	}
+
+	//~~~Static~~~//
+
+	static void AddressToBytes(std::vector<byte> &Output, size_t Offset, const std::array<uint, 8> &Address);
 
 	static ulong BytesToUll(const std::vector<byte> &Input, size_t Offset, size_t Length);
 

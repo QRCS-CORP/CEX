@@ -50,14 +50,14 @@ std::string AsymmetricTransformConvert::ToName(AsymmetricTransforms Enumeral)
 	case AsymmetricTransforms::RLWES2Q12289N2048:
 		name = std::string("RLWES2Q12289N2048");
 		break;
-	case AsymmetricTransforms::SPXS128F256:
-		name = std::string("SPXS128F256");
+	case AsymmetricTransforms::SPXS1S128SHAKE:
+		name = std::string("SPXS1S128SHAKE");
 		break;
-	case AsymmetricTransforms::SPXS256F256:
-		name = std::string("SPXS256F256");
+	case AsymmetricTransforms::SPXS2S192SHAKE:
+		name = std::string("SPXS2S192SHAKE");
 		break;
-	case AsymmetricTransforms::SPXS512F256:
-		name = std::string("SPXS512F256");
+	case AsymmetricTransforms::SPXS3S256SHAKE:
+		name = std::string("SPXS3S256SHAKE");
 		break;
 	default:
 		name = std::string("None");
@@ -127,17 +127,17 @@ AsymmetricTransforms AsymmetricTransformConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricTransforms::RLWES2Q12289N2048;
 	}
-	else if (Name == std::string("SPXS128F256"))
+	else if (Name == std::string("SPXS1S128SHAKE"))
 	{
-		tname = AsymmetricTransforms::SPXS128F256;
+		tname = AsymmetricTransforms::SPXS1S128SHAKE;
 	}
-	else if (Name == std::string("SPXS256F256"))
+	else if (Name == std::string("SPXS2S192SHAKE"))
 	{
-		tname = AsymmetricTransforms::SPXS256F256;
+		tname = AsymmetricTransforms::SPXS2S192SHAKE;
 	}
-	else if (Name == std::string("SPXS512F256"))
+	else if (Name == std::string("SPXS3S256SHAKE"))
 	{
-		tname = AsymmetricTransforms::SPXS512F256;
+		tname = AsymmetricTransforms::SPXS3S256SHAKE;
 	}
 	else
 	{

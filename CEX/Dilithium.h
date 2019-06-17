@@ -61,10 +61,12 @@ using Enumeration::DilithiumParameters;
 /// Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
 /// sgn.Initialize(PublicKey);
 /// std::vector&lt;byte&gt; message(0);
-/// bool status;
 ///
-///	// if authentication fails, do something
-///	status = sgn.Verify(Signature, msg);
+///	// authenticate the signature
+///	if (!sgn.Verify(Signature, msg))
+/// {
+///		//  authentication failed, do something..
+/// }
 /// </code>
 /// </example>
 /// 
@@ -84,10 +86,11 @@ using Enumeration::DilithiumParameters;
 /// <description>:</description>
 /// 
 /// <list type="bullet">
-/// <item><description>There are three available parameter sets dilineated by security strength (S1, S2, S3); medium security: DLMS1N256Q8380417, high security: DLMS2N256Q8380417, highest security: DLMS2N256Q8380417</description></item>
-/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
+/// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); medium security: DLMS1N256Q8380417, high security: DLMS2N256Q8380417, highest security: DLMS2N256Q8380417</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
-/// <item><description>The message is authenticated; the Verify function checks the signature and returns false on message authentication failure</description></item>
+/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher; the Public key is used for verification, and use the Private for signing a message.</description></item>
+/// <item><description>Use the Generate function to create a public/private key-pair, and the Sign function to sign a message</description></item>
+/// <item><description>The message-signature is tested using the Verify function, which checks the signature and returns false on authentication failure</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -161,24 +164,29 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: This class is initialized for Signing with the Private key
+	/// Read Only: This class has been initialized for Signing with the Private key
 	/// </summary>
 	const bool IsSigner() override;
 
 	/// <summary>
-	/// Read Only: The signature scheme and parameter name
+	/// Read Only: The signature scheme and parameter name, including the loaded parameter-set
 	/// </summary>
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: The expected Private key size in bytes
+	/// Read Only: The Private key-size in bytes
 	/// </summary>
 	const size_t PrivateKeySize() override;
 
 	/// <summary>
-	/// Read Only: The expected Public key size in bytes
+	/// Read Only: The Public key-size in bytes
 	/// </summary>
 	const size_t PublicKeySize() override;
+
+	/// <summary>
+	/// Read Only: The base signature size in bytes
+	/// </summary>
+	const size_t SignatureSize() override;
 
 	//~~~Public Functions~~~//
 
@@ -192,7 +200,7 @@ public:
 	AsymmetricKeyPair* Generate() override;
 
 	/// <summary>
-	/// Initialize the signature scheme for signing (private key) or verifying (public key)
+	/// Initialize the signature scheme for signing (private-key) or verifying (public-key)
 	/// </summary>
 	/// 
 	/// <param name="Key">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
@@ -218,7 +226,7 @@ public:
 	/// <param name="Signature">The output signature array containing the signature and message</param>
 	/// <param name="Message">The message byte array containing the data to process</param>
 	/// 
-	/// <returns>Returns true if the signature matches</returns>
+	/// <returns>Returns true if the signature matches, false for authentication failure</returns>
 	bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) override;
 };
 

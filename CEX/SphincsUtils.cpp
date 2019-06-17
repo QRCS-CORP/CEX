@@ -2,6 +2,16 @@
 
 NAMESPACE_SPHINCS
 
+void SphincsUtils::AddressToBytes(std::vector<byte> &Output, size_t Offset, const std::array<uint, 8> &Address)
+{
+	size_t i;
+
+	for (i = 0; i < 8; ++i)
+	{
+		UllToBytes(Output, Offset + (i * 4), Address[i], 4);
+	}
+}
+
 ulong SphincsUtils::BytesToUll(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	size_t i;

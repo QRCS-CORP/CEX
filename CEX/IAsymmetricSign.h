@@ -96,14 +96,19 @@ public:
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Read Only: The expected Private key size in bytes
+	/// Read Only: The Private key-size in bytes
 	/// </summary>
 	virtual const size_t PrivateKeySize() = 0;
 
 	/// <summary>
-	/// Read Only: The expected Public key size in bytes
+	/// Read Only: The Public key-size in bytes
 	/// </summary>
 	virtual const size_t PublicKeySize() = 0;
+
+	/// <summary>
+	/// Read Only: The base signature size in bytes
+	/// </summary>
+	virtual const size_t SignatureSize() = 0;
 
 	//~~~Public Functions~~~//
 

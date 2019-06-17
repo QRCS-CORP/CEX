@@ -102,6 +102,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4dbd37ccb1ea492b70f251185a859a59"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ring_l_w_e.html#a4dbd37ccb1ea492b70f251185a859a59">~RingLWE</a> () override</td></tr>
 <tr class="memdesc:a4dbd37ccb1ea492b70f251185a859a59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a4dbd37ccb1ea492b70f251185a859a59">More...</a><br /></td></tr>
 <tr class="separator:a4dbd37ccb1ea492b70f251185a859a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ea2c2ebf4f5b9c32a62559ff048379d"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ring_l_w_e.html#a5ea2c2ebf4f5b9c32a62559ff048379d">CipherTextSize</a> () override</td></tr>
+<tr class="memdesc:a5ea2c2ebf4f5b9c32a62559ff048379d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected base cipher-text size in bytes  <a href="#a5ea2c2ebf4f5b9c32a62559ff048379d">More...</a><br /></td></tr>
+<tr class="separator:a5ea2c2ebf4f5b9c32a62559ff048379d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27a2788f999a472bc723539ad507a39f"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ring_l_w_e.html#a27a2788f999a472bc723539ad507a39f">DomainKey</a> ()</td></tr>
 <tr class="memdesc:a27a2788f999a472bc723539ad507a39f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.  <a href="#a27a2788f999a472bc723539ad507a39f">More...</a><br /></td></tr>
 <tr class="separator:a27a2788f999a472bc723539ad507a39f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,6 +123,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa312a4e0caa72c16952e2b1c3ea2a8e1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga54a04adf3e9a92c6b1cbbc65858339a5">RLWEParameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ring_l_w_e.html#aa312a4e0caa72c16952e2b1c3ea2a8e1">Parameters</a> ()</td></tr>
 <tr class="memdesc:aa312a4e0caa72c16952e2b1c3ea2a8e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#aa312a4e0caa72c16952e2b1c3ea2a8e1">More...</a><br /></td></tr>
 <tr class="separator:aa312a4e0caa72c16952e2b1c3ea2a8e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a191038dc4377ad8eac65ceb828b36287"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ring_l_w_e.html#a191038dc4377ad8eac65ceb828b36287">PrivateKeySize</a> () override</td></tr>
+<tr class="memdesc:a191038dc4377ad8eac65ceb828b36287"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key-size in bytes  <a href="#a191038dc4377ad8eac65ceb828b36287">More...</a><br /></td></tr>
+<tr class="separator:a191038dc4377ad8eac65ceb828b36287"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6aa7616131c43500f7b917c5bba2e066"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ring_l_w_e.html#a6aa7616131c43500f7b917c5bba2e066">PublicKeySize</a> () override</td></tr>
+<tr class="memdesc:a6aa7616131c43500f7b917c5bba2e066"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key-size in bytes  <a href="#a6aa7616131c43500f7b917c5bba2e066">More...</a><br /></td></tr>
+<tr class="separator:a6aa7616131c43500f7b917c5bba2e066"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ea68f8849f95dcd8f6378018b0b9732"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ring_l_w_e.html#a3ea68f8849f95dcd8f6378018b0b9732">SharedSecretSize</a> () override</td></tr>
 <tr class="memdesc:a3ea68f8849f95dcd8f6378018b0b9732"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers shared secret output size.  <a href="#a3ea68f8849f95dcd8f6378018b0b9732">More...</a><br /></td></tr>
 <tr class="separator:a3ea68f8849f95dcd8f6378018b0b9732"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -328,6 +337,35 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a5ea2c2ebf4f5b9c32a62559ff048379d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ea2c2ebf4f5b9c32a62559ff048379d">&#9670;&nbsp;</a></span>CipherTextSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t RingLWE::CipherTextSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected base cipher-text size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a6775d481795ca02f8d5fd55ea509dd70">IAsymmetricCipher</a>.</p>
+
+</div>
+</div>
 <a id="a166c01d8fc455250eb87929d4d04342e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a166c01d8fc455250eb87929d4d04342e">&#9670;&nbsp;</a></span>Decapsulate()</h2>
 
@@ -685,6 +723,64 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </div><div class="memdoc">
 
 <p>Read Only: The ciphers parameters enumeration name </p>
+
+</div>
+</div>
+<a id="a191038dc4377ad8eac65ceb828b36287"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a191038dc4377ad8eac65ceb828b36287">&#9670;&nbsp;</a></span>PrivateKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t RingLWE::PrivateKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Private key-size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a72fcb30cc523473bed29daaa9f4ba5af">IAsymmetricCipher</a>.</p>
+
+</div>
+</div>
+<a id="a6aa7616131c43500f7b917c5bba2e066"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6aa7616131c43500f7b917c5bba2e066">&#9670;&nbsp;</a></span>PublicKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t RingLWE::PublicKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Public key-size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#af11f32a507eb624d971071df30eea529">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>

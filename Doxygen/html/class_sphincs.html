@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the Sphincs-plus asymmetric signature scheme (SPHINCS+)  
+<p>An implementation of the Sphincs-Plus asymmetric signature scheme (SPHINCS+)  
  <a href="class_sphincs.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_sphincs_8h_source.html">Sphincs.h</a>&gt;</code></p>
@@ -93,9 +93,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:accb9768f3e854794f53536a148835cb4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_sphincs.html">Sphincs</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#accb9768f3e854794f53536a148835cb4">operator=</a> (const <a class="el" href="class_sphincs.html">Sphincs</a> &amp;)=delete</td></tr>
 <tr class="memdesc:accb9768f3e854794f53536a148835cb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#accb9768f3e854794f53536a148835cb4">More...</a><br /></td></tr>
 <tr class="separator:accb9768f3e854794f53536a148835cb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76116905bec3982470c0514b81fda416"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a76116905bec3982470c0514b81fda416">Sphincs</a> (<a class="el" href="group___enumeration.html#gaadbab417f390bc7cafd80e88a380a98a">SphincsParameters</a> Parameters=<a class="el" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa92f0b00f3fe025cf435e642a0727ec8d">SphincsParameters::SPXS256F256</a>, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
-<tr class="memdesc:a76116905bec3982470c0514b81fda416"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: Instantiate this class  <a href="#a76116905bec3982470c0514b81fda416">More...</a><br /></td></tr>
-<tr class="separator:a76116905bec3982470c0514b81fda416"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee6c5197e6e2396fdb5e51bbd2e5b9a4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#aee6c5197e6e2396fdb5e51bbd2e5b9a4">Sphincs</a> (<a class="el" href="group___enumeration.html#gaadbab417f390bc7cafd80e88a380a98a">SphincsParameters</a> Parameters=<a class="el" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aacae5ff5c06fa7e9fb234516a5a981ed0">SphincsParameters::SPXS2S192SHAKE</a>, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
+<tr class="memdesc:aee6c5197e6e2396fdb5e51bbd2e5b9a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: Instantiate this class  <a href="#aee6c5197e6e2396fdb5e51bbd2e5b9a4">More...</a><br /></td></tr>
+<tr class="separator:aee6c5197e6e2396fdb5e51bbd2e5b9a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99562eaefa5e1f599d21142cf703bd86"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a99562eaefa5e1f599d21142cf703bd86">Sphincs</a> (<a class="el" href="group___enumeration.html#gaadbab417f390bc7cafd80e88a380a98a">SphincsParameters</a> Parameters, <a class="el" href="class_i_prng.html">IPrng</a> *Rng)</td></tr>
 <tr class="memdesc:a99562eaefa5e1f599d21142cf703bd86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using an external Prng instance  <a href="#a99562eaefa5e1f599d21142cf703bd86">More...</a><br /></td></tr>
 <tr class="separator:a99562eaefa5e1f599d21142cf703bd86"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,22 +109,25 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a588146e86b94ac4199e4ef9f8e2314c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme has been initialized with a key  <a href="#a588146e86b94ac4199e4ef9f8e2314c0">More...</a><br /></td></tr>
 <tr class="separator:a588146e86b94ac4199e4ef9f8e2314c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0eb4574df842bb3c6d389ea8a1bba76"><td class="memItemLeft" align="right" valign="top">const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#aa0eb4574df842bb3c6d389ea8a1bba76">IsSigner</a> () override</td></tr>
-<tr class="memdesc:aa0eb4574df842bb3c6d389ea8a1bba76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: This class is initialized for Signing with the Private key  <a href="#aa0eb4574df842bb3c6d389ea8a1bba76">More...</a><br /></td></tr>
+<tr class="memdesc:aa0eb4574df842bb3c6d389ea8a1bba76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: This class has been initialized for Signing with the Private key  <a href="#aa0eb4574df842bb3c6d389ea8a1bba76">More...</a><br /></td></tr>
 <tr class="separator:aa0eb4574df842bb3c6d389ea8a1bba76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61ea39256ea247709d7d72e8fbeb9dcb"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a61ea39256ea247709d7d72e8fbeb9dcb">Name</a> () override</td></tr>
-<tr class="memdesc:a61ea39256ea247709d7d72e8fbeb9dcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme name  <a href="#a61ea39256ea247709d7d72e8fbeb9dcb">More...</a><br /></td></tr>
+<tr class="memdesc:a61ea39256ea247709d7d72e8fbeb9dcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme name, including the loaded parameter-set  <a href="#a61ea39256ea247709d7d72e8fbeb9dcb">More...</a><br /></td></tr>
 <tr class="separator:a61ea39256ea247709d7d72e8fbeb9dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08985c961919894c9b69b4388c707a7a"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a08985c961919894c9b69b4388c707a7a">PrivateKeySize</a> () override</td></tr>
-<tr class="memdesc:a08985c961919894c9b69b4388c707a7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key size in bytes  <a href="#a08985c961919894c9b69b4388c707a7a">More...</a><br /></td></tr>
+<tr class="memdesc:a08985c961919894c9b69b4388c707a7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Private key-size in bytes  <a href="#a08985c961919894c9b69b4388c707a7a">More...</a><br /></td></tr>
 <tr class="separator:a08985c961919894c9b69b4388c707a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a384523c49d175414091494c466abc087"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a384523c49d175414091494c466abc087">PublicKeySize</a> () override</td></tr>
-<tr class="memdesc:a384523c49d175414091494c466abc087"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key size in bytes  <a href="#a384523c49d175414091494c466abc087">More...</a><br /></td></tr>
+<tr class="memdesc:a384523c49d175414091494c466abc087"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Public key size in bytes  <a href="#a384523c49d175414091494c466abc087">More...</a><br /></td></tr>
 <tr class="separator:a384523c49d175414091494c466abc087"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab31a752692b8e5b738a6bac4b90a15c"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#aab31a752692b8e5b738a6bac4b90a15c">SignatureSize</a> () override</td></tr>
+<tr class="memdesc:aab31a752692b8e5b738a6bac4b90a15c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The base signature size in bytes  <a href="#aab31a752692b8e5b738a6bac4b90a15c">More...</a><br /></td></tr>
+<tr class="separator:aab31a752692b8e5b738a6bac4b90a15c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad09e3b91330fdea9190b0a65660cbf3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_asymmetric_key_pair.html">AsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#ad09e3b91330fdea9190b0a65660cbf3c">Generate</a> () override</td></tr>
 <tr class="memdesc:ad09e3b91330fdea9190b0a65660cbf3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#ad09e3b91330fdea9190b0a65660cbf3c">More...</a><br /></td></tr>
 <tr class="separator:ad09e3b91330fdea9190b0a65660cbf3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fe512af37d407c7e4ea35bb9ae8b427"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a8fe512af37d407c7e4ea35bb9ae8b427">Initialize</a> (<a class="el" href="class_asymmetric_key.html">AsymmetricKey</a> *<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
-<tr class="memdesc:a8fe512af37d407c7e4ea35bb9ae8b427"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the signature scheme for signing (private key) or verifying (public key)  <a href="#a8fe512af37d407c7e4ea35bb9ae8b427">More...</a><br /></td></tr>
+<tr class="memdesc:a8fe512af37d407c7e4ea35bb9ae8b427"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the signature scheme for signing (private-key) or verifying (public-key)  <a href="#a8fe512af37d407c7e4ea35bb9ae8b427">More...</a><br /></td></tr>
 <tr class="separator:a8fe512af37d407c7e4ea35bb9ae8b427"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa9ddb2a6c9fed9485791bd7008bc129"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#aaa9ddb2a6c9fed9485791bd7008bc129">Sign</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>, std::vector&lt; byte &gt; &amp;Signature) override</td></tr>
 <tr class="memdesc:aaa9ddb2a6c9fed9485791bd7008bc129"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign a message array and return the message and attached signature  <a href="#aaa9ddb2a6c9fed9485791bd7008bc129">More...</a><br /></td></tr>
@@ -147,21 +150,24 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a15d6681f385e01d414ca3523121921d9 inherit pub_methods_class_i_asymmetric_sign"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the Sphincs-plus asymmetric signature scheme (SPHINCS+) </p>
-<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(<a class="code" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa782caa6858f2ff54bfa2db4381aae8c7">SphincsParameters::SPXS128F256</a>);</div><div class="line">IAsymmetricKeyPair* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line"><a class="code" href="class_i_asymmetric_key.html">IAsymmetricKey</a>* pubk = kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; pk = pubk-&gt;ToBytes();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(<a class="code" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa782caa6858f2ff54bfa2db4381aae8c7">SphincsParameters::SPXS128F256</a>);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(<a class="code" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa782caa6858f2ff54bfa2db4381aae8c7">SphincsParameters::SPXS128F256</a>);</div><div class="line">sgn.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><span class="comment">// if authentication fails, do something</span></div><div class="line">status = sgn.Verify(Signature, msg);</div></div><!-- fragment --> <p>Implementation Notes: </p>
-<p>SPHINCS+ is a high-security post-quantum stateless hash-based signature scheme that signs hundreds of messages per second on a modern 4-core 3.5GHz Intel CPU. <br />
-Signatures are 41 KB, public keys are 1 KB, and private keys are 1 KB. <br />
-SPHINCS-256 is designed to provide long-term 2128 security even against attackers equipped with quantum computers. <br />
-Unlike most hash-based signature schemes, SPHINCS-256 is stateless, allowing it to be a drop-in replacement for current signature schemes.</p>
+<div class="textblock"><p>An implementation of the Sphincs-Plus asymmetric signature scheme (SPHINCS+) </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(<a class="code" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa6dc30c027affca52eba1dc91efd92789">SphincsParameters::SPXS1S128SHAKE</a>);</div><div class="line">IAsymmetricKeyPair* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line"><a class="code" href="class_i_asymmetric_key.html">IAsymmetricKey</a>* pubk = kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; pk = pubk-&gt;ToBytes();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(<a class="code" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa6dc30c027affca52eba1dc91efd92789">SphincsParameters::SPXS1S128SHAKE</a>);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(<a class="code" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa6dc30c027affca52eba1dc91efd92789">SphincsParameters::SPXS1S128SHAKE</a>);</div><div class="line">sgn.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"></div><div class="line"><span class="comment">// authenticate the signature</span></div><div class="line"><span class="keywordflow">if</span> (!sgn.Verify(Signature, msg))</div><div class="line">{</div><div class="line">    <span class="comment">//  authentication failed, do something..</span></div><div class="line">}</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<p>SPHINCS+ is a high-security post-quantum secure stateless hash-based signature scheme. <br />
+Signature sizes vary depending on the parameters; 16KB (S128), 33KB (S192), to 58KB with the strongest parameter S256. <br />
+Both the public and private keys are both less than 1KB in size. <br />
+SPHINCS+ is designed to provide long-term security even against attackers equipped with quantum computers. <br />
+Unlike most hash-based signature schemes, SPHINCS+ is stateless, allowing it to be a drop-in replacement for current signature schemes.</p>
 <ul>
 <li>
-There are three available parameter sets using the 'fast' version of the algorithm dilineated by the core hashing function SHAKE; the SHAKE128 based SPXS128F256, SPXS256F256 using SHAKE256, and the experimental SPXS512F256 using SHAKE512, selectable through the class constructor parameter </li>
+There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); SPXS1S128SHAKE, SPXS2S192SHAKE, and SPXS3S256SHAKE (strongest) </li>
 <li>
 The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption. </li>
 <li>
 The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng </li>
 <li>
-The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure </li>
+Use the Generate function to create a public/private key-pair, and the Sign function to sign a message </li>
+<li>
+The message-signature is tested using the Verify function, which checks the signature and returns false on authentication failure </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
@@ -202,8 +208,8 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 
 </div>
 </div>
-<a id="a76116905bec3982470c0514b81fda416"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76116905bec3982470c0514b81fda416">&#9670;&nbsp;</a></span>Sphincs() <span class="overload">[2/3]</span></h2>
+<a id="aee6c5197e6e2396fdb5e51bbd2e5b9a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee6c5197e6e2396fdb5e51bbd2e5b9a4">&#9670;&nbsp;</a></span>Sphincs() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -212,7 +218,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
           <td class="memname">Sphincs::Sphincs </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaadbab417f390bc7cafd80e88a380a98a">SphincsParameters</a>&#160;</td>
-          <td class="paramname"><em>Parameters</em> = <code><a class="el" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aa92f0b00f3fe025cf435e642a0727ec8d">SphincsParameters::SPXS256F256</a></code>, </td>
+          <td class="paramname"><em>Parameters</em> = <code><a class="el" href="group___enumeration.html#ggaadbab417f390bc7cafd80e88a380a98aacae5ff5c06fa7e9fb234516a5a981ed0">SphincsParameters::SPXS2S192SHAKE</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -231,7 +237,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 <p>Constructor: Instantiate this class </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Parameters</td><td>The SPHINCS+ parameter set; default is SPXF256</td></tr>
+    <tr><td class="paramname">Parameters</td><td>The SPHINCS+ parameter set; default is SPXS2S192SHAKE</td></tr>
     <tr><td class="paramname">PrngType</td><td>The random prng provider; default is Block-cipher Counter Rng (BCR)</td></tr>
   </table>
   </dd>
@@ -399,7 +405,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the signature scheme for signing (private key) or verifying (public key) </p>
+<p>Initialize the signature scheme for signing (private-key) or verifying (public-key) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The <a class="el" href="class_asymmetric_key.html" title="An Asymmetric primitive key container.">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
@@ -469,7 +475,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: This class is initialized for Signing with the Private key </p>
+<p>Read Only: This class has been initialized for Signing with the Private key </p>
 
 <p>Implements <a class="el" href="class_i_asymmetric_sign.html#a9b0782caaf4b9a872c937aea3b9f81a8">IAsymmetricSign</a>.</p>
 
@@ -498,7 +504,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The signature scheme name </p>
+<p>Read Only: The signature scheme name, including the loaded parameter-set </p>
 
 <p>Implements <a class="el" href="class_i_asymmetric_sign.html#a71d275a877944114879c70462e8aec7d">IAsymmetricSign</a>.</p>
 
@@ -555,7 +561,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The expected Private key size in bytes </p>
+<p>Read Only: The Private key-size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_asymmetric_sign.html#a37029c2531087e3ee90ef1c57a2f0838">IAsymmetricSign</a>.</p>
 
@@ -584,7 +590,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The expected Public key size in bytes </p>
+<p>Read Only: The Public key size in bytes </p>
 
 <p>Implements <a class="el" href="class_i_asymmetric_sign.html#a95d9971467e4cef79b51f960c4c64575">IAsymmetricSign</a>.</p>
 
@@ -627,7 +633,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 <p>Sign a message array and return the message and attached signature </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Message</td><td>The message byte array containing the data to process</td></tr>
+    <tr><td class="paramname">Message</td><td>The message byte array containing the message to sign</td></tr>
     <tr><td class="paramname">Signature</td><td>The output signature array containing the signature and message</td></tr>
   </table>
   </dd>
@@ -635,6 +641,35 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
 <dl class="section return"><dt>Returns</dt><dd>Returns the size of the signed message</dd></dl>
 
 <p>Implements <a class="el" href="class_i_asymmetric_sign.html#a1c6d71ed448c63a5d48d486969ca92ca">IAsymmetricSign</a>.</p>
+
+</div>
+</div>
+<a id="aab31a752692b8e5b738a6bac4b90a15c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab31a752692b8e5b738a6bac4b90a15c">&#9670;&nbsp;</a></span>SignatureSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t Sphincs::SignatureSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The base signature size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_sign.html#a617fb050761bdbb59053a390352c8f4f">IAsymmetricSign</a>.</p>
 
 </div>
 </div>
@@ -680,7 +715,7 @@ Website: <a href="https://sphincs.org/">NTRU-Prime Website</a>. </li>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns true if the signature matches</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if the signature matches, false for authentication failure</dd></dl>
 
 <p>Implements <a class="el" href="class_i_asymmetric_sign.html#a97c18bdfde7cf463ada1433fdf55fca0">IAsymmetricSign</a>.</p>
 

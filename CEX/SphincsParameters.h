@@ -16,17 +16,17 @@ enum class SphincsParameters : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S1 parameters; (Medium Security) The Sphincs SHAKE128, F256 parameter set
+	/// The S1 parameters; (Medium Security) The Sphincs SHAKE256, S128 parameter set
 	/// </summary>
-	SPXS128F256 = static_cast<byte>(AsymmetricTransforms::SPXS128F256),
+	SPXS1S128SHAKE = static_cast<byte>(AsymmetricTransforms::SPXS1S128SHAKE),
 	/// <summary>
-	/// The S2 parameters; (High Security) The Sphincs SHAKE256, F256 parameter set
+	/// The S2 parameters; (High Security) The Sphincs SHAKE256, S192 parameter set
 	/// </summary>
-	SPXS256F256 = static_cast<byte>(AsymmetricTransforms::SPXS256F256),
+	SPXS2S192SHAKE = static_cast<byte>(AsymmetricTransforms::SPXS2S192SHAKE),
 	/// <summary>
-	/// The S3 parameters; (Highest Security) The experimental Sphincs SHAKE512, F256 parameter set
+	/// The S3 parameters; (Highest Security) The Sphincs SHAKE256, S256 parameter set
 	/// </summary>
-	SPXS512F256 = static_cast<byte>(AsymmetricTransforms::SPXS512F256)
+	SPXS3S256SHAKE = static_cast<byte>(AsymmetricTransforms::SPXS3S256SHAKE)
 };
 
 class SphincsParameterConvert

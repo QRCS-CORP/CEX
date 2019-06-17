@@ -82,7 +82,7 @@ Inheritance diagram for IAsymmetricSign:</div>
   <img src="class_i_asymmetric_sign.png" usemap="#IAsymmetricSign_map" alt=""/>
   <map id="IAsymmetricSign_map" name="IAsymmetricSign_map">
 <area href="class_dilithium.html" title="An implementation of the Dilithium asymmetric signature scheme (DILITHIUM)" alt="Dilithium" shape="rect" coords="0,56,105,80"/>
-<area href="class_sphincs.html" title="An implementation of the Sphincs-plus asymmetric signature scheme (SPHINCS+)" alt="Sphincs" shape="rect" coords="115,56,220,80"/>
+<area href="class_sphincs.html" title="An implementation of the Sphincs-Plus asymmetric signature scheme (SPHINCS+)" alt="Sphincs" shape="rect" coords="115,56,220,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -113,11 +113,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a71d275a877944114879c70462e8aec7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme name  <a href="#a71d275a877944114879c70462e8aec7d">More...</a><br /></td></tr>
 <tr class="separator:a71d275a877944114879c70462e8aec7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37029c2531087e3ee90ef1c57a2f0838"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a37029c2531087e3ee90ef1c57a2f0838">PrivateKeySize</a> ()=0</td></tr>
-<tr class="memdesc:a37029c2531087e3ee90ef1c57a2f0838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key size in bytes  <a href="#a37029c2531087e3ee90ef1c57a2f0838">More...</a><br /></td></tr>
+<tr class="memdesc:a37029c2531087e3ee90ef1c57a2f0838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Private key-size in bytes  <a href="#a37029c2531087e3ee90ef1c57a2f0838">More...</a><br /></td></tr>
 <tr class="separator:a37029c2531087e3ee90ef1c57a2f0838"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95d9971467e4cef79b51f960c4c64575"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a95d9971467e4cef79b51f960c4c64575">PublicKeySize</a> ()=0</td></tr>
-<tr class="memdesc:a95d9971467e4cef79b51f960c4c64575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key size in bytes  <a href="#a95d9971467e4cef79b51f960c4c64575">More...</a><br /></td></tr>
+<tr class="memdesc:a95d9971467e4cef79b51f960c4c64575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Public key-size in bytes  <a href="#a95d9971467e4cef79b51f960c4c64575">More...</a><br /></td></tr>
 <tr class="separator:a95d9971467e4cef79b51f960c4c64575"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a617fb050761bdbb59053a390352c8f4f"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a617fb050761bdbb59053a390352c8f4f">SignatureSize</a> ()=0</td></tr>
+<tr class="memdesc:a617fb050761bdbb59053a390352c8f4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The base signature size in bytes  <a href="#a617fb050761bdbb59053a390352c8f4f">More...</a><br /></td></tr>
+<tr class="separator:a617fb050761bdbb59053a390352c8f4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab51a5eb81adf56edf13cf4f6413114d9"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_asymmetric_key_pair.html">AsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#ab51a5eb81adf56edf13cf4f6413114d9">Generate</a> ()=0</td></tr>
 <tr class="memdesc:ab51a5eb81adf56edf13cf4f6413114d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#ab51a5eb81adf56edf13cf4f6413114d9">More...</a><br /></td></tr>
 <tr class="separator:ab51a5eb81adf56edf13cf4f6413114d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -463,7 +466,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The expected Private key size in bytes </p>
+<p>Read Only: The Private key-size in bytes </p>
 
 <p>Implemented in <a class="el" href="class_dilithium.html#a9e374ef7058b87bd76989fd093cb0f2a">Dilithium</a>, and <a class="el" href="class_sphincs.html#a08985c961919894c9b69b4388c707a7a">Sphincs</a>.</p>
 
@@ -492,7 +495,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The expected Public key size in bytes </p>
+<p>Read Only: The Public key-size in bytes </p>
 
 <p>Implemented in <a class="el" href="class_dilithium.html#aa625f481f6b09af524694fdb839c9f13">Dilithium</a>, and <a class="el" href="class_sphincs.html#a384523c49d175414091494c466abc087">Sphincs</a>.</p>
 
@@ -543,6 +546,35 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>Returns the size of the signed message</dd></dl>
 
 <p>Implemented in <a class="el" href="class_dilithium.html#a866323ff7d78fc3cf258a51e897e3ba1">Dilithium</a>, and <a class="el" href="class_sphincs.html#aaa9ddb2a6c9fed9485791bd7008bc129">Sphincs</a>.</p>
+
+</div>
+</div>
+<a id="a617fb050761bdbb59053a390352c8f4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a617fb050761bdbb59053a390352c8f4f">&#9670;&nbsp;</a></span>SignatureSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAsymmetricSign::SignatureSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The base signature size in bytes </p>
+
+<p>Implemented in <a class="el" href="class_dilithium.html#ae51f42e68d5e5d8f350086b8de94802a">Dilithium</a>, and <a class="el" href="class_sphincs.html#aab31a752692b8e5b738a6bac4b90a15c">Sphincs</a>.</p>
 
 </div>
 </div>

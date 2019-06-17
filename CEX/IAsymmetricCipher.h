@@ -76,6 +76,11 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
+	/// Read Only: The expected base cipher-text size in bytes
+	/// </summary>
+	virtual const size_t CipherTextSize() = 0;
+
+	/// <summary>
 	/// Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret.
 	/// <para>Changing this code will create a unique distribution of the cipher.
 	/// The domain key can be used as a secondary secret shared between hosts in an authenticated domain.
@@ -103,6 +108,16 @@ public:
 	/// Read Only: The ciphers name
 	/// </summary>
 	virtual const std::string Name() = 0;
+
+	/// <summary>
+	/// Read Only: The expected Private key-size in bytes
+	/// </summary>
+	virtual const size_t PrivateKeySize() = 0;
+
+	/// <summary>
+	/// Read Only: The expected Public key-size in bytes
+	/// </summary>
+	virtual const size_t PublicKeySize() = 0;
 
 	/// <summary>
 	/// Read Only: The ciphers shared secret output size.

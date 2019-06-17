@@ -3,12 +3,15 @@
 #include "PrngFromName.h"
 #include "SecureRandom.h"
 #include "SHAKE.h"
-#include "SPXF256.h"
+#include "SPXS128SHAKE.h"
+#include "SPXS192SHAKE.h"
+#include "SPXS256SHAKE.h"
 
 NAMESPACE_SPHINCS
 
 using Enumeration::AsymmetricPrimitiveConvert;
 using Utility::MemoryTools;
+using Enumeration::SphincsParameterConvert;
 
 class Sphincs::SphincsState
 {
@@ -64,6 +67,7 @@ Sphincs::~Sphincs()
 	{
 		m_privateKey.release();
 	}
+
 	if (m_publicKey != nullptr)
 	{
 		m_publicKey.release();
@@ -105,36 +109,145 @@ const bool Sphincs::IsSigner()
 
 const std::string Sphincs::Name()
 {
-	std::string ret = AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Sphincs);
+	std::string ret;
 
-	if (m_sphincsState->Parameters == SphincsParameters::SPXS128F256)
-	{
-		ret += "-SPXS128F256";
-	}
-	else if (m_sphincsState->Parameters == SphincsParameters::SPXS256F256)
-	{
-		ret += "-SPXS256F256";
-	}
+	ret = AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium) + std::string("") + 
+		SphincsParameterConvert::ToName(m_sphincsState->Parameters);
 
 	return ret;
 }
 
 const size_t Sphincs::PrivateKeySize()
 {
-	return SPXF256::SPHINCS_SECRETKEY_SIZE;
+	size_t klen;
+
+	switch (m_sphincsState->Parameters)
+	{
+		case SphincsParameters::SPXS1S128SHAKE:
+		{
+			klen = SPXS128SHAKE::SPHINCS_SECRETKEY_SIZE;
+			break;
+		}
+		case SphincsParameters::SPXS2S192SHAKE:
+		{
+			klen = SPXS192SHAKE::SPHINCS_SECRETKEY_SIZE;
+			break;
+		}
+		case SphincsParameters::SPXS3S256SHAKE:
+		{
+			klen = SPXS256SHAKE::SPHINCS_SECRETKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
 }
 
 const size_t Sphincs::PublicKeySize()
 {
-	return SPXF256::SPHINCS_PUBLICKEY_SIZE;
+	size_t klen;
+
+	switch (m_sphincsState->Parameters)
+	{
+		case SphincsParameters::SPXS1S128SHAKE:
+		{
+			klen = SPXS128SHAKE::SPHINCS_PUBLICKEY_SIZE;
+			break;
+		}
+		case SphincsParameters::SPXS2S192SHAKE:
+		{
+			klen = SPXS192SHAKE::SPHINCS_PUBLICKEY_SIZE;
+			break;
+		}
+		case SphincsParameters::SPXS3S256SHAKE:
+		{
+			klen = SPXS256SHAKE::SPHINCS_PUBLICKEY_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return klen;
+}
+
+/// <summary>
+/// Read Only: The base signature size in bytes
+/// </summary>
+const size_t Sphincs::SignatureSize()
+{
+	size_t slen;
+
+	switch (m_sphincsState->Parameters)
+	{
+		case SphincsParameters::SPXS1S128SHAKE:
+		{
+			slen = SPXS128SHAKE::SPHINCS_SIGNATURE_SIZE;
+			break;
+		}
+		case SphincsParameters::SPXS2S192SHAKE:
+		{
+			slen = SPXS192SHAKE::SPHINCS_SIGNATURE_SIZE;
+			break;
+		}
+		case SphincsParameters::SPXS3S256SHAKE:
+		{
+			slen = SPXS256SHAKE::SPHINCS_SIGNATURE_SIZE;
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("SignatureSize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return slen;
 }
 
 AsymmetricKeyPair* Sphincs::Generate()
 {
-	std::vector<byte> pk(SPXF256::SPHINCS_PUBLICKEY_SIZE);
-	std::vector<byte> sk(SPXF256::SPHINCS_SECRETKEY_SIZE);
+	std::vector<byte> pk(0);
+	std::vector<byte> sk(0);
 
-	SPXF256::Generate(pk, sk, m_rndGenerator, m_sphincsState->Parameters);
+	switch (m_sphincsState->Parameters)
+	{
+		case SphincsParameters::SPXS1S128SHAKE:
+		{
+			pk.resize(SPXS128SHAKE::SPHINCS_PUBLICKEY_SIZE);
+			sk.resize(SPXS128SHAKE::SPHINCS_SECRETKEY_SIZE);
+			SPXS128SHAKE::Generate(pk, sk, m_rndGenerator, m_sphincsState->Parameters);
+
+			break;
+		}
+		case SphincsParameters::SPXS2S192SHAKE:
+		{
+			pk.resize(SPXS192SHAKE::SPHINCS_PUBLICKEY_SIZE);
+			sk.resize(SPXS192SHAKE::SPHINCS_SECRETKEY_SIZE);
+			SPXS192SHAKE::Generate(pk, sk, m_rndGenerator, m_sphincsState->Parameters);
+
+			break;
+		}
+		case SphincsParameters::SPXS3S256SHAKE:
+		{
+			pk.resize(SPXS256SHAKE::SPHINCS_PUBLICKEY_SIZE);
+			sk.resize(SPXS256SHAKE::SPHINCS_SECRETKEY_SIZE);
+			SPXS256SHAKE::Generate(pk, sk, m_rndGenerator, m_sphincsState->Parameters);
+
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+
 	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_sphincsState->Parameters));
 	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_sphincsState->Parameters));
 
@@ -174,20 +287,43 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
+
 	if (!m_sphincsState->Signer)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::NotInitialized);
 	}
+
 	if (Message.size() == 0)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::InvalidParam);
 	}
 
-	size_t sgnlen;
+	size_t slen;
 
-	sgnlen = SPXF256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_sphincsState->Parameters);
+	switch (m_sphincsState->Parameters)
+	{
+		case SphincsParameters::SPXS1S128SHAKE:
+		{
+			slen = SPXS128SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_sphincsState->Parameters);
+			break;
+		}
+		case SphincsParameters::SPXS2S192SHAKE:
+		{
+			slen = SPXS192SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_sphincsState->Parameters);
+			break;
+		}
+		case SphincsParameters::SPXS3S256SHAKE:
+		{
+			slen = SPXS256SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_sphincsState->Parameters);
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
 
-	return sgnlen;
+	return slen;
 }
 
 bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message)
@@ -196,16 +332,39 @@ bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Mess
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The cipher has not been initialized!"), ErrorCodes::IllegalOperation);
 	}
+
 	if (m_sphincsState->Signer)
 	{
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for verification!"), ErrorCodes::NotInitialized);
 	}
 
-	bool result;
+	bool res;
 
-	result = SPXF256::Verify(Message, Signature, m_publicKey->Polynomial(), m_sphincsState->Parameters);
 
-	return result;
+	switch (m_sphincsState->Parameters)
+	{
+		case SphincsParameters::SPXS1S128SHAKE:
+		{
+			res = SPXS128SHAKE::Verify(Message, Signature, m_publicKey->Polynomial(), m_sphincsState->Parameters);
+			break;
+		}
+		case SphincsParameters::SPXS2S192SHAKE:
+		{
+			res = SPXS192SHAKE::Verify(Message, Signature, m_publicKey->Polynomial(), m_sphincsState->Parameters);
+			break;
+		}
+		case SphincsParameters::SPXS3S256SHAKE:
+		{
+			res = SPXS256SHAKE::Verify(Message, Signature, m_publicKey->Polynomial(), m_sphincsState->Parameters);
+			break;
+		}
+		default:
+		{
+			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
+		}
+	}
+
+	return res;
 }
 
 NAMESPACE_SPHINCSEND
