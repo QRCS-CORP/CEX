@@ -2,6 +2,7 @@
 #include "../CEX/HMAC.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
+#include "../CEX/SHA2.h"
 #include "../CEX/SymmetricKey.h"
 
 namespace Test
@@ -10,6 +11,7 @@ namespace Test
 	using Mac::HMAC;
 	using Utility::IntegerTools;
 	using Prng::SecureRandom;
+	using Digest::SHA2;
 	using Enumeration::SHA2Digests;
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
@@ -49,6 +51,9 @@ namespace Test
 	{
 		try
 		{
+			Ancillary();
+			OnProgress(std::string("HMACTest: Passed the HMAC compact functions tests.."));
+
 			Exception();
 			OnProgress(std::string("HMACTest: Passed HMAC exception handling tests.."));
 
@@ -98,6 +103,63 @@ namespace Test
 		catch (std::exception const &ex)
 		{
 			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
+		}
+	}
+
+	void HMACTest::Ancillary()
+	{
+		std::vector<byte> otp(0);
+
+		// HMAC-256
+
+		otp.resize(m_expected[0].size());
+		SHA2::MACR64P512(m_key[0], m_message[0], 0, m_message[0].size(), otp, 0);
+
+		if (otp != m_expected[0])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR64P512"), std::string("Expected values don't match! -HA1"));
+		}
+
+		otp.resize(m_expected[1].size());
+		SHA2::MACR64P512(m_key[1], m_message[1], 0, m_message[1].size(), otp, 0);
+
+		if (otp != m_expected[1])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR64P512"), std::string("Expected values don't match! -HA2"));
+		}
+
+		otp.resize(m_expected[2].size());
+		SHA2::MACR64P512(m_key[2], m_message[2], 0, m_message[2].size(), otp, 0);
+
+		if (otp != m_expected[2])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR64P512"), std::string("Expected values don't match! -HA3"));
+		}
+
+		// HMAC-512
+
+		otp.resize(m_expected[6].size());
+		SHA2::MACR80P1024(m_key[0], m_message[0], 0, m_message[0].size(), otp, 0);
+
+		if (otp != m_expected[6])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR80P1024"), std::string("Expected values don't match! -HA4"));
+		}
+
+		otp.resize(m_expected[7].size());
+		SHA2::MACR80P1024(m_key[1], m_message[1], 0, m_message[1].size(), otp, 0);
+
+		if (otp != m_expected[7])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR80P1024"), std::string("Expected values don't match! -HA5"));
+		}
+
+		otp.resize(m_expected[8].size());
+		SHA2::MACR80P1024(m_key[2], m_message[2], 0, m_message[2].size(), otp, 0);
+
+		if (otp != m_expected[8])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR80P1024"), std::string("Expected values don't match! -HA6"));
 		}
 	}
 

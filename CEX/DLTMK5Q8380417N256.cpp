@@ -344,7 +344,7 @@ bool DLTMK5Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 
 void DLTMK5Q8380417N256::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
-	Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
 NAMESPACE_DILITHIUMEND

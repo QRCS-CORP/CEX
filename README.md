@@ -41,6 +41,7 @@ Note: This is still an early stage in the development of this library (pre-alpha
 ### Asymmetric Signature Schemes
 * The Dilithium asymmetric signature schemes
 * The SPHINCS+ 256F-SHAKE128/256 asymmetric signature schemes
+* The XMSS/XMSS-MT asymmetric signature schemes
 
 ### Block Ciphers
 Note: Each cipher can be deployed as either the standard form (AES, Serpent, Twofish), or the extended hybrid using cSHAKE or HKDF(SHA2) key expansion
@@ -116,8 +117,9 @@ The current version is <B>1.0.0.7</B> (A7 version), which are the major, minor, 
 The next planned release (1.0.0.8) is planned for February 2019.
   
 ### New in Current Release 1.0.0.7 (version A7):
-* The Dilithium asymmetric signature scheme
-* The SPHINCS+ asymmetric signature scheme
+* The Dilithium asymmetric signature schemes
+* The SPHINCS+ 256F-SHAKE128/256 asymmetric signature schemes
+* The XMSS/XMSS-MT asymmetric signature schemes
 * The NTRU Prime asymmetric cipher
 * The cSHAKE XOF function added as an HX symmetric cipher key expansion option
 * Update of all base asymmetric ciphers and signature schemes to match NIST PQ entries
@@ -128,7 +130,7 @@ The next planned release (1.0.0.8) is planned for February 2019.
 * ChaCha256-P20 and ChaCha512-P80 authenticated stream ciphers
 
 ### Planned Release 1.0.0.8 (version A8):
-## ETA is February 14, 2019
+## ETA is August 1st, 2019
 * Authenticated stream ciphers ACS,ThreeFish-256/512/1024, and ChaCha256/512
 * Update secure key mechanisms and integrate internally
 * Full security, documentation, and code review cycles
@@ -148,6 +150,8 @@ The next planned release (1.0.0.8) is planned for February 2019.
 * NTRU Prime
 * Picnic
 * SPHINCS+
+* Dilithium
+* XMSS/XMSS-MT
 
 ### Planned Release 1.2.0.1
 * PQ-TLS

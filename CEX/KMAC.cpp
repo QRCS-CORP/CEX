@@ -1,12 +1,10 @@
 #include "KMAC.h"
-#include "ArrayTools.h"
 #include "IntegerTools.h"
 #include "Keccak.h"
 #include "MemoryTools.h"
 
 NAMESPACE_MAC
 
-using Utility::ArrayTools;
 using Utility::IntegerTools;
 using Digest::Keccak;
 using Enumeration::MacConvert;
@@ -19,14 +17,14 @@ public:
 
 	std::array<ulong, STATE_SIZE> State = { 0ULL };
 	std::array<byte, BUFFER_SIZE> Buffer = { 0x00 };
-	size_t BlockSize;
+	size_t Rate;
 	size_t MacSize;
 	size_t Position;
 	KmacModes KmacMode;
 
 	KmacState(size_t InputSize, size_t OutputSize, KmacModes Mode)
 		:
-		BlockSize(InputSize),
+		Rate(InputSize),
 		MacSize(OutputSize),
 		Position(0),
 		KmacMode(Mode)
@@ -35,7 +33,7 @@ public:
 
 	~KmacState()
 	{
-		BlockSize = 0;
+		Rate = 0;
 		MacSize = 0;
 		Position = 0;
 		KmacMode = KmacModes::None;
@@ -181,7 +179,7 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 
 	olen = Output.size() - OutOffset;
-	blen = ArrayTools::RightEncode(buf, 0, static_cast<ulong>(olen) * 8);
+	blen = Keccak::RightEncode(buf, 0, static_cast<ulong>(olen) * sizeof(ulong));
 
 	for (i = 0; i < blen; i++)
 	{
@@ -189,10 +187,10 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 
 	m_kmacState->Position += blen;
-	m_kmacState->Buffer[m_kmacState->Position] = DOMAIN_CODE;
-	m_kmacState->Buffer[m_kmacState->BlockSize - 1] |= 128;
+	m_kmacState->Buffer[m_kmacState->Position] = Keccak::KECCAK_KMAC_DOMAIN;
+	m_kmacState->Buffer[m_kmacState->Rate - 1] |= 128;
 
-	ArrayTools::AbsorbBlock8to64(m_kmacState->Buffer, 0, m_kmacState->State, m_kmacState->BlockSize);
+	Keccak::FastAbsorb(m_kmacState->Buffer, 0, m_kmacState->Rate, m_kmacState->State);
 	Squeeze(Output, OutOffset, olen, m_kmacState);
 
 	return olen;
@@ -238,8 +236,8 @@ void KMAC::Initialize(ISymmetricKey &Parameters)
 	}
 	else
 	{
-		std::vector<byte> dcode{ 0x4B, 0x4D, 0x41, 0x43 };
-		Customize(Parameters.Nonce(), dcode, m_kmacState);
+		std::vector<byte> name{ 0x4B, 0x4D, 0x41, 0x43 };
+		Customize(Parameters.Nonce(), name, m_kmacState);
 	}
 
 	LoadKey(Parameters.Key(), m_kmacState);
@@ -267,15 +265,15 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	if (Length != 0)
 	{
 		// update partially filled block
-		if (m_kmacState->Position != 0 && (m_kmacState->Position + Length >= m_kmacState->BlockSize))
+		if (m_kmacState->Position != 0 && (m_kmacState->Position + Length >= m_kmacState->Rate))
 		{
-			const size_t RMDLEN = m_kmacState->BlockSize - m_kmacState->Position;
+			const size_t RMDLEN = m_kmacState->Rate - m_kmacState->Position;
 			if (RMDLEN != 0)
 			{
 				MemoryTools::Copy(Input, InOffset, m_kmacState->Buffer, m_kmacState->Position, RMDLEN);
 			}
 
-			ArrayTools::AbsorbBlock8to64(m_kmacState->Buffer, 0, m_kmacState->State, m_kmacState->BlockSize);
+			Keccak::FastAbsorb(m_kmacState->Buffer, 0, m_kmacState->Rate, m_kmacState->State);
 			Permute(m_kmacState);
 			m_kmacState->Position = 0;
 			InOffset += RMDLEN;
@@ -283,12 +281,12 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 		}
 
 		// sequential loop through remaining blocks
-		while (Length >= m_kmacState->BlockSize)
+		while (Length >= m_kmacState->Rate)
 		{
-			ArrayTools::AbsorbBlock8to64(Input, InOffset, m_kmacState->State, m_kmacState->BlockSize);
+			Keccak::FastAbsorb(Input, InOffset, m_kmacState->Rate, m_kmacState->State);
 			Permute(m_kmacState);
-			InOffset += m_kmacState->BlockSize;
-			Length -= m_kmacState->BlockSize;
+			InOffset += m_kmacState->Rate;
+			Length -= m_kmacState->Rate;
 		}
 
 		// store unaligned bytes
@@ -304,57 +302,14 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::unique_ptr<KmacState> &State)
 {
-	std::array<byte, BUFFER_SIZE> pad;
-	size_t i;
-	ulong offset;
-
-	MemoryTools::Clear(pad, 0, pad.size());
-	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
-	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
-
-	if (Name.size() != 0)
+	if (State->KmacMode != KmacModes::KMAC1024)
 	{
-		for (i = 0; i < Name.size(); i++)
-		{
-			if (offset == State->BlockSize)
-			{
-				Keccak::FastAbsorb(pad, 0, State->BlockSize, State->State);
-				Permute(State);
-				offset = 0;
-			}
-
-			pad[offset] = Name[i];
-			++offset;
-		}
+		Keccak::CustomizeR24(Customization, Name, State->Rate, State->State);
 	}
-
-	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
-
-	if (Customization.size() != 0)
+	else
 	{
-		for (i = 0; i < Customization.size(); ++i)
-		{
-			if (offset == State->BlockSize)
-			{
-				Keccak::FastAbsorb(pad, 0, State->BlockSize, State->State);
-				Permute(State);
-				offset = 0;
-			}
-
-			pad[offset] = Customization[i];
-			++offset;
-		}
+		Keccak::CustomizeR48(Customization, Name, State->Rate, State->State);
 	}
-
-	MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
-	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
-
-	for (size_t i = 0; i < offset; i += 8)
-	{
-		State->State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
-	}
-
-	Permute(State);
 }
 
 void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &State)
@@ -364,16 +319,16 @@ void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &Sta
 	ulong offset;
 
 	MemoryTools::Clear(pad, 0, pad.size());
-	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->BlockSize));
-	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Key.size()) * 8);
+	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
+	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Key.size()) * sizeof(ulong));
 
 	if (Key.size() != 0)
 	{
-		for (i = 0; i < Key.size(); i++)
+		for (i = 0; i < Key.size(); ++i)
 		{
-			if (offset == State->BlockSize)
+			if (offset == State->Rate)
 			{
-				Keccak::FastAbsorb(pad, 0, State->BlockSize, State->State);
+				Keccak::FastAbsorb(pad, 0, State->Rate, State->State);
 				Permute(State);
 				offset = 0;
 			}
@@ -388,7 +343,7 @@ void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &Sta
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		State->State[i / 8] ^= IntegerTools::LeBytesTo64(pad, i);
+		State->State[i / sizeof(ulong)] ^= IntegerTools::LeBytesTo64(pad, i);
 	}
 
 	Permute(State);
@@ -418,17 +373,17 @@ void KMAC::Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 {
 	size_t i;
 	
-	while (Length >= State->BlockSize)
+	while (Length >= State->Rate)
 	{
 		Permute(State);
 
-		for (i = 0; i < State->BlockSize / 8; ++i)
+		for (i = 0; i < State->Rate / sizeof(ulong); ++i)
 		{
-			IntegerTools::Le64ToBytes(State->State[i], Output, OutOffset + (i * 8));
+			IntegerTools::Le64ToBytes(State->State[i], Output, OutOffset + (i * sizeof(ulong)));
 		}
 
-		OutOffset += State->BlockSize;
-		Length -= State->BlockSize;
+		OutOffset += State->Rate;
+		Length -= State->Rate;
 	}
 
 	if (Length != 0)
@@ -437,14 +392,14 @@ void KMAC::Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 		for (i = 0; i < Length / 8; ++i)
 		{
-			IntegerTools::Le64ToBytes(State->State[i], Output, OutOffset + (i * 8));
+			IntegerTools::Le64ToBytes(State->State[i], Output, OutOffset + (i * sizeof(ulong)));
 		}
 
 		Length -= i * 8;
 
 		if (Length > 0)
 		{
-			MemoryTools::CopyFromValue(State->State[i], Output, OutOffset + (i * 8), Length);
+			MemoryTools::CopyFromValue(State->State[i], Output, OutOffset + (i * sizeof(ulong)), Length);
 		}
 	}
 }

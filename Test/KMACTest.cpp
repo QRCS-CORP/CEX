@@ -1,4 +1,5 @@
 #include "KMACTest.h"
+#include "../CEX/Keccak.h"
 #include "../CEX/KMAC.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
@@ -7,6 +8,7 @@
 namespace Test
 {
 	using Exception::CryptoMacException;
+	using Digest::Keccak;
 	using Mac::KMAC;
 	using Utility::IntegerTools;
 	using Prng::SecureRandom;
@@ -51,6 +53,9 @@ namespace Test
 	{
 		try
 		{
+			Ancillary();
+			OnProgress(std::string("KMACTest: Passed the KMAC compact functions tests.."));
+
 			Exception();
 			OnProgress(std::string("KMACTest: Passed KMAC exception handling tests.."));
 
@@ -112,6 +117,115 @@ namespace Test
 		catch (std::exception const &ex)
 		{
 			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
+		}
+	}
+
+	void KMACTest::Ancillary()
+	{
+		std::vector<byte> otp(0);
+
+		// KMAC-128
+
+		otp.resize(m_expected[0].size());
+		Keccak::MACR24P1600(m_key[0], m_custom[0], m_message[0], 0, m_message[0].size(), otp, Keccak::KECCAK128_RATE_SIZE);
+
+		if (otp != m_expected[0])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA1"));
+		}
+
+		otp.resize(m_expected[1].size());
+		Keccak::MACR24P1600(m_key[0], m_custom[1], m_message[0], 0, m_message[0].size(), otp, Keccak::KECCAK128_RATE_SIZE);
+
+		if (otp != m_expected[1])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA2"));
+		}
+
+		otp.resize(m_expected[2].size());
+		Keccak::MACR24P1600(m_key[0], m_custom[1], m_message[1], 0, m_message[1].size(), otp, Keccak::KECCAK128_RATE_SIZE);
+
+		if (otp != m_expected[2])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA3"));
+		}
+
+		// KMAC-256
+
+		otp.resize(m_expected[3].size());
+		Keccak::MACR24P1600(m_key[0], m_custom[1], m_message[0], 0, m_message[0].size(), otp, Keccak::KECCAK256_RATE_SIZE);
+
+		if (otp != m_expected[3])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA4"));
+		}
+
+		otp.resize(m_expected[4].size());
+		Keccak::MACR24P1600(m_key[0], m_custom[0], m_message[1], 0, m_message[1].size(), otp, Keccak::KECCAK256_RATE_SIZE);
+
+		if (otp != m_expected[4])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA5"));
+		}
+
+		otp.resize(m_expected[5].size());
+		Keccak::MACR24P1600(m_key[0], m_custom[1], m_message[1], 0, m_message[1].size(), otp, Keccak::KECCAK256_RATE_SIZE);
+
+		if (otp != m_expected[5])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA6"));
+		}
+
+		// KMAC-512
+
+		otp.resize(m_expected[6].size());
+		Keccak::MACR24P1600(m_key[1], m_custom[1], m_message[2], 0, m_message[2].size(), otp, Keccak::KECCAK512_RATE_SIZE);
+
+		if (otp != m_expected[6])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA7"));
+		}
+
+		otp.resize(m_expected[7].size());
+		Keccak::MACR24P1600(m_key[2], m_custom[3], m_message[2], 0, m_message[2].size(), otp, Keccak::KECCAK512_RATE_SIZE);
+
+		if (otp != m_expected[7])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA8"));
+		}
+
+		otp.resize(m_expected[8].size());
+		Keccak::MACR24P1600(m_key[1], m_custom[2], m_message[3], 0, m_message[3].size(), otp, Keccak::KECCAK512_RATE_SIZE);
+
+		if (otp != m_expected[8])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR24P1600"), std::string("Expected values don't match! -KA9"));
+		}
+
+		// KMAC-1024
+
+		otp.resize(m_expected[9].size());
+		Keccak::MACR48P1600(m_key[1], m_custom[3], m_message[2], 0, m_message[2].size(), otp, Keccak::KECCAK1024_RATE_SIZE);
+
+		if (otp != m_expected[9])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR48P1600"), std::string("Expected values don't match! -KA10"));
+		}
+
+		otp.resize(m_expected[10].size());
+		Keccak::MACR48P1600(m_key[2], m_custom[2], m_message[3], 0, m_message[3].size(), otp, Keccak::KECCAK1024_RATE_SIZE);
+
+		if (otp != m_expected[10])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR48P1600"), std::string("Expected values don't match! -KA11"));
+		}
+
+		otp.resize(m_expected[11].size());
+		Keccak::MACR48P1600(m_key[2], m_custom[3], m_message[2], 0, m_message[2].size(), otp, Keccak::KECCAK1024_RATE_SIZE);
+
+		if (otp != m_expected[11])
+		{
+			throw TestException(std::string("Ancillary"), std::string("MACR48P1600"), std::string("Expected values don't match! -KA12"));
 		}
 	}
 

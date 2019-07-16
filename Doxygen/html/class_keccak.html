@@ -79,10 +79,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:adc892bedebb3cbdd8291d6a9119184bf"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
-<tr class="memitem:adc892bedebb3cbdd8291d6a9119184bf"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#adc892bedebb3cbdd8291d6a9119184bf">Absorb</a> (const ArrayU8 &amp;Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
-<tr class="memdesc:adc892bedebb3cbdd8291d6a9119184bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak absorb function; can use the 24, or 48 round version of the permutation if CEX_SHAKE_STRONG is defined.  <a href="#adc892bedebb3cbdd8291d6a9119184bf">More...</a><br /></td></tr>
-<tr class="separator:adc892bedebb3cbdd8291d6a9119184bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abad197873fc4d8aad9da00ea265ee801"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
 <tr class="memitem:abad197873fc4d8aad9da00ea265ee801"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#abad197873fc4d8aad9da00ea265ee801">AbsorbR24</a> (const ArrayU8 &amp;Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
 <tr class="memdesc:abad197873fc4d8aad9da00ea265ee801"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak 24-round absorb function; copy bytes from a byte array to the state array.  <a href="#abad197873fc4d8aad9da00ea265ee801">More...</a><br /></td></tr>
@@ -91,14 +87,26 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a43109633f22a1fe9e38189469629dd67"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a43109633f22a1fe9e38189469629dd67">AbsorbR48</a> (const ArrayU8 &amp;Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
 <tr class="memdesc:a43109633f22a1fe9e38189469629dd67"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak 48-round absorb function; copy bytes from a byte array to the state array.  <a href="#a43109633f22a1fe9e38189469629dd67">More...</a><br /></td></tr>
 <tr class="separator:a43109633f22a1fe9e38189469629dd67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a4478a7177d259f01b53795d94f652b"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
-<tr class="memitem:a3a4478a7177d259f01b53795d94f652b"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a3a4478a7177d259f01b53795d94f652b">CXOFP1600</a> (const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const ArrayU8 &amp;Customization, const ArrayU8 &amp;Name, ArrayU8 &amp;Output, size_t OutOffset, size_t OutLength, size_t Rate)</td></tr>
-<tr class="memdesc:a3a4478a7177d259f01b53795d94f652b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak custom XOF function (cSHAKE) using the standard 24 rounds; process a key, customization and name strings and return a pseudo-random output array.  <a href="#a3a4478a7177d259f01b53795d94f652b">More...</a><br /></td></tr>
-<tr class="separator:a3a4478a7177d259f01b53795d94f652b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78794ca6338f7abd683edf09b5bc713f"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
-<tr class="memitem:a78794ca6338f7abd683edf09b5bc713f"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a78794ca6338f7abd683edf09b5bc713f">CXOFPR481600</a> (const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const ArrayU8 &amp;Customization, const ArrayU8 &amp;Name, ArrayU8 &amp;Output, size_t OutOffset, size_t OutLength, size_t Rate)</td></tr>
-<tr class="memdesc:a78794ca6338f7abd683edf09b5bc713f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The extended Keccak custom XOF function (cSHAKE) using 48 rounds; process an input seed array and return a pseudo-random output array.  <a href="#a78794ca6338f7abd683edf09b5bc713f">More...</a><br /></td></tr>
-<tr class="separator:a78794ca6338f7abd683edf09b5bc713f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0f460132e176ed21ae8ab5bdddddf3f"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
+<tr class="memitem:af0f460132e176ed21ae8ab5bdddddf3f"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#af0f460132e176ed21ae8ab5bdddddf3f">Compute</a> (const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>, size_t Offset, size_t Length, ArrayU8 &amp;Output, size_t Rate)</td></tr>
+<tr class="memdesc:af0f460132e176ed21ae8ab5bdddddf3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">A compact (stateless) form of the Keccak message digest function (SHA3) using the standard 24 rounds; processes a message, and return the hash in the output array.  <a href="#af0f460132e176ed21ae8ab5bdddddf3f">More...</a><br /></td></tr>
+<tr class="separator:af0f460132e176ed21ae8ab5bdddddf3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0acf19ff0e2676f99f47f4b436edb443"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
+<tr class="memitem:a0acf19ff0e2676f99f47f4b436edb443"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a0acf19ff0e2676f99f47f4b436edb443">CustomizeR24</a> (const ArrayU8 &amp;Customization, const ArrayU8 &amp;Name, size_t Rate, std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
+<tr class="memdesc:a0acf19ff0e2676f99f47f4b436edb443"><td class="mdescLeft">&#160;</td><td class="mdescRight">The standard 24 round implementation used by custom SHAKE functions to add customization and name strings to the state  <a href="#a0acf19ff0e2676f99f47f4b436edb443">More...</a><br /></td></tr>
+<tr class="separator:a0acf19ff0e2676f99f47f4b436edb443"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadf3b94174beb99a7e4a474a905c9343"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
+<tr class="memitem:aadf3b94174beb99a7e4a474a905c9343"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#aadf3b94174beb99a7e4a474a905c9343">CustomizeR48</a> (const ArrayU8 &amp;Customization, const ArrayU8 &amp;Name, size_t Rate, std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
+<tr class="memdesc:aadf3b94174beb99a7e4a474a905c9343"><td class="mdescLeft">&#160;</td><td class="mdescRight">The extended 48 round implementation used by custom SHAKE functions to add customization and name strings to the state  <a href="#aadf3b94174beb99a7e4a474a905c9343">More...</a><br /></td></tr>
+<tr class="separator:aadf3b94174beb99a7e4a474a905c9343"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7e6a713dcc43384ad59f9bbd13b52a1"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
+<tr class="memitem:ad7e6a713dcc43384ad59f9bbd13b52a1"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#ad7e6a713dcc43384ad59f9bbd13b52a1">CXOFR24P1600</a> (const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const ArrayU8 &amp;Customization, const ArrayU8 &amp;Name, ArrayU8 &amp;Output, size_t Offset, size_t Length, size_t Rate)</td></tr>
+<tr class="memdesc:ad7e6a713dcc43384ad59f9bbd13b52a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak custom XOF function (cSHAKE) using the standard 24 rounds; process a key, customization and name strings and return a pseudo-random output array.  <a href="#ad7e6a713dcc43384ad59f9bbd13b52a1">More...</a><br /></td></tr>
+<tr class="separator:ad7e6a713dcc43384ad59f9bbd13b52a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67fe889fbe2ce62a09596e18815f35d0"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
+<tr class="memitem:a67fe889fbe2ce62a09596e18815f35d0"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a67fe889fbe2ce62a09596e18815f35d0">CXOFPR481600</a> (const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const ArrayU8 &amp;Customization, const ArrayU8 &amp;Name, ArrayU8 &amp;Output, size_t Offset, size_t Length, size_t Rate)</td></tr>
+<tr class="memdesc:a67fe889fbe2ce62a09596e18815f35d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The extended Keccak custom XOF function (cSHAKE) using 48 rounds; process an input seed array and return a pseudo-random output array.  <a href="#a67fe889fbe2ce62a09596e18815f35d0">More...</a><br /></td></tr>
+<tr class="separator:a67fe889fbe2ce62a09596e18815f35d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1e96e49cd9a3b6a5bd62e3dde63fed6"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
 <tr class="memitem:af1e96e49cd9a3b6a5bd62e3dde63fed6"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#af1e96e49cd9a3b6a5bd62e3dde63fed6">FastAbsorb</a> (const ArrayU8 &amp;Input, size_t InOffset, size_t InLength, std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
 <tr class="memdesc:af1e96e49cd9a3b6a5bd62e3dde63fed6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The fast absorb function; XOR an input byte array with the state array, no other processing is performed.  <a href="#af1e96e49cd9a3b6a5bd62e3dde63fed6">More...</a><br /></td></tr>
@@ -107,10 +115,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a3a94349075697ee7b9f89a9d7741fdf8"><td class="memTemplItemLeft" align="right" valign="top">static ulong&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a3a94349075697ee7b9f89a9d7741fdf8">LeftEncode</a> (ArrayU8 &amp;Output, size_t Offset, ulong Value)</td></tr>
 <tr class="memdesc:a3a94349075697ee7b9f89a9d7741fdf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keccak common function: Left encode a value onto an array  <a href="#a3a94349075697ee7b9f89a9d7741fdf8">More...</a><br /></td></tr>
 <tr class="separator:a3a94349075697ee7b9f89a9d7741fdf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc3bf0884ae5d46d59f226d7d34ca026"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
-<tr class="memitem:adc3bf0884ae5d46d59f226d7d34ca026"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#adc3bf0884ae5d46d59f226d7d34ca026">Squeeze</a> (std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State, ArrayU8 &amp;Output, size_t OutOffset, size_t Blocks, size_t Rate)</td></tr>
-<tr class="memdesc:adc3bf0884ae5d46d59f226d7d34ca026"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak squeeze function; can use the 24, or 48 round version of the permutation if CEX_SHAKE_STRONG is defined.  <a href="#adc3bf0884ae5d46d59f226d7d34ca026">More...</a><br /></td></tr>
-<tr class="separator:adc3bf0884ae5d46d59f226d7d34ca026"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d7d4e485782a7bdb3b43e5d37687a49"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
+<tr class="memitem:a2d7d4e485782a7bdb3b43e5d37687a49"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a2d7d4e485782a7bdb3b43e5d37687a49">MACR24P1600</a> (const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const ArrayU8 &amp;Customization, const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>, size_t Offset, size_t Length, ArrayU8 &amp;Output, size_t Rate)</td></tr>
+<tr class="memdesc:a2d7d4e485782a7bdb3b43e5d37687a49"><td class="mdescLeft">&#160;</td><td class="mdescRight">A compact (stateless) form of the message authentication code generator (KMAC), using the standard 24 round permutation.  <a href="#a2d7d4e485782a7bdb3b43e5d37687a49">More...</a><br /></td></tr>
+<tr class="separator:a2d7d4e485782a7bdb3b43e5d37687a49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09fb4a1c13f2298eea9001b4ed1bc7cf"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
+<tr class="memitem:a09fb4a1c13f2298eea9001b4ed1bc7cf"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a09fb4a1c13f2298eea9001b4ed1bc7cf">MACR48P1600</a> (const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const ArrayU8 &amp;Customization, const ArrayU8 &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>, size_t Offset, size_t Length, ArrayU8 &amp;Output, size_t Rate)</td></tr>
+<tr class="memdesc:a09fb4a1c13f2298eea9001b4ed1bc7cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">A compact (stateless) form of the message authentication code generator (KMAC), using the extended 48 round permutation.  <a href="#a09fb4a1c13f2298eea9001b4ed1bc7cf">More...</a><br /></td></tr>
+<tr class="separator:a09fb4a1c13f2298eea9001b4ed1bc7cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12c7a9016a632f36e2f2fa995502fd4d"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8 &gt; </td></tr>
 <tr class="memitem:a12c7a9016a632f36e2f2fa995502fd4d"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a12c7a9016a632f36e2f2fa995502fd4d">SqueezeR24</a> (std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State, ArrayU8 &amp;Output, size_t OutOffset, size_t Blocks, size_t Rate)</td></tr>
 <tr class="memdesc:a12c7a9016a632f36e2f2fa995502fd4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak 24-round extraction function; extract blocks of state to an output 8-bit array  <a href="#a12c7a9016a632f36e2f2fa995502fd4d">More...</a><br /></td></tr>
@@ -119,20 +131,14 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae3b8dfc9841d186a17a343a3e9791e6b"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#ae3b8dfc9841d186a17a343a3e9791e6b">SqueezeR48</a> (std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State, ArrayU8 &amp;Output, size_t OutOffset, size_t Blocks, size_t Rate)</td></tr>
 <tr class="memdesc:ae3b8dfc9841d186a17a343a3e9791e6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak 48-round extraction function; extract blocks of state to an output 8-bit array  <a href="#ae3b8dfc9841d186a17a343a3e9791e6b">More...</a><br /></td></tr>
 <tr class="separator:ae3b8dfc9841d186a17a343a3e9791e6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a734664ac204df4a579e0970c3bbecee9"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8A , typename ArrayU8B &gt; </td></tr>
-<tr class="memitem:a734664ac204df4a579e0970c3bbecee9"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a734664ac204df4a579e0970c3bbecee9">XOFP1600</a> (const ArrayU8A &amp;Input, size_t InOffset, size_t InLength, ArrayU8B &amp;Output, size_t OutOffset, size_t OutLength, size_t Rate)</td></tr>
-<tr class="memdesc:a734664ac204df4a579e0970c3bbecee9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak XOF function using 24 rounds; process an input seed array and return a pseudo-random output array.  <a href="#a734664ac204df4a579e0970c3bbecee9">More...</a><br /></td></tr>
-<tr class="separator:a734664ac204df4a579e0970c3bbecee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab72ada92d76df03521e06d01e869b4fb"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8A , typename ArrayU8B &gt; </td></tr>
-<tr class="memitem:ab72ada92d76df03521e06d01e869b4fb"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#ab72ada92d76df03521e06d01e869b4fb">XOFPR481600</a> (const ArrayU8A &amp;Input, size_t InOffset, size_t InLength, ArrayU8B &amp;Output, size_t OutOffset, size_t OutLength, size_t Rate)</td></tr>
-<tr class="memdesc:ab72ada92d76df03521e06d01e869b4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The extended Keccak XOF function using 48 rounds; process an input seed array and return a pseudo-random output array.  <a href="#ab72ada92d76df03521e06d01e869b4fb">More...</a><br /></td></tr>
-<tr class="separator:ab72ada92d76df03521e06d01e869b4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf1f7cacd9f883750d29a70c36033923"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak.html#aaf1f7cacd9f883750d29a70c36033923">Permute</a> (std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
-<tr class="memdesc:aaf1f7cacd9f883750d29a70c36033923"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak permutation function; uses the 24 round implementation, or the extended 48 round implementation of the permutation if CEX_SHAKE_STRONG is defined.  <a href="#aaf1f7cacd9f883750d29a70c36033923">More...</a><br /></td></tr>
-<tr class="separator:aaf1f7cacd9f883750d29a70c36033923"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4297150d987bb935f2c32247a2800de1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak.html#a4297150d987bb935f2c32247a2800de1">PermuteR48</a> (std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
-<tr class="memdesc:a4297150d987bb935f2c32247a2800de1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak permutation function; uses the 48 round extended implementation of the permutation.  <a href="#a4297150d987bb935f2c32247a2800de1">More...</a><br /></td></tr>
-<tr class="separator:a4297150d987bb935f2c32247a2800de1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68cf32cf2c6ced7b0fe9be81681f7a3b"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8A , typename ArrayU8B &gt; </td></tr>
+<tr class="memitem:a68cf32cf2c6ced7b0fe9be81681f7a3b"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a68cf32cf2c6ced7b0fe9be81681f7a3b">XOFR24P1600</a> (const ArrayU8A &amp;Input, size_t InOffset, size_t InLength, ArrayU8B &amp;Output, size_t OutOffset, size_t OutLength, size_t Rate)</td></tr>
+<tr class="memdesc:a68cf32cf2c6ced7b0fe9be81681f7a3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak XOF function using 24 rounds; process an input seed array and return a pseudo-random output array.  <a href="#a68cf32cf2c6ced7b0fe9be81681f7a3b">More...</a><br /></td></tr>
+<tr class="separator:a68cf32cf2c6ced7b0fe9be81681f7a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5907066432ac7a6f0b494365c10a82d"><td class="memTemplParams" colspan="2">template&lt;typename ArrayU8A , typename ArrayU8B &gt; </td></tr>
+<tr class="memitem:af5907066432ac7a6f0b494365c10a82d"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#af5907066432ac7a6f0b494365c10a82d">XOFR48P1600</a> (const ArrayU8A &amp;Input, size_t InOffset, size_t InLength, ArrayU8B &amp;Output, size_t OutOffset, size_t OutLength, size_t Rate)</td></tr>
+<tr class="memdesc:af5907066432ac7a6f0b494365c10a82d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The extended Keccak XOF function using 48 rounds; process an input seed array and return a pseudo-random output array.  <a href="#af5907066432ac7a6f0b494365c10a82d">More...</a><br /></td></tr>
+<tr class="separator:af5907066432ac7a6f0b494365c10a82d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6079662dbbda522a40d2ba1cc92fae2c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak.html#a6079662dbbda522a40d2ba1cc92fae2c">PermuteR24P1600C</a> (std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
 <tr class="memdesc:a6079662dbbda522a40d2ba1cc92fae2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The compact form of the 24 round (standard) SHA3 permutation function.  <a href="#a6079662dbbda522a40d2ba1cc92fae2c">More...</a><br /></td></tr>
 <tr class="separator:a6079662dbbda522a40d2ba1cc92fae2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -145,6 +151,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a931877d9b6dac4176f31d5bca540b0d4"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak.html#a931877d9b6dac4176f31d5bca540b0d4">PermuteR48P1600U</a> (std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;State)</td></tr>
 <tr class="memdesc:a931877d9b6dac4176f31d5bca540b0d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The unrolled form of the 48 round (extended) SHA3 permutation function.  <a href="#a931877d9b6dac4176f31d5bca540b0d4">More...</a><br /></td></tr>
 <tr class="separator:a931877d9b6dac4176f31d5bca540b0d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d4b9104ae65c2fa6706dd878331ef41"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:a7d4b9104ae65c2fa6706dd878331ef41"><td class="memTemplItemLeft" align="right" valign="top">static ulong&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_keccak.html#a7d4b9104ae65c2fa6706dd878331ef41">RightEncode</a> (Array &amp;Output, size_t Offset, ulong Value)</td></tr>
+<tr class="memdesc:a7d4b9104ae65c2fa6706dd878331ef41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keccak common function: Right encode a value onto an array  <a href="#a7d4b9104ae65c2fa6706dd878331ef41">More...</a><br /></td></tr>
+<tr class="separator:a7d4b9104ae65c2fa6706dd878331ef41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -157,6 +167,9 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a7738d1c5beba21e29a2507d92c83b6be"><td class="memItemLeft" align="right" valign="top">static const byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak.html#a7738d1c5beba21e29a2507d92c83b6be">KECCAK_CSHAKE_DOMAIN</a> = 0x04</td></tr>
 <tr class="memdesc:a7738d1c5beba21e29a2507d92c83b6be"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak cSHAKE domain identifier  <a href="#a7738d1c5beba21e29a2507d92c83b6be">More...</a><br /></td></tr>
 <tr class="separator:a7738d1c5beba21e29a2507d92c83b6be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb02216ed17248c6fddaff193811bdc4"><td class="memItemLeft" align="right" valign="top">static const byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak.html#acb02216ed17248c6fddaff193811bdc4">KECCAK_KMAC_DOMAIN</a> = 0x04</td></tr>
+<tr class="memdesc:acb02216ed17248c6fddaff193811bdc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak KMAC domain identifier  <a href="#acb02216ed17248c6fddaff193811bdc4">More...</a><br /></td></tr>
+<tr class="separator:acb02216ed17248c6fddaff193811bdc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5505f7c74c1ceae7a74de3dccb84cddc"><td class="memItemLeft" align="right" valign="top">static const byte&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_keccak.html#a5505f7c74c1ceae7a74de3dccb84cddc">KECCAK_SHA3_DOMAIN</a> = 0x06</td></tr>
 <tr class="memdesc:a5505f7c74c1ceae7a74de3dccb84cddc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Keccak SHA3 digest domain identifier  <a href="#a5505f7c74c1ceae7a74de3dccb84cddc">More...</a><br /></td></tr>
 <tr class="separator:a5505f7c74c1ceae7a74de3dccb84cddc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -210,82 +223,6 @@ The H suffix denotes functions that take an SIMD wrapper class as the state valu
 Experimental functions using AVX512 instructions are also implemented; PermuteR24P8x1600H and PermuteR48P8x1600H. <br />
 These extended functions are only visible at run-time on some development platforms (VS..), if the <b>AVX2</b> or <b>AVX512</b> compiler flags are declared explicitly.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="adc892bedebb3cbdd8291d6a9119184bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc892bedebb3cbdd8291d6a9119184bf">&#9670;&nbsp;</a></span>Absorb()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename ArrayU8 &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void Keccak::Absorb </td>
-          <td>(</td>
-          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
-          <td class="paramname"><em>Input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>InOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>InLength</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Rate</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">byte&#160;</td>
-          <td class="paramname"><em>Domain</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>State</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The Keccak absorb function; can use the 24, or 48 round version of the permutation if CEX_SHAKE_STRONG is defined. </p>
-<p>Copies bytes from an 8-bit vector or array to the state array. Input length must be 64-bit aligned, domain code terminates the input.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>The input byte array, can be either an 8-bit array or vector</td></tr>
-    <tr><td class="paramname">InOffset</td><td>The starting offset withing the input array</td></tr>
-    <tr><td class="paramname">InLength</td><td>The number of bytes to process; must be 64-bit aligned</td></tr>
-    <tr><td class="paramname">Rate</td><td>The Keccak aborbtion rate in bytes</td></tr>
-    <tr><td class="paramname">Domain</td><td>The Keccak implementation domain</td></tr>
-    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="abad197873fc4d8aad9da00ea265ee801"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abad197873fc4d8aad9da00ea265ee801">&#9670;&nbsp;</a></span>AbsorbR24()</h2>
 
@@ -438,8 +375,8 @@ template&lt;typename ArrayU8 &gt; </div>
 
 </div>
 </div>
-<a id="a3a4478a7177d259f01b53795d94f652b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a4478a7177d259f01b53795d94f652b">&#9670;&nbsp;</a></span>CXOFP1600()</h2>
+<a id="af0f460132e176ed21ae8ab5bdddddf3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0f460132e176ed21ae8ab5bdddddf3f">&#9670;&nbsp;</a></span>Compute()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -450,40 +387,28 @@ template&lt;typename ArrayU8 &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void Keccak::CXOFP1600 </td>
+          <td class="memname">static void Keccak::Compute </td>
           <td>(</td>
           <td class="paramtype">const ArrayU8 &amp;&#160;</td>
-          <td class="paramname"><em>Key</em>, </td>
+          <td class="paramname"><em>Message</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
-          <td class="paramname"><em>Customization</em>, </td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
-          <td class="paramname"><em>Name</em>, </td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">ArrayU8 &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutLength</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -504,16 +429,14 @@ template&lt;typename ArrayU8 &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>The Keccak custom XOF function (cSHAKE) using the standard 24 rounds; process a key, customization and name strings and return a pseudo-random output array. </p>
-<p>A compact form of the cSHAKE XOF function.</p>
+<p>A compact (stateless) form of the Keccak message digest function (SHA3) using the standard 24 rounds; processes a message, and return the hash in the output array. </p>
+<p>Set the Rate parameter to match the desired SHA3 function; 128, 256, or 512-bit hash function.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Key</td><td>The input byte key array, can be either a standard array or vector</td></tr>
-    <tr><td class="paramname">Customization</td><td>The customization string; can be used to create a custom implementation of SHAKE</td></tr>
-    <tr><td class="paramname">Name</td><td>The name string, optional; can be used to as a domain or algorithm identifier, creating unique output</td></tr>
-    <tr><td class="paramname">Output</td><td>The input byte seed array, can be either an 8-bit array or vector</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset withing the output array</td></tr>
-    <tr><td class="paramname">OutLength</td><td>The number of output bytes to produce</td></tr>
+    <tr><td class="paramname">Message</td><td>The input byte message array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offseet within the message byte array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of message bytes to process</td></tr>
+    <tr><td class="paramname">Output</td><td>The output hash array; returns a hash the size of the SHA3 mode, set by the Rate parameter; 16, 32, or 64 bytes</td></tr>
     <tr><td class="paramname">Rate</td><td>The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</td></tr>
   </table>
   </dd>
@@ -521,8 +444,130 @@ template&lt;typename ArrayU8 &gt; </div>
 
 </div>
 </div>
-<a id="a78794ca6338f7abd683edf09b5bc713f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78794ca6338f7abd683edf09b5bc713f">&#9670;&nbsp;</a></span>CXOFPR481600()</h2>
+<a id="a0acf19ff0e2676f99f47f4b436edb443"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0acf19ff0e2676f99f47f4b436edb443">&#9670;&nbsp;</a></span>CustomizeR24()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayU8 &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void Keccak::CustomizeR24 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Customization</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Rate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>State</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The standard 24 round implementation used by custom SHAKE functions to add customization and name strings to the state </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Customization</td><td>The input byte message array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Name</td><td>The starting offseet within the message byte array</td></tr>
+    <tr><td class="paramname">Rate</td><td>The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</td></tr>
+    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aadf3b94174beb99a7e4a474a905c9343"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aadf3b94174beb99a7e4a474a905c9343">&#9670;&nbsp;</a></span>CustomizeR48()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayU8 &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void Keccak::CustomizeR48 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Customization</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Rate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>State</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The extended 48 round implementation used by custom SHAKE functions to add customization and name strings to the state </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Customization</td><td>The input byte message array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Name</td><td>The starting offseet within the message byte array</td></tr>
+    <tr><td class="paramname">Rate</td><td>The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</td></tr>
+    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a67fe889fbe2ce62a09596e18815f35d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67fe889fbe2ce62a09596e18815f35d0">&#9670;&nbsp;</a></span>CXOFPR481600()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -560,13 +605,13 @@ template&lt;typename ArrayU8 &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>, </td>
+          <td class="paramname"><em>Offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutLength</em>, </td>
+          <td class="paramname"><em>Length</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -595,8 +640,91 @@ template&lt;typename ArrayU8 &gt; </div>
     <tr><td class="paramname">Customization</td><td>The customization string; can be used to create a custom implementation of SHAKE</td></tr>
     <tr><td class="paramname">Name</td><td>The name string, optional; can be used to as a domain or algorithm identifier, creating unique output</td></tr>
     <tr><td class="paramname">Output</td><td>The input byte seed array, can be either an 8-bit array or vector</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset withing the output array</td></tr>
-    <tr><td class="paramname">OutLength</td><td>The number of output bytes to produce</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset withing the output array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of output bytes to produce</td></tr>
+    <tr><td class="paramname">Rate</td><td>The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad7e6a713dcc43384ad59f9bbd13b52a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7e6a713dcc43384ad59f9bbd13b52a1">&#9670;&nbsp;</a></span>CXOFR24P1600()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayU8 &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void Keccak::CXOFR24P1600 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Customization</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Rate</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The Keccak custom XOF function (cSHAKE) using the standard 24 rounds; process a key, customization and name strings and return a pseudo-random output array. </p>
+<p>A compact form of the cSHAKE XOF function.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The input byte key array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Customization</td><td>The customization string; can be used to create a custom implementation of SHAKE</td></tr>
+    <tr><td class="paramname">Name</td><td>The name string, optional; can be used to as a domain or algorithm identifier, creating unique output</td></tr>
+    <tr><td class="paramname">Output</td><td>The input byte seed array, can be either an 8-bit array or vector</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offset withing the output array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of output bytes to produce</td></tr>
     <tr><td class="paramname">Rate</td><td>The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</td></tr>
   </table>
   </dd>
@@ -721,35 +849,166 @@ template&lt;typename ArrayU8 &gt; </div>
 
 </div>
 </div>
-<a id="aaf1f7cacd9f883750d29a70c36033923"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf1f7cacd9f883750d29a70c36033923">&#9670;&nbsp;</a></span>Permute()</h2>
+<a id="a2d7d4e485782a7bdb3b43e5d37687a49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d7d4e485782a7bdb3b43e5d37687a49">&#9670;&nbsp;</a></span>MACR24P1600()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayU8 &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void Keccak::Permute </td>
+          <td class="memname">static void Keccak::MACR24P1600 </td>
           <td>(</td>
-          <td class="paramtype">std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>State</em></td><td>)</td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Customization</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Message</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Rate</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>The Keccak permutation function; uses the 24 round implementation, or the extended 48 round implementation of the permutation if CEX_SHAKE_STRONG is defined. </p>
-<p>This function has been optimized for a small memory consumption. To enable the compact form of this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</p>
+<p>A compact (stateless) form of the message authentication code generator (KMAC), using the standard 24 round permutation. </p>
+<p>Process a key, customization string, and a message, and output a keyed-hash output array.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
+    <tr><td class="paramname">Key</td><td>The input byte key array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Customization</td><td>The customization string; can be used to create a custom implementation of KMAC</td></tr>
+    <tr><td class="paramname">Message</td><td>The input byte message array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offseet within the message byte array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of message bytes to process</td></tr>
+    <tr><td class="paramname">Output</td><td>The output hash array; returns a hash the size of the KMAC mode, set by the Rate parameter; 16, 32, or 64 bytes</td></tr>
+    <tr><td class="paramname">Rate</td><td>The block input rate of permutation calls; KMAC128=168, KMAC256=136, KMAC512=72</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a09fb4a1c13f2298eea9001b4ed1bc7cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09fb4a1c13f2298eea9001b4ed1bc7cf">&#9670;&nbsp;</a></span>MACR48P1600()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ArrayU8 &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void Keccak::MACR48P1600 </td>
+          <td>(</td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Customization</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Message</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ArrayU8 &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Rate</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A compact (stateless) form of the message authentication code generator (KMAC), using the extended 48 round permutation. </p>
+<p>Process a key, customization string, and a message, and output a keyed-hash output array.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The input byte key array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Customization</td><td>The customization string; can be used to create a custom implementation of KMAC</td></tr>
+    <tr><td class="paramname">Message</td><td>The input byte message array, can be either a standard array or vector</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting offseet within the message byte array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of message bytes to process</td></tr>
+    <tr><td class="paramname">Output</td><td>The output hash array; returns a hash the size of the KMAC mode, set by the Rate parameter; 16, 32, or 64 bytes</td></tr>
+    <tr><td class="paramname">Rate</td><td>The block input rate of permutation calls; KMAC128=168, KMAC256=136, KMAC512=72</td></tr>
   </table>
   </dd>
 </dl>
@@ -817,41 +1076,6 @@ template&lt;typename ArrayU8 &gt; </div>
 
 <p>The unrolled form of the 24 round (standard) SHA3 permutation function. </p>
 <p>This function (the default) has been optimized for speed, and timing neutrality. To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a4297150d987bb935f2c32247a2800de1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4297150d987bb935f2c32247a2800de1">&#9670;&nbsp;</a></span>PermuteR48()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void Keccak::PermuteR48 </td>
-          <td>(</td>
-          <td class="paramtype">std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>State</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>The Keccak permutation function; uses the 48 round extended implementation of the permutation. </p>
-<p>This function has been optimized for constant time and a small memory consumption. To enable the compact form of this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
@@ -931,46 +1155,34 @@ template&lt;typename ArrayU8 &gt; </div>
 
 </div>
 </div>
-<a id="adc3bf0884ae5d46d59f226d7d34ca026"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc3bf0884ae5d46d59f226d7d34ca026">&#9670;&nbsp;</a></span>Squeeze()</h2>
+<a id="a7d4b9104ae65c2fa6706dd878331ef41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d4b9104ae65c2fa6706dd878331ef41">&#9670;&nbsp;</a></span>RightEncode()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ArrayU8 &gt; </div>
+template&lt;typename Array &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void Keccak::Squeeze </td>
+          <td class="memname">static ulong Keccak::RightEncode </td>
           <td>(</td>
-          <td class="paramtype">std::array&lt; ulong, <a class="el" href="class_keccak.html#afe6189a3216451de2deb617f3daa9630">KECCAK_STATE_SIZE</a> &gt; &amp;&#160;</td>
-          <td class="paramname"><em>State</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ArrayU8 &amp;&#160;</td>
+          <td class="paramtype">Array &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>, </td>
+          <td class="paramname"><em>Offset</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Blocks</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Rate</em>&#160;</td>
+          <td class="paramtype">ulong&#160;</td>
+          <td class="paramname"><em>Value</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -985,18 +1197,16 @@ template&lt;typename ArrayU8 &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>The Keccak squeeze function; can use the 24, or 48 round version of the permutation if CEX_SHAKE_STRONG is defined. </p>
-<p>Extracts blocks of state to an output unsigned 8-bit vector or array.</p>
+<p>Keccak common function: Right encode a value onto an array </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">State</td><td>The permutations uint64 state array</td></tr>
-    <tr><td class="paramname">Output</td><td>The output byte array, can be either an 8-bit array or vector</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset withing the output array</td></tr>
-    <tr><td class="paramname">Blocks</td><td>The number of blocks to extract</td></tr>
-    <tr><td class="paramname">Rate</td><td>The Keccak extraction rate</td></tr>
+    <tr><td class="paramname">Output</td><td>The output integer array</td></tr>
+    <tr><td class="paramname">Offset</td><td>The output array starting offest</td></tr>
+    <tr><td class="paramname">Value</td><td>The value to remove</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of encoded bits</dd></dl>
 
 </div>
 </div>
@@ -1136,8 +1346,8 @@ template&lt;typename ArrayU8 &gt; </div>
 
 </div>
 </div>
-<a id="a734664ac204df4a579e0970c3bbecee9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a734664ac204df4a579e0970c3bbecee9">&#9670;&nbsp;</a></span>XOFP1600()</h2>
+<a id="a68cf32cf2c6ced7b0fe9be81681f7a3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68cf32cf2c6ced7b0fe9be81681f7a3b">&#9670;&nbsp;</a></span>XOFR24P1600()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1148,7 +1358,7 @@ template&lt;typename ArrayU8A , typename ArrayU8B &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void Keccak::XOFP1600 </td>
+          <td class="memname">static void Keccak::XOFR24P1600 </td>
           <td>(</td>
           <td class="paramtype">const ArrayU8A &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -1219,8 +1429,8 @@ template&lt;typename ArrayU8A , typename ArrayU8B &gt; </div>
 
 </div>
 </div>
-<a id="ab72ada92d76df03521e06d01e869b4fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab72ada92d76df03521e06d01e869b4fb">&#9670;&nbsp;</a></span>XOFPR481600()</h2>
+<a id="af5907066432ac7a6f0b494365c10a82d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5907066432ac7a6f0b494365c10a82d">&#9670;&nbsp;</a></span>XOFR48P1600()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1231,7 +1441,7 @@ template&lt;typename ArrayU8A , typename ArrayU8B &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void Keccak::XOFPR481600 </td>
+          <td class="memname">static void Keccak::XOFR48P1600 </td>
           <td>(</td>
           <td class="paramtype">const ArrayU8A &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -1564,6 +1774,30 @@ template&lt;typename ArrayU8A , typename ArrayU8B &gt; </div>
 </div><div class="memdoc">
 
 <p>The Keccak custom 8x-wide cSHAKE domain identifier </p>
+
+</div>
+</div>
+<a id="acb02216ed17248c6fddaff193811bdc4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb02216ed17248c6fddaff193811bdc4">&#9670;&nbsp;</a></span>KECCAK_KMAC_DOMAIN</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const byte Keccak::KECCAK_KMAC_DOMAIN = 0x04</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The Keccak KMAC domain identifier </p>
 
 </div>
 </div>

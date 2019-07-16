@@ -4,22 +4,6 @@
 #include "CexDomain.h"
 #include "CryptoException.h"
 
-#if defined(CEX_OS_OPENBSD)
-#include <string.h>
-#endif
-#if defined(CEX_OS_POSIX)
-#	include <sys/types.h>
-#	include <sys/resource.h>
-#	include <sys/mman.h>
-#	include <cstdlib>
-#	include <signal.h>
-#	include <setjmp.h>
-#	include <unistd.h>
-#	include <errno.h>
-#elif defined(CEX_OS_WINDOWS)
-#	include <windows.h>
-#endif
-
 NAMESPACE_ROOT
 
 using Exception::CryptoException;

@@ -80,7 +80,6 @@ class KMAC final : public MacBase
 private:
 
 	static const size_t BUFFER_SIZE = 200;
-	static const size_t DOMAIN_CODE = 0x04;
 	static const size_t MINKEY_LENGTH = 16;
 	static const size_t MINSALT_LENGTH = 4;
 	static const size_t STATE_SIZE = 25;
@@ -175,7 +174,7 @@ public:
 	/// <summary>
 	/// Initialize the MAC generator with an ISymmetricKey key container.
 	/// <para>Can accept either the SymmetricKey or SymmetricSecureKey container to load keying material.
-	/// Uses a key, salt, and info arrays to initialize the MAC.</para>
+	/// Uses a key, and optional customization and name arrays to initialize the MAC, which align to the Key, Nonce, and Info arrays in the symmetric key structure.</para>
 	/// </summary>
 	/// 
 	/// <param name="Parameters">An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</param>

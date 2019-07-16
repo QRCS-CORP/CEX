@@ -200,6 +200,7 @@
     <ClInclude Include="..\..\CEX\DLTMK4Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK5Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h" />
+    <ClInclude Include="..\..\CEX\FORS.h" />
     <ClInclude Include="..\..\CEX\MCS.h" />
     <ClInclude Include="..\..\CEX\ACP.h" />
     <ClInclude Include="..\..\CEX\AeadModeFromName.h" />
@@ -212,7 +213,7 @@
     <ClInclude Include="..\..\CEX\AsymmetricKeyPair.h" />
     <ClInclude Include="..\..\CEX\AsymmetricKeyTypes.h" />
     <ClInclude Include="..\..\CEX\AsymmetricSecureKey.h" />
-    <ClInclude Include="..\..\CEX\AsymmetricTransforms.h" />
+    <ClInclude Include="..\..\CEX\AsymmetricParameters.h" />
     <ClInclude Include="..\..\CEX\BitConverter.h" />
     <ClInclude Include="..\..\CEX\Blake256.h" />
     <ClInclude Include="..\..\CEX\Blake.h" />
@@ -295,7 +296,6 @@
     <ClInclude Include="..\..\CEX\GCM.h" />
     <ClInclude Include="..\..\CEX\GMAC.h" />
     <ClInclude Include="..\..\CEX\IAsymmetricParameters.h" />
-    <ClInclude Include="..\..\CEX\KeccakState.h" />
     <ClInclude Include="..\..\CEX\KMAC.h" />
     <ClInclude Include="..\..\CEX\McElieceUtils.h" />
     <ClInclude Include="..\..\CEX\HKDF.h" />
@@ -414,7 +414,12 @@
     <ClInclude Include="..\..\CEX\ULong256.h" />
     <ClInclude Include="..\..\CEX\ULong512.h" />
     <ClInclude Include="..\..\CEX\UShort128.h" />
+    <ClInclude Include="..\..\CEX\WOTS.h" />
     <ClInclude Include="..\..\CEX\X923.h" />
+    <ClInclude Include="..\..\CEX\XMSS.h" />
+    <ClInclude Include="..\..\CEX\XmssCore.h" />
+    <ClInclude Include="..\..\CEX\XmssParameters.h" />
+    <ClInclude Include="..\..\CEX\XmssUtils.h" />
     <ClInclude Include="..\..\CEX\ZeroOne.h" />
   </ItemGroup>
   <ItemGroup>
@@ -423,6 +428,7 @@
     <ClCompile Include="..\..\CEX\DLTMK4Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK5Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp" />
+    <ClCompile Include="..\..\CEX\FORS.cpp" />
     <ClCompile Include="..\..\CEX\MCS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp" />
@@ -433,7 +439,7 @@
     <ClCompile Include="..\..\CEX\AsymmetricKey.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricKeyPair.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricSecureKey.cpp" />
-    <ClCompile Include="..\..\CEX\AsymmetricTransforms.cpp" />
+    <ClCompile Include="..\..\CEX\AsymmetricParameters.cpp" />
     <ClCompile Include="..\..\CEX\BitConverter.cpp" />
     <ClCompile Include="..\..\CEX\Blake.cpp" />
     <ClCompile Include="..\..\CEX\Blake256.cpp" />
@@ -591,7 +597,12 @@
     <ClCompile Include="..\..\CEX\TSX512.cpp" />
     <ClCompile Include="..\..\CEX\ThreefishModes.cpp" />
     <ClCompile Include="..\..\CEX\TimeStamp.cpp" />
+    <ClCompile Include="..\..\CEX\WOTS.cpp" />
     <ClCompile Include="..\..\CEX\X923.cpp" />
+    <ClCompile Include="..\..\CEX\XMSS.cpp" />
+    <ClCompile Include="..\..\CEX\XmssCore.cpp" />
+    <ClCompile Include="..\..\CEX\XmssParameters.cpp" />
+    <ClCompile Include="..\..\CEX\XmssUtils.cpp" />
     <ClCompile Include="..\..\CEX\ZeroOne.cpp" />
   </ItemGroup>
   <ItemGroup>

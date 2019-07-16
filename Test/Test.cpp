@@ -131,6 +131,7 @@
 #include "../Test/SymmetricKeyTest.h"
 #include "../Test/ThreefishTest.h"
 #include "../Test/UtilityTest.h"
+#include "../Test/XMSSTest.h"
 
 using namespace Test;
 
@@ -207,9 +208,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7w (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7x (A7)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      June 17, 2019                     *");
+	ConsoleUtils::WriteLine("* Date:      July 16, 2019                     *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -279,14 +280,6 @@ void TestRun(ITest* Test)
 		}
 	}
 }
-
-// TODO: 1.8
-// Add Permute and XOF functions to: Rijndael, Threefish, ChaCha, (SHA2 HMAC Drbg?).
-// ex. Rijndael: PermuteP256T([array[32]]input, [array[32]]output, rkeys, rounds) and PemuteP256H (T=table, H=intrinsics, 4x, x4, x8, x16).
-// Add counter based XOF functions to each, ex. XOFR30P256.
-// Use a define to add XOF option to asymmetric primitives.
-//
-// Implement timing-neutral (tableless) fallback RHX/RCS transforms
 
 int main()
 {
@@ -495,6 +488,7 @@ int main()
 			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
 			TestRun(new DilithiumTest());
 			TestRun(new SphincsTest());
+			TestRun(new XMSSTest());
 		}
 		else
 		{

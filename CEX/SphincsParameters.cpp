@@ -4,7 +4,7 @@ NAMESPACE_ENUMERATION
 
 std::string SphincsParameterConvert::ToName(SphincsParameters Enumeral)
 {
-	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricTransforms>(Enumeral));
+	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricParameters>(Enumeral));
 }
 
 SphincsParameters SphincsParameterConvert::FromName(std::string &Name)

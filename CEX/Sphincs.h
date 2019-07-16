@@ -78,10 +78,10 @@ using Enumeration::SphincsParameters;
 /// 
 /// <list type="bullet">
 /// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); SPXS1S128SHAKE, SPXS2S192SHAKE, and SPXS3S256SHAKE (strongest)</description></item>
-/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
+/// <item><description>The signature schemes operational mode (signing/verifying) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>Use the Generate function to create a public/private key-pair, and the Sign function to sign a message</description></item>
-/// <item><description>The message-signature is tested using the Verify function, which checks the signature and returns false on authentication failure</description></item>
+/// <item><description>The message-signature is tested using the Verify function, which checks the signature, populates the message array, and returns false on authentication failure</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>

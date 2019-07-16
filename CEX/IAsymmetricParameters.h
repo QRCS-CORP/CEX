@@ -20,12 +20,12 @@
 #define CEX_IASYMMETRICPARAMETERS_H
 
 #include "CexDomain.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 #include "BlockCiphers.h"
 
 NAMESPACE_ASYMMETRIC
 
-using Enumeration::AsymmetricTransforms;
+using Enumeration::AsymmetricParameters;
 using Enumeration::BlockCiphers;
 
 /// <summary>
@@ -77,7 +77,7 @@ public:
 	/// <summary>
 	/// The asymmetric transform parameter
 	/// </summary>
-	virtual const AsymmetricTransforms AsymmetricTransform() = 0;
+	virtual const AsymmetricParameters AsymmetricTransform() = 0;
 
 	/// <summary>
 	/// The byte size of the base secret key polynomial
@@ -100,7 +100,7 @@ public:
 	///
 	/// <param name="Transform">The parameter sets enumeration name</param>
 	/// <param name="AuthEngine">The authentication engine used by the Encrypt/Decrypt CCA secure api</param>
-	virtual void Load(AsymmetricTransforms Transform, BlockCiphers AuthEngine) = 0;
+	virtual void Load(AsymmetricParameters Transform, BlockCiphers AuthEngine) = 0;
 
 	/// <summary>
 	/// Reset current parameters

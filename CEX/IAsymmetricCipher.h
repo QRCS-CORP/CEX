@@ -24,7 +24,7 @@
 #include "AsymmetricKeyPair.h"
 #include "AsymmetricKeyTypes.h"
 #include "AsymmetricPrimitives.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 #include "CryptoAsymmetricException.h"
 #include "IPrng.h"
 #include "Prngs.h"
@@ -33,7 +33,7 @@ NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricKeyTypes;
 using Enumeration::AsymmetricPrimitives;
-using Enumeration::AsymmetricTransforms;
+using Enumeration::AsymmetricParameters;
 using Exception::CryptoAsymmetricException;
 using Enumeration::ErrorCodes;
 using Prng::IPrng;

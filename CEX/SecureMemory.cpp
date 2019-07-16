@@ -1,4 +1,21 @@
 #include "SecureMemory.h"
+#include <stdlib.h>
+
+#if defined(CEX_OS_OPENBSD)
+#	include <string.h>
+#endif
+#if defined(CEX_OS_POSIX)
+#	include <sys/types.h>
+#	include <sys/resource.h>
+#	include <sys/mman.h>
+#	include <cstdlib>
+#	include <signal.h>
+#	include <setjmp.h>
+#	include <unistd.h>
+#	include <errno.h>
+#elif defined(CEX_OS_WINDOWS)
+#	include <windows.h>
+#endif
 
 NAMESPACE_ROOT
 
@@ -68,7 +85,7 @@ void* SecureMemory::Allocate(size_t Length)
 
 #else
 
-	throw CryptoException(CLASS_NAME, std::string("Allocate"), std::string("Secure memory not supported on this system!"), Enumeration::ErrorCodes::NotSupported);
+	ptr = (byte*)malloc(Length);
 
 #endif
 
@@ -102,8 +119,9 @@ void SecureMemory::Erase(void* Pointer, size_t Length)
 #else
 
 	volatile byte* ptr = reinterpret_cast<volatile byte*>(Pointer);
+	size_t i;
 
-	for (size_t i = 0; i != Length; ++i)
+	for (i = 0; i != Length; ++i)
 	{
 		ptr[i] = 0;
 	}
@@ -134,7 +152,7 @@ void SecureMemory::Free(void* Pointer, size_t Length)
 
 #else
 
-		throw CryptoException(CLASS_NAME, std::string("Free"), std::string("Secure memory not supported on this system!"), Enumeration::ErrorCodes::NotSupported);
+		free((byte*)Pointer);
 
 #endif
 	}
@@ -195,7 +213,7 @@ size_t SecureMemory::Limit()
 
 	if (::GetProcessWorkingSetSize(::GetCurrentProcess(), &wmin, &wmax))
 	{
-		overhead = PageSize() * 11ULL;
+		overhead = PageSize() * 0x000BUL;
 
 		if (wmin > overhead)
 		{
@@ -212,7 +230,7 @@ size_t SecureMemory::PageSize()
 {
 	long pagelen;
 
-	pagelen = 4096;
+	pagelen = 0x00001000LL;
 
 #if defined(CEX_OS_POSIX)
 
@@ -223,15 +241,11 @@ size_t SecureMemory::PageSize()
 		pagelen = CEX_SECMEMALLOC_DEFAULT;
 	}
 
-	return static_cast<size_t>(pagelen);
-
 #elif defined(CEX_OS_WINDOWS)
 
 	SYSTEM_INFO sysinfo;
 	::GetSystemInfo(&sysinfo);
-	pagelen = static_cast<size_t>(sysinfo.dwPageSize);
-
-	return static_cast<size_t>(pagelen);
+	pagelen = static_cast<long>(sysinfo.dwPageSize);
 
 #endif
 

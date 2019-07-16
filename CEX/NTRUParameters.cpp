@@ -4,7 +4,7 @@ NAMESPACE_ENUMERATION
 
 std::string NTRUParameterConvert::ToName(NTRUParameters Enumeral)
 {
-	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricTransforms>(Enumeral));
+	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricParameters>(Enumeral));
 }
 
 NTRUParameters NTRUParameterConvert::FromName(std::string &Name)

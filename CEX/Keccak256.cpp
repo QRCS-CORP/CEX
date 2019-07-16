@@ -15,7 +15,7 @@ class Keccak256::Keccak256State
 {
 public:
 
-	std::array<ulong, 25> H = { 0 };
+	std::array<ulong, Keccak::KECCAK_STATE_SIZE> H = { 0 };
 
 	Keccak256State()
 	{
@@ -92,13 +92,11 @@ const std::string Keccak256::Name()
 { 
 	std::string name;
 
+	name = DigestConvert::ToName(Enumeral());
+
 	if (m_treeParams.FanOut() > 1)
 	{
-		name = DigestConvert::ToName(Enumeral()) + std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
-	}
-	else
-	{
-		name = DigestConvert::ToName(Enumeral());
+		name += std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 
 	return name;

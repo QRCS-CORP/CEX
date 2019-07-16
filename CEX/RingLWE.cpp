@@ -327,8 +327,8 @@ AsymmetricKeyPair* RingLWE::Generate()
 		}
 	}
 
-	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_rlweState->Parameters));
-	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_rlweState->Parameters));
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(m_rlweState->Parameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricParameters>(m_rlweState->Parameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
@@ -364,7 +364,7 @@ void RingLWE::Initialize(AsymmetricKey* Key)
 void RingLWE::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
 {
 	std::vector<byte> tmpn(Name().begin(), Name().end());
-	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
+	Keccak::CXOFR24P1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_RINGLWEEND

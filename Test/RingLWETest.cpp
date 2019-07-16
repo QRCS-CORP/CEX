@@ -15,7 +15,7 @@ namespace Test
 	using Asymmetric::AsymmetricKeyPair;
 	using Enumeration::AsymmetricKeyTypes;
 	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricTransforms;
+	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
 	using Utility::IntegerTools;
 	using Test::NistRng;
@@ -425,7 +425,7 @@ namespace Test
 		std::vector<byte> pk1 = kp1->PublicKey()->Polynomial();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(RLWEParameters::RLWES1Q12289N1024));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(RLWEParameters::RLWES1Q12289N1024));
 		cpr1.Initialize(pk2);
 		cpr1.Encapsulate(cpt, sec1);
 
@@ -450,7 +450,7 @@ namespace Test
 		std::vector<byte> pk3 = kp2->PublicKey()->Polynomial();
 		pk3[0] += 1;
 		pk3[1] += 1;
-		AsymmetricKey* pk4 = new AsymmetricKey(pk3, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(RLWEParameters::RLWES2Q12289N2048));
+		AsymmetricKey* pk4 = new AsymmetricKey(pk3, AsymmetricPrimitives::RingLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(RLWEParameters::RLWES2Q12289N2048));
 		cpr2.Initialize(pk4);
 		cpr2.Encapsulate(cpt, sec1);
 

@@ -217,41 +217,6 @@ public:
 	}
 
 	/// <summary>
-	/// Keccak common function: Right encode a value onto an array
-	/// </summary>
-	/// 
-	/// <param name="Output">The output integer array</param>
-	/// <param name="Offset">The output array starting offest</param>
-	/// <param name="Value">The value to remove</param>
-	/// 
-	/// <returns>The number of encoded bits</returns>
-	template<typename Array>
-	static ulong RightEncode(Array &Output, size_t Offset, ulong Value)
-	{
-		ulong i;
-		ulong n;
-		ulong v;
-
-		for (v = Value, n = 0; v && (n < sizeof(ulong)); ++n, v >>= 8)
-		{
-		}
-
-		if (n == 0)
-		{
-			n = 1;
-		}
-
-		for (i = 1; i <= n; ++i)
-		{
-			Output[Offset + (i - 1)] = static_cast<uint8_t>(Value >> (8 * (n - i)));
-		}
-
-		Output[Offset + n] = static_cast<uint8_t>(n);
-
-		return n + 1;
-	}
-
-	/// <summary>
 	/// Split a string into a vector of strings
 	/// </summary>
 	/// 

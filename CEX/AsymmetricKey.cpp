@@ -20,9 +20,9 @@ public:
 	SecureVector<byte> Polynomial;
 	AsymmetricKeyTypes KeyClass;
 	AsymmetricPrimitives Primitive;
-	AsymmetricTransforms Parameters;
+	AsymmetricParameters Parameters;
 
-	AsymmetricKeyState(const std::vector<byte> &Poly, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricTransforms ParameterType)
+	AsymmetricKeyState(const std::vector<byte> &Poly, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricParameters ParameterType)
 		:
 		Polynomial(Lock(Poly)),
 		Primitive(PrimitiveType),
@@ -31,7 +31,7 @@ public:
 	{
 	}
 
-	AsymmetricKeyState(const SecureVector<byte> &Poly, AsymmetricPrimitives AsymmetricType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricTransforms ParameterType)
+	AsymmetricKeyState(const SecureVector<byte> &Poly, AsymmetricPrimitives AsymmetricType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricParameters ParameterType)
 		:
 		Polynomial(Poly),
 		Primitive(AsymmetricType),
@@ -43,7 +43,7 @@ public:
 	AsymmetricKeyState(const std::vector<byte> &KeyStream)
 		:
 		KeyClass(static_cast<AsymmetricKeyTypes>(KeyStream[0])),
-		Parameters(static_cast<AsymmetricTransforms>(KeyStream[1])),
+		Parameters(static_cast<AsymmetricParameters>(KeyStream[1])),
 		Primitive(static_cast<AsymmetricPrimitives>(KeyStream[2])),
 		Polynomial(KeyStream.begin() + 3, KeyStream.end())
 	{
@@ -52,7 +52,7 @@ public:
 	AsymmetricKeyState(const SecureVector<byte> &KeyStream)
 		:
 		KeyClass(static_cast<AsymmetricKeyTypes>(KeyStream[0])),
-		Parameters(static_cast<AsymmetricTransforms>(KeyStream[1])),
+		Parameters(static_cast<AsymmetricParameters>(KeyStream[1])),
 		Primitive(static_cast<AsymmetricPrimitives>(KeyStream[2])),
 		Polynomial(KeyStream.begin() + 3, KeyStream.end())
 	{
@@ -68,23 +68,23 @@ public:
 		Clear(Polynomial);
 		Primitive = AsymmetricPrimitives::None;
 		KeyClass = AsymmetricKeyTypes::None;
-		Parameters = AsymmetricTransforms::None;
+		Parameters = AsymmetricParameters::None;
 	}
 };
 
 //~~~Constructors~~~//
 
-AsymmetricKey::AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType)
+AsymmetricKey::AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricParameters ParameterType)
 	:
-	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricTransforms::None) ?
+	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricParameters::None) ?
 		new AsymmetricKeyState(Polynomial, PrimitiveType, CipherKeyType, ParameterType) :
 		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The types can not be none and the polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
 {
 }
 
-AsymmetricKey::AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricTransforms ParameterType)
+AsymmetricKey::AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes CipherKeyType, AsymmetricParameters ParameterType)
 	:
-	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricTransforms::None) ?
+	m_keyState((Polynomial.size() != 0 && PrimitiveType != AsymmetricPrimitives::None && CipherKeyType != AsymmetricKeyTypes::None && ParameterType != AsymmetricParameters::None) ?
 		new AsymmetricKeyState(Polynomial, PrimitiveType, CipherKeyType, ParameterType) :
 		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The types can not be none and the polynomial array can not be zero length!"), Enumeration::ErrorCodes::InvalidParam))
 {
@@ -107,7 +107,7 @@ const AsymmetricKeyTypes AsymmetricKey::KeyClass()
 	return m_keyState->KeyClass;
 }
 
-const AsymmetricTransforms AsymmetricKey::Parameters()
+const AsymmetricParameters AsymmetricKey::Parameters()
 {
 	return m_keyState->Parameters;
 }
@@ -137,7 +137,7 @@ AsymmetricKey* AsymmetricKey::DeSerialize(SecureVector<byte> &KeyStream)
 	AsymmetricKey* tmpk = new AsymmetricKey(SecureVector<byte>(KeyStream.begin() + 3, KeyStream.end()), 
 		static_cast<AsymmetricPrimitives>(KeyStream[2]),
 		static_cast<AsymmetricKeyTypes>(KeyStream[0]),
-		static_cast<AsymmetricTransforms>(KeyStream[1]));
+		static_cast<AsymmetricParameters>(KeyStream[1]));
 
 	return tmpk;
 }

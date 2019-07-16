@@ -113,10 +113,6 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a5f67d71cfe7dfe55f863bf16ab9b9114"><td class="memTemplItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_array_tools.html#a5f67d71cfe7dfe55f863bf16ab9b9114">Remove</a> (T Value, Array &amp;Output)</td></tr>
 <tr class="memdesc:a5f67d71cfe7dfe55f863bf16ab9b9114"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove all instances of an integer value from an array  <a href="#a5f67d71cfe7dfe55f863bf16ab9b9114">More...</a><br /></td></tr>
 <tr class="separator:a5f67d71cfe7dfe55f863bf16ab9b9114"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab81f76f44bbc49d1562c6dac0085f795"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
-<tr class="memitem:ab81f76f44bbc49d1562c6dac0085f795"><td class="memTemplItemLeft" align="right" valign="top">static ulong&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_array_tools.html#ab81f76f44bbc49d1562c6dac0085f795">RightEncode</a> (Array &amp;Output, size_t Offset, ulong Value)</td></tr>
-<tr class="memdesc:ab81f76f44bbc49d1562c6dac0085f795"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keccak common function: Right encode a value onto an array  <a href="#ab81f76f44bbc49d1562c6dac0085f795">More...</a><br /></td></tr>
-<tr class="separator:ab81f76f44bbc49d1562c6dac0085f795"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61c8fe6c9b7ad7b9a59e14b9ca2ada09"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_array_tools.html#a61c8fe6c9b7ad7b9a59e14b9ca2ada09">Split</a> (const std::string &amp;Input, char Delimiter, std::vector&lt; std::string &gt; &amp;Output)</td></tr>
 <tr class="memdesc:a61c8fe6c9b7ad7b9a59e14b9ca2ada09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Split a string into a vector of strings  <a href="#a61c8fe6c9b7ad7b9a59e14b9ca2ada09">More...</a><br /></td></tr>
 <tr class="separator:a61c8fe6c9b7ad7b9a59e14b9ca2ada09"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -574,61 +570,6 @@ template&lt;typename T , typename Array &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of integers in the new array</dd></dl>
-
-</div>
-</div>
-<a id="ab81f76f44bbc49d1562c6dac0085f795"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab81f76f44bbc49d1562c6dac0085f795">&#9670;&nbsp;</a></span>RightEncode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Array &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static ulong ArrayTools::RightEncode </td>
-          <td>(</td>
-          <td class="paramtype">Array &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ulong&#160;</td>
-          <td class="paramname"><em>Value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Keccak common function: Right encode a value onto an array </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>The output integer array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The output array starting offest</td></tr>
-    <tr><td class="paramname">Value</td><td>The value to remove</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of encoded bits</dd></dl>
 
 </div>
 </div>

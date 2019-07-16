@@ -2,7 +2,7 @@
 #define CEX_RLWEPARAMETERS_H
 
 #include "CexDomain.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 
 NAMESPACE_ENUMERATION
 
@@ -18,11 +18,11 @@ enum class RLWEParameters : byte
 	/// <summary>
 	/// The S1 parameters; (High Security) A modulus of 12289 with 1024 coefficients
 	/// </summary>
-	RLWES1Q12289N1024 = static_cast<byte>(AsymmetricTransforms::RLWES1Q12289N1024),
+	RLWES1Q12289N1024 = static_cast<byte>(AsymmetricParameters::RLWES1Q12289N1024),
 	/// <summary>
 	/// A modulus of 12289 with 2048 coefficients
 	/// </summary>
-	RLWES2Q12289N2048 = static_cast<byte>(AsymmetricTransforms::RLWES2Q12289N2048)
+	RLWES2Q12289N2048 = static_cast<byte>(AsymmetricParameters::RLWES2Q12289N2048)
 };
 
 class RLWEParameterConvert

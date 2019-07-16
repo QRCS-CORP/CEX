@@ -11,6 +11,7 @@ var searchData=
   ['keccak_5fcshake_5fdomain',['KECCAK_CSHAKE_DOMAIN',['../class_keccak.html#a7738d1c5beba21e29a2507d92c83b6be',1,'Keccak']]],
   ['keccak_5fcshakew4_5fdomain',['KECCAK_CSHAKEW4_DOMAIN',['../class_keccak.html#abb5531cea1696e9c57ec66039c183945',1,'Keccak']]],
   ['keccak_5fcshakew8_5fdomain',['KECCAK_CSHAKEW8_DOMAIN',['../class_keccak.html#a18d2b039dda51d6e58d564eec57d5189',1,'Keccak']]],
+  ['keccak_5fkmac_5fdomain',['KECCAK_KMAC_DOMAIN',['../class_keccak.html#acb02216ed17248c6fddaff193811bdc4',1,'Keccak']]],
   ['keccak_5frc24',['KECCAK_RC24',['../class_keccak.html#af09f33ca338c46d8de990d21ed87e7fa',1,'Keccak']]],
   ['keccak_5frc48',['KECCAK_RC48',['../class_keccak.html#a4493a3ae96750765870f6f67994952ed',1,'Keccak']]],
   ['keccak_5fsha3_5fdomain',['KECCAK_SHA3_DOMAIN',['../class_keccak.html#a5505f7c74c1ceae7a74de3dccb84cddc',1,'Keccak']]],

@@ -18,7 +18,7 @@ class SHA256::SHA256State
 {
 public:
 
-	std::array<uint, 8> H;
+	std::array<uint, 8> H = { 0 };
 	ulong T;
 
 	SHA256State()
@@ -41,14 +41,7 @@ public:
 	void Reset()
 	{
 		T = 0;
-		H[0] = 0x6A09E667UL;
-		H[1] = 0xBB67AE85UL;
-		H[2] = 0x3C6EF372UL;
-		H[3] = 0xA54FF53AUL;
-		H[4] = 0x510E527FUL;
-		H[5] = 0x9B05688CUL;
-		H[6] = 0x1F83D9ABUL;
-		H[7] = 0x5BE0CD19UL;
+		MemoryTools::Copy(SHA2::SHA256State, 0, H, 0, H.size() * sizeof(uint));
 	}
 };
 

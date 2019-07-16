@@ -30,7 +30,10 @@ namespace Test
 	using Numeric::UInt512;
 	using Numeric::ULong512;
 #endif
-	using namespace Digest;
+	using Digest::SHA2;
+	using Digest::SHA256;
+	using Digest::SHA512; 
+	using Digest::SHA2Params;
 
 	const std::string SHA2Test::CLASSNAME = "SHA2Test";
 	const std::string SHA2Test::DESCRIPTION = "Tests SHA-2 256/512 with NIST KAT vectors.";
@@ -71,10 +74,11 @@ namespace Test
 	{
 		try
 		{
+			Ancillary();
+			OnProgress(std::string("SHA2Test: Passed SHA2-256/512 compact functions tests.."));
+
 			Exception();
 			OnProgress(std::string("SHA2Test: Passed SHA2-256/512 exception handling tests.."));
-
-			// test sequential modes
 
 			SHA256* dgt256s = new SHA256(false);
 			SHA512* dgt512s = new SHA512(false);
@@ -133,6 +137,79 @@ namespace Test
 		catch (std::exception const &ex)
 		{
 			throw TestException(CLASSNAME, std::string("Unknown Origin"), std::string(ex.what()));
+		}
+	}
+
+	void SHA2Test::Ancillary()
+	{
+		std::vector<byte> otp(0);
+
+		// SHA2-256
+
+		otp.resize(m_expected[0].size());
+		SHA2::Compute256(m_message[0], 0, m_message[0].size(), otp, 0);
+
+		if (otp != m_expected[0])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute256"), std::string("Expected values don't match! -SA1"));
+		}
+
+		otp.resize(m_expected[1].size());
+		SHA2::Compute256(m_message[1], 0, m_message[1].size(), otp, 0);
+
+		if (otp != m_expected[1])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute256"), std::string("Expected values don't match! -SA2"));
+		}
+
+		otp.resize(m_expected[2].size());
+		SHA2::Compute256(m_message[2], 0, m_message[2].size(), otp, 0);
+
+		if (otp != m_expected[2])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute256"), std::string("Expected values don't match! -SA3"));
+		}
+
+		otp.resize(m_expected[3].size());
+		SHA2::Compute256(m_message[3], 0, m_message[3].size(), otp, 0);
+
+		if (otp != m_expected[3])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute256"), std::string("Expected values don't match! -SA4"));
+		}
+
+		// SHA2-512
+
+		otp.resize(m_expected[4].size());
+		SHA2::Compute512(m_message[0], 0, m_message[0].size(), otp, 0);
+
+		if (otp != m_expected[4])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA5"));
+		}
+
+		otp.resize(m_expected[5].size());
+		SHA2::Compute512(m_message[1], 0, m_message[1].size(), otp, 0);
+
+		if (otp != m_expected[5])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA6"));
+		}
+
+		otp.resize(m_expected[6].size());
+		SHA2::Compute512(m_message[2], 0, m_message[2].size(), otp, 0);
+
+		if (otp != m_expected[6])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA7"));
+		}
+
+		otp.resize(m_expected[7].size());
+		SHA2::Compute512(m_message[3], 0, m_message[3].size(), otp, 0);
+
+		if (otp != m_expected[7])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA8"));
 		}
 	}
 

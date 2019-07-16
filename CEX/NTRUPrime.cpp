@@ -357,8 +357,8 @@ AsymmetricKeyPair* NTRUPrime::Generate()
 		}
 	}
 
-	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_ntruState->Parameters));
-	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_ntruState->Parameters));
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(m_ntruState->Parameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricParameters>(m_ntruState->Parameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
@@ -394,7 +394,7 @@ void NTRUPrime::Initialize(AsymmetricKey* Key)
 void NTRUPrime::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
 {
 	std::vector<byte> tmpn(Name().begin(), Name().end());
-	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
+	Keccak::CXOFR24P1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_NTRUPRIMEEND

@@ -1154,7 +1154,7 @@ void RLWEQ12289N2048::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 
 void RLWEQ12289N2048::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 {
-	Keccak::XOFP1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
+	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
 NAMESPACE_RINGLWEEND

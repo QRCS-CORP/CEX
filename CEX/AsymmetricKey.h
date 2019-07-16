@@ -4,14 +4,14 @@
 #include "CexDomain.h"
 #include "AsymmetricPrimitives.h"
 #include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 #include "IAsymmetricKey.h"
 
 NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricPrimitives;
 using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
+using Enumeration::AsymmetricParameters;
 
 /// <summary>
 /// An Asymmetric primitive key container.
@@ -56,7 +56,7 @@ public:
 	/// <param name="ParameterType">The asymmetric primitives parameter-set enumeration name</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are passed</exception>
-	AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType);
+	AsymmetricKey(const std::vector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType);
 
 	/// <summary>
 	/// Initialize an AsymmetricKey container
@@ -68,7 +68,7 @@ public:
 	/// <param name="ParameterType">The asymmetric primitives parameter-set enumeration name</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters are passed</exception>
-	AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType);
+	AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -90,7 +90,7 @@ public:
 	/// <summary>
 	/// Read Only: The asymmetric primitives parameter-set enumeration name
 	/// </summary>
-	const AsymmetricTransforms Parameters() override;
+	const AsymmetricParameters Parameters() override;
 
 	/// <summary>
 	/// Read Only: Returns a copy of the asymmetric keys standard-vector polynomial

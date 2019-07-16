@@ -370,8 +370,8 @@ AsymmetricKeyPair* McEliece::Generate()
 		}
 	}
 
-	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mpkcState->Parameters));
-	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_mpkcState->Parameters));
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(m_mpkcState->Parameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricParameters>(m_mpkcState->Parameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
@@ -407,7 +407,7 @@ void McEliece::Initialize(AsymmetricKey* Key)
 void McEliece::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
 {
 	std::vector<byte> tmpn(Name().begin(), Name().end());
-	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
+	Keccak::CXOFR24P1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_MCELIECEEND

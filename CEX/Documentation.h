@@ -15,19 +15,19 @@ CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.7w</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.7x</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   v1.0.0.7w
-\date      June 17, 2019
+\version   v1.0.0.7x
+\date      July 16, 2019
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.7w (A7 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.7x (A7 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.7w (version A7):</B> \n
+<B>Current Release v1.0.0.7x (version A7):</B> \n
 
 The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
 The Dilithium asymmetric signature scheme \n
@@ -309,7 +309,6 @@ NAMESPACE_ROOT
 		class Keccak512 {};
 		class Keccak1024 {};
 		class KeccakParams {};
-		class KeccakState {};
 		class SHA2 {};
 		class SHA256 {};
 		class SHA512 {};
@@ -345,7 +344,7 @@ NAMESPACE_ROOT
 		enum class AeadModes {};
 		enum class AsymmetricKeyTypes {};
 		enum class AsymmetricPrimitives {};
-		enum class AsymmetricTransforms {};
+		enum class AsymmetricParameters {};
 		enum class Authenticators {};
 		enum class BlockCiphers {};
 		enum class BlockCipherExtensions {};

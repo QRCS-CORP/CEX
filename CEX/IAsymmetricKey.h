@@ -4,7 +4,7 @@
 #include "CexDomain.h"
 #include "AsymmetricPrimitives.h"
 #include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 #include "CryptoAsymmetricException.h"
 #include "SecureVector.h"
 
@@ -12,7 +12,7 @@ NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricPrimitives;
 using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
+using Enumeration::AsymmetricParameters;
 using Exception::CryptoAsymmetricException;
 
 /// <summary>
@@ -63,7 +63,7 @@ public:
 	/// <summary>
 	/// Read Only: The asymmetric primitives parameter type-name
 	/// </summary>
-	virtual const AsymmetricTransforms Parameters() = 0;
+	virtual const AsymmetricParameters Parameters() = 0;
 
 	/// <summary>
 	/// Read Only: Returns a standard-vector copy of the asymmetric-key polynomial

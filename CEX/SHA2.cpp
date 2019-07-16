@@ -1,13 +1,15 @@
 #include "SHA2.h"
 #include "IntegerTools.h"
+#include "MemoryTools.h"
 
 NAMESPACE_DIGEST
 
 using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 //~~~SHA2 K Constants~~~//
 
-const std::vector<uint> SHA2::K256
+const std::vector<uint> SHA2::SHA256_RC64
 {
 	0x428A2F98UL, 0x71374491UL, 0xB5C0FBCFUL, 0xE9B5DBA5UL, 0x3956C25BUL, 0x59F111F1UL, 0x923F82A4UL, 0xAB1C5ED5UL,
 	0xD807AA98UL, 0x12835B01UL, 0x243185BEUL, 0x550C7DC3UL, 0x72BE5D74UL, 0x80DEB1FEUL, 0x9BDC06A7UL, 0xC19BF174UL,
@@ -19,7 +21,7 @@ const std::vector<uint> SHA2::K256
 	0x748F82EEUL, 0x78A5636FUL, 0x84C87814UL, 0x8CC70208UL, 0x90BEFFFAUL, 0xA4506CEBUL, 0xBEF9A3F7UL, 0xC67178F2UL
 };
 
-const std::vector<ulong> SHA2::K512
+const std::vector<ulong> SHA2::SHA512_RC80
 {
 	0X428A2F98D728AE22ULL, 0X7137449123EF65CDULL, 0XB5C0FBCFEC4D3B2FULL, 0XE9B5DBA58189DBBCULL, 0X3956C25BF348B538ULL, 0X59F111F1B605D019ULL, 0X923F82A4AF194F9BULL, 0XAB1C5ED5DA6D8118ULL,
 	0XD807AA98A3030242ULL, 0X12835B0145706FBEULL, 0X243185BE4EE4B28CULL, 0X550C7DC3D5FFB4E2ULL, 0X72BE5D74F27B896FULL, 0X80DEB1FE3B1696B1ULL, 0X9BDC06A725C71235ULL, 0XC19BF174CF692694ULL,
@@ -33,9 +35,34 @@ const std::vector<ulong> SHA2::K512
 	0X28DB77F523047D84ULL, 0X32CAAB7B40C72493ULL, 0X3C9EBE0A15C9BEBCULL, 0X431D67C49C100D4CULL, 0X4CC5D4BECB3E42B6ULL, 0X597F299CFC657E2AULL, 0X5FCB6FAB3AD6FAECULL, 0X6C44198C4A475817ULL
 };
 
+const std::vector<uint> SHA2::SHA256State =
+{
+	0x6A09E667UL,
+	0xBB67AE85UL,
+	0x3C6EF372UL,
+	0xA54FF53AUL,
+	0x510E527FUL,
+	0x9B05688CUL,
+	0x1F83D9ABUL,
+	0x5BE0CD19UL
+};
+
+const std::vector<ulong> SHA2::SHA512State =
+{
+	0x6A09E667F3BCC908ULL,
+	0xBB67AE8584CAA73BULL,
+	0x3C6EF372FE94F82BULL,
+	0xA54FF53A5F1D36F1ULL,
+	0x510E527FADE682D1ULL,
+	0x9B05688C2B3E6C1FULL,
+	0x1F83D9ABFB41BD6BULL,
+	0x5BE0CD19137E2179ULL
+};
+
 //~~~Public Functions~~~//
 
 //~~~SHA2-256~~~//
+
 
 void SHA2::PermuteR64P512C(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State)
 {
@@ -64,21 +91,21 @@ void SHA2::PermuteR64P512C(const std::vector<byte> &Input, size_t InOffset, std:
 
 	for (i = 0; i < 8; ++i)
 	{
-		Round256(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K256[j], W[j]);
+		Round256(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], SHA256_RC64[j], W[j]);
 		++j;
-		Round256(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K256[j], W[j]);
+		Round256(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], SHA256_RC64[j], W[j]);
 		++j;
-		Round256(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K256[j], W[j]);
+		Round256(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], SHA256_RC64[j], W[j]);
 		++j;
-		Round256(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K256[j], W[j]);
+		Round256(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], SHA256_RC64[j], W[j]);
 		++j;
-		Round256(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K256[j], W[j]);
+		Round256(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], SHA256_RC64[j], W[j]);
 		++j;
-		Round256(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K256[j], W[j]);
+		Round256(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], SHA256_RC64[j], W[j]);
 		++j;
-		Round256(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K256[j], W[j]);
+		Round256(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], SHA256_RC64[j], W[j]);
 		++j;
-		Round256(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K256[j], W[j]);
+		Round256(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], SHA256_RC64[j], W[j]);
 		++j;
 	}
 
@@ -608,28 +635,28 @@ void SHA2::PermuteR64P8x512H(const std::vector<byte> &Input, size_t InOffset, st
 	j = 0;
 	for (i = 0; i < 8; ++i)
 	{
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
 		++j;
 	}
@@ -691,28 +718,28 @@ void SHA2::PermuteR64P16x512H(const std::vector<byte> &Input, size_t InOffset, s
 	j = 0;
 	for (i = 0; i < 8; ++i)
 	{
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
 		++j;
-		K.Load(K256[j]);
+		K.Load(SHA256_RC64[j]);
 		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
 		++j;
 	}
@@ -757,21 +784,21 @@ void SHA2::PermuteR80P1024C(const std::vector<byte> &Input, size_t InOffset, std
 	j = 0;
 	for (i = 0; i < 10; ++i)
 	{
-		Round512(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K512[j], W[j]);
+		Round512(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], SHA512_RC80[j], W[j]);
 		++j;
-		Round512(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K512[j], W[j]);
+		Round512(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], SHA512_RC80[j], W[j]);
 		++j;
-		Round512(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K512[j], W[j]);
+		Round512(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], SHA512_RC80[j], W[j]);
 		++j;
-		Round512(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K512[j], W[j]);
+		Round512(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], SHA512_RC80[j], W[j]);
 		++j;
-		Round512(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K512[j], W[j]);
+		Round512(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], SHA512_RC80[j], W[j]);
 		++j;
-		Round512(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K512[j], W[j]);
+		Round512(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], SHA512_RC80[j], W[j]);
 		++j;
-		Round512(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K512[j], W[j]);
+		Round512(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], SHA512_RC80[j], W[j]);
 		++j;
-		Round512(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K512[j], W[j]);
+		Round512(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], SHA512_RC80[j], W[j]);
 		++j;
 	}
 
@@ -1191,28 +1218,28 @@ void SHA2::PermuteR80P4x1024H(const std::vector<byte> &Input, size_t InOffset, s
 	j = 0;
 	for (i = 0; i < 10; ++i)
 	{
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
 		++j;
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
 		++j;
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
 		++j;
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
 		++j;
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
 		++j;
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
 		++j;
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
 		++j;
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
 		++j;
 	}
@@ -1266,28 +1293,28 @@ void SHA2::PermuteR80P8x1024H(const std::vector<byte> &Input, size_t InOffset, s
 	j = 0;
 	for (i = 0; i < 10; ++i)
 	{
-		K.Load(K512[j]);
+		K.Load(SHA512_RC80[j]);
 		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
 		++j;
-		K.Load(K512[j];
+		K.Load(SHA512_RC80[j];
 		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
 		++j;
-		K.Load(K512[j];
+		K.Load(SHA512_RC80[j];
 		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
 		++j;
-		K.Load(K512[j];
+		K.Load(SHA512_RC80[j];
 		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
 		++j;
-		K.Load(K512[j];
+		K.Load(SHA512_RC80[j];
 		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
 		++j;
-		K.Load(K512[j];
+		K.Load(SHA512_RC80[j];
 		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
 		++j;
-		K.Load(K512[j];
+		K.Load(SHA512_RC80[j];
 		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
 		++j;
-		K.Load(K512[j];
+		K.Load(SHA512_RC80[j];
 		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
 		++j;
 	}

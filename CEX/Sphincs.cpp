@@ -1,8 +1,6 @@
 #include "Sphincs.h"
 #include "MemoryTools.h"
 #include "PrngFromName.h"
-#include "SecureRandom.h"
-#include "SHAKE.h"
 #include "SPXS128SHAKE.h"
 #include "SPXS192SHAKE.h"
 #include "SPXS256SHAKE.h"
@@ -221,7 +219,7 @@ AsymmetricKeyPair* Sphincs::Generate()
 		{
 			pk.resize(SPXS128SHAKE::SPHINCS_PUBLICKEY_SIZE);
 			sk.resize(SPXS128SHAKE::SPHINCS_SECRETKEY_SIZE);
-			SPXS128SHAKE::Generate(pk, sk, m_rndGenerator, m_sphincsState->Parameters);
+			SPXS128SHAKE::Generate(pk, sk, m_rndGenerator);
 
 			break;
 		}
@@ -229,7 +227,7 @@ AsymmetricKeyPair* Sphincs::Generate()
 		{
 			pk.resize(SPXS192SHAKE::SPHINCS_PUBLICKEY_SIZE);
 			sk.resize(SPXS192SHAKE::SPHINCS_SECRETKEY_SIZE);
-			SPXS192SHAKE::Generate(pk, sk, m_rndGenerator, m_sphincsState->Parameters);
+			SPXS192SHAKE::Generate(pk, sk, m_rndGenerator);
 
 			break;
 		}
@@ -237,7 +235,7 @@ AsymmetricKeyPair* Sphincs::Generate()
 		{
 			pk.resize(SPXS256SHAKE::SPHINCS_PUBLICKEY_SIZE);
 			sk.resize(SPXS256SHAKE::SPHINCS_SECRETKEY_SIZE);
-			SPXS256SHAKE::Generate(pk, sk, m_rndGenerator, m_sphincsState->Parameters);
+			SPXS256SHAKE::Generate(pk, sk, m_rndGenerator);
 
 			break;
 		}
@@ -248,8 +246,8 @@ AsymmetricKeyPair* Sphincs::Generate()
 	}
 
 
-	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(m_sphincsState->Parameters));
-	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(m_sphincsState->Parameters));
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(m_sphincsState->Parameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(m_sphincsState->Parameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
@@ -304,17 +302,17 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 	{
 		case SphincsParameters::SPXS1S128SHAKE:
 		{
-			slen = SPXS128SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_sphincsState->Parameters);
+			slen = SPXS128SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
 		case SphincsParameters::SPXS2S192SHAKE:
 		{
-			slen = SPXS192SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_sphincsState->Parameters);
+			slen = SPXS192SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
 		case SphincsParameters::SPXS3S256SHAKE:
 		{
-			slen = SPXS256SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_sphincsState->Parameters);
+			slen = SPXS256SHAKE::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
 			break;
 		}
 		default:
@@ -345,17 +343,17 @@ bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Mess
 	{
 		case SphincsParameters::SPXS1S128SHAKE:
 		{
-			res = SPXS128SHAKE::Verify(Message, Signature, m_publicKey->Polynomial(), m_sphincsState->Parameters);
+			res = SPXS128SHAKE::Verify(Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
 		case SphincsParameters::SPXS2S192SHAKE:
 		{
-			res = SPXS192SHAKE::Verify(Message, Signature, m_publicKey->Polynomial(), m_sphincsState->Parameters);
+			res = SPXS192SHAKE::Verify(Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
 		case SphincsParameters::SPXS3S256SHAKE:
 		{
-			res = SPXS256SHAKE::Verify(Message, Signature, m_publicKey->Polynomial(), m_sphincsState->Parameters);
+			res = SPXS256SHAKE::Verify(Message, Signature, m_publicKey->Polynomial());
 			break;
 		}
 		default:

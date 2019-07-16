@@ -97,6 +97,11 @@ public:
 	static const byte KECCAK_CSHAKE_DOMAIN = 0x04;
 
 	/// <summary>
+	/// The Keccak KMAC domain identifier
+	/// </summary>
+	static const byte KECCAK_KMAC_DOMAIN = 0x04;
+
+	/// <summary>
 	/// The Keccak SHA3 digest domain identifier
 	/// </summary>
 	static const byte KECCAK_SHA3_DOMAIN = 0x06;
@@ -164,28 +169,6 @@ public:
 	/// The Keccak state size in uint64 integers
 	/// </summary>
 	static const size_t KECCAK_STATE_SIZE = 25;
-
-	/// <summary>
-	/// The Keccak absorb function; can use the 24, or 48 round version of the permutation if CEX_SHAKE_STRONG is defined.
-	/// <para>Copies bytes from an 8-bit vector or array to the state array.
-	/// Input length must be 64-bit aligned, domain code terminates the input.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input byte array, can be either an 8-bit array or vector</param>
-	/// <param name="InOffset">The starting offset withing the input array</param>
-	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
-	/// <param name="Rate">The Keccak aborbtion rate in bytes</param>
-	/// <param name="Domain">The Keccak implementation domain</param>
-	/// <param name="State">The permutations uint64 state array</param>
-	template<typename ArrayU8>
-	static void Absorb(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
-	{
-#if defined(CEX_SHAKE_STRONG)
-		AbsorbR48(Input, InOffset, InLength, Rate, Domain, State);
-#else
-		AbsorbR24(Input, InOffset, InLength, Rate, Domain, State);
-#endif
-	}
 
 	/// <summary>
 	/// The Keccak 24-round absorb function; copy bytes from a byte array to the state array.
@@ -276,22 +259,45 @@ public:
 	}
 
 	/// <summary>
-	/// The Keccak custom XOF function (cSHAKE) using the standard 24 rounds; process a key, customization and name strings and return a pseudo-random output array.
-	/// <para>A compact form of the cSHAKE XOF function.</para>
+	/// A compact (stateless) form of the Keccak message digest function (SHA3) using the standard 24 rounds; processes a message, and return the hash in the output array.
+	/// <para>Set the Rate parameter to match the desired SHA3 function; 128, 256, or 512-bit hash function.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
-	/// <param name="Customization">The customization string; can be used to create a custom implementation of SHAKE</param>
-	/// <param name="Name">The name string, optional; can be used to as a domain or algorithm identifier, creating unique output</param>
-	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
-	/// <param name="OutOffset">The starting offset withing the output array</param>
-	/// <param name="OutLength">The number of output bytes to produce</param>
+	/// <param name="Message">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Offset">The starting offseet within the message byte array</param>
+	/// <param name="Length">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; returns a hash the size of the SHA3 mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
 	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	template<typename ArrayU8>
-	static void CXOFP1600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Name, ArrayU8 &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	static void Compute(const ArrayU8 &Message, size_t Offset, size_t Length, ArrayU8 &Output, size_t Rate)
 	{
-		static const size_t BUFFER_SIZE = KECCAK_STATE_SIZE * sizeof(ulong);
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		ArrayU8 hash(KECCAK256_DIGEST_SIZE);
+		const size_t OTPLEN = ((KECCAK_STATE_SIZE * sizeof(ulong)) - Rate) / 2;
+
+		AbsorbR24(Message, Offset, Length, Rate, KECCAK_SHA3_DOMAIN, state);
+
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR24P1600C(state);
+#else
+		Keccak::PermuteR24P1600U(state);
+#endif
+
+		MemoryTools::Copy(state, 0, Output, 0, OTPLEN);
+	}
+
+	/// <summary>
+	/// The standard 24 round implementation used by custom SHAKE functions to add customization and name strings to the state
+	/// </summary>
+	/// 
+	/// <param name="Customization">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Name">The starting offseet within the message byte array</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename ArrayU8>
+	static void CustomizeR24(const ArrayU8 &Customization, const ArrayU8 &Name, size_t Rate, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	{
+		const size_t BUFFER_SIZE = KECCAK_STATE_SIZE * sizeof(ulong);
 		std::array<byte, BUFFER_SIZE> pad = { 0 };
 		size_t i;
 		size_t offset;
@@ -305,8 +311,8 @@ public:
 			{
 				if (offset == Rate)
 				{
-					FastAbsorb(pad, 0, Rate, state);
-					Permute(state);
+					Keccak::FastAbsorb(pad, 0, Rate, State);
+					PermuteR24P1600U(State);
 					offset = 0;
 				}
 
@@ -323,8 +329,8 @@ public:
 			{
 				if (offset == Rate)
 				{
-					FastAbsorb(pad, 0, Rate, state);
-					Permute(state);
+					Keccak::FastAbsorb(pad, 0, Rate, State);
+					PermuteR24P1600U(State);
 					offset = 0;
 				}
 
@@ -335,19 +341,98 @@ public:
 
 		MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
 		offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
-		MemoryTools::XOR(pad, 0, state, 0, offset);
-		Permute(state);
+		MemoryTools::XOR(pad, 0, State, 0, offset);
 
-		Keccak::Absorb(Key, 0, Key.size(), Rate, Keccak::KECCAK_CSHAKE_DOMAIN, state);
+		PermuteR24P1600U(State);
+	}
 
-		while (OutLength != 0)
+	/// <summary>
+	/// The extended 48 round implementation used by custom SHAKE functions to add customization and name strings to the state
+	/// </summary>
+	/// 
+	/// <param name="Customization">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Name">The starting offseet within the message byte array</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename ArrayU8>
+	static void CustomizeR48(const ArrayU8 &Customization, const ArrayU8 &Name, size_t Rate, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	{
+		const size_t BUFFER_SIZE = KECCAK_STATE_SIZE * sizeof(ulong);
+		std::array<byte, BUFFER_SIZE> pad = { 0 };
+		size_t i;
+		size_t offset;
+
+		offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(Rate));
+		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
+
+		if (Name.size() != 0)
 		{
-			const size_t DIFF = IntegerTools::Min(Rate, OutLength);
+			for (i = 0; i < Name.size(); ++i)
+			{
+				if (offset == Rate)
+				{
+					Keccak::FastAbsorb(pad, 0, Rate, State);
+					PermuteR48P1600U(State);
+					offset = 0;
+				}
 
-			Permute(state);
-			MemoryTools::Copy(state, 0, Output, OutOffset, DIFF);
-			OutOffset += DIFF;
-			OutLength -= DIFF;
+				pad[offset] = Name[i];
+				++offset;
+			}
+		}
+
+		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
+
+		if (Customization.size() != 0)
+		{
+			for (i = 0; i < Customization.size(); ++i)
+			{
+				if (offset == Rate)
+				{
+					Keccak::FastAbsorb(pad, 0, Rate, State);
+					PermuteR48P1600U(State);
+					offset = 0;
+				}
+
+				pad[offset] = Customization[i];
+				++offset;
+			}
+		}
+
+		MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
+		offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
+		MemoryTools::XOR(pad, 0, State, 0, offset);
+
+		PermuteR48P1600U(State);
+	}
+
+	/// <summary>
+	/// The Keccak custom XOF function (cSHAKE) using the standard 24 rounds; process a key, customization and name strings and return a pseudo-random output array.
+	/// <para>A compact form of the cSHAKE XOF function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
+	/// <param name="Customization">The customization string; can be used to create a custom implementation of SHAKE</param>
+	/// <param name="Name">The name string, optional; can be used to as a domain or algorithm identifier, creating unique output</param>
+	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="Offset">The starting offset withing the output array</param>
+	/// <param name="Length">The number of output bytes to produce</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayU8>
+	static void CXOFR24P1600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Name, ArrayU8 &Output, size_t Offset, size_t Length, size_t Rate)
+	{
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		CustomizeR24(Customization, Name, Rate, state);
+		AbsorbR24(Key, 0, Key.size(), Rate, Keccak::KECCAK_CSHAKE_DOMAIN, state);
+
+		while (Length != 0)
+		{
+			const size_t DIFF = IntegerTools::Min(Rate, Length);
+
+			PermuteR24P1600U(state);
+			MemoryTools::Copy(state, 0, Output, Offset, DIFF);
+			Offset += DIFF;
+			Length -= DIFF;
 		}
 	}
 
@@ -360,70 +445,24 @@ public:
 	/// <param name="Customization">The customization string; can be used to create a custom implementation of SHAKE</param>
 	/// <param name="Name">The name string, optional; can be used to as a domain or algorithm identifier, creating unique output</param>
 	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
-	/// <param name="OutOffset">The starting offset withing the output array</param>
-	/// <param name="OutLength">The number of output bytes to produce</param>
+	/// <param name="Offset">The starting offset withing the output array</param>
+	/// <param name="Length">The number of output bytes to produce</param>
 	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	template<typename ArrayU8>
-	static void CXOFPR481600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Name, ArrayU8 &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	static void CXOFPR481600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Name, ArrayU8 &Output, size_t Offset, size_t Length, size_t Rate)
 	{
-		static const size_t BUFFER_SIZE = KECCAK_STATE_SIZE * sizeof(ulong);
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
-		std::array<byte, BUFFER_SIZE> pad = { 0 };
-		size_t i;
-		size_t offset;
+		CustomizeR48(Customization, Name, Rate, state);
+		AbsorbR48(Key, 0, Key.size(), Rate, Keccak::KECCAK_CSHAKE_DOMAIN, state);
 
-		offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(Rate));
-		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
-
-		if (Name.size() != 0)
+		while (Length != 0)
 		{
-			for (i = 0; i < Name.size(); ++i)
-			{
-				if (offset == Rate)
-				{
-					FastAbsorb(pad, 0, Rate, state);
-					PermuteR48(state);
-					offset = 0;
-				}
+			const size_t DIFF = IntegerTools::Min(Rate, Length);
 
-				pad[offset] = Name[i];
-				++offset;
-			}
-		}
-
-		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
-
-		if (Customization.size() != 0)
-		{
-			for (i = 0; i < Customization.size(); ++i)
-			{
-				if (offset == Rate)
-				{
-					FastAbsorb(pad, 0, Rate, state);
-					PermuteR48(state);
-					offset = 0;
-				}
-
-				pad[offset] = Customization[i];
-				++offset;
-			}
-		}
-
-		MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
-		offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
-		MemoryTools::XOR(pad, 0, state, 0, offset);
-
-		Keccak::PermuteR48(state);
-		Keccak::AbsorbR48(Key, 0, Key.size(), Rate, Keccak::KECCAK_CSHAKE_DOMAIN, state);
-
-		while (OutLength != 0)
-		{
-			const size_t DIFF = IntegerTools::Min(Rate, OutLength);
-
-			Keccak::PermuteR48(state);
-			MemoryTools::Copy(state, 0, Output, OutOffset, DIFF);
-			OutOffset += DIFF;
-			OutLength -= DIFF;
+			PermuteR48P1600U(state);
+			MemoryTools::Copy(state, 0, Output, Offset, DIFF);
+			Offset += DIFF;
+			Length -= DIFF;
 		}
 	}
 
@@ -487,23 +526,193 @@ public:
 	}
 
 	/// <summary>
-	/// The Keccak squeeze function; can use the 24, or 48 round version of the permutation if CEX_SHAKE_STRONG is defined.
-	/// <para>Extracts blocks of state to an output unsigned 8-bit vector or array.</para>
+	/// A compact (stateless) form of the message authentication code generator (KMAC), using the standard 24 round permutation.
+	/// <para>Process a key, customization string, and a message, and output a keyed-hash output array.</para>
 	/// </summary>
 	/// 
-	/// <param name="State">The permutations uint64 state array</param>
-	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
-	/// <param name="OutOffset">The starting offset withing the output array</param>
-	/// <param name="Blocks">The number of blocks to extract</param>
-	/// <param name="Rate">The Keccak extraction rate</param>
+	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
+	/// <param name="Customization">The customization string; can be used to create a custom implementation of KMAC</param>
+	/// <param name="Message">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Offset">The starting offseet within the message byte array</param>
+	/// <param name="Length">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; returns a hash the size of the KMAC mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
+	/// <param name="Rate">The block input rate of permutation calls; KMAC128=168, KMAC256=136, KMAC512=72</param>
 	template<typename ArrayU8>
-	static void Squeeze(std::array<ulong, KECCAK_STATE_SIZE> &State, ArrayU8 &Output, size_t OutOffset, size_t Blocks, size_t Rate)
+	static void MACR24P1600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Message, size_t Offset, size_t Length, ArrayU8 &Output, size_t Rate)
 	{
-#if defined(CEX_SHAKE_STRONG)
-		SqueezeR48(State, Output, OutOffset, Blocks, Rate);
-#else
-		SqueezeR24(State, Output, OutOffset, Blocks, Rate);
-#endif
+		const size_t BUFLEN = Keccak::KECCAK_STATE_SIZE * sizeof(ulong);
+		const std::vector<byte> KNAME{ 0x4B, 0x4D, 0x41, 0x43 };
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		std::array<byte, BUFLEN> pad = { 0 };
+		std::vector<byte> buf(sizeof(size_t) + 1);
+		ulong poft;
+		size_t blen;
+		size_t i;
+
+		// add the customization
+		CustomizeR24(Customization, KNAME, Rate, state);
+		
+		// absorb the key
+		poft = LeftEncode(pad, 0, static_cast<ulong>(Rate));
+		poft += LeftEncode(pad, poft, static_cast<ulong>(Key.size()) * sizeof(ulong));
+
+		if (Key.size() != 0)
+		{
+			for (i = 0; i < Key.size(); ++i)
+			{
+				if (poft == Rate)
+				{
+					FastAbsorb(pad, 0, Rate, state);
+					PermuteR24P1600U(state);
+					poft = 0;
+				}
+
+				pad[poft] = Key[i];
+				++poft;
+			}
+		}
+
+		MemoryTools::Clear(pad, poft, BUFLEN - poft);
+		poft = (poft % sizeof(ulong) == 0) ? poft : poft + (sizeof(ulong) - (poft % sizeof(ulong)));
+
+		for (i = 0; i < poft; i += 8)
+		{
+			state[i / sizeof(ulong)] ^= IntegerTools::LeBytesTo64(pad, i);
+		}
+
+		PermuteR24P1600U(state);
+
+		// loop through the message, absorbing it into the state
+		while (Length >= Rate)
+		{
+			FastAbsorb(Message, Offset, Rate, state);
+			PermuteR24P1600U(state);
+			Length -= Rate;
+			Offset += Rate;
+		}
+
+		if (Length != 0)
+		{
+			MemoryTools::Copy(Message, Offset, pad, 0, Length);
+			MemoryTools::Clear(pad, Length, pad.size() - Length);
+		}
+
+		// add the remaining message bytes to the state and finalize
+
+		blen = Keccak::RightEncode(pad, Length, static_cast<ulong>(Output.size()) * sizeof(ulong));
+
+		Length += blen;
+		pad[Length] = Keccak::KECCAK_KMAC_DOMAIN;
+		pad[Rate - 1] |= 128;
+		Keccak::FastAbsorb(pad, 0, Rate, state);
+
+		// output the hash
+		Length = Output.size();
+		Offset = 0;
+
+		while (Length != 0)
+		{
+			const size_t DIFF = IntegerTools::Min(Rate, Length);
+			PermuteR24P1600U(state);
+			MemoryTools::Copy(state, 0, Output, Offset, DIFF);
+			Offset += DIFF;
+			Length -= DIFF;
+		}
+	}
+
+	/// <summary>
+	/// A compact (stateless) form of the message authentication code generator (KMAC), using the extended 48 round permutation.
+	/// <para>Process a key, customization string, and a message, and output a keyed-hash output array.</para>
+	/// </summary>
+	/// 
+	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
+	/// <param name="Customization">The customization string; can be used to create a custom implementation of KMAC</param>
+	/// <param name="Message">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Offset">The starting offseet within the message byte array</param>
+	/// <param name="Length">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; returns a hash the size of the KMAC mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
+	/// <param name="Rate">The block input rate of permutation calls; KMAC128=168, KMAC256=136, KMAC512=72</param>
+	template<typename ArrayU8>
+	static void MACR48P1600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Message, size_t Offset, size_t Length, ArrayU8 &Output, size_t Rate)
+	{
+		const size_t BUFLEN = Keccak::KECCAK_STATE_SIZE * sizeof(ulong);
+		const std::vector<byte> KNAME{ 0x4B, 0x4D, 0x41, 0x43 };
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		std::array<byte, BUFLEN> pad = { 0 };
+		std::vector<byte> buf(sizeof(size_t) + 1);
+		ulong poft;
+		size_t blen;
+		size_t i;
+
+		// add the customization
+		CustomizeR48(Customization, KNAME, Rate, state);
+
+		// absorb the key
+		poft = LeftEncode(pad, 0, static_cast<ulong>(Rate));
+		poft += LeftEncode(pad, poft, static_cast<ulong>(Key.size()) * sizeof(ulong));
+
+		if (Key.size() != 0)
+		{
+			for (i = 0; i < Key.size(); ++i)
+			{
+				if (poft == Rate)
+				{
+					FastAbsorb(pad, 0, Rate, state);
+					PermuteR48P1600U(state);
+					poft = 0;
+				}
+
+				pad[poft] = Key[i];
+				++poft;
+			}
+		}
+
+		MemoryTools::Clear(pad, poft, BUFLEN - poft);
+		poft = (poft % sizeof(ulong) == 0) ? poft : poft + (sizeof(ulong) - (poft % sizeof(ulong)));
+
+		for (i = 0; i < poft; i += 8)
+		{
+			state[i / sizeof(ulong)] ^= IntegerTools::LeBytesTo64(pad, i);
+		}
+
+		PermuteR48P1600U(state);
+
+		// loop through the message, absorbing it into the state
+		while (Length >= Rate)
+		{
+			FastAbsorb(Message, Offset, Rate, state);
+			PermuteR48P1600U(state);
+			Length -= Rate;
+			Offset += Rate;
+		}
+
+		if (Length != 0)
+		{
+			MemoryTools::Copy(Message, Offset, pad, 0, Length);
+			MemoryTools::Clear(pad, Length, pad.size() - Length);
+		}
+
+		// add the remaining message bytes to the state and finalize
+
+		blen = Keccak::RightEncode(pad, Length, static_cast<ulong>(Output.size()) * sizeof(ulong));
+
+		Length += blen;
+		pad[Length] = Keccak::KECCAK_KMAC_DOMAIN;
+		pad[Rate - 1] |= 128;
+		Keccak::FastAbsorb(pad, 0, Rate, state);
+
+		// output the hash
+		Length = Output.size();
+		Offset = 0;
+
+		while (Length != 0)
+		{
+			const size_t DIFF = IntegerTools::Min(Rate, Length);
+			PermuteR48P1600U(state);
+			MemoryTools::Copy(state, 0, Output, Offset, DIFF);
+			Offset += DIFF;
+			Length -= DIFF;
+		}
 	}
 
 	/// <summary>
@@ -520,11 +729,7 @@ public:
 	{
 		while (Blocks > 0)
 		{
-#if defined(CEX_DIGEST_COMPACT)
-			Digest::Keccak::PermuteR24P1600C(State);
-#else
-			Digest::Keccak::PermuteR24P1600U(State);
-#endif
+			Keccak::PermuteR24P1600U(State);
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
@@ -555,11 +760,7 @@ public:
 	{
 		while (Blocks > 0)
 		{
-#if defined(CEX_DIGEST_COMPACT)
-			Digest::Keccak::PermuteR48P1600C(State);
-#else
 			Digest::Keccak::PermuteR48P1600U(State);
-#endif
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
@@ -589,7 +790,7 @@ public:
 	/// <param name="OutLength">The number of output bytes to produce</param>
 	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	template<typename ArrayU8A, typename ArrayU8B>
-	static void XOFP1600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	static void XOFR24P1600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 	{
 		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
@@ -599,7 +800,7 @@ public:
 		while (InLength >= Rate)
 		{
 			FastAbsorb(Input, InOffset, Rate, state);
-			Permute(state);
+			PermuteR24P1600U(state);
 			InLength -= Rate;
 			InOffset += Rate;
 		}
@@ -619,13 +820,13 @@ public:
 #endif
 
 		blkcnt = OutLength / Rate;
-		Squeeze(state, Output, OutOffset, blkcnt, Rate);
+		SqueezeR24(state, Output, OutOffset, blkcnt, Rate);
 		OutOffset += blkcnt * Rate;
 		OutLength -= blkcnt * Rate;
 
 		if (OutLength != 0)
 		{
-			Permute(state);
+			PermuteR24P1600U(state);
 
 			const size_t FNLBLK = (OutLength % sizeof(ulong) == 0) ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
 
@@ -651,7 +852,7 @@ public:
 	/// <param name="OutLength">The number of output bytes to produce</param>
 	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	template<typename ArrayU8A, typename ArrayU8B>
-	static void XOFPR481600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	static void XOFR48P1600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
 	{
 		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
@@ -661,7 +862,7 @@ public:
 		while (InLength >= Rate)
 		{
 			FastAbsorb(Input, InOffset, Rate, state);
-			Keccak::PermuteR48(state);
+			Keccak::PermuteR48P1600U(state);
 			InLength -= Rate;
 			InOffset += Rate;
 		}
@@ -687,36 +888,18 @@ public:
 
 		if (OutLength != 0)
 		{
-			Keccak::PermuteR48(state);
+			Keccak::PermuteR48P1600U(state);
 
 			const size_t FNLBLK = (OutLength % sizeof(ulong) == 0) ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
 
-			for (i = 0; i < FNLBLK; i++)
+			for (i = 0; i < FNLBLK; ++i)
 			{
-				IntegerTools::Le64ToBytes(state[i], msg, (8 * i));
+				IntegerTools::Le64ToBytes(state[i], msg, (sizeof(ulong) * i));
 			}
 
 			MemoryTools::Copy(msg, 0, Output, OutOffset, OutLength);
 		}
 	}
-
-	/// <summary>
-	/// The Keccak permutation function; uses the 24 round implementation, or the extended 48 round implementation of the permutation if CEX_SHAKE_STRONG is defined.
-	/// <para>This function has been optimized for a small memory consumption.
-	/// To enable the compact form of this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations uint64 state array</param>
-	static void Permute(std::array<ulong, KECCAK_STATE_SIZE> &State);
-
-	/// <summary>
-	/// The Keccak permutation function; uses the 48 round extended implementation of the permutation.
-	/// <para>This function has been optimized for constant time and a small memory consumption.
-	/// To enable the compact form of this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR48(std::array<ulong, KECCAK_STATE_SIZE> &State);
 
 	/// <summary>
 	/// The compact form of the 24 round (standard) SHA3 permutation function.
@@ -794,6 +977,40 @@ public:
 
 #endif
 
+	/// <summary>
+	/// Keccak common function: Right encode a value onto an array
+	/// </summary>
+	/// 
+	/// <param name="Output">The output integer array</param>
+	/// <param name="Offset">The output array starting offest</param>
+	/// <param name="Value">The value to remove</param>
+	/// 
+	/// <returns>The number of encoded bits</returns>
+	template<typename Array>
+	static ulong RightEncode(Array &Output, size_t Offset, ulong Value)
+	{
+		ulong i;
+		ulong n;
+		ulong v;
+
+		for (v = Value, n = 0; v && (n < sizeof(ulong)); ++n, v >>= 8)
+		{
+		}
+
+		if (n == 0)
+		{
+			n = 1;
+		}
+
+		for (i = 1; i <= n; ++i)
+		{
+			Output[Offset + (i - 1)] = static_cast<uint8_t>(Value >> (8 * (n - i)));
+		}
+
+		Output[Offset + n] = static_cast<uint8_t>(n);
+
+		return n + 1;
+	}
 };
 
 NAMESPACE_DIGESTEND

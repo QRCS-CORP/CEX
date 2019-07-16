@@ -362,6 +362,7 @@
     <ClInclude Include="..\..\Test\TestUtils.h" />
     <ClInclude Include="..\..\Test\ThreefishTest.h" />
     <ClInclude Include="..\..\Test\UtilityTest.h" />
+    <ClInclude Include="..\..\Test\XMSSTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\ACPTest.cpp" />
@@ -427,6 +428,7 @@
     <ClCompile Include="..\..\Test\TestUtils.cpp" />
     <ClCompile Include="..\..\Test\ThreefishTest.cpp" />
     <ClCompile Include="..\..\Test\UtilityTest.cpp" />
+    <ClCompile Include="..\..\Test\XMSSTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Static\CEXEngine.vcxproj">

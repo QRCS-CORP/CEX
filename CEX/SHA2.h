@@ -20,6 +20,8 @@
 #define CEX_SHA2_H
 
 #include "CexDomain.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 
 #if defined(__AVX2__)
 #	include "UInt256.h"
@@ -31,6 +33,9 @@
 #endif
 
 NAMESPACE_DIGEST
+
+using Utility::IntegerTools;
+using Utility::MemoryTools;
 
 #if defined(__AVX2__)
 	using Numeric::UInt256;
@@ -56,8 +61,8 @@ class SHA2
 {
 private:
 
-	static const std::vector<uint> K256;
-	static const std::vector<ulong> K512;
+	static const std::vector<uint> SHA256_RC64;
+	static const std::vector<ulong> SHA512_RC80;
 
 	template<typename T>
 	static void Round256W(T &A, T &B, T &C, T &D, T &E, T &F, T &G, T &H, T &M, T &P)
@@ -104,12 +109,150 @@ private:
 
 public:
 
+	static const std::vector<uint> SHA256State;
+
+	static const std::vector<ulong> SHA512State;
+
 	static const size_t SHA256_DIGEST_SIZE = 32;
 	static const size_t SHA512_DIGEST_SIZE = 64;
 	static const size_t SHA256_RATE_SIZE = 64;
 	static const size_t SHA512_RATE_SIZE = 128;
 
 	//~~~SHA2-256~~~//
+
+	/// <summary>
+	/// A compact (stateless) form of the SHA2-256 message digest function; processes a message, and return the hash in the output array.
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the input byte array</param>
+	/// <param name="InLength">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; contains the output hash of 32 bytes</param>
+	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	template<typename ArrayU8>
+	static void Compute256(const ArrayU8 &Input, size_t InOffset, size_t InLength, ArrayU8 &Output, size_t OutOffset)
+	{
+		std::array<uint, 8> state = { 0 };
+		std::vector<byte> buf(SHA256_RATE_SIZE);
+		ulong bitlen;
+		ulong t;
+
+		t = 0;
+		MemoryTools::Copy(SHA2::SHA256State, 0, state, 0, state.size() * sizeof(uint));
+
+		while (InLength >= SHA256_RATE_SIZE)
+		{
+			PermuteR64P512U(Input, InOffset, state);
+			InLength -= SHA256_RATE_SIZE;
+			InOffset += SHA256_RATE_SIZE;
+			t += SHA256_RATE_SIZE;
+		}
+
+		t += InLength;
+		bitlen = (t << 3);
+		MemoryTools::Copy(Input, InOffset, buf, 0, InLength);
+
+		buf[InLength] = 128;
+		++InLength;
+
+		if (InLength > 56)
+		{
+			PermuteR64P512U(buf, 0, state);
+			MemoryTools::Clear(buf, 0, SHA2::SHA256_RATE_SIZE);
+		}
+
+		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
+		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen)), buf, 60);
+
+		PermuteR64P512U(buf, 0, state);
+
+		// copy as big endian aligned to output code
+		IntegerTools::BeUL256ToBlock(state, 0, Output, OutOffset);
+	}
+
+	/// <summary>
+	/// A compact (stateless) form of the SHA2-256 message authentication code generator (HMAC-256).
+	/// <para>Process a key, and a message, and return the hash in the output array.</para>
+	/// </summary>
+	/// 
+	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
+	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the message byte array</param>
+	/// <param name="InLength">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; contains the output mac code of 32 bytes</param>
+	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	template<typename ArrayU8>
+	static void MACR64P512(const ArrayU8 &Key, const ArrayU8 &Input, size_t InOffset, size_t InLength, ArrayU8 &Output, size_t OutOffset)
+	{
+		CEXASSERT(Key.size() <= SHA256_RATE_SIZE, "The Mac key array must be a maximum of 64 bytes in length");
+
+		const byte IPAD = 0x36;
+		const byte OPAD = 0x5C;
+		std::vector<byte> buf(SHA256_RATE_SIZE);
+		std::vector<byte> ipad(SHA256_RATE_SIZE);
+		std::vector<byte> opad(SHA256_RATE_SIZE);
+		std::array<uint, 8> state = { 0 };
+		ulong bitlen;
+		ulong t;
+
+		// copy in the key and xor the hamming weights into input and output pads
+		MemoryTools::Copy(Key, 0, ipad, 0, Key.size());
+		MemoryTools::Copy(ipad, 0, opad, 0, ipad.size());
+		MemoryTools::XorPad(ipad, IPAD);
+		MemoryTools::XorPad(opad, OPAD);
+
+		// initialize the sha256 state
+		MemoryTools::Copy(SHA2::SHA256State, 0, state, 0, state.size() * sizeof(uint));
+
+		// permute the input pad
+		PermuteR64P512U(ipad, 0, state);
+		t = SHA256_RATE_SIZE;
+
+		// process the message
+		while (InLength >= SHA256_RATE_SIZE)
+		{
+			PermuteR64P512U(Input, InOffset, state);
+			InLength -= SHA256_RATE_SIZE;
+			InOffset += SHA256_RATE_SIZE;
+			t += SHA256_RATE_SIZE;
+		}
+
+		// finalize the message data
+		t += InLength;
+		bitlen = (t << 3);
+		MemoryTools::Copy(Input, InOffset, buf, 0, InLength);
+		buf[InLength] = 128;
+		++InLength;
+
+		if (InLength > 56)
+		{
+			PermuteR64P512U(buf, 0, state);
+			MemoryTools::Clear(buf, 0, SHA2::SHA256_RATE_SIZE);
+		}
+
+		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
+		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen)), buf, 60);
+		PermuteR64P512U(buf, 0, state);
+
+		// store the code in the buffer
+		IntegerTools::BeUL256ToBlock(state, 0, buf, 0);
+		MemoryTools::Clear(buf, SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE);
+		// reset the sha2 state
+		MemoryTools::Copy(SHA2::SHA256State, 0, state, 0, state.size() * sizeof(uint));
+
+		// permute the output pad
+		PermuteR64P512U(opad, 0, state);
+		// finalize the buffer
+		t = SHA256_RATE_SIZE + SHA256_DIGEST_SIZE;
+		bitlen = (t << 3);
+		buf[SHA256_DIGEST_SIZE] = 128;
+		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
+		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen)), buf, 60);
+		PermuteR64P512U(buf, 0, state);
+
+		// copy as big endian aligned to output code
+		IntegerTools::BeUL256ToBlock(state, 0, Output, OutOffset);
+	}
 
 	/// <summary>
 	/// The compact form of the SHA2-256 permutation function.
@@ -172,6 +315,139 @@ public:
 #endif
 
 	//~~~SHA2-512~~~//
+
+	/// <summary>
+	/// A compact (stateless) form of the SHA2-512 message digest function; processes a message, and return the hash in the output array.
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the input byte array</param>
+	/// <param name="InLength">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; containst the output hash of 64 bytes</param>
+	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	template<typename ArrayU8>
+	static void Compute512(const ArrayU8 &Input, size_t InOffset, size_t InLength, ArrayU8 &Output, size_t OutOffset)
+	{
+		std::array<ulong, 8> state = { 0 };
+		std::vector<byte> buf(SHA512_RATE_SIZE);
+		ulong bitlen;
+		std::array<ulong, 2> t = { 0 };
+
+		MemoryTools::Copy(SHA2::SHA512State, 0, state, 0, state.size() * sizeof(ulong));
+
+		while (InLength >= SHA512_RATE_SIZE)
+		{
+			PermuteR80P1024U(Input, InOffset, state);
+			InLength -= SHA512_RATE_SIZE;
+			InOffset += SHA512_RATE_SIZE;
+			t[0] += SHA512_RATE_SIZE;
+		}
+
+		t[0] += InLength;
+		bitlen = (t[0] << 3);
+		MemoryTools::Copy(Input, InOffset, buf, 0, InLength);
+
+		buf[InLength] = 128;
+		++InLength;
+
+		if (InLength > 112)
+		{
+			PermuteR80P1024U(buf, 0, state);
+			MemoryTools::Clear(buf, 0, SHA2::SHA512_RATE_SIZE);
+		}
+
+		IntegerTools::Be64ToBytes(t[1], buf, 112);
+		IntegerTools::Be64ToBytes(bitlen, buf, 120);
+
+		PermuteR80P1024U(buf, 0, state);
+
+		// copy as big endian aligned to output code
+		IntegerTools::BeULL512ToBlock(state, 0, Output, OutOffset);
+	}
+
+	/// <summary>
+	/// A compact (stateless) form of the HMAC SHA2-512 message authentication code generator (HMAC-512).
+	/// <para>Process a key, and a message, and return the hash in the output array.</para>
+	/// </summary>
+	/// 
+	/// <param name="Key">The input byte key array, can be either a standard array or vector</param>
+	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the message byte array</param>
+	/// <param name="InLength">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; contains the output mac code of 64 bytes</param>
+	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	template<typename ArrayU8>
+	static void MACR80P1024(const ArrayU8 &Key, const ArrayU8 &Input, size_t InOffset, size_t InLength, ArrayU8 &Output, size_t OutOffset)
+	{
+		CEXASSERT(Key.size() <= SHA512_RATE_SIZE, "The Mac key array must be a maximum of 128 bytes in length");
+
+		const byte IPAD = 0x36;
+		const byte OPAD = 0x5C;
+		std::vector<byte> buf(SHA512_RATE_SIZE);
+		std::vector<byte> ipad(SHA512_RATE_SIZE);
+		std::vector<byte> opad(SHA512_RATE_SIZE);
+		std::array<ulong, 8> state = { 0 };
+		std::array<ulong, 2> t = { 0 };
+		ulong bitlen;
+
+		// copy in the key and xor the hamming weights into input and output pads
+		MemoryTools::Copy(Key, 0, ipad, 0, Key.size());
+		MemoryTools::Copy(ipad, 0, opad, 0, ipad.size());
+		MemoryTools::XorPad(ipad, IPAD);
+		MemoryTools::XorPad(opad, OPAD);
+
+		// initialize the sha256 state
+		MemoryTools::Copy(SHA2::SHA512State, 0, state, 0, state.size() * sizeof(ulong));
+
+		// permute the input pad
+		PermuteR80P1024U(ipad, 0, state);
+		t[0] = SHA512_RATE_SIZE;
+
+		// process the message
+		while (InLength >= SHA512_RATE_SIZE)
+		{
+			PermuteR80P1024U(Input, InOffset, state);
+			InLength -= SHA512_RATE_SIZE;
+			InOffset += SHA512_RATE_SIZE;
+			t[0] += SHA512_RATE_SIZE;
+		}
+
+		// finalize the message data
+		t[0] += InLength;
+		bitlen = (t[0] << 3);
+		MemoryTools::Copy(Input, InOffset, buf, 0, InLength);
+		buf[InLength] = 128;
+		++InLength;
+
+		if (InLength > 112)
+		{
+			PermuteR80P1024U(buf, 0, state);
+			MemoryTools::Clear(buf, 0, SHA2::SHA512_RATE_SIZE);
+		}
+
+		IntegerTools::Be64ToBytes(t[1], buf, 112);
+		IntegerTools::Be64ToBytes(bitlen, buf, 120);
+		PermuteR80P1024U(buf, 0, state);
+
+		// store the code in the buffer
+		IntegerTools::BeULL512ToBlock(state, 0, buf, 0);
+		MemoryTools::Clear(buf, SHA512_DIGEST_SIZE, SHA512_DIGEST_SIZE);
+		// reset the sha2 state
+		MemoryTools::Copy(SHA2::SHA512State, 0, state, 0, state.size() * sizeof(ulong));
+
+		// permute the output pad
+		PermuteR80P1024U(opad, 0, state);
+		// finalize the buffer
+		t[0] = SHA512_RATE_SIZE + SHA512_DIGEST_SIZE;
+		bitlen = (t[0] << 3);
+		buf[SHA512_DIGEST_SIZE] = 128;
+		IntegerTools::Be64ToBytes(t[1], buf, 112);
+		IntegerTools::Be64ToBytes(bitlen, buf, 120);
+		PermuteR80P1024U(buf, 0, state);
+
+		// copy as big endian aligned to output code
+		IntegerTools::BeULL512ToBlock(state, 0, Output, OutOffset);
+	}
 
 	/// <summary>
 	/// The compact form of the SHA2-512 permutation function.

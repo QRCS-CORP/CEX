@@ -2,7 +2,7 @@
 #define CEX_DILITHIUMPARAMETERS_H
 
 #include "CexDomain.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 
 NAMESPACE_ENUMERATION
 
@@ -18,15 +18,15 @@ enum class DilithiumParameters : byte
 	/// <summary>
 	/// The S1 parameters; (Medium Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS1N256Q8380417 = static_cast<byte>(AsymmetricTransforms::DLMS1N256Q8380417),
+	DLMS1N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLMS1N256Q8380417),
 	/// <summary>
 	/// The S2 parameters; (High Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS2N256Q8380417 = static_cast<byte>(AsymmetricTransforms::DLMS2N256Q8380417),
+	DLMS2N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLMS2N256Q8380417),
 	/// <summary>
 	/// The S3 parameters; (Highest Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS3N256Q8380417 = static_cast<byte>(AsymmetricTransforms::DLMS3N256Q8380417),
+	DLMS3N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLMS3N256Q8380417),
 };
 
 class DilithiumParameterConvert

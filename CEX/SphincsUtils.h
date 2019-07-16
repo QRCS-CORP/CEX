@@ -20,12 +20,18 @@
 #define CEX_SPHINCSUTILS_H
 
 #include "CexDomain.h"
-
-NAMESPACE_SPHINCS
+#include "Keccak.h"
+#include "MemoryTools.h"
+#include <functional>
 
 /// 
 /// internal
 /// 
+
+NAMESPACE_SPHINCS
+
+using Digest::Keccak;
+using Utility::MemoryTools;
 
 /// <summary>
 // An internal Sphincs+ utilities class
@@ -33,6 +39,8 @@ NAMESPACE_SPHINCS
 class SphincsUtils
 {
 private:
+
+	static const size_t SPX_ADDR_BYTES = 32;
 
 public:
 
@@ -103,7 +111,23 @@ public:
 
 	static ulong BytesToUll(const std::vector<byte> &Input, size_t Offset, size_t Length);
 
+	static void PrfAddress(std::vector<byte> &Output, size_t Offset, const std::vector<byte> &Key, const std::array<uint, 8> &Address, size_t N);
+
+	static void THash(std::vector<byte> &Output, size_t OutOffset, const std::vector<byte> &Input, size_t InOffset, const size_t InputBlocks,
+		const std::vector<byte> &PkSeed, std::array<uint, 8> &Address, std::vector<byte> &Buffer, std::vector<byte> &Mask, size_t N);
+
+	static void TreeHash(std::vector<byte> &Root, size_t RootOffset, std::vector<byte> &Authpath, size_t AuthOffset, const std::vector<byte> &SkSeed, const std::vector<byte> &PkSeed,
+		uint LeafIndex, uint IndexOffset, uint TreeHeight, std::array<uint, 8> &TreeAddress, std::vector<byte> &Stack, std::vector<uint> &Heights, size_t N,
+		std::function<void(std::vector<byte> &,
+			size_t,
+			const std::vector<byte> &,
+			const std::vector<byte> &,
+			uint, std::array<uint, 8> &,
+			size_t)> &LeafGen);
+
 	static void UllToBytes(std::vector<byte> &Output, size_t Offset, ulong Value, size_t Length);
+
+	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 };
 
 NAMESPACE_SPHINCSEND

@@ -36,7 +36,7 @@ public:
 	SecureVector<byte> Salt;
 	AsymmetricPrimitives Primitive;
 	AsymmetricKeyTypes KeyClass;
-	AsymmetricTransforms Parameters;
+	AsymmetricParameters Parameters;
 	SecurityPolicy Policy;
 
 	AsymmetricSecureKeyState()
@@ -44,13 +44,13 @@ public:
 		Polynomial(0),
 		Salt(0),
 		KeyClass(AsymmetricKeyTypes::None),
-		Parameters(AsymmetricTransforms::None),
+		Parameters(AsymmetricParameters::None),
 		Policy(SecurityPolicy::None),
 		Primitive(AsymmetricPrimitives::None)
 	{
 	}
 
-	AsymmetricSecureKeyState(const std::vector<byte> &Coefficients, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType, const std::vector<byte> &KeySalt, SecurityPolicy PolicyType)
+	AsymmetricSecureKeyState(const std::vector<byte> &Coefficients, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType, const std::vector<byte> &KeySalt, SecurityPolicy PolicyType)
 		:
 		Polynomial(Lock(Coefficients)),
 		Salt(Lock(KeySalt)),
@@ -61,7 +61,7 @@ public:
 	{
 	}
 
-	AsymmetricSecureKeyState(const SecureVector<byte> &Coefficients, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms ParameterType, const SecureVector<byte> &KeySalt, SecurityPolicy PolicyType)
+	AsymmetricSecureKeyState(const SecureVector<byte> &Coefficients, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType, const SecureVector<byte> &KeySalt, SecurityPolicy PolicyType)
 		:
 		Polynomial(Coefficients),
 		Salt(KeySalt),
@@ -82,7 +82,7 @@ public:
 		Clear(Polynomial);
 		Clear(Salt);
 		KeyClass = AsymmetricKeyTypes::None;
-		Parameters = AsymmetricTransforms::None;
+		Parameters = AsymmetricParameters::None;
 		Policy = SecurityPolicy::None;
 		Primitive = AsymmetricPrimitives::None;
 	}
@@ -90,18 +90,18 @@ public:
 
 //~~~Constructors~~~//
 
-AsymmetricSecureKey::AsymmetricSecureKey(const std::vector<byte> &Polynomial, const std::vector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms Parameters, SecurityPolicy PolicyType)
+AsymmetricSecureKey::AsymmetricSecureKey(const std::vector<byte> &Polynomial, const std::vector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType)
 	:
-	m_secureState(Polynomial.size() != 0 && KeyClass != AsymmetricKeyTypes::None && PrimitiveType != AsymmetricPrimitives::None && Parameters != AsymmetricTransforms::None && PolicyType != SecurityPolicy::None ?
+	m_secureState(Polynomial.size() != 0 && KeyClass != AsymmetricKeyTypes::None && PrimitiveType != AsymmetricPrimitives::None && Parameters != AsymmetricParameters::None && PolicyType != SecurityPolicy::None ?
 		new AsymmetricSecureKeyState(Polynomial, PrimitiveType, KeyClass, Parameters, KeySalt, PolicyType) :
 		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The parameters are invalid!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
 }
 
-AsymmetricSecureKey::AsymmetricSecureKey(const SecureVector<byte> &Polynomial, const SecureVector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms Parameters, SecurityPolicy PolicyType)
+AsymmetricSecureKey::AsymmetricSecureKey(const SecureVector<byte> &Polynomial, const SecureVector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType)
 	:
-	m_secureState(Polynomial.size() != 0 && KeyClass != AsymmetricKeyTypes::None && PrimitiveType != AsymmetricPrimitives::None && Parameters != AsymmetricTransforms::None && PolicyType != SecurityPolicy::None ?
+	m_secureState(Polynomial.size() != 0 && KeyClass != AsymmetricKeyTypes::None && PrimitiveType != AsymmetricPrimitives::None && Parameters != AsymmetricParameters::None && PolicyType != SecurityPolicy::None ?
 		new AsymmetricSecureKeyState(Polynomial, PrimitiveType, KeyClass, Parameters, KeySalt, PolicyType) :
 		throw CryptoAsymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The parameters are invalid!"), ErrorCodes::InvalidParam))
 {
@@ -125,7 +125,7 @@ const AsymmetricKeyTypes AsymmetricSecureKey::KeyClass()
 	return m_secureState->KeyClass;
 }
 
-const AsymmetricTransforms AsymmetricSecureKey::Parameters()
+const AsymmetricParameters AsymmetricSecureKey::Parameters()
 {
 	return m_secureState->Parameters;
 }

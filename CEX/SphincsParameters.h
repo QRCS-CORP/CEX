@@ -2,7 +2,7 @@
 #define CEX_SPHINCSPARAMETERS_H
 
 #include "CexDomain.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 
 NAMESPACE_ENUMERATION
 
@@ -18,15 +18,15 @@ enum class SphincsParameters : byte
 	/// <summary>
 	/// The S1 parameters; (Medium Security) The Sphincs SHAKE256, S128 parameter set
 	/// </summary>
-	SPXS1S128SHAKE = static_cast<byte>(AsymmetricTransforms::SPXS1S128SHAKE),
+	SPXS1S128SHAKE = static_cast<byte>(AsymmetricParameters::SPXS1S128SHAKE),
 	/// <summary>
 	/// The S2 parameters; (High Security) The Sphincs SHAKE256, S192 parameter set
 	/// </summary>
-	SPXS2S192SHAKE = static_cast<byte>(AsymmetricTransforms::SPXS2S192SHAKE),
+	SPXS2S192SHAKE = static_cast<byte>(AsymmetricParameters::SPXS2S192SHAKE),
 	/// <summary>
 	/// The S3 parameters; (Highest Security) The Sphincs SHAKE256, S256 parameter set
 	/// </summary>
-	SPXS3S256SHAKE = static_cast<byte>(AsymmetricTransforms::SPXS3S256SHAKE)
+	SPXS3S256SHAKE = static_cast<byte>(AsymmetricParameters::SPXS3S256SHAKE)
 };
 
 class SphincsParameterConvert

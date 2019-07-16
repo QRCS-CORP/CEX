@@ -344,8 +344,8 @@ AsymmetricKeyPair* ModuleLWE::Generate()
 
 	MLWEQ3329N256::Generate(pk, sk, m_rndGenerator);
 
-	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(m_mlweState->Parameters));
-	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricTransforms>(m_mlweState->Parameters));
+	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(m_mlweState->Parameters));
+	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPrivateKey, static_cast<AsymmetricParameters>(m_mlweState->Parameters));
 
 	return new AsymmetricKeyPair(ask, apk);
 }
@@ -380,7 +380,7 @@ void ModuleLWE::Initialize(AsymmetricKey* Key)
 void ModuleLWE::CXOF(const std::vector<byte> &Domain, const std::vector<byte> &Key, std::vector<byte> &Secret, size_t Rate)
 {
 	std::vector<byte> tmpn(Name().begin(), Name().end());
-	Keccak::CXOFP1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
+	Keccak::CXOFR24P1600(Key, Domain, tmpn, Secret, 0, Secret.size(), Rate);
 }
 
 NAMESPACE_MODULELWEEND

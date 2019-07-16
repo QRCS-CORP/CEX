@@ -182,7 +182,7 @@ void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	std::vector<byte> tmpv(m_hmacGenerator->DigestSize(), 0);
+	std::vector<byte> tmpv(m_hmacGenerator->DigestSize(), 0x00);
 
 	if (!IsInitialized())
 	{

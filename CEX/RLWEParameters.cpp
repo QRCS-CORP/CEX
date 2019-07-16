@@ -4,7 +4,7 @@ NAMESPACE_ENUMERATION
 
 std::string RLWEParameterConvert::ToName(RLWEParameters Enumeral)
 {
-	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricTransforms>(Enumeral));
+	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricParameters>(Enumeral));
 }
 
 RLWEParameters RLWEParameterConvert::FromName(std::string &Name)

@@ -15,7 +15,7 @@ namespace Test
 	using Asymmetric::AsymmetricKeyPair;
 	using Enumeration::AsymmetricKeyTypes;
 	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricTransforms;
+	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
 	using Utility::IntegerTools;
 	using Asymmetric::Encrypt::MPKC::McEliece;
@@ -425,7 +425,7 @@ namespace Test
 		std::vector<byte> pk1 = kp1->PublicKey()->Polynomial();
 		gen.Generate(pk1, 0, 2048);
 
-		AsymmetricKey* ak1 = new AsymmetricKey(pk1, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MPKCParameters::MPKCS1N4096T62));
+		AsymmetricKey* ak1 = new AsymmetricKey(pk1, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MPKCParameters::MPKCS1N4096T62));
 		cpr1.Initialize(ak1);
 		cpr1.Encapsulate(cpt, ssk1);
 		cpr1.Initialize(kp1->PrivateKey());
@@ -452,7 +452,7 @@ namespace Test
 		std::vector<byte> pk2 = kp2->PublicKey()->Polynomial();
 		gen.Generate(pk2, 0, 4096);
 
-		AsymmetricKey* ak2 = new AsymmetricKey(pk2, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MPKCParameters::MPKCS1N6960T119));
+		AsymmetricKey* ak2 = new AsymmetricKey(pk2, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MPKCParameters::MPKCS1N6960T119));
 		cpr2.Initialize(ak2);
 		cpr2.Encapsulate(cpt, ssk1);
 		cpr2.Initialize(kp2->PrivateKey());
@@ -480,7 +480,7 @@ namespace Test
 		std::vector<byte> pk3 = kp3->PublicKey()->Polynomial();
 		gen.Generate(pk3, 0, 8192);
 
-		AsymmetricKey* ak3 = new AsymmetricKey(pk3, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MPKCParameters::MPKCS1N8192T128));
+		AsymmetricKey* ak3 = new AsymmetricKey(pk3, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MPKCParameters::MPKCS1N8192T128));
 		cpr3.Initialize(ak3);
 		cpr3.Encapsulate(cpt, ssk1);
 		cpr3.Initialize(kp3->PrivateKey());

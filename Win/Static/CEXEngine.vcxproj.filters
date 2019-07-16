@@ -313,6 +313,18 @@
     <Filter Include="Source Files\Asymmetric\Cipher\NTRUPrime\Support">
       <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\XMSS">
+      <UniqueIdentifier>{1dd46494-c00f-4ec1-8445-8381548ffb5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Sign\XMSS">
+      <UniqueIdentifier>{e60a0e96-1933-4c38-8288-e1e37b87872a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Sign\XMSS\Support">
+      <UniqueIdentifier>{47f184f9-eeb6-41b4-adac-3154f3e594cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\XMSS\Support">
+      <UniqueIdentifier>{4118c121-99e0-46eb-9e8d-163048477265}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -687,9 +699,6 @@
     <ClInclude Include="..\..\CEX\ShakeModes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\KeccakState.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Skein.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
@@ -701,9 +710,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\IAsymmetricParameters.h">
       <Filter>Header Files\Asymmetric\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\AsymmetricTransforms.h">
-      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\AsymmetricKeyTypes.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -755,9 +761,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\Sphincs.h">
       <Filter>Header Files\Asymmetric\Sign\Sphincs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SphincsUtils.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SphincsParameters.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -976,6 +979,30 @@
       <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SPXS256SHAKE.h">
+      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\FORS.h">
+      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\WOTS.h">
+      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\XMSS.h">
+      <Filter>Header Files\Asymmetric\Sign\XMSS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\XmssParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsymmetricParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\XmssCore.h">
+      <Filter>Header Files\Asymmetric\Sign\XMSS\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\XmssUtils.h">
+      <Filter>Header Files\Asymmetric\Sign\XMSS\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SphincsUtils.h">
       <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1259,9 +1286,6 @@
     <ClCompile Include="..\..\CEX\Sphincs.cpp">
       <Filter>Source Files\Asymmetric\Sign\Sphincs</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\SphincsUtils.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Dilithium.cpp">
       <Filter>Source Files\Asymmetric\Sign\Dilithium</Filter>
     </ClCompile>
@@ -1329,9 +1353,6 @@
       <Filter>Source Files\Cipher\Stream\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\AeadModes.cpp">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\AsymmetricTransforms.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CipherModes.cpp">
@@ -1503,6 +1524,30 @@
       <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\SPXS256SHAKE.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\FORS.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\WOTS.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\XmssParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\XMSS.cpp">
+      <Filter>Source Files\Asymmetric\Sign\XMSS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\XmssCore.cpp">
+      <Filter>Source Files\Asymmetric\Sign\XMSS\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\XmssUtils.cpp">
+      <Filter>Source Files\Asymmetric\Sign\XMSS\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsUtils.cpp">
       <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClCompile>
   </ItemGroup>

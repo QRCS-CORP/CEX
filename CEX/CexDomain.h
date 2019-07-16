@@ -32,6 +32,8 @@
 #define NAMESPACE_DILITHIUMEND } } } }
 #define NAMESPACE_SPHINCS namespace CEX { namespace Asymmetric { namespace Sign { namespace SPX {
 #define NAMESPACE_SPHINCSEND } } } }
+#define NAMESPACE_XMSS namespace CEX { namespace Asymmetric { namespace Sign { namespace XMSS {
+#define NAMESPACE_XMSSEND } } } }
 
 #define NAMESPACE_CIPHER namespace CEX { namespace Cipher {
 #define NAMESPACE_CIPHEREND } }

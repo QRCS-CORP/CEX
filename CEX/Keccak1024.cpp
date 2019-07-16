@@ -92,13 +92,11 @@ const std::string Keccak1024::Name()
 {
 	std::string name;
 
+	name = DigestConvert::ToName(Enumeral());
+
 	if (m_treeParams.FanOut() > 1)
 	{
-		name = DigestConvert::ToName(Enumeral()) + std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
-	}
-	else
-	{
-		name = DigestConvert::ToName(Enumeral());
+		name += std::string("-P") + IntegerTools::ToString(m_parallelProfile.ParallelMaxDegree());
 	}
 
 	return name;

@@ -6,7 +6,7 @@
 #include "AsymmetricPrimitives.h"
 #include "AsymmetricKey.h"
 #include "AsymmetricKeyTypes.h"
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 #include "IStreamCipher.h"
 #include "SecurityPolicy.h"
 
@@ -14,7 +14,7 @@ NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricPrimitives;
 using Enumeration::AsymmetricKeyTypes;
-using Enumeration::AsymmetricTransforms;
+using Enumeration::AsymmetricParameters;
 using Cipher::Stream::IStreamCipher;
 using Enumeration::SecurityPolicy;
 
@@ -66,7 +66,7 @@ public:
 	/// <param name="PolicyType">The asymmetric keys security policy</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters or an empty polynomial vector are passed</exception>
-	AsymmetricSecureKey(const std::vector<byte> &Polynomial, const std::vector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms Parameters, SecurityPolicy PolicyType);
+	AsymmetricSecureKey(const std::vector<byte> &Polynomial, const std::vector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType);
 
 	/// <summary>
 	/// Initialize this class with an asymmetric secure-vector polynomial and the asymmetric primitives parameter settings
@@ -80,7 +80,7 @@ public:
 	/// <param name="PolicyType">The asymmetric keys security policy</param>
 	///
 	/// <exception cref="CryptoAsymmetricException">Thrown if invalid parameters or an empty polynomial vector are passed</exception>
-	AsymmetricSecureKey(const SecureVector<byte> &Polynomial, const SecureVector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricTransforms Parameters, SecurityPolicy PolicyType);
+	AsymmetricSecureKey(const SecureVector<byte> &Polynomial, const SecureVector<byte> &KeySalt, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters Parameters, SecurityPolicy PolicyType);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -97,7 +97,7 @@ public:
 	/// <summary>
 	/// Read Only: The asymmetric primitives parameter-set enumeration
 	/// </summary>
-	const AsymmetricTransforms Parameters() override;
+	const AsymmetricParameters Parameters() override;
 
 	/// <summary>
 	/// ead Only: The keys asymmetric primitive enumeration type

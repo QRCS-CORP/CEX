@@ -513,7 +513,7 @@ SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP
 </div><div class="memdoc">
 
 <p>Initialize the MAC generator with an ISymmetricKey key container. </p>
-<p>Can accept either the SymmetricKey or SymmetricSecureKey container to load keying material. Uses a key, salt, and info arrays to initialize the MAC.</p>
+<p>Can accept either the SymmetricKey or SymmetricSecureKey container to load keying material. Uses a key, and optional customization and name arrays to initialize the MAC, which align to the Key, Nonce, and Info arrays in the symmetric key structure.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Parameters</td><td>An ISymmetricKey key interface, which can accept either a SymmetricKey or SymmetricSecureKey container</td></tr>

@@ -1,9 +1,11 @@
 #ifndef CEX_CEXCONFIG_H
 #define CEX_CEXCONFIG_H
 
+/* Linting exceptions */
+
 /*lint -e10 */		// bogus missing brace exception caused by namespace macro
 /*lint -e96 */		// masks unmatched brace reported in internal type_traits
-/*lint -e537 */		// unavoidable 'repeated include file' reported because of namespace header
+/*lint -e537 */		// unavoidable 'repeated include file' reported because of namespace header (using include guards)
 /*lint -e686 */		// warns that MS and VS external errors are muted
 /*lint -e766 */		// bogus unused header, informational
 /*lint -e974 */		// 'recursion warning' elective
@@ -477,6 +479,19 @@ typedef unsigned char byte;
 // Settings in this section can be modified		//
 //////////////////////////////////////////////////
 
+// set the master XOF function used by the asymmetric ciphers and signature schemes
+// changing this value will toggle the XOF function used by most asymmetric primitives
+// Note: this will change the output of these asymmetric functions (KAT tests will no longer align)
+
+// the standard Keccak SHAKE function
+#define CEX_XOF_KECCAKR24P1600
+// the extended (double the rounds) Keccak SHAKE function
+//#define CEX_XOF_KECCAKR48P1600
+// the HKDF(HMAC(SHA2-256)) key derivation function
+//#define CEX_XOF_SHA2R64P512
+// the HKDF(HMAC(SHA2-512)) key derivation function
+//#define CEX_XOF_SHA2R80P1024
+
 // enable the legal-key-size exception set on all primitives
 //#define CEX_ENFORCE_LEGALKEY
 
@@ -491,9 +506,6 @@ typedef unsigned char byte;
 
 // toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3
 //#define CEX_KECCAK_STRONG
-
-// toggles to the 48 round implementation of SHAKE in generators, asymmetric ciphers, and signature schemes
-//#define CEX_SHAKE_STRONG
 
 // toggles the compact form for all digest permutations, used for performance and small code-cache cases
 // the digests will use the unrolled (timing-neutral) form of the permutation function if this constant is removed

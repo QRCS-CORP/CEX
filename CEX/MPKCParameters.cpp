@@ -4,7 +4,7 @@ NAMESPACE_ENUMERATION
 
 std::string MPKCParameterConvert::ToName(MPKCParameters Enumeral)
 {
-	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricTransforms>(Enumeral));
+	return AsymmetricTransformConvert::ToName(static_cast<AsymmetricParameters>(Enumeral));
 }
 
 MPKCParameters MPKCParameterConvert::FromName(std::string &Name)

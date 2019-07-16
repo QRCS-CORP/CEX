@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Asymmetric cipher enumeration names
+/// Asymmetric cipher and signature-scheme enumeration names
 /// </summary>
 enum class AsymmetricPrimitives : byte
 {
@@ -37,7 +37,15 @@ enum class AsymmetricPrimitives : byte
 	/// <summary>
 	/// The Sphincs asymmetric signature scheme
 	/// </summary>
-	Sphincs = 6
+	Sphincs = 6,
+	/// <summary>
+	/// The eXtended Merkle Signature Scheme
+	/// </summary>
+	XMSS = 7,
+	/// <summary>
+	/// The eXtended Merkle Signature Scheme Multi-Tree
+	/// </summary>
+	XMSSMT = 8
 };
 
 class AsymmetricPrimitiveConvert

@@ -19,7 +19,7 @@
 #ifndef CEX_DILITHIUM_H
 #define CEX_DILITHIUM_H
 
-#include "AsymmetricTransforms.h"
+#include "AsymmetricParameters.h"
 #include "IAsymmetricSign.h"
 #include "AsymmetricKeyPair.h"
 #include "DilithiumParameters.h"
@@ -88,9 +88,9 @@ using Enumeration::DilithiumParameters;
 /// <list type="bullet">
 /// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); medium security: DLMS1N256Q8380417, high security: DLMS2N256Q8380417, highest security: DLMS2N256Q8380417</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
-/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher; the Public key is used for verification, and use the Private for signing a message.</description></item>
+/// <item><description>The signature schemes operational mode (signing/verifying) is determined by the IAsymmetricKey key-type used to Initialize the cipher; the Public key is used for verification, and use the Private for signing a message.</description></item>
 /// <item><description>Use the Generate function to create a public/private key-pair, and the Sign function to sign a message</description></item>
-/// <item><description>The message-signature is tested using the Verify function, which checks the signature and returns false on authentication failure</description></item>
+/// <item><description>The message-signature is tested using the Verify function, which checks the signature, populates the message array, and returns false on authentication failure</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>

@@ -160,7 +160,7 @@ namespace Test
 		// test the stand-alone XOF api
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[0].size());
-		Keccak::XOFP1600(m_key[0], 0, m_key[0].size(), otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
+		Keccak::XOFR24P1600(m_key[0], 0, m_key[0].size(), otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
 
 		if (otp != m_expected[0])
 		{
@@ -185,7 +185,7 @@ namespace Test
 		// test the SHAKE-256 XOF api
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[5].size());
-		Keccak::XOFP1600(m_key[5], 0, m_key[5].size(), otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
+		Keccak::XOFR24P1600(m_key[5], 0, m_key[5].size(), otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
 
 		if (otp != m_expected[5])
 		{
@@ -210,7 +210,7 @@ namespace Test
 		// test the SHAKE-512 XOF api
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[10].size());
-		Keccak::XOFP1600(m_key[10], 0, m_key[10].size(), otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
+		Keccak::XOFR24P1600(m_key[10], 0, m_key[10].size(), otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
 
 		if (otp != m_expected[10])
 		{
@@ -235,7 +235,7 @@ namespace Test
 		// test the SHAKE-1024 XOF api
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[15].size());
-		Keccak::XOFPR481600(m_key[15], 0, m_key[15].size(), otp, 0, otp.size(), Keccak::KECCAK1024_RATE_SIZE);
+		Keccak::XOFR48P1600(m_key[15], 0, m_key[15].size(), otp, 0, otp.size(), Keccak::KECCAK1024_RATE_SIZE);
 
 		if (otp != m_expected[15])
 		{
@@ -248,7 +248,7 @@ namespace Test
 
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[20].size());
-		Keccak::CXOFP1600(m_key[0], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
+		Keccak::CXOFR24P1600(m_key[0], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK128_RATE_SIZE);
 
 		if (otp != m_expected[20])
 		{
@@ -258,7 +258,7 @@ namespace Test
 		// cSHAKE-256
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[22].size());
-		Keccak::CXOFP1600(m_key[5], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
+		Keccak::CXOFR24P1600(m_key[5], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK256_RATE_SIZE);
 
 		if (otp != m_expected[22])
 		{
@@ -268,7 +268,7 @@ namespace Test
 		// cSHAKE-512
 		MemoryTools::Clear(otp, 0, otp.size());
 		otp.resize(m_expected[24].size());
-		Keccak::CXOFP1600(m_key[10], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
+		Keccak::CXOFR24P1600(m_key[10], m_custom, ZERO, otp, 0, otp.size(), Keccak::KECCAK512_RATE_SIZE);
 
 		if (otp != m_expected[24])
 		{

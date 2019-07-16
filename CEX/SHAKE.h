@@ -250,12 +250,12 @@ public:
 
 	/// <summary>
 	/// Initialize the cSHAKE generator with key, customization, and name standard vectors.
-	/// <para>This method initiatializes cSHAKE using the Customization and Name vectors as the pre-initialization parameters.</para>
+	/// <para>This method initiatializes cSHAKE using the Customization and Information vectors as the pre-initialization parameters.</para>
 	/// </summary>
 	/// 
 	/// <param name="Key">The standard-vector key used to initialize the generator</param>
 	/// <param name="Customization">The customization standard-vector used to create a unique generator output</param>
-	/// <param name="Information">The information customization standard-vector</param>
+	/// <param name="Information">The information (cSHAKE name parameter) standard-vector</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key, customization, or name array is illegaly sized</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information);
@@ -267,7 +267,7 @@ public:
 	/// 
 	/// <param name="Key">The secure-vector key used to initialize the generator</param>
 	/// <param name="Customization">The secure-vector customization used to create a unique generator output</param>
-	/// <param name="Information">The information customization secure-vector</param>
+	/// <param name="Information">The information (cSHAKE name parameter) secure-vector</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if either the key, customization, or name array is illegaly sized</exception>
 	void Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization, const SecureVector<byte> &Information);

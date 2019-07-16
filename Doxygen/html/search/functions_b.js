@@ -1,6 +1,10 @@
 var searchData=
 [
   ['macbase',['MacBase',['../class_mac_base.html#aa58012e7753f6cbcc36e57ed6d6f6908',1,'MacBase::MacBase(const MacBase &amp;)=delete'],['../class_mac_base.html#a3004785eade89ead6822a54fde7b57f7',1,'MacBase::MacBase()=delete'],['../class_mac_base.html#a8f02b551dd4f25f84ab47c93b30c7366',1,'MacBase::MacBase(size_t BlockSize, Macs Enumeral, std::string &amp;Name, std::vector&lt; SymmetricKeySize &gt; &amp;KeySizes, size_t MinimumKey, size_t MinimumSalt, size_t TagSize)']]],
+  ['macr24p1600',['MACR24P1600',['../class_keccak.html#a2d7d4e485782a7bdb3b43e5d37687a49',1,'Keccak']]],
+  ['macr48p1600',['MACR48P1600',['../class_keccak.html#a09fb4a1c13f2298eea9001b4ed1bc7cf',1,'Keccak']]],
+  ['macr64p512',['MACR64P512',['../struct_s_h_a2.html#a4abe1b502dea6a7ff42f4cb595a7edc5',1,'SHA2']]],
+  ['macr80p1024',['MACR80P1024',['../struct_s_h_a2.html#a0d9fb57809de3b79d16cdc15f6975bea',1,'SHA2']]],
   ['macstream',['MacStream',['../class_mac_stream.html#a298c4f9ba4fa26f8b603515530706a82',1,'MacStream::MacStream(const MacStream &amp;)=delete'],['../class_mac_stream.html#ab90551051a9da31608f9db2bb29979bf',1,'MacStream::MacStream()=delete'],['../class_mac_stream.html#a47b97059fa50022a530a02643d40611e',1,'MacStream::MacStream(Macs MacType)'],['../class_mac_stream.html#a3cc2b7e29b8b0684c0c0a42392efda2d',1,'MacStream::MacStream(IMac *Mac)']]],
   ['max',['Max',['../class_integer_tools.html#a013fe0c0864812529ffc86bdff3dc783',1,'IntegerTools']]],
   ['maxdepth',['MaxDepth',['../struct_blake_params.html#a95c88eeff39589ce26100cda1d8dd7dd',1,'BlakeParams']]],

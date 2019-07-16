@@ -14,7 +14,7 @@ namespace Test
 	using Asymmetric::AsymmetricKeyPair;
 	using Enumeration::AsymmetricKeyTypes;
 	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricTransforms;
+	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
 	using Utility::IntegerTools;
 	using Test::NistRng;
@@ -285,7 +285,7 @@ namespace Test
 		// verify the signature
 		if (sig != m_sigexp[0])
 		{
-			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Cipher-text arrays do not match! -SI4"));
+			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Cipher-text arrays do not match! -SI3"));
 		}
 
 		// initialize and verify
@@ -294,7 +294,7 @@ namespace Test
 		// verify and test for expected output
 		if (!sgn1.Verify(sig, msg))
 		{
-			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Failed authentication test! -SI3"));
+			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Failed authentication test! -SI4"));
 		}
 
 		if (msg != m_msgexp[0])
@@ -541,7 +541,7 @@ namespace Test
 		// alter private key
 		std::vector<byte> sk1 = kp->PrivateKey()->Polynomial();
 		gen.Generate(sk1, 0, 16);
-		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(SphincsParameters::SPXS2S192SHAKE));
+		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(SphincsParameters::SPXS2S192SHAKE));
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -567,7 +567,7 @@ namespace Test
 		// alter public key
 		std::vector<byte> pk1 = (kp->PublicKey()->Polynomial());
 		gen.Generate(pk1, 0, 16);
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(SphincsParameters::SPXS2S192SHAKE));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Sphincs, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(SphincsParameters::SPXS2S192SHAKE));
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);

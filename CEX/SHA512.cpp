@@ -15,8 +15,8 @@ class SHA512::SHA512State
 {
 public:
 
-	std::array<ulong, 8> H;
-	std::array<ulong, 2> T;
+	std::array<ulong, 8> H = { 0 };
+	std::array<ulong, 2> T = { 0 };
 
 	SHA512State()
 	{
@@ -43,14 +43,7 @@ public:
 	{
 		T[0] = 0;
 		T[1] = 0;
-		H[0] = 0x6A09E667F3BCC908ULL;
-		H[1] = 0xBB67AE8584CAA73BULL;
-		H[2] = 0x3C6EF372FE94F82BULL;
-		H[3] = 0xA54FF53A5F1D36F1ULL;
-		H[4] = 0x510E527FADE682D1ULL;
-		H[5] = 0x9B05688C2B3E6C1FULL;
-		H[6] = 0x1F83D9ABFB41BD6BULL;
-		H[7] = 0x5BE0CD19137E2179ULL;
+		MemoryTools::Copy(SHA2::SHA512State, 0, H, 0, H.size() * sizeof(ulong));
 	}
 };
 

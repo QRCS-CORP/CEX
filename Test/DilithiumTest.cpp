@@ -14,7 +14,7 @@ namespace Test
 	using Asymmetric::AsymmetricKeyPair;
 	using Enumeration::AsymmetricKeyTypes;
 	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricTransforms;
+	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
 	using Asymmetric::Sign::DLM::Dilithium;
 	using Enumeration::DilithiumParameters;
@@ -538,7 +538,7 @@ namespace Test
 		// serialize and alter private key
 		std::vector<byte> sk1 = kp->PrivateKey()->Polynomial();
 		gen.Generate(sk1, 0, 16);
-		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417));
+		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLMS2N256Q8380417));
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -565,7 +565,7 @@ namespace Test
 		// alter public key
 		std::vector<byte> pk1 = kp->PublicKey()->Polynomial();
 		gen.Generate(pk1, 0, 16);
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricTransforms>(DilithiumParameters::DLMS2N256Q8380417));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLMS2N256Q8380417));
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);

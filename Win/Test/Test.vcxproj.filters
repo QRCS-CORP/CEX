@@ -461,6 +461,9 @@
     <ClInclude Include="..\..\Test\NistRng.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\XMSSTest.h">
+      <Filter>Header Files\Test\Asymmetric\Sign</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -651,6 +654,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\NistRng.cpp">
       <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\XMSSTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Sign</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

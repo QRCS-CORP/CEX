@@ -15,7 +15,7 @@ namespace Test
 	using Asymmetric::AsymmetricKeyPair;
 	using Enumeration::AsymmetricKeyTypes;
 	using Enumeration::AsymmetricPrimitives;
-	using Enumeration::AsymmetricTransforms;
+	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
 	using Utility::IntegerTools;
 	using Enumeration::MLWEParameters;
@@ -544,7 +544,7 @@ namespace Test
 		std::vector<byte> pk1 = kp1->PublicKey()->Polynomial();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MLWEParameters::MLWES1Q3329N256));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MLWEParameters::MLWES1Q3329N256));
 		cpr1.Initialize(pk2);
 		cpr1.Encapsulate(cpt, sec1);
 
@@ -569,7 +569,7 @@ namespace Test
 		std::vector<byte> pk3 = kp2->PublicKey()->Polynomial();
 		pk3[0] += 1;
 		pk3[1] += 1;
-		AsymmetricKey* pk4 = new AsymmetricKey(pk3, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MLWEParameters::MLWES2Q3329N256));
+		AsymmetricKey* pk4 = new AsymmetricKey(pk3, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MLWEParameters::MLWES2Q3329N256));
 		cpr2.Initialize(pk4);
 		cpr2.Encapsulate(cpt, sec1);
 
@@ -594,7 +594,7 @@ namespace Test
 		std::vector<byte> pk5 = kp3->PublicKey()->Polynomial();
 		pk5[0] += 1;
 		pk5[1] += 1;
-		AsymmetricKey* pk6 = new AsymmetricKey(pk5, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricTransforms>(MLWEParameters::MLWES3Q3329N256));
+		AsymmetricKey* pk6 = new AsymmetricKey(pk5, AsymmetricPrimitives::ModuleLWE, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MLWEParameters::MLWES3Q3329N256));
 		cpr3.Initialize(pk6);
 		cpr3.Encapsulate(cpt, sec1);
 

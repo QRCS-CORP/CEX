@@ -357,84 +357,28 @@ void SHAKE::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Lengt
 {
 	CEXASSERT(Input.size() - InOffset >= Length, "The output buffer is too short!");
 
-	std::array<byte, BUFFER_SIZE> msg;
-
-	if (Length != 0)
+	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
-		// sequential loop through blocks
-		while (Length >= State->Rate)
-		{
-			Keccak::FastAbsorb(Input, InOffset, State->Rate, State->State);
-			Permute(State);
-			InOffset += State->Rate;
-			Length -= State->Rate;
-		}
-
-		// store unaligned bytes
-		if (Length != 0)
-		{
-			MemoryTools::Copy(Input, InOffset, msg, 0, Length);
-		}
-
-		msg[Length] = State->Domain;
-		++Length;
-
-		MemoryTools::Clear(msg, Length, State->Rate - Length);
-		msg[State->Rate - 1] |= 0x80;
-		Keccak::FastAbsorb(msg, 0, State->Rate, State->State);
+		Keccak::AbsorbR24(Input, InOffset, Length, State->Rate, State->Domain, State->State);
+	}
+	else
+	{
+		Keccak::AbsorbR48(Input, InOffset, Length, State->Rate, State->Domain, State->State);
 	}
 }
 
 void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<ShakeState> &State)
 {
-	std::array<byte, BUFFER_SIZE> pad = { 0 };
-	size_t i;
-	size_t offset;
-
-	offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(State->Rate));
-	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Information.size()) * 8);
-
 	State->Domain = Keccak::KECCAK_CSHAKE_DOMAIN;
 
-	if (Information.size() != 0)
+	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
-		for (i = 0; i < Information.size(); ++i)
-		{
-			if (offset == State->Rate)
-			{
-				Keccak::FastAbsorb(pad, 0, State->Rate, State->State);
-				Permute(State);
-				offset = 0;
-			}
-
-			pad[offset] = Information[i];
-			++offset;
-		}
+		Keccak::CustomizeR24(Customization, Information, State->Rate, State->State);
 	}
-
-	offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
-
-	if (Customization.size() != 0)
+	else
 	{
-		for (i = 0; i < Customization.size(); ++i)
-		{
-			if (offset == State->Rate)
-			{
-				Keccak::FastAbsorb(pad, 0, State->Rate, State->State);
-				Permute(State);
-				offset = 0;
-			}
-
-			pad[offset] = Customization[i];
-			++offset;
-		}
+		Keccak::CustomizeR48(Customization, Information, State->Rate, State->State);
 	}
-
-	MemoryTools::Clear(pad, offset, BUFFER_SIZE - offset);
-	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
-	MemoryTools::XOR(pad, 0, State->State, 0, offset);
-
-	Permute(State);
 }
 
 void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ShakeState> &State)

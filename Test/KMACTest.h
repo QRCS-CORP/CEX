@@ -60,6 +60,11 @@ namespace Test
 		std::string Run() override;
 
 		/// <summary>
+		/// Tests the compact forms of the KMAC functions
+		/// </summary>
+		void Ancillary();
+
+		/// <summary>
 		/// Test exception handlers for correct execution
 		/// </summary>
 		void Exception();
