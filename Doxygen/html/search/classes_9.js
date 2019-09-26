@@ -8,5 +8,6 @@ var searchData=
   ['keccak256',['Keccak256',['../class_keccak256.html',1,'']]],
   ['keccak512',['Keccak512',['../class_keccak512.html',1,'']]],
   ['keccakparams',['KeccakParams',['../class_keccak_params.html',1,'']]],
-  ['kmac',['KMAC',['../class_k_m_a_c.html',1,'']]]
+  ['kmac',['KMAC',['../class_k_m_a_c.html',1,'']]],
+  ['kyber',['Kyber',['../class_kyber.html',1,'']]]
 ];

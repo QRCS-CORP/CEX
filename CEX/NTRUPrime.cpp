@@ -13,7 +13,7 @@ using Enumeration::AsymmetricPrimitiveConvert;
 using Enumeration::ErrorCodes;
 using Utility::IntegerTools;
 using Digest::Keccak;
-using Enumeration::NTRUParameterConvert;
+using Enumeration::NTRUPrimeParameterConvert;
 
 class NTRUPrime::NtruState
 {
@@ -23,9 +23,9 @@ public:
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
-	NTRUParameters Parameters;
+	NTRUPrimeParameters Parameters;
 
-	NtruState(NTRUParameters Params, bool Destroy)
+	NtruState(NTRUPrimeParameters Params, bool Destroy)
 		:
 		DomainKey(0),
 		Destroyed(Destroy),
@@ -41,26 +41,26 @@ public:
 		Destroyed = false;
 		Encryption = false;
 		Initialized = false;
-		Parameters = NTRUParameters::None;
+		Parameters = NTRUPrimeParameters::None;
 	}
 };
 
 //~~~Constructor~~~//
 
-NTRUPrime::NTRUPrime(NTRUParameters Parameters, Prngs PrngType)
+NTRUPrime::NTRUPrime(NTRUPrimeParameters Parameters, Prngs PrngType)
 	:
-	m_ntruState(new NtruState(Parameters != NTRUParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_ntruState(new NtruState(Parameters != NTRUPrimeParameters::None ? Parameters :
+		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
 }
 
-NTRUPrime::NTRUPrime(NTRUParameters Parameters, IPrng* Prng)
+NTRUPrime::NTRUPrime(NTRUPrimeParameters Parameters, IPrng* Prng)
 	:
-	m_ntruState(new NtruState(Parameters != NTRUParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_ntruState(new NtruState(Parameters != NTRUPrimeParameters::None ? Parameters :
+		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
@@ -106,17 +106,17 @@ const size_t NTRUPrime::CipherTextSize()
 
 	switch (m_ntruState->Parameters)
 	{
-		case (NTRUParameters::NTRUS1SQ4621N653):
+		case (NTRUPrimeParameters::NTRUS1SQ4621N653):
 		{
 			clen = NTRUSQ4621P653::CIPHERTEXT_SIZE;
 			break;
 		}
-		case (NTRUParameters::NTRUS2SQ4591N761):
+		case (NTRUPrimeParameters::NTRUS2SQ4591N761):
 		{
 			clen = NTRUSQ4591P761::CIPHERTEXT_SIZE;
 			break;
 		}
-		case (NTRUParameters::NTRUS3SQ5167N857):
+		case (NTRUPrimeParameters::NTRUS3SQ5167N857):
 		{
 			clen = NTRUSQ5167P857::CIPHERTEXT_SIZE;
 			break;
@@ -156,12 +156,12 @@ const std::string NTRUPrime::Name()
 
 	ret = AsymmetricPrimitiveConvert::ToName(Enumeral()) + 
 		std::string("-") + 
-		NTRUParameterConvert::ToName(m_ntruState->Parameters);
+		NTRUPrimeParameterConvert::ToName(m_ntruState->Parameters);
 
 	return ret;
 }
 
-const NTRUParameters NTRUPrime::Parameters()
+const NTRUPrimeParameters NTRUPrime::Parameters()
 {
 	return m_ntruState->Parameters;
 }
@@ -172,17 +172,17 @@ const size_t NTRUPrime::PrivateKeySize()
 
 	switch (m_ntruState->Parameters)
 	{
-		case (NTRUParameters::NTRUS1SQ4621N653):
+		case (NTRUPrimeParameters::NTRUS1SQ4621N653):
 		{
 			klen = NTRUSQ4621P653::PRIVATEKEY_SIZE;
 			break;
 		}
-		case (NTRUParameters::NTRUS2SQ4591N761):
+		case (NTRUPrimeParameters::NTRUS2SQ4591N761):
 		{
 			klen = NTRUSQ4591P761::PRIVATEKEY_SIZE;
 			break;
 		}
-		case (NTRUParameters::NTRUS3SQ5167N857):
+		case (NTRUPrimeParameters::NTRUS3SQ5167N857):
 		{
 			klen = NTRUSQ5167P857::PRIVATEKEY_SIZE;
 			break;
@@ -202,17 +202,17 @@ const size_t NTRUPrime::PublicKeySize()
 
 	switch (m_ntruState->Parameters)
 	{
-		case (NTRUParameters::NTRUS1SQ4621N653):
+		case (NTRUPrimeParameters::NTRUS1SQ4621N653):
 		{
 			klen = NTRUSQ4621P653::PUBLICKEY_SIZE;
 			break;
 		}
-		case (NTRUParameters::NTRUS2SQ4591N761):
+		case (NTRUPrimeParameters::NTRUS2SQ4591N761):
 		{
 			klen = NTRUSQ4591P761::PUBLICKEY_SIZE;
 			break;
 		}
-		case (NTRUParameters::NTRUS3SQ5167N857):
+		case (NTRUPrimeParameters::NTRUS3SQ5167N857):
 		{
 			klen = NTRUSQ5167P857::PUBLICKEY_SIZE;
 			break;
@@ -243,17 +243,17 @@ bool NTRUPrime::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 
 	switch (m_ntruState->Parameters)
 	{
-		case NTRUParameters::NTRUS1SQ4621N653:
+		case NTRUPrimeParameters::NTRUS1SQ4621N653:
 		{
 			result = NTRUSQ4621P653::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
 		}
-		case NTRUParameters::NTRUS2SQ4591N761:
+		case NTRUPrimeParameters::NTRUS2SQ4591N761:
 		{
 			result = NTRUSQ4591P761::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
 		}
-		case NTRUParameters::NTRUS3SQ5167N857:
+		case NTRUPrimeParameters::NTRUS3SQ5167N857:
 		{
 			result = NTRUSQ5167P857::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
@@ -286,19 +286,19 @@ void NTRUPrime::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 	switch (m_ntruState->Parameters)
 	{
-		case NTRUParameters::NTRUS1SQ4621N653:
+		case NTRUPrimeParameters::NTRUS1SQ4621N653:
 		{
 			CipherText.resize(NTRUSQ4621P653::CIPHERTEXT_SIZE);
 			NTRUSQ4621P653::Encapsulate(sec, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
 			break;
 		}
-		case NTRUParameters::NTRUS2SQ4591N761:
+		case NTRUPrimeParameters::NTRUS2SQ4591N761:
 		{
 			CipherText.resize(NTRUSQ4591P761::CIPHERTEXT_SIZE);
 			NTRUSQ4591P761::Encapsulate(sec, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
 			break;
 		}
-		case NTRUParameters::NTRUS3SQ5167N857:
+		case NTRUPrimeParameters::NTRUS3SQ5167N857:
 		{
 			CipherText.resize(NTRUSQ5167P857::CIPHERTEXT_SIZE);
 			NTRUSQ5167P857::Encapsulate(sec, CipherText, m_publicKey->Polynomial(), m_rndGenerator);
@@ -323,28 +323,28 @@ void NTRUPrime::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 AsymmetricKeyPair* NTRUPrime::Generate()
 {
-	CEXASSERT(m_ntruState->Parameters != NTRUParameters::None, "The parameter setting is invalid");
+	CEXASSERT(m_ntruState->Parameters != NTRUPrimeParameters::None, "The parameter setting is invalid");
 
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
 
 	switch (m_ntruState->Parameters)
 	{
-		case NTRUParameters::NTRUS1SQ4621N653:
+		case NTRUPrimeParameters::NTRUS1SQ4621N653:
 		{
 			pk.resize(NTRUSQ4621P653::PUBLICKEY_SIZE);
 			sk.resize(NTRUSQ4621P653::PRIVATEKEY_SIZE);
 			NTRUSQ4621P653::Generate(pk, sk, m_rndGenerator);
 			break;
 		}
-		case NTRUParameters::NTRUS2SQ4591N761:
+		case NTRUPrimeParameters::NTRUS2SQ4591N761:
 		{
 			pk.resize(NTRUSQ4591P761::PUBLICKEY_SIZE);
 			sk.resize(NTRUSQ4591P761::PRIVATEKEY_SIZE);
 			NTRUSQ4591P761::Generate(pk, sk, m_rndGenerator);
 			break;
 		}
-		case NTRUParameters::NTRUS3SQ5167N857:
+		case NTRUPrimeParameters::NTRUS3SQ5167N857:
 		{
 			pk.resize(NTRUSQ5167P857::PUBLICKEY_SIZE);
 			sk.resize(NTRUSQ5167P857::PRIVATEKEY_SIZE);
@@ -378,13 +378,13 @@ void NTRUPrime::Initialize(AsymmetricKey* Key)
 	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
 		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
-		m_ntruState->Parameters = static_cast<NTRUParameters>(m_publicKey->Parameters());
+		m_ntruState->Parameters = static_cast<NTRUPrimeParameters>(m_publicKey->Parameters());
 		m_ntruState->Encryption = true;
 	}
 	else
 	{
 		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
-		m_ntruState->Parameters = static_cast<NTRUParameters>(m_privateKey->Parameters());
+		m_ntruState->Parameters = static_cast<NTRUPrimeParameters>(m_privateKey->Parameters());
 		m_ntruState->Encryption = false;
 	}
 

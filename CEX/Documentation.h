@@ -9,27 +9,29 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.7 (A7).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.8 (A8).
 \brief
 CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.7x</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.8a</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   v1.0.0.7x
-\date      July 16, 2019
+\version   v1.0.0.8a
+\date      September 22, 2019
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.7x (A7 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.8a (A8 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.7x (version A7):</B> \n
+<B>Current Release v1.0.0.8a (version A8):</B> \n
 
 The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
+The Rainbow asymmetric signature scheme \n
+The XMSS/MT asymmetric signature scheme \n
 The Dilithium asymmetric signature scheme \n
 The SPHINCS+ asymmetric signature scheme \n
 The NTRU-Prime asymmetric cipher \n
@@ -39,9 +41,9 @@ The cSHAKE option (RHX/SHX) integrated into HX symmetric ciphers \n
 Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
 
 <B>Planned Release 1.1.0.1</B> \n
-RingLWE \n
+NewHope \n
 McEliece \n
-ModuleLWE \n
+Kyber \n
 NTRUPrime \n
 Dilithium \n
 SPHINCS+ \n \n
@@ -62,7 +64,7 @@ Added CSX512-P80 symmetric cipher \n
 Asymmetric ciphers updated to the NIST PQ Round 1 versions \n \n
 
 <B>Version 1.0.0.5, February 22, 2018</B> \n
-Added the ModuleLWE asymmetric cipher \n
+Added the Kyber asymmetric cipher \n
 Added asymmetric cipher Encapsulate/Decapsulate api \n
 Added the 128/256/512/1024 SHAKE XOF function \n
 Updates to random providers and Prngs \n
@@ -79,7 +81,7 @@ A full optimization cycle completed \n \n
 
 <B>Version 1.0.0.3, June 30, 2017</B> \n
 Added asymmetric cipher interfaces and framework \n
-Added RingLWE asymmetric cipher \n
+Added NewHope asymmetric cipher \n
 Added the Auto Collection seed Provider (ACP) \n
 Addition of the HCR prng \n
 Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators \n
@@ -150,12 +152,12 @@ NAMESPACE_ROOT
 			/*! @} */
 
 			/*!
-			*  \addtogroup ModuleLWE
+			*  \addtogroup Kyber
 			*  @{
 			*  @brief The McEliece Cipher Namespace
 			*/
 			NAMESPACE_MODULELWE
-				class ModuleLWE {};
+				class Kyber {};
 			NAMESPACE_MODULELWEEND
 			/*! @} */
 
@@ -170,12 +172,12 @@ NAMESPACE_ROOT
 			/*! @} */
 
 			/*!
-			*  \addtogroup RingLWE
+			*  \addtogroup NewHope
 			*  @{
-			*  @brief The RingLWE Cipher Namespace
+			*  @brief The NewHope Cipher Namespace
 			*/
 			NAMESPACE_RINGLWE
-				class RingLWE {};
+				class NewHope {};
 			NAMESPACE_RINGLWEEND
 			/*! @} */
 		NAMESPACE_ASYMMETRICENCRYPTEND
@@ -199,13 +201,33 @@ NAMESPACE_ROOT
 			/*! @} */
 
 			/*!
-			*  \addtogroup Sphincs
+			*  \addtogroup Rainbow
+			*  @{
+			*  @brief The Rainbow asymmetric signature scheme Namespace
+			*/
+			NAMESPACE_RAINBOW
+				class Rainbow {};
+			NAMESPACE_RAINBOWEND
+			/*! @} */
+
+			/*!
+			*  \addtogroup SphincsPlus
 			*  @{
 			*  @brief The SPHINCS+ asymmetric signature scheme Namespace
 			*/
-			NAMESPACE_SPHINCS
-				class Sphincs {};
+			NAMESPACE_SPHINCSPLUS
+				class SphincsPlus {};
 			NAMESPACE_SPHINCSEND
+			/*! @} */
+
+			/*!
+			*  \addtogroup XMSS
+			*  @{
+			*  @brief The XMSS/MT asymmetric signature scheme Namespace
+			*/
+			NAMESPACE_XMSS
+				class XMSS {};
+			NAMESPACE_XMSSEND
 			/*! @} */
 
 		NAMESPACE_ASYMMETRICSIGNEND
@@ -356,20 +378,20 @@ NAMESPACE_ROOT
 		enum class Kdfs {};
 		enum class KeySizes {};
 		enum class Macs {};
-		enum class MLWEParameters {};
-		enum class MPKCParameters {};
-		enum class NTRUParameters {};
+		enum class KyberParameters {};
+		enum class McElieceParameters {};
+		enum class NTRUPrimeParameters {};
 		enum class PaddingModes {};
 		enum class Prngs {};
 		enum class Providers {};
-		enum class RLWEParameters {};
+		enum class NewHopeParameters {};
 		enum class RoundCounts {};
 		enum class SHA2Digests {};
 		enum class ShakeModes {};
 		enum class SimdIntegers {};
 		enum class SimdProfiles {};
 		enum class SkeinUbiType {};
-		enum class SphincsParameters {};
+		enum class SphincsPlusParameters {};
 		enum class StreamAuthenticators {};
 		enum class StreamCiphers {};
 		enum class StreamModes {};

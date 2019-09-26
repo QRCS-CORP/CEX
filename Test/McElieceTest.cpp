@@ -4,7 +4,7 @@
 #include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/McEliece.h"
-#include "../CEX/RingLWE.h"
+#include "../CEX/NewHope.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SecureVector.h"
@@ -19,7 +19,7 @@ namespace Test
 	using Exception::CryptoAsymmetricException;
 	using Utility::IntegerTools;
 	using Asymmetric::Encrypt::MPKC::McEliece;
-	using Enumeration::MPKCParameters;
+	using Enumeration::McElieceParameters;
 	using Test::NistRng;
 	using Prng::SecureRandom;
 
@@ -100,12 +100,12 @@ namespace Test
 	void McElieceTest::Authentication()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(0);
-		std::vector<byte> ssk2(0);
+		std::vector<byte> ssk1(32);
+		std::vector<byte> ssk2(32);
 
 		// MPKCS1N4096T62
 
-		McEliece cpr1(MPKCParameters::MPKCS1N4096T62);
+		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, ssk1);
@@ -124,7 +124,7 @@ namespace Test
 		ssk2.clear();
 		delete kp1;
 
-		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
@@ -143,7 +143,7 @@ namespace Test
 		ssk2.clear();
 		delete kp2;
 
-		McEliece cpr3(MPKCParameters::MPKCS1N8192T128);
+		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 		cpr3.Initialize(kp3->PublicKey());
 		cpr3.Encapsulate(cpt, ssk1);
@@ -161,13 +161,13 @@ namespace Test
 	void McElieceTest::CipherText()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(0);
-		std::vector<byte> ssk2(0);
+		std::vector<byte> ssk1(32);
+		std::vector<byte> ssk2(32);
 		SecureRandom gen;
 
 		// MPKCS1N4096T62
 
-		McEliece cpr1(MPKCParameters::MPKCS1N4096T62);
+		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, ssk1);
@@ -188,7 +188,7 @@ namespace Test
 		ssk2.clear();
 		delete kp1;
 
-		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
@@ -210,7 +210,7 @@ namespace Test
 		ssk1.clear();
 		ssk2.clear();
 
-		McEliece cpr3(MPKCParameters::MPKCS1N8192T128);
+		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 		cpr3.Initialize(kp3->PublicKey());
 		cpr3.Encapsulate(cpt, ssk1);
@@ -232,7 +232,7 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			McEliece cpr(MPKCParameters::None);
+			McEliece cpr(McElieceParameters::None);
 
 			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -ME1"));
 		}
@@ -246,7 +246,7 @@ namespace Test
 
 		try
 		{
-			McEliece cpr(MPKCParameters::MPKCS1N4096T62, Enumeration::Prngs::None);
+			McEliece cpr(McElieceParameters::MPKCS1N4096T62, Enumeration::Prngs::None);
 
 			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -ME2"));
 		}
@@ -261,8 +261,8 @@ namespace Test
 		// test initialization
 		try
 		{
-			McEliece cpr(MPKCParameters::MPKCS1N4096T62, Enumeration::Prngs::BCR);
-			Asymmetric::Encrypt::RLWE::RingLWE cprb;
+			McEliece cpr(McElieceParameters::MPKCS1N4096T62, Enumeration::Prngs::BCR);
+			Asymmetric::Encrypt::RLWE::NewHope cprb;
 			// create an invalid key set
 			AsymmetricKeyPair* kp = cprb.Generate();
 			cpr.Initialize(kp->PrivateKey());
@@ -281,15 +281,15 @@ namespace Test
 	void McElieceTest::Kat()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(0);
-		std::vector<byte> ssk2(0);
+		std::vector<byte> ssk1(32);
+		std::vector<byte> ssk2(32);
 		NistRng gen;
 
 		// MPKCS1N4096T62
 
 		gen.Initialize(m_cprseed);
 
-		McEliece cpr1(MPKCParameters::MPKCS1N4096T62, &gen);
+		McEliece cpr1(McElieceParameters::MPKCS1N4096T62, &gen);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 		cpr1.Initialize(kp1->PublicKey());
 		cpr1.Encapsulate(cpt, ssk1);
@@ -324,7 +324,7 @@ namespace Test
 
 		gen.Initialize(m_cprseed);
 
-		McEliece cpr2(MPKCParameters::MPKCS1N6960T119, &gen);
+		McEliece cpr2(McElieceParameters::MPKCS1N6960T119, &gen);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
@@ -359,7 +359,7 @@ namespace Test
 
 		gen.Initialize(m_cprseed);
 
-		McEliece cpr3(MPKCParameters::MPKCS1N8192T128, &gen);
+		McEliece cpr3(McElieceParameters::MPKCS1N8192T128, &gen);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 		cpr3.Initialize(kp3->PublicKey());
 		cpr3.Encapsulate(cpt, ssk1);
@@ -412,20 +412,20 @@ namespace Test
 	void McElieceTest::PublicKey()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(0);
-		std::vector<byte> ssk2(0);
+		std::vector<byte> ssk1(32);
+		std::vector<byte> ssk2(32);
 		SecureRandom gen;
 
 		// MPKCS1N4096T62
 
-		McEliece cpr1(MPKCParameters::MPKCS1N4096T62);
+		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
 		AsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
 		std::vector<byte> pk1 = kp1->PublicKey()->Polynomial();
 		gen.Generate(pk1, 0, 2048);
 
-		AsymmetricKey* ak1 = new AsymmetricKey(pk1, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MPKCParameters::MPKCS1N4096T62));
+		AsymmetricKey* ak1 = new AsymmetricKey(pk1, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS1N4096T62));
 		cpr1.Initialize(ak1);
 		cpr1.Encapsulate(cpt, ssk1);
 		cpr1.Initialize(kp1->PrivateKey());
@@ -445,14 +445,14 @@ namespace Test
 		ssk1.clear();
 		ssk2.clear();
 
-		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
 		std::vector<byte> pk2 = kp2->PublicKey()->Polynomial();
 		gen.Generate(pk2, 0, 4096);
 
-		AsymmetricKey* ak2 = new AsymmetricKey(pk2, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MPKCParameters::MPKCS1N6960T119));
+		AsymmetricKey* ak2 = new AsymmetricKey(pk2, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS1N6960T119));
 		cpr2.Initialize(ak2);
 		cpr2.Encapsulate(cpt, ssk1);
 		cpr2.Initialize(kp2->PrivateKey());
@@ -473,14 +473,14 @@ namespace Test
 		ssk2.clear();
 		ssk2.resize(32);
 
-		McEliece cpr3(MPKCParameters::MPKCS1N8192T128);
+		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		// alter public key
 		std::vector<byte> pk3 = kp3->PublicKey()->Polynomial();
 		gen.Generate(pk3, 0, 8192);
 
-		AsymmetricKey* ak3 = new AsymmetricKey(pk3, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(MPKCParameters::MPKCS1N8192T128));
+		AsymmetricKey* ak3 = new AsymmetricKey(pk3, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS1N8192T128));
 		cpr3.Initialize(ak3);
 		cpr3.Encapsulate(cpt, ssk1);
 		cpr3.Initialize(kp3->PrivateKey());
@@ -497,7 +497,7 @@ namespace Test
 	{
 		SecureVector<byte> skey(0);
 
-		McEliece cpr(MPKCParameters::MPKCS1N4096T62);
+		McEliece cpr(McElieceParameters::MPKCS1N4096T62);
 		AsymmetricKeyPair* kp = cpr.Generate();
 		AsymmetricKey* prik1 = kp->PrivateKey();
 		skey = AsymmetricKey::Serialize(*prik1);
@@ -527,9 +527,9 @@ namespace Test
 	void McElieceTest::Stress()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(0);
-		std::vector<byte> ssk2(0);
-		McEliece cpr1(MPKCParameters::MPKCS1N4096T62);
+		std::vector<byte> ssk1(32);
+		std::vector<byte> ssk2(32);
+		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -555,7 +555,7 @@ namespace Test
 		ssk1.clear();
 		ssk2.clear();
 
-		McEliece cpr2(MPKCParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -581,7 +581,7 @@ namespace Test
 		ssk1.clear();
 		ssk2.clear();
 
-		McEliece cpr3(MPKCParameters::MPKCS1N8192T128);
+		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{

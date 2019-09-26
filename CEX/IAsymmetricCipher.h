@@ -29,7 +29,7 @@
 #include "IPrng.h"
 #include "Prngs.h"
 
-NAMESPACE_ASYMMETRIC
+NAMESPACE_ASYMMETRICENCRYPT
 
 using Enumeration::AsymmetricKeyTypes;
 using Enumeration::AsymmetricPrimitives;
@@ -162,6 +162,6 @@ public:
 	virtual void Initialize(AsymmetricKey* Key) = 0;
 };
 
-NAMESPACE_ASYMMETRICEND
+NAMESPACE_ASYMMETRICENCRYPTEND
 #endif
 

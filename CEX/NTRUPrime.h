@@ -15,27 +15,30 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Updated by September 24, 2019
+// Contact: develop@vtdev.com
 
 #ifndef CEX_NTRUPRIME_H
 #define CEX_NTRUPRIME_H
 
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
-#include "NTRUParameters.h"
+#include "NTRUPrimeParameters.h"
 
 NAMESPACE_NTRUPRIME
 
-using Enumeration::NTRUParameters;
+using Enumeration::NTRUPrimeParameters;
 
 
 /// <summary>
-/// An implementation of the NTRU-Prime asymmetric cipher (NTRUPRIME)
+/// An implementation of the NTRU-Prime asymmetric cipher (NTRU-SPRIME)
 /// </summary> 
 /// 
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// NTRUPrime cpr(NTRUParameters::NTRUS2SQ4591N761);
+/// NTRUPrime cpr(NTRUPrimeParameters::NTRUS2SQ4591N761);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// 
 /// // serialize the public key
@@ -50,7 +53,7 @@ using Enumeration::NTRUParameters;
 /// std::vector&lt;byte&gt; sec(0);
 ///
 /// // initialize the cipher
-/// NTRUPrime cpr(NTRUParameters::NTRUS2SQ4591N761);
+/// NTRUPrime cpr(NTRUPrimeParameters::NTRUS2SQ4591N761);
 /// cpr.Initialize(PublicKey);
 /// // generate the ciphertext and shared secret
 /// status = cpr.Encapsulate(cpt, sec);
@@ -62,7 +65,7 @@ using Enumeration::NTRUParameters;
 /// bool status;
 ///
 /// // initialize the cipher
-/// NTRUPrime cpr(NTRUParameters::NTRUS2LQ4591N761);
+/// NTRUPrime cpr(NTRUPrimeParameters::NTRUS2LQ4591N761);
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the shared secret, status returns authentication outcome, false for failure
 /// status = cpr.Decapsulate(cpt, sec);
@@ -137,7 +140,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	NTRUPrime(NTRUParameters Parameters = NTRUParameters::NTRUS2SQ4591N761, Prngs PrngType = Prngs::BCR);
+	NTRUPrime(NTRUPrimeParameters Parameters = NTRUPrimeParameters::NTRUS2SQ4591N761, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -147,7 +150,7 @@ public:
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	NTRUPrime(NTRUParameters Parameters, IPrng* Prng);
+	NTRUPrime(NTRUPrimeParameters Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -194,7 +197,7 @@ public:
 	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
-	const NTRUParameters Parameters();
+	const NTRUPrimeParameters Parameters();
 
 	/// <summary>
 	/// Read Only: The expected Private key-size in bytes

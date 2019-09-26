@@ -42,5 +42,7 @@ var searchData=
   ['kmac128',['KMAC128',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ad448089350a14e557822d0363c63ce81',1,'Documentation.h']]],
   ['kmac256',['KMAC256',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a1421b85b6d4ee9a863d5b1588c880103',1,'KMAC256():&#160;Documentation.h'],['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103',1,'KMAC256():&#160;Documentation.h']]],
   ['kmac512',['KMAC512',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ade80307d986a42c3fd894b2923057bf1',1,'KMAC512():&#160;Documentation.h'],['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ade80307d986a42c3fd894b2923057bf1',1,'KMAC512():&#160;Documentation.h']]],
-  ['kmacmode',['KmacMode',['../class_k_m_a_c.html#a4a5cf6fecff6bab16d6632015bcef915',1,'KMAC']]]
+  ['kmacmode',['KmacMode',['../class_k_m_a_c.html#a4a5cf6fecff6bab16d6632015bcef915',1,'KMAC']]],
+  ['kyber',['Kyber',['../class_kyber.html',1,'Kyber'],['../class_kyber.html#a7c1213cb3716bca2f2be9ddd768b35bf',1,'Kyber::Kyber(const Kyber &amp;)=delete'],['../class_kyber.html#ace0714f7dfa9c0c3551bb597cb042f42',1,'Kyber::Kyber(KyberParameters Parameters=KyberParameters::MLWES2Q3329N256, Prngs PrngType=Prngs::BCR)'],['../class_kyber.html#acd1d094ab8e21f549e8fe2af4aa35fdb',1,'Kyber::Kyber(KyberParameters Parameters, IPrng *Prng)'],['../group___enumeration.html#gga0d453c3bfe290768ade0e837b8cec582aa5146ead66c4fdabf39fdb1441542570',1,'Kyber():&#160;Documentation.h'],['../group___kyber.html',1,'(Global Namespace)']]],
+  ['kyberparameters',['KyberParameters',['../group___enumeration.html#ga1b7777fd54f39a4ef0998234f945c05a',1,'Documentation.h']]]
 ];

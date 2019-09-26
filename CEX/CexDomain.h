@@ -28,9 +28,11 @@
 
 #define NAMESPACE_ASYMMETRICSIGN namespace CEX { namespace Asymmetric { namespace Sign {
 #define NAMESPACE_ASYMMETRICSIGNEND } } }
-#define NAMESPACE_DILITHIUM namespace CEX { namespace Asymmetric { namespace Sign { namespace DLM {
+#define NAMESPACE_DILITHIUM namespace CEX { namespace Asymmetric { namespace Sign { namespace DLTM {
 #define NAMESPACE_DILITHIUMEND } } } }
-#define NAMESPACE_SPHINCS namespace CEX { namespace Asymmetric { namespace Sign { namespace SPX {
+#define NAMESPACE_RAINBOW namespace CEX { namespace Asymmetric { namespace Sign { namespace RNBW {
+#define NAMESPACE_RAINBOWEND } } } }
+#define NAMESPACE_SPHINCSPLUS namespace CEX { namespace Asymmetric { namespace Sign { namespace SPXP {
 #define NAMESPACE_SPHINCSEND } } } }
 #define NAMESPACE_XMSS namespace CEX { namespace Asymmetric { namespace Sign { namespace XMSS {
 #define NAMESPACE_XMSSEND } } } }

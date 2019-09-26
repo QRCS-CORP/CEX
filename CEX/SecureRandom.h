@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// Updated by January 28, 2019
+// Updated by September 24, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_SECURERANDOM_H
@@ -24,17 +24,12 @@
 
 #include "IProvider.h"
 #include "CryptoRandomException.h"
-#include "Drbgs.h"
-#include "IDigest.h"
-#include "IntegerTools.h"
 #include "IPrng.h"
-#include "MemoryTools.h"
 #include "SecureVector.h"
 
 NAMESPACE_PRNG
 
 using Exception::CryptoRandomException;
-using Enumeration::Digests;
 using Prng::IPrng;
 using Enumeration::Prngs;
 using Enumeration::Providers;
@@ -61,7 +56,12 @@ class SecureRandom
 {
 private:
 
+	static const size_t BUFFER_SIZE = 1024;
+
+	SecureVector<byte> m_rndBuffer;
+	size_t m_rndIndex;
 	std::unique_ptr<IPrng> m_rngEngine;
+
 
 public:
 

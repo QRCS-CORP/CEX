@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// Updated by January 28, 2019
+// Updated by September 24, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_BCR_H
@@ -26,6 +26,7 @@
 #include "BlockCiphers.h"
 #include "IDrbg.h"
 #include "Providers.h"
+#include "SecureVector.h"
 
 NAMESPACE_PRNG
 
@@ -68,12 +69,12 @@ class BCR final : public PrngBase
 {
 private:
 
-	static const size_t BLOCK_SIZE = 16;
-	static const size_t BUFFER_DEF = 4096;
-	static const size_t BUFFER_MIN = 64;
+	static const size_t BUFFER_SIZE = CEX_PRNG_BUFFER_SIZE;
 
 	bool m_isParallel;
 	Providers m_pvdType;
+	SecureVector<byte> m_rndBuffer;
+	size_t m_rndIndex;
 	std::unique_ptr<IDrbg> m_rngGenerator;
 
 public:
@@ -153,8 +154,8 @@ public:
 
 private:
 
-	static void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
-	static void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
 };
 
 NAMESPACE_PRNGEND

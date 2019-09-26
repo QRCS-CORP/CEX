@@ -29,7 +29,7 @@ NAMESPACE_RINGLWE
 /// 
 
 /// <summary>
-/// The RingLWE FFT using a modulus of 12289 with 1024 coefficients
+/// The NewHope FFT using a modulus of 12289 with 1024 coefficients
 /// </summary>
 class RLWEQ12289N1024
 {

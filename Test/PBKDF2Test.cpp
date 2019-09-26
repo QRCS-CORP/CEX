@@ -1,6 +1,7 @@
 #include "PBKDF2Test.h"
 #include "../CEX/SymmetricKey.h"
 #include "../CEX/HMAC.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/PBKDF2.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SHA256.h"

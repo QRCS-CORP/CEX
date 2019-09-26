@@ -61,6 +61,11 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
+	/// Read/Write: If the random provider is specified, reseeds the generator after each generation call.
+	/// </summary>
+	virtual const bool &CyclicReseed() = 0;
+
+	/// <summary>
 	/// Read Only: The Drbg generators type name
 	/// </summary>
 	virtual const Drbgs Enumeral() = 0;

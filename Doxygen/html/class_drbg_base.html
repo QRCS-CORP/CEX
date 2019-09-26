@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.7</span>
+   &#160;<span id="projectnumber">1.0.0.8</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -105,6 +105,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a318d9b55d09206b3a8081038eff47fbd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a318d9b55d09206b3a8081038eff47fbd">~DrbgBase</a> ()</td></tr>
 <tr class="memdesc:a318d9b55d09206b3a8081038eff47fbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a318d9b55d09206b3a8081038eff47fbd">More...</a><br /></td></tr>
 <tr class="separator:a318d9b55d09206b3a8081038eff47fbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae18748f9b38d881dcbc8cae10fcee8d9"><td class="memItemLeft" align="right" valign="top">const bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#ae18748f9b38d881dcbc8cae10fcee8d9">CyclicReseed</a> () override</td></tr>
+<tr class="memdesc:ae18748f9b38d881dcbc8cae10fcee8d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: If the random provider is specified, reseeds the generator after each generation call.  <a href="#ae18748f9b38d881dcbc8cae10fcee8d9">More...</a><br /></td></tr>
+<tr class="separator:ae18748f9b38d881dcbc8cae10fcee8d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e70e47f63286b4d088aad61a9777ffa"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga8889084a5726d1d32ee6b0a6066cdaae">Drbgs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#a6e70e47f63286b4d088aad61a9777ffa">Enumeral</a> () override</td></tr>
 <tr class="memdesc:a6e70e47f63286b4d088aad61a9777ffa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The prngs type name  <a href="#a6e70e47f63286b4d088aad61a9777ffa">More...</a><br /></td></tr>
 <tr class="separator:a6e70e47f63286b4d088aad61a9777ffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,7 +124,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:ae750bd31b66bd0ecbe439ff5d5b0322f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum number of times the generator can be reseeded  <a href="#ae750bd31b66bd0ecbe439ff5d5b0322f">More...</a><br /></td></tr>
 <tr class="separator:ae750bd31b66bd0ecbe439ff5d5b0322f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab738f0a3709ffe54d16c5bc9ff64914f"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_drbg_base.html#ab738f0a3709ffe54d16c5bc9ff64914f">Name</a> () override</td></tr>
-<tr class="memdesc:ab738f0a3709ffe54d16c5bc9ff64914f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The KDF generators formal class name  <a href="#ab738f0a3709ffe54d16c5bc9ff64914f">More...</a><br /></td></tr>
+<tr class="memdesc:ab738f0a3709ffe54d16c5bc9ff64914f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The DRBGs formal class name  <a href="#ab738f0a3709ffe54d16c5bc9ff64914f">More...</a><br /></td></tr>
 <tr class="separator:ab738f0a3709ffe54d16c5bc9ff64914f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_drbg"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_drbg')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_drbg.html">IDrbg</a></td></tr>
 <tr class="memitem:ab3a970f0af96f788b1e65a1426fa19d6 inherit pub_methods_class_i_drbg"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_drbg.html#ab3a970f0af96f788b1e65a1426fa19d6">IDrbg</a> (const <a class="el" href="class_i_drbg.html">IDrbg</a> &amp;)=delete</td></tr>
@@ -310,6 +313,35 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ae18748f9b38d881dcbc8cae10fcee8d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae18748f9b38d881dcbc8cae10fcee8d9">&#9670;&nbsp;</a></span>CyclicReseed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const bool &amp; DrbgBase::CyclicReseed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read/Write: If the random provider is specified, reseeds the generator after each generation call. </p>
+
+<p>Implements <a class="el" href="class_i_drbg.html#a097d3f8f974e79fb9e37c2be7d837b52">IDrbg</a>.</p>
+
+</div>
+</div>
 <a id="a6e70e47f63286b4d088aad61a9777ffa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6e70e47f63286b4d088aad61a9777ffa">&#9670;&nbsp;</a></span>Enumeral()</h2>
 
@@ -478,7 +510,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>The KDF generators formal class name </p>
+<p>Read Only: The DRBGs formal class name </p>
 
 <p>Implements <a class="el" href="class_i_drbg.html#a4a1572086749484e4b52c1dcdab90601">IDrbg</a>.</p>
 

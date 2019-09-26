@@ -8,14 +8,14 @@ std::string AsymmetricTransformConvert::ToName(AsymmetricParameters Enumeral)
 
 	switch (Enumeral)
 	{
-	case AsymmetricParameters::DLMS1N256Q8380417:
-		name = std::string("DLMS1N256Q8380417");
+	case AsymmetricParameters::DLTMS1N256Q8380417:
+		name = std::string("DLTMS1N256Q8380417");
 		break;
-	case AsymmetricParameters::DLMS2N256Q8380417:
-		name = std::string("DLMS2N256Q8380417");
+	case AsymmetricParameters::DLTMS2N256Q8380417:
+		name = std::string("DLTMS2N256Q8380417");
 		break;
-	case AsymmetricParameters::DLMS3N256Q8380417:
-		name = std::string("DLMS3N256Q8380417");
+	case AsymmetricParameters::DLTMS3N256Q8380417:
+		name = std::string("DLTMS3N256Q8380417");
 		break;
 	case AsymmetricParameters::MLWES1Q3329N256:
 		name = std::string("MLWES1Q3329N256");
@@ -44,20 +44,29 @@ std::string AsymmetricTransformConvert::ToName(AsymmetricParameters Enumeral)
 	case AsymmetricParameters::NTRUS3SQ5167N857:
 		name = std::string("NTRUS3SQ5167N857");
 		break;
+	case AsymmetricParameters::RNBWS1S128SHAKE256:
+		name = std::string("RNBWS1S128SHAKE256");
+		break;
+	case AsymmetricParameters::RNBWS2S192SHAKE512:
+		name = std::string("RNBWS2S192SHAKE512");
+		break;
+	case AsymmetricParameters::RNBWS3S256SHAKE512:
+		name = std::string("RNBWS3S256SHAKE512");
+		break;
 	case AsymmetricParameters::RLWES1Q12289N1024:
 		name = std::string("RLWES1Q12289N1024");
 		break;
 	case AsymmetricParameters::RLWES2Q12289N2048:
 		name = std::string("RLWES2Q12289N2048");
 		break;
-	case AsymmetricParameters::SPXS1S128SHAKE:
-		name = std::string("SPXS1S128SHAKE");
+	case AsymmetricParameters::SPXPS1S128SHAKE:
+		name = std::string("SPXPS1S128SHAKE");
 		break;
-	case AsymmetricParameters::SPXS2S192SHAKE:
-		name = std::string("SPXS2S192SHAKE");
+	case AsymmetricParameters::SPXPS2S192SHAKE:
+		name = std::string("SPXPS2S192SHAKE");
 		break;
-	case AsymmetricParameters::SPXS3S256SHAKE:
-		name = std::string("SPXS3S256SHAKE");
+	case AsymmetricParameters::SPXPS3S256SHAKE:
+		name = std::string("SPXPS3S256SHAKE");
 		break;
 	case AsymmetricParameters::XMSSSHA256H10:
 		name = std::string("XMSSSHA256H10");
@@ -203,17 +212,17 @@ AsymmetricParameters AsymmetricTransformConvert::FromName(std::string &Name)
 {
 	AsymmetricParameters tname;
 
-	if (Name == std::string("DLMS1N256Q8380417"))
+	if (Name == std::string("DLTMS1N256Q8380417"))
 	{
-		tname = AsymmetricParameters::DLMS1N256Q8380417;
+		tname = AsymmetricParameters::DLTMS1N256Q8380417;
 	}
-	else if (Name == std::string("DLMS2N256Q8380417"))
+	else if (Name == std::string("DLTMS2N256Q8380417"))
 	{
-		tname = AsymmetricParameters::DLMS2N256Q8380417;
+		tname = AsymmetricParameters::DLTMS2N256Q8380417;
 	}
-	else if (Name == std::string("DLMS3N256Q8380417"))
+	else if (Name == std::string("DLTMS3N256Q8380417"))
 	{
-		tname = AsymmetricParameters::DLMS3N256Q8380417;
+		tname = AsymmetricParameters::DLTMS3N256Q8380417;
 	}
 	else if (Name == std::string("MLWES1Q3329N256"))
 	{
@@ -251,6 +260,18 @@ AsymmetricParameters AsymmetricTransformConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricParameters::NTRUS3SQ5167N857;
 	}
+	else if (Name == std::string("RNBWS1S128SHAKE256"))
+	{
+		tname = AsymmetricParameters::RNBWS1S128SHAKE256;
+	}
+	else if (Name == std::string("RNBWS2S192SHAKE512"))
+	{
+		tname = AsymmetricParameters::RNBWS2S192SHAKE512;
+	}
+	else if (Name == std::string("RNBWS3S256SHAKE512"))
+	{
+		tname = AsymmetricParameters::RNBWS3S256SHAKE512;
+	}
 	else if (Name == std::string("RLWES1Q12289N1024"))
 	{
 		tname = AsymmetricParameters::RLWES1Q12289N1024;
@@ -259,17 +280,17 @@ AsymmetricParameters AsymmetricTransformConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricParameters::RLWES2Q12289N2048;
 	}
-	else if (Name == std::string("SPXS1S128SHAKE"))
+	else if (Name == std::string("SPXPS1S128SHAKE"))
 	{
-		tname = AsymmetricParameters::SPXS1S128SHAKE;
+		tname = AsymmetricParameters::SPXPS1S128SHAKE;
 	}
-	else if (Name == std::string("SPXS2S192SHAKE"))
+	else if (Name == std::string("SPXPS2S192SHAKE"))
 	{
-		tname = AsymmetricParameters::SPXS2S192SHAKE;
+		tname = AsymmetricParameters::SPXPS2S192SHAKE;
 	}
-	else if (Name == std::string("SPXS3S256SHAKE"))
+	else if (Name == std::string("SPXPS3S256SHAKE"))
 	{
-		tname = AsymmetricParameters::SPXS3S256SHAKE;
+		tname = AsymmetricParameters::SPXPS3S256SHAKE;
 	}
 	else if (Name == std::string("XMSSSHA256H10"))
 	{

@@ -13,7 +13,7 @@ using Enumeration::XmssParameters;
 /// <summary>
 /// The XMSS support class
 /// </summary>
-class XmssCore
+class XMSSCore
 {
 private:
 
@@ -171,6 +171,12 @@ private:
 	static int32_t XmssMtCoreSign(const XmssParams &Params, std::vector<byte> &SecretKey, std::vector<byte> &Signature, size_t &SigLength, const std::vector<byte> &Message, size_t MsgLength);
 
 public:
+
+	static size_t GetPublicKeySize(XmssParameters Parameters);
+
+	static size_t GetPrivateKeySize(XmssParameters Parameters);
+
+	static size_t GetSignatureSize(XmssParameters Parameters);
 
 	static void Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, XmssParameters Parameters);
 

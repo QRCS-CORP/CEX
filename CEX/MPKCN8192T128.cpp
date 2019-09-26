@@ -1,7 +1,7 @@
 #include "MPKCN8192T128.h"
 #include "Keccak.h"
 #include "IntegerTools.h"
-#include "McElieceUtils.h"
+#include "MPKCUtils.h"
 
 NAMESPACE_MCELIECE
 
@@ -111,7 +111,7 @@ void MPKCN8192T128::SupportGen(ushort* S, const byte* C)
 
 	for (bctr = 0; bctr < (1 << GFBITS); ++bctr)
 	{
-		a = McElieceUtils::BitReverse(bctr);
+		a = MPKCUtils::BitReverse(bctr);
 
 		for (j = 0; j < GFBITS; ++j)
 		{
@@ -121,7 +121,7 @@ void MPKCN8192T128::SupportGen(ushort* S, const byte* C)
 
 	for (j = 0; j < GFBITS; ++j)
 	{
-		McElieceUtils::ApplyBenes(L[j], C, false);
+		MPKCUtils::ApplyBenes(L[j], C, false);
 	}
 
 	for (i = 0; i < SYS_N; ++i)
@@ -227,7 +227,7 @@ void MPKCN8192T128::ControlBits(byte* Output, const uint* Pi)
 	byte c[(((2 * GFBITS) - 1) * (1 << GFBITS)) / 16] = { 0 };
 	size_t i;
 
-	McElieceUtils::PermuteBits(GFBITS, (1UL << GFBITS), 1UL, 0UL, c, Pi);
+	MPKCUtils::PermuteBits(GFBITS, (1UL << GFBITS), 1UL, 0UL, c, Pi);
 
 	for (i = 0; i < sizeof(c); ++i)
 	{
@@ -263,7 +263,7 @@ byte MPKCN8192T128::DecryptE(byte* E, const byte* Sk, const byte* C)
 
 	for (i = 0; i < SYS_T; ++i)
 	{
-		g[i] = McElieceUtils::Load16(Sk);
+		g[i] = MPKCUtils::Load16(Sk);
 		g[i] &= GFMASK;
 		Sk += 2;
 	}
@@ -368,7 +368,7 @@ void MPKCN8192T128::GenE(byte* E, std::unique_ptr<IPrng> &Rng)
 
 	for (i = 0; i < SYS_N / 64; ++i)
 	{
-		McElieceUtils::Store64(E + i * 8, eint[i]);
+		MPKCUtils::Store64(E + i * 8, eint[i]);
 	}
 }
 
@@ -448,7 +448,7 @@ int32_t MPKCN8192T128::PkGen(byte* Pk, const byte* Sk)
 
 		for (i = 0; i < SYS_T; i++)
 		{
-			g[i] = McElieceUtils::Load16(Sk);
+			g[i] = MPKCUtils::Load16(Sk);
 			g[i] &= GFMASK;
 			Sk += 2;
 		}
@@ -669,7 +669,7 @@ int32_t MPKCN8192T128::PermConversion(uint* Perm)
 		L[i] |= i;
 	}
 
-	McElieceUtils::Sort63b(1 << GFBITS, L);
+	MPKCUtils::Sort63b(1 << GFBITS, L);
 
 	for (i = 1; i < (1 << GFBITS); ++i)
 	{
@@ -728,7 +728,7 @@ int32_t MPKCN8192T128::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
 
 	for (i = 0; i < SYS_T; ++i)
 	{
-		McElieceUtils::Store16(Sk + SYS_N / 8 + i * 2, g[i]);
+		MPKCUtils::Store16(Sk + SYS_N / 8 + i * 2, g[i]);
 	}
 
 	ControlBits(Sk + SYS_N / 8 + IRR_BYTES, (uint*)perm.data());

@@ -1,5 +1,6 @@
 #include "SCRYPTTest.h"
 #include "../CEX/HMAC.h"
+#include "../CEX/IntegerTools.h"
 #include "../CEX/SCRYPT.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKeySize.h"

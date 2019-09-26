@@ -29,7 +29,7 @@ NAMESPACE_MODULELWE
 /// 
 
 /// <summary>
-/// The ModuleLWE FFT
+/// The Kyber FFT
 /// </summary>
 class MLWEQ3329N256
 {

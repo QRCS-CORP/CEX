@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.7</span>
+   &#160;<span id="projectnumber">1.0.0.8</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -81,10 +81,10 @@ Inheritance diagram for IAsymmetricCipher:</div>
  <div class="center">
   <img src="class_i_asymmetric_cipher.png" usemap="#IAsymmetricCipher_map" alt=""/>
   <map id="IAsymmetricCipher_map" name="IAsymmetricCipher_map">
-<area href="class_mc_eliece.html" title="An implementation of the Niederreiter dual form of the McEliece public key crypto-system (MPKC)" alt="McEliece" shape="rect" coords="0,56,118,80"/>
-<area href="class_module_l_w_e.html" title="An implementation of the Module Learning With Errors asymmetric cipher (KYBER)" alt="ModuleLWE" shape="rect" coords="128,56,246,80"/>
-<area href="class_n_t_r_u_prime.html" title="An implementation of the NTRU-Prime asymmetric cipher (NTRUPRIME)" alt="NTRUPrime" shape="rect" coords="256,56,374,80"/>
-<area href="class_ring_l_w_e.html" title="An implementation of the Ring Learning With Errors asymmetric cipher (NewHope)" alt="RingLWE" shape="rect" coords="384,56,502,80"/>
+<area href="class_kyber.html" title="An implementation of the Module Learning With Errors asymmetric cipher (KYBER)" alt="Kyber" shape="rect" coords="0,56,118,80"/>
+<area href="class_mc_eliece.html" title="An implementation of the Niederreiter dual form of the McEliece public key crypto-system (MPKC)" alt="McEliece" shape="rect" coords="128,56,246,80"/>
+<area href="class_new_hope.html" title="An implementation of the Ring Learning With Errors asymmetric cipher (NewHope)" alt="NewHope" shape="rect" coords="256,56,374,80"/>
+<area href="class_n_t_r_u_prime.html" title="An implementation of the NTRU-Prime asymmetric cipher (NTRU-SPRIME)" alt="NTRUPrime" shape="rect" coords="384,56,502,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -254,7 +254,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The expected base cipher-text size in bytes </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a9c042e3145b628306183cef84bd8ea9f">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a5ea2c2ebf4f5b9c32a62559ff048379d">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#afc449e193470e15ff383432b35587d71">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aaad378e435a77a3daeb17b26223847cb">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a9c042e3145b628306183cef84bd8ea9f">McEliece</a>, <a class="el" href="class_new_hope.html#a033e47167f42be2a12b4d92c8d700542">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#afc449e193470e15ff383432b35587d71">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a96aca9690eb5a99502ec4d0a43a9c956">Kyber</a>.</p>
 
 </div>
 </div>
@@ -302,7 +302,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns true if decryption is sucesssful</dd></dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a057079568ae36600dccfe9fd888cf2ab">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a166c01d8fc455250eb87929d4d04342e">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#ace8ab010767e794b3d50386d215ce888">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aa08db36c2ee150018de5754d1dc635ba">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a057079568ae36600dccfe9fd888cf2ab">McEliece</a>, <a class="el" href="class_new_hope.html#a5152e3142729bd26c884dad5498a98e4">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#ace8ab010767e794b3d50386d215ce888">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a45435640b812966be4c948c08993747e">Kyber</a>.</p>
 
 </div>
 </div>
@@ -332,7 +332,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret. </p>
 <p>Changing this code will create a unique distribution of the cipher. The domain key can be used as a secondary secret shared between hosts in an authenticated domain. The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation. For best security, the key should be random, secret, and shared only between hosts within a secure domain.</p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a7c1f872e6d8f908a852db126231c2eb3">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a27a2788f999a472bc723539ad507a39f">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#aca4ebe693bde39d774b2023504a1b06c">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#a4181a2c2ea05e46e014d4551ad5dfeca">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a7c1f872e6d8f908a852db126231c2eb3">McEliece</a>, <a class="el" href="class_new_hope.html#aa66df30702db5721c4391c1cde2c3c2c">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#aca4ebe693bde39d774b2023504a1b06c">NTRUPrime</a>, and <a class="el" href="class_kyber.html#af3956ddf314787fd9076eba14a5f1514">Kyber</a>.</p>
 
 </div>
 </div>
@@ -379,7 +379,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a4f6861fd1351a04d62b0495355bd99f1">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#ac844374e285f3f3551741a871a1993b1">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a05104233aa3643b4a8a5fe5dc1fe61e4">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aac191f0e7a41a9982d6b4f6988471b45">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a4f6861fd1351a04d62b0495355bd99f1">McEliece</a>, <a class="el" href="class_new_hope.html#a1f8c0b95cdcefeffdea4ab788ac759d7">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a05104233aa3643b4a8a5fe5dc1fe61e4">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a98fbe087c30a6939b7770d870ec30dbf">Kyber</a>.</p>
 
 </div>
 </div>
@@ -408,7 +408,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher type-name </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#ab0209b13422f8b7f656a072ccbc1845c">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a48e74796f3ede2e617e06e3dd78d218f">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a0d14c2bf2436bd95c67d7d9a89c359de">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#ac88c5eab3920eb90ad8e49be88594af2">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#ab0209b13422f8b7f656a072ccbc1845c">McEliece</a>, <a class="el" href="class_new_hope.html#ae7eb6ac71819348bed24f4904eb44e42">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a0d14c2bf2436bd95c67d7d9a89c359de">NTRUPrime</a>, and <a class="el" href="class_kyber.html#aa79a105b032b8e63b31d3d9ac2df83d8">Kyber</a>.</p>
 
 </div>
 </div>
@@ -437,7 +437,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Generate a public/private key-pair </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a2faf84b73497946c6b4e84b153cfbba4">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a02853162b092480b186c461e7e9c04e6">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a874596e9ad5c437e6c6ff0a6525f1d9e">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#adb0d48c306832b224b317386773976b4">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a2faf84b73497946c6b4e84b153cfbba4">McEliece</a>, <a class="el" href="class_new_hope.html#a5df2e201ffbe41e629fae974e686cdcb">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a874596e9ad5c437e6c6ff0a6525f1d9e">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a545afc8d9d816a78518fc4ae49db3df4">Kyber</a>.</p>
 
 </div>
 </div>
@@ -479,7 +479,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#abc67836600abcabf527cf36a0a43d256">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a6be0bb571b97b6de9184de3bd1b197cb">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#aa606ae7ec8ac35a895aec44e7f4b7d56">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#a04ab2308d07970f350a690be21b570be">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#abc67836600abcabf527cf36a0a43d256">McEliece</a>, <a class="el" href="class_new_hope.html#a239a7d742cc8cf06e1fe51c628d7add6">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#aa606ae7ec8ac35a895aec44e7f4b7d56">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a81db16480f73b4b503270a158ceb6dff">Kyber</a>.</p>
 
 </div>
 </div>
@@ -508,7 +508,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher is initialized for encryption </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#ac1ec03bf88cf09a030dd89ba324b06b7">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a0b8b55a26615c8ae6271b6bef39f4272">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a2a72df230b02b0961455ec433eb357d2">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#af079a2b3792e9107c9b06fc956eddeff">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#ac1ec03bf88cf09a030dd89ba324b06b7">McEliece</a>, <a class="el" href="class_new_hope.html#aca0ca39c6366a41905a87b67b5d9aad5">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a2a72df230b02b0961455ec433eb357d2">NTRUPrime</a>, and <a class="el" href="class_kyber.html#ac50734602794550a88870fe8174a7281">Kyber</a>.</p>
 
 </div>
 </div>
@@ -537,7 +537,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher has been initialized with a key </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a7f4a707111b95f3fe985db967e941ca5">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#aafd54e9639e9cc0dc2b6300fc24eb61e">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a98364399612ed34916761174e9ceaafc">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aa8d9020c00294cb01298dcddff1f5b7e">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a7f4a707111b95f3fe985db967e941ca5">McEliece</a>, <a class="el" href="class_new_hope.html#a81cbafb2341f607451becbe75a3e8b52">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a98364399612ed34916761174e9ceaafc">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a4943d32581f8e011a84b8bdeef4ad44d">Kyber</a>.</p>
 
 </div>
 </div>
@@ -566,7 +566,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The ciphers name </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a0c96e14e00fb46fa1798af3b628f1293">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a8a8de02edc94fcc5809215d9cc64cdfc">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a8a824662d92cb14aa720dc14cb207a75">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#aec361dc87bf4a64eed1b8bb1e1a3c1ec">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a0c96e14e00fb46fa1798af3b628f1293">McEliece</a>, <a class="el" href="class_new_hope.html#a0b875425795f0c58df8e042b07e36db9">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a8a824662d92cb14aa720dc14cb207a75">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a5489adb8d0a6224a255a6fb9a0230831">Kyber</a>.</p>
 
 </div>
 </div>
@@ -623,7 +623,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The expected Private key-size in bytes </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#ac88bb24a41849b5bc25a8e8c8a32e0f0">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a191038dc4377ad8eac65ceb828b36287">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#adcc5401bb2b9d6b63bcc14fe077054b8">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#ad0c12dd9c61d2245362b01a709e9c341">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#ac88bb24a41849b5bc25a8e8c8a32e0f0">McEliece</a>, <a class="el" href="class_new_hope.html#abc07005216f1904653e94d1b2016e842">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#adcc5401bb2b9d6b63bcc14fe077054b8">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a1e188bdb88e9a52e0c9475e05e100a4a">Kyber</a>.</p>
 
 </div>
 </div>
@@ -652,7 +652,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The expected Public key-size in bytes </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a7a69761a0514b3ecd27dc57273df545b">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a6aa7616131c43500f7b917c5bba2e066">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a27c2574b2009e0ce60a490820f78596d">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#add9de3deb76fcc1667b994dd0ed471f3">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a7a69761a0514b3ecd27dc57273df545b">McEliece</a>, <a class="el" href="class_new_hope.html#a1de152942324370b7105608dc410dc66">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a27c2574b2009e0ce60a490820f78596d">NTRUPrime</a>, and <a class="el" href="class_kyber.html#a25ad4c973297cc8a63693fbc5f3403bd">Kyber</a>.</p>
 
 </div>
 </div>
@@ -682,7 +682,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: The ciphers shared secret output size. </p>
 <p>When using the DomainKey parameter, the domain-key is added to the ciphers output shared-secret and used as seed material by a custom SHAKE-512, this allows for variable length output. In this operating mode, the shared secret can be any size. In standard operating mode, the output shared-secret is the expected output from the asymmetric cipher.</p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a39697911ed1c04de0c0d708c0b843405">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a3ea68f8849f95dcd8f6378018b0b9732">RingLWE</a>, <a class="el" href="class_n_t_r_u_prime.html#a9c93da08cc2eaf1182d32ee07e60f52b">NTRUPrime</a>, and <a class="el" href="class_module_l_w_e.html#a4e3fb63861b5973328f9c1a6f5d286bf">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_mc_eliece.html#a39697911ed1c04de0c0d708c0b843405">McEliece</a>, <a class="el" href="class_new_hope.html#afcf187fad0e384d227d0e7130f5329cd">NewHope</a>, <a class="el" href="class_n_t_r_u_prime.html#a9c93da08cc2eaf1182d32ee07e60f52b">NTRUPrime</a>, and <a class="el" href="class_kyber.html#ac3cc66cf97be6dbc6f628a0a1bd29a5d">Kyber</a>.</p>
 
 </div>
 </div>

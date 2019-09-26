@@ -15,12 +15,15 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Updated by September 24, 2019
+// Contact: develop@vtdev.com
 
 #ifndef CEX_DILITHIUM_H
 #define CEX_DILITHIUM_H
 
 #include "AsymmetricParameters.h"
-#include "IAsymmetricSign.h"
+#include "IAsymmetricSigner.h"
 #include "AsymmetricKeyPair.h"
 #include "DilithiumParameters.h"
 #include "AsymmetricKey.h"
@@ -37,7 +40,7 @@ using Enumeration::DilithiumParameters;
 /// <example>
 /// <description>Generate the Public and Private key-pair</description>
 /// <code>
-/// Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+/// Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 /// IAsymmetricKeyPair* kp = sgn.Generate();
 /// 
 /// // serialize the public key
@@ -47,7 +50,7 @@ using Enumeration::DilithiumParameters;
 ///
 /// <description>Sign a message:</description>
 /// <code>
-/// Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+/// Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 /// sgn.Initialize(PrivateKey);
 /// 
 /// std::vector&lt;byte&gt; msg(32);
@@ -58,7 +61,7 @@ using Enumeration::DilithiumParameters;
 ///
 /// <description>Verify a signature and return the message:</description>
 /// <code>
-/// Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+/// Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 /// sgn.Initialize(PublicKey);
 /// std::vector&lt;byte&gt; message(0);
 ///
@@ -86,7 +89,7 @@ using Enumeration::DilithiumParameters;
 /// <description>:</description>
 /// 
 /// <list type="bullet">
-/// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); medium security: DLMS1N256Q8380417, high security: DLMS2N256Q8380417, highest security: DLMS2N256Q8380417</description></item>
+/// <item><description>There are three available parameters set through the constructor, ordered by security strength (S1, S2, S3); medium security: DLTMS1N256Q8380417, high security: DLTMS2N256Q8380417, highest security: DLTMS2N256Q8380417</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The signature schemes operational mode (signing/verifying) is determined by the IAsymmetricKey key-type used to Initialize the cipher; the Public key is used for verification, and use the Private for signing a message.</description></item>
 /// <item><description>Use the Generate function to create a public/private key-pair, and the Sign function to sign a message</description></item>
@@ -102,7 +105,7 @@ using Enumeration::DilithiumParameters;
 /// <item><description>Website: <a href="https://pq-crystals.org/dilithium/">Dilithium Website</a></description></item>.
 /// </list>
 /// </remarks>
-class Dilithium final : public IAsymmetricSign
+class Dilithium final : public IAsymmetricSigner
 {
 private:
 

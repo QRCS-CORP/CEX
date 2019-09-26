@@ -2,7 +2,7 @@
 #include "MemoryTools.h"
 #include "PrngFromName.h"
 #include "XMSSCore.h"
-#include "XmssUtils.h"
+#include "XMSSUtils.h"
 
 NAMESPACE_XMSS
 
@@ -40,7 +40,7 @@ public:
 XMSS::XMSS(XmssParameters Parameters, Prngs PrngType)
 	:
 	m_xmssState(new XmssState(Parameters != XmssParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam),
+		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
@@ -50,7 +50,7 @@ XMSS::XMSS(XmssParameters Parameters, Prngs PrngType)
 XMSS::XMSS(XmssParameters Parameters, IPrng* Rng)
 	:
 	m_xmssState(new XmssState(Parameters != XmssParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The ModuleLWE parameter set is invalid!"), ErrorCodes::InvalidParam),
+		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
 	m_rndGenerator(Rng != nullptr ? Rng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
@@ -93,7 +93,7 @@ const AsymmetricPrimitives XMSS::Enumeral()
 {
 	AsymmetricPrimitives ret;
 
-	ret = XmssUtils::IsXMSS(m_xmssState->Parameters) ? AsymmetricPrimitives::XMSS : AsymmetricPrimitives::XMSSMT;
+	ret = XMSSUtils::IsXMSS(m_xmssState->Parameters) ? AsymmetricPrimitives::XMSS : AsymmetricPrimitives::XMSSMT;
 
 	return ret;
 }
@@ -122,29 +122,7 @@ const size_t XMSS::PrivateKeySize()
 {
 	size_t klen;
 
-	klen = 0;
-	/*switch (m_xmssState->Parameters)
-	{
-	case XmssParameters::SPXS1S128SHAKE:
-	{
-		klen = SPXS128SHAKE::SPHINCS_SECRETKEY_SIZE;
-		break;
-	}
-	case XmssParameters::SPXS2S192SHAKE:
-	{
-		klen = SPXS192SHAKE::SPHINCS_SECRETKEY_SIZE;
-		break;
-	}
-	case XmssParameters::SPXS3S256SHAKE:
-	{
-		klen = SPXS256SHAKE::SPHINCS_SECRETKEY_SIZE;
-		break;
-	}
-	default:
-	{
-		throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
-	}
-	}*/
+	klen = XMSSCore::GetPrivateKeySize(m_xmssState->Parameters);
 
 	return klen;
 }
@@ -153,29 +131,7 @@ const size_t XMSS::PublicKeySize()
 {
 	size_t klen;
 
-	klen = 0;
-	/*switch (m_xmssState->Parameters)
-	{
-	case XmssParameters::SPXS1S128SHAKE:
-	{
-		klen = SPXS128SHAKE::SPHINCS_PUBLICKEY_SIZE;
-		break;
-	}
-	case XmssParameters::SPXS2S192SHAKE:
-	{
-		klen = SPXS192SHAKE::SPHINCS_PUBLICKEY_SIZE;
-		break;
-	}
-	case XmssParameters::SPXS3S256SHAKE:
-	{
-		klen = SPXS256SHAKE::SPHINCS_PUBLICKEY_SIZE;
-		break;
-	}
-	default:
-	{
-		throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
-	}
-	}*/
+	klen = XMSSCore::GetPublicKeySize(m_xmssState->Parameters);
 
 	return klen;
 }
@@ -184,29 +140,7 @@ const size_t XMSS::SignatureSize()
 {
 	size_t slen;
 
-	slen = 0;
-	/*switch (m_xmssState->Parameters)
-	{
-	case XmssParameters::SPXS1S128SHAKE:
-	{
-		slen = SPXS128SHAKE::SPHINCS_SIGNATURE_SIZE;
-		break;
-	}
-	case XmssParameters::SPXS2S192SHAKE:
-	{
-		slen = SPXS192SHAKE::SPHINCS_SIGNATURE_SIZE;
-		break;
-	}
-	case XmssParameters::SPXS3S256SHAKE:
-	{
-		slen = SPXS256SHAKE::SPHINCS_SIGNATURE_SIZE;
-		break;
-	}
-	default:
-	{
-		throw CryptoAsymmetricException(Name(), std::string("SignatureSize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
-	}
-	}*/
+	slen = XMSSCore::GetSignatureSize(m_xmssState->Parameters);
 
 	return slen;
 }
@@ -216,7 +150,7 @@ AsymmetricKeyPair* XMSS::Generate()
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
 
-	XmssCore::Generate(pk, sk, m_rndGenerator, m_xmssState->Parameters);
+	XMSSCore::Generate(pk, sk, m_rndGenerator, m_xmssState->Parameters);
 
 	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(m_xmssState->Parameters));
 	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(m_xmssState->Parameters));
@@ -270,7 +204,7 @@ size_t XMSS::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature
 
 	size_t slen;
 
-	slen = XmssCore::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_xmssState->Parameters);
+	slen = XMSSCore::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_xmssState->Parameters);
 
 	return slen;
 }
@@ -291,7 +225,7 @@ bool XMSS::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message
 
 	res = false;
 
-	res = XmssCore::Verify(Message, Signature, m_publicKey->Polynomial(), m_xmssState->Parameters);
+	res = XMSSCore::Verify(Message, Signature, m_publicKey->Polynomial(), m_xmssState->Parameters);
 
 	return res;
 }

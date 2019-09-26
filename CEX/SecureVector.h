@@ -179,7 +179,7 @@ inline static void Extract(const SecureVector<T> &Input, size_t InOffset, std::v
 		Output.resize(OTPSZE);
 	}
 
-	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Input.size() * sizeof(T));
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Elements * sizeof(T));
 }
 
 /// <summary>

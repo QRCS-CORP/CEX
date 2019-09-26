@@ -21,7 +21,7 @@ enum class AsymmetricPrimitives : byte
 	/// <summary>
 	/// A Module-LWE cipher implementation
 	/// </summary>
-	ModuleLWE = 2,
+	Kyber = 2,
 	/// <summary>
 	/// An NTRUPrime cipher implementation
 	/// </summary>
@@ -31,21 +31,25 @@ enum class AsymmetricPrimitives : byte
 	/// </summary>
 	Dilithium = 4,
 	/// <summary>
+	/// A Rainbow multivariate asymmetric signature scheme
+	/// </summary>
+	Rainbow = 5,
+	/// <summary>
 	/// A Ring-LWE cipher implementation
 	/// </summary>
-	RingLWE = 5,
+	NewHope = 6,
 	/// <summary>
-	/// The Sphincs asymmetric signature scheme
+	/// The SphincsPlus asymmetric signature scheme
 	/// </summary>
-	Sphincs = 6,
+	SphincsPlus = 7,
 	/// <summary>
 	/// The eXtended Merkle Signature Scheme
 	/// </summary>
-	XMSS = 7,
+	XMSS = 8,
 	/// <summary>
 	/// The eXtended Merkle Signature Scheme Multi-Tree
 	/// </summary>
-	XMSSMT = 8
+	XMSSMT = 9
 };
 
 class AsymmetricPrimitiveConvert

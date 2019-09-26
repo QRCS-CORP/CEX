@@ -14,17 +14,17 @@ std::string AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives Enumeral)
 		case AsymmetricPrimitives::McEliece:
 			name = std::string("McEliece");
 			break;
-		case AsymmetricPrimitives::ModuleLWE:
-			name = std::string("ModuleLWE");
+		case AsymmetricPrimitives::Kyber:
+			name = std::string("Kyber");
 			break;
 		case AsymmetricPrimitives::NTRUPrime:
 			name = std::string("NTRUPrime");
 			break;
-		case AsymmetricPrimitives::RingLWE:
-			name = std::string("RingLWE");
+		case AsymmetricPrimitives::NewHope:
+			name = std::string("NewHope");
 			break;
-		case AsymmetricPrimitives::Sphincs:
-			name = std::string("Sphincs");
+		case AsymmetricPrimitives::SphincsPlus:
+			name = std::string("SphincsPlus");
 			break;
 		default:
 			name = std::string("None");
@@ -46,21 +46,21 @@ AsymmetricPrimitives AsymmetricPrimitiveConvert::FromName(std::string &Name)
 	{
 		tname = AsymmetricPrimitives::McEliece;
 	}	
-	else if (Name == std::string("ModuleLWE"))
+	else if (Name == std::string("Kyber"))
 	{
-		tname = AsymmetricPrimitives::ModuleLWE;
+		tname = AsymmetricPrimitives::Kyber;
 	}
 	else if (Name == std::string("NTRUPrime"))
 	{
 		tname = AsymmetricPrimitives::NTRUPrime;
 	}
-	else if (Name == std::string("RingLWE"))
+	else if (Name == std::string("NewHope"))
 	{
-		tname = AsymmetricPrimitives::RingLWE;
+		tname = AsymmetricPrimitives::NewHope;
 	}
-	else if (Name == std::string("Sphincs"))
+	else if (Name == std::string("SphincsPlus"))
 	{
-		tname = AsymmetricPrimitives::Sphincs;
+		tname = AsymmetricPrimitives::SphincsPlus;
 	}
 	else
 	{

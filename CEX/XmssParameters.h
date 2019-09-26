@@ -207,10 +207,10 @@ public:
 	static XmssParameters FromName(std::string &Name);
 
 	/// <summary>
-	/// Derive the SphincsParameters formal string name from the enumeration name
+	/// Derive the SphincsPlusParameters formal string name from the enumeration name
 	/// </summary>
 	/// 
-	/// <param name="Enumeral">The SphincsParameters enumeration member</param>
+	/// <param name="Enumeral">The SphincsPlusParameters enumeration member</param>
 	///
 	/// <returns>The matching XmssParameters string name</returns>
 	static std::string ToName(XmssParameters Enumeral);

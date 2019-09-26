@@ -15,13 +15,16 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Updated by September 24, 2019
+// Contact: develop@vtdev.com
 
 #ifndef CEX_XMSS_H
 #define CEX_XMSS_H
 
 #include "AsymmetricKey.h"
 #include "AsymmetricKeyPair.h"
-#include "IAsymmetricSign.h"
+#include "IAsymmetricSigner.h"
 #include "XmssParameters.h"
 
 NAMESPACE_XMSS
@@ -70,7 +73,7 @@ using Enumeration::XmssParameters;
 /// 
 /// <remarks>
 /// <description>Introduction</description>
-/// <para>Both XMSS and XMSS-MT use WOTS+ as a main building block. \n
+/// <para>Both XMSS and XMSS-MT use SPXPWOTS+ as a main building block. \n
 /// XMSS provides cryptographic digital signatures without relying on the conjectured hardness of mathematical problems. \n
 /// Instead, it is proven that it only relies on the properties of cryptographic hash functions. \n
 /// XMSS provides strong security guarantees and is even secure when the collision resistance of the underlying hash function is broken. \n
@@ -92,7 +95,7 @@ using Enumeration::XmssParameters;
 /// <item><description>XMSS/XMSS-MT <a href="https://github.com/XMSS/xmss-reference">Reference code</a>.</description></item>
 /// </list>
 /// </remarks>
-class XMSS final : public IAsymmetricSign
+class XMSS final : public IAsymmetricSigner
 {
 private:
 

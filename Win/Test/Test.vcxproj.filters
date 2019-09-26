@@ -368,9 +368,6 @@
     <ClInclude Include="..\..\Test\SimdWrapperTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\RingLWETest.h">
-      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\AsymmetricSpeedTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
@@ -386,9 +383,6 @@
     <ClInclude Include="..\..\Test\SHAKETest.h">
       <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\ModuleLWETest.h">
-      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\CSGTest.h">
       <Filter>Header Files\Test\GeneratorTest</Filter>
     </ClInclude>
@@ -397,9 +391,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\BCGTest.h">
       <Filter>Header Files\Test\GeneratorTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\NTRUTest.h">
-      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\ThreefishTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
@@ -415,9 +406,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\RandomUtils.h">
       <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\SphincsTest.h">
-      <Filter>Header Files\Test\Asymmetric\Sign</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\DilithiumTest.h">
       <Filter>Header Files\Test\Asymmetric\Sign</Filter>
@@ -463,6 +451,21 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\XMSSTest.h">
       <Filter>Header Files\Test\Asymmetric\Sign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RainbowTest.h">
+      <Filter>Header Files\Test\Asymmetric\Sign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\KyberTest.h">
+      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\NewHopeTest.h">
+      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SphincsPlusTest.h">
+      <Filter>Header Files\Test\Asymmetric\Sign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\NTRUPrimeTest.h">
+      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -562,9 +565,6 @@
     <ClCompile Include="..\..\Test\SimdWrapperTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\RingLWETest.cpp">
-      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
@@ -580,9 +580,6 @@
     <ClCompile Include="..\..\Test\SHAKETest.cpp">
       <Filter>Source Files\Test\KdfTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\ModuleLWETest.cpp">
-      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\CSGTest.cpp">
       <Filter>Source Files\Test\GeneratorTest</Filter>
     </ClCompile>
@@ -591,9 +588,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\BCGTest.cpp">
       <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\NTRUTest.cpp">
-      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\ThreefishTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
@@ -606,9 +600,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\HCGTest.cpp">
       <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\SphincsTest.cpp">
-      <Filter>Source Files\Test\Asymmetric\Sign</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\DilithiumTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Sign</Filter>
@@ -657,6 +648,21 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\XMSSTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Sign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RainbowTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Sign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\KyberTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\NewHopeTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SphincsPlusTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Sign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\NTRUPrimeTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

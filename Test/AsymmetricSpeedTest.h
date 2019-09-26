@@ -2,27 +2,15 @@
 #define CEXTEST_ASYMMETRICSPEEDTEST_H
 
 #include "ITest.h"
-#include "../CEX/AsymmetricPrimitives.h"
-#include "../CEX/DilithiumParameters.h"
-#include "../CEX/IBlockCipher.h"
-#include "../CEX/MLWEParameters.h"
-#include "../CEX/MPKCParameters.h"
-#include "../CEX/NTRUParameters.h"
-#include "../CEX/Prngs.h"
-#include "../CEX/RLWEParameters.h"
-#include "../CEX/SphincsParameters.h"
+#include "../CEX/AsymmetricCiphers.h"
+#include "../CEX/AsymmetricParameters.h"
+#include "../CEX/AsymmetricSigners.h"
 
 namespace Test
 {
-	using Enumeration::BlockCiphers;
-	using Enumeration::DilithiumParameters;
-	using Cipher::Block::IBlockCipher;
-	using Enumeration::MLWEParameters;
-	using Enumeration::MPKCParameters;
-	using Enumeration::NTRUParameters;
-	using Enumeration::Prngs;
-	using Enumeration::RLWEParameters;
-	using Enumeration::SphincsParameters;
+	using Enumeration::AsymmetricCiphers;
+	using Enumeration::AsymmetricParameters;
+	using Enumeration::AsymmetricSigners;
 
 	/// <summary>
 	/// Asymmetric Cipher and Signature Scheme Speed Tests
@@ -41,9 +29,9 @@ namespace Test
 		static const uint64_t GB1 = MB1 * 1000;
 		static const uint64_t DEF_DATA_SIZE = MB100;
 #if defined (_DEBUG)
-		static const uint64_t DEF_TEST_ITER = 10;
+		static const uint64_t TEST_ITERATIONS = 10;
 #else
-		static const uint64_t DEF_TEST_ITER = 100;
+		static const uint64_t TEST_ITERATIONS = 100;
 #endif
 
 		TestEventHandler m_progressEvent;
@@ -77,24 +65,12 @@ namespace Test
 
 	private:
 
-		void DlmGenerateLoop(DilithiumParameters Params, size_t Loops, Prngs PrngType);
-		void DlmSignLoop(DilithiumParameters Params, size_t Loops, Prngs PrngType);
-		void DlmVerifyLoop(DilithiumParameters Params, size_t Loops, Prngs PrngType);
-		void MpkcDecryptLoop(MPKCParameters Params, size_t Loops, Prngs PrngType);
-		void MpkcEncryptLoop(MPKCParameters Params, size_t Loops, Prngs PrngType);
-		void MpkcGenerateLoop(MPKCParameters Params, size_t Loops, Prngs PrngType);
-		void MlweDecryptLoop(MLWEParameters Params, size_t Loops, Prngs PrngType);
-		void MlweEncryptLoop(MLWEParameters Params, size_t Loops, Prngs PrngType);
-		void MlweGenerateLoop(MLWEParameters Params, size_t Loops, Prngs PrngType);
-		void NtruDecryptLoop(NTRUParameters Params, size_t Loops, Prngs PrngType);
-		void NtruEncryptLoop(NTRUParameters Params, size_t Loops, Prngs PrngType);
-		void NtruGenerateLoop(NTRUParameters Params, size_t Loops, Prngs PrngType);
-		void RlweDecryptLoop(RLWEParameters Params, size_t Loops, Prngs PrngType);
-		void RlweEncryptLoop(RLWEParameters Params, size_t Loops, Prngs PrngType);
-		void RlweGenerateLoop(RLWEParameters Params, size_t Loops, Prngs PrngType);
-		void SpxGenerateLoop(SphincsParameters Params, size_t Loops, Prngs PrngType);
-		void SpxSignLoop(SphincsParameters Params, size_t Loops, Prngs PrngType);
-		void SpxVerifyLoop(SphincsParameters Params, size_t Loops, Prngs PrngType);
+		void CipherDecryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters);
+		void CipherEncryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters);
+		void CipherGenerateLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters);
+		void SignerGenerateLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters);
+		void SignerSignLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters);
+		void SignerVerifyLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters);
 		uint64_t GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count);
 		void OnProgress(const std::string &Data);
 	};

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['ntruparameters',['NTRUParameters',['../group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e',1,'Documentation.h']]]
+  ['newhopeparameters',['NewHopeParameters',['../group___enumeration.html#ga2a29dd4d65fc333fc7266a6aa839b3f7',1,'Documentation.h']]],
+  ['ntruprimeparameters',['NTRUPrimeParameters',['../group___enumeration.html#gaf514e80c57300c1aa6b4afc0151895c8',1,'Documentation.h']]]
 ];

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.7</span>
+   &#160;<span id="projectnumber">1.0.0.8</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -71,7 +71,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the NTRU-Prime asymmetric cipher (NTRUPRIME)  
+<p>An implementation of the NTRU-Prime asymmetric cipher (NTRU-SPRIME)  
  <a href="class_n_t_r_u_prime.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_n_t_r_u_prime_8h_source.html">NTRUPrime.h</a>&gt;</code></p>
@@ -93,12 +93,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a812771efca1bbd78828d9c9e808beda4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_n_t_r_u_prime.html">NTRUPrime</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a812771efca1bbd78828d9c9e808beda4">operator=</a> (const <a class="el" href="class_n_t_r_u_prime.html">NTRUPrime</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a812771efca1bbd78828d9c9e808beda4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a812771efca1bbd78828d9c9e808beda4">More...</a><br /></td></tr>
 <tr class="separator:a812771efca1bbd78828d9c9e808beda4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb1c702bc942b21a10e74f38d518941c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#afb1c702bc942b21a10e74f38d518941c">NTRUPrime</a> (<a class="el" href="group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e">NTRUParameters</a> <a class="el" href="class_n_t_r_u_prime.html#a10db0d673bced1b6a98e210010aeaf1a">Parameters</a>=<a class="el" href="group___enumeration.html#gga523b9bb04a889b4d724240405d2b590eaffcdc100f03433c569b73bb77724ab09">NTRUParameters::NTRUS2SQ4591N761</a>, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
-<tr class="memdesc:afb1c702bc942b21a10e74f38d518941c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the cipher with auto-initialized prng and digest functions  <a href="#afb1c702bc942b21a10e74f38d518941c">More...</a><br /></td></tr>
-<tr class="separator:afb1c702bc942b21a10e74f38d518941c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a954b73a3817411b6b7c0e4f266957c93"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a954b73a3817411b6b7c0e4f266957c93">NTRUPrime</a> (<a class="el" href="group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e">NTRUParameters</a> <a class="el" href="class_n_t_r_u_prime.html#a10db0d673bced1b6a98e210010aeaf1a">Parameters</a>, <a class="el" href="class_i_prng.html">IPrng</a> *Prng)</td></tr>
-<tr class="memdesc:a954b73a3817411b6b7c0e4f266957c93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using external Prng and Digest instances  <a href="#a954b73a3817411b6b7c0e4f266957c93">More...</a><br /></td></tr>
-<tr class="separator:a954b73a3817411b6b7c0e4f266957c93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93cc2b1e78e0dc20f422432acf7336e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a93cc2b1e78e0dc20f422432acf7336e3">NTRUPrime</a> (<a class="el" href="group___enumeration.html#gaf514e80c57300c1aa6b4afc0151895c8">NTRUPrimeParameters</a> <a class="el" href="class_n_t_r_u_prime.html#ab382f90da5868705e99ee423f2eb1b60">Parameters</a>=<a class="el" href="group___enumeration.html#ggaf514e80c57300c1aa6b4afc0151895c8affcdc100f03433c569b73bb77724ab09">NTRUPrimeParameters::NTRUS2SQ4591N761</a>, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
+<tr class="memdesc:a93cc2b1e78e0dc20f422432acf7336e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the cipher with auto-initialized prng and digest functions  <a href="#a93cc2b1e78e0dc20f422432acf7336e3">More...</a><br /></td></tr>
+<tr class="separator:a93cc2b1e78e0dc20f422432acf7336e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c548ff5637f411353b6c24c3507ebcb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a7c548ff5637f411353b6c24c3507ebcb">NTRUPrime</a> (<a class="el" href="group___enumeration.html#gaf514e80c57300c1aa6b4afc0151895c8">NTRUPrimeParameters</a> <a class="el" href="class_n_t_r_u_prime.html#ab382f90da5868705e99ee423f2eb1b60">Parameters</a>, <a class="el" href="class_i_prng.html">IPrng</a> *Prng)</td></tr>
+<tr class="memdesc:a7c548ff5637f411353b6c24c3507ebcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using external Prng and Digest instances  <a href="#a7c548ff5637f411353b6c24c3507ebcb">More...</a><br /></td></tr>
+<tr class="separator:a7c548ff5637f411353b6c24c3507ebcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1ce7c906368f4cd8c42e530974a214f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#ad1ce7c906368f4cd8c42e530974a214f">~NTRUPrime</a> ()</td></tr>
 <tr class="memdesc:ad1ce7c906368f4cd8c42e530974a214f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#ad1ce7c906368f4cd8c42e530974a214f">More...</a><br /></td></tr>
 <tr class="separator:ad1ce7c906368f4cd8c42e530974a214f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,9 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8a824662d92cb14aa720dc14cb207a75"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a8a824662d92cb14aa720dc14cb207a75">Name</a> () override</td></tr>
 <tr class="memdesc:a8a824662d92cb14aa720dc14cb207a75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher and parameter-set formal names  <a href="#a8a824662d92cb14aa720dc14cb207a75">More...</a><br /></td></tr>
 <tr class="separator:a8a824662d92cb14aa720dc14cb207a75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10db0d673bced1b6a98e210010aeaf1a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e">NTRUParameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#a10db0d673bced1b6a98e210010aeaf1a">Parameters</a> ()</td></tr>
-<tr class="memdesc:a10db0d673bced1b6a98e210010aeaf1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#a10db0d673bced1b6a98e210010aeaf1a">More...</a><br /></td></tr>
-<tr class="separator:a10db0d673bced1b6a98e210010aeaf1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab382f90da5868705e99ee423f2eb1b60"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gaf514e80c57300c1aa6b4afc0151895c8">NTRUPrimeParameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#ab382f90da5868705e99ee423f2eb1b60">Parameters</a> ()</td></tr>
+<tr class="memdesc:ab382f90da5868705e99ee423f2eb1b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#ab382f90da5868705e99ee423f2eb1b60">More...</a><br /></td></tr>
+<tr class="separator:ab382f90da5868705e99ee423f2eb1b60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcc5401bb2b9d6b63bcc14fe077054b8"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_n_t_r_u_prime.html#adcc5401bb2b9d6b63bcc14fe077054b8">PrivateKeySize</a> () override</td></tr>
 <tr class="memdesc:adcc5401bb2b9d6b63bcc14fe077054b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key-size in bytes  <a href="#adcc5401bb2b9d6b63bcc14fe077054b8">More...</a><br /></td></tr>
 <tr class="separator:adcc5401bb2b9d6b63bcc14fe077054b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,8 +159,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a97a138a5407f8e8cf9c0a65c8549e4c5 inherit pub_methods_class_i_asymmetric_cipher"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the NTRU-Prime asymmetric cipher (NTRUPRIME) </p>
-<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_n_t_r_u_prime.html">NTRUPrime</a> cpr(<a class="code" href="group___enumeration.html#gga523b9bb04a889b4d724240405d2b590eaffcdc100f03433c569b73bb77724ab09">NTRUParameters::NTRUS2SQ4591N761</a>);</div><div class="line">IAsymmetricKeyPair* kp = cpr.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line"><a class="code" href="class_i_asymmetric_key.html">IAsymmetricKey</a>* pubk = kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; pk = pubk-&gt;ToBytes();</div></div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">create the shared secret</div><div class="line">std::vector&lt;byte&gt; cpt(0);</div><div class="line">std::vector&lt;byte&gt; sec(0);</div><div class="line"></div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line"><a class="code" href="class_n_t_r_u_prime.html">NTRUPrime</a> cpr(<a class="code" href="group___enumeration.html#gga523b9bb04a889b4d724240405d2b590eaffcdc100f03433c569b73bb77724ab09">NTRUParameters::NTRUS2SQ4591N761</a>);</div><div class="line">cpr.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line"><span class="comment">// generate the ciphertext and shared secret</span></div><div class="line">status = cpr.Encapsulate(cpt, sec);</div></div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(0);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line"><a class="code" href="class_n_t_r_u_prime.html">NTRUPrime</a> cpr(NTRUParameters::NTRUS2LQ4591N761);</div><div class="line">cpr.Initialize(PrivateKey);</div><div class="line"><span class="comment">// decrypt the shared secret, status returns authentication outcome, false for failure</span></div><div class="line">status = cpr.Decapsulate(cpt, sec);</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<div class="textblock"><p>An implementation of the NTRU-Prime asymmetric cipher (NTRU-SPRIME) </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_n_t_r_u_prime.html">NTRUPrime</a> cpr(<a class="code" href="group___enumeration.html#ggaf514e80c57300c1aa6b4afc0151895c8affcdc100f03433c569b73bb77724ab09">NTRUPrimeParameters::NTRUS2SQ4591N761</a>);</div><div class="line">IAsymmetricKeyPair* kp = cpr.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line"><a class="code" href="class_i_asymmetric_key.html">IAsymmetricKey</a>* pubk = kp-&gt;PublicKey();</div><div class="line">std::vector&lt;byte&gt; pk = pubk-&gt;ToBytes();</div></div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">create the shared secret</div><div class="line">std::vector&lt;byte&gt; cpt(0);</div><div class="line">std::vector&lt;byte&gt; sec(0);</div><div class="line"></div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line"><a class="code" href="class_n_t_r_u_prime.html">NTRUPrime</a> cpr(<a class="code" href="group___enumeration.html#ggaf514e80c57300c1aa6b4afc0151895c8affcdc100f03433c569b73bb77724ab09">NTRUPrimeParameters::NTRUS2SQ4591N761</a>);</div><div class="line">cpr.Initialize(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line"><span class="comment">// generate the ciphertext and shared secret</span></div><div class="line">status = cpr.Encapsulate(cpt, sec);</div></div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; sec(0);</div><div class="line"><span class="keywordtype">bool</span> status;</div><div class="line"></div><div class="line"><span class="comment">// initialize the cipher</span></div><div class="line"><a class="code" href="class_n_t_r_u_prime.html">NTRUPrime</a> cpr(NTRUPrimeParameters::NTRUS2LQ4591N761);</div><div class="line">cpr.Initialize(PrivateKey);</div><div class="line"><span class="comment">// decrypt the shared secret, status returns authentication outcome, false for failure</span></div><div class="line">status = cpr.Decapsulate(cpt, sec);</div></div><!-- fragment --> <p>Implementation Notes: </p>
 <p>Several ideal-lattice-based cryptosystems have been broken by recent attacks that exploit special structures of the rings used in those cryptosystems. <br />
 The same structures are also used in the leading proposals for post-quantum lattice-based cryptography, including the classic NTRU cryptosystem and typical Ring-LWE-based cryptosystems. <br />
 NTRU-Prime tweaks NTRU to use rings without these structures. This implementation uses three parameter sets from the Streamlined NTRU-Prime implementations; optimized from an implementation perspective. <br />
@@ -223,8 +223,8 @@ Website: <a href="https://ntruprime.cr.yp.to/">NTRU-Prime Website</a>. </li>
 
 </div>
 </div>
-<a id="afb1c702bc942b21a10e74f38d518941c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afb1c702bc942b21a10e74f38d518941c">&#9670;&nbsp;</a></span>NTRUPrime() <span class="overload">[2/3]</span></h2>
+<a id="a93cc2b1e78e0dc20f422432acf7336e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93cc2b1e78e0dc20f422432acf7336e3">&#9670;&nbsp;</a></span>NTRUPrime() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -232,8 +232,8 @@ Website: <a href="https://ntruprime.cr.yp.to/">NTRU-Prime Website</a>. </li>
         <tr>
           <td class="memname">NTRUPrime::NTRUPrime </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e">NTRUParameters</a>&#160;</td>
-          <td class="paramname"><em>Parameters</em> = <code><a class="el" href="group___enumeration.html#gga523b9bb04a889b4d724240405d2b590eaffcdc100f03433c569b73bb77724ab09">NTRUParameters::NTRUS2SQ4591N761</a></code>, </td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#gaf514e80c57300c1aa6b4afc0151895c8">NTRUPrimeParameters</a>&#160;</td>
+          <td class="paramname"><em>Parameters</em> = <code><a class="el" href="group___enumeration.html#ggaf514e80c57300c1aa6b4afc0151895c8affcdc100f03433c569b73bb77724ab09">NTRUPrimeParameters::NTRUS2SQ4591N761</a></code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -266,8 +266,8 @@ Website: <a href="https://ntruprime.cr.yp.to/">NTRU-Prime Website</a>. </li>
 
 </div>
 </div>
-<a id="a954b73a3817411b6b7c0e4f266957c93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a954b73a3817411b6b7c0e4f266957c93">&#9670;&nbsp;</a></span>NTRUPrime() <span class="overload">[3/3]</span></h2>
+<a id="a7c548ff5637f411353b6c24c3507ebcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c548ff5637f411353b6c24c3507ebcb">&#9670;&nbsp;</a></span>NTRUPrime() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -275,7 +275,7 @@ Website: <a href="https://ntruprime.cr.yp.to/">NTRU-Prime Website</a>. </li>
         <tr>
           <td class="memname">NTRUPrime::NTRUPrime </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e">NTRUParameters</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#gaf514e80c57300c1aa6b4afc0151895c8">NTRUPrimeParameters</a>&#160;</td>
           <td class="paramname"><em>Parameters</em>, </td>
         </tr>
         <tr>
@@ -699,14 +699,14 @@ Website: <a href="https://ntruprime.cr.yp.to/">NTRU-Prime Website</a>. </li>
 
 </div>
 </div>
-<a id="a10db0d673bced1b6a98e210010aeaf1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a10db0d673bced1b6a98e210010aeaf1a">&#9670;&nbsp;</a></span>Parameters()</h2>
+<a id="ab382f90da5868705e99ee423f2eb1b60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab382f90da5868705e99ee423f2eb1b60">&#9670;&nbsp;</a></span>Parameters()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="group___enumeration.html#ga523b9bb04a889b4d724240405d2b590e">NTRUParameters</a> NTRUPrime::Parameters </td>
+          <td class="memname">const <a class="el" href="group___enumeration.html#gaf514e80c57300c1aa6b4afc0151895c8">NTRUPrimeParameters</a> NTRUPrime::Parameters </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>

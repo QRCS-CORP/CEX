@@ -18,15 +18,15 @@ enum class DilithiumParameters : byte
 	/// <summary>
 	/// The S1 parameters; (Medium Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS1N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLMS1N256Q8380417),
+	DLTMS1N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLTMS1N256Q8380417),
 	/// <summary>
 	/// The S2 parameters; (High Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS2N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLMS2N256Q8380417),
+	DLTMS2N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLTMS2N256Q8380417),
 	/// <summary>
 	/// The S3 parameters; (Highest Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS3N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLMS3N256Q8380417),
+	DLTMS3N256Q8380417 = static_cast<byte>(AsymmetricParameters::DLTMS3N256Q8380417),
 };
 
 class DilithiumParameterConvert

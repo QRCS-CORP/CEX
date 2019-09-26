@@ -3,7 +3,7 @@
 #include "../CEX/AsymmetricKey.h"
 #include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/IntegerTools.h"
-#include "../CEX/ModuleLWE.h"
+#include "../CEX/Kyber.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SecureVector.h"
 #include "../CEX/XMSS.h"
@@ -212,7 +212,7 @@ namespace Test
 		try
 		{
 			XMSS sgn(XmssParameters::XMSSSHA256H10);
-			Asymmetric::Encrypt::MLWE::ModuleLWE cprb;
+			Asymmetric::Encrypt::MLWE::Kyber cprb;
 			// create an invalid key set
 			AsymmetricKeyPair* kp = cprb.Generate();
 			sgn.Initialize(kp->PrivateKey());

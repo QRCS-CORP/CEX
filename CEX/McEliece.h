@@ -15,17 +15,20 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Updated by September 24, 2019
+// Contact: develop@vtdev.com
 
 #ifndef CEX_MCELIECE_H
 #define CEX_MCELIECE_H
 
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
-#include "MPKCParameters.h"
+#include "McElieceParameters.h"
 
 NAMESPACE_MCELIECE
 
-using Enumeration::MPKCParameters;
+using Enumeration::McElieceParameters;
 
 /// <summary>
 /// An implementation of the Niederreiter dual form of the McEliece public key crypto-system (MPKC)
@@ -34,7 +37,7 @@ using Enumeration::MPKCParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// McEliece cpr(MPKCParameters::MPKCS1N4096T62, [PrngType], [CipherType]);
+/// McEliece cpr(McElieceParameters::MPKCS1N4096T62, [PrngType], [CipherType]);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// // serialize the public key
 /// IAsymmetricKey* pubk = kp->PublicKey();
@@ -48,7 +51,7 @@ using Enumeration::MPKCParameters;
 /// std::vector&lt;byte&gt; ssk(0);
 ///
 /// // initialize the cipher
-/// McEliece cpr(MPKCParameters::MPKCS1N4096T62, Prng-Type);
+/// McEliece cpr(McElieceParameters::MPKCS1N4096T62, Prng-Type);
 /// cpr.Initialize(PublicKey);
 /// // encrypt the secret
 /// cpr.Encapsulate(cpt, ssk);
@@ -59,7 +62,7 @@ using Enumeration::MPKCParameters;
 /// std::vector&lt;byte&gt; ssk(0);
 /// bool status;
 ///
-/// McEliece cpr(MPKCParameters::MPKCS1N4096T62, Prng-Type);
+/// McEliece cpr(McElieceParameters::MPKCS1N4096T62, Prng-Type);
 /// // initialize the cipher
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the secret, status returns authentication outcome, false for failure
@@ -73,7 +76,7 @@ using Enumeration::MPKCParameters;
 ///
 /// <para>This implementation is based on two different implementations of the asymmetric primitive; the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/."> 'McBits'</a>,  \n
 /// and the NIST PQ Round 2 implementation by the same authors (using the recommended version contained in the SUPERCOP package). \n
-/// The MPKCParameters enumeration member is passed to the constructor along with the Prng enum type value (required: the default is BCR), or an initialized instance of a Prng through the secondary advanced constructor option. \n
+/// The McElieceParameters enumeration member is passed to the constructor along with the Prng enum type value (required: the default is BCR), or an initialized instance of a Prng through the secondary advanced constructor option. \n
 /// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key-tag byte array. \n
 /// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
 ///
@@ -139,7 +142,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	McEliece(MPKCParameters Parameters = MPKCParameters::MPKCS1N4096T62, Prngs PrngType = Prngs::BCR);
+	McEliece(McElieceParameters Parameters = McElieceParameters::MPKCS1N4096T62, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -149,7 +152,7 @@ public:
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	McEliece(MPKCParameters Parameters, IPrng* Prng);
+	McEliece(McElieceParameters Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -196,7 +199,7 @@ public:
 	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
-	const MPKCParameters Parameters();
+	const McElieceParameters Parameters();
 
 	/// <summary>
 	/// Read Only: The expected Private key-size in bytes

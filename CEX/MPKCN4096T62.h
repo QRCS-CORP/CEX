@@ -181,11 +181,11 @@ private:
 	{
 	public:
 
-		static void Transform(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input);
+		static void Transform(std::vector<std::array<ulong, MPKC_M>> &Output, std::array<ulong, MPKC_M> &Input);
 
 	private:
 
-		static void Butterflies(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input);
+		static void Butterflies(std::vector<std::array<ulong, MPKC_M>> &Output, std::array<ulong, MPKC_M> &Input);
 
 		static void RadixConversions(std::array<ulong, MPKC_M> &Output);
 	};

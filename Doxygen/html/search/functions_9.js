@@ -14,5 +14,6 @@ var searchData=
   ['keysize',['KeySize',['../class_symmetric_key_size.html#a419367240982c602a46ca393819f695b',1,'SymmetricKeySize']]],
   ['keysizes',['KeySizes',['../class_i_symmetric_key.html#ad34c4468dd76c88142018c2c6bf9ff20',1,'ISymmetricKey::KeySizes()'],['../class_symmetric_key.html#afe90aec133e56c6657c336f4c498eb2f',1,'SymmetricKey::KeySizes()'],['../class_symmetric_secure_key.html#a0f9c7b9ba79a7f64238f64815199f2f2',1,'SymmetricSecureKey::KeySizes()']]],
   ['kmac',['KMAC',['../class_k_m_a_c.html#a1f90dcc401f5bd5ba31e85e0f13e87c6',1,'KMAC::KMAC(const KMAC &amp;)=delete'],['../class_k_m_a_c.html#a01e5f1e7adca8c556acd02dc296653ac',1,'KMAC::KMAC(KmacModes KmacModeType=KmacModes::KMAC256)']]],
-  ['kmacmode',['KmacMode',['../class_k_m_a_c.html#a4a5cf6fecff6bab16d6632015bcef915',1,'KMAC']]]
+  ['kmacmode',['KmacMode',['../class_k_m_a_c.html#a4a5cf6fecff6bab16d6632015bcef915',1,'KMAC']]],
+  ['kyber',['Kyber',['../class_kyber.html#a7c1213cb3716bca2f2be9ddd768b35bf',1,'Kyber::Kyber(const Kyber &amp;)=delete'],['../class_kyber.html#ace0714f7dfa9c0c3551bb597cb042f42',1,'Kyber::Kyber(KyberParameters Parameters=KyberParameters::MLWES2Q3329N256, Prngs PrngType=Prngs::BCR)'],['../class_kyber.html#acd1d094ab8e21f549e8fe2af4aa35fdb',1,'Kyber::Kyber(KyberParameters Parameters, IPrng *Prng)']]]
 ];

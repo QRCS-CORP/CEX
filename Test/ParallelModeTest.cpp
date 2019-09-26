@@ -99,8 +99,8 @@ namespace Test
 
 	void ParallelModeTest::Stress(ICipherMode* Cipher, bool Encryption)
 	{
-		const size_t MINSMP = Cipher->ParallelProfile().ParallelBlockSize();
-		const size_t MAXSMP = Cipher->ParallelProfile().ParallelBlockSize() * 4;
+		const uint MINSMP = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint MAXSMP = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize()) * 4;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[1];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;

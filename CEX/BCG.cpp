@@ -226,7 +226,7 @@ void BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		m_bcgState->Counter += Length;
 
 		// generator must be re-seeded
-		if (m_bcgState->Counter >= ReseedThreshold())
+		if (m_bcgState->Counter >= ReseedThreshold() || CyclicReseed() == true)
 		{
 			// increment the reseed count
 			++m_bcgState->Reseed;

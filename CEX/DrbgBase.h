@@ -12,6 +12,7 @@ class DrbgBase : public IDrbg
 {
 private:
 
+	bool m_cyclicReseed;
 	Drbgs m_drbgEnumeral;
 	std::string m_drbgName;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
@@ -58,6 +59,11 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
+	/// Read/Write: If the random provider is specified, reseeds the generator after each generation call.
+	/// </summary>
+	const bool &CyclicReseed() override;
+
+	/// <summary>
 	/// Read Only: The prngs type name
 	/// </summary>
 	const Drbgs Enumeral() override;
@@ -83,7 +89,7 @@ public:
 	const size_t MaxReseedCount() override;
 
 	/// <summary>
-	/// The KDF generators formal class name
+	/// Read Only: The DRBGs formal class name
 	/// </summary>
 	const std::string Name() override;
 };

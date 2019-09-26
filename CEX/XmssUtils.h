@@ -8,7 +8,7 @@ NAMESPACE_XMSS
 
 using Enumeration::XmssParameters;
 
-class XmssUtils
+class XMSSUtils
 {
 public:
 

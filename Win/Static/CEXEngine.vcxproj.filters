@@ -130,12 +130,6 @@
     <Filter Include="Header Files\Asymmetric\Sign">
       <UniqueIdentifier>{d00d4d78-1dd5-4f8d-b85a-bd38bb12538d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Asymmetric\Sign\Sphincs">
-      <UniqueIdentifier>{ef3863fe-b139-419d-ad5b-52fc4e249eca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Sign\Sphincs\Support">
-      <UniqueIdentifier>{ad1e07fb-357c-42b1-886a-07ad5622b0aa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Asymmetric\Sign\Dilithium">
       <UniqueIdentifier>{e1dc5f4f-d16a-4a86-ac41-a86ddb31a63e}</UniqueIdentifier>
     </Filter>
@@ -262,23 +256,11 @@
     <Filter Include="Source Files\Asymmetric\Cipher">
       <UniqueIdentifier>{60af2114-8bce-4b8b-82cb-13a3c8e36f1c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Asymmetric\Cipher\RingLWE">
-      <UniqueIdentifier>{a80898f3-6afc-4a1c-bfd4-4f19a584e69f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Cipher\RingLWE\Support">
-      <UniqueIdentifier>{2b081e58-9b0d-4b2a-9efc-a35b79f5ab15}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Asymmetric\Cipher\McEliece">
       <UniqueIdentifier>{d98aa6ce-c534-49cd-a0bc-b66dd7a4b7b5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Asymmetric\Cipher\McEliece\Support">
       <UniqueIdentifier>{ab06a14a-2609-4f59-ba79-efcf1f62c296}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Cipher\ModuleLWE">
-      <UniqueIdentifier>{0048dfae-3e1d-4584-88d1-b696870447d3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Asymmetric\Cipher\ModuleLWE\Support">
-      <UniqueIdentifier>{676eba65-b1be-4edd-a465-b9f26c1164fc}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Asymmetric\Cipher">
       <UniqueIdentifier>{39640886-cd1f-4352-97bd-da3f850b94ac}</UniqueIdentifier>
@@ -288,18 +270,6 @@
     </Filter>
     <Filter Include="Header Files\Asymmetric\Cipher\McEliece\Support">
       <UniqueIdentifier>{28e04534-0f5a-4369-9c19-3e666e47b28e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Cipher\RingLWE">
-      <UniqueIdentifier>{046e42d0-5c8a-40d8-929c-fec0297d71eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Cipher\RingLWE\Support">
-      <UniqueIdentifier>{d6f55125-7c64-4ebd-84f5-317335929c13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Cipher\ModuleLWE">
-      <UniqueIdentifier>{5bb45a3e-efd7-4d50-876c-582e7f2dc3d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Asymmetric\Cipher\ModuleLWE\Support">
-      <UniqueIdentifier>{e6761720-0098-4cee-9e0b-f62d8fced8bb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Asymmetric\Cipher\NTRUPrime">
       <UniqueIdentifier>{de7c0483-f3e9-4fb0-bca3-c54eeab893d9}</UniqueIdentifier>
@@ -324,6 +294,48 @@
     </Filter>
     <Filter Include="Header Files\Asymmetric\Sign\XMSS\Support">
       <UniqueIdentifier>{4118c121-99e0-46eb-9e8d-163048477265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\Rainbow">
+      <UniqueIdentifier>{e8a9d025-6d09-4a4e-894d-9255cc687aad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Sign\Rainbow">
+      <UniqueIdentifier>{ed6fe804-137f-4bca-bb8b-42e6d2145d56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\Rainbow\Support">
+      <UniqueIdentifier>{bf8d0dac-9b2a-499c-a3a5-a6808dbabad6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Sign\Rainbow\Support">
+      <UniqueIdentifier>{2f0e800a-5c67-4e36-9722-01a1d70a44ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\Kyber">
+      <UniqueIdentifier>{5bb45a3e-efd7-4d50-876c-582e7f2dc3d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\Kyber\Support">
+      <UniqueIdentifier>{e6761720-0098-4cee-9e0b-f62d8fced8bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\NewHope">
+      <UniqueIdentifier>{046e42d0-5c8a-40d8-929c-fec0297d71eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\NewHope\Support">
+      <UniqueIdentifier>{d6f55125-7c64-4ebd-84f5-317335929c13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\SphincsPlus">
+      <UniqueIdentifier>{ef3863fe-b139-419d-ad5b-52fc4e249eca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\SphincsPlus\Support">
+      <UniqueIdentifier>{ad1e07fb-357c-42b1-886a-07ad5622b0aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\Kyber">
+      <UniqueIdentifier>{0048dfae-3e1d-4584-88d1-b696870447d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\Kyber\Support">
+      <UniqueIdentifier>{676eba65-b1be-4edd-a465-b9f26c1164fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\NewHope">
+      <UniqueIdentifier>{a80898f3-6afc-4a1c-bfd4-4f19a584e69f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\NewHope\Support">
+      <UniqueIdentifier>{2b081e58-9b0d-4b2a-9efc-a35b79f5ab15}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -639,14 +651,8 @@
     <ClInclude Include="..\..\CEX\IAsymmetricCipher.h">
       <Filter>Header Files\Asymmetric\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\IAsymmetricSign.h">
-      <Filter>Header Files\Asymmetric\Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\UInt512.h">
       <Filter>Header Files\Numeric</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\RingLWE.h">
-      <Filter>Header Files\Asymmetric\Cipher\RingLWE</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\UShort128.h">
       <Filter>Header Files\Numeric</Filter>
@@ -681,9 +687,6 @@
     <ClInclude Include="..\..\CEX\AeadModes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\McElieceUtils.h">
-      <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoAuthenticationFailure.h">
       <Filter>Header Files\Exception</Filter>
     </ClInclude>
@@ -692,9 +695,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\Poly1305.h">
       <Filter>Header Files\Mac</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\ModuleLWE.h">
-      <Filter>Header Files\Asymmetric\Cipher\ModuleLWE</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ShakeModes.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -730,7 +730,7 @@
       <Filter>Header Files\Kdf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h">
-      <Filter>Header Files\Asymmetric\Cipher\RingLWE\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\NewHope\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2Digests.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -742,7 +742,7 @@
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\RLWEQ12289N2048.h">
-      <Filter>Header Files\Asymmetric\Cipher\RingLWE\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\NewHope\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Threefish.h">
       <Filter>Header Files\Cipher\Stream\Support</Filter>
@@ -759,28 +759,10 @@
     <ClInclude Include="..\..\CEX\ErrorCodes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Sphincs.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SphincsParameters.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Dilithium.h">
       <Filter>Header Files\Asymmetric\Sign\Dilithium</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\DilithiumParameters.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\RLWEParameters.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\NTRUParameters.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MPKCParameters.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MLWEParameters.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SymmetricCiphers.h">
@@ -943,7 +925,7 @@
       <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MLWEQ3329N256.h">
-      <Filter>Header Files\Asymmetric\Cipher\ModuleLWE\Support</Filter>
+      <Filter>Header Files\Asymmetric\Cipher\Kyber\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\NTRUPrime.h">
       <Filter>Header Files\Asymmetric\Cipher\NTRUPrime</Filter>
@@ -969,24 +951,6 @@
     <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h">
       <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\DLMNPolyMath.h">
-      <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SPXS128SHAKE.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SPXS192SHAKE.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SPXS256SHAKE.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\FORS.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\WOTS.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\XMSS.h">
       <Filter>Header Files\Asymmetric\Sign\XMSS</Filter>
     </ClInclude>
@@ -996,14 +960,86 @@
     <ClInclude Include="..\..\CEX\AsymmetricParameters.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\XmssCore.h">
+    <ClInclude Include="..\..\CEX\Rainbow.h">
+      <Filter>Header Files\Asymmetric\Sign\Rainbow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RainbowParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DLTMPolyMath.h">
+      <Filter>Header Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RNBWGfMath.h">
+      <Filter>Header Files\Asymmetric\Sign\Rainbow\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RNBWCore.h">
+      <Filter>Header Files\Asymmetric\Sign\Rainbow\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\XMSSCore.h">
       <Filter>Header Files\Asymmetric\Sign\XMSS\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\XmssUtils.h">
+    <ClInclude Include="..\..\CEX\XMSSUtils.h">
       <Filter>Header Files\Asymmetric\Sign\XMSS\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SphincsUtils.h">
-      <Filter>Header Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    <ClInclude Include="..\..\CEX\SphincsPlus.h">
+      <Filter>Header Files\Asymmetric\Sign\SphincsPlus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MPKCUtils.h">
+      <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Kyber.h">
+      <Filter>Header Files\Asymmetric\Cipher\Kyber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NewHope.h">
+      <Filter>Header Files\Asymmetric\Cipher\NewHope</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXPFORS.h">
+      <Filter>Header Files\Asymmetric\Sign\SphincsPlus\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXPUtils.h">
+      <Filter>Header Files\Asymmetric\Sign\SphincsPlus\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXPS256SHAKE.h">
+      <Filter>Header Files\Asymmetric\Sign\SphincsPlus\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXPWOTS.h">
+      <Filter>Header Files\Asymmetric\Sign\SphincsPlus\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXPS128SHAKE.h">
+      <Filter>Header Files\Asymmetric\Sign\SphincsPlus\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXPS192SHAKE.h">
+      <Filter>Header Files\Asymmetric\Sign\SphincsPlus\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KyberParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\McElieceParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NewHopeParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUPrimeParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsymmetricCipherFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsymmetricCiphers.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsymmetricSigners.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsymmetricSignerFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAsymmetricSigner.h">
+      <Filter>Header Files\Asymmetric\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SphincsPlusParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1193,9 +1229,6 @@
     <ClCompile Include="..\..\CEX\CryptoRandomException.cpp">
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\RingLWE.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\RingLWE</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\ACP.cpp">
       <Filter>Source Files\Provider</Filter>
     </ClCompile>
@@ -1223,9 +1256,6 @@
     <ClCompile Include="..\..\CEX\CryptoAuthenticationFailure.cpp">
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\McElieceUtils.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\BlakeParams.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
@@ -1241,9 +1271,6 @@
     <ClCompile Include="..\..\CEX\Poly1305.cpp">
       <Filter>Source Files\Mac</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\ModuleLWE.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\ModuleLWE</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\CSG.cpp">
       <Filter>Source Files\Drbg</Filter>
     </ClCompile>
@@ -1257,7 +1284,7 @@
       <Filter>Source Files\Kdf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\RingLWE\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\NewHope\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\TimeStamp.cpp">
       <Filter>Source Files\Utility</Filter>
@@ -1275,16 +1302,13 @@
       <Filter>Source Files\Cipher\Stream\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\RLWEQ12289N2048.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\RingLWE\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\NewHope\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Threefish.cpp">
       <Filter>Source Files\Cipher\Stream\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MacFromName.cpp">
       <Filter>Source Files\Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Sphincs.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Dilithium.cpp">
       <Filter>Source Files\Asymmetric\Sign\Dilithium</Filter>
@@ -1370,12 +1394,6 @@
     <ClCompile Include="..\..\CEX\Macs.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\MPKCParameters.cpp">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\NTRUParameters.cpp">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\PaddingModes.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
@@ -1385,9 +1403,6 @@
     <ClCompile Include="..\..\CEX\Providers.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\RLWEParameters.cpp">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\SecurityPolicy.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
@@ -1395,9 +1410,6 @@
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ShakeModes.cpp">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SphincsParameters.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\StreamAuthenticators.cpp">
@@ -1413,9 +1425,6 @@
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\DilithiumParameters.cpp">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\MLWEParameters.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\BlockCiphers.cpp">
@@ -1488,7 +1497,7 @@
       <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MLWEQ3329N256.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\ModuleLWE\Support</Filter>
+      <Filter>Source Files\Asymmetric\Cipher\Kyber\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\NTRUPrime.cpp">
       <Filter>Source Files\Asymmetric\Cipher\NTRUPrime</Filter>
@@ -1514,24 +1523,6 @@
     <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp">
       <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\DLMNPolyMath.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SPXS128SHAKE.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SPXS192SHAKE.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SPXS256SHAKE.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\FORS.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\WOTS.cpp">
-      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\XmssParameters.cpp">
       <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
@@ -1541,14 +1532,83 @@
     <ClCompile Include="..\..\CEX\XMSS.cpp">
       <Filter>Source Files\Asymmetric\Sign\XMSS</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\XmssCore.cpp">
+    <ClCompile Include="..\..\CEX\Rainbow.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Rainbow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RainbowParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DLTMPolyMath.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RNBWCore.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Rainbow\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\XMSSCore.cpp">
       <Filter>Source Files\Asymmetric\Sign\XMSS\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\XmssUtils.cpp">
+    <ClCompile Include="..\..\CEX\XMSSUtils.cpp">
       <Filter>Source Files\Asymmetric\Sign\XMSS\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\SphincsUtils.cpp">
+    <ClCompile Include="..\..\CEX\MPKCUtils.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Kyber.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\Kyber</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NewHope.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\NewHope</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXPFORS.cpp">
       <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXPUtils.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXPS128SHAKE.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXPS192SHAKE.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXPS256SHAKE.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXPWOTS.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsPlus.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Sphincs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RNBWGfMath.cpp">
+      <Filter>Source Files\Asymmetric\Sign\Rainbow\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\KyberParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\McElieceParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NewHopeParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUPrimeParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricCipherFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricCiphers.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricSigners.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AsymmetricSignerFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsPlusParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

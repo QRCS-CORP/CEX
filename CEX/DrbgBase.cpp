@@ -9,6 +9,7 @@ using Utility::IntegerTools;
 
 DrbgBase::DrbgBase(Drbgs Enumeral, std::string &Name, std::vector<SymmetricKeySize> &KeySizes, ulong MaxOutput, size_t MaxRequests, size_t MaxReseed)
 	:
+	m_cyclicReseed(false),
 	m_drbgEnumeral(Enumeral),
 	m_drbgName(Name),
 	m_legalKeySizes(KeySizes),
@@ -20,6 +21,7 @@ DrbgBase::DrbgBase(Drbgs Enumeral, std::string &Name, std::vector<SymmetricKeySi
 
 DrbgBase::~DrbgBase()
 {
+	m_cyclicReseed = false;
 	m_drbgEnumeral = Drbgs::None;
 	m_drbgName.empty();
 	m_maxOutput = 0;
@@ -29,6 +31,10 @@ DrbgBase::~DrbgBase()
 }
 
 //~~~Accessors~~~//
+const bool &DrbgBase::CyclicReseed()
+{
+	return m_cyclicReseed;
+}
 
 const Drbgs DrbgBase::Enumeral()
 {

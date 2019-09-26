@@ -311,7 +311,7 @@ void CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	{
 		m_csgState->Counter += Length;
 
-		if (m_csgState->Counter >= ReseedThreshold())
+		if (m_csgState->Counter >= ReseedThreshold() || CyclicReseed() == true)
 		{
 			++m_csgState->Reseed;
 

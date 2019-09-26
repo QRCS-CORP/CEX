@@ -134,8 +134,8 @@ private:
 	static const ulong MAX_OUTPUT = 10240000000;
 	// 100mb: maximum size of a single request
 	static const size_t MAX_REQUEST = 102400000;
-	// 1024: maximum reseed calls before exception
-	static const size_t MAX_THRESHOLD = 1024;
+	// 10000: maximum reseed calls before exception
+	static const size_t MAX_THRESHOLD = 10000;
 	// the minimum key length that will initialize the generator
 	static const size_t MINKEY_LENGTH = 16;
 

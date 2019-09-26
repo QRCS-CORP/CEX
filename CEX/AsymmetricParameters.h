@@ -17,15 +17,15 @@ enum class AsymmetricParameters : byte
 	/// <summary>
 	/// The Dilithium S1 parameters; (Medium Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS1N256Q8380417 = 1,
+	DLTMS1N256Q8380417 = 1,
 	/// <summary>
 	/// The Dilithium S2 parameters; (High Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS2N256Q8380417 = 2,
+	DLTMS2N256Q8380417 = 2,
 	/// <summary>
 	/// The Dilithium S3 parameters; (Highest Security) using a modulus of 8380417 with 256 coefficients
 	/// </summary>
-	DLMS3N256Q8380417 = 3,
+	DLTMS3N256Q8380417 = 3,
 	/// <summary>
 	/// The Kyber S1 parameters; (Medium Security) A modulus of 7681 with 256 coefficients and K of 2
 	/// </summary>
@@ -53,15 +53,27 @@ enum class AsymmetricParameters : byte
 	/// <summary>
 	/// The NTRU-Prime S1 parameters; (Medium Security) The rounded quotient form S-Prime, modulus of 4621 with 653 coefficients
 	/// </summary>
-	NTRUS1SQ4621N653 = 11,
+	NTRUS1SQ4621N653 = 10,
 	/// <summary>
 	/// The NTRU-Prime S2 parameters; (High Security) The rounded quotient form S-Prime, modulus of 4591 with 761 coefficients
 	/// </summary>
-	NTRUS2SQ4591N761 = 13,
+	NTRUS2SQ4591N761 = 11,
 	/// <summary>
 	/// The NTRU-Prime S3 parameters; (Highest Security) The rounded quotient form S-Prime, modulus of 5167 with 857 coefficients
 	/// </summary>
-	NTRUS3SQ5167N857 = 15,
+	NTRUS3SQ5167N857 = 12,
+	/// <summary>
+	/// The Rainbow S1 parameters; (Medium Security) SHA256, S128 parameter set
+	/// </summary>
+	RNBWS1S128SHAKE256 = 13,
+	/// <summary>
+	/// The Rainbow S2 parameters; (High Security) SHA384, S192 parameter set
+	/// </summary>
+	RNBWS2S192SHAKE512 = 14,
+	/// <summary>
+	/// The Rainbow S3 parameters; (Highest Security) SHA512, S256 parameter set
+	/// </summary>
+	RNBWS3S256SHAKE512 = 15,
 	/// <summary>
 	/// The NewHope S1 parameters; (High Security) A modulus of 12289 with 1024 coefficients
 	/// </summary>
@@ -71,17 +83,17 @@ enum class AsymmetricParameters : byte
 	/// </summary>
 	RLWES2Q12289N2048 = 17,
 	/// <summary>
-	/// The Sphincs S1 parameters; (Medium Security) The Sphincs SHAKE256, S128 parameter set
+	/// The SphincsPlus S1 parameters; (Medium Security) The SphincsPlus SHAKE256, S128 parameter set
 	/// </summary>
-	SPXS1S128SHAKE = 18,
+	SPXPS1S128SHAKE = 18,
 	/// <summary>
-	/// The Sphincs S2 parameters; (High Security) The Sphincs SHAKE256, S192 parameter set
+	/// The SphincsPlus S2 parameters; (High Security) The SphincsPlus SHAKE256, S192 parameter set
 	/// </summary>
-	SPXS2S192SHAKE = 19,
+	SPXPS2S192SHAKE = 19,
 	/// <summary>
-	/// The Sphincs S3 parameters; (Highest Security) The Sphincs SHAKE256, S256 parameter set
+	/// The SphincsPlus S3 parameters; (Highest Security) The SphincsPlus SHAKE256, S256 parameter set
 	/// </summary>
-	SPXS3S256SHAKE = 20,
+	SPXPS3S256SHAKE = 20,
 	/// <summary>
 	/// The XMSS SHA256H10 parameter; (Medium Security) SHA2-256 with a tree height of 10
 	/// </summary>

@@ -2,7 +2,7 @@
 #include "CSX256.h"
 #include "IntegerTools.h"
 #include "Keccak.h"
-#include "McElieceUtils.h"
+#include "MPKCUtils.h"
 
 NAMESPACE_MCELIECE
 
@@ -870,14 +870,14 @@ void MPKCN4096T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array
 			inp[11] = (Input[0][11] >> (N - 63)) | (Input[1][11] << (127 - N));
 		}
 
-		McElieceUtils::Multiply(prod, Output, inp);
-		d = McElieceUtils::Reduce(prod, MPKC_M);
+		MPKCUtils::Multiply(prod, Output, inp);
+		d = MPKCUtils::Reduce(prod, MPKC_M);
 
 		// 3 cases
-		bInv = McElieceUtils::Invert(b, MPKC_M);
-		r = McElieceUtils::Multiply(d, bInv, MPKC_M);
-		McElieceUtils::Insert(rvec, r);
-		McElieceUtils::Multiply(tmpc, rvec, tmpb);
+		bInv = MPKCUtils::Invert(b, MPKC_M);
+		r = MPKCUtils::Multiply(d, bInv, MPKC_M);
+		MPKCUtils::Insert(rvec, r);
+		MPKCUtils::Multiply(tmpc, rvec, tmpb);
 
 		tmpc[0] ^= Output[0];
 		tmpc[1] ^= Output[1];
@@ -892,12 +892,12 @@ void MPKCN4096T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array
 		tmpc[10] ^= Output[10];
 		tmpc[11] ^= Output[11];
 
-		masknz = McElieceUtils::MaskNonZero64(d);
-		maskleq = McElieceUtils::MaskLeq64(L * 2, N);
+		masknz = MPKCUtils::MaskNonZero64(d);
+		maskleq = MPKCUtils::MaskLeq64(L * 2, N);
 		mask16b = (masknz & maskleq) & 0xFFFF;
 
-		McElieceUtils::CMov(Output, tmpb, masknz & maskleq);
-		McElieceUtils::Copy(tmpc, Output);
+		MPKCUtils::CMov(Output, tmpb, masknz & maskleq);
+		MPKCUtils::Copy(tmpc, Output);
 
 		b = (d & mask16b) | (b & ~mask16b);
 		L = ((N + 1 - L) & mask16b) | (L & ~mask16b);
@@ -940,7 +940,7 @@ byte MPKCN4096T62::DecryptE(std::vector<byte> &E, const std::vector<byte> &Priva
 	IntegerTools::BlockToLe(PrivateKey, MPKC_IRR_SIZE, cond, 0, MPKC_CND_SIZE);
 	std::vector<ulong> recv(MPKC_COLUMN_SIZE);
 	PreProcess(recv, S);
-	McElieceUtils::BenesCompact(recv, cond, 1UL);
+	MPKCUtils::BenesCompact(recv, cond, 1UL);
 
 	// scaling
 	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> inverse;
@@ -957,14 +957,14 @@ byte MPKCN4096T62::DecryptE(std::vector<byte> &E, const std::vector<byte> &Priva
 	BerlekampMassey(locator, sPriv);
 
 	// additive FFT
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> Evaluate;
-	AdditiveFFT::Transform(Evaluate, locator);
+	std::vector<std::array<ulong, MPKC_M>> evaluate(MPKC_COLUMN_SIZE);
+	AdditiveFFT::Transform(evaluate, locator);
 
 	std::array<ulong, MPKC_COLUMN_SIZE> error;
 
 	for (i = 0; i < error.size(); ++i)
 	{
-		error[i] = McElieceUtils::Or(Evaluate[i], MPKC_M);
+		error[i] = MPKCUtils::Or(evaluate[i], MPKC_M);
 		error[i] = ~error[i];
 	}
 
@@ -1006,10 +1006,10 @@ byte MPKCN4096T62::DecryptE(std::vector<byte> &E, const std::vector<byte> &Priva
 	t = diff & 0xFF;
 
 	// compact and store
-	McElieceUtils::BenesCompact(error, cond, 0);
+	MPKCUtils::BenesCompact(error, cond, 0);
 	IntegerTools::LeToBlock(error, 0, E, 0, error.size() * sizeof(ulong));
 
-	t |= McElieceUtils::Weight(error) ^ MPKC_T;
+	t |= MPKCUtils::Weight(error) ^ MPKC_T;
 	t -= 1;
 	t >>= 63;
 
@@ -1034,7 +1034,7 @@ void MPKCN4096T62::PreProcess(std::vector<ulong> &Received, const std::vector<by
 
 void MPKCN4096T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received)
 {
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> Evaluate;
+	std::vector<std::array<ulong, MPKC_M>> evaluate(MPKC_COLUMN_SIZE);
 	std::array<ulong, MPKC_M> skint;
 	std::array<ulong, MPKC_M> tmp;
 	size_t ctr;
@@ -1042,14 +1042,14 @@ void MPKCN4096T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZ
 
 	// computing inverses
 	MemoryTools::Copy(PrivateKey, 0, skint, 0, MPKC_M * sizeof(ulong));
-	AdditiveFFT::Transform(Evaluate, skint);
-	Square(Evaluate[0], Evaluate[0]);
-	McElieceUtils::Copy(Evaluate[0], Inverse[0]);
+	AdditiveFFT::Transform(evaluate, skint);
+	Square(evaluate[0], evaluate[0]);
+	MPKCUtils::Copy(evaluate[0], Inverse[0]);
 
 	for (i = 1; i < MPKC_COLUMN_SIZE; ++i)
 	{
-		Square(Evaluate[i], Evaluate[i]);
-		McElieceUtils::Multiply(Inverse[i], Inverse[i - 1], Evaluate[i]);
+		Square(evaluate[i], evaluate[i]);
+		MPKCUtils::Multiply(Inverse[i], Inverse[i - 1], evaluate[i]);
 	}
 
 	Invert(tmp, Inverse[63]);
@@ -1057,13 +1057,13 @@ void MPKCN4096T62::Scaling(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZ
 
 	do
 	{
-		McElieceUtils::Multiply(Inverse[ctr], tmp, Inverse[ctr - 1]);
-		McElieceUtils::Multiply(tmp, tmp, Evaluate[ctr]);
+		MPKCUtils::Multiply(Inverse[ctr], tmp, Inverse[ctr - 1]);
+		MPKCUtils::Multiply(tmp, tmp, evaluate[ctr]);
 		--ctr;
 	} 
 	while (ctr != 0);
 
-	McElieceUtils::Copy(tmp, Inverse[0]);
+	MPKCUtils::Copy(tmp, Inverse[0]);
 
 	for (i = 0; i < MPKC_COLUMN_SIZE; ++i)
 	{
@@ -1296,7 +1296,7 @@ bool MPKCN4096T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<us
 	{
 		for (k = j + 1; k < MPKC_T; ++k)
 		{
-			mask = McElieceUtils::Diff(mat[j][j], mat[j][k]);
+			mask = MPKCUtils::Diff(mat[j][j], mat[j][k]);
 
 			for (c = 0; c < MPKC_T + 1; ++c) 
 			{
@@ -1313,11 +1313,11 @@ bool MPKCN4096T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<us
 		}
 
 		// compute inverse
-		inverse = McElieceUtils::Invert(mat[j][j], MPKC_M);
+		inverse = MPKCUtils::Invert(mat[j][j], MPKC_M);
 
 		for (c = 0; c < MPKC_T + 1; ++c) 
 		{
-			mat[c][j] = McElieceUtils::Multiply(mat[c][j], inverse, MPKC_M);
+			mat[c][j] = MPKCUtils::Multiply(mat[c][j], inverse, MPKC_M);
 		}
 
 		for (k = 0; k < MPKC_T; ++k)
@@ -1328,7 +1328,7 @@ bool MPKCN4096T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<us
 			{
 				for (c = 0; c < MPKC_T + 1; ++c)
 				{
-					mat[c][k] ^= McElieceUtils::Multiply(mat[c][j], t, MPKC_M);
+					mat[c][k] ^= MPKCUtils::Multiply(mat[c][j], t, MPKC_M);
 				}
 			}
 		}
@@ -1399,8 +1399,8 @@ void MPKCN4096T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IP
 bool MPKCN4096T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey)
 {
 	std::array<ulong, MPKC_M> skint;
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> Evaluate;
-	std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> inverse;
+	std::vector<std::array<ulong, MPKC_M>> evaluate(MPKC_COLUMN_SIZE);
+	std::vector<std::array<ulong, MPKC_M>> inverse(MPKC_COLUMN_SIZE);
 	ulong mask;
 	ulong u;
 	size_t c;
@@ -1419,12 +1419,12 @@ bool MPKCN4096T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &
 		skint[i] = IntegerTools::LeBytesTo64(PrivateKey, i * 8);
 	}
 
-	AdditiveFFT::Transform(Evaluate, skint);
-	McElieceUtils::Copy(Evaluate[0], inverse[0]);
+	AdditiveFFT::Transform(evaluate, skint);
+	MPKCUtils::Copy(evaluate[0], inverse[0]);
 
 	for (i = 1; i < MPKC_COLUMN_SIZE; ++i)
 	{
-		McElieceUtils::Multiply(inverse[i], inverse[i - 1], Evaluate[i]);
+		MPKCUtils::Multiply(inverse[i], inverse[i - 1], evaluate[i]);
 	}
 
 	std::array<ulong, MPKC_M> tmp;
@@ -1434,13 +1434,13 @@ bool MPKCN4096T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &
 
 	do
 	{
-		McElieceUtils::Multiply(inverse[ctr], tmp, inverse[ctr - 1]);
-		McElieceUtils::Multiply(tmp, tmp, Evaluate[ctr]);
+		MPKCUtils::Multiply(inverse[ctr], tmp, inverse[ctr - 1]);
+		MPKCUtils::Multiply(tmp, tmp, evaluate[ctr]);
 		--ctr;
 	} 
 	while (ctr != 0);
 
-	McElieceUtils::Copy(tmp, inverse[0]);
+	MPKCUtils::Copy(tmp, inverse[0]);
 	std::array<std::array<ulong, MPKC_COLUMN_SIZE>, MPKC_PKN_ROWS> mat;
 
 	// fill matrix 
@@ -1456,7 +1456,7 @@ bool MPKCN4096T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &
 	{
 		for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 		{
-			McElieceUtils::Multiply(inverse[j], inverse[j], GfPoints[j]);
+			MPKCUtils::Multiply(inverse[j], inverse[j], GfPoints[j]);
 
 			for (k = 0; k < MPKC_M; ++k)
 			{
@@ -1475,7 +1475,7 @@ bool MPKCN4096T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &
 
 	for (i = 0; i < MPKC_PKN_ROWS; ++i)
 	{
-		McElieceUtils::BenesCompact(mat[i], cond, 0);
+		MPKCUtils::BenesCompact(mat[i], cond, 0);
 	}
 
 	// gaussian elimination 
@@ -1563,13 +1563,13 @@ bool MPKCN4096T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &
 
 //~~~FFT~~~//
 
-void MPKCN4096T62::AdditiveFFT::Transform(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
+void MPKCN4096T62::AdditiveFFT::Transform(std::vector<std::array<ulong, MPKC_M>> &Output, std::array<ulong, MPKC_M> &Input)
 {
 	RadixConversions(Input);
 	Butterflies(Output, Input);
 }
 
-void MPKCN4096T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>, MPKC_COLUMN_SIZE> &Output, std::array<ulong, MPKC_M> &Input)
+void MPKCN4096T62::AdditiveFFT::Butterflies(std::vector<std::array<ulong, MPKC_M>> &Output, std::array<ulong, MPKC_M> &Input)
 {
 	size_t b;
 	size_t i;
@@ -1636,7 +1636,7 @@ void MPKCN4096T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, MPKC_M>
 			{
 				for (k = j; k < j + s; ++k)
 				{
-					McElieceUtils::Multiply(tmp, Output[k + s], ButterflyConsts[pos + (k - j)]);
+					MPKCUtils::Multiply(tmp, Output[k + s], ButterflyConsts[pos + (k - j)]);
 
 					// memory tiling
 					for (b = 0; b < MPKC_M; ++b)
@@ -1723,7 +1723,7 @@ void MPKCN4096T62::AdditiveFFT::RadixConversions(std::array<ulong, MPKC_M> &Outp
 
 		}
 
-		McElieceUtils::Multiply(Output, Output, RadixScalar[i]);
+		MPKCUtils::Multiply(Output, Output, RadixScalar[i]);
 	}
 }
 
@@ -1756,9 +1756,9 @@ void MPKCN4096T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_
 		{
 			for (k = j; k < j + s; ++k)
 			{
-				McElieceUtils::Add(Input[k], Input[k + s]);
-				McElieceUtils::Multiply(tmp, Input[k], ButterflyConsts[pos + (k - j)]);
-				McElieceUtils::Add(Input[k + s], tmp);
+				MPKCUtils::Add(Input[k], Input[k + s]);
+				MPKCUtils::Multiply(tmp, Input[k], ButterflyConsts[pos + (k - j)]);
+				MPKCUtils::Add(Input[k + s], tmp);
 			}
 		}
 	} 
@@ -1786,7 +1786,7 @@ void MPKCN4096T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_
 			buf[ButterflyReverse[j]] = Input[j][i];
 		}
 
-		McElieceUtils::TransposeCompact64x64(buf);
+		MPKCUtils::TransposeCompact64x64(buf);
 
 		for (j = 0; j < MPKC_COLUMN_SIZE; ++j)
 		{
@@ -1797,132 +1797,132 @@ void MPKCN4096T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_
 	// broadcast
 	std::array<std::array<ulong, MPKC_M>, 6> pre;
 
-	McElieceUtils::Copy(Input[32], pre[0]);
-	McElieceUtils::Add(Input[33], Input[32]);
-	McElieceUtils::Copy(Input[33], pre[1]);
-	McElieceUtils::Add(Input[35], Input[33]);
-	McElieceUtils::Add(pre[0], Input[35]);
-	McElieceUtils::Add(Input[34], Input[35]);
-	McElieceUtils::Copy(Input[34], pre[2]);
-	McElieceUtils::Add(Input[38], Input[34]);
-	McElieceUtils::Add(pre[0], Input[38]);
-	McElieceUtils::Add(Input[39], Input[38]);
-	McElieceUtils::Add(pre[1], Input[39]);
-	McElieceUtils::Add(Input[37], Input[39]);
-	McElieceUtils::Add(pre[0], Input[37]);
-	McElieceUtils::Add(Input[36], Input[37]);
-	McElieceUtils::Copy(Input[36], pre[3]);
-	McElieceUtils::Add(Input[44], Input[36]);
-	McElieceUtils::Add(pre[0], Input[44]);
-	McElieceUtils::Add(Input[45], Input[44]);
-	McElieceUtils::Add(pre[1], Input[45]);
-	McElieceUtils::Add(Input[47], Input[45]);
-	McElieceUtils::Add(pre[0], Input[47]);
-	McElieceUtils::Add(Input[46], Input[47]);
-	McElieceUtils::Add(pre[2], Input[46]);
-	McElieceUtils::Add(Input[42], Input[46]);
-	McElieceUtils::Add(pre[0], Input[42]);
-	McElieceUtils::Add(Input[43], Input[42]);
-	McElieceUtils::Add(pre[1], Input[43]);
-	McElieceUtils::Add(Input[41], Input[43]);
-	McElieceUtils::Add(pre[0], Input[41]);
-	McElieceUtils::Add(Input[40], Input[41]);
-	McElieceUtils::Copy(Input[40], pre[4]);
-	McElieceUtils::Add(Input[56], Input[40]);
-	McElieceUtils::Add(pre[0], Input[56]);
-	McElieceUtils::Add(Input[57], Input[56]);
-	McElieceUtils::Add(pre[1], Input[57]);
-	McElieceUtils::Add(Input[59], Input[57]);
-	McElieceUtils::Add(pre[0], Input[59]);
-	McElieceUtils::Add(Input[58], Input[59]);
-	McElieceUtils::Add(pre[2], Input[58]);
-	McElieceUtils::Add(Input[62], Input[58]);
-	McElieceUtils::Add(pre[0], Input[62]);
-	McElieceUtils::Add(Input[63], Input[62]);
-	McElieceUtils::Add(pre[1], Input[63]);
-	McElieceUtils::Add(Input[61], Input[63]);
-	McElieceUtils::Add(pre[0], Input[61]);
-	McElieceUtils::Add(Input[60], Input[61]);
-	McElieceUtils::Add(pre[3], Input[60]);
-	McElieceUtils::Add(Input[52], Input[60]);
-	McElieceUtils::Add(pre[0], Input[52]);
-	McElieceUtils::Add(Input[53], Input[52]);
-	McElieceUtils::Add(pre[1], Input[53]);
-	McElieceUtils::Add(Input[55], Input[53]);
-	McElieceUtils::Add(pre[0], Input[55]);
-	McElieceUtils::Add(Input[54], Input[55]);
-	McElieceUtils::Add(pre[2], Input[54]);
-	McElieceUtils::Add(Input[50], Input[54]);
-	McElieceUtils::Add(pre[0], Input[50]);
-	McElieceUtils::Add(Input[51], Input[50]);
-	McElieceUtils::Add(pre[1], Input[51]);
-	McElieceUtils::Add(Input[49], Input[51]);
-	McElieceUtils::Add(pre[0], Input[49]);
-	McElieceUtils::Add(Input[48], Input[49]);
-	McElieceUtils::Copy(Input[48], pre[5]);
-	McElieceUtils::Add(Input[16], Input[48]);
-	McElieceUtils::Add(pre[0], Input[16]);
-	McElieceUtils::Add(Input[17], Input[16]);
-	McElieceUtils::Add(pre[1], Input[17]);
-	McElieceUtils::Add(Input[19], Input[17]);
-	McElieceUtils::Add(pre[0], Input[19]);
-	McElieceUtils::Add(Input[18], Input[19]);
-	McElieceUtils::Add(pre[2], Input[18]);
-	McElieceUtils::Add(Input[22], Input[18]);
-	McElieceUtils::Add(pre[0], Input[22]);
-	McElieceUtils::Add(Input[23], Input[22]);
-	McElieceUtils::Add(pre[1], Input[23]);
-	McElieceUtils::Add(Input[21], Input[23]);
-	McElieceUtils::Add(pre[0], Input[21]);
-	McElieceUtils::Add(Input[20], Input[21]);
-	McElieceUtils::Add(pre[3], Input[20]);
-	McElieceUtils::Add(Input[28], Input[20]);
-	McElieceUtils::Add(pre[0], Input[28]);
-	McElieceUtils::Add(Input[29], Input[28]);
-	McElieceUtils::Add(pre[1], Input[29]);
-	McElieceUtils::Add(Input[31], Input[29]);
-	McElieceUtils::Add(pre[0], Input[31]);
-	McElieceUtils::Add(Input[30], Input[31]);
-	McElieceUtils::Add(pre[2], Input[30]);
-	McElieceUtils::Add(Input[26], Input[30]);
-	McElieceUtils::Add(pre[0], Input[26]);
-	McElieceUtils::Add(Input[27], Input[26]);
-	McElieceUtils::Add(pre[1], Input[27]);
-	McElieceUtils::Add(Input[25], Input[27]);
-	McElieceUtils::Add(pre[0], Input[25]);
-	McElieceUtils::Add(Input[24], Input[25]);
-	McElieceUtils::Add(pre[4], Input[24]);
-	McElieceUtils::Add(Input[8], Input[24]);
-	McElieceUtils::Add(pre[0], Input[8]);
-	McElieceUtils::Add(Input[9], Input[8]);
-	McElieceUtils::Add(pre[1], Input[9]);
-	McElieceUtils::Add(Input[11], Input[9]);
-	McElieceUtils::Add(pre[0], Input[11]);
-	McElieceUtils::Add(Input[10], Input[11]);
-	McElieceUtils::Add(pre[2], Input[10]);
-	McElieceUtils::Add(Input[14], Input[10]);
-	McElieceUtils::Add(pre[0], Input[14]);
-	McElieceUtils::Add(Input[15], Input[14]);
-	McElieceUtils::Add(pre[1], Input[15]);
-	McElieceUtils::Add(Input[13], Input[15]);
-	McElieceUtils::Add(pre[0], Input[13]);
-	McElieceUtils::Add(Input[12], Input[13]);
-	McElieceUtils::Add(pre[3], Input[12]);
-	McElieceUtils::Add(Input[4], Input[12]);
-	McElieceUtils::Add(pre[0], Input[4]);
-	McElieceUtils::Add(Input[5], Input[4]);
-	McElieceUtils::Add(pre[1], Input[5]);
-	McElieceUtils::Add(Input[7], Input[5]);
-	McElieceUtils::Add(pre[0], Input[7]);
-	McElieceUtils::Add(Input[6], Input[7]);
-	McElieceUtils::Add(pre[2], Input[6]);
-	McElieceUtils::Add(Input[2], Input[6]);
-	McElieceUtils::Add(pre[0], Input[2]);
-	McElieceUtils::Add(Input[3], Input[2]);
-	McElieceUtils::Add(pre[1], Input[3]);
-	McElieceUtils::Add(Input[1], Input[3]);
-	McElieceUtils::Add(pre[0], Input[1]);
-	McElieceUtils::Add(Output[0], Input[0], Input[1]);
+	MPKCUtils::Copy(Input[32], pre[0]);
+	MPKCUtils::Add(Input[33], Input[32]);
+	MPKCUtils::Copy(Input[33], pre[1]);
+	MPKCUtils::Add(Input[35], Input[33]);
+	MPKCUtils::Add(pre[0], Input[35]);
+	MPKCUtils::Add(Input[34], Input[35]);
+	MPKCUtils::Copy(Input[34], pre[2]);
+	MPKCUtils::Add(Input[38], Input[34]);
+	MPKCUtils::Add(pre[0], Input[38]);
+	MPKCUtils::Add(Input[39], Input[38]);
+	MPKCUtils::Add(pre[1], Input[39]);
+	MPKCUtils::Add(Input[37], Input[39]);
+	MPKCUtils::Add(pre[0], Input[37]);
+	MPKCUtils::Add(Input[36], Input[37]);
+	MPKCUtils::Copy(Input[36], pre[3]);
+	MPKCUtils::Add(Input[44], Input[36]);
+	MPKCUtils::Add(pre[0], Input[44]);
+	MPKCUtils::Add(Input[45], Input[44]);
+	MPKCUtils::Add(pre[1], Input[45]);
+	MPKCUtils::Add(Input[47], Input[45]);
+	MPKCUtils::Add(pre[0], Input[47]);
+	MPKCUtils::Add(Input[46], Input[47]);
+	MPKCUtils::Add(pre[2], Input[46]);
+	MPKCUtils::Add(Input[42], Input[46]);
+	MPKCUtils::Add(pre[0], Input[42]);
+	MPKCUtils::Add(Input[43], Input[42]);
+	MPKCUtils::Add(pre[1], Input[43]);
+	MPKCUtils::Add(Input[41], Input[43]);
+	MPKCUtils::Add(pre[0], Input[41]);
+	MPKCUtils::Add(Input[40], Input[41]);
+	MPKCUtils::Copy(Input[40], pre[4]);
+	MPKCUtils::Add(Input[56], Input[40]);
+	MPKCUtils::Add(pre[0], Input[56]);
+	MPKCUtils::Add(Input[57], Input[56]);
+	MPKCUtils::Add(pre[1], Input[57]);
+	MPKCUtils::Add(Input[59], Input[57]);
+	MPKCUtils::Add(pre[0], Input[59]);
+	MPKCUtils::Add(Input[58], Input[59]);
+	MPKCUtils::Add(pre[2], Input[58]);
+	MPKCUtils::Add(Input[62], Input[58]);
+	MPKCUtils::Add(pre[0], Input[62]);
+	MPKCUtils::Add(Input[63], Input[62]);
+	MPKCUtils::Add(pre[1], Input[63]);
+	MPKCUtils::Add(Input[61], Input[63]);
+	MPKCUtils::Add(pre[0], Input[61]);
+	MPKCUtils::Add(Input[60], Input[61]);
+	MPKCUtils::Add(pre[3], Input[60]);
+	MPKCUtils::Add(Input[52], Input[60]);
+	MPKCUtils::Add(pre[0], Input[52]);
+	MPKCUtils::Add(Input[53], Input[52]);
+	MPKCUtils::Add(pre[1], Input[53]);
+	MPKCUtils::Add(Input[55], Input[53]);
+	MPKCUtils::Add(pre[0], Input[55]);
+	MPKCUtils::Add(Input[54], Input[55]);
+	MPKCUtils::Add(pre[2], Input[54]);
+	MPKCUtils::Add(Input[50], Input[54]);
+	MPKCUtils::Add(pre[0], Input[50]);
+	MPKCUtils::Add(Input[51], Input[50]);
+	MPKCUtils::Add(pre[1], Input[51]);
+	MPKCUtils::Add(Input[49], Input[51]);
+	MPKCUtils::Add(pre[0], Input[49]);
+	MPKCUtils::Add(Input[48], Input[49]);
+	MPKCUtils::Copy(Input[48], pre[5]);
+	MPKCUtils::Add(Input[16], Input[48]);
+	MPKCUtils::Add(pre[0], Input[16]);
+	MPKCUtils::Add(Input[17], Input[16]);
+	MPKCUtils::Add(pre[1], Input[17]);
+	MPKCUtils::Add(Input[19], Input[17]);
+	MPKCUtils::Add(pre[0], Input[19]);
+	MPKCUtils::Add(Input[18], Input[19]);
+	MPKCUtils::Add(pre[2], Input[18]);
+	MPKCUtils::Add(Input[22], Input[18]);
+	MPKCUtils::Add(pre[0], Input[22]);
+	MPKCUtils::Add(Input[23], Input[22]);
+	MPKCUtils::Add(pre[1], Input[23]);
+	MPKCUtils::Add(Input[21], Input[23]);
+	MPKCUtils::Add(pre[0], Input[21]);
+	MPKCUtils::Add(Input[20], Input[21]);
+	MPKCUtils::Add(pre[3], Input[20]);
+	MPKCUtils::Add(Input[28], Input[20]);
+	MPKCUtils::Add(pre[0], Input[28]);
+	MPKCUtils::Add(Input[29], Input[28]);
+	MPKCUtils::Add(pre[1], Input[29]);
+	MPKCUtils::Add(Input[31], Input[29]);
+	MPKCUtils::Add(pre[0], Input[31]);
+	MPKCUtils::Add(Input[30], Input[31]);
+	MPKCUtils::Add(pre[2], Input[30]);
+	MPKCUtils::Add(Input[26], Input[30]);
+	MPKCUtils::Add(pre[0], Input[26]);
+	MPKCUtils::Add(Input[27], Input[26]);
+	MPKCUtils::Add(pre[1], Input[27]);
+	MPKCUtils::Add(Input[25], Input[27]);
+	MPKCUtils::Add(pre[0], Input[25]);
+	MPKCUtils::Add(Input[24], Input[25]);
+	MPKCUtils::Add(pre[4], Input[24]);
+	MPKCUtils::Add(Input[8], Input[24]);
+	MPKCUtils::Add(pre[0], Input[8]);
+	MPKCUtils::Add(Input[9], Input[8]);
+	MPKCUtils::Add(pre[1], Input[9]);
+	MPKCUtils::Add(Input[11], Input[9]);
+	MPKCUtils::Add(pre[0], Input[11]);
+	MPKCUtils::Add(Input[10], Input[11]);
+	MPKCUtils::Add(pre[2], Input[10]);
+	MPKCUtils::Add(Input[14], Input[10]);
+	MPKCUtils::Add(pre[0], Input[14]);
+	MPKCUtils::Add(Input[15], Input[14]);
+	MPKCUtils::Add(pre[1], Input[15]);
+	MPKCUtils::Add(Input[13], Input[15]);
+	MPKCUtils::Add(pre[0], Input[13]);
+	MPKCUtils::Add(Input[12], Input[13]);
+	MPKCUtils::Add(pre[3], Input[12]);
+	MPKCUtils::Add(Input[4], Input[12]);
+	MPKCUtils::Add(pre[0], Input[4]);
+	MPKCUtils::Add(Input[5], Input[4]);
+	MPKCUtils::Add(pre[1], Input[5]);
+	MPKCUtils::Add(Input[7], Input[5]);
+	MPKCUtils::Add(pre[0], Input[7]);
+	MPKCUtils::Add(Input[6], Input[7]);
+	MPKCUtils::Add(pre[2], Input[6]);
+	MPKCUtils::Add(Input[2], Input[6]);
+	MPKCUtils::Add(pre[0], Input[2]);
+	MPKCUtils::Add(Input[3], Input[2]);
+	MPKCUtils::Add(pre[1], Input[3]);
+	MPKCUtils::Add(Input[1], Input[3]);
+	MPKCUtils::Add(pre[0], Input[1]);
+	MPKCUtils::Add(Output[0], Input[0], Input[1]);
 
 	const ushort Beta[6] =
 	{
@@ -1935,7 +1935,7 @@ void MPKCN4096T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_
 		tmp[j] = ~tmp[j] + 1;
 	}
 
-	McElieceUtils::Multiply(Output[1], pre[0], tmp);
+	MPKCUtils::Multiply(Output[1], pre[0], tmp);
 
 	for (i = 1; i < 6; ++i)
 	{
@@ -1945,8 +1945,8 @@ void MPKCN4096T62::TransposedFFT::Butterflies(std::array<std::array<ulong, MPKC_
 			tmp[j] = ~tmp[j] + 1;
 		}
 
-		McElieceUtils::Multiply(tmp, pre[i], tmp);
-		McElieceUtils::Add(Output[1], tmp);
+		MPKCUtils::Multiply(tmp, pre[i], tmp);
+		MPKCUtils::Add(Output[1], tmp);
 	}
 }
 
@@ -1976,8 +1976,8 @@ void MPKCN4096T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, 
 
 		if (ctr < 5)
 		{
-			McElieceUtils::Multiply(Output[0], Output[0], RadixTrScalar[ctr][0]);
-			McElieceUtils::Multiply(Output[1], Output[1], RadixTrScalar[ctr][1]);
+			MPKCUtils::Multiply(Output[0], Output[0], RadixTrScalar[ctr][0]);
+			MPKCUtils::Multiply(Output[1], Output[1], RadixTrScalar[ctr][1]);
 		}
 
 		for (i = 0; i < MPKC_M; ++i)
@@ -2007,22 +2007,22 @@ void MPKCN4096T62::Invert(std::array<ulong, MPKC_M> &Output, const std::array<ul
 	std::array<ulong, MPKC_M> tmpa;
 	std::array<ulong, MPKC_M> tmpb;
 
-	McElieceUtils::Copy(Input, Output);
+	MPKCUtils::Copy(Input, Output);
 	Square(Output, Output);
-	McElieceUtils::Multiply(tmpa, Output, Input);
+	MPKCUtils::Multiply(tmpa, Output, Input);
 	Square(Output, tmpa);
 	Square(Output, Output);
-	McElieceUtils::Multiply(tmpb, Output, tmpa);
+	MPKCUtils::Multiply(tmpb, Output, tmpa);
 	Square(Output, tmpb);
 	Square(Output, Output);
 	Square(Output, Output);
 	Square(Output, Output);
-	McElieceUtils::Multiply(Output, Output, tmpb);
+	MPKCUtils::Multiply(Output, Output, tmpb);
 	Square(Output, Output);
 	Square(Output, Output);
-	McElieceUtils::Multiply(Output, Output, tmpa);
+	MPKCUtils::Multiply(Output, Output, tmpa);
 	Square(Output, Output);
-	McElieceUtils::Multiply(Output, Output, Input);
+	MPKCUtils::Multiply(Output, Output, Input);
 	Square(Output, Output);
 }
 
@@ -2037,15 +2037,15 @@ void MPKCN4096T62::MatrixMultiply(std::array<ushort, MPKC_T> &Output, std::array
 	{
 		for (j = 0; j < 62; ++j)
 		{
-			tmp[i + j] ^= McElieceUtils::Multiply(A[i], B[j], MPKC_M);
+			tmp[i + j] ^= MPKCUtils::Multiply(A[i], B[j], MPKC_M);
 		}
 	}
 
 	for (i = 122; i >= 62; --i)
 	{
-		tmp[i - 55] ^= McElieceUtils::Multiply(tmp[i], 0x06E3U, MPKC_M);
-		tmp[i - 61] ^= McElieceUtils::Multiply(tmp[i], 0x06BAU, MPKC_M);
-		tmp[i - 62] ^= McElieceUtils::Multiply(tmp[i], 0x0FC1U, MPKC_M);
+		tmp[i - 55] ^= MPKCUtils::Multiply(tmp[i], 0x06E3U, MPKC_M);
+		tmp[i - 61] ^= MPKCUtils::Multiply(tmp[i], 0x06BAU, MPKC_M);
+		tmp[i - 62] ^= MPKCUtils::Multiply(tmp[i], 0x0FC1U, MPKC_M);
 	}
 
 	for (i = 0; i < 62; ++i) 

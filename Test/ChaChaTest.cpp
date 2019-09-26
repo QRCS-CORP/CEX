@@ -628,8 +628,8 @@ namespace Test
 
 	void ChaChaTest::Parallel(IStreamCipher* Cipher)
 	{
-		const size_t MINSMP = Cipher->ParallelBlockSize();
-		const size_t MAXSMP = Cipher->ParallelBlockSize() * 4;
+		const uint MINSMP = static_cast<uint>(Cipher->ParallelBlockSize());
+		const uint MAXSMP = static_cast<uint>(Cipher->ParallelBlockSize()) * 4;
 		Cipher::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 		std::vector<byte> cpt1;
 		std::vector<byte> cpt2;

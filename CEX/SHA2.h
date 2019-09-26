@@ -110,12 +110,14 @@ private:
 public:
 
 	static const std::vector<uint> SHA256State;
-
+	static const std::vector<ulong> SHA384State;
 	static const std::vector<ulong> SHA512State;
 
 	static const size_t SHA256_DIGEST_SIZE = 32;
+	static const size_t SHA384_DIGEST_SIZE = 48;
 	static const size_t SHA512_DIGEST_SIZE = 64;
 	static const size_t SHA256_RATE_SIZE = 64;
+	static const size_t SHA384_RATE_SIZE = 128;
 	static const size_t SHA512_RATE_SIZE = 128;
 
 	//~~~SHA2-256~~~//
@@ -138,7 +140,7 @@ public:
 		ulong t;
 
 		t = 0;
-		MemoryTools::Copy(SHA2::SHA256State, 0, state, 0, state.size() * sizeof(uint));
+		MemoryTools::Copy(SHA256State, 0, state, 0, state.size() * sizeof(uint));
 
 		while (InLength >= SHA256_RATE_SIZE)
 		{
@@ -158,7 +160,7 @@ public:
 		if (InLength > 56)
 		{
 			PermuteR64P512U(buf, 0, state);
-			MemoryTools::Clear(buf, 0, SHA2::SHA256_RATE_SIZE);
+			MemoryTools::Clear(buf, 0, SHA256_RATE_SIZE);
 		}
 
 		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
@@ -202,7 +204,7 @@ public:
 		MemoryTools::XorPad(opad, OPAD);
 
 		// initialize the sha256 state
-		MemoryTools::Copy(SHA2::SHA256State, 0, state, 0, state.size() * sizeof(uint));
+		MemoryTools::Copy(SHA256State, 0, state, 0, state.size() * sizeof(uint));
 
 		// permute the input pad
 		PermuteR64P512U(ipad, 0, state);
@@ -227,7 +229,7 @@ public:
 		if (InLength > 56)
 		{
 			PermuteR64P512U(buf, 0, state);
-			MemoryTools::Clear(buf, 0, SHA2::SHA256_RATE_SIZE);
+			MemoryTools::Clear(buf, 0, SHA256_RATE_SIZE);
 		}
 
 		IntegerTools::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitlen) >> 32), buf, 56);
@@ -238,7 +240,7 @@ public:
 		IntegerTools::BeUL256ToBlock(state, 0, buf, 0);
 		MemoryTools::Clear(buf, SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE);
 		// reset the sha2 state
-		MemoryTools::Copy(SHA2::SHA256State, 0, state, 0, state.size() * sizeof(uint));
+		MemoryTools::Copy(SHA256State, 0, state, 0, state.size() * sizeof(uint));
 
 		// permute the output pad
 		PermuteR64P512U(opad, 0, state);
@@ -314,6 +316,62 @@ public:
 
 #endif
 
+	//~~~SHA2-384~~~//
+
+	/// <summary>
+	/// A compact (stateless) form of the SHA2-384 message digest function; processes a message, and return the hash in the output array.
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="InOffset">The starting offseet within the input byte array</param>
+	/// <param name="InLength">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; containst the output hash of 48 bytes</param>
+	/// <param name="OutOffset">The starting offseet within the output byte array</param>
+	template<typename ArrayU8>
+	static void Compute384(const ArrayU8 &Input, size_t InOffset, size_t InLength, ArrayU8 &Output, size_t OutOffset)
+	{
+		std::array<ulong, 8> state = { 0 };
+		std::vector<byte> buf(SHA384_RATE_SIZE);
+		ulong bitlen;
+		std::array<ulong, 2> t = { 0 };
+
+		MemoryTools::Copy(SHA384State, 0, state, 0, state.size() * sizeof(ulong));
+
+		while (InLength >= SHA384_RATE_SIZE)
+		{
+			PermuteR80P1024U(Input, InOffset, state);
+			InLength -= SHA384_RATE_SIZE;
+			InOffset += SHA384_RATE_SIZE;
+			t[0] += SHA384_RATE_SIZE;
+		}
+
+		t[0] += InLength;
+		bitlen = (t[0] << 3);
+		MemoryTools::Copy(Input, InOffset, buf, 0, InLength);
+
+		buf[InLength] = 128;
+		++InLength;
+
+		if (InLength > 112)
+		{
+			PermuteR80P1024U(buf, 0, state);
+			MemoryTools::Clear(buf, 0, SHA384_RATE_SIZE);
+		}
+
+		IntegerTools::Be64ToBytes(t[1], buf, 112);
+		IntegerTools::Be64ToBytes(bitlen, buf, 120);
+
+		PermuteR80P1024U(buf, 0, state);
+
+		// copy as big endian aligned to output code
+		IntegerTools::Be64ToBytes(state[0], Output, OutOffset);
+		IntegerTools::Be64ToBytes(state[1], Output, OutOffset + 8);
+		IntegerTools::Be64ToBytes(state[2], Output, OutOffset + 16);
+		IntegerTools::Be64ToBytes(state[3], Output, OutOffset + 24);
+		IntegerTools::Be64ToBytes(state[4], Output, OutOffset + 32);
+		IntegerTools::Be64ToBytes(state[5], Output, OutOffset + 40);
+	}
+
 	//~~~SHA2-512~~~//
 
 	/// <summary>
@@ -333,7 +391,7 @@ public:
 		ulong bitlen;
 		std::array<ulong, 2> t = { 0 };
 
-		MemoryTools::Copy(SHA2::SHA512State, 0, state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA512State, 0, state, 0, state.size() * sizeof(ulong));
 
 		while (InLength >= SHA512_RATE_SIZE)
 		{
@@ -353,7 +411,7 @@ public:
 		if (InLength > 112)
 		{
 			PermuteR80P1024U(buf, 0, state);
-			MemoryTools::Clear(buf, 0, SHA2::SHA512_RATE_SIZE);
+			MemoryTools::Clear(buf, 0, SHA512_RATE_SIZE);
 		}
 
 		IntegerTools::Be64ToBytes(t[1], buf, 112);
@@ -397,7 +455,7 @@ public:
 		MemoryTools::XorPad(opad, OPAD);
 
 		// initialize the sha256 state
-		MemoryTools::Copy(SHA2::SHA512State, 0, state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA512State, 0, state, 0, state.size() * sizeof(ulong));
 
 		// permute the input pad
 		PermuteR80P1024U(ipad, 0, state);
@@ -422,7 +480,7 @@ public:
 		if (InLength > 112)
 		{
 			PermuteR80P1024U(buf, 0, state);
-			MemoryTools::Clear(buf, 0, SHA2::SHA512_RATE_SIZE);
+			MemoryTools::Clear(buf, 0, SHA512_RATE_SIZE);
 		}
 
 		IntegerTools::Be64ToBytes(t[1], buf, 112);
@@ -433,7 +491,7 @@ public:
 		IntegerTools::BeULL512ToBlock(state, 0, buf, 0);
 		MemoryTools::Clear(buf, SHA512_DIGEST_SIZE, SHA512_DIGEST_SIZE);
 		// reset the sha2 state
-		MemoryTools::Copy(SHA2::SHA512State, 0, state, 0, state.size() * sizeof(ulong));
+		MemoryTools::Copy(SHA512State, 0, state, 0, state.size() * sizeof(ulong));
 
 		// permute the output pad
 		PermuteR80P1024U(opad, 0, state);

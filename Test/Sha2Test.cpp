@@ -178,6 +178,40 @@ namespace Test
 			throw TestException(std::string("Ancillary"), std::string("Compute256"), std::string("Expected values don't match! -SA4"));
 		}
 
+		// SHA2-384
+
+		otp.resize(m_expected[8].size());
+		SHA2::Compute384(m_message[0], 0, m_message[0].size(), otp, 0);
+
+		if (otp != m_expected[8])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute384"), std::string("Expected values don't match! -SA5"));
+		}
+
+		otp.resize(m_expected[9].size());
+		SHA2::Compute384(m_message[1], 0, m_message[1].size(), otp, 0);
+
+		if (otp != m_expected[9])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute384"), std::string("Expected values don't match! -SA6"));
+		}
+
+		otp.resize(m_expected[10].size());
+		SHA2::Compute384(m_message[2], 0, m_message[2].size(), otp, 0);
+
+		if (otp != m_expected[10])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute384"), std::string("Expected values don't match! -SA7"));
+		}
+
+		otp.resize(m_expected[11].size());
+		SHA2::Compute384(m_message[3], 0, m_message[3].size(), otp, 0);
+
+		if (otp != m_expected[11])
+		{
+			throw TestException(std::string("Ancillary"), std::string("Compute384"), std::string("Expected values don't match! -SA8"));
+		}
+
 		// SHA2-512
 
 		otp.resize(m_expected[4].size());
@@ -185,7 +219,7 @@ namespace Test
 
 		if (otp != m_expected[4])
 		{
-			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA5"));
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA9"));
 		}
 
 		otp.resize(m_expected[5].size());
@@ -193,7 +227,7 @@ namespace Test
 
 		if (otp != m_expected[5])
 		{
-			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA6"));
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA10"));
 		}
 
 		otp.resize(m_expected[6].size());
@@ -201,7 +235,7 @@ namespace Test
 
 		if (otp != m_expected[6])
 		{
-			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA7"));
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA11"));
 		}
 
 		otp.resize(m_expected[7].size());
@@ -209,7 +243,7 @@ namespace Test
 
 		if (otp != m_expected[7])
 		{
-			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA8"));
+			throw TestException(std::string("Ancillary"), std::string("Compute512"), std::string("Expected values don't match! -SA12"));
 		}
 	}
 
@@ -555,8 +589,12 @@ namespace Test
 			std::string("CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E"),
 			std::string("204A8FC6DDA82F0A0CED7BEB8E08A41657C16EF468B228A8279BE331A703C33596FD15C13B1B07F9AA1D3BEA57789CA031AD85C7A71DD70354EC631238CA3445"),
 			std::string("8E959B75DAE313DA8CF4F72814FC143F8F7779C6EB9F7FA17299AEADB6889018501D289E4900F7E4331B99DEC4B5433AC7D329EEB6DD26545E96E55B874BE909"),
+			std::string("CB00753F45A35E8BB5A03D699AC65007272C32AB0EDED1631A8B605A43FF5BED8086072BA1E7CC2358BAECA134C825A7"),
+			std::string("38B060A751AC96384CD9327EB1B1E36A21FDB71114BE07434C0CC7BF63F6E1DA274EDEBFE76F65FBD51AD2F14898B95B"),
+			std::string("3391FDDDFC8DC7393707A65B1B4709397CF8B1D162AF05ABFE8F450DE5F36BC6B0455A8520BC4E6F5FE95B1FE3C8452B"),
+			std::string("09330C33F71147E83D192FC782CD1B4753111B173B3B05D22FA08086E3B0F712FCC7C71A557E2DB966C3E9FA91746039")
 		};
-		HexConverter::Decode(expected, 8, m_expected);
+		HexConverter::Decode(expected, 12, m_expected);
 
 		/*lint -restore */
 	}

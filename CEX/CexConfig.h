@@ -113,6 +113,13 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	define <unistd.h>
 #endif
 
+// 32 or 64 bit architecture
+#if (defined(__x86_64__) || defined(__amd64__) || defined(_M_X64))
+#	define CEX_ARCH_64
+#else
+#	define CEX_ARCH_32
+#endif
+
 #if defined(_WIN32)
 #	define CEX_HAS_VIRTUALLOCK
 #	define CEX_HAS_RTLSECUREMEMORY
@@ -482,6 +489,9 @@ typedef unsigned char byte;
 // set the master XOF function used by the asymmetric ciphers and signature schemes
 // changing this value will toggle the XOF function used by most asymmetric primitives
 // Note: this will change the output of these asymmetric functions (KAT tests will no longer align)
+
+// the default internal buffer size applied to all PRNGs
+#define CEX_PRNG_BUFFER_SIZE 1024
 
 // the standard Keccak SHAKE function
 #define CEX_XOF_KECCAKR24P1600

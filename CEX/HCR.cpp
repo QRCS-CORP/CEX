@@ -22,6 +22,8 @@ HCR::HCR(SHA2Digests DigestType, Providers ProviderType)
 		throw CryptoRandomException(PrngConvert::ToName(Prngs::HCR), std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_pvdType(ProviderType != Providers::None ? ProviderType :
 		throw CryptoRandomException(PrngConvert::ToName(Prngs::HCR), std::string("Constructor"), std::string("Provider type can not be none!"), ErrorCodes::InvalidParam)),
+	m_rndBuffer(BUFFER_SIZE),
+	m_rndIndex(BUFFER_SIZE),
 	m_rngGenerator(new HCG(static_cast<SHA2Digests>(DigestType)))
 {
 	Reset();
@@ -31,6 +33,8 @@ HCR::~HCR()
 {
 	m_digestType = SHA2Digests::None;
 	m_pvdType = Providers::None;
+	m_rndIndex = 0;
+	Clear(m_rndBuffer);
 
 	if (m_rngGenerator != nullptr)
 	{
@@ -96,12 +100,70 @@ void HCR::Reset()
 
 void HCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
+	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+
+	if (Length != 0)
+	{
+		if (Length > BUFLEN)
+		{
+			if (BUFLEN > 0)
+			{
+				Extract(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+			}
+
+			while (Length >= m_rndBuffer.size())
+			{
+				Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+				Extract(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
+				Length -= m_rndBuffer.size();
+				Offset += m_rndBuffer.size();
+			}
+
+			Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+			Extract(m_rndBuffer, 0, Output, Offset, Length);
+			m_rndIndex = Length;
+		}
+		else
+		{
+			Extract(m_rndBuffer, m_rndIndex, Output, Offset, Length);
+			m_rndIndex += Length;
+		}
+	}
+
 	Generator->Generate(Output, Offset, Length);
 }
 
 void HCR::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
-	Generator->Generate(Output, Offset, Length);
+	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+
+	if (Length != 0)
+	{
+		if (Length > BUFLEN)
+		{
+			if (BUFLEN > 0)
+			{
+				Copy(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+			}
+
+			while (Length >= m_rndBuffer.size())
+			{
+				Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+				Copy(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
+				Length -= m_rndBuffer.size();
+				Offset += m_rndBuffer.size();
+			}
+
+			Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+			Copy(m_rndBuffer, 0, Output, Offset, Length);
+			m_rndIndex = Length;
+		}
+		else
+		{
+			Copy(m_rndBuffer, m_rndIndex, Output, Offset, Length);
+			m_rndIndex += Length;
+		}
+	}
 }
 
 NAMESPACE_PRNGEND

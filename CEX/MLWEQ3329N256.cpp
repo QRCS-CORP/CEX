@@ -39,14 +39,14 @@ const std::vector<int16_t> MLWEQ3329N256::ZetasInv =
 
 bool MLWEQ3329N256::Decapsulate(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey)
 {
-	const size_t KLEN = (CipherText.size() == CIPHERTEXTK2_SIZE) ? 2 : (CipherText.size() == CIPHERTEXTK3_SIZE) ? 3 : 4;
+	const uint KLEN = (CipherText.size() == CIPHERTEXTK2_SIZE) ? 2 : (CipherText.size() == CIPHERTEXTK3_SIZE) ? 3 : 4;
 	const size_t PRILEN = MLWE_POLY_SIZE * KLEN;
 	std::vector<byte> buf(2 * MLWE_SEED_SIZE);
 	std::vector<byte> cmp(CipherText.size());
 	std::vector<byte> kr(2 * MLWE_SEED_SIZE);
 	std::vector<byte> pk(PrivateKey.size() - PRILEN);
 	std::vector<byte> seed(MLWE_SEED_SIZE);
-	int32_t fail;
+	size_t fail;
 
 	// decrypt the coin
 	CpaDecrypt(buf, CipherText, PrivateKey, KLEN);
@@ -76,7 +76,7 @@ bool MLWEQ3329N256::Decapsulate(std::vector<byte> &Secret, const std::vector<byt
 
 void MLWEQ3329N256::Encapsulate(std::vector<byte> &Secret, std::vector<byte> &CipherText, const std::vector<byte> &PublicKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
-	const size_t KLEN = (PublicKey.size() - MLWE_SEED_SIZE) / MLWE_POLY_SIZE;
+	const uint KLEN = static_cast<uint>(PublicKey.size() - MLWE_SEED_SIZE) / MLWE_POLY_SIZE;
 	// will contain key, coins
 	std::vector<byte> kr(2 * MLWE_SEED_SIZE);
 	std::vector<byte> ktmp(MLWE_SEED_SIZE);
@@ -102,7 +102,7 @@ void MLWEQ3329N256::Encapsulate(std::vector<byte> &Secret, std::vector<byte> &Ci
 
 void MLWEQ3329N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
-	const size_t KLEN = (PublicKey.size() - MLWE_SEED_SIZE) / MLWE_POLY_SIZE;
+	const uint KLEN = static_cast<uint>(PublicKey.size() - MLWE_SEED_SIZE) / MLWE_POLY_SIZE;
 	const size_t PRILEN = KLEN * MLWE_POLY_SIZE;
 	std::vector<byte> seed(2 * MLWE_SEED_SIZE);
 
@@ -150,19 +150,19 @@ void MLWEQ3329N256::UnpackSk(std::vector<std::array<ushort, MLWE_N>> &Sk, const 
 void MLWEQ3329N256::PackCiphertext(std::vector<byte> &R, std::vector<std::array<ushort, MLWE_N>> &B, std::array<ushort, MLWE_N> &V)
 {
 	PolyVecCompress(R, B);
-	PolyCompress(R, V, B.size());
+	PolyCompress(R, V, static_cast<uint>(B.size()));
 }
 
 void MLWEQ3329N256::UnpackCiphertext(std::vector<std::array<ushort, MLWE_N>> &B, std::array<ushort, MLWE_N> &V, const std::vector<byte> &C)
 {
 	PolyVecDecompress(B, C);
-	PolyDecompress(V, C, B.size());
+	PolyDecompress(V, C, static_cast<uint>(B.size()));
 }
 
 uint MLWEQ3329N256::RejUniform(std::array<ushort, MLWE_N> &R, uint ROffset, uint RLength, const std::vector<byte> &Buffer, size_t BufLength)
 {
 	uint ctr;
-	uint pos;
+	size_t pos;
 	ushort val;
 
 	ctr = ROffset;

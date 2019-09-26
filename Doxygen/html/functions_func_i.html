@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.7</span>
+   &#160;<span id="projectnumber">1.0.0.8</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -78,8 +78,8 @@ $(function() {
 <li>IAsymmetricParameters()
 : <a class="el" href="class_i_asymmetric_parameters.html#a56c1723b66d1cc90e62b57bcea300c6d">IAsymmetricParameters</a>
 </li>
-<li>IAsymmetricSign()
-: <a class="el" href="class_i_asymmetric_sign.html#aa3ad0850420ebbea5ea2e6c83155a559">IAsymmetricSign</a>
+<li>IAsymmetricSigner()
+: <a class="el" href="class_i_asymmetric_signer.html#a1ba4fdce8c21314efc10d88ddaeb6779">IAsymmetricSigner</a>
 </li>
 <li>IBlockCipher()
 : <a class="el" href="class_i_block_cipher.html#ab7f96ce0a0cccb943f2d446a3191353a">IBlockCipher</a>
@@ -138,7 +138,7 @@ $(function() {
 , <a class="el" href="class_h_k_d_f.html#a9171b6c01b82b3334c6245e70f6dd3e8">HKDF</a>
 , <a class="el" href="class_h_m_a_c.html#ad6da7b16079abf7c73c41176ab59e299">HMAC</a>
 , <a class="el" href="class_i_asymmetric_cipher.html#aabac9994cd23be5eec02a0555dcc0228">IAsymmetricCipher</a>
-, <a class="el" href="class_i_asymmetric_sign.html#a4b35faed78f989e5f9899d6ecd3241f5">IAsymmetricSign</a>
+, <a class="el" href="class_i_asymmetric_signer.html#a1136574f59b769224112da9ef84d3c52">IAsymmetricSigner</a>
 , <a class="el" href="class_i_block_cipher.html#a4bfc2c7a5f000feb3be6c3a8c79fcff1">IBlockCipher</a>
 , <a class="el" href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">ICipherMode</a>
 , <a class="el" href="class_i_c_m.html#affec1f8beb4cb805103a63702bf410cd">ICM</a>
@@ -148,21 +148,22 @@ $(function() {
 , <a class="el" href="class_i_stream_cipher.html#a5e7082b23cc1f65eb7b702a70136fd47">IStreamCipher</a>
 , <a class="el" href="class_k_d_f2.html#a235d4a47591ea6e58350d6cb317599a7">KDF2</a>
 , <a class="el" href="class_k_m_a_c.html#a9fc29f42df622e96a7ada94b6a7ef10a">KMAC</a>
+, <a class="el" href="class_kyber.html#a81db16480f73b4b503270a158ceb6dff">Kyber</a>
 , <a class="el" href="class_mac_stream.html#af15cbd905c852dd96a1ca21a9217c7a4">MacStream</a>
 , <a class="el" href="class_mc_eliece.html#abc67836600abcabf527cf36a0a43d256">McEliece</a>
 , <a class="el" href="class_m_c_s.html#acd508e0e9ce5130a50449127d378c54e">MCS</a>
-, <a class="el" href="class_module_l_w_e.html#a04ab2308d07970f350a690be21b570be">ModuleLWE</a>
+, <a class="el" href="class_new_hope.html#a239a7d742cc8cf06e1fe51c628d7add6">NewHope</a>
 , <a class="el" href="class_n_t_r_u_prime.html#aa606ae7ec8ac35a895aec44e7f4b7d56">NTRUPrime</a>
 , <a class="el" href="class_o_f_b.html#a82f8ee44cbef0f7d41f0a02be6641989">OFB</a>
 , <a class="el" href="class_p_b_k_d_f2.html#a47622f10656a1bfd1294587f85713c45">PBKDF2</a>
 , <a class="el" href="class_poly1305.html#aaff0c9d6e09b18e49257ffe762108e7a">Poly1305</a>
+, <a class="el" href="class_rainbow.html#a9decddcb99620b6eb45e22e8ee297f2a">Rainbow</a>
 , <a class="el" href="class_r_c_s.html#aeca6ca7b4f949d4fea718ae58e63f33c">RCS</a>
 , <a class="el" href="class_r_h_x.html#a54ac922d8245d46a7061cba477eaa21a">RHX</a>
-, <a class="el" href="class_ring_l_w_e.html#a6be0bb571b97b6de9184de3bd1b197cb">RingLWE</a>
 , <a class="el" href="class_s_c_r_y_p_t.html#ac85348f8541815c919d73c84ae2be047">SCRYPT</a>
 , <a class="el" href="class_s_h_a_k_e.html#ab21477f14b7068b54baeaaf3274fa495">SHAKE</a>
 , <a class="el" href="class_s_h_x.html#aebed156807720a5585cfe52ccbe5d4e3">SHX</a>
-, <a class="el" href="class_sphincs.html#a8fe512af37d407c7e4ea35bb9ae8b427">Sphincs</a>
+, <a class="el" href="class_sphincs_plus.html#aa6761dba7584c18a8fb83348d623e8ff">SphincsPlus</a>
 , <a class="el" href="class_t_s_x1024.html#ad5c3fb36e6a9ae2419a48eb05c02eaaa">TSX1024</a>
 , <a class="el" href="class_t_s_x256.html#aa7cb148c0829b237ab0e3a2884e9d8a2">TSX256</a>
 , <a class="el" href="class_t_s_x512.html#a0e6eccf4ec35cee762dae2f9d252b8d5">TSX512</a>
@@ -220,14 +221,14 @@ $(function() {
 , <a class="el" href="class_i_cipher_mode.html#a6b9e5e05b83c6e84e6082d0b6334d470">ICipherMode</a>
 , <a class="el" href="class_i_c_m.html#a721407c09a8fb966b67823879202e8b1">ICM</a>
 , <a class="el" href="class_i_stream_cipher.html#a10ef7a97b4a62e89984f64fc7dd8318d">IStreamCipher</a>
+, <a class="el" href="class_kyber.html#ac50734602794550a88870fe8174a7281">Kyber</a>
 , <a class="el" href="class_mc_eliece.html#ac1ec03bf88cf09a030dd89ba324b06b7">McEliece</a>
 , <a class="el" href="class_m_c_s.html#aa1b0039b86b9c4132978cf7503277f19">MCS</a>
-, <a class="el" href="class_module_l_w_e.html#af079a2b3792e9107c9b06fc956eddeff">ModuleLWE</a>
+, <a class="el" href="class_new_hope.html#aca0ca39c6366a41905a87b67b5d9aad5">NewHope</a>
 , <a class="el" href="class_n_t_r_u_prime.html#a2a72df230b02b0961455ec433eb357d2">NTRUPrime</a>
 , <a class="el" href="class_o_f_b.html#a6e5ed25ccbe10b7dde0e61a305b4369a">OFB</a>
 , <a class="el" href="class_r_c_s.html#ad6d87da5f031e5aecbb11a6f299530d6">RCS</a>
 , <a class="el" href="class_r_h_x.html#a08bed44fe21bdc4132dad49f6cf9b1d3">RHX</a>
-, <a class="el" href="class_ring_l_w_e.html#a0b8b55a26615c8ae6271b6bef39f4272">RingLWE</a>
 , <a class="el" href="class_s_h_x.html#a8fb576085c0558aecb5d0299344c2c1c">SHX</a>
 , <a class="el" href="class_t_s_x1024.html#a884090c5735582b0a8fa201f5964d9ea">TSX1024</a>
 , <a class="el" href="class_t_s_x256.html#aba62e177093a8a3b6856f56d04d3de5c">TSX256</a>
@@ -237,7 +238,7 @@ $(function() {
 : <a class="el" href="class_integer_tools.html#aacd002f623f6b8c06dcf968caa9a2c95">IntegerTools</a>
 </li>
 <li>IsFinalBlock()
-: <a class="el" href="class_skein_ubi_tweak.html#a397a32d8c946ee1d5ddbd3bf3e5c766d">SkeinUbiTweak</a>
+: <a class="el" href="class_skein_ubi_tweak.html#a863de80bb934869073cc55e4b730eebe">SkeinUbiTweak</a>
 </li>
 <li>IsFirstBlock()
 : <a class="el" href="class_skein_ubi_tweak.html#a744c46a7159a4bdda2a399987815d50b">SkeinUbiTweak</a>
@@ -262,7 +263,7 @@ $(function() {
 , <a class="el" href="class_h_k_d_f.html#a3b960f3f37161b35bc0b173e0e017f28">HKDF</a>
 , <a class="el" href="class_h_m_a_c.html#adc9ffe014421a253677a8e8647e5152f">HMAC</a>
 , <a class="el" href="class_i_asymmetric_cipher.html#a01959076fd9ec583cd23ac8bc8bcd7c1">IAsymmetricCipher</a>
-, <a class="el" href="class_i_asymmetric_sign.html#a8895a33e75f6efeb0ebe8a91ee8d534a">IAsymmetricSign</a>
+, <a class="el" href="class_i_asymmetric_signer.html#a0ce80ceed575d781219e058b29d7f88a">IAsymmetricSigner</a>
 , <a class="el" href="class_i_block_cipher.html#a5119952207cba4278018ef18f124dede">IBlockCipher</a>
 , <a class="el" href="class_i_cipher_mode.html#a1b57c47c070538abb55e96e09e7ce5a2">ICipherMode</a>
 , <a class="el" href="class_i_c_m.html#afc458f9c6eb6bd3ed18bef6d8db215c9">ICM</a>
@@ -272,20 +273,21 @@ $(function() {
 , <a class="el" href="class_i_stream_cipher.html#a4ea87e736f13d1fa3494dd0b58fd51a3">IStreamCipher</a>
 , <a class="el" href="class_k_d_f2.html#aac4f591dabf5732557c5deebe3471318">KDF2</a>
 , <a class="el" href="class_k_m_a_c.html#abcd6fd347494b1abf461bdd4d381e346">KMAC</a>
+, <a class="el" href="class_kyber.html#a4943d32581f8e011a84b8bdeef4ad44d">Kyber</a>
 , <a class="el" href="class_mc_eliece.html#a7f4a707111b95f3fe985db967e941ca5">McEliece</a>
 , <a class="el" href="class_m_c_s.html#aa66027bf2d40e9cf956913cd79cb17e0">MCS</a>
-, <a class="el" href="class_module_l_w_e.html#aa8d9020c00294cb01298dcddff1f5b7e">ModuleLWE</a>
+, <a class="el" href="class_new_hope.html#a81cbafb2341f607451becbe75a3e8b52">NewHope</a>
 , <a class="el" href="class_n_t_r_u_prime.html#a98364399612ed34916761174e9ceaafc">NTRUPrime</a>
 , <a class="el" href="class_o_f_b.html#a5a251feb550c172aa058250169ab922c">OFB</a>
 , <a class="el" href="class_p_b_k_d_f2.html#a9abbe4011fa4a5b9b68b5deeeba7d8ff">PBKDF2</a>
 , <a class="el" href="class_poly1305.html#a8093000137092b2ed2f3278ea38261b1">Poly1305</a>
+, <a class="el" href="class_rainbow.html#a2d29f953081d703e5ac706fb8e3e91af">Rainbow</a>
 , <a class="el" href="class_r_c_s.html#a0a1df168ea185a05ae02a743845917cd">RCS</a>
 , <a class="el" href="class_r_h_x.html#aafa1daad79b5b30d09f379b2cdce518f">RHX</a>
-, <a class="el" href="class_ring_l_w_e.html#aafd54e9639e9cc0dc2b6300fc24eb61e">RingLWE</a>
 , <a class="el" href="class_s_c_r_y_p_t.html#a8824e34473190144f890e4a750085be6">SCRYPT</a>
 , <a class="el" href="class_s_h_a_k_e.html#a26054d7f55c1584bdccda9061ce2fac3">SHAKE</a>
 , <a class="el" href="class_s_h_x.html#ac4ea567917110bd918296b618851ba9f">SHX</a>
-, <a class="el" href="class_sphincs.html#a588146e86b94ac4199e4ef9f8e2314c0">Sphincs</a>
+, <a class="el" href="class_sphincs_plus.html#a17dc0f7bc2d28fc67001bcf7ce3e5583">SphincsPlus</a>
 , <a class="el" href="class_t_s_x1024.html#a2876bf17cd41996125308edac89a61ed">TSX1024</a>
 , <a class="el" href="class_t_s_x256.html#a313d6aaf2353067d706d48ec21ca0288">TSX256</a>
 , <a class="el" href="class_t_s_x512.html#a4948ff32ebe840630d3eec28d58bf1bb">TSX512</a>
@@ -342,12 +344,13 @@ $(function() {
 </li>
 <li>IsSigner()
 : <a class="el" href="class_dilithium.html#a53998ac127553733580db685517c80f9">Dilithium</a>
-, <a class="el" href="class_i_asymmetric_sign.html#a9b0782caaf4b9a872c937aea3b9f81a8">IAsymmetricSign</a>
-, <a class="el" href="class_sphincs.html#aa0eb4574df842bb3c6d389ea8a1bba76">Sphincs</a>
+, <a class="el" href="class_i_asymmetric_signer.html#aa41e59b02e21b46e4310021a8009dd13">IAsymmetricSigner</a>
+, <a class="el" href="class_rainbow.html#ac55242d6717f03b7de0fe7fda8b628bf">Rainbow</a>
+, <a class="el" href="class_sphincs_plus.html#a919591999582b73f7806212ef71efa6b">SphincsPlus</a>
 , <a class="el" href="class_x_m_s_s.html#a254be2d1894f33962d08f50b8af285d5">XMSS</a>
 </li>
 <li>IStreamCipher()
-: <a class="el" href="class_i_stream_cipher.html#a90aeba23816b7a14b4a6f9c68b301570">IStreamCipher</a>
+: <a class="el" href="class_i_stream_cipher.html#aab5703da1dc45a1b920469dae8cd8ccf">IStreamCipher</a>
 </li>
 <li>IsX64()
 : <a class="el" href="class_cpu_detect.html#a17ffa21f829625e843315a35079fdfb0">CpuDetect</a>
@@ -356,7 +359,7 @@ $(function() {
 : <a class="el" href="class_cpu_detect.html#abb34bf2edfc1ef675f3200269b242d3d">CpuDetect</a>
 </li>
 <li>ISymmetricKey()
-: <a class="el" href="class_i_symmetric_key.html#aebbf53fdec6f690a128bc7cc84aa46a9">ISymmetricKey</a>
+: <a class="el" href="class_i_symmetric_key.html#a78b724cf8867a2395398bbf359f95c35">ISymmetricKey</a>
 </li>
 <li>IsZero()
 : <a class="el" href="class_integer_tools.html#a3b51fbc891bd9d4cc066f47ce3767ed1">IntegerTools</a>

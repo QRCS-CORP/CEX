@@ -4,7 +4,7 @@
 #include "../CEX/AsymmetricKeyPair.h"
 #include "../CEX/Dilithium.h"
 #include "../CEX/IntegerTools.h"
-#include "../CEX/ModuleLWE.h"
+#include "../CEX/Kyber.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/SecureVector.h"
 
@@ -16,7 +16,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
-	using Asymmetric::Sign::DLM::Dilithium;
+	using Asymmetric::Sign::DLTM::Dilithium;
 	using Enumeration::DilithiumParameters;
 	using Utility::IntegerTools;
 	using Test::NistRng;
@@ -99,8 +99,8 @@ namespace Test
 
 	void DilithiumTest::Authentication()
 	{
-		Dilithium sgn1(DilithiumParameters::DLMS2N256Q8380417);
-		Dilithium sgn2(DilithiumParameters::DLMS2N256Q8380417);
+		Dilithium sgn1(DilithiumParameters::DLTMS2N256Q8380417);
+		Dilithium sgn2(DilithiumParameters::DLTMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -145,7 +145,7 @@ namespace Test
 		// invalid prng type
 		try
 		{
-			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417, Enumeration::Prngs::None);
+			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417, Enumeration::Prngs::None);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE2"));
 		}
@@ -160,7 +160,7 @@ namespace Test
 		// null prng
 		try
 		{
-			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417, nullptr);
+			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417, nullptr);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE3"));
 		}
@@ -177,7 +177,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 			sgn.Sign(msg, sig);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE4"));
@@ -195,7 +195,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 			sgn.Verify(sig, msg);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -DE5"));
@@ -211,8 +211,8 @@ namespace Test
 		// test initialization with invalid key
 		try
 		{
-			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
-			Asymmetric::Encrypt::MLWE::ModuleLWE cprb;
+			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
+			Asymmetric::Encrypt::MLWE::Kyber cprb;
 			// create an invalid key set
 			AsymmetricKeyPair* kp = cprb.Generate();
 			sgn.Initialize(kp->PrivateKey());
@@ -232,7 +232,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 			AsymmetricKeyPair* kp = sgn.Generate();
 			sgn.Initialize(kp->PublicKey());
 			sgn.Sign(msg, sig);
@@ -255,11 +255,11 @@ namespace Test
 		std::vector<byte> sig(0);
 		NistRng gen;
 
-		// DLMS1N256Q8380417
+		// DLTMS1N256Q8380417
 
 		gen.Initialize(m_rngseed[0]);
 
-		Dilithium sgn1(DilithiumParameters::DLMS1N256Q8380417, &gen);
+		Dilithium sgn1(DilithiumParameters::DLTMS1N256Q8380417, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp1 = sgn1.Generate();
@@ -304,11 +304,11 @@ namespace Test
 		sig.clear();
 		delete kp1;
 
-		// DLMS1N256Q8380417
+		// DLTMS1N256Q8380417
 
 		gen.Initialize(m_rngseed[0]);
 
-		Dilithium sgn2(DilithiumParameters::DLMS2N256Q8380417, &gen);
+		Dilithium sgn2(DilithiumParameters::DLTMS2N256Q8380417, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp2 = sgn2.Generate();
@@ -350,11 +350,11 @@ namespace Test
 		sig.clear();
 		delete kp2;
 
-		// DLMS3N256Q8380417
+		// DLTMS3N256Q8380417
 
 		gen.Initialize(m_rngseed[0]);
 
-		Dilithium sgn3(DilithiumParameters::DLMS3N256Q8380417, &gen);
+		Dilithium sgn3(DilithiumParameters::DLTMS3N256Q8380417, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp3 = sgn3.Generate();
@@ -405,13 +405,13 @@ namespace Test
 		NistRng gen;
 		size_t i;
 
-		// DLMS1N256Q8380417
+		// DLTMS1N256Q8380417
 
 		for (i = 0; i < m_rngseed.size(); ++i)
 		{
 			gen.Initialize(m_rngseed[i]);
 
-			Dilithium sgn(DilithiumParameters::DLMS1N256Q8380417, &gen);
+			Dilithium sgn(DilithiumParameters::DLTMS1N256Q8380417, &gen);
 
 			// generate the key pair
 			AsymmetricKeyPair* kp = sgn.Generate();
@@ -446,13 +446,13 @@ namespace Test
 			delete kp;
 		}
 
-		// DLMS1N256Q8380417
+		// DLTMS1N256Q8380417
 
 		for (i = 0; i < m_rngseed.size(); ++i)
 		{
 			gen.Initialize(m_rngseed[i]);
 
-			Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417, &gen);
+			Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417, &gen);
 
 			// generate the key pair
 			AsymmetricKeyPair* kp = sgn.Generate();
@@ -485,13 +485,13 @@ namespace Test
 			delete kp;
 		}
 
-		// DLMS1N256Q8380417
+		// DLTMS1N256Q8380417
 
 		for (i = 0; i < m_rngseed.size(); ++i)
 		{
 			gen.Initialize(m_rngseed[i]);
 
-			Dilithium sgn(DilithiumParameters::DLMS3N256Q8380417, &gen);
+			Dilithium sgn(DilithiumParameters::DLTMS3N256Q8380417, &gen);
 
 			// generate the key pair
 			AsymmetricKeyPair* kp = sgn.Generate();
@@ -528,7 +528,7 @@ namespace Test
 	void DilithiumTest::PrivateKey()
 	{
 		SecureRandom gen;
-		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -538,7 +538,7 @@ namespace Test
 		// serialize and alter private key
 		std::vector<byte> sk1 = kp->PrivateKey()->Polynomial();
 		gen.Generate(sk1, 0, 16);
-		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLMS2N256Q8380417));
+		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLTMS2N256Q8380417));
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -555,7 +555,7 @@ namespace Test
 	void DilithiumTest::PublicKey()
 	{
 		SecureRandom gen;
-		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -565,7 +565,7 @@ namespace Test
 		// alter public key
 		std::vector<byte> pk1 = kp->PublicKey()->Polynomial();
 		gen.Generate(pk1, 0, 16);
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLMS2N256Q8380417));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::Dilithium, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(DilithiumParameters::DLTMS2N256Q8380417));
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -581,7 +581,7 @@ namespace Test
 
 	void DilithiumTest::Serialization()
 	{
-		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 		SecureVector<byte> skey(0);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
@@ -619,7 +619,7 @@ namespace Test
 	void DilithiumTest::Signature()
 	{
 		SecureRandom gen;
-		Dilithium sgn(DilithiumParameters::DLMS2N256Q8380417);
+		Dilithium sgn(DilithiumParameters::DLTMS2N256Q8380417);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -644,9 +644,9 @@ namespace Test
 	void DilithiumTest::Stress()
 	{
 		SecureRandom gen;
-		Dilithium sgn1(DilithiumParameters::DLMS1N256Q8380417);
-		Dilithium sgn2(DilithiumParameters::DLMS2N256Q8380417);
-		Dilithium sgn3(DilithiumParameters::DLMS3N256Q8380417);
+		Dilithium sgn1(DilithiumParameters::DLTMS1N256Q8380417);
+		Dilithium sgn2(DilithiumParameters::DLTMS2N256Q8380417);
+		Dilithium sgn3(DilithiumParameters::DLTMS3N256Q8380417);
 		std::vector<byte> msg1(0);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -1005,7 +1005,7 @@ namespace Test
 
 		const std::vector<std::string> sigexp =
 		{
-			// DLMS1N256Q8380417
+			// DLTMS1N256Q8380417
 			std::string("A785B7DB95D555880DBB8A49FD02E8D1891EB3396344C330AE81441F3CA8E275B58395CBF4E80DC3768480063C464764783C360EB289666D168C18C0D07C8BCA"
 				"53D29987E697CD6F2CF282C03F2A16C303411FAEB95068C7397476A34905341B658F89A0EC26B838E5331F92A23A460ECB6D231DAD5EC48E02B90D3248196342"
 				"BA254A0A7C26572C744D43001DC4A9CE797B033D37114E38716B607EC563546076BBA867F5BB45D9B8A8C9128E533C6A484B66ACFEFD57400BB13DA67E1DA170"
@@ -1140,7 +1140,7 @@ namespace Test
 				"BCEFFD000000000000000000000000000F1E3143088078032001C40062162424241510F10320884B66800400F0104080501100008CCA4DD293A4FC012F7AF5B5"
 				"2A046471EFCD720C9384919BE05A61CDE8E8B01251C5AB885E820FD36ED9FF6FDF45783EC81A86728CBB74B426ADFF96123C08FAC2BC6C58A9C0DD7176129226"
 				"2C65F20DF47751F0831770A6BB7B3760BB7F5EFFFB6E11AC35F353A6F24400B80B287834E92C9CF0D3C949D6DCA31B0B94E0E3312E8BD02174B170C2CA9355FE"),
-			// DLMS1N256Q8380417
+			// DLTMS1N256Q8380417
 			std::string("F21B63C5CB868F1932B5D92B34758845E0123E40F7987C10643C3420D352BB2CFFC0BC3B1ADBD774D150EE4580537B06057D115D12E6331A10D3B31A5ED370D7"
 				"368D566798B4C4E6725602B39AB1548F7772D985892A901907A8E9D6C6C1B55207ECD8A30F1E2965A171E121CD94D26F8447A89B2F3BC555CB87F9E22FB112DD"
 				"63A565B4E289B420099B24F5E4F8F3778D49CDAB369BA335B3609A0D40AE746B7749955DE80BA51779AC91EAC7E6595D1F82C263DAC3A5945C05D642A19BDEC0"
@@ -1317,7 +1317,7 @@ namespace Test
 				"8082908895EF931570675A20082F7AF5B52A046471EFCD720C9384919BE05A61CDE8E8B01251C5AB885E820FD36ED9FF6FDF45783EC81A86728CBB74B426ADFF"
 				"96123C08FAC2BC6C58A9C0DD71761292262C65F20DF47751F0831770A6BB7B3760BB7F5EFFFB6E11AC35F353A6F24400B80B287834E92C9CF0D3C949D6DCA31B"
 				"0B94E0E3312E8BD02174B170C2CA9355FE"),
-			// DLMS3N256Q8380417
+			// DLTMS3N256Q8380417
 			std::string("D78758C8992B2D0FC51A03D76B071796F915D6B2415F610758D188AC94048C530D81B2C1BC7B9519B3EB4F0CFA97DA66B8D14470711D1A851A52B372C2BEB4A3"
 				"FEA33A293BC18347D151477D197BD9397AB2741AA65E37C172EF29DDA2700ECFB9DF478FF94CAC216BDDD67E2A52A283312A2B09927BA1737FBDEC1385978371"
 				"A1A199543B8B369110EBE2B6DF441AEE27B5207CDD3AF2F77109F2A3DB89D300E27D9A484733F6085D21A3C4D7D27F243789FEBE361DE4829C20441CD1938ED9"

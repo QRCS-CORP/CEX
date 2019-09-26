@@ -207,7 +207,7 @@ void HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		// update the reseed threshold counter
 		m_hcgState->Counter += Length;
 
-		if (m_hcgState->Counter >= ReseedThreshold())
+		if (m_hcgState->Counter >= ReseedThreshold() || CyclicReseed() == true)
 		{
 			// update the total reseeds counter
 			++m_hcgState->Reseed;

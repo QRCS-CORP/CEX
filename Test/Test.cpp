@@ -1,69 +1,3 @@
-
-// TRAJECTORY
-//
-// ##SCHEDULE FOR 1.0.0.8 RELEASE ###
-// ##Eta is February 14, 2019 ##
-//
-// Authenticated stream ciphers MCS,ThreeFish-256/512/1024, and CSX256/512	- done
-// Update secure key mechanisms and integrate internally						- started
-// Full security, documentation, and code review cycles							- started
-// Begin optimization and review of asymmetric primitives						- 
-// Create accompanying website and publish documentation						- 
-//
-// New in Current Release 1.0.0.7 (version A7):
-// The Dilithium asymmetric signature scheme
-// The SPHINCS + asymmetric signature scheme
-// The NTRU-Prime asymmetric cipher
-// The cSHAKE XOF function added as an HX symmetric cipher key expansion option
-// Update of all base asymmetric ciphers and signature schemes to match NIST PQ entries
-// Message digests updated for performance and security
-// Integrated an optional built - in authentication generator(HMAC / KMAC) to each stream cipher
-// Added the Authenticate and Encrypt and AEAD stream cipher implementation(Authenticated Cipher Stream : MCS).
-// Threefish 256/512/1024 authenticated stream ciphers
-// CSX256 - P20 and CSX512 - P80 authenticated stream ciphers
-//
-// ### Planned Release 1.1.0.1 ###
-//
-// RingLWE							-added
-// McEliece							-added
-// ModuleLWE						-added
-// NTRUPrime						-added
-// SPHINCS+							-added
-// Dilithium						-added
-// Optimization						-started
-// AVX512 integration				-started
-// Compiler compatibility			-started
-// Android/iOS/Linux compatibility	-started
-// DLL API (.NET/Java)				-not started
-//
-// ### Planned Release 1.2.0.1 ###
-//
-// Direct Trust Model DTM-KEX (external?)
-// Post-Quantum Secure DNS, PQ-SECDNS (external)
-// Shared Trust Model STM-KEX (external?)
-//
-// ### Style Rules ###
-// 
-// namespace: Single capaitalized word, ex. Network::
-// class name: Pascal case description, maximum of two words, ex. SymmetricKey()
-// function name: Pascal case, maximum of two words, ex. Initialize()
-// function parameters: Pascal case, maximum of two words, ex. Initialize(ISymmetricKey &Key)
-// global variable: Camel Case, with the prefix 'g_', ex. g_globalState
-// class variable: Camel Case, with the prefix 'm_', ex. m_classState
-// function variable: a single word or 2 Camel case words in abbreviated form, ex. ctr, or, bctr
-// global const: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
-// class const: All Caps, a total of two words, ex. CLASS_CONSTANT
-// function const: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
-//
-// 1.0.0.8 TODOs
-// rewrite padding modes for constant time						-done
-// Rewrite the symmetric secure key with authentication			-done
-// Add an asymmetric secure key									-done
-// Reorganize the namespace (key and cipher)					-done
-// Review all classes for constant time operations				-done
-// Update all documentation to current implementations			-done
-// Add *nix random provider functions							-done
-
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,17 +41,18 @@
 #include "../Test/MacStreamTest.h"
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
-#include "../Test/ModuleLWETest.h"
-#include "../Test/NTRUTest.h"
+#include "../Test/KyberTest.h"
+#include "../Test/NTRUPrimeTest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
 #include "../Test/Poly1305Test.h"
+#include "../Test/RainbowTest.h"
 #include "../Test/RandomOutputTest.h"
 #include "../Test/RCSTest.h"
 #include "../Test/RDPTest.h"
 #include "../Test/RijndaelTest.h"
-#include "../Test/RingLWETest.h"
+#include "../Test/NewHopeTest.h"
 #include "../Test/SCRYPTTest.h"
 #include "../Test/SecureStreamTest.h"
 #include "../Test/SerpentTest.h"
@@ -126,7 +61,7 @@
 #include "../Test/SimdWrapperTest.h"
 #include "../Test/SHAKETest.h"
 #include "../Test/SkeinTest.h"
-#include "../Test/SphincsTest.h"
+#include "../Test/SphincsPlusTest.h"
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
 #include "../Test/ThreefishTest.h"
@@ -206,11 +141,11 @@ void PrintRandom(size_t Lines)
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("************************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++    *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.7x (A7)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.8a (A8)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      July 16, 2019                     *");
+	ConsoleUtils::WriteLine("* Date:      September 22, 2019                *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -419,7 +354,6 @@ int main()
 
 			PrintHeader("Testing the AES software implementation (RHX)");
 			TestRun(new RijndaelTest(false));
-
 			PrintHeader("Testing the Serpent software implementation (SHX)");
 			TestRun(new SerpentTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
@@ -482,12 +416,13 @@ int main()
 			TestRun(new UtilityTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
 			TestRun(new McElieceTest());
-			TestRun(new ModuleLWETest());
-			TestRun(new NTRUTest());
-			TestRun(new RingLWETest());
+			TestRun(new KyberTest());
+			TestRun(new NTRUPrimeTest());
+			TestRun(new NewHopeTest());
 			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
 			TestRun(new DilithiumTest());
-			TestRun(new SphincsTest());
+			TestRun(new RainbowTest());
+			TestRun(new SphincsPlusTest());
 			TestRun(new XMSSTest());
 		}
 		else

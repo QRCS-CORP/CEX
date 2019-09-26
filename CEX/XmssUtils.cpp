@@ -1,8 +1,8 @@
-#include "XmssUtils.h"
+#include "XMSSUtils.h"
 
 NAMESPACE_XMSS
 
-bool XmssUtils::IsXMSS(XmssParameters Enumeral)
+bool XMSSUtils::IsXMSS(XmssParameters Enumeral)
 {
 	bool ret;
 
@@ -33,7 +33,7 @@ bool XmssUtils::IsXMSS(XmssParameters Enumeral)
 	return ret;
 }
 
-uint XmssUtils::ToOid(XmssParameters Enumeral)
+uint XMSSUtils::ToOid(XmssParameters Enumeral)
 {
 	uint oid;
 

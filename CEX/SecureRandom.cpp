@@ -1,5 +1,6 @@
 #include "SecureRandom.h"
 #include "BitConverter.h"
+#include "MemoryTools.h"
 #include "ProviderFromName.h"
 #include "PrngFromName.h"
 
@@ -12,12 +13,17 @@ using Utility::MemoryTools;
 
 SecureRandom::SecureRandom(Prngs PrngType, Providers ProviderType)
 	:
+	m_rndBuffer(BUFFER_SIZE),
+	m_rndIndex(BUFFER_SIZE),
 	m_rngEngine(Helper::PrngFromName::GetInstance(PrngType, ProviderType))
 {
 }
 
 SecureRandom::~SecureRandom()
 {
+	m_rndIndex = 0;
+	Clear(m_rndBuffer);
+
 	if (m_rngEngine != nullptr)
 	{
 		m_rngEngine.reset(nullptr);
@@ -91,22 +97,78 @@ std::vector<byte> SecureRandom::Generate(size_t Length)
 
 void SecureRandom::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	m_rngEngine->Generate(Output, Offset, Length);
+	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+
+	if (Length != 0)
+	{
+		if (Length > BUFLEN)
+		{
+			if (BUFLEN > 0)
+			{
+				Extract(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+			}
+
+			while (Length >= m_rndBuffer.size())
+			{
+				m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+				Extract(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
+				Length -= m_rndBuffer.size();
+				Offset += m_rndBuffer.size();
+			}
+
+			m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+			Extract(m_rndBuffer, 0, Output, Offset, Length);
+			m_rndIndex = Length;
+		}
+		else
+		{
+			Extract(m_rndBuffer, m_rndIndex, Output, Offset, Length);
+			m_rndIndex += Length;
+		}
+	}
 }
 
 void SecureRandom::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
-	m_rngEngine->Generate(Output, Offset, Length);
+	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+
+	if (Length != 0)
+	{
+		if (Length > BUFLEN)
+		{
+			if (BUFLEN > 0)
+			{
+				Copy(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+			}
+
+			while (Length >= m_rndBuffer.size())
+			{
+				m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+				Copy(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
+				Length -= m_rndBuffer.size();
+				Offset += m_rndBuffer.size();
+			}
+
+			m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
+			Copy(m_rndBuffer, 0, Output, Offset, Length);
+			m_rndIndex = Length;
+		}
+		else
+		{
+			Copy(m_rndBuffer, m_rndIndex, Output, Offset, Length);
+			m_rndIndex += Length;
+		}
+	}
 }
 
 void SecureRandom::Generate(std::vector<byte> &Output)
 {
-	m_rngEngine->Generate(Output);
+	Generate(Output, 0, Output.size());
 }
 
 void SecureRandom::Generate(SecureVector<byte> &Output)
 {
-	m_rngEngine->Generate(Output);
+	Generate(Output, 0, Output.size());
 }
 
 char SecureRandom::NextChar()

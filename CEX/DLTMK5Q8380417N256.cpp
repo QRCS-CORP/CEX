@@ -1,7 +1,8 @@
 #include "DLTMK5Q8380417N256.h"
-#include "DLMNPolyMath.h"
+#include "DLTMPolyMath.h"
 #include "Keccak.h"
 #include "MemoryTools.h"
+#include "DLTMPolyMath.h"
 
 NAMESPACE_DILITHIUM
 
@@ -33,44 +34,44 @@ void DLTMK5Q8380417N256::Generate(std::vector<byte> &PublicKey, std::vector<byte
 	MemoryTools::Copy(sbuf, (2 * DILITHIUM_SEED_SIZE), key, 0, key.size());
 
 	// expand matrix 
-	DLMNPolyMath::ExpandMat(mat, rho);
+	DLTMPolyMath::ExpandMat(mat, rho);
 	nonce = 0;
 
 	// sample short vectors s1 and s2 
 	for (i = 0; i < DILITHIUM_L; ++i)
 	{
-		DLMNPolyMath::PolyUniformEta(s1[i], rhoprime, nonce, DILITHIUM_ETA, DILITHIUM_SETABITS);
+		DLTMPolyMath::PolyUniformEta(s1[i], rhoprime, nonce, DILITHIUM_ETA, DILITHIUM_SETABITS);
 		++nonce;
 	}
 
 	for (i = 0; i < DILITHIUM_K; ++i)
 	{
-		DLMNPolyMath::PolyUniformEta(s2[i], rhoprime, nonce, DILITHIUM_ETA, DILITHIUM_SETABITS);
+		DLTMPolyMath::PolyUniformEta(s2[i], rhoprime, nonce, DILITHIUM_ETA, DILITHIUM_SETABITS);
 		++nonce;
 	}
 
 	// matrix-vector multiplication 
 	s1hat = s1;
-	DLMNPolyMath::PolyVecNtt(s1hat);
+	DLTMPolyMath::PolyVecNtt(s1hat);
 
 	for (i = 0; i < DILITHIUM_K; ++i)
 	{
-		DLMNPolyMath::PolyVecPointwiseAccInvMontgomery(t[i], mat[i], s1hat);
-		DLMNPolyMath::PolyReduce(t[i]);
-		DLMNPolyMath::PolyInvNttMontgomery(t[i]);
+		DLTMPolyMath::PolyVecPointwiseAccInvMontgomery(t[i], mat[i], s1hat);
+		DLTMPolyMath::PolyReduce(t[i]);
+		DLTMPolyMath::PolyInvNttMontgomery(t[i]);
 	}
 
 	// add error vector s2 
-	DLMNPolyMath::PolyVecAdd(t, t, s2);
+	DLTMPolyMath::PolyVecAdd(t, t, s2);
 
 	// extract t1 and write public key 
-	DLMNPolyMath::PolyVecFreeze(t);
-	DLMNPolyMath::PolyVecPower2Round(t1, t0, t);
-	DLMNPolyMath::PackPk(PublicKey, rho, t1, DILITHIUM_POLT1_SIZE_PACKED);
+	DLTMPolyMath::PolyVecFreeze(t);
+	DLTMPolyMath::PolyVecPower2Round(t1, t0, t);
+	DLTMPolyMath::PackPk(PublicKey, rho, t1, DILITHIUM_POLT1_SIZE_PACKED);
 
 	// compute CRH(rho, t1) and write secret key 
 	XOF(PublicKey, 0, DILITHIUM_PUBLICKEY_SIZE, tr, 0, tr.size(), Keccak::KECCAK256_RATE_SIZE);
-	DLMNPolyMath::PackSk(PrivateKey, rho, key, tr, s1, s2, t0, DILITHIUM_ETA, DILITHIUM_POLETA_SIZE_PACKED, DILITHIUM_POLT0_SIZE_PACKED);
+	DLTMPolyMath::PackSk(PrivateKey, rho, key, tr, s1, s2, t0, DILITHIUM_ETA, DILITHIUM_POLETA_SIZE_PACKED, DILITHIUM_POLT0_SIZE_PACKED);
 }
 
 void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
@@ -101,7 +102,7 @@ void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<by
 	ushort nonce;
 
 	nonce = 0;
-	DLMNPolyMath::UnpackSk(rho, key, tr, s1, s2, t0, PrivateKey, DILITHIUM_ETA, DILITHIUM_POLETA_SIZE_PACKED, DILITHIUM_POLT0_SIZE_PACKED);
+	DLTMPolyMath::UnpackSk(rho, key, tr, s1, s2, t0, PrivateKey, DILITHIUM_ETA, DILITHIUM_POLETA_SIZE_PACKED, DILITHIUM_POLT0_SIZE_PACKED);
 
 	// copy tr and message into the signedmsg buffer,
 	// backwards since message and signedmsg can be equal in SUPERCOP API 
@@ -129,50 +130,50 @@ void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<by
 #endif
 
 	// expand matrix and transform vectors 
-	DLMNPolyMath::ExpandMat(mat, rho);
-	DLMNPolyMath::PolyVecNtt(s1);
-	DLMNPolyMath::PolyVecNtt(s2);
-	DLMNPolyMath::PolyVecNtt(t0);
+	DLTMPolyMath::ExpandMat(mat, rho);
+	DLTMPolyMath::PolyVecNtt(s1);
+	DLTMPolyMath::PolyVecNtt(s2);
+	DLTMPolyMath::PolyVecNtt(t0);
 
 	while (true)
 	{
 		// sample intermediate vector y 
 		for (i = 0; i < DILITHIUM_L; ++i)
 		{
-			DLMNPolyMath::PolyUniformGamma1M1(y[i], rhoprime, nonce);
+			DLTMPolyMath::PolyUniformGamma1M1(y[i], rhoprime, nonce);
 			++nonce;
 		}
 
 		// matrix-vector multiplication 
 		yhat = y;
-		DLMNPolyMath::PolyVecNtt(yhat);
+		DLTMPolyMath::PolyVecNtt(yhat);
 
 		for (i = 0; i < DILITHIUM_K; ++i)
 		{
-			DLMNPolyMath::PolyVecPointwiseAccInvMontgomery(w[i], mat[i], yhat);
-			DLMNPolyMath::PolyReduce(w[i]);
-			DLMNPolyMath::PolyInvNttMontgomery(w[i]);
+			DLTMPolyMath::PolyVecPointwiseAccInvMontgomery(w[i], mat[i], yhat);
+			DLTMPolyMath::PolyReduce(w[i]);
+			DLTMPolyMath::PolyInvNttMontgomery(w[i]);
 		}
 
 		// decompose w and call the random oracle 
-		DLMNPolyMath::PolyVecCSubQ(w);
-		DLMNPolyMath::PolyVecDecompose(w1, w0, w);
-		DLMNPolyMath::Challenge(c, mu, w1);
+		DLTMPolyMath::PolyVecCSubQ(w);
+		DLTMPolyMath::PolyVecDecompose(w1, w0, w);
+		DLTMPolyMath::Challenge(c, mu, w1);
 		chat = c;
-		DLMNPolyMath::PolyNtt(chat);
+		DLTMPolyMath::PolyNtt(chat);
 
 		// check that subtracting cs2 does not change high bits of w and low bits
 		// do not reveal secret information 
 		for (i = 0; i < DILITHIUM_K; ++i)
 		{
-			DLMNPolyMath::PolyPointwiseInvMontgomery(cs2[i], chat, s2[i]);
-			DLMNPolyMath::PolyInvNttMontgomery(cs2[i]);
+			DLTMPolyMath::PolyPointwiseInvMontgomery(cs2[i], chat, s2[i]);
+			DLTMPolyMath::PolyInvNttMontgomery(cs2[i]);
 		}
 
-		DLMNPolyMath::PolyVecSub(w0, w0, cs2);
-		DLMNPolyMath::PolyVecFreeze(w0);
+		DLTMPolyMath::PolyVecSub(w0, w0, cs2);
+		DLTMPolyMath::PolyVecFreeze(w0);
 
-		if (DLMNPolyMath::PolyVecChkNorm(w0, DILITHIUM_GAMMA2 - DILITHIUM_BETA) != 0)
+		if (DLTMPolyMath::PolyVecChkNorm(w0, DILITHIUM_GAMMA2 - DILITHIUM_BETA) != 0)
 		{
 			continue;
 		}
@@ -180,14 +181,14 @@ void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<by
 		// compute z, reject if it reveals secret 
 		for (i = 0; i < DILITHIUM_L; ++i)
 		{
-			DLMNPolyMath::PolyPointwiseInvMontgomery(z[i], chat, s1[i]);
-			DLMNPolyMath::PolyInvNttMontgomery(z[i]);
+			DLTMPolyMath::PolyPointwiseInvMontgomery(z[i], chat, s1[i]);
+			DLTMPolyMath::PolyInvNttMontgomery(z[i]);
 		}
 
-		DLMNPolyMath::PolyVecAdd(z, z, y);
-		DLMNPolyMath::PolyVecFreeze(z);
+		DLTMPolyMath::PolyVecAdd(z, z, y);
+		DLTMPolyMath::PolyVecFreeze(z);
 
-		if (DLMNPolyMath::PolyVecChkNorm(z, DILITHIUM_GAMMA1 - DILITHIUM_BETA) != 0)
+		if (DLTMPolyMath::PolyVecChkNorm(z, DILITHIUM_GAMMA1 - DILITHIUM_BETA) != 0)
 		{
 			continue;
 		}
@@ -195,20 +196,20 @@ void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<by
 		// compute hints for w1 
 		for (i = 0; i < DILITHIUM_K; ++i)
 		{
-			DLMNPolyMath::PolyPointwiseInvMontgomery(ct0[i], chat, t0[i]);
-			DLMNPolyMath::PolyInvNttMontgomery(ct0[i]);
+			DLTMPolyMath::PolyPointwiseInvMontgomery(ct0[i], chat, t0[i]);
+			DLTMPolyMath::PolyInvNttMontgomery(ct0[i]);
 		}
 
-		DLMNPolyMath::PolyVecCSubQ(ct0);
+		DLTMPolyMath::PolyVecCSubQ(ct0);
 
-		if (DLMNPolyMath::PolyVecChkNorm(ct0, DILITHIUM_GAMMA2) != 0)
+		if (DLTMPolyMath::PolyVecChkNorm(ct0, DILITHIUM_GAMMA2) != 0)
 		{
 			continue;
 		}
 
-		DLMNPolyMath::PolyVecAdd(w0, w0, ct0);
-		DLMNPolyMath::PolyVecCSubQ(w0);
-		n = DLMNPolyMath::PolyVecMakeHint(h, w0, w1);
+		DLTMPolyMath::PolyVecAdd(w0, w0, ct0);
+		DLTMPolyMath::PolyVecCSubQ(w0);
+		n = DLTMPolyMath::PolyVecMakeHint(h, w0, w1);
 
 		if (n > DILITHIUM_OMEGA)
 		{
@@ -216,7 +217,7 @@ void DLTMK5Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<by
 		}
 
 		// write signature 
-		DLMNPolyMath::PackSig(Signature, z, h, c, DILITHIUM_OMEGA, DILITHIUM_POLZ_SIZE_PACKED);
+		DLTMPolyMath::PackSig(Signature, z, h, c, DILITHIUM_OMEGA, DILITHIUM_POLZ_SIZE_PACKED);
 
 		break;
 	}
@@ -250,16 +251,16 @@ bool DLTMK5Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 	if (bsig == 0)
 	{
 		msglen = Signature.size() - DILITHIUM_SIGNATURE_SIZE;
-		DLMNPolyMath::UnpackPk(rho, t1, PublicKey, DILITHIUM_POLT1_SIZE_PACKED);
+		DLTMPolyMath::UnpackPk(rho, t1, PublicKey, DILITHIUM_POLT1_SIZE_PACKED);
 
-		if (DLMNPolyMath::UnpackSig(z, h, c, Signature, DILITHIUM_OMEGA, DILITHIUM_POLZ_SIZE_PACKED) != 0)
+		if (DLTMPolyMath::UnpackSig(z, h, c, Signature, DILITHIUM_OMEGA, DILITHIUM_POLZ_SIZE_PACKED) != 0)
 		{
 			bsig = -1;
 		}
 
 		if (bsig == 0)
 		{
-			if (DLMNPolyMath::PolyVecChkNorm(z, DILITHIUM_GAMMA1 - DILITHIUM_BETA) != 0)
+			if (DLTMPolyMath::PolyVecChkNorm(z, DILITHIUM_GAMMA1 - DILITHIUM_BETA) != 0)
 			{
 				bsig = -1;
 			}
@@ -279,34 +280,34 @@ bool DLTMK5Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 				XOF(Message, (DILITHIUM_SIGNATURE_SIZE - DILITHIUM_CRH_SIZE), DILITHIUM_CRH_SIZE + msglen, mu, 0, DILITHIUM_CRH_SIZE, Keccak::KECCAK256_RATE_SIZE);
 
 				// matrix-vector multiplication; compute Az-c2^dt1 
-				DLMNPolyMath::ExpandMat(mat, rho);
-				DLMNPolyMath::PolyVecNtt(z);
+				DLTMPolyMath::ExpandMat(mat, rho);
+				DLTMPolyMath::PolyVecNtt(z);
 
 				for (i = 0; i < DILITHIUM_K; ++i)
 				{
-					DLMNPolyMath::PolyVecPointwiseAccInvMontgomery(tmp1[i], mat[i], z);
+					DLTMPolyMath::PolyVecPointwiseAccInvMontgomery(tmp1[i], mat[i], z);
 				}
 
 				chat = c;
-				DLMNPolyMath::PolyNtt(chat);
-				DLMNPolyMath::PolyVecShiftL(t1);
-				DLMNPolyMath::PolyVecNtt(t1);
+				DLTMPolyMath::PolyNtt(chat);
+				DLTMPolyMath::PolyVecShiftL(t1);
+				DLTMPolyMath::PolyVecNtt(t1);
 
 				for (i = 0; i < DILITHIUM_K; ++i)
 				{
-					DLMNPolyMath::PolyPointwiseInvMontgomery(tmp2[i], chat, t1[i]);
+					DLTMPolyMath::PolyPointwiseInvMontgomery(tmp2[i], chat, t1[i]);
 				}
 
-				DLMNPolyMath::PolyVecSub(tmp1, tmp1, tmp2);
-				DLMNPolyMath::PolyVecReduce(tmp1);
-				DLMNPolyMath::PolyVecInvNttMontgomery(tmp1);
+				DLTMPolyMath::PolyVecSub(tmp1, tmp1, tmp2);
+				DLTMPolyMath::PolyVecReduce(tmp1);
+				DLTMPolyMath::PolyVecInvNttMontgomery(tmp1);
 
 				// reconstruct w1 
-				DLMNPolyMath::PolyVecCSubQ(tmp1);
-				DLMNPolyMath::PolyVecUseHint(w1, tmp1, h);
+				DLTMPolyMath::PolyVecCSubQ(tmp1);
+				DLTMPolyMath::PolyVecUseHint(w1, tmp1, h);
 
 				// call random oracle and verify challenge 
-				DLMNPolyMath::Challenge(cp, mu, w1);
+				DLTMPolyMath::Challenge(cp, mu, w1);
 
 				for (i = 0; i < DILITHIUM_N; ++i)
 				{

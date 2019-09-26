@@ -10,5 +10,6 @@ var searchData=
   ['kmac1024',['KMAC1024',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ac5ba8d97d4055160e3d16817de07618f',1,'KMAC1024():&#160;Documentation.h'],['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ac5ba8d97d4055160e3d16817de07618f',1,'KMAC1024():&#160;Documentation.h']]],
   ['kmac128',['KMAC128',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ad448089350a14e557822d0363c63ce81',1,'Documentation.h']]],
   ['kmac256',['KMAC256',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a1421b85b6d4ee9a863d5b1588c880103',1,'KMAC256():&#160;Documentation.h'],['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103',1,'KMAC256():&#160;Documentation.h']]],
-  ['kmac512',['KMAC512',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ade80307d986a42c3fd894b2923057bf1',1,'KMAC512():&#160;Documentation.h'],['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ade80307d986a42c3fd894b2923057bf1',1,'KMAC512():&#160;Documentation.h']]]
+  ['kmac512',['KMAC512',['../group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ade80307d986a42c3fd894b2923057bf1',1,'KMAC512():&#160;Documentation.h'],['../group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274ade80307d986a42c3fd894b2923057bf1',1,'KMAC512():&#160;Documentation.h']]],
+  ['kyber',['Kyber',['../group___enumeration.html#gga0d453c3bfe290768ade0e837b8cec582aa5146ead66c4fdabf39fdb1441542570',1,'Documentation.h']]]
 ];
