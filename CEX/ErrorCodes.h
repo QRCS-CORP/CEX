@@ -35,77 +35,93 @@ enum class ErrorCodes : byte
 	/// </summary>
 	IllegalOperation = 5,
 	/// <summary>
+	/// The IP address is invalid
+	/// </summary>
+	InvalidAddress = 6,
+	/// <summary>
 	/// Invalid symmetric key parameter; information
 	/// </summary>
-	InvalidInfo = 6,
+	InvalidInfo = 7,
 	/// <summary>
 	/// Invalid symmetric key parameter; key
 	/// </summary>
-	InvalidKey = 7,
+	InvalidKey = 8,
 	/// <summary>
 	/// Invalid symmetric key parameter; nonce
 	/// </summary>
-	InvalidNonce = 8,
+	InvalidNonce = 9,
 	/// <summary>
 	/// Invalid parameter
 	/// </summary>
-	InvalidParam = 9,
+	InvalidParam = 10,
 	/// <summary>
 	/// Invalid salt parameter
 	/// </summary>
-	InvalidSalt = 10,
+	InvalidSalt = 11,
 	/// <summary>
 	/// Invalid size parameter
 	/// </summary>
-	InvalidSize = 11,
+	InvalidSize = 12,
+	/// <summary> 
+	/// The socket parameters are invalid
+	/// </summary>
+	InvalidSocket = 13,
 	/// <summary>
 	/// Invalid state
 	/// </summary>
-	InvalidState = 12,
+	InvalidState = 14,
 	/// <summary>
 	/// Maximum value exceeded
 	/// </summary>
-	MaxExceeded = 13,
+	MaxExceeded = 15,
 	/// <summary>
 	/// Access was denied
 	/// </summary>
-	NoAccess = 14,
+	NoAccess = 16,
 	/// <summary>
 	/// The resource was not found
 	/// </summary>
-	NotFound = 15,
+	NotFound = 17,
 	/// <summary>
 	/// The host could not be found
 	/// </summary>
-	NoHost = 16,
+	NoHost = 18,
 	/// <summary>
 	/// The algorithm was not initialized
 	/// </summary>
-	NotInitialized = 17,
+	NotInitialized = 19,
 	/// <summary>
 	/// The operation is not supported
 	/// </summary>
-	NotSupported = 18,
+	NotSupported = 20,
 	/// <summary>
 	/// The stream is read only
 	/// </summary>
-	ReadOnly = 19,
+	ReadOnly = 21,
 	/// <summary>
 	/// The number of retries was exceeded
 	/// </summary>
-	RetriesExceeded = 20,
+	RetriesExceeded = 22,
+	/// <summary>
+	/// The socket operation has failed
+	/// </summary>
+	SocketFailure = 23,
+	/// <summary>
+	/// The destination host is unreachable
+	/// </summary>
+	Unreachable = 24,
 	/// <summary>
 	/// The stream is write only
 	/// </summary>
-	WriteOnly = 21,
+	WriteOnly = 25,
 	/// <summary>
 	/// The behavior is undefined
 	/// </summary>
-	UnDefined = 22,
+	UnDefined = 26,
 	/// <summary>
 	/// An error of unknown origin has occured
 	/// </summary>
-	UnKnown = 23
+	UnKnown = 27
 };
 
 class ErrorCodeConvert

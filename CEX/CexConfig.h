@@ -113,11 +113,34 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	define <unistd.h>
 #endif
 
+
+#if defined(_MSC_VER)
+#	define CEX_NO_VTABLE __declspec(novtable)
+#else
+#	define CEX_NO_VTABLE
+#endif
+
+
 // 32 or 64 bit architecture
 #if (defined(__x86_64__) || defined(__amd64__) || defined(_M_X64))
 #	define CEX_ARCH_64
 #else
 #	define CEX_ARCH_32
+#endif
+
+// network architecture
+#if defined(_WIN64) || defined(_WIN32) || defined(__CYGWIN__)
+#	define CEX_WINDOWS_SOCKETS
+#else
+#	define CEX_BERKELY_SOCKETS
+#endif
+
+#ifndef TYPE_OF_SOCKLEN_T
+#	if defined(_WIN64) || defined(_WIN32) || defined(__CYGWIN__)
+#		define TYPE_OF_SOCKLEN_T int
+#	else
+#		define TYPE_OF_SOCKLEN_T ::socklen_t
+#	endif
 #endif
 
 #if defined(_WIN32)

@@ -303,7 +303,7 @@ void KDF2::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, s
 {
 	std::vector<byte> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Generator);
-	Move(tmps, Output, OutOffset);
+	SecureMove(tmps, Output, OutOffset);
 }
 
 NAMESPACE_KDFEND

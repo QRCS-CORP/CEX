@@ -224,6 +224,8 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	if (m_kdfGenerator != nullptr)
 	{
+		// info string is ciphers name + 2 bytes for key size + user defined info ex. rhx256=RHXH25601
+		// construct the customization string, starting with the ciphers formal string name
 		std::string tmpn = Name();
 		m_rhxState->Custom.resize(tmpn.size() + sizeof(ushort) + Parameters.KeySizes().InfoSize());
 		// add the ciphers formal class name to the customization string
@@ -231,10 +233,10 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		// add the key size in bits
 		ushort ksec = static_cast<ushort>(Parameters.KeySizes().KeySize()) * 8;
 		IntegerTools::Le16ToBytes(ksec, m_rhxState->Custom, tmpn.size());
-		// append the optional info code
+		// append the optional user-supplied info code
 		MemoryTools::Copy(Parameters.Info(), 0, m_rhxState->Custom, tmpn.size() + sizeof(ushort), Parameters.KeySizes().InfoSize());
 
-		// extended kdf key expansion
+		// call the extended kdf key expansion function, and populate the round key array in state
 		SecureExpand(Parameters.SecureKey(), m_rhxState, m_kdfGenerator);
 	}
 	else
@@ -258,6 +260,17 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 				m_rhxState->RoundKeys[k + j] = tmpk;
 			}
 		}
+
+		// pre-load the s-box into l1 cache as a timing defense
+#if defined(CEX_PREFETCH_RHX_TABLES)
+		PrefetchSbox();
+#endif
+
+		// pre-load the inverse multiplication tables
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchITables();
+#endif
+
 		// sbox inversion
 		for (i = bwords; i < m_rhxState->RoundKeys.size() - bwords; i++)
 		{
@@ -267,10 +280,6 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 				IT3[SBox[static_cast<byte>(m_rhxState->RoundKeys[i])]];
 		}
 	}
-
-#if defined(CEX_PREFETCH_RHX_TABLES)
-	Prefetch(m_rhxState->Encryption);
-#endif
 
 	// ready to transform data
 	m_rhxState->Initialized = true;
@@ -345,7 +354,7 @@ void RHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState> 
 	// rounds: k256=22, k512=30, k1024=38
 	State->Rounds = Key.size() != 128 ? (Key.size() / 4) + 14 : 38;
 	// round-key array size
-	klen = ((BLOCK_SIZE / 4) * (State->Rounds + 1));
+	klen = ((BLOCK_SIZE / sizeof(uint)) * (State->Rounds + 1));
 	SecureVector<byte> tmpr(klen * sizeof(uint));
 	// salt is not used
 	SecureVector<byte> salt(0);
@@ -357,7 +366,7 @@ void RHX::SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState> 
 	// initialize round-key array
 	State->RoundKeys.resize(klen);
 
-	// copy p-rand bytes to round keys
+	// copy bytes to round keys
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	MemoryTools::Copy(tmpr, 0, State->RoundKeys, 0, tmpr.size());
 #else
@@ -510,11 +519,21 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	uint Y2;
 	uint Y3;
 
+	// pre-load the round key array into l1 as a timing defence
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchRoundKey(m_rhxState->RoundKeys);
+#endif
+
 	// round 0
 	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rhxState->RoundKeys[0];
 	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rhxState->RoundKeys[1];
 	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rhxState->RoundKeys[2];
 	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rhxState->RoundKeys[3];
+
+	// pre-load the inverse multiplication tables
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchITables();
+#endif
 
 	// round 1
 	Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[4];
@@ -523,6 +542,7 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[7];
 
 	kctr = 8;
+
 	// rounds loop
 	while (kctr != RNDCNT)
 	{
@@ -537,6 +557,11 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 		Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[kctr + 7];
 		kctr += 8;
 	}
+
+	// pre-load the inverse s-box
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchISbox();
+#endif
 
 	// final round
 	Output[OutOffset] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
@@ -593,11 +618,21 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	uint Y2;
 	uint Y3;
 
+	// pre-load the round key array into l1 as a timing defence
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchRoundKey(m_rhxState->RoundKeys);
+#endif
+
 	// round 0
 	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rhxState->RoundKeys[0];
 	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rhxState->RoundKeys[1];
 	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rhxState->RoundKeys[2];
 	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rhxState->RoundKeys[3];
+
+	// pre-load the multiplication tables
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchTables();
+#endif
 
 	// round 1
 	Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[4];
@@ -626,6 +661,11 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[kctr];
 		++kctr;
 	}
+
+	// pre-load the s-box
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchSbox();
+#endif
 
 	// final round
 	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
@@ -736,25 +776,49 @@ std::vector<SymmetricKeySize> RHX::CalculateKeySizes(BlockCipherExtensions Exten
 }
 
 CEX_OPTIMIZE_IGNORE
-void RHX::Prefetch(bool Encryption)
+void RHX::PrefetchISbox()
 {
-	// timing defence: pre-load tables into cache
-	if (Encryption == true)
-	{
-		MemoryTools::PrefetchL2(SBox, 0, 256);
-		MemoryTools::PrefetchL2(T0, 0, 1024);
-		MemoryTools::PrefetchL2(T1, 0, 1024);
-		MemoryTools::PrefetchL2(T2, 0, 1024);
-		MemoryTools::PrefetchL2(T3, 0, 1024);
-	}
-	else
-	{
-		MemoryTools::PrefetchL2(ISBox, 0, 256);
-		MemoryTools::PrefetchL2(IT0, 0, 1024);
-		MemoryTools::PrefetchL2(IT1, 0, 1024);
-		MemoryTools::PrefetchL2(IT2, 0, 1024);
-		MemoryTools::PrefetchL2(IT3, 0, 1024);
-	}
+	// timing defence: pre-load inverse sbox into l1 cache
+	MemoryTools::PrefetchL1(ISBox, 0, ISBox.size());
+}
+CEX_OPTIMIZE_RESUME
+
+CEX_OPTIMIZE_IGNORE
+void RHX::PrefetchITables()
+{
+	// timing defence: pre-load inverse multiplication tables into l1 cache
+	MemoryTools::PrefetchL1(IT0, 0, IT0.size() * sizeof(uint));
+	MemoryTools::PrefetchL1(IT1, 0, IT1.size() * sizeof(uint));
+	MemoryTools::PrefetchL1(IT2, 0, IT2.size() * sizeof(uint));
+	MemoryTools::PrefetchL1(IT3, 0, IT3.size() * sizeof(uint));
+}
+CEX_OPTIMIZE_RESUME
+
+CEX_OPTIMIZE_IGNORE
+void RHX::PrefetchRoundKey(const SecureVector<uint> &Rkey)
+{
+	// timing defence: load the round-key array into l1 cache
+	MemoryTools::PrefetchL1(Rkey, 0, Rkey.size() * sizeof(uint));
+}
+CEX_OPTIMIZE_RESUME
+
+CEX_OPTIMIZE_IGNORE
+void RHX::PrefetchSbox()
+{
+	// timing defence: pre-load sbox into l1 cache
+	MemoryTools::PrefetchL1(SBox, 0, SBox.size());
+}
+CEX_OPTIMIZE_RESUME
+
+CEX_OPTIMIZE_IGNORE
+void RHX::PrefetchTables()
+{
+	// timing defence: pre-load multiplication tables into l1 cache
+	MemoryTools::PrefetchL1(T0, 0, T0.size() * sizeof(uint));
+	MemoryTools::PrefetchL1(T1, 0, T1.size() * sizeof(uint));
+	MemoryTools::PrefetchL1(T2, 0, T2.size() * sizeof(uint));
+	MemoryTools::PrefetchL1(T3, 0, T3.size() * sizeof(uint));
+
 }
 CEX_OPTIMIZE_RESUME
 

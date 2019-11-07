@@ -225,7 +225,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key)
 
 void SHAKE::Initialize(const SecureVector<byte> &Key)
 {
-	Initialize(Unlock(Key));
+	Initialize(SecureUnlock(Key));
 }
 
 void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
@@ -304,7 +304,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Cu
 
 void SHAKE::Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization)
 {
-	Initialize(Unlock(Key), Unlock(Customization));
+	Initialize(SecureUnlock(Key), SecureUnlock(Customization));
 }
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Customization, const std::vector<byte> &Information)
@@ -342,7 +342,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Cu
 
 void SHAKE::Initialize(const SecureVector<byte> &Key, const SecureVector<byte> &Customization, const SecureVector<byte> &Information)
 {
-	Initialize(Unlock(Key), Unlock(Customization), Unlock(Information));
+	Initialize(SecureUnlock(Key), SecureUnlock(Customization), SecureUnlock(Information));
 }
 
 void SHAKE::Reset()
@@ -357,6 +357,9 @@ void SHAKE::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Lengt
 {
 	CEXASSERT(Input.size() - InOffset >= Length, "The output buffer is too short!");
 
+#if defined(CEX_KECCAK_STRONG)
+	Keccak::AbsorbR48(Input, InOffset, Length, State->Rate, State->Domain, State->State);
+#else
 	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
 		Keccak::AbsorbR24(Input, InOffset, Length, State->Rate, State->Domain, State->State);
@@ -365,6 +368,7 @@ void SHAKE::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Lengt
 	{
 		Keccak::AbsorbR48(Input, InOffset, Length, State->Rate, State->Domain, State->State);
 	}
+#endif
 }
 
 void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<ShakeState> &State)
@@ -443,11 +447,27 @@ void SHAKE::Permute(std::unique_ptr<ShakeState> &State)
 {
 	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
+#if defined(CEX_KECCAK_STRONG)
+#	if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600C(State->State);
+#	else
+		Keccak::PermuteR48P1600U(State->State);
+#	endif
+#else
+#	if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR24P1600C(State->State);
+#	else
 		Keccak::PermuteR24P1600U(State->State);
+#	endif
+#endif
 	}
 	else
 	{
+#if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600C(State->State);
+#else
 		Keccak::PermuteR48P1600U(State->State);
+#endif
 	}
 
 	++State->Counter;

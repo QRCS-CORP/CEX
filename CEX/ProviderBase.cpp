@@ -49,7 +49,7 @@ ushort ProviderBase::NextUInt16()
 	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(ushort));
-	Clear(smp);
+	SecureClear(smp);
 
 	return x;
 }
@@ -62,7 +62,7 @@ uint ProviderBase::NextUInt32()
 	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(uint));
-	Clear(smp);
+	SecureClear(smp);
 
 	return x;
 }
@@ -75,7 +75,7 @@ ulong ProviderBase::NextUInt64()
 	x = 0;
 	Generate(smp);
 	MemoryTools::CopyToValue(smp, 0, x, sizeof(ulong));
-	Clear(smp);
+	SecureClear(smp);
 
 	return x;
 }

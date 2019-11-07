@@ -13,7 +13,7 @@ using Utility::MemoryTools;
 using Enumeration::ShakeModes;
 using Enumeration::StreamCipherConvert;
 
-const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x61 };
+const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62 };
 const __m128i ACS::BLEND_MASK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
 const __m128i ACS::SHIFT_MASK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
 
@@ -23,54 +23,202 @@ public:
 
 	std::vector<__m128i> RoundKeys;
 	SecureVector<byte> Custom;
-	std::vector<byte> Nonce;
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
+	SecureVector<byte> Name;
+	std::vector<byte> Nonce;
 	ulong Counter;
-	size_t Rounds;
+	ushort Rounds;
+	StreamAuthenticators Authenticator;
 	ShakeModes Mode;
 	bool Encryption;
 	bool Initialized;
 
-	AcsState(StreamAuthenticators AuthenticatorType)
+	AcsState()
 		:
 		RoundKeys(0),
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
+		Name(0),
 		Nonce(BLOCK_SIZE, 0x00),
 		Counter(0),
 		Rounds(0),
+		Authenticator(StreamAuthenticators::None),
 		Mode(ShakeModes::None),
 		Encryption(false),
 		Initialized(false)
 	{
 	}
 
+	AcsState(SecureVector<byte> &State)
+		:
+		RoundKeys(0),
+		Custom(0),
+		MacKey(0),
+		MacTag(0),
+		Name(0),
+		Nonce(BLOCK_SIZE, 0x00),
+		Counter(0),
+		Rounds(0),
+		Authenticator(StreamAuthenticators::None),
+		Mode(ShakeModes::None),
+		Encryption(false),
+		Initialized(false)
+	{
+		DeSerialize(State);
+	}
+
 	~AcsState()
 	{
-		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(__m128i));
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
+		MemoryTools::Clear(Name, 0, Name.size());
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
+
 		Counter = 0;
 		Rounds = 0;
+		Authenticator = StreamAuthenticators::None;
 		Mode = ShakeModes::None;
 		Encryption = false;
 		Initialized = false;
 	}
 
+	void DeSerialize(SecureVector<byte> &SecureState)
+	{
+		size_t soff;
+		ushort vlen;
+
+		soff = 0;
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		RoundKeys.resize(vlen / sizeof(__m128i));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, RoundKeys, 0, vlen);
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		Custom.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, Custom, 0, Custom.size());
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MacKey.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, MacKey, 0, MacKey.size());
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MacTag.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, MacTag, 0, MacTag.size());
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		Name.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, Name, 0, Name.size());
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		Nonce.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, Nonce, 0, Nonce.size());
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &Counter, sizeof(ulong));
+		soff += sizeof(ulong);
+		MemoryTools::CopyToObject(SecureState, soff, &Rounds, sizeof(ushort));
+		soff += sizeof(ushort);
+
+		MemoryTools::CopyToObject(SecureState, soff, &Authenticator, sizeof(StreamAuthenticators));
+		soff += sizeof(StreamAuthenticators);
+		MemoryTools::CopyToObject(SecureState, soff, &Mode, sizeof(ShakeModes));
+		soff += sizeof(ShakeModes);
+
+		MemoryTools::CopyToObject(SecureState, soff, &Encryption, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyToObject(SecureState, soff, &Initialized, sizeof(bool));
+	}
+
 	void Reset()
 	{
-		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(__m128i));
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
+		MemoryTools::Clear(Name, 0, Name.size());
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
+
 		Counter = 0;
+		Rounds = 0;
 		Encryption = false;
 		Initialized = false;
+	}
+
+	SecureVector<byte> Serialize()
+	{
+		const size_t STASZE = (RoundKeys.size() * sizeof(__m128i)) + Custom.size() + MacKey.size() + MacTag.size() +
+			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(StreamAuthenticators) + sizeof(ShakeModes) + (2 * sizeof(bool)) + (6 * sizeof(ushort));
+
+		size_t soff;
+		ushort vlen;
+		SecureVector<byte> state(STASZE);
+
+		soff = 0;
+		vlen = static_cast<ushort>(RoundKeys.size() * sizeof(__m128i));
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(RoundKeys, 0, state, soff, static_cast<size_t>(vlen));
+		soff += vlen;
+
+		vlen = static_cast<ushort>(Custom.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(Custom, 0, state, soff, Custom.size());
+		soff += Custom.size();
+
+		vlen = static_cast<ushort>(MacKey.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(MacKey, 0, state, soff, MacKey.size());
+		soff += MacKey.size();
+
+		vlen = static_cast<ushort>(MacTag.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(MacTag, 0, state, soff, MacTag.size());
+		soff += MacTag.size();
+
+		vlen = static_cast<ushort>(Name.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(Name, 0, state, soff, Name.size());
+		soff += Name.size();
+
+		vlen = static_cast<ushort>(Nonce.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(Nonce, 0, state, soff, Nonce.size());
+		soff += Nonce.size();
+
+		MemoryTools::CopyFromObject(&Counter, state, soff, sizeof(ulong));
+		soff += sizeof(ulong);
+		MemoryTools::CopyFromObject(&Rounds, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+
+		MemoryTools::CopyFromObject(&Authenticator, state, soff, sizeof(StreamAuthenticators));
+		soff += sizeof(StreamAuthenticators);
+		MemoryTools::CopyFromObject(&Mode, state, soff, sizeof(ShakeModes));
+		soff += sizeof(ShakeModes);
+
+		MemoryTools::CopyFromObject(&Encryption, state, soff, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyFromObject(&Initialized, state, soff, sizeof(bool));
+
+		return state;
 	}
 };
 
@@ -78,7 +226,7 @@ public:
 
 ACS::ACS(StreamAuthenticators AuthenticatorType)
 	:
-	m_rcsState(new AcsState(AuthenticatorType)),
+	m_acsState(new AcsState()),
 	m_legalKeySizes{
 		SymmetricKeySize(32, BLOCK_SIZE, INFO_SIZE),
 		SymmetricKeySize(64, BLOCK_SIZE, INFO_SIZE),
@@ -90,6 +238,30 @@ ACS::ACS(StreamAuthenticators AuthenticatorType)
 #if !defined(CEX_AVX_INTRINSICS)
 	throw CryptoSymmetricException(StreamCipherConvert::ToName(StreamCiphers::RCS), std::string("Constructor"), std::string("AVX is not supported on this system!"), ErrorCodes::NotSupported);
 #endif
+}
+
+ACS::ACS(SecureVector<byte> &State)
+	:
+	m_acsState(State.size() > STATE_THRESHOLD ? new AcsState(State) :
+		throw CryptoSymmetricException(std::string("ACS"), std::string("Constructor"), std::string("The State array is invalid!"), ErrorCodes::InvalidKey)),
+	m_legalKeySizes{
+		SymmetricKeySize(32, BLOCK_SIZE, INFO_SIZE),
+		SymmetricKeySize(64, BLOCK_SIZE, INFO_SIZE),
+		SymmetricKeySize(128, BLOCK_SIZE, INFO_SIZE) },
+	m_macAuthenticator(m_acsState->Authenticator == StreamAuthenticators::None ? nullptr :
+		Helper::MacFromName::GetInstance(m_acsState->Authenticator)),
+	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
+{
+#if !defined(CEX_AVX_INTRINSICS)
+	throw CryptoSymmetricException(StreamCipherConvert::ToName(StreamCiphers::ACS), std::string("Constructor"), std::string("AVX is not supported on this system!"), ErrorCodes::NotSupported);
+#endif
+
+	if (m_acsState->Authenticator != StreamAuthenticators::None)
+	{
+		// initialize the mac
+		SymmetricKey kpm(m_acsState->MacKey);
+		m_macAuthenticator->Initialize(kpm);
+	}
 }
 
 ACS::~ACS()
@@ -120,12 +292,12 @@ const bool ACS::IsAuthenticator()
 
 const bool ACS::IsEncryption()
 {
-	return m_rcsState->Encryption;
+	return m_acsState->Encryption;
 }
 
 const bool ACS::IsInitialized()
 {
-	return m_rcsState->Initialized;
+	return m_acsState->Initialized;
 }
 
 const bool ACS::IsParallel()
@@ -147,6 +319,11 @@ const std::string ACS::Name()
 	return name;
 }
 
+const std::vector<byte> ACS::Nonce()
+{
+	return m_acsState->Nonce;
+}
+
 const size_t ACS::ParallelBlockSize()
 {
 	return m_parallelProfile.ParallelBlockSize();
@@ -159,12 +336,12 @@ ParallelOptions &ACS::ParallelProfile()
 
 const std::vector<byte> ACS::Tag()
 {
-	return Unlock(m_rcsState->MacTag);
+	return SecureUnlock(m_acsState->MacTag);
 }
 
 const void ACS::Tag(SecureVector<byte> &Output)
 {
-	Copy(m_rcsState->MacTag, 0, Output, 0, m_rcsState->MacTag.size());
+	SecureCopy(m_acsState->MacTag, 0, Output, 0, m_acsState->MacTag.size());
 }
 
 const size_t ACS::TagSize()
@@ -205,49 +382,53 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		Reset();
 	}
 
-	SecureVector<byte> code(0);
+	// set up the state members
+	m_acsState->Authenticator = m_macAuthenticator != nullptr ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
+	// set the initial mac counter value
+	m_acsState->Counter = 1;
+	// set the number of rounds
+	m_acsState->Rounds = Parameters.KeySizes().KeySize() != 128 ? static_cast<ushort>((Parameters.KeySizes().KeySize() / 4)) + 14 : 38;
 
-	if (Parameters.KeySizes().InfoSize() != 0)
-	{
-		// custom code
-		code.resize(Parameters.KeySizes().InfoSize());
-		MemoryTools::Copy(Parameters.Info(), 0, code, 0, code.size());
-	}
-	else
-	{
-		// standard
-		code.resize(OMEGA_INFO.size());
-		MemoryTools::Copy(OMEGA_INFO, 0, code, 0, code.size());
-	}
-
-	// set the initial counter value
-	m_rcsState->Counter = 1;
-	m_rcsState->Rounds = Parameters.KeySizes().KeySize() != 128 ? (Parameters.KeySizes().KeySize() / 4) + 14 : 38;
 	// create the cSHAKE customization string
-	std::string tmpn = Name();
-	m_rcsState->Custom.resize(sizeof(ulong) + sizeof(ushort) + tmpn.size());
-	// add mac counter, key-size bits, and algorithm name to customization string
-	IntegerTools::Le64ToBytes(m_rcsState->Counter, m_rcsState->Custom, 0);
-	ushort kbits = static_cast<ushort>(Parameters.KeySizes().KeySize() * 8);
-	IntegerTools::Le16ToBytes(kbits, m_rcsState->Custom, sizeof(ulong));
-	MemoryTools::CopyFromObject(tmpn.data(), m_rcsState->Custom, sizeof(ulong) + sizeof(ushort), tmpn.size());
-	// copy the nonce to state
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_rcsState->Nonce, 0, BLOCK_SIZE);
-	// initialize cSHAKE with k,c
-	m_rcsState->Mode = (Parameters.KeySizes().KeySize() == 64) ? ShakeModes::SHAKE512 : (Parameters.KeySizes().KeySize() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
-	Kdf::SHAKE gen(m_rcsState->Mode);
-	gen.Initialize(Parameters.SecureKey(), m_rcsState->Custom);
+	m_acsState->Custom.resize(Parameters.KeySizes().InfoSize() + OMEGA_INFO.size());
+	// copy the version string to the customization parameter
+	MemoryTools::Copy(OMEGA_INFO, 0, m_acsState->Custom, 0, OMEGA_INFO.size());
+	// copy the user defined string to the customization parameter
+	MemoryTools::Copy(Parameters.Info(), 0, m_acsState->Custom, OMEGA_INFO.size(), Parameters.KeySizes().InfoSize());
 
-	// generate the cipher round-keys
-	const size_t RNKLEN = ((BLOCK_SIZE / sizeof(uint)) * (m_rcsState->Rounds + 1)) / 4;
-	m_rcsState->RoundKeys.resize(RNKLEN);
+	// create the cSHAKE name string
+	std::string tmpn = Name();
+	// add mac counter, key-size bits, and algorithm name to name string
+	m_acsState->Name.resize(sizeof(ulong) + sizeof(ushort) + tmpn.size());
+	// mac counter is always first 8 bytes of name
+	IntegerTools::Le64ToBytes(m_acsState->Counter, m_acsState->Name, 0);
+	// add the cipher key size in bits as an unsigned 16-bit integer
+	ushort kbits = static_cast<ushort>(Parameters.KeySizes().KeySize() * 8);
+	IntegerTools::Le16ToBytes(kbits, m_acsState->Name, sizeof(ulong));
+	// copy the name string to state
+	MemoryTools::CopyFromObject(tmpn.data(), m_acsState->Name, sizeof(ulong) + sizeof(ushort), tmpn.size());
+
+	// copy the nonce to state
+	MemoryTools::Copy(Parameters.Nonce(), 0, m_acsState->Nonce, 0, BLOCK_SIZE);
+
+	// cipher key size determines key expansion function and Mac generator type; 256 or 512-bit
+	m_acsState->Mode = (Parameters.KeySizes().KeySize() == 64) ? ShakeModes::SHAKE512 : (Parameters.KeySizes().KeySize() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
+	// initialize the generator
+	Kdf::SHAKE gen(m_acsState->Mode);
+	// key with cSHAKE(k,c,n)
+	gen.Initialize(Parameters.SecureKey(), m_acsState->Custom, m_acsState->Name);
+
+	// calculate the size of the round-key array
+	const size_t RNKLEN = (BLOCK_SIZE / sizeof(__m128i)) * (m_acsState->Rounds + 1);
+	m_acsState->RoundKeys.resize(RNKLEN);
 	SecureVector<byte> tmpr(RNKLEN * sizeof(__m128i));
+	// generate the cipher round-keys
 	gen.Generate(tmpr);
 
 	// copy p-rand bytes to round keys
 	for (i = 0; i < RNKLEN; ++i)
 	{
-		m_rcsState->RoundKeys[i] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&tmpr[i * sizeof(__m128i)]));
+		m_acsState->RoundKeys[i] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&tmpr[i * sizeof(__m128i)]));
 	}
 
 	MemoryTools::Clear(tmpr, 0, tmpr.size());
@@ -258,17 +439,17 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[1];
 		SecureVector<byte> mack(ks.KeySize());
 		gen.Generate(mack);
-		// initailize the mac
+		// initialize the mac
 		SymmetricKey kpm(mack);
 		m_macAuthenticator->Initialize(kpm);
 		// store the key
-		m_rcsState->MacKey.resize(mack.size());
-		Move(mack, m_rcsState->MacKey, 0);
-		m_rcsState->MacTag.resize(TagSize());
+		m_acsState->MacKey.resize(mack.size());
+		SecureMove(mack, m_acsState->MacKey, 0);
+		m_acsState->MacTag.resize(TagSize());
 	}
 
-	m_rcsState->Encryption = Encryption;
-	m_rcsState->Initialized = true;
+	m_acsState->Encryption = Encryption;
+	m_acsState->Initialized = true;
 }
 
 void ACS::ParallelMaxDegree(size_t Degree)
@@ -311,16 +492,16 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			}
 
 			// add the starting position of the nonce
-			m_macAuthenticator->Update(m_rcsState->Nonce, 0, BLOCK_SIZE);
+			m_macAuthenticator->Update(m_acsState->Nonce, 0, BLOCK_SIZE);
 			// encrypt the stream
 			Process(Input, InOffset, Output, OutOffset, Length);
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Output, OutOffset, Length);
 			// update the mac counter
-			m_rcsState->Counter += Length;
+			m_acsState->Counter += Length;
 			// finalize the mac and add the tag to the stream
-			Finalize(m_rcsState, m_macAuthenticator);
-			MemoryTools::Copy(m_rcsState->MacTag, 0, Output, OutOffset + Length, m_rcsState->MacTag.size());
+			Finalize(m_acsState, m_macAuthenticator);
+			MemoryTools::Copy(m_acsState->MacTag, 0, Output, OutOffset + Length, m_acsState->MacTag.size());
 		}
 		else
 		{
@@ -333,15 +514,15 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 		if (IsAuthenticator())
 		{
 			// add the starting position of the nonce
-			m_macAuthenticator->Update(m_rcsState->Nonce, 0, BLOCK_SIZE);
+			m_macAuthenticator->Update(m_acsState->Nonce, 0, BLOCK_SIZE);
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Input, InOffset, Length);
 			// update the mac counter
-			m_rcsState->Counter += Length;
+			m_acsState->Counter += Length;
 			// finalize the mac and verify
-			Finalize(m_rcsState, m_macAuthenticator);
+			Finalize(m_acsState, m_macAuthenticator);
 
-			if (!IntegerTools::Compare(Input, InOffset + Length, m_rcsState->MacTag, 0, m_rcsState->MacTag.size()))
+			if (!IntegerTools::Compare(Input, InOffset + Length, m_acsState->MacTag, 0, m_acsState->MacTag.size()))
 			{
 				throw CryptoAuthenticationFailure(Name(), std::string("Transform"), std::string("The authentication tag does not match!"), ErrorCodes::AuthenticationFailure);
 			}
@@ -359,12 +540,13 @@ void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Auth
 	// generate the mac code
 	Authenticator->Finalize(State->MacTag, 0);
 
-	// customization string is: mac counter + algorithm name
-	IntegerTools::Le64ToBytes(State->Counter, State->Custom, 0);
+	// name string is an unsigned 64-bit processed bytes counter + the cipher name
+	IntegerTools::Le64ToBytes(State->Counter, State->Name, 0);
 
 	// extract the new mac key
 	Kdf::SHAKE gen(State->Mode);
-	gen.Initialize(State->MacKey, State->Custom);
+	// cSHAKE(k,c,n), bytes counter provides cSHAKE domain seperation in the stream; will generate a unique mac-key each time
+	gen.Initialize(State->MacKey, State->Custom, State->Name);
 	SymmetricKeySize ks = Authenticator->LegalKeySizes()[1];
 	SecureVector<byte> mack(ks.KeySize());
 	gen.Generate(mack);
@@ -373,7 +555,7 @@ void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Auth
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
-	Move(mack, State->MacKey, 0);
+	SecureMove(mack, State->MacKey, 0);
 }
 
 void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
@@ -541,7 +723,7 @@ void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 		// thread level counter
 		std::vector<byte> thdc(BLOCK_SIZE);
 		// offset counter by chunk size / block size  
-		IntegerTools::LeIncrease8(m_rcsState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
+		IntegerTools::LeIncrease8(m_acsState->Nonce, thdc, static_cast<uint>(CTRLEN * i));
 		const size_t STMPOS = i * CNKLEN;
 		// generate random at output offset
 		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);
@@ -556,14 +738,14 @@ void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	});
 
 	// copy last counter to class variable
-	MemoryTools::Copy(tmpc, 0, m_rcsState->Nonce, 0, BLOCK_SIZE);
+	MemoryTools::Copy(tmpc, 0, m_acsState->Nonce, 0, BLOCK_SIZE);
 
 	// last block processing
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 	if (ALNLEN < OUTLEN)
 	{
 		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, FNLLEN, m_rcsState->Nonce);
+		Generate(Output, ALNLEN, FNLLEN, m_acsState->Nonce);
 
 		for (size_t i = ALNLEN; i < OUTLEN; i++)
 		{
@@ -579,7 +761,7 @@ void ACS::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std
 	size_t i;
 
 	// generate random
-	Generate(Output, OutOffset, Length, m_rcsState->Nonce);
+	Generate(Output, OutOffset, Length, m_acsState->Nonce);
 
 	if (ALNLEN != 0)
 	{
@@ -598,7 +780,7 @@ void ACS::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std
 
 void ACS::Reset()
 {
-	m_rcsState->Reset();
+	m_acsState->Reset();
 
 	if (IsAuthenticator())
 	{
@@ -608,10 +790,17 @@ void ACS::Reset()
 	m_parallelProfile.Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 }
 
+SecureVector<byte> ACS::Serialize()
+{
+	SecureVector<byte> tmps = m_acsState->Serialize();
+
+	return tmps;
+}
+
 void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t HLFBLK = 16;
-	const size_t RNDCNT = m_rcsState->RoundKeys.size() - 3;
+	const size_t RNDCNT = m_acsState->RoundKeys.size() - 3;
 	size_t kctr;
 
 	__m128i blk1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
@@ -620,9 +809,9 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	__m128i tmp2;
 
 	kctr = 0;
-	blk1 = _mm_xor_si128(blk1, m_rcsState->RoundKeys[kctr]);
+	blk1 = _mm_xor_si128(blk1, m_acsState->RoundKeys[kctr]);
 	++kctr;
-	blk2 = _mm_xor_si128(blk2, m_rcsState->RoundKeys[kctr]);
+	blk2 = _mm_xor_si128(blk2, m_acsState->RoundKeys[kctr]);
 
 	while (kctr != RNDCNT)
 	{
@@ -634,10 +823,10 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 		tmp2 = _mm_shuffle_epi8(tmp2, SHIFT_MASK);
 		++kctr;
 		// encrypt the first half-block
-		blk1 = _mm_aesenc_si128(tmp1, m_rcsState->RoundKeys[kctr]);
+		blk1 = _mm_aesenc_si128(tmp1, m_acsState->RoundKeys[kctr]);
 		++kctr;
 		// encrypt the second half-block
-		blk2 = _mm_aesenc_si128(tmp2, m_rcsState->RoundKeys[kctr]);
+		blk2 = _mm_aesenc_si128(tmp2, m_acsState->RoundKeys[kctr]);
 	}
 
 	// final block
@@ -646,9 +835,9 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	tmp1 = _mm_shuffle_epi8(tmp1, SHIFT_MASK);
 	tmp2 = _mm_shuffle_epi8(tmp2, SHIFT_MASK);
 	++kctr;
-	blk1 = _mm_aesenclast_si128(tmp1, m_rcsState->RoundKeys[kctr]);
+	blk1 = _mm_aesenclast_si128(tmp1, m_acsState->RoundKeys[kctr]);
 	++kctr;
-	blk2 = _mm_aesenclast_si128(tmp2, m_rcsState->RoundKeys[kctr]);
+	blk2 = _mm_aesenclast_si128(tmp2, m_acsState->RoundKeys[kctr]);
 
 	// store in output
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), blk1);

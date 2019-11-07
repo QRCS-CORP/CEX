@@ -63,7 +63,7 @@ public:
 
 MCS::MCS(BlockCiphers CipherType, StreamAuthenticators AuthenticatorType)
 	:
-	m_acsState(new McsState(AuthenticatorType)),
+	m_mcsState(new McsState(AuthenticatorType)),
 	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The Cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_macAuthenticator(AuthenticatorType == StreamAuthenticators::None ? nullptr :
@@ -122,12 +122,12 @@ const bool MCS::IsAuthenticator()
 
 const bool MCS::IsEncryption()
 {
-	return m_acsState->Encryption;
+	return m_mcsState->Encryption;
 }
 
 const bool MCS::IsInitialized()
 {
-	return m_acsState->Initialized;
+	return m_mcsState->Initialized;
 }
 
 const bool MCS::IsParallel()
@@ -149,6 +149,11 @@ const std::string MCS::Name()
 	return name;
 }
 
+const std::vector<byte> MCS::Nonce()
+{
+	return m_cipherMode->Nonce();
+}
+
 const size_t MCS::ParallelBlockSize()
 {
 	return m_parallelProfile.ParallelBlockSize();
@@ -161,12 +166,12 @@ ParallelOptions &MCS::ParallelProfile()
 
 const std::vector<byte> MCS::Tag()
 {
-	return Unlock(m_acsState->MacTag);
+	return SecureUnlock(m_mcsState->MacTag);
 }
 
 const void MCS::Tag(SecureVector<byte> &Output)
 {
-	Copy(m_acsState->MacTag, 0, Output, 0, m_acsState->MacTag.size());
+	SecureCopy(m_mcsState->MacTag, 0, Output, 0, m_mcsState->MacTag.size());
 }
 
 const size_t MCS::TagSize()
@@ -229,19 +234,19 @@ void MCS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	else
 	{
 		// set the initial counter value
-		m_acsState->Counter = 1;
+		m_mcsState->Counter = 1;
 
 		// create the cSHAKE customization string
 		std::string tmpn = Name();
-		m_acsState->Custom.resize(sizeof(ulong) + tmpn.size());
+		m_mcsState->Custom.resize(sizeof(ulong) + tmpn.size());
 		// add mac counter and algorithm name to customization string
-		IntegerTools::Le64ToBytes(m_acsState->Counter, m_acsState->Custom, 0);
-		MemoryTools::CopyFromObject(tmpn.data(), m_acsState->Custom, sizeof(ulong), tmpn.size());
+		IntegerTools::Le64ToBytes(m_mcsState->Counter, m_mcsState->Custom, 0);
+		MemoryTools::CopyFromObject(tmpn.data(), m_mcsState->Custom, sizeof(ulong), tmpn.size());
 
 		// initialize cSHAKE with k,c
-		m_acsState->Mode = (Parameters.KeySizes().KeySize() == 64) ? ShakeModes::SHAKE512 : (Parameters.KeySizes().KeySize() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
-		Kdf::SHAKE gen(m_acsState->Mode);
-		gen.Initialize(Parameters.SecureKey(), m_acsState->Custom);
+		m_mcsState->Mode = (Parameters.KeySizes().KeySize() == 64) ? ShakeModes::SHAKE512 : (Parameters.KeySizes().KeySize() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
+		Kdf::SHAKE gen(m_mcsState->Mode);
+		gen.Initialize(Parameters.SecureKey(), m_mcsState->Custom);
 
 		// generate the cipher key
 		SecureVector<byte> cprk(Parameters.KeySizes().KeySize());
@@ -259,13 +264,13 @@ void MCS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		SymmetricKey kpm(mack);
 		m_macAuthenticator->Initialize(kpm);
 		// store the key
-		m_acsState->MacKey.resize(mack.size());
-		Move(mack, m_acsState->MacKey, 0);
-		m_acsState->MacTag.resize(TagSize());
+		m_mcsState->MacKey.resize(mack.size());
+		SecureMove(mack, m_mcsState->MacKey, 0);
+		m_mcsState->MacTag.resize(TagSize());
 	}
 
-	m_acsState->Encryption = Encryption;
-	m_acsState->Initialized = true;
+	m_mcsState->Encryption = Encryption;
+	m_mcsState->Initialized = true;
 }
 
 void MCS::ParallelMaxDegree(size_t Degree)
@@ -314,10 +319,10 @@ void MCS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Output, OutOffset, Length);
 			// update the mac counter
-			m_acsState->Counter += Length;
+			m_mcsState->Counter += Length;
 			// finalize the mac and add the tag to the stream
-			Finalize(m_acsState, m_macAuthenticator);
-			MemoryTools::Copy(m_acsState->MacTag, 0, Output, OutOffset + Length, m_acsState->MacTag.size());
+			Finalize(m_mcsState, m_macAuthenticator);
+			MemoryTools::Copy(m_mcsState->MacTag, 0, Output, OutOffset + Length, m_mcsState->MacTag.size());
 		}
 		else
 		{
@@ -334,11 +339,11 @@ void MCS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Input, InOffset, Length);
 			// update the mac counter
-			m_acsState->Counter += Length;
+			m_mcsState->Counter += Length;
 			// finalize the mac and verify
-			Finalize(m_acsState, m_macAuthenticator);
+			Finalize(m_mcsState, m_macAuthenticator);
 
-			if (!IntegerTools::Compare(Input, InOffset + Length, m_acsState->MacTag, 0, m_acsState->MacTag.size()))
+			if (!IntegerTools::Compare(Input, InOffset + Length, m_mcsState->MacTag, 0, m_mcsState->MacTag.size()))
 			{
 				throw CryptoAuthenticationFailure(Name(), std::string("Transform"), std::string("The authentication tag does not match!"), ErrorCodes::AuthenticationFailure);
 			}
@@ -370,12 +375,12 @@ void MCS::Finalize(std::unique_ptr<McsState> &State, std::unique_ptr<IMac> &Auth
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
-	Move(mack, State->MacKey, 0);
+	SecureMove(mack, State->MacKey, 0);
 }
 
 void MCS::Reset()
 {
-	m_acsState->Reset();
+	m_mcsState->Reset();
 
 	if (IsAuthenticator())
 	{

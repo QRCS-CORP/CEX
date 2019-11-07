@@ -74,21 +74,21 @@ namespace Test
 		SymmetricKeyGenerator kgen256(Enumeration::SecurityPolicy::SPL256, Enumeration::Providers::CSP);
 		OnProgress(std::string("Testing pseudo-random generation with a 256-bit security policy using the system provider"));
 		kgen256.Generate(tmps, 0, tmps.size());
-		tmpv = Unlock(tmps);
+		tmpv = SecureUnlock(tmps);
 		Evaluate(kgen256.Name(), tmpv);
 
 		std::memset(tmps.data(), 0x00, tmps.size());
 		SymmetricKeyGenerator kgen512(Enumeration::SecurityPolicy::SPL512, Enumeration::Providers::CSP);
 		OnProgress(std::string("Testing pseudo-random generation with a 512-bit security policy using the system provider"));
 		kgen512.Generate(tmps, 0, tmps.size());
-		tmpv = Unlock(tmps);
+		tmpv = SecureUnlock(tmps);
 		Evaluate(kgen512.Name(), tmpv);
 
 		std::memset(tmps.data(), 0x00, tmps.size());
 		SymmetricKeyGenerator kgen1024(Enumeration::SecurityPolicy::SPL1024, Enumeration::Providers::CSP);
 		OnProgress(std::string("Testing pseudo-random generation with a 1024-bit security policy using the system provider"));
 		kgen1024.Generate(tmps, 0, tmps.size());
-		tmpv = Unlock(tmps);
+		tmpv = SecureUnlock(tmps);
 		Evaluate(kgen1024.Name(), tmpv);
 	}
 

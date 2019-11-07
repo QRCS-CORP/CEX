@@ -189,7 +189,7 @@ size_t Poly1305::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	std::vector<byte> tag(TagSize());
 
 	Finalize(tag, 0);
-	Move(tag, Output, OutOffset);
+	SecureMove(tag, Output, OutOffset);
 
 	return TagSize();
 }

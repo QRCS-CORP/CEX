@@ -268,14 +268,14 @@ namespace Test
 			throw TestException(std::string("Serialization"), std::string("AsymmetricKey"), std::string("The serialized asymmetric key is invalid! -AS1"));
 		}
 
-		if (Unlock(kp1.SecurePolynomial()) != poly)
+		if (SecureUnlock(kp1.SecurePolynomial()) != poly)
 		{
 			throw TestException(std::string("Serialization"), std::string("AsymmetricKey"), std::string("The serialized asymmetric key is invalid! -AS2"));
 		}
 
 		AsymmetricSecureKey kp2(spoly, tmps, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
 
-		if (kp2.Polynomial() != Unlock(spoly) || kp2.KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp2.PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
+		if (kp2.Polynomial() != SecureUnlock(spoly) || kp2.KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp2.PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
 		{
 			throw TestException(std::string("Serialization"), std::string("AsymmetricSecureKey"), std::string("The serialized asymmetric key is invalid! -AS3"));
 		}
@@ -315,7 +315,7 @@ namespace Test
 		tmpk = AsymmetricSecureKey::Serialize(kp3);
 		AsymmetricKey* kp4 = AsymmetricKey::DeSerialize(tmpk);
 
-		if (kp4->Polynomial() != Unlock(spoly) || kp4->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp4->PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
+		if (kp4->Polynomial() != SecureUnlock(spoly) || kp4->KeyClass() != AsymmetricKeyTypes::CipherPrivateKey || kp4->PrimitiveType() != AsymmetricPrimitives::NTRUPrime)
 		{
 			throw TestException(std::string("Serialization"), std::string("AsymmetricSecureKey"), std::string("The deserialized asymmetric key is invalid! -AS2"));
 		}
@@ -345,8 +345,8 @@ namespace Test
 		// test standard vector standard and secure keys
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			spoly = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
-			tmps = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			spoly = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			tmps = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
 
 			AsymmetricSecureKey kp(spoly, tmps, AsymmetricPrimitives::NTRUPrime, AsymmetricKeyTypes::CipherPrivateKey, AsymmetricParameters::NTRUS2SQ4591N761, SecurityPolicy::SPL256);
 			tmpr.resize(spoly.size());

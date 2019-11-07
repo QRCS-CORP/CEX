@@ -207,6 +207,11 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
+	/// Read Only: The current value of the nonce counter array.
+	/// </summary>
+	const std::vector<byte> Nonce() override;
+
+	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class, but must be a multiple of the ParallelMinimumSize().</para>
 	/// </summary>

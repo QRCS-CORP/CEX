@@ -12,7 +12,7 @@ NAMESPACE_ROUTING
 /// </summary>
 /// 
 /// <example>
-/// <description>Example of getting a seed value:</description>
+/// <description>Example of returning a value:</description>
 /// <code>
 /// class SampleEvent
 /// {
@@ -33,8 +33,7 @@ NAMESPACE_ROUTING
 /// 
 /// void ProgressTest()
 /// {
-/// 	CipherStream cs(Enumeration::SymmetricCiphers::RDX,
-/// 		22,
+/// 	CipherStream cs(Enumeration::SymmetricCiphers::RHX,
 /// 		Enumeration::CipherModes::CBC,
 /// 		Enumeration::PaddingModes::PKCS7);
 /// 
@@ -53,7 +52,7 @@ template <typename T>
 class Event
 {
 private:
-	std::vector< Delegate<T>* > m_delegates;
+	std::vector<Delegate<T>*> m_delegates;
 
 public:
 
@@ -64,7 +63,9 @@ public:
 	{
 		// an object can only subscribe once
 		if (find(m_delegates.begin(), m_delegates.end(), delegate) == m_delegates.end())
+		{
 			m_delegates.push_back(delegate);
+		}
 	}
 
 	/// <summary>
@@ -72,15 +73,21 @@ public:
 	/// </summary>
 	inline void operator-=(Delegate<T>* delegate)
 	{
-		typedef typename std::vector< Delegate<T>* >::iterator iter;
-		iter i = m_delegates.begin();
+		typedef typename std::vector<Delegate<T>*>::iterator iter;
+		iter i;
+
+		i = m_delegates.begin();
 
 		while (i != m_delegates.end())
 		{
 			if (*i == delegate)
+			{
 				i = m_delegates.erase(i);
+			}
 			else
+			{
 				++i;
+			}
 		}
 	}
 
@@ -89,10 +96,12 @@ public:
 	/// </summary>
 	inline void operator()(T param)
 	{
-		typedef typename std::vector< Delegate<T>* >::iterator iter;
+		typedef typename std::vector<Delegate<T>*>::iterator iter;
 
 		for (iter i = m_delegates.begin(); i != m_delegates.end(); ++i)
+		{
 			(*i)->operator()(param);
+		}
 	}
 };
 

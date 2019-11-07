@@ -99,7 +99,7 @@ inline bool operator != (const SecureAllocator<T>&, const SecureAllocator<U>&)
 /// <param name="Input">The SecureVector to erase</param>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
-inline static void Clear(SecureVector<T> &Input)
+inline static void SecureClear(SecureVector<T> &Input)
 {
 	if (Input.size() != 0)
 	{
@@ -119,7 +119,7 @@ CEX_OPTIMIZE_RESUME
 /// <param name="OutOffset">The starting offset within the standard-vector</param>
 /// <param name="Length">The number of bytes to copy</param>
 template<typename T>
-inline static void Copy(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Length)
+inline static void SecureCopy(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(Input.size() - InOffset >= Length, "The length is longer than the input array");
 	CEXASSERT(Output.size() - OutOffset >= Length, "The length is longer than the output array");
@@ -135,7 +135,7 @@ inline static void Copy(const SecureVector<T> &Input, size_t InOffset, SecureVec
 /// <param name="Input">The SecureVector source array</param>
 /// <param name="Output">The standard-vector destination</param>
 template<typename T>
-inline static void Extract(const SecureVector<T> &Input, std::vector<T> &Output)
+inline static void SecureExtract(const SecureVector<T> &Input, std::vector<T> &Output)
 {
 	const size_t OTPSZE = Output.size();
 
@@ -151,7 +151,7 @@ inline static void Extract(const SecureVector<T> &Input, std::vector<T> &Output)
 /// <param name="Input">The SecureVector source array</param>
 /// <param name="Output">The SecureVector destination array</param>
 template<typename T>
-inline static void Extract(const SecureVector<T> &Input, SecureVector<T> &Output)
+inline static void SecureExtract(const SecureVector<T> &Input, SecureVector<T> &Output)
 {
 	const size_t OTPSZE = Output.size();
 
@@ -170,7 +170,7 @@ inline static void Extract(const SecureVector<T> &Input, SecureVector<T> &Output
 /// <param name="OutOffset">The starting offset within the destination SecureVector</param>
 /// <param name="Elements">The number of vector elements to copy</param>
 template<typename T>
-inline static void Extract(const SecureVector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Elements)
+inline static void SecureExtract(const SecureVector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Elements)
 {
 	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
 
@@ -193,7 +193,7 @@ inline static void Extract(const SecureVector<T> &Input, size_t InOffset, std::v
 /// <param name="OutOffset">The starting offset within the destination SecureVector</param>
 /// <param name="Elements">The number of vector elements to copy</param>
 template<typename T>
-inline static void Extract(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
+inline static void SecureExtract(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
 {
 	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
 
@@ -213,7 +213,7 @@ inline static void Extract(const SecureVector<T> &Input, size_t InOffset, Secure
 /// <param name="Input">The standard-vector source array</param>
 /// <param name="Output">The SecureVector destination array</param>
 template<typename T>
-inline static void Insert(const std::vector<T> &Input, SecureVector<T> &Output)
+inline static void SecureInsert(const std::vector<T> &Input, SecureVector<T> &Output)
 {
 	const size_t OTPSZE = Output.size();
 
@@ -229,7 +229,7 @@ inline static void Insert(const std::vector<T> &Input, SecureVector<T> &Output)
 /// <param name="Input">The SecureVector source array</param>
 /// <param name="Output">The SecureVector destination array</param>
 template<typename T>
-inline static void Insert(const SecureVector<T> &Input, SecureVector<T> &Output)
+inline static void SecureInsert(const SecureVector<T> &Input, SecureVector<T> &Output)
 {
 	const size_t OTPSZE = Output.size();
 
@@ -248,7 +248,7 @@ inline static void Insert(const SecureVector<T> &Input, SecureVector<T> &Output)
 /// <param name="OutOffset">The starting offset within the SecureVector</param>
 /// <param name="Elements">The number of elements to copy</param>
 template<typename T>
-inline static void Insert(const std::vector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
+inline static void SecureInsert(const std::vector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
 {
 	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
 
@@ -271,7 +271,7 @@ inline static void Insert(const std::vector<T> &Input, size_t InOffset, SecureVe
 /// <param name="OutOffset">The starting offset within the destination SecureVector</param>
 /// <param name="Elements">The number of elements to copy</param>
 template<typename T>
-inline static void Insert(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
+inline static void SecureInsert(const SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Elements)
 {
 	const size_t OTPSZE = Output.size() >= OutOffset + Elements ? 0 : OutOffset + Elements;
 
@@ -291,7 +291,7 @@ inline static void Insert(const SecureVector<T> &Input, size_t InOffset, SecureV
 /// 
 /// <returns>A SecureVector copy of the input array</returns>
 template<typename T>
-inline static SecureVector<T> Lock(const std::vector<T> &Input)
+inline static SecureVector<T> SecureLock(const std::vector<T> &Input)
 {
 	SecureVector<T> ret(Input.size());
 
@@ -309,7 +309,7 @@ inline static SecureVector<T> Lock(const std::vector<T> &Input)
 /// <returns>A SecureVector copy of the input array</returns>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
-inline static SecureVector<T> LockClear(std::vector<T> &Input)
+inline static SecureVector<T> SecureLockClear(std::vector<T> &Input)
 {
 	SecureVector<T> ret(Input.size());
 
@@ -331,7 +331,7 @@ CEX_OPTIMIZE_RESUME
 /// <param name="Length">The number of bytes to copy</param>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
-inline static void Move(std::vector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
+inline static void SecureMove(std::vector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
 {
 	CEXASSERT(Output.size() - OutOffset >= Input.size(), "The input array is longer than the output array");
 
@@ -351,7 +351,7 @@ CEX_OPTIMIZE_RESUME
 /// <param name="Length">The number of bytes to copy</param>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
-inline static void Move(SecureVector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
+inline static void SecureMove(SecureVector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
 {
 	CEXASSERT(Output.size() - OutOffset >= Input.size(), "The input array is longer than the output array");
 
@@ -369,7 +369,7 @@ CEX_OPTIMIZE_RESUME
 /// 
 /// <returns>A standard-vector copy of the SecureArray</returns>
 template<typename T>
-inline static std::vector<T> Unlock(const SecureVector<T> &Input)
+inline static std::vector<T> SecureUnlock(const SecureVector<T> &Input)
 {
 	std::vector<T> ret(Input.size());
 
@@ -387,7 +387,7 @@ inline static std::vector<T> Unlock(const SecureVector<T> &Input)
 /// <returns>A standard-vector copy of the SecureArray</returns>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
-inline static std::vector<T> UnlockClear(SecureVector<T> &Input)
+inline static std::vector<T> SecureUnlockClear(SecureVector<T> &Input)
 {
 	std::vector<T> ret(Input.size());
 

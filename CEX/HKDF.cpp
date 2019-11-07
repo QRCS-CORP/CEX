@@ -277,7 +277,7 @@ void HKDF::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, s
 {
 	std::vector<byte> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Generator);
-	Move(tmps, Output, OutOffset);
+	SecureMove(tmps, Output, OutOffset);
 }
 
 void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)

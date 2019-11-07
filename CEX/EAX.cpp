@@ -437,7 +437,7 @@ void EAX::Compute()
 	if (AutoIncrement())
 	{
 		IntegerTools::BeIncrement8(m_eaxState->Buffer);
-		SymmetricKey kp(m_eaxState->Key, Lock(m_eaxState->Buffer));
+		SymmetricKey kp(m_eaxState->Key, SecureLock(m_eaxState->Buffer));
 		Initialize(IsEncryption(), kp);
 
 		if (PreserveAD())

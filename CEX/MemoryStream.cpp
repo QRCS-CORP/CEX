@@ -3,6 +3,8 @@
 
 NAMESPACE_IO
 
+using Utility::MemoryTools;
+
 const std::string MemoryStream::CLASS_NAME("MemoryStream");
 
 //~~~Constructor~~~//
@@ -49,7 +51,7 @@ MemoryStream::MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t 
 	CEXASSERT(Length <= Data.size() - Offset, "Length exceeds input capacity");
 
 	m_streamData.resize(Length);
-	Utility::MemoryTools::Copy(Data, Offset, m_streamData, 0, Length);
+	MemoryTools::Copy(Data, Offset, m_streamData, 0, Length);
 }
 
 MemoryStream::~MemoryStream()
@@ -131,7 +133,7 @@ size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 	if (Length > 0)
 	{
-		Utility::MemoryTools::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
+		MemoryTools::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
 		m_streamPosition += Length;
 	}
 
@@ -142,7 +144,7 @@ byte MemoryStream::ReadByte()
 {
 	CEXASSERT(m_streamData.size() - m_streamPosition >= 1, "Stream length exceeded");
 	byte data = 0;
-	Utility::MemoryTools::CopyToValue(m_streamData, m_streamPosition, data, 1);
+	MemoryTools::CopyToValue(m_streamData, m_streamPosition, data, 1);
 	m_streamPosition += 1;
 
 	return data;
@@ -150,7 +152,7 @@ byte MemoryStream::ReadByte()
 
 void MemoryStream::Reset()
 {
-	Utility::MemoryTools::Clear(m_streamData, 0, m_streamData.size());
+	MemoryTools::Clear(m_streamData, 0, m_streamData.size());
 	m_streamData.resize(0);
 	m_streamPosition = 0;
 }
@@ -191,7 +193,7 @@ void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 		m_streamData.resize(ttlLen);
 	}
 
-	Utility::MemoryTools::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
+	MemoryTools::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
 	m_streamPosition += Length;
 }
 
@@ -202,7 +204,7 @@ void MemoryStream::WriteByte(byte Value)
 		m_streamData.resize(m_streamData.size() + 1);
 	}
 
-	Utility::MemoryTools::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
+	MemoryTools::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
 	m_streamPosition += 1;
 }
 

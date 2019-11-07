@@ -134,6 +134,7 @@ private:
 	static const size_t MAX_PRLALLOC = 100000000;
 	static const std::vector<byte> OMEGA_INFO;
 	static const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_THRESHOLD = 838;
 	static const byte UPDATE_PREFIX = 0x80;
 
 	class RcsState;
@@ -157,14 +158,25 @@ public:
 	RCS& operator=(const RCS&) = delete;
 
 	/// <summary>
-	/// Initialize the Cipher Mode using a block cipher type name.
-	/// <para>The cipher instance is created and destroyed automatically.</para>
+	/// Initialize the stream cipher using a stream authentication generator type-name
 	/// </summary>
 	///
 	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid block cipher type is used</exception>
 	RCS(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
+
+	/// <summary>
+	/// Initialize the stream cipher using a secure-vector serialized state.
+	/// <para>The Serialize function stores the internal state of the cipher, so that it can be reinitialized,
+	/// without the need to call the Initialize function and key-schedule. 
+	/// If this constructor is used, the cipher is fully initialized to the values it had when the Serialize function was called.</para>
+	/// </summary>
+	///
+	/// <param name="State">The serialized state, created by the Serialize() function</param>
+	///
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid block cipher type is used</exception>
+	RCS(SecureVector<byte> &State);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -209,6 +221,11 @@ public:
 	/// Read Only: The stream ciphers formal implementation name
 	/// </summary>
 	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The current value of the nonce counter array.
+	/// </summary>
+	const std::vector<byte> Nonce() override;
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
@@ -268,6 +285,16 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
+	/// Saves the internal state of the cipher to a secure vector.
+	/// <para>The Serialize function can store the internal state of the cipher at the time it is invoked.
+	/// The cipher instance can be reinitialized through a constructor option, without the need to re-call the Initialize function and associated key-schedule functions.
+	/// This is useful in situations where the cipher is required intermitantly, and the entire state can be stored rather than just the key and nonce.</para>
+	/// </summary>
+	///
+	/// <returns>The serialized cipher state</returns>
+	SecureVector<byte> Serialize();
+
+	/// <summary>
 	/// Add additional data to the message authentication code generator.  
 	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can then be called before or after a stream segment has been processed.</para>
 	/// </summary>
@@ -298,7 +325,9 @@ public:
 private:
 
 	static void Finalize(std::unique_ptr<RcsState> &State, std::unique_ptr<IMac> &Authenticator);
-	static void Prefetch();
+	static void PrefetchRoundKey(const SecureVector<uint> &Rkey);
+	static void PrefetchSbox();
+	static void PrefetchTables();
 	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter);
 	void Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);

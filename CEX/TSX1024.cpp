@@ -139,6 +139,16 @@ const std::string TSX1024::Name()
 	return name;
 }
 
+const std::vector<byte> TSX1024::Nonce()
+{
+	std::vector<byte> tmpn(2 * sizeof(ulong));
+
+	IntegerTools::Le64ToBytes(m_tsx1024State->Nonce[0], tmpn, 0);
+	IntegerTools::Le64ToBytes(m_tsx1024State->Nonce[1], tmpn, sizeof(ulong));
+
+	return tmpn;
+}
+
 const size_t TSX1024::ParallelBlockSize()
 {
 	return m_parallelProfile.ParallelBlockSize();
@@ -151,12 +161,12 @@ ParallelOptions &TSX1024::ParallelProfile()
 
 const std::vector<byte> TSX1024::Tag()
 {
-	return Unlock(m_tsx1024State->MacTag);
+	return SecureUnlock(m_tsx1024State->MacTag);
 }
 
 const void TSX1024::Tag(SecureVector<byte> &Output)
 {
-	Copy(m_tsx1024State->MacTag, 0, Output, 0, m_tsx1024State->MacTag.size());
+	SecureCopy(m_tsx1024State->MacTag, 0, Output, 0, m_tsx1024State->MacTag.size());
 }
 
 const size_t TSX1024::TagSize()
@@ -281,7 +291,7 @@ void TSX1024::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_macAuthenticator->Initialize(kpm);
 		// store the key
 		m_tsx1024State->MacKey.resize(mack.size());
-		Move(mack, m_tsx1024State->MacKey, 0);
+		SecureMove(mack, m_tsx1024State->MacKey, 0);
 		m_tsx1024State->MacTag.resize(TagSize());
 	}
 
@@ -390,7 +400,7 @@ void TSX1024::Finalize(std::unique_ptr<TSX1024State> &State, std::unique_ptr<IMa
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
-	Move(mack, State->MacKey, 0);
+	SecureMove(mack, State->MacKey, 0);
 }
 
 void TSX1024::Generate(std::unique_ptr<TSX1024State> &State, std::array<ulong, 2> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length)

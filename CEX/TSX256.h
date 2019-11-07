@@ -191,6 +191,16 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
+	/// Read Only: The stream ciphers formal implementation name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The current value of the nonce counter array.
+	/// </summary>
+	const std::vector<byte> Nonce() override;
+
+	/// <summary>
 	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this cipher.
 	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallel processing.</para>
@@ -201,11 +211,6 @@ public:
 	/// Read Only: A vector of SymmetricKeySize containers, containing legal cipher input-key sizes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Read Only: The stream ciphers formal implementation name
-	/// </summary>
-	const std::string Name() override;
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.

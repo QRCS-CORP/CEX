@@ -142,6 +142,16 @@ const std::string CSX256::Name()
 	return name;
 }
 
+const std::vector<byte> CSX256::Nonce()
+{
+	std::vector<byte> tmpn(2 * sizeof(uint));
+
+	IntegerTools::Le32ToBytes(m_csx256State->Nonce[0], tmpn, 0);
+	IntegerTools::Le32ToBytes(m_csx256State->Nonce[1], tmpn, sizeof(uint));
+
+	return tmpn;
+}
+
 const size_t CSX256::ParallelBlockSize() 
 {
 	return m_parallelProfile.ParallelBlockSize(); 
@@ -154,12 +164,12 @@ ParallelOptions &CSX256::ParallelProfile()
 
 const std::vector<byte> CSX256::Tag()
 {
-	return Unlock(m_csx256State->MacTag);
+	return SecureUnlock(m_csx256State->MacTag);
 }
 
 const void CSX256::Tag(SecureVector<byte> &Output)
 {
-	Copy(m_csx256State->MacTag, 0, Output, 0, m_csx256State->MacTag.size());
+	SecureCopy(m_csx256State->MacTag, 0, Output, 0, m_csx256State->MacTag.size());
 }
 
 const size_t CSX256::TagSize()
@@ -251,7 +261,7 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_macAuthenticator->Initialize(kpm);
 		// store the key
 		m_csx256State->MacKey.resize(mack.size());
-		Move(mack, m_csx256State->MacKey, 0);
+		SecureMove(mack, m_csx256State->MacKey, 0);
 		m_csx256State->MacTag.resize(TagSize());
 	}
 
@@ -360,7 +370,7 @@ void CSX256::Finalize(std::unique_ptr<CSX256State> &State, std::unique_ptr<IMac>
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
-	Move(mack, State->MacKey, 0);
+	SecureMove(mack, State->MacKey, 0);
 }
 
 void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length)

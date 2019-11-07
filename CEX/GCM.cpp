@@ -16,6 +16,7 @@ public:
 	std::vector<byte> AAD;
 	SecureVector<byte> Buffer;
 	SecureVector<byte> Key;
+
 	std::vector<byte> Nonce;
 	std::vector<byte> Tag;
 	size_t Counter;
@@ -339,7 +340,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		// key the block-cipher and create the hash key
 		m_cipherMode->Engine()->Initialize(true, Parameters);
 		std::vector<byte> tmph(BLOCK_SIZE);
-		const std::vector<byte> ZEROES(BLOCK_SIZE);
+		const std::vector<byte> ZEROES(BLOCK_SIZE, 0x00);
 		m_cipherMode->Engine()->Transform(ZEROES, 0, tmph, 0);
 
 		std::vector<ulong> gkey = 
@@ -369,13 +370,13 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	else
 	{
 		std::vector<byte> tmpn(BLOCK_SIZE);
-		m_gcmHash->Multiply(Unlock(m_gcmState->Buffer), tmpn, m_gcmState->Buffer.size());
+		m_gcmHash->Multiply(SecureUnlock(m_gcmState->Buffer), tmpn, m_gcmState->Buffer.size());
 		m_gcmHash->Finalize(tmpn, 0, m_gcmState->Buffer.size());
 		MemoryTools::Copy(tmpn, 0, m_gcmState->Nonce, 0, m_gcmState->Nonce.size());
 	}
 
 	// initialize the CTR mode
-	SymmetricKey ckp(m_gcmState->Key, Lock(m_gcmState->Nonce));
+	SymmetricKey ckp(m_gcmState->Key, SecureLock(m_gcmState->Nonce));
 	m_cipherMode->Initialize(true, ckp);
 	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 

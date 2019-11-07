@@ -40,8 +40,6 @@
 
 NAMESPACE_BLOCK
 
-//#if defined(__AVX__)
-
 /// <summary>
 /// A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or cSHAKE key schedule, and increased transformation rounds.
 /// <para>This cipher should not be used directly but through a cipher mode, or as part of a larger construction.</para>
@@ -73,7 +71,16 @@ NAMESPACE_BLOCK
 /// AHX extended mode can use an HMAC based Key Derivation Function; HKDF(HMAC(SHA2)) or the Keccak XOF function cSHAKE, to expand the input cipher key to create the internal round-key integer array. \n
 /// This provides better security, and allows for an implemetation to safely use an increased number of transformation rounds further strengthening the cipher. \n
 /// The cipher can also use a user-definable cipher tweak through the Info parameter of the symmetric key container, this can be used to create a unique cipher-text output. \n
-/// This tweak array is set as either the information string for HKDF, or as the cSHAKE name string.</para>
+/// This tweak array is set as either the information string for HKDF, or as the cSHAKE name string. \n
+/// The Info parameter is a concatonation of the ciphers formal string name, two Little Endian bytes for the key size in bits, and an optional user defined tweak, which can be a secondary key or a salt value.
+/// </para>
+/// <description>The default Info parameters:</description>
+/// <list type="bullet">
+/// <item><description>RHX256, HKDF(SHA2-256 variant) = RHXH25601</description>.</item>
+/// <item><description>RHX512, HKDF(SHA2-512 variant) = RHXH51202</description>.</item>
+/// <item><description>RHX256, (cSHAKE-256 variant) = RHXS25601</description>.</item>
+/// <item><description>RHX512, (cSHAKE-512 variant) = RHXS51202</description>.</item>
+/// </list>
 /// <para>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. \n
 /// AHX is capable of processing up to 38 transformation rounds in extended mode; a 256-bit key uses 22 rounds, a 512-bit key 30 rounds, and a 1024-bit key is set to 38 rounds.</para>
 /// 
@@ -332,6 +339,5 @@ private:
 	void Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 };
 
-//#endif
 NAMESPACE_BLOCKEND
 #endif

@@ -453,10 +453,10 @@ namespace Test
 		nonce = gen.Generate(16);
 		salt = gen.Generate(32);
 
-		secinfo = Lock(info);
-		seckey = Lock(key);
-		secnonce = Lock(nonce);
-		secsalt = Lock(salt);
+		secinfo = SecureLock(info);
+		seckey = SecureLock(key);
+		secnonce = SecureLock(nonce);
+		secsalt = SecureLock(salt);
 
 		// test symmetric key constructors
 		SymmetricKey kp1(key, nonce, info);
@@ -835,37 +835,37 @@ namespace Test
 		// test standard vector standard and secure keys
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			secinfo = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
-			seckey = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
-			secnonce = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
-			secsalt = Lock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			secinfo = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			seckey = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			secnonce = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
+			secsalt = SecureLock(gen.Generate(gen.NextUInt32(MAXM_ALLOC, MINM_ALLOC)));
 
 			SymmetricKey sp(seckey, secnonce, secinfo);
 
-			if (sp.Key() != Unlock(seckey))
+			if (sp.Key() != SecureUnlock(seckey))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS7"));
 			}
-			if (sp.Nonce() != Unlock(secnonce))
+			if (sp.Nonce() != SecureUnlock(secnonce))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS8"));
 			}
-			if (sp.Info() != Unlock(secinfo))
+			if (sp.Info() != SecureUnlock(secinfo))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SIS9"));
 			}
 
 			SymmetricSecureKey ss(seckey, secnonce, secinfo, SecurityPolicy::SPL256, secsalt);
 
-			if (ss.Key() != Unlock(seckey))
+			if (ss.Key() != SecureUnlock(seckey))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI10"));
 			}
-			if (ss.Nonce() != Unlock(secnonce))
+			if (ss.Nonce() != SecureUnlock(secnonce))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI11"));
 			}
-			if (ss.Info() != Unlock(secinfo))
+			if (ss.Info() != SecureUnlock(secinfo))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI12"));
 			}

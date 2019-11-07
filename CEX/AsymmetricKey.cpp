@@ -24,7 +24,7 @@ public:
 
 	AsymmetricKeyState(const std::vector<byte> &Poly, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes AsymmetricKeyType, AsymmetricParameters ParameterType)
 		:
-		Polynomial(Lock(Poly)),
+		Polynomial(SecureLock(Poly)),
 		Primitive(PrimitiveType),
 		KeyClass(AsymmetricKeyType),
 		Parameters(ParameterType)
@@ -65,7 +65,7 @@ public:
 
 	void Reset()
 	{
-		Clear(Polynomial);
+		SecureClear(Polynomial);
 		Primitive = AsymmetricPrimitives::None;
 		KeyClass = AsymmetricKeyTypes::None;
 		Parameters = AsymmetricParameters::None;
@@ -114,7 +114,7 @@ const AsymmetricParameters AsymmetricKey::Parameters()
 
 const std::vector<byte> AsymmetricKey::Polynomial()
 {
-	std::vector<byte> tmp = Unlock(m_keyState->Polynomial);
+	std::vector<byte> tmp = SecureUnlock(m_keyState->Polynomial);
 	return tmp;
 }
 

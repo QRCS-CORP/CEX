@@ -129,6 +129,11 @@ namespace Test
 		void Parallel(IStreamCipher* Cipher);
 
 		/// <summary>
+		/// Tests the the ciphers state serialization function
+		/// </summary>
+		void Serialization();
+
+		/// <summary>
 		/// Test transformation and inverse with random in a looping [TEST_CYCLES] stress-test
 		/// </summary>
 		/// 

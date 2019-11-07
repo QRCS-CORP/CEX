@@ -142,7 +142,7 @@ private:
 	static const byte UPDATE_PREFIX = 0x80;
 
 	class McsState;
-	std::unique_ptr<McsState> m_acsState;
+	std::unique_ptr<McsState> m_mcsState;
 	std::unique_ptr<CTR> m_cipherMode;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ParallelOptions m_parallelProfile;
@@ -215,6 +215,11 @@ public:
 	/// Read Only: The stream ciphers formal implementation name
 	/// </summary>
 	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The current value of the nonce counter array.
+	/// </summary>
+	const std::vector<byte> Nonce() override;
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.

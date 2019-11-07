@@ -330,7 +330,7 @@ void CSG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	std::vector<byte> tmpr(Length);
 	Generate(tmpr, 0, Length);
-	Move(tmpr, Output, OutOffset);
+	SecureMove(tmpr, Output, OutOffset);
 }
 
 void CSG::Initialize(ISymmetricKey &Parameters)
@@ -526,7 +526,7 @@ void CSG::Update(const SecureVector<byte> &Key)
 		Derive(m_csgProvider, m_csgState);
 	}
 
-	std::vector<byte> tmpk = Unlock(Key);
+	std::vector<byte> tmpk = SecureUnlock(Key);
 
 	// add new entropy equal to the state
 	for (size_t i = 0; i < m_csgState->State.size(); ++i)
@@ -709,10 +709,20 @@ void CSG::Permute(std::unique_ptr<CsgState> &State)
 {
 	if (State->ShakeMode != ShakeModes::SHAKE1024)
 	{
-#if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR24P1600C(State->State[State->Index]);
+		// use the double-round 48 round permutation
+#if defined(CEX_KECCAK_STRONG)
+#	if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR48P1600C(State->State[State->Index]);
+#	else
+		Keccak::PermuteR48P1600U(State->State[State->Index]);
+#	endif
 #else
+		// use the standard 24 round permutation
+#	if defined(CEX_DIGEST_COMPACT)
+		Keccak::PermuteR24P1600C(State->State[State->Index]);
+#	else
 		Keccak::PermuteR24P1600U(State->State[State->Index]);
+#	endif
 #endif
 	}
 	else

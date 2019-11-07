@@ -52,8 +52,8 @@ public:
 
 	AsymmetricSecureKeyState(const std::vector<byte> &Coefficients, AsymmetricPrimitives PrimitiveType, AsymmetricKeyTypes KeyClass, AsymmetricParameters ParameterType, const std::vector<byte> &KeySalt, SecurityPolicy PolicyType)
 		:
-		Polynomial(Lock(Coefficients)),
-		Salt(Lock(KeySalt)),
+		Polynomial(SecureLock(Coefficients)),
+		Salt(SecureLock(KeySalt)),
 		KeyClass(KeyClass),
 		Primitive(PrimitiveType),
 		Parameters(ParameterType),
@@ -79,8 +79,8 @@ public:
 
 	void Reset()
 	{
-		Clear(Polynomial);
-		Clear(Salt);
+		SecureClear(Polynomial);
+		SecureClear(Salt);
 		KeyClass = AsymmetricKeyTypes::None;
 		Parameters = AsymmetricParameters::None;
 		Policy = SecurityPolicy::None;
@@ -144,7 +144,7 @@ const std::vector<byte> AsymmetricSecureKey::Polynomial()
 		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Polynomial"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
-	return UnlockClear(tmps);
+	return SecureUnlockClear(tmps);
 }
 
 const void AsymmetricSecureKey::SecurePolynomial(SecureVector<byte> &Output)
@@ -206,7 +206,7 @@ void AsymmetricSecureKey::Encipher(std::unique_ptr<AsymmetricSecureKeyState> &St
 	std::vector<byte> cpt(State->Polynomial.size());
 
 	// transfer from the secure-vector to a working state
-	tmpt = UnlockClear(State->Polynomial);
+	tmpt = SecureUnlockClear(State->Polynomial);
 
 	// resize the cipher-text to accommodate the authentication tag
 	if (cpr->IsAuthenticator())
@@ -223,7 +223,7 @@ void AsymmetricSecureKey::Encipher(std::unique_ptr<AsymmetricSecureKeyState> &St
 	cpr->Initialize(true, kpc);
 	cpr->Transform(tmpt, 0, cpt, 0, tmpt.size());
 	// copy the encrypted cipher-text to secure state and erase buffer
-	State->Polynomial = LockClear(cpt);
+	State->Polynomial = SecureLockClear(cpt);
 }
 
 void AsymmetricSecureKey::Extract(std::unique_ptr<AsymmetricSecureKeyState> &State, SecureVector<byte> &Output, size_t Length)
@@ -243,7 +243,7 @@ void AsymmetricSecureKey::Extract(std::unique_ptr<AsymmetricSecureKeyState> &Sta
 	SymmetricKey kpc(tmpk, tmpn);
 	cpr->Initialize(false, kpc);
 	// copy from secure-vector to cipher-text buffer
-	std::vector<byte> cpt = Unlock(State->Polynomial);
+	std::vector<byte> cpt = SecureUnlock(State->Polynomial);
 	// decrypt to temp state
 	cpr->Transform(cpt, 0, tmpt, 0, CPTSZE);
 	// erase the temp cipher-text
@@ -340,7 +340,7 @@ void AsymmetricSecureKey::GetSystemKey(SecurityPolicy Policy, const SecureVector
 	}
 
 	SHAKE gen(mode);
-	gen.Initialize(cust, Unlock(Salt));
+	gen.Initialize(cust, SecureUnlock(Salt));
 	gen.Generate(Output, 0, Output.size());
 }
 

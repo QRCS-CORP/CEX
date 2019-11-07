@@ -143,9 +143,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.8a (A8)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.8b (A8)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      September 22, 2019                *");
+	ConsoleUtils::WriteLine("* Date:      November 7, 2019                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -488,3 +488,16 @@ int main()
 		return 0;
 	}
 }
+
+// Misc Notes
+//
+// DTM Model
+// 
+//					Certification Authority
+//				/							\
+//			Authentication Agent			AA(...)
+//			/	|		|		\			/\
+//	Protected Domain	PD		PD			PD(...)
+//					PQSECDNS
+//		/		|		|			\		/||\
+//	Requesting Host		RH			RH	    RH(...)

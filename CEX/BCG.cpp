@@ -255,7 +255,7 @@ void BCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	std::vector<byte> tmpr(Length);
 	Generate(tmpr, 0, Length);
-	Move(tmpr, Output, OutOffset);
+	SecureMove(tmpr, Output, OutOffset);
 }
 
 void BCG::Initialize(ISymmetricKey &Parameters)

@@ -44,7 +44,7 @@ public:
 	SecureKeyState(const std::vector<byte> &KeyState, SecurityPolicy SecPolicy)
 		:
 		Salt(0),
-		State(Lock(KeyState)),
+		State(SecureLock(KeyState)),
 		KeySizes(KeyState.size(), 0, 0),
 		Policy(SecPolicy)
 	{
@@ -52,8 +52,8 @@ public:
 
 	SecureKeyState(const std::vector<byte> &KeyState, SecurityPolicy SecPolicy, const std::vector<byte> &SaltState)
 		:
-		Salt(Lock(SaltState)),
-		State(Lock(KeyState)),
+		Salt(SecureLock(SaltState)),
+		State(SecureLock(KeyState)),
 		KeySizes(KeyState.size(), 0, 0),
 		Policy(SecPolicy)
 	{
@@ -72,7 +72,7 @@ public:
 
 	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, SecurityPolicy SecPolicy, const std::vector<byte> &SaltState)
 		:
-		Salt(Lock(SaltState)),
+		Salt(SecureLock(SaltState)),
 		State(KeyState.size() + NonceState.size()),
 		KeySizes(KeyState.size(), NonceState.size(), 0),
 		Policy(SecPolicy)
@@ -95,7 +95,7 @@ public:
 
 	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, const std::vector<byte> &InfoState, SecurityPolicy SecPolicy, const std::vector<byte> &SaltState)
 		:
-		Salt(Lock(SaltState)),
+		Salt(SecureLock(SaltState)),
 		State(KeyState.size() + NonceState.size() + InfoState.size()),
 		KeySizes(KeyState.size(), NonceState.size(), InfoState.size()),
 		Policy(SecPolicy)
@@ -176,8 +176,8 @@ public:
 
 	void Reset()
 	{
-		Clear(Salt);
-		Clear(State);
+		SecureClear(Salt);
+		SecureClear(State);
 		KeySizes.Reset();
 		Policy = SecurityPolicy::None;
 	}
@@ -303,7 +303,7 @@ const std::vector<byte> SymmetricSecureKey::Info()
 		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Info"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
-	return Unlock(tmps);
+	return SecureUnlock(tmps);
 }
 
 const std::vector<byte> SymmetricSecureKey::Key()
@@ -319,7 +319,7 @@ const std::vector<byte> SymmetricSecureKey::Key()
 		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Key"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
-	return Unlock(tmps);
+	return SecureUnlock(tmps);
 }
 
 SymmetricKeySize &SymmetricSecureKey::KeySizes() const
@@ -340,7 +340,7 @@ const std::vector<byte> SymmetricSecureKey::Nonce()
 		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Nonce"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
-	return Unlock(tmps);
+	return SecureUnlock(tmps);
 }
 
 const SecureVector<byte> SymmetricSecureKey::SecureInfo()
@@ -395,7 +395,7 @@ const SecureVector<byte> SymmetricSecureKey::SecureNonce()
 
 SymmetricSecureKey* SymmetricSecureKey::Clone()
 {
-	return new SymmetricSecureKey(Key(), Nonce(), Info(), m_secureState->Policy, Unlock(m_secureState->Salt));
+	return new SymmetricSecureKey(Key(), Nonce(), Info(), m_secureState->Policy, SecureUnlock(m_secureState->Salt));
 }
 
 void SymmetricSecureKey::Reset()
@@ -483,7 +483,7 @@ void SymmetricSecureKey::Encipher(std::unique_ptr<SecureKeyState> &State)
 	std::vector<byte> cpt(State->State.size());
 
 	// transfer from the secure-vector to a working state
-	tmpt = UnlockClear(State->State);
+	tmpt = SecureUnlockClear(State->State);
 
 	// resize the cipher-text to accommodate the authentication tag
 	if (cpr->IsAuthenticator())
@@ -500,7 +500,7 @@ void SymmetricSecureKey::Encipher(std::unique_ptr<SecureKeyState> &State)
 	cpr->Initialize(true, kpc);
 	cpr->Transform(tmpt, 0, cpt, 0, tmpt.size());
 	// copy the encrypted cipher-text to secure state and erase buffer
-	State->State = LockClear(cpt);
+	State->State = SecureLockClear(cpt);
 }
 
 void SymmetricSecureKey::Extract(std::unique_ptr<SecureKeyState> &State, size_t StateOffset, SecureVector<byte> &Output, size_t Length)
@@ -520,7 +520,7 @@ void SymmetricSecureKey::Extract(std::unique_ptr<SecureKeyState> &State, size_t 
 	SymmetricKey kpc(tmpk, tmpn);
 	cpr->Initialize(false, kpc);
 	// copy from secure-vector to cipher-text buffer
-	std::vector<byte> cpt = Unlock(State->State);
+	std::vector<byte> cpt = SecureUnlock(State->State);
 	// decrypt to temp state
 	cpr->Transform(cpt, 0, tmpt, 0, CPTSZE);
 	// erase the temp cipher-text
@@ -617,7 +617,7 @@ void SymmetricSecureKey::GetSystemKey(SecurityPolicy Policy, const SecureVector<
 	}
 
 	SHAKE gen(mode);
-	gen.Initialize(cust, Unlock(Salt));
+	gen.Initialize(cust, SecureUnlock(Salt));
 	gen.Generate(Output, 0, Output.size());
 }
 

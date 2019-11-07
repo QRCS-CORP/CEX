@@ -388,7 +388,7 @@ void SCRYPT::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length,
 {
 	std::vector<byte> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Options, Generator);
-	Move(tmps, Output, OutOffset);
+	SecureMove(tmps, Output, OutOffset);
 }
 
 void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Key, std::vector<byte> &Salt, std::unique_ptr<IDigest> &Generator)

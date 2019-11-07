@@ -195,7 +195,7 @@ size_t CMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	std::vector<byte> tag(TagSize());
 
 	Finalize(tag, 0);
-	Move(tag, Output, OutOffset);
+	SecureMove(tag, Output, OutOffset);
 	Reset();
 
 	return TagSize();

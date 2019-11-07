@@ -289,7 +289,7 @@ namespace Test
 	{
 		/*lint -save -e122 */
 		/*lint -save -e146 */
-		/*lint -save -e417 */
+		/*lint -save -e417 */  // k1,c1,m2,e6	k2,c3,m2,e7		k1,c2,m3,e8
 
 		const std::vector<std::string> key =
 		{

@@ -93,7 +93,7 @@ namespace Test
 			Finalization(rcsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[4], m_code[6], m_code[7]);
 			Finalization(rcsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[5], m_code[8], m_code[9]);
 			Finalization(rcsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[6], m_code[10], m_code[11]);
-			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer finalization tests."));
+			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer finalization tests.")); 
 
 			// original known answer test vectors generated with this implementation
 			Kat(rcs256s, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
@@ -112,6 +112,10 @@ namespace Test
 			// compare parallel output with sequential for equality
 			Parallel(rcs256s);
 			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 parallel to sequential equivalence test.."));
+
+			// tests the cipher state serialization feature
+			Serialization();
+			OnProgress(std::string("RCSTest: Passed RCS state serialization test.."));
 
 			// looping test of successful decryption with random keys and input
 			Stress(rcs256s);
@@ -268,6 +272,23 @@ namespace Test
 
 	void RCSTest::Exception()
 	{
+		// test serialized loading with invalid state
+		try
+		{
+			SecureVector<byte> sta(100);
+			RCS cpr2(sta);
+
+			throw TestException(std::string("RCS"), std::string("Exception"), std::string("Exception handling failure! -AE1"));
+		}
+		catch (CryptoSymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+
 		// test initialization key and nonce input sizes
 		try
 		{
@@ -395,7 +416,7 @@ namespace Test
 			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("MAC output is not equal! -TF4"));
 		}
 
-		// use constant time IntegerTools::Compare to verify
+		// use constant time IntegerTools::Compare to verify in real-world use
 		if (!IntegerTools::Compare(otp, 0, Message, 0, MSGLEN) || !IntegerTools::Compare(otp, MSGLEN, Message, 0, MSGLEN))
 		{
 			throw TestException(std::string("Finalization"), Cipher->Name(), std::string("Decrypted output does not match the input! -TF5"));
@@ -528,6 +549,48 @@ namespace Test
 		}
 	}
 
+	void RCSTest::Serialization()
+	{
+		const size_t MSGLEN = 137;
+		RCS cpr1(StreamAuthenticators::KMAC256);
+		Cipher::SymmetricKeySize ks = cpr1.LegalKeySizes()[0];
+		std::vector<byte> cpt1(MSGLEN + cpr1.TagSize());
+		std::vector<byte> cpt2(MSGLEN + cpr1.TagSize());
+		std::vector<byte> key(ks.KeySize(), 0x01);
+		std::vector<byte> cust(ks.InfoSize(), 0x02);
+		std::vector<byte> msg(MSGLEN, 0x03);
+		std::vector<byte> nonce(ks.NonceSize(), 0x04);
+		std::vector<byte> plt1(MSGLEN);
+		std::vector<byte> plt2(MSGLEN);
+
+		SymmetricKey kp(key, nonce, cust);
+		cpr1.Initialize(true, kp);
+
+		SecureVector<byte> sta1 = cpr1.Serialize();
+		RCS cpr2(sta1);
+
+		cpr1.Transform(msg, 0, cpt1, 0, msg.size());
+		cpr2.Transform(msg, 0, cpt2, 0, msg.size());
+
+		if (cpt1 != cpt2)
+		{
+			throw TestException(std::string("Serialization"), cpr1.Name(), std::string("Transformation output is not equal! -SS1"));
+		}
+
+		cpr1.Initialize(false, kp);
+
+		SecureVector<byte> sta2 = cpr1.Serialize();
+		RCS cpr3(sta2);
+
+		cpr1.Transform(cpt1, 0, plt1, 0, plt1.size());
+		cpr3.Transform(cpt2, 0, plt2, 0, plt2.size());
+
+		if (plt1 != msg || plt1 != plt2)
+		{
+			throw TestException(std::string("Serialization"), cpr1.Name(), std::string("Transformation output is not equal! -SS2"));
+		}
+	}
+
 	void RCSTest::Stress(IStreamCipher* Cipher)
 	{
 		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
@@ -633,37 +696,37 @@ namespace Test
 		const std::vector<std::string> code =
 		{
 			// rcsc256h256
-			std::string("1D40A5B9BF4CCA23A8DCA7168CF4BD4277EA702E32FF3FAD004C93AA56EF6261"),
-			std::string("555614FE3331D4DFC3F4EC7BD1394AF774C79263EF6D7977F4F5370251FB79C4"),
+			std::string("561825714E22F6B507A26CEC06A37133CC79708A9A41CB48EF00298AE145C8F1"),
+			std::string("FFCB284536959D891CA2A8F5BF2E593CE9E44C0759B91DD0AE572EBB8E117C34"),
 			// rcsc256k256
-			std::string("231FEB02DE792F037DD6C2255E4240BA59176E4ECD560D7F372F001B5CF48287"),
-			std::string("3F00657BE24E71D829D9B9C1E5908DA8B69965AD9C0355FF7B767B33A87128CA"),
+			std::string("F00501356BFE37D737C96C689AA191576EDC984049B107B898E28318FF64A757"),
+			std::string("333B7C16B8AF5F0CC2D5BEEB1E5177D54A39900C81AFD4E0AD220C1490883224"),
 			// rcsc256p256
-			std::string("D78EE06F0F6D3D630F89E781DA72B273"),
-			std::string("BEBB0546E2C91A9C91769D7D0803A316"),
+			std::string("27CB6860D2E7ECB30B090E9B049FC665"),
+			std::string("F9AEEAAC05C04B659AEF5CFA202C0780"),
 			// rcsc512h512
-			std::string("FA4C4C575A3A8A570195CD94B88B3902616ACFC826FC8FF585E35C1C3B3FFC493A3214D3BE55875AA8B1D99025F6EC68D1E7188DBD5533EF9753031E6738F174"),
-			std::string("F76EC279A34983248FFAA824CB39BCDC9F49C7F84FFFEA4B6D14CF3ABFA506E104F78A0A6DD5B24451121B2CA65425399537EFE56D3033169DD2494C77AE16AE"),
+			std::string("A2DEEA637DC3EB021CC32D6B6B33B7FABD38ACAF89A2701CE157DB5959BF0B8AA054630F6EA00594D419A996CCCA1754AC9A87AD75DC028D0FC357FEA6821CF7"),
+			std::string("2EA348E061DDBA93CB0352E6EA4089D6E063342DD584D30A3A5DCDC4CAC3D318BD03FAFC0D3E0B4205E716C70905409D4B09943ACEB9616BBE4064956900AC2C"),
 			// rcsc512k512
-			std::string("B547C684989EE28177E8985EA828B4C192CEB77EC932934D2E30F39F28EA62FDC704ACE875F891F953FE35018B3E724506265F1F7DD8AB4033D2A0680DA1993E"),
-			std::string("84918AAE074AE4288D7640DCBAF8838EF162A90E24422CC9FE9D51090D9FA3BDDE4FEB35016D3D589E8D9A96243D23FCFF714970D7B61797EB2F8C75F300FB3E"),
+			std::string("ED546436FF04B913515CD9B06B0DF021896204488F98AEAA8B0A327E195ECFFC403FF01E39623B6AA4A11096E1A820054BD5872E164C8BA4B88142CB74E0076D"),
+			std::string("9B78DCE6E831A50DDC6B3671DAE0841F2161C3762F454118549BF8B8400B98F509893B0D3EFAAD29328B0DC3E118AE832DEE0601886A0478402CD98764EE62C1"),
 			// rcs1024k1024
-			std::string("B21264DC5D55B0880E70158A488689B1F323BBC07171EFCE8E2656E1BE5E2013C37A2750DAACCC497626B46131321E76DFBFB83072C98DEA28F6AD7FCCE1D810"
-				"A0F3DAD7DB3BCD2729D749193A30FE3F94D2E423BA8EDA814EF2D8CF508FB9EEA2E14B7C3772A9FA4DBE7EEE7139E8493D28241152085EC6C8E2F12FD10E2082"),
-			std::string("2D17026CF307EB60FFBAFF5663BAF1E90E98C9939308BC88A59D78568035AEEE0104E966D8C694E1924050C3370F472ECB2D3274BCCFE9D28DFB49F7F4BC9977"
-				"779C8F2FF07968183127C6761043EF09BC3EB23D5EC9742A9AEDE18653C5054848EE7EEEA254892DF33C9D13083482FA018AD5516B87AD9AFC04B7DC48FCEF97")
+			std::string("9ED6938DA37418A861189DB36AC25738FF569DD34AF2900DA501E24170E02CE7A0EF66CF186F130FCF30D669700A055CC9B73B4C871DF53AE7B4057A8A5680B6"
+				"65E7115D032E60DA9A35D9364A25409FCDAC32D539B91880430479FC91EB789FD05027C98C8BC5DAD03F2482146D8321691C1E613BD036920EC6422C5F378FAB"),
+			std::string("90940CC5BB407DFF9C50E1D2F2065E0AC6022CE6DF753F17977FCBF26AC378F26E040A0AA255C552AE427490C883BB6ADED8583900EDFD8B1BA4D2D590A53BDB"
+				"8444D41DEB4132D72718ED7ED6142F5E244EE0A2FFB20756B3BF011F11757D8E05899E9EE02C98D864A1DD3D767906846C92873C674B0ED0414C7AADA5BD6D1A")
 		};
 		HexConverter::Decode(code, 12, m_code);
 
 		const std::vector<std::string> expected =
 		{
-			std::string("CC89C77F3A7B0C2A926BC868D7CD680C6C2B1C5FB1975CF32655DB032F232B26"),	// rcs256s
-			std::string("57A352F74A695B05A388F4B1160E6000DCA007DAD89BC8A3DC13897917113539"),	// rcsc256h256
-			std::string("9F242A4AA69A66ACF89FD3ECBDA751BE2A7AC67C558025C59F493C6E142F0AE9"),	// rcsc256k256
-			std::string("3C9B482572A2DCCEF94BEB15FD1753DE51D8A588CA4DF018E68891FC724C13F9"),	// rcsc256p256
-			std::string("39C25E6E1E651847CA1771457302B1C131555A9107C890F82897B4A53A3E7549"),	// rcsc512h512
-			std::string("375D351BB811FB2801D21D74D629438ED9C460BD0CC0497797C38A8BD25325E2"),	// rcsc512k512
-			std::string("1DAD1838BA6CEFBA9098E9E957E2BD6B007CB158B2F9AD7817F9DF57C950D4BD")		// rcsc1024k1024
+			std::string("A0E750C82CC3CC45A253D8013B3235F69B499F6C0098D2D1B1FF17C25C89A70F"),	// rcs256s
+			std::string("1829CB0E4B9DD6B985C099E28B5E1074586D4F14FAA8E1EDA32F047CBDC58086"),	// rcsc256h256
+			std::string("0A62E14EFEF56C3FFE2570C78EB502046E2F3BE5E60CEA67FA8BD8316B898099"),	// rcsc256k256
+			std::string("A1C51A7279E94C164D96902E9C71E2F883DF25358A85A1F09105104FB47299F7"),	// rcsc256p256
+			std::string("BFDDD46D4D6EB9DFB5E1FD4B57D091CE65521DFC3419CC362CDE840875BB7325"),	// rcsc512h512
+			std::string("5066AF59A10EEF7BE271E2BA1B346EE370C8E88C67CF3F62997CCE4804585EB4"),	// rcsc512k512
+			std::string("919E38CB0329A7784B3277017FD86FB97AEAE24B995E91B0EA244E68AEBE82BB")		// rcsc1024k1024
 		};
 		HexConverter::Decode(expected, 7, m_expected);
 
@@ -683,7 +746,7 @@ namespace Test
 
 		const std::vector<std::string> monte =
 		{
-			std::string("F55BC2A2085E494466158E4285A53FB57F73EFC323CAF2FC6E9742616DB12303")
+			std::string("7324D28336C5C8F71FA4287DB0373687E580E9D8490F0B073BB40FE72F568F8C")
 		};
 		HexConverter::Decode(monte, 1, m_monte);
 

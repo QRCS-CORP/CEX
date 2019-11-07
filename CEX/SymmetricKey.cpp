@@ -30,7 +30,7 @@ public:
 
 	KeyState(const std::vector<byte> &KeyState)
 		:
-		Key(Lock(KeyState)),
+		Key(SecureLock(KeyState)),
 		Nonce(0),
 		Info(0),
 		KeySizes(Key.size(), 0, 0)
@@ -39,8 +39,8 @@ public:
 
 	KeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState)
 		:
-		Key(Lock(KeyState)),
-		Nonce(Lock(NonceState)),
+		Key(SecureLock(KeyState)),
+		Nonce(SecureLock(NonceState)),
 		Info(0),
 		KeySizes(KeyState.size(), NonceState.size(), 0)
 	{
@@ -48,9 +48,9 @@ public:
 
 	KeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, const std::vector<byte> &InfoState)
 		:
-		Key(Lock(KeyState)),
-		Nonce(Lock(NonceState)),
-		Info(Lock(InfoState)),
+		Key(SecureLock(KeyState)),
+		Nonce(SecureLock(NonceState)),
+		Info(SecureLock(InfoState)),
 		KeySizes(KeyState.size(), NonceState.size(), InfoState.size())
 	{
 	}
@@ -89,9 +89,9 @@ public:
 
 	void Reset()
 	{
-		Clear(Key);
-		Clear(Info);
-		Clear(Nonce);
+		SecureClear(Key);
+		SecureClear(Info);
+		SecureClear(Nonce);
 		KeySizes.Reset();
 	}
 };
@@ -149,13 +149,13 @@ SymmetricKey::~SymmetricKey()
 
 const std::vector<byte> SymmetricKey::Info() 
 { 
-	std::vector<byte> tmp = Unlock(m_keyState->Info);
+	std::vector<byte> tmp = SecureUnlock(m_keyState->Info);
 	return tmp;
 }
 
 const std::vector<byte> SymmetricKey::Key()
 {
-	std::vector<byte> tmp = Unlock(m_keyState->Key);
+	std::vector<byte> tmp = SecureUnlock(m_keyState->Key);
 	return tmp;
 }
 
@@ -166,14 +166,14 @@ SymmetricKeySize &SymmetricKey::KeySizes() const
 
 const std::vector<byte> SymmetricKey::Nonce() 
 { 
-	std::vector<byte> tmp = Unlock(m_keyState->Nonce);
+	std::vector<byte> tmp = SecureUnlock(m_keyState->Nonce);
 	return tmp;
 }
 
 const SecureVector<byte> SymmetricKey::SecureInfo()
 {
 	SecureVector<byte> tmpr(0);
-	Insert(m_keyState->Info, tmpr);
+	SecureInsert(m_keyState->Info, tmpr);
 
 	return tmpr;
 }
@@ -181,7 +181,7 @@ const SecureVector<byte> SymmetricKey::SecureInfo()
 const SecureVector<byte> SymmetricKey::SecureKey()
 {
 	SecureVector<byte> tmpr(0);
-	Insert(m_keyState->Key, tmpr);
+	SecureInsert(m_keyState->Key, tmpr);
 
 	return tmpr;
 }
@@ -189,7 +189,7 @@ const SecureVector<byte> SymmetricKey::SecureKey()
 const SecureVector<byte> SymmetricKey::SecureNonce()
 {
 	SecureVector<byte> tmpr(0);
-	Insert(m_keyState->Nonce, tmpr);
+	SecureInsert(m_keyState->Nonce, tmpr);
 
 	return tmpr;
 }

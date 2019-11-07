@@ -83,15 +83,15 @@ void SHA2::PermuteR64P512C(const std::vector<byte> &Input, size_t InOffset, std:
 	size_t i;
 	size_t j;
 
-	Utility::MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(uint));
+	MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(uint));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	for (i = 0; i < 16; ++i)
 	{
-		W[i] = Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)));
+		W[i] = IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)));
 	}
 #else
-	Utility::MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(uint));
+	MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(uint));
 #endif
 
 	for (i = 16; i < 64; i++)
@@ -168,22 +168,22 @@ void SHA2::PermuteR64P512U(const std::vector<byte> &Input, size_t InOffset, std:
 	G = State[6];
 	H = State[7];
 
-	W0 = Utility::IntegerTools::BeBytesTo32(Input, InOffset);
-	W1 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 4);
-	W2 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 8);
-	W3 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 12);
-	W4 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 16);
-	W5 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 20);
-	W6 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 24);
-	W7 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 28);
-	W8 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 32);
-	W9 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 36);
-	W10 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 40);
-	W11 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 44);
-	W12 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 48);
-	W13 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 52);
-	W14 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 56);
-	W15 = Utility::IntegerTools::BeBytesTo32(Input, InOffset + 60);
+	W0 = IntegerTools::BeBytesTo32(Input, InOffset);
+	W1 = IntegerTools::BeBytesTo32(Input, InOffset + 4);
+	W2 = IntegerTools::BeBytesTo32(Input, InOffset + 8);
+	W3 = IntegerTools::BeBytesTo32(Input, InOffset + 12);
+	W4 = IntegerTools::BeBytesTo32(Input, InOffset + 16);
+	W5 = IntegerTools::BeBytesTo32(Input, InOffset + 20);
+	W6 = IntegerTools::BeBytesTo32(Input, InOffset + 24);
+	W7 = IntegerTools::BeBytesTo32(Input, InOffset + 28);
+	W8 = IntegerTools::BeBytesTo32(Input, InOffset + 32);
+	W9 = IntegerTools::BeBytesTo32(Input, InOffset + 36);
+	W10 = IntegerTools::BeBytesTo32(Input, InOffset + 40);
+	W11 = IntegerTools::BeBytesTo32(Input, InOffset + 44);
+	W12 = IntegerTools::BeBytesTo32(Input, InOffset + 48);
+	W13 = IntegerTools::BeBytesTo32(Input, InOffset + 52);
+	W14 = IntegerTools::BeBytesTo32(Input, InOffset + 56);
+	W15 = IntegerTools::BeBytesTo32(Input, InOffset + 60);
 
 	R = H + (((E >> 6) | (E << 26)) ^ ((E >> 11) | (E << 21)) ^ ((E >> 25) | (E << 7))) + ((E & F) ^ (~E & G)) + W0 + 0x428A2F98UL;
 	D += R;
@@ -620,23 +620,23 @@ void SHA2::PermuteR64P8x512H(const std::vector<byte> &Input, size_t InOffset, st
 	size_t i;
 	size_t j;
 
-	Utility::MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(UInt256));
+	MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(UInt256));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448));
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448));
 	}
 #else
-	Utility::MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt256));
+	MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt256));
 #endif
 
 	for (i = 16; i < 64; i++)
@@ -695,31 +695,31 @@ void SHA2::PermuteR64P16x512H(const std::vector<byte> &Input, size_t InOffset, s
 	size_t i;
 	size_t j;
 
-	Utility::MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(UInt512));
+	MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(UInt512));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 512),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 576),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 640),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 704),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 768),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 832),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 896),
-			Utility::IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 960));
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 512),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 576),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 640),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 704),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 768),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 832),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 896),
+			IntegerTools::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 960));
 	}
 #else
-	Utility::MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt512));
+	MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt512));
 #endif
 
 	for (i = 16; i < 64; i++)
@@ -777,15 +777,15 @@ void SHA2::PermuteR80P1024C(const std::vector<byte> &Input, size_t InOffset, std
 	size_t i;
 	size_t j;
 
-	Utility::MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(ulong));
+	MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(ulong));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	for (i = 0; i < 16; ++i)
 	{
-		W[i] = Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+		W[i] = IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
 	}
 #else
-	Utility::MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ulong));
+	MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ulong));
 #endif
 
 	for (i = 16; i < 80; i++)
@@ -861,22 +861,22 @@ void SHA2::PermuteR80P1024U(const std::vector<byte> &Input, size_t InOffset, std
 	G = State[6];
 	H = State[7];
 
-	W0 = Utility::IntegerTools::BeBytesTo64(Input, InOffset);
-	W1 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 8);
-	W2 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 16);
-	W3 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 24);
-	W4 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 32);
-	W5 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 40);
-	W6 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 48);
-	W7 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 56);
-	W8 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 64);
-	W9 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 72);
-	W10 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 80);
-	W11 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 88);
-	W12 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 96);
-	W13 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 104);
-	W14 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 112);
-	W15 = Utility::IntegerTools::BeBytesTo64(Input, InOffset + 120);
+	W0 = IntegerTools::BeBytesTo64(Input, InOffset);
+	W1 = IntegerTools::BeBytesTo64(Input, InOffset + 8);
+	W2 = IntegerTools::BeBytesTo64(Input, InOffset + 16);
+	W3 = IntegerTools::BeBytesTo64(Input, InOffset + 24);
+	W4 = IntegerTools::BeBytesTo64(Input, InOffset + 32);
+	W5 = IntegerTools::BeBytesTo64(Input, InOffset + 40);
+	W6 = IntegerTools::BeBytesTo64(Input, InOffset + 48);
+	W7 = IntegerTools::BeBytesTo64(Input, InOffset + 56);
+	W8 = IntegerTools::BeBytesTo64(Input, InOffset + 64);
+	W9 = IntegerTools::BeBytesTo64(Input, InOffset + 72);
+	W10 = IntegerTools::BeBytesTo64(Input, InOffset + 80);
+	W11 = IntegerTools::BeBytesTo64(Input, InOffset + 88);
+	W12 = IntegerTools::BeBytesTo64(Input, InOffset + 96);
+	W13 = IntegerTools::BeBytesTo64(Input, InOffset + 104);
+	W14 = IntegerTools::BeBytesTo64(Input, InOffset + 112);
+	W15 = IntegerTools::BeBytesTo64(Input, InOffset + 120);
 
 	R = H + (((E << 50) | (E >> 14)) ^ ((E << 46) | (E >> 18)) ^ ((E << 23) | (E >> 41))) + ((E & F) ^ (~E & G)) + W0 + 0x428A2F98D728AE22ULL;
 	D += R;
@@ -1207,19 +1207,19 @@ void SHA2::PermuteR80P4x1024H(const std::vector<byte> &Input, size_t InOffset, s
 	size_t i;
 	size_t j;
 
-	Utility::MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(ULong256));
+	MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(ULong256));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384));
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384));
 	}
 #else
-	Utility::MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong256));
+	MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong256));
 #endif
 
 	for (i = 16; i < 80; i++)
@@ -1278,23 +1278,23 @@ void SHA2::PermuteR80P8x1024H(const std::vector<byte> &Input, size_t InOffset, s
 	size_t i;
 	size_t j;
 
-	Utility::MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(ULong512));
+	MemoryTools::Copy(State, 0, A, 0, State.size() * sizeof(ULong512));
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 512),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 640),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 768),
-			Utility::IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 896));
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 512),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 640),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 768),
+			IntegerTools::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 896));
 	}
 #else
-	Utility::MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong512));
+	MemoryTools::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong512));
 #endif
 
 	for (i = 16; i < 80; i++)

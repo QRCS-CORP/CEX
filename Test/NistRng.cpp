@@ -112,7 +112,7 @@ namespace Test
 	{
 		std::vector<byte> tmpo(Length);
 		Generate(tmpo, 0, tmpo.size());
-		Move(tmpo, Output, Offset);
+		SecureMove(tmpo, Output, Offset);
 	}
 
 	void NistRng::Generate(std::vector<byte> &Output)
@@ -124,7 +124,7 @@ namespace Test
 	{
 		std::vector<byte> tmpo(Output.size());
 		Generate(tmpo, 0, tmpo.size());
-		Move(tmpo, Output, 0);
+		SecureMove(tmpo, Output, 0);
 	}
 
 	void NistRng::Initialize(const std::vector<byte> &Seed)

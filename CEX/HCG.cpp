@@ -230,7 +230,7 @@ void HCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	std::vector<byte> tmpr(Length);
 	Generate(tmpr, 0, Length);
-	Move(tmpr, Output, OutOffset);
+	SecureMove(tmpr, Output, OutOffset);
 }
 
 void HCG::Initialize(ISymmetricKey &Parameters)
@@ -331,7 +331,7 @@ void HCG::Update(const SecureVector<byte> &Key)
 	}
 #endif
 
-	std::vector<byte> tmpk = Unlock(Key);
+	std::vector<byte> tmpk = SecureUnlock(Key);
 
 	Update(tmpk);
 	MemoryTools::Clear(tmpk, 0, tmpk.size());
