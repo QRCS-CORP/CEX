@@ -2,6 +2,7 @@
 #define CEX_AEADMODES_H
 
 #include "CexDomain.h"
+#include "CipherModes.h"
 
 NAMESPACE_ENUMERATION
 
@@ -17,11 +18,15 @@ enum class AeadModes : byte
 	/// <summary>
 	/// Encrypt and Authenticate AEAD Mode
 	/// </summary>
-	EAX = 5,
+	EAX = static_cast<byte>(CipherModes::EAX),
 	/// <summary>
 	/// Galois Counter AEAD Mode
 	/// </summary>
-	GCM = 6
+	GCM = static_cast<byte>(CipherModes::GCM),
+	/// <summary>
+	/// Counter-mode Hash-based Authentication AEAD mode
+	/// </summary>
+	HBA = static_cast<byte>(CipherModes::HBA)
 };
 
 class AeadModeConvert

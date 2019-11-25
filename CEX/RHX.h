@@ -25,11 +25,12 @@
 // Implementation Details:
 // An implementation based on the Rijndael block cipher, 
 // using HKDF with a selectable Message Digest for expanded key generation.
-// Rijndael HKDF Extended (RHX)
+// Rijndael HKDF Extension (RHX)
 // Written by John G. Underhill, November 11, 2014
 // Updated October 20, 2016
 // Updated April 16, 2017
 // Updated November 30, 2018
+// Updated November 12, 2019
 // Contact: develop@vtdev.com
 
 #ifndef CEX_RHX_H
@@ -80,6 +81,10 @@ NAMESPACE_BLOCK
 /// <item><description>RHX256, (cSHAKE-256 variant) = RHXS25601</description>.</item>
 /// <item><description>RHX512, (cSHAKE-512 variant) = RHXS51202</description>.</item>
 /// </list>
+/// <para>AHX, the Intel AES-NI implementation is considered the primary AES/eAES implementation, with this version used as a fallback. \n
+/// There are two implementations in this version, the constant-time implementation which is the default, and the table-based implementation, 
+/// which is fast but vulnerable to timing related side-channel attacks. \n
+/// The table-based implementation can be enabled by unremming the CEX_RIJNDAEL_TABLES macro, in the user-configurable section of the CexConfig.h file.</para>
 /// <para>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. \n
 /// RHX is capable of processing up to 38 transformation rounds in extended mode; a 256-bit key uses 22 rounds, a 512-bit key 30 rounds, and a 1024-bit key is set to 38 rounds.</para>
 /// 

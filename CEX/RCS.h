@@ -137,6 +137,13 @@ private:
 	static const size_t STATE_THRESHOLD = 838;
 	static const byte UPDATE_PREFIX = 0x80;
 
+	// temporary
+
+	static const std::vector<uint> MT0;
+	static const std::vector<uint> MT1;
+	static const std::vector<uint> MT2;
+	static const std::vector<uint> MT3;
+
 	class RcsState;
 	std::unique_ptr<RcsState> m_rcsState;
 	std::vector<SymmetricKeySize> m_legalKeySizes;

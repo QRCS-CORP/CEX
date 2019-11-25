@@ -214,6 +214,14 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	endif
 #endif
 
+#if defined(CEX_ARCH_IX86)
+#	define CEX_RIJNDAEL_AESNI
+#elif defined(CEX_ARCH_ARM)
+#	define CEX_RIJNDAEL_ARM
+#elif defined(CEX_ARCH_PPC)
+#	define CEX_RIJNDAEL_PWR8
+#endif
+
 #if defined(__GNUG__) || defined(__clang__)
 #	define CEX_MALLOC_FN __attribute__((malloc))
 #elif defined(_MSC_VER)
@@ -504,88 +512,106 @@ typedef unsigned char byte;
 
 #endif
 
-//////////////////////////////////////////////////
-//		*** User Configurable Section ***		//
-// Settings in this section can be modified		//
-//////////////////////////////////////////////////
 
-// set the master XOF function used by the asymmetric ciphers and signature schemes
-// changing this value will toggle the XOF function used by most asymmetric primitives
-// Note: this will change the output of these asymmetric functions (KAT tests will no longer align)
+///////////////////////////////////////////////////
+///		*** User Configurable Section ***		///
+/// Settings in this section can be modified	///
+///////////////////////////////////////////////////
 
-// the default internal buffer size applied to all PRNGs
+
+/// <summary>
+/// 
+/// </summary>
+//#define CEX_RIJNDAEL_TABLES
+
+/// <summary>
+/// The default internal buffer size applied to all PRNGs
+/// </summary>
 #define CEX_PRNG_BUFFER_SIZE 1024
 
-// the standard Keccak SHAKE function
-#define CEX_XOF_KECCAKR24P1600
-// the extended (double the rounds) Keccak SHAKE function
-//#define CEX_XOF_KECCAKR48P1600
-// the HKDF(HMAC(SHA2-256)) key derivation function
-//#define CEX_XOF_SHA2R64P512
-// the HKDF(HMAC(SHA2-512)) key derivation function
-//#define CEX_XOF_SHA2R80P1024
-
-// enable the legal-key-size exception set on all primitives
+/// <summary>
+/// Enable the legal-key-size exception set on all primitives
+/// </summary>
 //#define CEX_ENFORCE_LEGALKEY
 
-// enable FIPS 140.2 entropy provider wellness test
+/// <summary>
+/// Enable FIPS 140.2 entropy provider wellness test
+/// </summary>
 #define CEX_FIPS140_ENABLED
 
 // enabling this value uses the volatile memset to erase array data
 #define CEX_VOLATILE_MEMSET
 
-// toggles CSX512 from 40 to 80 rounds of mixing
+/// <summary>
+/// Toggles CSX512 from 40 to 80 rounds of mixing
+/// </summary>
 #define CEX_CHACHA512_STRONG
 
-// toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3
+/// <summary>
+/// Toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3
+/// </summary>
 //#define CEX_KECCAK_STRONG
 
-// toggles the compact form for all digest permutations, used for performance and small code-cache cases
-// the digests will use the unrolled (timing-neutral) form of the permutation function if this constant is removed
+/// <summary>
+/// Toggles the compact form for all digest permutations, used for performance and small code-cache cases.
+/// The digests will use the unrolled (timing-neutral) form of the permutation function if this constant is removed.
+/// </summary>
 //#define CEX_DIGEST_COMPACT
 
-// toggles the compact form for all stream cipher permutations, used for performance and small code-cache cases
-// the ciphers will use the unrolled (timing-neutral) form of the permutation function if this constant is removed
-// Note, that this may cause cache evictions on CPUs with a small code-cache, timing should be tested on the target CPU before implementing
+/// <summary>
+/// Toggles the compact form for all stream cipher permutations, used for performance and small code-cache cases
+/// the ciphers will use the unrolled (timing-neutral) form of the permutation function if this constant is removed.
+/// Note, that this may cause cache evictions on CPUs with a small code-cache, timing should be tested on the target CPU before implementing
+/// </summary>
 //#define CEX_CIPHER_COMPACT
 
-// enables/disables OS rotation intrinsics
+/// <summary>
+/// Enables/disables OS rotation intrinsics
+/// </summary>
 #if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)
 #	define CEX_FASTROTATE_ENABLED
 #endif
 
-// prefetch base multiplier used by the symmetric cipher modes parallel block calculation
+/// <summary>
+/// Prefetch base multiplier used by the symmetric cipher modes parallel block calculation
+/// </summary>
 #define CEX_PREFETCH_BASE 2048
 
-// pre-loads tables in rhx and thx into L1 for performance and as a timing attack counter measure
+/// <summary>
+/// Pre-loads tables in rhx and thx into L1 for performance and as a timing attack counter measure
+/// </summary>
 #define CEX_PREFETCH_RHX_TABLES
 
-// enabling this value will add cpu jitter to the ACP entropy collector (slightly stronger, but much slower)
+/// <summary>
+/// Enabling this value will add cpu jitter to the ACP entropy collector (slightly stronger, but much slower)
+/// </summary>
 #define CEX_ACP_JITTER
 
-// AVX512 Capabilities Check
-// TODO: future expansion (if you can test it, I'll add it)
-// links: 
-// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
-// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
-// https://colfaxresearch.com/knl-avx512/
-// 
-// #include <immintrin.h>
-// supported is 1: ex. __AVX512CD__ 1
-//F		__AVX512F__					Foundation
-//CD	__AVX512CD__				Conflict Detection Instructions(CDI)
-//ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
-//PF	__AVX512PF__				Prefetch Instructions(PFI)
-//DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
-//BW	__AVX512BW__				Byte and Word Instructions(BW)
-//VL	__AVX512VL__				Vector Length Extensions(VL)
-//IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
-//VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
-//VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
-//FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
-//VPOPCNT	__AVX512VPOPCNTDQ__		?
-
-// Note: AVX512 is currently untested, this flag enables support on a compliant system
+/// <summary>
+/// AVX512 Capabilities Check
+/// TODO: future expansion (if you can test it, I'll add it)
+/// links: 
+/// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
+/// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
+/// https://colfaxresearch.com/knl-avx512/
+/// 
+/// #include <immintrin.h>
+/// supported is 1: ex. __AVX512CD__ 1
+/// F		__AVX512F__					Foundation
+/// CD	__AVX512CD__				Conflict Detection Instructions(CDI)
+/// ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
+/// PF	__AVX512PF__				Prefetch Instructions(PFI)
+/// DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
+/// BW	__AVX512BW__				Byte and Word Instructions(BW)
+/// VL	__AVX512VL__				Vector Length Extensions(VL)
+/// IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
+/// VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
+/// VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
+/// FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
+/// VPOPCNT	__AVX512VPOPCNTDQ__		?
+/// 
+/// Note: AVX512 is currently untested, this flag enables support on a compliant system
+/// </summary>
 //#define CEX_AVX512_SUPPORTED
 
 #if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
@@ -595,7 +621,11 @@ typedef unsigned char byte;
 #	endif
 #endif
 
-// avx minimum verification
+// avx
+
+/// <summary>
+/// AVX minimum version support
+/// </summary>
 #if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 #	define CEX_AVX_SUPPORTED
 #endif

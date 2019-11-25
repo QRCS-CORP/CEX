@@ -79,9 +79,9 @@ KMAC::KMAC(KmacModes KmacModeType)
 					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_RATE_SIZE :
 					Keccak::KECCAK1024_RATE_SIZE)),
 			SymmetricKeySize(
-				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_DIGEST_SIZE :
-					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
-					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
+				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_RATE_SIZE :
+					KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_RATE_SIZE :
 					Keccak::KECCAK1024_DIGEST_SIZE),
 				(KmacModeType == KmacModes::KMAC128 ? Keccak::KECCAK128_RATE_SIZE :
 					KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_RATE_SIZE :

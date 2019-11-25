@@ -7,6 +7,7 @@
 #include "../CEX/CBC.h"
 #include "../CEX/CFB.h"
 #include "../CEX/ECB.h"
+#include "../CEX/HBA.h"
 #include "../CEX/ICM.h"
 #include "../CEX/OFB.h"
 #include "../CEX/EAX.h"
@@ -109,6 +110,11 @@ namespace Test
 			GCMSpeedTest(true, false);
 			OnProgress(std::string("***AES-GCM Parallel Encryption***"));
 			GCMSpeedTest(true, true);
+
+			OnProgress(std::string("***AES-HBA Sequential Encryption***"));
+			HBASpeedTest(true, false);
+			OnProgress(std::string("***AES-HBA Parallel Encryption***"));
+			HBASpeedTest(true, true);
 
 			OnProgress(std::string("### STREAM CIPHER TESTS ###"));
 			OnProgress(std::string("### Tests speeds of Salsa and ChaCha stream ciphers"));
@@ -324,6 +330,26 @@ namespace Test
 		}
 	}
 
+	void CipherSpeedTest::HBASpeedTest(bool Encrypt, bool Parallel)
+	{
+		if (HAS_AESNI)
+		{
+			AHX* eng = new AHX();
+			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA256);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+		else
+		{
+			RHX* eng = new RHX();
+			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA256);
+			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+			delete cpr;
+			delete eng;
+		}
+	}
+
 	//*** Stream Cipher Tests ***//
 
 	void CipherSpeedTest::CSX256SpeedTest()
@@ -409,7 +435,6 @@ namespace Test
 	{
 		m_progressEvent(Data);
 	}
-
 
 	// Note: internal test, ignore
 	void CipherSpeedTest::CounterSpeedTest()

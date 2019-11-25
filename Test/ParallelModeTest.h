@@ -2,6 +2,7 @@
 #define CEXTEST_PARALLELMODETEST_H
 
 #include "ITest.h"
+#include "../CEX/IAeadMode.h"
 #include "../CEX/ICipherMode.h"
 
 namespace Test
@@ -55,6 +56,14 @@ namespace Test
 		/// Start the tests
 		/// </summary>
 		std::string Run() override;
+
+		/// <summary>
+		/// Compares synchronous to parallel processed random-sized, pseudo-random array transformations and their inverse in a looping [TEST_CYCLES] stress-test
+		/// </summary>
+		/// 
+		/// <param name="Cipher">The cipher instance pointer</param>
+		/// <param name="Encryption">Test encryption or decryption output</param>
+		void Stress(IAeadMode* Cipher, bool Encryption);
 
 		/// <summary>
 		/// Compares synchronous to parallel processed random-sized, pseudo-random array transformations and their inverse in a looping [TEST_CYCLES] stress-test

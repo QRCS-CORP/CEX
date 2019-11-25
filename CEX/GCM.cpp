@@ -5,7 +5,7 @@
 NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
-using Enumeration::CipherModeConvert;
+using Enumeration::AeadModeConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 
@@ -72,7 +72,7 @@ GCM::GCM(BlockCiphers CipherType)
 	:
 	m_gcmState(new GcmState(true)),
 	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
-		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::GCM), std::string("Constructor"), std::string("The block cipher type can nor be None!"), ErrorCodes::InvalidParam)),
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::GCM), std::string("Constructor"), std::string("The block cipher type can nor be None!"), ErrorCodes::InvalidParam)),
 	m_gcmHash(new Digest::GHASH()),
 	m_legalKeySizes((CipherType == BlockCiphers::AES || CipherType == BlockCiphers::Serpent) ?
 		std::vector<SymmetricKeySize> { 
@@ -92,7 +92,7 @@ GCM::GCM(IBlockCipher* Cipher)
 	:
 	m_gcmState(new GcmState(false)),
 	m_cipherMode(Cipher != nullptr ? new CTR(Cipher) :
-		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::GCM), std::string("Constructor"), std::string("The block cipher can nor be null!"), ErrorCodes::IllegalOperation)),
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::GCM), std::string("Constructor"), std::string("The block cipher can nor be null!"), ErrorCodes::IllegalOperation)),
 	m_gcmHash(new Digest::GHASH()),
 	m_legalKeySizes((Cipher == nullptr || Cipher->Enumeral() == BlockCiphers::AES || Cipher->Enumeral() == BlockCiphers::Serpent) ?
 		std::vector<SymmetricKeySize> { 
@@ -139,24 +139,9 @@ bool &GCM::AutoIncrement()
 	return m_gcmState->AutoIncrement;
 }
 
-const size_t GCM::BlockSize()
+const AeadModes GCM::Enumeral()
 {
-	return BLOCK_SIZE;
-}
-
-const BlockCiphers GCM::CipherType()
-{
-	return m_cipherMode->Engine()->Enumeral();
-}
-
-IBlockCipher* GCM::Engine()
-{
-	return m_cipherMode->Engine();
-}
-
-const CipherModes GCM::Enumeral()
-{
-	return CipherModes::GCM;
+	return AeadModes::GCM;
 }
 
 const bool GCM::IsEncryption()
@@ -193,7 +178,7 @@ const std::string GCM::Name()
 {
 	std::string tmpn;
 
-	tmpn = CipherModeConvert::ToName(Enumeral()) + std::string("-") + BlockCipherConvert::ToName(CipherType());
+	tmpn = AeadModeConvert::ToName(Enumeral()) + std::string("-") + BlockCipherConvert::ToName(m_cipherMode->CipherType());
 
 	return tmpn;
 }
@@ -218,43 +203,12 @@ const std::vector<byte> GCM::Tag()
 	return m_gcmState->Tag;
 }
 
+const void GCM::Tag(SecureVector<byte> &Output)
+{
+	SecureInsert(m_gcmState->Tag, 0, Output, 0, m_gcmState->Tag.size());
+}
+
 //~~~Public Functions~~~//
-
-void GCM::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(!IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size(), Output.size()) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Decrypt128(Input, 0, Output, 0);
-}
-
-void GCM::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(!IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Decrypt128(Input, InOffset, Output, OutOffset);
-}
-
-void GCM::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size(), Output.size()) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Encrypt128(Input, 0, Output, 0);
-}
-
-void GCM::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Encrypt128(Input, InOffset, Output, OutOffset);
-}
 
 void GCM::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
@@ -400,6 +354,22 @@ void GCM::ParallelMaxDegree(size_t Degree)
 }
 
 void GCM::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
+{
+	if (!IsInitialized())
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+	if (m_gcmState->AAD.size() != 0)
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The associated data has already been set!"), ErrorCodes::IllegalOperation);
+	}
+
+	m_gcmState->AAD.resize(Length);
+	MemoryTools::Copy(Input, Offset, m_gcmState->AAD, 0, Length);
+	m_gcmHash->Multiply(m_gcmState->AAD, m_gcmState->Tag, Length);
+}
+
+void GCM::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (!IsInitialized())
 	{

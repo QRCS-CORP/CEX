@@ -9,7 +9,7 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.8 (A8).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.8c (A8).
 \brief
 CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
@@ -19,15 +19,15 @@ The current version is <B>v1.0.0.8a</B> (A8 version), which are the major, minor
 \brief
 
 \author    John G. Underhill
-\version   v1.0.0.8b
-\date      November 7, 2019
+\version   v1.0.0.8c
+\date      November 12, 2019
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.8b (A8 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.8c (A8 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.8b (version A8):</B> \n
+<B>Current Release v1.0.0.8c (version A8):</B> \n
 
 The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
 The Rainbow asymmetric signature scheme \n

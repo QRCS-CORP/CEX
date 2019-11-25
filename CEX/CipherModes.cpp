@@ -29,6 +29,9 @@ std::string CipherModeConvert::ToName(CipherModes Enumeral)
 	case CipherModes::GCM:
 		name = std::string("GCM");
 		break;
+	case CipherModes::HBA:
+		name = std::string("HBA");
+		break;
 	case CipherModes::ICM:
 		name = std::string("ICM");
 		break;
@@ -55,7 +58,7 @@ CipherModes CipherModeConvert::FromName(std::string &Name)
 	{
 		tname = CipherModes::CBC;
 	}
-	if (Name == std::string("CFB"))
+	else if (Name == std::string("CFB"))
 	{
 		tname = CipherModes::CFB;
 	}
@@ -63,7 +66,7 @@ CipherModes CipherModeConvert::FromName(std::string &Name)
 	{
 		tname = CipherModes::CTR;
 	}
-	if (Name == std::string("EAX"))
+	else if (Name == std::string("EAX"))
 	{
 		tname = CipherModes::EAX;
 	}
@@ -71,11 +74,15 @@ CipherModes CipherModeConvert::FromName(std::string &Name)
 	{
 		tname = CipherModes::ECB;
 	}
-	if (Name == std::string("GCM"))
+	else if (Name == std::string("GCM"))
 	{
 		tname = CipherModes::GCM;
 	}
-	if (Name == std::string("ICM"))
+	else if (Name == std::string("HBA"))
+	{
+		tname = CipherModes::HBA;
+	}
+	else if (Name == std::string("ICM"))
 	{
 		tname = CipherModes::ICM;
 	}

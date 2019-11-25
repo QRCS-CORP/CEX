@@ -5,7 +5,7 @@
 NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
-using Enumeration::CipherModeConvert;
+using Enumeration::AeadModeConvert;
 using Utility::IntegerTools;
 using Utility::MemoryTools;
 
@@ -17,7 +17,7 @@ public:
 	std::vector<byte> Buffer;
 	SecureVector<byte> Key;
 	SecureVector<byte> Nonce;
-	std::vector<byte> Tag;
+	SecureVector<byte> Tag;
 	bool AutoIncrement;
 	bool Destroyed;
 	bool Encryption;
@@ -65,7 +65,7 @@ EAX::EAX(BlockCiphers CipherType)
 	:
 	m_eaxState(new EaxState(true)),
 	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
-		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::EAX), std::string("Constructor"), std::string("The block cipher enumeration type can nor be none!"), ErrorCodes::InvalidParam)),
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::EAX), std::string("Constructor"), std::string("The block cipher enumeration type can nor be none!"), ErrorCodes::InvalidParam)),
 	m_macGenerator(new Mac::CMAC(m_cipherMode->Engine())),
 	m_parallelProfile(BLOCK_SIZE, m_cipherMode->ParallelProfile().IsParallel(), m_cipherMode->ParallelProfile().ParallelBlockSize(),
 		m_cipherMode->ParallelProfile().ParallelMaxDegree(), true, m_cipherMode->Engine()->StateCacheSize(), true)
@@ -76,7 +76,7 @@ EAX::EAX(IBlockCipher* Cipher)
 	:
 	m_eaxState(new EaxState(false)),
 	m_cipherMode(Cipher != nullptr ? new CTR(Cipher) :
-		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::EAX), std::string("Constructor"), std::string("The block cipher instance can nor be null!"), ErrorCodes::IllegalOperation)),
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::EAX), std::string("Constructor"), std::string("The block cipher instance can nor be null!"), ErrorCodes::IllegalOperation)),
 	m_macGenerator(new Mac::CMAC(Cipher)),
 	m_parallelProfile(BLOCK_SIZE, m_cipherMode->ParallelProfile().IsParallel(), m_cipherMode->ParallelProfile().ParallelBlockSize(),
 		m_cipherMode->ParallelProfile().ParallelMaxDegree(), true, m_cipherMode->Engine()->StateCacheSize(), true)
@@ -108,29 +108,14 @@ EAX::~EAX()
 
 //~~~Accessors~~~//
 
-bool &EAX::AutoIncrement() 
+bool &EAX::AutoIncrement()
 {
-	return m_eaxState->AutoIncrement; 
+	return m_eaxState->AutoIncrement;
 }
 
-const size_t EAX::BlockSize()
-{ 
-	return BLOCK_SIZE; 
-}
-
-const BlockCiphers EAX::CipherType() 
-{ 
-	return m_cipherMode->Engine()->Enumeral();
-}
-
-IBlockCipher* EAX::Engine() 
-{ 
-	return m_cipherMode->Engine();
-}
-
-const CipherModes EAX::Enumeral()
+const AeadModes EAX::Enumeral()
 {
-	return CipherModes::EAX; 
+	return AeadModes::EAX; 
 }
 
 const bool EAX::IsEncryption()
@@ -167,7 +152,7 @@ const std::string EAX::Name()
 { 
 	std::string tmpn;
 
-	tmpn = CipherModeConvert::ToName(Enumeral()) + std::string("-") + BlockCipherConvert::ToName(CipherType());
+	tmpn = AeadModeConvert::ToName(Enumeral()) + std::string("-") + BlockCipherConvert::ToName(m_cipherMode->CipherType());
 
 	return tmpn;
 }
@@ -189,46 +174,15 @@ bool &EAX::PreserveAD()
 
 const std::vector<byte> EAX::Tag()
 {
-	return m_eaxState->Tag;
+	return SecureUnlock(m_eaxState->Tag);
+}
+
+const void EAX::Tag(SecureVector<byte> &Output)
+{
+	SecureCopy(m_eaxState->Tag, 0, Output, 0, m_eaxState->Tag.size());
 }
 
 //~~~Public Functions~~~//
-
-void EAX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(!IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size(), Output.size()) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Decrypt128(Input, 0, Output, 0);
-}
-
-void EAX::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(!IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Decrypt128(Input, InOffset, Output, OutOffset);
-}
-
-void EAX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size(), Output.size()) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Encrypt128(Input, 0, Output, 0);
-}
-
-void EAX::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(IsEncryption(), "The cipher mode has been initialized for encryption!");
-	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	Encrypt128(Input, InOffset, Output, OutOffset);
-}
 
 void EAX::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
@@ -337,6 +291,28 @@ void EAX::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 	// update the tag and finalize to new AAD
 	UpdateTag(0x01);
 	m_macGenerator->Update(Input, Offset, Length);
+	m_macGenerator->Finalize(m_eaxState->AAD, 0);
+	// increment update counter
+	m_macGenerator->Clear();
+	UpdateTag(0x02);
+}
+
+void EAX::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length)
+{
+	if (!IsInitialized())
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+	if (m_eaxState->AAD.size() != 0)
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The associated data has already been set!"), ErrorCodes::IllegalOperation);
+	}
+
+	// size the AAD string
+	m_eaxState->AAD.resize(m_macGenerator->TagSize());
+	// update the tag and finalize to new AAD
+	UpdateTag(0x01);
+	m_macGenerator->Update(SecureUnlock(Input), Offset, Length);
 	m_macGenerator->Finalize(m_eaxState->AAD, 0);
 	// increment update counter
 	m_macGenerator->Clear();

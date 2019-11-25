@@ -43,9 +43,13 @@ enum class CipherModes : byte
 	/// </summary>
 	GCM = 7,
 	/// <summary>
+	/// Block cipher counter-mode with Hash-based Authentication, AEAD mode
+	/// </summary>
+	HBA = 8,
+	/// <summary>
 	/// Little Endian Integer Counter Mode
 	/// </summary>
-	ICM = 8,
+	ICM = 9,
 	/// <summary>
 	/// Output FeedBack Mode
 	/// </summary>

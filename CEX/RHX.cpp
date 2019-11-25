@@ -205,11 +205,6 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vec
 
 void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	size_t bwords;
-	size_t i;
-	size_t j;
-	size_t k;
-
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, Parameters.KeySizes().KeySize()))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
@@ -244,6 +239,13 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		// standard rijndael key expansion
 		StandardExpand(Parameters.SecureKey(), m_rhxState);
 	}
+
+#if defined(CEX_RIJNDAEL_TABLES)
+
+	size_t bwords;
+	size_t i;
+	size_t j;
+	size_t k;
 
 	// inverse cipher
 	if (!m_rhxState->Encryption)
@@ -280,6 +282,8 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 				IT3[SBox[static_cast<byte>(m_rhxState->RoundKeys[i])]];
 		}
 	}
+
+#endif
 
 	// ready to transform data
 	m_rhxState->Initialized = true;
@@ -389,6 +393,11 @@ void RHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState
 	State->Rounds = KWORDS + 6;
 	// setup expanded key
 	State->RoundKeys.resize(BWORDS * (State->Rounds + 1), 0x0UL);
+
+	// pre-load the s-box into L1 cache
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchSbox();
+#endif
 
 	if (KWORDS == 8)
 	{
@@ -506,6 +515,8 @@ void RHX::ExpandSubBlock(SecureVector<uint> &RoundKeys, size_t KeyIndex, size_t 
 
 //~~~Rounds Processing~~~//
 
+#if defined(CEX_RIJNDAEL_TABLES)
+
 void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t RNDCNT = m_rhxState->RoundKeys.size() - 4;
@@ -529,6 +540,12 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rhxState->RoundKeys[1];
 	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rhxState->RoundKeys[2];
 	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rhxState->RoundKeys[3];
+
+	std::vector<byte> tmps(16);
+	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[0], tmps, 0); // 122,213..159
+	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[1], tmps, 4); // 19,17..197
+	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[2], tmps, 8);
+	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[3], tmps, 12);
 
 	// pre-load the inverse multiplication tables
 #if defined(CEX_PREFETCH_RHX_TABLES)
@@ -585,6 +602,39 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	Output[OutOffset + 15] = static_cast<byte>(ISBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
 }
 
+#else
+
+void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	SecureVector<byte> state(BLOCK_SIZE, 0x00);
+	size_t i;
+
+	MemoryTools::Copy(Input, InOffset, state, 0, BLOCK_SIZE);
+
+	AddRoundKey(state, m_rhxState->RoundKeys, m_rhxState->Rounds << 2);
+
+	// pre-load the s-box into L1 cache
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchISbox();
+#endif
+
+	for (i = m_rhxState->Rounds - 1; i > 0; --i)
+	{
+		InvShiftRows(state);
+		InvSubBytes(state);
+		AddRoundKey(state, m_rhxState->RoundKeys, (i << 2));
+		InvMixColumns(state);
+	}
+
+	InvShiftRows(state);
+	InvSubBytes(state);
+	AddRoundKey(state, m_rhxState->RoundKeys, 0);
+
+	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
+}
+
+#endif
+
 void RHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
@@ -604,6 +654,8 @@ void RHX::Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vect
 	Decrypt1024(Input, InOffset, Output, OutOffset);
 	Decrypt1024(Input, InOffset + 128, Output, OutOffset + 128);
 }
+
+#if defined(CEX_RIJNDAEL_TABLES)
 
 void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
@@ -634,7 +686,19 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	PrefetchTables();
 #endif
 
+	// row 0 = 0,4,8,12
+	// row 1 = 1,5,9,13
+	// row 2 = 2,6,10,14
+	// row 3 = 3,7,11,15
+	// shifted to:
+	// row 0 = 0,4,8,12
+	// row 1 = 5,9,13,1
+	// row 2 = 10,14,2,6
+	// row 3 = 15,3,7,11
+
 	// round 1
+	// byte= 0,5,10,15
+	// byte= 4,6,11,3
 	Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[4];
 	Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[5];
 	Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[6];
@@ -688,6 +752,39 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	Output[OutOffset + 14] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
 	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
 }
+
+#else
+
+void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	SecureVector<byte> state(BLOCK_SIZE, 0x00);
+	size_t i;
+
+	MemoryTools::Copy(Input, InOffset, state, 0, BLOCK_SIZE);
+
+	AddRoundKey(state, m_rhxState->RoundKeys, 0);
+
+	// pre-load the s-box into L1 cache
+#if defined(CEX_PREFETCH_RHX_TABLES)
+	PrefetchSbox();
+#endif
+
+	for (i = 1; i < m_rhxState->Rounds; ++i)
+	{
+		SubBytes(state);
+		ShiftRows(state);
+		MixColumns(state);
+		AddRoundKey(state, m_rhxState->RoundKeys, (i << 2));
+	}
+
+	SubBytes(state);
+	ShiftRows(state);
+	AddRoundKey(state, m_rhxState->RoundKeys, (m_rhxState->Rounds << 2));
+
+	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
+}
+
+#endif
 
 void RHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
@@ -784,6 +881,32 @@ void RHX::PrefetchISbox()
 CEX_OPTIMIZE_RESUME
 
 CEX_OPTIMIZE_IGNORE
+void RHX::PrefetchSbox()
+{
+	// timing defence: pre-load sbox into l1 cache
+	MemoryTools::PrefetchL1(SBox, 0, SBox.size());
+}
+CEX_OPTIMIZE_RESUME
+
+uint RHX::SubByte(uint Rot)
+{
+	uint val;
+	uint res;
+
+	val = 0xFF & Rot;
+	res = SBox[val];
+	val = 0xFF & (Rot >> 8);
+	res |= (static_cast<uint>(SBox[val]) << 8);
+	val = 0xFF & (Rot >> 16);
+	res |= (static_cast<uint>(SBox[val]) << 16);
+	val = 0xFF & (Rot >> 24);
+
+	return res | (static_cast<uint>(SBox[val]) << 24);
+}
+
+#if defined(CEX_RIJNDAEL_TABLES)
+
+CEX_OPTIMIZE_IGNORE
 void RHX::PrefetchITables()
 {
 	// timing defence: pre-load inverse multiplication tables into l1 cache
@@ -803,14 +926,6 @@ void RHX::PrefetchRoundKey(const SecureVector<uint> &Rkey)
 CEX_OPTIMIZE_RESUME
 
 CEX_OPTIMIZE_IGNORE
-void RHX::PrefetchSbox()
-{
-	// timing defence: pre-load sbox into l1 cache
-	MemoryTools::PrefetchL1(SBox, 0, SBox.size());
-}
-CEX_OPTIMIZE_RESUME
-
-CEX_OPTIMIZE_IGNORE
 void RHX::PrefetchTables()
 {
 	// timing defence: pre-load multiplication tables into l1 cache
@@ -822,20 +937,6 @@ void RHX::PrefetchTables()
 }
 CEX_OPTIMIZE_RESUME
 
-uint RHX::SubByte(uint Rot)
-{
-	uint val;
-	uint res;
-
-	val = 0xFF & Rot;
-	res = SBox[val];
-	val = 0xFF & (Rot >> 8);
-	res |= (static_cast<uint>(SBox[val]) << 8);
-	val = 0xFF & (Rot >> 16);
-	res |= (static_cast<uint>(SBox[val]) << 16);
-	val = 0xFF & (Rot >> 24);
-
-	return res | (static_cast<uint>(SBox[val]) << 24);
-}
+#endif
 
 NAMESPACE_BLOCKEND

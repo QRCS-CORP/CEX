@@ -205,6 +205,7 @@
     <ClInclude Include="..\..\CEX\DLTMK4Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK5Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h" />
+    <ClInclude Include="..\..\CEX\HBA.h" />
     <ClInclude Include="..\..\CEX\Network.h" />
     <ClInclude Include="..\..\CEX\SPXPFORS.h" />
     <ClInclude Include="..\..\CEX\MCS.h" />
@@ -446,6 +447,7 @@
     <ClCompile Include="..\..\CEX\DLTMK4Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK5Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp" />
+    <ClCompile Include="..\..\CEX\HBA.cpp" />
     <ClCompile Include="..\..\CEX\Network.cpp" />
     <ClCompile Include="..\..\CEX\RNBWGfMath.cpp" />
     <ClCompile Include="..\..\CEX\SPXPFORS.cpp" />

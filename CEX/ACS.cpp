@@ -537,6 +537,11 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Authenticator)
 {
+	// 1.1c: the total number of bytes processed terminates the mac input stream
+	//std::vector<byte> mctr(sizeof(ulong));
+	//IntegerTools::LeIncrease8(mctr, State->Counter + State->Nonce.size());
+	//Authenticator->Update(mctr, 0, mctr.size());
+
 	// generate the mac code
 	Authenticator->Finalize(State->MacTag, 0);
 

@@ -28,12 +28,12 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	Serpent = 2,
 	/// <summary>
-	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA256) secure key schedule.
+	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(HMAC-SHA2-256) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RHXH256 = 39,
 	/// <summary>
-	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA512) secure key schedule.
+	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(HMAC-SHA2-512) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RHXH512 = 40,
@@ -53,12 +53,12 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	RHXS1024 = 43,
 	/// <summary>
-	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA256) secure key schedule.
+	/// An implementation of the Serpent Block Cipher extended with an HKDF(HMAC-SHA2-256) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	SHXH256 = 45,
 	/// <summary>
-	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA512) secure key schedule.
+	/// An implementation of the Serpent Block Cipher extended with an HKDF(HMAC-SHA2-512) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	SHXH512 = 46,
@@ -218,27 +218,27 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	RCSH256 = 161,
 	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using RHX-KMAC-512 for authentication.
+	/// The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-512 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RCSH512 = 162,
 	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-256 for authentication.
+	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-256 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RCSK256 = 163,
 	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-512 for authentication.
+	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-512 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RCSK512 = 164,
 	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication.
+	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-1024 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RCSK1024 = 165,
 	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication.
+	/// The authenticated Rijndael-256 Stream Cipher; using Poly1305 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RCSP256 = 166,

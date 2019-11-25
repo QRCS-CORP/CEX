@@ -1056,6 +1056,9 @@
     <ClInclude Include="..\..\CEX\Network.h">
       <Filter>Header Files\Network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\HBA.h">
+      <Filter>Header Files\Cipher\Block\AEAD</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1639,6 +1642,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Network.cpp">
       <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\HBA.cpp">
+      <Filter>Source Files\Cipher\Block\AEAD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

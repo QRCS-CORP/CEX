@@ -75,19 +75,22 @@ namespace Test
 				Kat(cpr1, m_keys[9], m_plainText[9], m_cipherText[9]);
 				Kat(cpr1, m_keys[10], m_plainText[10], m_cipherText[10]);
 				Kat(cpr1, m_keys[11], m_plainText[11], m_cipherText[11]);
+				Kat(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
+				Kat(cpr1, m_keys[13], m_plainText[12], m_cipherText[13]);
+				Kat(cpr1, m_keys[14], m_plainText[12], m_cipherText[14]);
 				delete cpr1;
 
 				AHX* cpr2 = new AHX(BlockCipherExtensions::HKDF256);
-				Kat(cpr2, m_keys[24], m_plainText[0], m_cipherText[24]);
+				Kat(cpr2, m_keys[27], m_plainText[0], m_cipherText[27]);
 				delete cpr2;
 				AHX* cpr3 = new AHX(BlockCipherExtensions::HKDF512);
-				Kat(cpr3, m_keys[25], m_plainText[0], m_cipherText[25]);
+				Kat(cpr3, m_keys[28], m_plainText[0], m_cipherText[28]);
 				delete cpr3;
 				AHX* cpr4 = new AHX(BlockCipherExtensions::SHAKE256);
-				Kat(cpr4, m_keys[24], m_plainText[0], m_cipherText[26]);
+				Kat(cpr4, m_keys[27], m_plainText[0], m_cipherText[29]);
 				delete cpr4;
 				AHX* cpr5 = new AHX(BlockCipherExtensions::SHAKE512);
-				Kat(cpr5, m_keys[25], m_plainText[0], m_cipherText[27]);
+				Kat(cpr5, m_keys[28], m_plainText[0], m_cipherText[30]);
 				delete cpr5;
 			}
 			else
@@ -105,19 +108,22 @@ namespace Test
 				Kat(cpr1, m_keys[9], m_plainText[9], m_cipherText[9]);
 				Kat(cpr1, m_keys[10], m_plainText[10], m_cipherText[10]);
 				Kat(cpr1, m_keys[11], m_plainText[11], m_cipherText[11]);
-				delete cpr1;
+				Kat(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
+				Kat(cpr1, m_keys[13], m_plainText[12], m_cipherText[13]);
+				Kat(cpr1, m_keys[14], m_plainText[12], m_cipherText[14]);
+				delete cpr1;/**/
 
 				RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
-				Kat(cpr2, m_keys[24], m_plainText[0], m_cipherText[24]);
+				Kat(cpr2, m_keys[27], m_plainText[0], m_cipherText[27]);
 				delete cpr2;
 				RHX* cpr3 = new RHX(BlockCipherExtensions::HKDF512);
-				Kat(cpr3, m_keys[25], m_plainText[0], m_cipherText[25]);
+				Kat(cpr3, m_keys[28], m_plainText[0], m_cipherText[28]);
 				delete cpr3;
 				RHX* cpr4 = new RHX(BlockCipherExtensions::SHAKE256);
-				Kat(cpr4, m_keys[24], m_plainText[0], m_cipherText[26]);
+				Kat(cpr4, m_keys[27], m_plainText[0], m_cipherText[29]);
 				delete cpr4;
 				RHX* cpr5 = new RHX(BlockCipherExtensions::SHAKE512);
-				Kat(cpr5, m_keys[25], m_plainText[0], m_cipherText[27]);
+				Kat(cpr5, m_keys[28], m_plainText[0], m_cipherText[30]);
 				delete cpr5;
 			}
 
@@ -126,61 +132,61 @@ namespace Test
 			if (m_aesniTest)
 			{
 				AHX* cpr1 = new AHX();
-				MonteCarlo(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
-				MonteCarlo(cpr1, m_keys[13], m_plainText[13], m_cipherText[13]);
-				MonteCarlo(cpr1, m_keys[14], m_plainText[14], m_cipherText[14]);
-				MonteCarlo(cpr1, m_keys[15], m_plainText[15], m_cipherText[15]);
-				MonteCarlo(cpr1, m_keys[16], m_plainText[16], m_cipherText[16]);
-				MonteCarlo(cpr1, m_keys[17], m_plainText[17], m_cipherText[17]);
-				MonteCarlo(cpr1, m_keys[18], m_plainText[18], m_cipherText[18]);
-				MonteCarlo(cpr1, m_keys[19], m_plainText[19], m_cipherText[19]);
-				MonteCarlo(cpr1, m_keys[20], m_plainText[20], m_cipherText[20]);
-				MonteCarlo(cpr1, m_keys[21], m_plainText[21], m_cipherText[21]);
-				MonteCarlo(cpr1, m_keys[22], m_plainText[22], m_cipherText[22]);
-				MonteCarlo(cpr1, m_keys[23], m_plainText[23], m_cipherText[23]);
+				MonteCarlo(cpr1, m_keys[15], m_plainText[13], m_cipherText[15]);
+				MonteCarlo(cpr1, m_keys[16], m_plainText[14], m_cipherText[16]);
+				MonteCarlo(cpr1, m_keys[17], m_plainText[15], m_cipherText[17]);
+				MonteCarlo(cpr1, m_keys[18], m_plainText[16], m_cipherText[18]);
+				MonteCarlo(cpr1, m_keys[19], m_plainText[17], m_cipherText[19]);
+				MonteCarlo(cpr1, m_keys[20], m_plainText[18], m_cipherText[20]);
+				MonteCarlo(cpr1, m_keys[21], m_plainText[19], m_cipherText[21]);
+				MonteCarlo(cpr1, m_keys[22], m_plainText[20], m_cipherText[22]);
+				MonteCarlo(cpr1, m_keys[23], m_plainText[21], m_cipherText[23]);
+				MonteCarlo(cpr1, m_keys[24], m_plainText[22], m_cipherText[24]);
+				MonteCarlo(cpr1, m_keys[25], m_plainText[23], m_cipherText[25]);
+				MonteCarlo(cpr1, m_keys[26], m_plainText[24], m_cipherText[26]);
 				delete cpr1;
 
 				AHX* cpr2 = new AHX(BlockCipherExtensions::HKDF256);
-				MonteCarlo(cpr2, m_keys[24], m_plainText[0], m_cipherText[28]);
+				MonteCarlo(cpr2, m_keys[27], m_plainText[0], m_cipherText[31]);
 				delete cpr2;
 				AHX* cpr3 = new AHX(BlockCipherExtensions::HKDF512);
-				MonteCarlo(cpr3, m_keys[25], m_plainText[0], m_cipherText[29]);
+				MonteCarlo(cpr3, m_keys[28], m_plainText[0], m_cipherText[32]);
 				delete cpr3;
 				AHX* cpr4 = new AHX(BlockCipherExtensions::SHAKE256);
-				MonteCarlo(cpr4, m_keys[24], m_plainText[0], m_cipherText[30]);
+				MonteCarlo(cpr4, m_keys[27], m_plainText[0], m_cipherText[33]);
 				delete cpr4;
 				AHX* cpr5 = new AHX(BlockCipherExtensions::SHAKE512);
-				MonteCarlo(cpr5, m_keys[25], m_plainText[0], m_cipherText[31]);
+				MonteCarlo(cpr5, m_keys[28], m_plainText[0], m_cipherText[34]);
 				delete cpr5;
 			}
 			else
 			{
 				RHX* cpr1 = new RHX();
-				MonteCarlo(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
-				MonteCarlo(cpr1, m_keys[13], m_plainText[13], m_cipherText[13]);
-				MonteCarlo(cpr1, m_keys[14], m_plainText[14], m_cipherText[14]);
-				MonteCarlo(cpr1, m_keys[15], m_plainText[15], m_cipherText[15]);
-				MonteCarlo(cpr1, m_keys[16], m_plainText[16], m_cipherText[16]);
-				MonteCarlo(cpr1, m_keys[17], m_plainText[17], m_cipherText[17]);
-				MonteCarlo(cpr1, m_keys[18], m_plainText[18], m_cipherText[18]);
-				MonteCarlo(cpr1, m_keys[19], m_plainText[19], m_cipherText[19]);
-				MonteCarlo(cpr1, m_keys[20], m_plainText[20], m_cipherText[20]);
-				MonteCarlo(cpr1, m_keys[21], m_plainText[21], m_cipherText[21]);
-				MonteCarlo(cpr1, m_keys[22], m_plainText[22], m_cipherText[22]);
-				MonteCarlo(cpr1, m_keys[23], m_plainText[23], m_cipherText[23]);
+				MonteCarlo(cpr1, m_keys[15], m_plainText[13], m_cipherText[15]);
+				MonteCarlo(cpr1, m_keys[16], m_plainText[14], m_cipherText[16]);
+				MonteCarlo(cpr1, m_keys[17], m_plainText[15], m_cipherText[17]);
+				MonteCarlo(cpr1, m_keys[18], m_plainText[16], m_cipherText[18]);
+				MonteCarlo(cpr1, m_keys[19], m_plainText[17], m_cipherText[19]);
+				MonteCarlo(cpr1, m_keys[20], m_plainText[18], m_cipherText[20]);
+				MonteCarlo(cpr1, m_keys[21], m_plainText[19], m_cipherText[21]);
+				MonteCarlo(cpr1, m_keys[22], m_plainText[20], m_cipherText[22]);
+				MonteCarlo(cpr1, m_keys[23], m_plainText[21], m_cipherText[23]);
+				MonteCarlo(cpr1, m_keys[24], m_plainText[22], m_cipherText[24]);
+				MonteCarlo(cpr1, m_keys[25], m_plainText[23], m_cipherText[25]);
+				MonteCarlo(cpr1, m_keys[26], m_plainText[24], m_cipherText[26]);
 				delete cpr1;
 
 				RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
-				MonteCarlo(cpr2, m_keys[24], m_plainText[0], m_cipherText[28]);
+				MonteCarlo(cpr2, m_keys[27], m_plainText[0], m_cipherText[31]);
 				delete cpr2;
 				RHX* cpr3 = new RHX(BlockCipherExtensions::HKDF512);
-				MonteCarlo(cpr3, m_keys[25], m_plainText[0], m_cipherText[29]);
+				MonteCarlo(cpr3, m_keys[28], m_plainText[0], m_cipherText[32]);
 				delete cpr3;
 				RHX* cpr4 = new RHX(BlockCipherExtensions::SHAKE256);
-				MonteCarlo(cpr4, m_keys[24], m_plainText[0], m_cipherText[30]);
+				MonteCarlo(cpr4, m_keys[27], m_plainText[0], m_cipherText[33]);
 				delete cpr4;
 				RHX* cpr5 = new RHX(BlockCipherExtensions::SHAKE512);
-				MonteCarlo(cpr5, m_keys[25], m_plainText[0], m_cipherText[31]);
+				MonteCarlo(cpr5, m_keys[28], m_plainText[0], m_cipherText[34]);
 				delete cpr5;
 			}
 
@@ -255,7 +261,7 @@ namespace Test
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, enc, 0);
 
-		if (enc != Expected)
+		if (enc != Expected) // e=121,62..204, n=221,169..145
 		{
 			throw TestException(std::string("Kat"), Cipher->Name(), std::string("Encrypted arrays are not equal!"));
 		}
@@ -426,6 +432,7 @@ namespace Test
 
 	void RijndaelTest::Initialize()
 	{
+		byte x = 0x3E;
 		/*lint -save -e122 */
 		/*lint -save -e417 */
 		const std::vector<std::string> keys =
@@ -443,6 +450,10 @@ namespace Test
 			std::string("00000000000000000000000000000080"),
 			std::string("000000000000000000000000000000000000000000000000"),
 			std::string("0000000000000000000000000000000000000000000000000000000000000000"),
+			// fips 197
+			std::string("000102030405060708090A0B0C0D0E0F"),
+			std::string("000102030405060708090a0b0c0d0e0f1011121314151617"),
+			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
 			// gladman
 			std::string("00000000000000000000000000000000"),
 			std::string("5F060D3716B345C253F6749ABAC10917"),
@@ -460,7 +471,7 @@ namespace Test
 			std::string("28E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A386"),
 			std::string("28E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A38628E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A386")
 		};
-		HexConverter::Decode(keys, 26, m_keys);
+		HexConverter::Decode(keys, 29, m_keys);
 
 		const std::vector<std::string> plainText =
 		{
@@ -477,6 +488,8 @@ namespace Test
 			std::string("00000000000000000000000000000000"),
 			std::string("80000000000000000000000000000000"),
 			std::string("80000000000000000000000000000000"),
+			// fips 197
+			std::string("00112233445566778899AABBCCDDEEFF"),
 			// gladman
 			std::string("00000000000000000000000000000000"),
 			std::string("355F697E8B868B65B25A04E18D782AFA"),
@@ -492,7 +505,7 @@ namespace Test
 			std::string("C737317FE0846F132B23C8C2A672CE22")
 
 		};
-		HexConverter::Decode(plainText, 24, m_plainText);
+		HexConverter::Decode(plainText, 25, m_plainText);
 
 		const std::vector<std::string> cipherText =
 		{
@@ -509,6 +522,10 @@ namespace Test
 			std::string("172AEAB3D507678ECAF455C12587ADB7"),
 			std::string("6CD02513E8D4DC986B4AFE087A60BD0C"),
 			std::string("DDC6BF790C15760D8D9AEB6F9A75FD4E"),
+			// fips 197
+			std::string("69C4E0D86A7B0430D8CDB78070B4C55A"),
+			std::string("DDA97CA4864CDFE06EAF70A0EC0D7191"),
+			std::string("8EA2B7CA516745BFEAFC49904B496089"),
 			// aes monte carlo tests
 			std::string("C34C052CC0DA8D73451AFE5F03BE297F"),
 			std::string("ACC863637868E3E068D2FD6E3508454A"),
@@ -539,7 +556,7 @@ namespace Test
 			// rhx-shake512
 			std::string("FB8977B80F5B0B7C2E4048DF590EB2F6")
 		};
-		HexConverter::Decode(cipherText, 32, m_cipherText);
+		HexConverter::Decode(cipherText, 35, m_cipherText);
 		/*lint -restore */
 	}
 

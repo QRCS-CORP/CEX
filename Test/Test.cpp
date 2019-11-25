@@ -143,9 +143,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.8b (A8)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.8c (A8)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      November 7, 2019                  *");
+	ConsoleUtils::WriteLine("* Date:      November 12, 2019                 *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -489,6 +489,58 @@ int main()
 	}
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Misc Notes
 //
 // DTM Model
@@ -501,3 +553,12 @@ int main()
 //					PQSECDNS
 //		/		|		|			\		/||\
 //	Requesting Host		RH			RH	    RH(...)
+
+// TODO 1.8
+// What can and should be serialized? (digests, kdfs, ciphers..)
+// Correct function states, all local variables should be contained in the state class (excepting instances)
+// Timing neutral sweep, check as much as you can
+// Add Power8/9 and ARM support for RHX, RCS
+// Linux, Apple support
+// test on more CPUs
+// ...

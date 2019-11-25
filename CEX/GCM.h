@@ -33,7 +33,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// GCM: A Galois/Counter Authenticated Block Cipher Mode
+/// GCM: A Galois/Counter Authenticated block cipher mode
 /// </summary> 
 /// 
 /// <example>
@@ -194,24 +194,9 @@ public:
 	bool &AutoIncrement() override;
 
 	/// <summary>
-	/// Read Only: Block size of internal cipher in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Read Only: The block ciphers formal type name
-	/// </summary>
-	const BlockCiphers CipherType() override;
-
-	/// <summary>
-	/// Read Only: The underlying Block Cipher instance
-	/// </summary>
-	IBlockCipher* Engine() override;
-
-	/// <summary>
 	/// Read Only: The Cipher Modes enumeration type name
 	/// </summary>
-	const CipherModes Enumeral() override;
+	const AeadModes Enumeral() override;
 
 	/// <summary>
 	/// Read Only: True if initialized for encryption, False for decryption
@@ -272,55 +257,18 @@ public:
 	bool &PreserveAD() override;
 
 	/// <summary>
-	/// Read Only: Returns the finalized MAC tag vector
+	/// Read Only: The current standard-vector MAC tag value
 	/// </summary>
 	const std::vector<byte> Tag() override;
 
+	/// <summary>
+	/// Copies the internal MAC tag to a secure-vector
+	/// </summary>
+	/// 
+	/// <param name="Output">The secure-vector receiving the MAC code</param>
+	const void Tag(SecureVector<byte> &Output);
+
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Decrypt a single block of bytes.
-	/// <para>Decrypts one block of bytes beginning at a zero index.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input vector of cipher-text bytes</param>
-	/// <param name="Output">The output vector of plain-text bytes</param>
-	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
-
-	/// <summary>
-	/// Decrypt a block of bytes with offset parameters.
-	/// <para>Decrypts one block of bytes using the designated offsets.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input vector of cipher-text bytes</param>
-	/// <param name="InOffset">The starting offset within the input vector</param>
-	/// <param name="Output">The output vector of plain-text bytes</param>
-	/// <param name="OutOffset">The starting offset within the output vector</param>
-	void DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
-
-	/// <summary>
-	/// Encrypt a single block of bytes. 
-	/// <para>Encrypts one block of bytes beginning at a zero index.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input vector of plain-text bytes</param>
-	/// <param name="Output">The output vector of cipher-text bytes</param>
-	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
-
-	/// <summary>
-	/// Encrypt a block of bytes using offset parameters. 
-	/// <para>Encrypts one block of bytes using the designated offsets.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input vector of plain-text bytes</param>
-	/// <param name="InOffset">The starting offset within the input vector</param>
-	/// <param name="Output">The output vector of cipher-text bytes</param>
-	/// <param name="OutOffset">The starting offset within the output vector</param>
-	void EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output standard-vector.     
@@ -376,7 +324,7 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
-	/// Add additional data to the nessage authentication code generator.  
+	/// Add additional data to the message authentication code generator.  
 	/// <para>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input. 
 	/// This function can only be called once per each initialization/finalization cycle.</para>
 	/// </summary>
@@ -387,6 +335,19 @@ public:
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
 	void SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
+
+	/// <summary>
+	/// Add additional data to the message authentication code generator using a memory-locked vector.  
+	/// <para>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input. 
+	/// This function can only be called once per each initialization/finalization cycle.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input secure-vector of bytes to process</param>
+	/// <param name="Offset">The starting offset within the input vector</param>
+	/// <param name="Length">The number of bytes to process</param>
+	///
+	/// <exception cref="CryptoCipherModeException">Thrown if state has been processed</exception>
+	void SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Transform a length of bytes with offset and length parameters. 

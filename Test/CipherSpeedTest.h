@@ -60,7 +60,7 @@ namespace Test
 		template<typename T>
 		static void ParallelBlockLoop(T* Cipher, bool Encrypt, bool Parallel, size_t SampleSize, size_t KeySize, size_t IvSize, size_t Loops, TestEventHandler &Handler)
 		{
-			const size_t BLKLEN = Parallel ? Cipher->ParallelBlockSize() : Cipher->BlockSize();
+			const size_t BLKLEN = Parallel ? Cipher->ParallelBlockSize() : 16;
 			const size_t ALNLEN = SampleSize - (SampleSize % BLKLEN);
 			std::vector<byte> buffer1(BLKLEN, 0x00);
 			std::vector<byte> buffer2(BLKLEN, 0x00);
@@ -94,7 +94,7 @@ namespace Test
 			}
 
 			dur = TestUtils::GetTimeMs64() - start;
-			len = Loops * SampleSize;
+			len = static_cast<ulong>(Loops) * SampleSize;
 			rate = GetBytesPerSecond(dur, len);
 			glen = TestUtils::ToString(len / GB1);
 			mbps = TestUtils::ToString((rate / MB1));
@@ -164,6 +164,7 @@ namespace Test
 		void CounterSpeedTest();
 		void EAXSpeedTest(bool Encrypt, bool Parallel);
 		void GCMSpeedTest(bool Encrypt, bool Parallel);
+		void HBASpeedTest(bool Encrypt, bool Parallel);
 		static uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void ICMSpeedTest(bool Encrypt, bool Parallel);
 		void OFBSpeedTest(bool Encrypt, bool Parallel);
