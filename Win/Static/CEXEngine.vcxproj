@@ -206,9 +206,9 @@
     <ClInclude Include="..\..\CEX\DLTMK5Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\HBA.h" />
+    <ClInclude Include="..\..\CEX\MCS.h" />
     <ClInclude Include="..\..\CEX\Network.h" />
     <ClInclude Include="..\..\CEX\SPXPFORS.h" />
-    <ClInclude Include="..\..\CEX\MCS.h" />
     <ClInclude Include="..\..\CEX\ACP.h" />
     <ClInclude Include="..\..\CEX\AeadModeFromName.h" />
     <ClInclude Include="..\..\CEX\AeadModes.h" />
@@ -304,7 +304,6 @@
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h" />
     <ClInclude Include="..\..\CEX\FileStream.h" />
     <ClInclude Include="..\..\CEX\Drbgs.h" />
-    <ClInclude Include="..\..\CEX\GCM.h" />
     <ClInclude Include="..\..\CEX\GMAC.h" />
     <ClInclude Include="..\..\CEX\IAsymmetricParameters.h" />
     <ClInclude Include="..\..\CEX\KMAC.h" />
@@ -328,7 +327,6 @@
     <ClInclude Include="..\..\CEX\IPrng.h" />
     <ClInclude Include="..\..\CEX\ISymmetricKey.h" />
     <ClInclude Include="..\..\CEX\KdfFromName.h" />
-    <ClInclude Include="..\..\CEX\EAX.h" />
     <ClInclude Include="..\..\CEX\Keccak1024.h" />
     <ClInclude Include="..\..\CEX\Keccak256.h" />
     <ClInclude Include="..\..\CEX\Keccak512.h" />
@@ -448,10 +446,10 @@
     <ClCompile Include="..\..\CEX\DLTMK5Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\HBA.cpp" />
+    <ClCompile Include="..\..\CEX\MCS.cpp" />
     <ClCompile Include="..\..\CEX\Network.cpp" />
     <ClCompile Include="..\..\CEX\RNBWGfMath.cpp" />
     <ClCompile Include="..\..\CEX\SPXPFORS.cpp" />
-    <ClCompile Include="..\..\CEX\MCS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp" />
     <ClCompile Include="..\..\CEX\AeadModes.cpp" />
@@ -507,7 +505,6 @@
     <ClCompile Include="..\..\CEX\DrbgBase.cpp" />
     <ClCompile Include="..\..\CEX\DrbgFromName.cpp" />
     <ClCompile Include="..\..\CEX\Drbgs.cpp" />
-    <ClCompile Include="..\..\CEX\EAX.cpp" />
     <ClCompile Include="..\..\CEX\ECB.cpp" />
     <ClCompile Include="..\..\CEX\ECP.cpp" />
     <ClCompile Include="..\..\CEX\ErrorCodes.cpp" />
@@ -546,7 +543,6 @@
     <ClCompile Include="..\..\CEX\NewHopeParameters.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
-    <ClCompile Include="..\..\CEX\GCM.cpp" />
     <ClCompile Include="..\..\CEX\GMAC.cpp" />
     <ClCompile Include="..\..\CEX\HKDF.cpp" />
     <ClCompile Include="..\..\CEX\HMAC.cpp" />

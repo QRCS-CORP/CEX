@@ -23,7 +23,7 @@ DrbgBase::~DrbgBase()
 {
 	m_cyclicReseed = false;
 	m_drbgEnumeral = Drbgs::None;
-	m_drbgName.empty();
+	m_drbgName = "";
 	m_maxOutput = 0;
 	m_maxRequest = 0;
 	m_maxReseed = 0;

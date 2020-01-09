@@ -22,7 +22,7 @@ MacBase::MacBase(size_t BlockSize, Macs Enumeral, std::string &Name, std::vector
 MacBase::~MacBase()
 {
 	m_macEnumeral = Macs::None;
-	m_macName.empty();
+	m_macName = "";
 	m_minKeySize = 0;
 	IntegerTools::Clear(m_legalKeySizes);
 }

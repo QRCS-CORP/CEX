@@ -59,8 +59,9 @@ void* SecureMemory::Allocate(size_t Length)
 #	if defined(CEX_HAS_POSIXMLOCK)
 		if (::mlock(ptr, Length) != 0)
 		{
-			::munmap(ptr, Length);
 			::memset(ptr, 0, Length);
+			::munmap(ptr, Length);
+
 			// failed to lock
 			ptr = nullptr;
 		}
@@ -73,10 +74,11 @@ void* SecureMemory::Allocate(size_t Length)
 
 	if (ptr != nullptr)
 	{
-		if (::VirtualLock(ptr, Length) == 0)
+		if (::VirtualLock((LPVOID)ptr, Length) == 0)
 		{
-			::VirtualFree(ptr, 0, MEM_RELEASE);
 			::memset(ptr, 0, Length);
+			::VirtualFree((LPVOID)ptr, 0, MEM_RELEASE);
+
 			// failed to lock
 			ptr = nullptr;
 		}
@@ -105,7 +107,7 @@ void SecureMemory::Erase(void* Pointer, size_t Length)
 {
 #if defined(CEX_HAS_RTLSECUREMEMORY)
 
-	::RtlSecureZeroMemory(Pointer, Length);
+	::RtlSecureZeroMemory((PVOID)Pointer, Length);
 
 #elif defined(CEX_OS_OPENBSD)
 
@@ -147,8 +149,12 @@ void SecureMemory::Free(void* Pointer, size_t Length)
 #elif defined(CEX_HAS_VIRTUALLOCK)
 
 		Erase(Pointer, Length);
-		::VirtualUnlock(Pointer, Length);
-		::VirtualFree(Pointer, 0, MEM_RELEASE);
+
+		if (Pointer != nullptr)
+		{
+			::VirtualUnlock((LPVOID)Pointer, Length);
+			::VirtualFree((LPVOID)Pointer, 0, MEM_RELEASE);
+		}
 
 #else
 

@@ -30,6 +30,11 @@ namespace Test
 		static const std::string SUCCESS;
 		static const bool HAS_AESNI;
 		static const size_t MAXM_ALLOC = 262140;
+#if defined(_DEBUG_)
+
+#else
+
+#endif
 		static const size_t MONTE_CYCLES = 10000;
 		static const size_t TEST_CYCLES = 10;
 
@@ -132,6 +137,18 @@ namespace Test
 		/// Tests the the ciphers state serialization function
 		/// </summary>
 		void Serialization();
+
+		/// <summary>
+		/// Test a single initialization and sequential successive calls to the transform
+		/// </summary>
+		///
+		/// <param name="Cipher">The cipher instance</param>
+		/// <param name="PlainText">The plain-text array</param>
+		/// <param name="Output1">The first expected output</param>
+		/// <param name="Output2">The second expected output</param>
+		/// <param name="Output3">The third expected output</param>
+		void Sequential(IStreamCipher* Cipher, const std::vector<byte>& PlainText, const std::vector<byte>& Output1,
+			const std::vector<byte>& Output2, const std::vector<byte>& Output3);
 
 		/// <summary>
 		/// Test transformation and inverse with random in a looping [TEST_CYCLES] stress-test

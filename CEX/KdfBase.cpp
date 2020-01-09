@@ -20,7 +20,7 @@ KdfBase::KdfBase(Kdfs Enumeral, size_t MinimumKey, size_t MinimumSalt, std::stri
 KdfBase::~KdfBase()
 {
 	m_kdfEnumeral = Kdfs::None;
-	m_kdfName.empty();
+	m_kdfName = "";
 	m_minKeySize = 0;
 	m_minSaltSize = 0;
 	IntegerTools::Clear(m_legalKeySizes);

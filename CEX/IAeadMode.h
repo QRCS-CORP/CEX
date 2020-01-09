@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2019 vtdev.com
+// Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -21,6 +21,7 @@
 
 #include "CexDomain.h"
 #include "AeadModes.h"
+#include "CryptoAuthenticationFailure.h"
 #include "CryptoCipherModeException.h"
 #include "IBlockCipher.h"
 #include "ISymmetricKey.h"
@@ -30,7 +31,8 @@
 
 NAMESPACE_MODE
 
-using Enumeration::AeadModes;
+using Enumeration::AeadModes; 
+using Exception::CryptoAuthenticationFailure;
 using Exception::CryptoCipherModeException;
 using Block::IBlockCipher;
 using Cipher::ISymmetricKey;
@@ -73,14 +75,6 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called.
-	/// <para>Treats the Nonce value loaded during Initialize as a monotonic counter; 
-	/// incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. 
-	/// If set to false, requires a re-key after each finalization cycle.</para>
-	/// </summary>
-	virtual bool &AutoIncrement() = 0;
-
-	/// <summary>
 	/// Read Only: The Cipher Modes enumeration type name
 	/// </summary>
 	virtual const AeadModes Enumeral() = 0;
@@ -108,16 +102,6 @@ public:
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Read Only: The maximum legal MAC tag length in bytes
-	/// </summary>
-	virtual const size_t MaxTagSize() = 0;
-
-	/// <summary>
-	/// Read Only: The minimum legal MAC tag length in bytes
-	/// </summary>
-	virtual const size_t MinTagSize() = 0;
-
-	/// <summary>
 	/// Read Only: The cipher-modes formal class name
 	/// </summary>
 	virtual const std::string Name() = 0;
@@ -137,13 +121,6 @@ public:
 	virtual ParallelOptions &ParallelProfile() = 0;
 
 	/// <summary>
-	/// Read/Write: Persist a one-time associated data for the entire session.
-	/// <para>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments.
-	/// Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.</para>
-	/// </summary>
-	virtual bool &PreserveAD() = 0;
-
-	/// <summary>
 	/// Read Only: Returns the finalized MAC tag vector
 	/// </summary>
 	virtual const std::vector<byte> Tag() = 0;
@@ -155,37 +132,12 @@ public:
 	/// <param name="Output">The secure-vector receiving the MAC code</param>
 	virtual const void Tag(SecureVector<byte> &Output) = 0;
 
+	/// <summary>
+	/// Read Only: The maximum legal MAC tag length in bytes
+	/// </summary>
+	virtual const size_t TagSize() = 0;
+
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Calculate the MAC code (Tag) and copy it to the Output standard-vector.     
-	/// <para>The output vector must be of sufficient length to receive the MAC code.
-	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used, unless AutoIncrement is enabled.</para>
-	/// </summary>
-	/// 
-	/// <param name="Output">The output standard-vector that receives the authentication code</param>
-	/// <param name="OutOffset">The starting offset within the output vector</param>
-	/// <param name="Length">The number of MAC code bytes to write to the output vector.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	virtual void Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
-
-	/// <summary>
-	/// Calculate the MAC code (Tag) and copy it to the Output secure-vector.     
-	/// <para>The output vector must be of sufficient length to receive the MAC code.
-	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Output">The output secure-vector that receives the authentication code</param>
-	/// <param name="OutOffset">The starting offset within the output vector</param>
-	/// <param name="Length">The number of MAC code bytes to write to the output vector.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	virtual void Finalize(SecureVector<byte> &Output, size_t OutOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Initialize the Cipher instance
@@ -248,42 +200,6 @@ public:
 	/// <param name="OutOffset">Starting offset within the output vector</param>
 	/// <param name="Length">The number of bytes to transform</param>
 	virtual void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) = 0;
-
-	/// <summary>
-	/// Generate the internal MAC code and compare it with the tag contained in the Input standard-vector.   
-	/// <para>This function finalizes the Decryption cycle and generates the MAC tag.
-	/// The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function.
-	/// Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input standard-vector containing the expected authentication code</param>
-	/// <param name="Offset">The starting offset within the input vector</param>
-	/// <param name="Length">The number of bytes to compare.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</para></param>
-	/// 
-	/// <returns>Returns true if the authentication codes match</returns>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	virtual bool Verify(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
-
-	/// <summary>
-	/// Generate the internal MAC code and compare it with the tag contained in the Input secure-vector.   
-	/// <para>This function finalizes the Decryption cycle and generates the MAC tag.
-	/// The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function.
-	/// Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input secure-vector containing the expected authentication code</param>
-	/// <param name="Offset">The starting offset within the input vector</param>
-	/// <param name="Length">The number of bytes to compare.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</para></param>
-	/// 
-	/// <returns>Returns true if the authentication codes match</returns>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	virtual bool Verify(const SecureVector<byte> &Input, size_t Offset, size_t Length) = 0;
 };
 
 NAMESPACE_MODEEND

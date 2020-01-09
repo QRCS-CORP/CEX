@@ -124,6 +124,40 @@ const bool HKDF::IsInitialized()
 
 //~~~Public Functions~~~//
 
+void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output)
+{
+	if (Salt.size() != 0)
+	{
+		SymmetricKey kps(Salt);
+		m_hkdfGenerator->Initialize(kps);
+	}
+	else
+	{
+		SymmetricKey kps(std::vector<byte>(m_hkdfGenerator->TagSize(), 0));
+		m_hkdfGenerator->Initialize(kps);
+	}
+
+	m_hkdfGenerator->Update(Key, 0, Key.size());
+	m_hkdfGenerator->Finalize(Output, 0);
+}
+
+void HKDF::Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt, SecureVector<byte> &Output)
+{
+	if (Salt.size() != 0)
+	{
+		SymmetricKey kps(Salt);
+		m_hkdfGenerator->Initialize(kps);
+	}
+	else
+	{
+		SymmetricKey kps(std::vector<byte>(m_hkdfGenerator->TagSize(), 0));
+		m_hkdfGenerator->Initialize(kps);
+	}
+	
+	m_hkdfGenerator->Update(SecureUnlock(Key), 0, Key.size());
+	m_hkdfGenerator->Finalize(Output, 0);
+}
+
 void HKDF::Generate(std::vector<byte> &Output)
 {
 	if (!IsInitialized())
@@ -190,17 +224,10 @@ void HKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 
 void HKDF::Initialize(ISymmetricKey &Parameters)
 {
-#if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
-	{
-		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
-	}
-#else
 	if (Parameters.KeySizes().KeySize() < MinimumKeySize())
 	{
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
-#endif
 
 	if (IsInitialized())
 	{
@@ -220,10 +247,11 @@ void HKDF::Initialize(ISymmetricKey &Parameters)
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
-		std::vector<byte> prk(m_hkdfGenerator->TagSize());
-		Extract(Parameters.Key(), Parameters.Nonce(), prk, m_hkdfState, m_hkdfGenerator);
+		SecureVector<byte> prk(m_hkdfGenerator->TagSize());
+		Extract(Parameters.SecureKey(), Parameters.SecureNonce(), prk);
 		SymmetricKey kp(prk);
 		m_hkdfGenerator->Initialize(kp);
+		SecureClear(prk);
 	}
 	else
 	{
@@ -278,26 +306,6 @@ void HKDF::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, s
 	std::vector<byte> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Generator);
 	SecureMove(tmps, Output, OutOffset);
-}
-
-void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)
-{
-	SymmetricKey kp(Key);
-	Generator->Initialize(kp);
-
-	if (Salt.size() != 0)
-	{
-		SymmetricKey kps(Salt);
-		Generator->Initialize(kps);
-	}
-	else
-	{
-		SymmetricKey kps(std::vector<byte>(Generator->TagSize(), 0));
-		Generator->Initialize(kps);
-	}
-
-	Generator->Update(Key, 0, Key.size());
-	Generator->Finalize(Output, 0);
 }
 
 NAMESPACE_KDFEND

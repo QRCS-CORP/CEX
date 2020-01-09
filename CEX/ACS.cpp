@@ -13,7 +13,7 @@ using Utility::MemoryTools;
 using Enumeration::ShakeModes;
 using Enumeration::StreamCipherConvert;
 
-const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62 };
+const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x63 };
 const __m128i ACS::BLEND_MASK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
 const __m128i ACS::SHIFT_MASK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
 
@@ -22,6 +22,7 @@ class ACS::AcsState
 public:
 
 	std::vector<__m128i> RoundKeys;
+	SecureVector<byte> Associated;
 	SecureVector<byte> Custom;
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
@@ -37,6 +38,7 @@ public:
 	AcsState()
 		:
 		RoundKeys(0),
+		Associated(0),
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
@@ -54,6 +56,7 @@ public:
 	AcsState(SecureVector<byte> &State)
 		:
 		RoundKeys(0),
+		Associated(0),
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
@@ -96,6 +99,12 @@ public:
 		RoundKeys.resize(vlen / sizeof(__m128i));
 		soff += sizeof(ushort);
 		MemoryTools::Copy(SecureState, soff, RoundKeys, 0, vlen);
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		Associated.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, Associated, 0, Associated.size());
 		soff += vlen;
 
 		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
@@ -146,6 +155,7 @@ public:
 	void Reset()
 	{
 		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(__m128i));
+		MemoryTools::Clear(Associated, 0, Associated.size());
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
@@ -160,8 +170,8 @@ public:
 
 	SecureVector<byte> Serialize()
 	{
-		const size_t STASZE = (RoundKeys.size() * sizeof(__m128i)) + Custom.size() + MacKey.size() + MacTag.size() +
-			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(StreamAuthenticators) + sizeof(ShakeModes) + (2 * sizeof(bool)) + (6 * sizeof(ushort));
+		const size_t STASZE = (RoundKeys.size() * sizeof(__m128i)) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
+			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(StreamAuthenticators) + sizeof(ShakeModes) + (2 * sizeof(bool)) + (7 * sizeof(ushort));
 
 		size_t soff;
 		ushort vlen;
@@ -173,6 +183,12 @@ public:
 		soff += sizeof(ushort);
 		MemoryTools::Copy(RoundKeys, 0, state, soff, static_cast<size_t>(vlen));
 		soff += vlen;
+
+		vlen = static_cast<ushort>(Associated.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(Associated, 0, state, soff, Associated.size());
+		soff += Associated.size();
 
 		vlen = static_cast<ushort>(Custom.size());
 		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
@@ -384,7 +400,7 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	// set up the state members
 	m_acsState->Authenticator = m_macAuthenticator != nullptr ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
-	// set the initial mac counter value
+	// set the initial processed-bytes count to one
 	m_acsState->Counter = 1;
 	// set the number of rounds
 	m_acsState->Rounds = Parameters.KeySizes().KeySize() != 128 ? static_cast<ushort>((Parameters.KeySizes().KeySize() / 4)) + 14 : 38;
@@ -410,7 +426,6 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	// copy the nonce to state
 	MemoryTools::Copy(Parameters.Nonce(), 0, m_acsState->Nonce, 0, BLOCK_SIZE);
-
 	// cipher key size determines key expansion function and Mac generator type; 256 or 512-bit
 	m_acsState->Mode = (Parameters.KeySizes().KeySize() == 64) ? ShakeModes::SHAKE512 : (Parameters.KeySizes().KeySize() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
 	// initialize the generator
@@ -473,14 +488,15 @@ void ACS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
 
-	// update the authenticator
-	m_macAuthenticator->Update(Input, Offset, Length);
+	// store the associated data
+	m_acsState->Associated.resize(Length);
+	MemoryTools::Copy(Input, Offset, m_acsState->Associated, 0, Length);
 }
 
 void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the block-size!");
 
 	if (IsEncryption())
 	{
@@ -497,7 +513,7 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			Process(Input, InOffset, Output, OutOffset, Length);
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Output, OutOffset, Length);
-			// update the mac counter
+			// update the processed bytes counter
 			m_acsState->Counter += Length;
 			// finalize the mac and add the tag to the stream
 			Finalize(m_acsState, m_macAuthenticator);
@@ -517,7 +533,7 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			m_macAuthenticator->Update(m_acsState->Nonce, 0, BLOCK_SIZE);
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Input, InOffset, Length);
-			// update the mac counter
+			// update the processed bytes counter
 			m_acsState->Counter += Length;
 			// finalize the mac and verify
 			Finalize(m_acsState, m_macAuthenticator);
@@ -537,20 +553,33 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Authenticator)
 {
-	// 1.1c: the total number of bytes processed terminates the mac input stream
-	//std::vector<byte> mctr(sizeof(ulong));
-	//IntegerTools::LeIncrease8(mctr, State->Counter + State->Nonce.size());
-	//Authenticator->Update(mctr, 0, mctr.size());
+	std::vector<byte> mctr(sizeof(ulong));
+	ulong mlen;
 
-	// generate the mac code
+	// 1.0c: add the total number of bytes processed by the mac, including this terminating string
+	mlen = State->Counter + State->Nonce.size() + State->Associated.size() + mctr.size();
+	IntegerTools::LeIncrease8(mctr, mlen);
+
+	// 1.0c: add the associated data to the mac
+	if (State->Associated.size() != 0)
+	{
+		Authenticator->Update(SecureUnlock(State->Associated), 0, State->Associated.size());
+		// clear the associated data, reset for each transformation, 
+		// assignable with a call to SetAssociatedData before each transform call
+		SecureClear(State->Associated);
+	}
+
+	// add the termination string to the mac
+	Authenticator->Update(mctr, 0, mctr.size());
+
+	// finalize the mac code to state
 	Authenticator->Finalize(State->MacTag, 0);
 
 	// name string is an unsigned 64-bit processed bytes counter + the cipher name
 	IntegerTools::Le64ToBytes(State->Counter, State->Name, 0);
 
-	// extract the new mac key
+	// extract the new mac key: cSHAKE(k,c,n)
 	Kdf::SHAKE gen(State->Mode);
-	// cSHAKE(k,c,n), bytes counter provides cSHAKE domain seperation in the stream; will generate a unique mac-key each time
 	gen.Initialize(State->MacKey, State->Custom, State->Name);
 	SymmetricKeySize ks = Authenticator->LegalKeySizes()[1];
 	SecureVector<byte> mack(ks.KeySize());

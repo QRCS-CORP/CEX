@@ -162,8 +162,6 @@ namespace Test
 		void TSX512SpeedTest();
 		void TSX1024SpeedTest();
 		void CounterSpeedTest();
-		void EAXSpeedTest(bool Encrypt, bool Parallel);
-		void GCMSpeedTest(bool Encrypt, bool Parallel);
 		void HBASpeedTest(bool Encrypt, bool Parallel);
 		static uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void ICMSpeedTest(bool Encrypt, bool Parallel);

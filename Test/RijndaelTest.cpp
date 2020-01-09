@@ -432,7 +432,6 @@ namespace Test
 
 	void RijndaelTest::Initialize()
 	{
-		byte x = 0x3E;
 		/*lint -save -e122 */
 		/*lint -save -e417 */
 		const std::vector<std::string> keys =

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2019 vtdev.com
+// Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -30,7 +30,7 @@
 // Updated October 20, 2016
 // Updated April 16, 2017
 // Updated November 30, 2018
-// Updated November 12, 2019
+// Updated January 09, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_RHX_H

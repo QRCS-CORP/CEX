@@ -10,8 +10,6 @@
 #include "../CEX/HBA.h"
 #include "../CEX/ICM.h"
 #include "../CEX/OFB.h"
-#include "../CEX/EAX.h"
-#include "../CEX/GCM.h"
 #include "../CEX/ACS.h"
 #include "../CEX/CSX256.h"
 #include "../CEX/CSX512.h"
@@ -97,19 +95,9 @@ namespace Test
 			OFBSpeedTest(true, false);
 
 			OnProgress(std::string("### AEAD Authenticated Cipher Modes ###"));
-			OnProgress(std::string("### Tests speeds of EAX and GCM authenticated modes"));
+			OnProgress(std::string("### Tests speeds of HBA authenticated mode"));
 			OnProgress(std::string("### Uses the standard rounds and a 256 bit key"));
 			OnProgress(std::string(""));
-
-			OnProgress(std::string("***AES-EAX Sequential Encryption***"));
-			EAXSpeedTest(true, false);
-			OnProgress(std::string("***AES-EAX Parallel Encryption***"));
-			EAXSpeedTest(true, true);
-
-			OnProgress(std::string("***AES-GCM Sequential Encryption***"));
-			GCMSpeedTest(true, false);
-			OnProgress(std::string("***AES-GCM Parallel Encryption***"));
-			GCMSpeedTest(true, true);
 
 			OnProgress(std::string("***AES-HBA Sequential Encryption***"));
 			HBASpeedTest(true, false);
@@ -289,46 +277,6 @@ namespace Test
 	}
 
 	//*** AEAD Mode Tests ***//
-
-	void CipherSpeedTest::EAXSpeedTest(bool Encrypt, bool Parallel)
-	{
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			EAX* cpr = new EAX(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-		{
-			RHX* eng = new RHX();
-			EAX* cpr = new EAX(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-	}
-
-	void CipherSpeedTest::GCMSpeedTest(bool Encrypt, bool Parallel)
-	{
-		if (HAS_AESNI)
-		{
-			AHX* eng = new AHX();
-			GCM* cpr = new GCM(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-		else
-		{
-			RHX* eng = new RHX();
-			GCM* cpr = new GCM(eng);
-			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
-			delete cpr;
-			delete eng;
-		}
-	}
 
 	void CipherSpeedTest::HBASpeedTest(bool Encrypt, bool Parallel)
 	{

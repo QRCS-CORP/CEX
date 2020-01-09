@@ -73,6 +73,10 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	error compiler is incompatible with this library!
 #endif
 
+#if defined(_DEBUG) || defined(_DEBUG_)
+#	define CEX_COMPILE_DEBUG
+#endif
+
 // preprocessor os selection (not all OS's will be supported; targets are win/android/linux/ios)
 #if defined(_WIN64) || defined(_WIN32)
 #	define CEX_OS_WINDOWS
@@ -110,7 +114,7 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #endif
 #if defined(__posix) || defined(_POSIX_VERSION)
 #	define CEX_OS_POSIX
-#	define <unistd.h>
+#	include <unistd.h>
 #endif
 
 

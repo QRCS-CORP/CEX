@@ -9,7 +9,7 @@ namespace Test
 	using Cipher::Block::Mode::IAeadMode;
 
 	/// <summary>
-	/// Tests the AEAD cipher modes; EAX and GCM.
+	/// Tests the AEAD cipher mode HBA.
 	/// <para>Tests each AEAD mode for correct operation, including KAT, parallel-mode, auto-increment, exception handling, and stress tests.</para>
 	/// </summary>
 	class AeadTest final : public ITest
@@ -20,15 +20,13 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
 
-		static const size_t AUTHEN_LEN = 20;
-		static const size_t MAC_LEN = 8;
 		static const size_t MIN_ALLOC = 1024;
 		static const size_t MAX_ALLOC = 4096;
-		static const size_t NONCE_LEN = 8;
+		static const size_t MONTE_CYCLES = 10000;
+		static const size_t TEST_CYCLES = 10;
 
 		std::vector<std::vector<byte>> m_associatedText;
 		std::vector<std::vector<byte>> m_cipherText;
-		std::vector<std::vector<byte>> m_expectedCode;
 		std::vector<std::vector<byte>> m_key;
 		std::vector<std::vector<byte>> m_nonce;
 		std::vector<std::vector<byte>> m_plainText;
@@ -82,24 +80,28 @@ namespace Test
 		/// <param name="AssociatedText">The associated text array</param>
 		/// <param name="PlainText">The plain-text array</param>
 		/// <param name="CipherText">The cipher-text array</param>
-		/// <param name="MacCode">The expected cipher authentication code</param>
-		void Kat(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, 
-			std::vector<byte> &PlainText, std::vector<byte> &CipherText, std::vector<byte> &MacCode);
-		
-		/// <summary>
-		/// Test incremental and auto incrementing updates
-		/// </summary>
-		///
-		/// <param name="Cipher">The cipher instance</param>
-		void Incremental(IAeadMode* Cipher);
-		
+		void Kat(IAeadMode* Cipher, const std::vector<byte> &Key, const std::vector<byte> &Nonce, 
+			const std::vector<byte> &AssociatedText, const std::vector<byte> &PlainText, const std::vector<byte> &CipherText);
+
 		/// <summary>
 		/// Compare parallel to sequential operation modes for equivalence
 		/// </summary>
 		///
 		/// <param name="Cipher">The cipher instance</param>
 		void Parallel(IAeadMode* Cipher);
-		
+
+		/// <summary>
+		/// Test a single initialization and sequential successive calls to the transform
+		/// </summary>
+		///
+		/// <param name="Cipher">The cipher instance</param>
+		/// <param name="PlainText">The plain-text array</param>
+		/// <param name="Output1">The first expected output</param>
+		/// <param name="Output2">The second expected output</param>
+		/// <param name="Output3">The third expected output</param>
+		void Sequential(IAeadMode* Cipher, const std::vector<byte> &PlainText, const std::vector<byte> &Output1, 
+			const std::vector<byte> &Output2, const std::vector<byte> &Output3);
+
 		/// <summary>
 		/// Test operations in a looping stress test
 		/// </summary>

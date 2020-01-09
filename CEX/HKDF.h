@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2019 vtdev.com
+// Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -174,6 +174,18 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
+	/// HKDF-Extract function; generate a new key using combined key and salt arrays as input.
+	/// </summary>
+	/// 
+	/// <param name="Key">The key used to initialize the generator</param>
+	/// <param name="Salt">The salt value, added to the key</param>
+	/// <param name="Output">Receives the newly generated key. 
+	/// The array size is the underlying digests output size (32 bytes with SHA2-256, and 64 bytes when using SHA2-512)</param>
+	void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output);
+
+	void Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt, SecureVector<byte> &Output);
+
+	/// <summary>
 	/// Fill a standard-vector with pseudo-random bytes
 	/// </summary>
 	/// 
@@ -231,7 +243,6 @@ private:
 
 	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
 	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
-	static void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator);
 };
 
 NAMESPACE_KDFEND

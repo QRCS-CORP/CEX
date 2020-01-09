@@ -4,8 +4,6 @@
 #include "../CEX/CTR.h"
 #include "../CEX/ECB.h"
 #include "../CEX/ICM.h"
-#include "../CEX/EAX.h"
-#include "../CEX/GCM.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
 
@@ -71,16 +69,6 @@ namespace Test
 			OnProgress(std::string("ParallelModeTest: Passed ICM parallel to sequential equivalence test.."));
 			delete cpr4;
 
-			EAX* cpr5 = new EAX(Enumeration::BlockCiphers::AES);
-			Stress(cpr5, true);
-			OnProgress(std::string("ParallelModeTest: Passed EAX parallel to sequential equivalence test.."));
-			delete cpr5;
-
-			GCM* cpr6 = new GCM(Enumeration::BlockCiphers::AES);
-			Stress(cpr6, true);
-			OnProgress(std::string("ParallelModeTest: Passed GCM parallel to sequential equivalence test.."));
-			delete cpr6;
-
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
@@ -122,18 +110,8 @@ namespace Test
 			inp.resize(plen);
 			otp.resize(plen);
 
-			if (Cipher->Enumeral() == Enumeration::AeadModes::EAX ||
-				Cipher->Enumeral() == Enumeration::AeadModes::GCM ||
-				Cipher->Enumeral() == Enumeration::AeadModes::HBA)
-			{
-				cpt1.resize(plen + ((IAeadMode*)Cipher)->MaxTagSize());
-				cpt2.resize(cpt1.size());
-			}
-			else
-			{
-				cpt1.resize(plen);
-				cpt2.resize(plen);
-			}
+			cpt1.resize(plen + ((IAeadMode*)Cipher)->TagSize());
+			cpt2.resize(cpt1.size());
 
 			IntegerTools::Fill(key, 0, key.size(), rnd);
 			IntegerTools::Fill(inp, 0, plen, rnd);
@@ -202,17 +180,8 @@ namespace Test
 			inp.resize(plen);
 			otp.resize(plen);
 
-			if (Cipher->Enumeral() == Enumeration::CipherModes::EAX ||
-				Cipher->Enumeral() == Enumeration::CipherModes::GCM)
-			{
-				cpt1.resize(plen + ((IAeadMode*)Cipher)->MaxTagSize());
-				cpt2.resize(cpt1.size());
-			}
-			else
-			{
-				cpt1.resize(plen);
-				cpt2.resize(plen);
-			}
+			cpt1.resize(plen);
+			cpt2.resize(plen);
 
 			IntegerTools::Fill(key, 0, key.size(), rnd);
 			IntegerTools::Fill(inp, 0, plen, rnd);

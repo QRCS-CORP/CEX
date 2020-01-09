@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2019 vtdev.com
+// Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -18,8 +18,9 @@
 //
 //
 // Implementation Details:
-// An implementation of an Rijndael-256 Counter Mode (RCS).
+// An implementation of an Rijndael-256 authenticated Counter Mode (RCS).
 // Written by John G. Underhill, March 8, 2019
+// Updated January 09, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_RCS_H
@@ -74,8 +75,7 @@ using Enumeration::StreamAuthenticators;
 /// <description><B>Overview:</B></description>
 /// <para>
 /// The RCS symmetric cipher is a 256-bit wide-block Rijndael based, Authenticate, Encrypt, and Additional Data (AEAD) authenticated stream-cipher. \n
-/// RCS is an online cipher, meaning it can stream data of any size, without needing to know the data size in advance. \n
-/// It also has provable security, based on the Rijndael-256 permutation function used by this cipher. \n
+/// RCS has provable security, based on the Rijndael-256 permutation function used by this cipher. \n
 /// RCS first encrypts the plain-text using a Little-Endian counter mode, then processes that cipher-text using a MAC function used for data authentication. \n
 /// When each transform encryption call is completed, the MAC code is generated and appended to the output vector automatically. \n
 /// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, and if authentication succeeds, then decrypting the data to plain-text. \n
@@ -91,8 +91,8 @@ using Enumeration::StreamAuthenticators;
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Supported key sizes are 32, 64, and 128 bytes (256, 512, and 1024 bits).</description></item>
-/// <item><description>The required Nonce size is 16 bytes (128 bits).</description></item>
-/// <item><description>The ISymmetricKey info value can be used as a cipher tweak to create a unique ciphertext and MAC output.</description></item>
+/// <item><description>The required Nonce size is 32 bytes (256 bits).</description></item>
+/// <item><description>The ISymmetricKey Info value can be used as a cipher tweak to create a unique ciphertext and MAC output.</description></item>
 /// <item><description>The ciphers Initialize function can use either a SymmetricKey, or an encrypted SymmetricSecureKey key container.</description></item>
 /// <item><description>The internal block input-size is fixed at 32 bytes wide (256 bits).</description></item>
 /// <item><description>This cipher is capable of authentication by setting the constructors StreamAuthenticators enumeration to Poly1305, or one of the HMAC or KMAC options.</description></item>

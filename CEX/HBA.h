@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2019 vtdev.com
+// Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -32,8 +32,10 @@
 
 NAMESPACE_MODE
 
+using Exception::CryptoAuthenticationFailure;
 using Mac::IMac;
 using Enumeration::StreamAuthenticators;
+
 
 /// <summary>
 /// A block cipher CTR mode with Hash Based Authentication, an AEAD cipher mode (HBA).
@@ -41,37 +43,33 @@ using Enumeration::StreamAuthenticators;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Encrypting a kb vector of bytes:</description>
+/// <description>Encrypting a 1kb vector of bytes:</description>
 /// <code>
 /// // create an instance using the RHX cipher and the Keccak based KMAC-256
 /// HBA cipher(BlockCiphers::RHXS256, StreamAuthenticators::KMAC256);
 /// // initialize for encryption
 /// cipher.Initialize(true, SymmetricKey(Key, Nonce, [Info]));
-/// // encrypt 1024 bytes
+/// // encrypt 1024 bytes, and finalize the mac, the code is appended to the end of the output vector
 /// cipher.Transform(Input, 0, Output, 0, 1024);
-/// // finalize the mac, and append the code to the end of the output vector
-/// cipher.Finalize(Output, 1024);
 /// </code>
 /// </example>
 ///
 /// <example>
-/// <description>Decrypting a kb of bytes:</description>
+/// <description>Decrypting a 1kb vector of bytes:</description>
 /// <code>
 /// // create an instance using the RHX cipher and the Keccak based KMAC-256
 /// HBA cipher(BlockCiphers::RHXS256, StreamAuthenticators::KMAC256);
 /// // initialize for decryption
 /// cipher.Initialize(false, SymmetricKey(Key, Nonce, [Info]));
-/// // decrypt 1024 bytes
-/// cipher.Transform(Input, 0, Output, 0, 1024);
-///
-/// // The verify compares the internally generated code 
-/// // to the one appended to the cipher-text input vector.
-/// // If the call returns false, authentication has failed.
-/// // This can also be done manually, by calling the Finalize function to generate the MAC tag,
-/// // and comparing it to the tag attached to the cipher-text
-/// if (!cipher.Verify(Input, 1024, 32))
+/// 
+/// // decrypt 1024 bytes, if the authentication fails a CryptoAuthenticationFailure exception is thrown
+/// try
 /// {
-///		throw;
+///		cipher.Transform(Input, 0, Output, 0, 1024);
+/// }
+/// catch (CryptoAuthenticationFailure const &ex)
+/// {
+///		// authentication has failed, do something..
 /// }
 /// </code>
 /// </example>
@@ -79,12 +77,11 @@ using Enumeration::StreamAuthenticators;
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>The HBA Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated block-cipher mode. \n
-/// HBA is an online mode, meaning it can stream data of any length, without needing to know the data size in advance. \n
-/// It also has provable security, the security-level dependant on the block cipher and MAC functions used by the mode. \n
+/// HBA has provable security, the security-level dependant on the block cipher and MAC functions used by the mode. \n
 /// HBA first encrypts the plaintext using a block-cipher counter mode (CTR), then processes that cipher-text using either an HMAC(SHA2) or KMAC, MAC authentication code generator. \n
-/// When encryption is completed, the MAC code is generated and appended to the output stream using the Finalize(Output, Offset) call. \n
+/// When encryption is completed, the MAC code is generated and appended to the output stream after each call to Transform(Input, InOffset, OLutput, OutOffset, Length) function. \n
 /// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text. \n
-/// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process.</para>
+/// If during the authentication stage of decryption the MAC code check fails, a CryptoAuthenticationFailure exception is generated, and the cipher-text is not decrypted.</para>
 ///
 /// <description><B>Description:</B></description>
 /// <para><EM>Legend:</EM> \n
@@ -99,14 +96,35 @@ using Enumeration::StreamAuthenticators;
 /// The HBA parallel mode also leverages SIMD instructions to 'double parallelize' those segments. \n
 /// An input block assigned to a thread uses SIMD instructions to decrypt/encrypt 4, 8, or 16 blocks in parallel per cycle, depending on which framework is runtime available, AVX, AVX2, or AVX512 instructions. \n
 /// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems, this can be disabled through the ParallelProfile accessor function. \n
-/// The cipher transform is parallelizable, however the authentication pass, (HMAC/KMAC), is processed sequentially.</para>
+/// The cipher transform is parallelizable, however the authentication pass, (HMAC/KMAC), is processed sequentially. (though this implementation does support the Intel SHA2-256 SIMD instructions).</para>
 ///
+///
+/// <description><B>API and Usage:</B></description>
+/// <para>
+/// The constructor HBA(BlockCiphers, StreamAuthenticators), has enumeration options for the base block-cipher type, and the MAC generator type.
+/// The advanced constructer HBA(IBlockCipher*, StreamAuthenticators), takes a pointer to an uninitalized block-cipher instance.
+/// Instances of the cipher and generator are created and assigned to internal unique pointers. \n
+/// The initialization function Initialize(bool, ISymmetricKey), sets the cipher mode to encryption or decryption mode, 
+/// and initializes the state with the user supplied key parameters. \n
+/// The SetAssociatedData(Input, Offset, Length) function updates the MAC generator with associatiated data. \n
+/// The Transform(Input, InOffset, Output, OutOffset, Length) function process a data array, and returns the transformed data.
+/// in Encryption mode, the input is encrypted and that cipher-text is added to the MAC generator, a MAC code is generated and appended to the cipher-text. \n
+/// In Decryption mode, the cipher-text is first processed by the MAC generator and the resulting MAC code is compared to the code appended to the cipher-text.
+/// If the codes do not match, the cipher-text has failed authentication, a CryptoAuthenticationFailure exception is raised, and the cipher-text is not decrypted.
+/// HBA is not an 'online' cipher mode, one in which multiple calls to transform are be made, 
+/// where the cipher-text is decrypted and the MAC updated in tandem, and the cipher-text is authenticated only after a finalization call is made.
+/// This implementation, does not use the online mode format, but instead adds or authenticates a MAC each time the Transform function is called.
+/// If during decryption, the MAC authentication check fails, an exception is raised and no decryption of the cipher-text takes place, 
+/// thus making this implementation immune to chosen ciphertext attacks that target the underlying block-cipher.
+/// </para>
+/// 
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>HBA is an AEAD authenticated mode, additional data such as packet header information can be added to the authentication process.</description></item>
-/// <item><description>Additional data can be added using the SetAssociatedData(Input, Offset, Length) call, and can be added at any point before the Finalize call.</description></item>
-/// <item><description>Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output vector in either encryption or decryption operation mode.</description></item>
-/// <item><description>The Verify(Input, Offset, Length) function can be used to compare the MAC code embedded with the cipher-text to the internal MAC code generated after a Decryption cycle.</description></item>
+/// <item><description>Additional data can be added using the SetAssociatedData(Input, Offset, Length) call, and during Initialize, using the Info parameter of the SymmetricKey.</description></item>
+/// <item><description>Each time the Transform function is called, this mode either adds a MAC code to the end of the output stream [encryption], or checks the MAC code appended to the cipher-text [decryption].</description></item>
+/// <item><description>The Transform(Input, InOffset, Output, OutOffset, Length) function adds a MAC code to the end of the output stream in Encryption mode; the output vector must be sized to allow for the full length of the cipher-text and the MAC tag (TagSize() property).</description></item>
+/// <item><description>In Decryption mode, the Transform function MACs the input cipher-text and compares the output to the MAC code appended to the input stream; if the MAC check fails, a CryptoAuthenticationFailure exception is raised.</description></item>
 /// <item><description>Encryption and decryption can both be pipelined (AVX/AVX2/AVX512), and multi-threaded with any even number of threads up to the processors total [virtual] processing cores.</description></item>
 /// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
 /// <item><description>The recommended parallel input block-size ParallelBlockSize(), is calculated automatically based on the processor(s) L1/L2 cache sizes, the algorithms code-cache requirements, and available memory.</description></item>
@@ -115,9 +133,14 @@ using Enumeration::StreamAuthenticators;
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>The <a href="http://web.cs.ucdavis.edu/~rogaway/papers/eax.pdf">HBA Mode</a> of Operation.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">AES Fips 197</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">SHA-2 Standard</a>.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2104">2104</a>: HMAC: Keyed-Hashing for Message Authentication.</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198-1</a>: The Keyed-Hash Message Authentication Code (HMAC).</description></item>
+/// <item><description>SHA3 <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">Fips202</a>.</description></item>
+/// <item><description>NIST <a href = "http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pd">SP800-185</a>.</description></item>
 /// <item><description>RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorithms for Authenticated Encryption</a>.</description></item>
-/// <item><description>Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/chap7.pdf">Chapter 7: Block Ciphers</a>.</description></item>
 /// </list>
 /// </remarks>
 class HBA final : public IAeadMode
@@ -127,7 +150,7 @@ private:
 	static const size_t BLOCK_SIZE = 16;
 	static const size_t MAX_PRLALLOC = 100000000;
 	static const size_t MIN_TAGSIZE = 32;
-	static const std::vector<byte> OMEGA_INFO;
+	static const std::vector<byte> HBA_INFO;
 
 	class HbaState;
 	std::unique_ptr<HbaState> m_chaState;
@@ -155,7 +178,6 @@ public:
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher type name.
-	/// The cipher defaults are the RHX-512 cipher and the KMAC-512 MAC code generator.
 	/// <para>The cipher instance is created and destroyed automatically.</para>
 	/// </summary>
 	///
@@ -163,10 +185,11 @@ public:
 	/// <param name="AuthenticatorType">The enumeration name of the MAC generator</param>,
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if an invalid block cipher type is used</exception>
-	explicit HBA(BlockCiphers CipherType , StreamAuthenticators AuthenticatorType );
+	explicit HBA(BlockCiphers CipherType, StreamAuthenticators AuthenticatorType);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance, and specify the authentication generator type.
+	/// <para>The cipher instance is created and destroyed automatically.</para>
 	/// </summary>
 	///
 	/// <param name="Cipher">An uninitialized Block Cipher instance; can not be null</param>
@@ -181,11 +204,6 @@ public:
 	~HBA() override;
 
 	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read/Write: This accessor is not required in this mode, and is not used</para>
-	/// </summary>
-	bool &AutoIncrement() override;
 
 	/// <summary>
 	/// Read Only: The Cipher Modes enumeration type name
@@ -215,16 +233,6 @@ public:
 	const  std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Read Only: The maximum legal tag length in bytes
-	/// </summary>
-	const size_t MaxTagSize() override;
-
-	/// <summary>
-	/// Read Only: The minimum legal tag length in bytes
-	/// </summary>
-	const size_t MinTagSize() override;
-
-	/// <summary>
 	/// Read Only: The mode and cipher name
 	/// </summary>
 	const std::string Name() override;
@@ -244,13 +252,6 @@ public:
 	ParallelOptions &ParallelProfile() override;
 
 	/// <summary>
-	/// Read/Write: Persist a one-time associated data for the entire session.
-	/// <para>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments.
-	/// Finalize and Verify can be called multiple times, applying the initial associated data to each finalization cycle.</para>
-	/// </summary>
-	bool &PreserveAD() override;
-
-	/// <summary>
 	/// Read Only: The current standard-vector MAC tag value
 	/// </summary>
 	const std::vector<byte> Tag() override;
@@ -262,38 +263,12 @@ public:
 	/// <param name="Output">The secure-vector receiving the MAC code</param>
 	const void Tag(SecureVector<byte> &Output);
 
+	/// <summary>
+	/// Read Only: The MAC code length in bytes
+	/// </summary>
+	const size_t TagSize() override;
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Calculate the MAC code (Tag) and copy it to the Output standard-vector.     
-	/// <para>The output vector must be of sufficient length to receive the MAC code.
-	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Output">The output standard-vector that receives the authentication code</param>
-	/// <param name="OutOffset">The starting offset within the output vector</param>
-	/// <param name="Length">The number of MAC code bytes to write to the output vector.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	void Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
-
-	/// <summary>
-	/// Calculate the MAC code (Tag) and copy it to the Output secure-vector.     
-	/// <para>The output vector must be of sufficient length to receive the MAC code.
-	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Output">The output secure-vector that receives the authentication code</param>
-	/// <param name="OutOffset">The starting offset within the output vector</param>
-	/// <param name="Length">The number of MAC code bytes to write to the output vector.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</para></param>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized, or output vector is too small</exception>
-	void Finalize(SecureVector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the Cipher instance.
@@ -320,7 +295,7 @@ public:
 
 	/// <summary>
 	/// Add additional data to the message authentication code generator.  
-	/// <para>Must be set before the finalization call. 
+	/// <para>Must be set before the transformation call. 
 	/// This function can only be called once per each initialization/finalization cycle.</para>
 	/// </summary>
 	/// 
@@ -333,7 +308,7 @@ public:
 
 	/// <summary>
 	/// Add additional data to the message authentication code generator using a memory-locked vector.  
-	/// <para>Must be set before the finalization call.
+	/// <para>Must be set before the transformation call.
 	/// This function can only be called once per each initialization/finalization cycle.</para>
 	/// </summary>
 	/// 
@@ -347,6 +322,10 @@ public:
 	/// <summary>
 	/// Transform a length of bytes with offset and length parameters. 
 	/// <para>This method processes a specified length of bytes, utilizing offsets incremented by the caller.
+	/// In encryption mode, the message data is encrypted, and the cipher-text is used by the MAC generator to calculate the MAC code, 
+	/// which is appended to the output array.
+	/// In decryption mode, the input cipher-text is added to the MAC generator, and an internal code is generated.
+	/// This code is compared to the MAC code contained in the cipher-text; if the codes do not match a CryptoAuthenticationFailure exception is thrown.
 	/// If IsParallel() is set to true, and the length is at least ParallelBlockSize(), the transform is run in parallel processing mode.
 	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
@@ -359,42 +338,12 @@ public:
 	/// <param name="Length">The number of bytes to transform</param>
 	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
-	/// <summary>
-	/// Generate the internal MAC code and compare it with the tag contained in the Input standard-vector.   
-	/// <para>This function can take the place of the Finalize call; if the cipher hasn't been finalized and no MAC code generated, 
-	/// this function will finalize the Decryption cycle and generate the MAC tag.
-	/// The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function.
-	/// Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input standard-vector containing the expected authentication code</param>
-	/// <param name="Offset">The starting offset within the input vector</param>
-	/// <param name="Length">The number of bytes to compare.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</para></param>
-	/// 
-	/// <returns>Returns true if the authentication codes match</returns>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	bool Verify(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
+	//~~~Private Functions~~~//
 
-	/// <summary>
-	/// Generate the internal MAC code and compare it with the tag contained in the Input secure-vector.   
-	/// <para>This function finalizes the Decryption cycle and generates the MAC tag.
-	/// The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function.
-	/// Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization.
-	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input secure-vector containing the expected authentication code</param>
-	/// <param name="Offset">The starting offset within the input vector</param>
-	/// <param name="Length">The number of bytes to compare.
-	/// <para>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</para></param>
-	/// 
-	/// <returns>Returns true if the authentication codes match</returns>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	bool Verify(const SecureVector<byte> &Input, size_t Offset, size_t Length) override;
+private:
+
+	void Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	bool Verify(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 };
 
 NAMESPACE_MODEEND

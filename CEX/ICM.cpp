@@ -247,7 +247,7 @@ void ICM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 void ICM::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the block-size!");
 
 	std::vector<byte> tmpc(BLOCK_SIZE);
 	MemoryTools::COPY128(m_icmState->Nonce, 0, tmpc, 0);

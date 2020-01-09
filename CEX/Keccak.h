@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2019 vtdev.com
+// Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -184,7 +184,7 @@ public:
 	template<typename ArrayU8>
 	static void AbsorbR24(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
 	{
-		std::array<byte, 200> msg = { 0 };
+		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
 
 		while (InLength >= Rate)
 		{
@@ -228,7 +228,7 @@ public:
 	template<typename ArrayU8>
 	static void AbsorbR48(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
 	{
-		std::array<byte, 200> msg = { 0 };
+		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
 
 		while (InLength >= Rate)
 		{

@@ -16,7 +16,7 @@ using Enumeration::StreamCipherConvert;
 
 const std::vector<byte> RCS::OMEGA_INFO = 
 {
-	0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62 
+	0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x63
 };
 
 const std::vector<uint> RCS::MT0 =
@@ -168,6 +168,7 @@ class RCS::RcsState
 public:
 
 	SecureVector<uint> RoundKeys;
+	SecureVector<byte> Associated;
 	SecureVector<byte> Custom;
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
@@ -183,6 +184,7 @@ public:
 	RcsState()
 		:
 		RoundKeys(0),
+		Associated(0),
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
@@ -200,6 +202,7 @@ public:
 	RcsState(SecureVector<byte> &State)
 		:
 		RoundKeys(0),
+		Associated(0),
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
@@ -218,6 +221,7 @@ public:
 	~RcsState()
 	{
 		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(Associated, 0, Associated.size());
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
@@ -235,13 +239,20 @@ public:
 	void DeSerialize(SecureVector<byte> &SecureState)
 	{
 		size_t soff;
-		ushort vlen;
+		ushort vlen; 
 
 		soff = 0;
+
 		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
 		RoundKeys.resize(vlen / sizeof(uint));
 		soff += sizeof(ushort);
 		MemoryTools::Copy(SecureState, soff, RoundKeys, 0, vlen);
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		Associated.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, Associated, 0, Associated.size());
 		soff += vlen;
 
 		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
@@ -292,6 +303,7 @@ public:
 	void Reset()
 	{
 		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(Associated, 0, Associated.size());
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
@@ -306,8 +318,8 @@ public:
 
 	SecureVector<byte> Serialize()
 	{
-		const size_t STASZE = (RoundKeys.size() * sizeof(uint)) + Custom.size() + MacKey.size() + MacTag.size() +
-			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(StreamAuthenticators) + sizeof(ShakeModes) + (2 * sizeof(bool)) + (6 * sizeof(ushort));
+		const size_t STASZE = (RoundKeys.size() * sizeof(uint)) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
+			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(StreamAuthenticators) + sizeof(ShakeModes) + (2 * sizeof(bool)) + (7 * sizeof(ushort));
 
 		size_t soff;
 		ushort vlen;
@@ -319,6 +331,12 @@ public:
 		soff += sizeof(ushort);
 		MemoryTools::Copy(RoundKeys, 0, state, soff, static_cast<size_t>(vlen));
 		soff += vlen;
+
+		vlen = static_cast<ushort>(Associated.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(Associated, 0, state, soff, Associated.size());
+		soff += Associated.size();
 
 		vlen = static_cast<ushort>(Custom.size());
 		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
@@ -524,7 +542,7 @@ void RCS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	// set up the state members
 	m_rcsState->Authenticator = m_macAuthenticator != nullptr ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
-	// set the initial mac counter value
+	// set the initial processed-bytes count to one
 	m_rcsState->Counter = 1;
 	// set the number of rounds
 	m_rcsState->Rounds = Parameters.KeySizes().KeySize() != 128 ? static_cast<ushort>((Parameters.KeySizes().KeySize() / 4)) + 14 : 38;
@@ -624,14 +642,15 @@ void RCS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
 
-	// update the authenticator
-	m_macAuthenticator->Update(Input, Offset, Length);
+	// store the associated data
+	m_rcsState->Associated.resize(Length);
+	MemoryTools::Copy(Input, Offset, m_rcsState->Associated, 0, Length);
 }
 
 void RCS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the block-size!");
 
 	if (IsEncryption())
 	{
@@ -648,9 +667,9 @@ void RCS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			Process(Input, InOffset, Output, OutOffset, Length);
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Output, OutOffset, Length);
-			// update the mac counter
+			// update the processed bytes counter
 			m_rcsState->Counter += Length;
-			// finalize the mac and add the tag to the stream
+			// finalize the mac and copy the tag to the end of the output stream
 			Finalize(m_rcsState, m_macAuthenticator);
 			MemoryTools::Copy(m_rcsState->MacTag, 0, Output, OutOffset + Length, m_rcsState->MacTag.size());
 		}
@@ -668,7 +687,7 @@ void RCS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			m_macAuthenticator->Update(m_rcsState->Nonce, 0, BLOCK_SIZE);
 			// update the mac with the ciphertext
 			m_macAuthenticator->Update(Input, InOffset, Length);
-			// update the mac counter
+			// update the processed bytes counter
 			m_rcsState->Counter += Length;
 			// finalize the mac and verify
 			Finalize(m_rcsState, m_macAuthenticator);
@@ -688,29 +707,40 @@ void RCS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 void RCS::Finalize(std::unique_ptr<RcsState> &State, std::unique_ptr<IMac> &Authenticator)
 {
+	std::vector<byte> mctr(sizeof(ulong));
+	ulong mlen;
 
+	// 1.0c: add the total number of bytes processed by the mac, including this terminating string
+	mlen = State->Counter + State->Nonce.size() + State->Associated.size() + mctr.size();
+	IntegerTools::LeIncrease8(mctr, mlen);
 
-	// 1.1c: add the total number of bytes processed to the mac
-	//std::vector<byte> mctr(sizeof(ulong));
-	//IntegerTools::LeIncrease8(mctr, State->Counter + State->Nonce.size());
-	//Authenticator->Update(mctr, 0, mctr.size());
+	// 1.0c: add the associated data to the mac
+	if (State->Associated.size() != 0)
+	{
+		Authenticator->Update(SecureUnlock(State->Associated), 0, State->Associated.size());
+		// clear the associated data, reset for each transformation, 
+		// assignable with a call to SetAssociatedData before each transform call
+		SecureClear(State->Associated);
+	}
 
-	// generate the mac code to state
+	// add the termination string to the mac
+	Authenticator->Update(mctr, 0, mctr.size());
+
+	// finalize the mac code to state
 	Authenticator->Finalize(State->MacTag, 0);
 
-	// name string is an unsigned 64-bit bytes counter + key size + cipher name
-	// the state counter is the number of bytes processed by the Mac update function
+	// name string is an unsigned 64-bit bytes counter + key-size + cipher-name
+	// the state counter is the number of bytes processed by the cipher
 	IntegerTools::Le64ToBytes(State->Counter, State->Name, 0);
 
-	// extract the new mac key
+	// extract the new mac key: cSHAKE(k,c,n)
 	Kdf::SHAKE gen(State->Mode);
-	// cSHAKE(k,c,n), bytes counter provides cSHAKE domain seperation in the stream; will generate a unique mac-key each time
 	gen.Initialize(State->MacKey, State->Custom, State->Name);
 	SymmetricKeySize ks = Authenticator->LegalKeySizes()[1];
 	SecureVector<byte> mack(ks.KeySize());
 	gen.Generate(mack);
 
-	// reset the generator with the new key
+	// re-initialize the generator with the new key
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
@@ -1024,43 +1054,6 @@ void RCS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 #if defined(CEX_PREFETCH_RHX_TABLES)
 	PrefetchTables();
 #endif
-
-	// row 0 = 0,4,8,12
-	// row 1 = 1,5,9,13
-	// row 2 = 2,6,10,14
-	// row 3 = 3,7,11,15
-	// shifted to:
-	// row 0 = 0,4,8,12
-	// row 1 = 5,9,13,1
-	// row 2 = 10,14,2,6
-	// row 3 = 15,3,7,11
-
-	// row 0 = 0,4,12,16
-	// row 1 = 1,5,13,17
-	// row 2 = 2,6,14,18
-	// row 3 = 3,7,15,19
-	// row 4 = 4,8,16,20
-	// row 5 = 5,9,17,21
-	// row 6 = 6,10,18,22
-	// row 7 = 7,11,19,23
-
-
-	// X0				X1				X2				X3
-	// 24,16,8,0		24,16,8,0		24,16,8,0		24,16,8,0
-	// 0,1,2,3			4,5,6,7			8,9,10,11		12,13,14,15
-
-	// X4				X5				X6				X7
-	// 24,16,8,0		24,16,8,0		24,16,8,0		24,16,8,0
-	// 16,17,18,19		20,21,22,23		24,25,26,27		28,29,30,31
-
-	// r0 0,5,14,19
-	// r1 4,9,18,23
-	// r2 8,13,22,27
-	// r3 12,17,26,31
-	// r4 16,21,30,3
-	// r5 20,25,2,7
-	// r6 24,29,6,11
-	// r7 28,1,10,15
 
 	// round 1
 	Y0 = MT0[static_cast<byte>(X0 >> 24)] ^ MT1[static_cast<byte>(X1 >> 16)] ^ MT2[static_cast<byte>(X3 >> 8)] ^ MT3[static_cast<byte>(X4)] ^ m_rcsState->RoundKeys[8];

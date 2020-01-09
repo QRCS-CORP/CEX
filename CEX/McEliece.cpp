@@ -2,7 +2,6 @@
 #include "MPKCN4096T62.h"
 #include "MPKCN6960T119.h"
 #include "MPKCN8192T128.h"
-#include "GCM.h"
 #include "IntegerTools.h"
 #include "Keccak.h"
 #include "PrngFromName.h"
@@ -11,7 +10,6 @@
 NAMESPACE_MCELIECE
 
 using Enumeration::AsymmetricPrimitiveConvert;
-using Enumeration::BlockCiphers;
 using Utility::IntegerTools;
 using Digest::Keccak;
 using Enumeration::McElieceParameterConvert;

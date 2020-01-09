@@ -131,7 +131,7 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 			throw CryptoProcessingException(std::string("GetCurrentTimerValue"), std::string("Timer"), std::string("GetThreadTimes failed!"), Enumeration::ErrorCodes::Unreachable);
 		}
 
-		return now.dwLowDateTime + ((TimerWord)now.dwHighDateTime << 32);
+		return now.dwLowDateTime + ((TimerWord)(ulong)now.dwHighDateTime << 32);
 	}
 GetCurrentThreadNotImplemented:
 	return (TimerWord)clock() * (10 * 1000 * 1000 / CLOCKS_PER_SEC);
