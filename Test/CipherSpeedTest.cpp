@@ -99,10 +99,10 @@ namespace Test
 			OnProgress(std::string("### Uses the standard rounds and a 256 bit key"));
 			OnProgress(std::string(""));
 
-			OnProgress(std::string("***AES-HBA Sequential Encryption***"));
-			HBASpeedTest(true, false);
-			OnProgress(std::string("***AES-HBA Parallel Encryption***"));
-			HBASpeedTest(true, true);
+			//OnProgress(std::string("***AES-HBA Sequential Encryption***"));
+			//HBASpeedTest(true, false);
+			//OnProgress(std::string("***AES-HBA Parallel Encryption***"));
+			//HBASpeedTest(true, true);
 
 			OnProgress(std::string("### STREAM CIPHER TESTS ###"));
 			OnProgress(std::string("### Tests speeds of Salsa and ChaCha stream ciphers"));
