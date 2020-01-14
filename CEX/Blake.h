@@ -58,7 +58,7 @@ private:
 
 	//~~~Inline Functions~~~//
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 	// Misra exception: this is a common extension of the Intel intrinsics api
 #	define _mm_roti_epi32(r, c) ( \
@@ -144,7 +144,7 @@ public:
 	/// <param name="IV">The permutations IV array</param>
 	static void PermuteR10P512U(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV);
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 	/// <summary>
 	/// The vertically vectorized form of the Blake2-256 permutation function.
@@ -158,7 +158,7 @@ public:
 
 #endif
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 	/// <summary>
 	/// The horizontally vectorized form of the Blake2-256 permutation function.
@@ -212,7 +212,7 @@ public:
 	/// <param name="IV">The permutations IV array</param>
 	static void PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV);
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 	/// <summary>
 	/// The vertically vectorized form of the Blake2-512 permutation function.
@@ -226,7 +226,7 @@ public:
 
 #endif
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 	/// <summary>
 	/// The horizontally vectorized form of the Blake2-512 permutation function.

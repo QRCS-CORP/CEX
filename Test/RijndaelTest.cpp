@@ -60,6 +60,7 @@ namespace Test
 			Exception();
 			OnProgress(std::string("RijndaelTest: Passed Rijndael exception handling tests.."));
 
+#if defined(__AVX__)
 			if (m_aesniTest)
 			{
 				AHX* cpr1 = new AHX();
@@ -94,6 +95,7 @@ namespace Test
 				delete cpr5;
 			}
 			else
+#endif
 			{
 				RHX* cpr1 = new RHX();
 				Kat(cpr1, m_keys[0], m_plainText[0], m_cipherText[0]);
@@ -111,7 +113,7 @@ namespace Test
 				Kat(cpr1, m_keys[12], m_plainText[12], m_cipherText[12]);
 				Kat(cpr1, m_keys[13], m_plainText[12], m_cipherText[13]);
 				Kat(cpr1, m_keys[14], m_plainText[12], m_cipherText[14]);
-				delete cpr1;/**/
+				delete cpr1;
 
 				RHX* cpr2 = new RHX(BlockCipherExtensions::HKDF256);
 				Kat(cpr2, m_keys[27], m_plainText[0], m_cipherText[27]);
@@ -129,6 +131,7 @@ namespace Test
 
 			OnProgress(std::string("RijndaelTest: Passed Rijndael FIPS 197 KAT tests.."));
 
+#if defined(__AVX__)
 			if (m_aesniTest)
 			{
 				AHX* cpr1 = new AHX();
@@ -160,6 +163,7 @@ namespace Test
 				delete cpr5;
 			}
 			else
+#endif
 			{
 				RHX* cpr1 = new RHX();
 				MonteCarlo(cpr1, m_keys[15], m_plainText[13], m_cipherText[15]);
@@ -261,7 +265,7 @@ namespace Test
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(Message, 0, enc, 0);
 
-		if (enc != Expected) // e=121,62..204, n=221,169..145
+		if (enc != Expected)
 		{
 			throw TestException(std::string("Kat"), Cipher->Name(), std::string("Encrypted arrays are not equal!"));
 		}

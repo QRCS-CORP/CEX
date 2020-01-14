@@ -554,7 +554,7 @@ void Blake256::Permute(const std::vector<byte> &Input, size_t InOffset, Blake2sS
 		Blake::IV256[6] ^ State.F[0],
 		Blake::IV256[7] ^ State.F[1] };
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 	Blake::PermuteR10P512V(Input, InOffset, State.H, iv);
 #else
 #	if defined(CEX_DIGEST_COMPACT)

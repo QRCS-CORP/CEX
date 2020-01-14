@@ -488,7 +488,7 @@ void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &
 	if (Length >= AVXBLK)
 	{
 		const size_t SEGALN = Length - (Length % AVXBLK);
-		std::array<uint, 8>;
+		std::array<uint, 8> tmpc;
 
 		// process 4 blocks (uses sse intrinsics if available)
 		while (ctr != SEGALN)

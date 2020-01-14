@@ -269,7 +269,7 @@ ACS::ACS(SecureVector<byte> &State)
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 #if !defined(CEX_AVX_INTRINSICS)
-	throw CryptoSymmetricException(StreamCipherConvert::ToName(StreamCiphers::ACS), std::string("Constructor"), std::string("AVX is not supported on this system!"), ErrorCodes::NotSupported);
+	throw CryptoSymmetricException(StreamCipherConvert::ToName(StreamCiphers::RCS), std::string("Constructor"), std::string("AVX is not supported on this system!"), ErrorCodes::NotSupported);
 #endif
 
 	if (m_acsState->Authenticator != StreamAuthenticators::None)

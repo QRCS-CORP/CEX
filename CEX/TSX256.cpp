@@ -8,8 +8,6 @@
 
 #if defined(__AVX2__)
 #	include "ULong256.h"
-#elif defined(__AVX__)
-#	include "ULong128.h"
 #endif
 
 NAMESPACE_STREAM

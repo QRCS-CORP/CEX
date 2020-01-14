@@ -1,0 +1,5 @@
+#include "PacketBuffer.h"
+
+NAMESPACE_NETWORK
+
+NAMESPACE_NETWORKEND

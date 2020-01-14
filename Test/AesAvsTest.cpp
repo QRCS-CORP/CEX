@@ -49,7 +49,9 @@ namespace Test
 		std::vector<byte> msg;
 
 		RHX* cprr = new RHX();
+#if defined(__AVX__)
 		AHX* cpra = new AHX();
+#endif
 
 		HexConverter::Decode(std::string("00000000000000000000000000000000"), msg);
 
@@ -70,11 +72,13 @@ namespace Test
 				HexConverter::Decode(istr, key);
 				HexConverter::Decode(jstr, cpt);
 
+#if defined(__AVX__)
 				if (m_aesniTest)
 				{
 					Kat(cpra, key, msg, cpt);
 				}
 				else
+#endif
 				{
 					Kat(cprr, key, msg, cpt);
 				}
@@ -93,11 +97,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 48), key);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
+#if defined(__AVX__)
 				if (m_aesniTest)
 				{
 					Kat(cpra, key, msg, cpt);
 				}
 				else
+#endif
 				{
 					Kat(cprr, key, msg, cpt);
 				}
@@ -116,11 +122,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 64), key);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
+#if defined(__AVX__)
 				if (m_aesniTest)
 				{
 					Kat(cpra, key, msg, cpt);
 				}
 				else
+#endif
 				{
 					Kat(cprr, key, msg, cpt);
 				}
@@ -140,11 +148,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), msg);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
+#if defined(__AVX__)
 				if (m_aesniTest)
 				{
 					Kat(cpra, key, msg, cpt);
 				}
 				else
+#endif
 				{
 					Kat(cprr, key, msg, cpt);
 				}
@@ -164,11 +174,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), msg);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
+#if defined(__AVX__)
 				if (m_aesniTest)
 				{
 					Kat(cpra, key, msg, cpt);
 				}
 				else
+#endif
 				{
 					Kat(cprr, key, msg, cpt);
 				}
@@ -188,11 +200,13 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), msg);
 				HexConverter::Decode(data.substr(j, 32), cpt);
 
+#if defined(__AVX__)
 				if (m_aesniTest)
 				{
 					Kat(cpra, key, msg, cpt);
 				}
 				else
+#endif
 				{
 					Kat(cprr, key, msg, cpt);
 				}

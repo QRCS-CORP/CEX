@@ -1303,7 +1303,7 @@ void Blake::PermuteR10P512U(const std::vector<byte> &Input, size_t InOffset, std
 	State[7] ^= R7 ^ R15;
 }
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 void Blake::PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
 {
@@ -1859,7 +1859,7 @@ void Blake::PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, std
 
 #endif
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 void Blake::PermuteR10P8x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State, const std::vector<UInt256> &IV)
 {
@@ -3636,7 +3636,7 @@ void Blake::PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, st
 	State[7] ^= R7 ^ R15;
 }
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 void Blake::PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
 {
@@ -4460,7 +4460,7 @@ void Blake::PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, st
 
 #endif
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 
 void Blake::PermuteR12P4x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, const std::vector<ULong256> &IV)
 {

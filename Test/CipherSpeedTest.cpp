@@ -147,6 +147,7 @@ namespace Test
 
 	void CipherSpeedTest::RHXSpeedTest(size_t KeySize)
 	{
+#if defined(__AVX__)
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
@@ -156,6 +157,7 @@ namespace Test
 			delete eng;
 		}
 		else
+#endif
 		{
 			RHX* eng = new RHX();
 			ECB* cpr = new ECB(eng);
@@ -178,6 +180,7 @@ namespace Test
 
 	void CipherSpeedTest::CBCSpeedTest(bool Encrypt, bool Parallel)
 	{
+#if defined(__AVX__)
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
@@ -187,6 +190,7 @@ namespace Test
 			delete eng;
 		}
 		else
+#endif
 		{
 			RHX* eng = new RHX();
 			CBC* cpr = new CBC(eng);
@@ -198,6 +202,7 @@ namespace Test
 
 	void CipherSpeedTest::CFBSpeedTest(bool Encrypt, bool Parallel)
 	{
+#if defined(__AVX__)
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
@@ -207,6 +212,7 @@ namespace Test
 			delete eng;
 		}
 		else
+#endif
 		{
 			RHX* eng = new RHX();
 			CFB* cpr = new CFB(eng);
@@ -218,6 +224,7 @@ namespace Test
 
 	void CipherSpeedTest::CTRSpeedTest(bool Encrypt, bool Parallel)
 	{
+#if defined(__AVX__)
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
@@ -227,6 +234,7 @@ namespace Test
 			delete eng;
 		}
 		else
+#endif
 		{
 			RHX* eng = new RHX();
 			CTR* cpr = new CTR(eng);
@@ -238,6 +246,7 @@ namespace Test
 
 	void CipherSpeedTest::ICMSpeedTest(bool Encrypt, bool Parallel)
 	{
+#if defined(__AVX__)
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
@@ -247,6 +256,7 @@ namespace Test
 			delete eng;
 		}
 		else
+#endif
 		{
 			RHX* eng = new RHX();
 			ICM* cpr = new ICM(eng);
@@ -258,6 +268,7 @@ namespace Test
 
 	void CipherSpeedTest::OFBSpeedTest(bool Encrypt, bool Parallel)
 	{
+#if defined(__AVX__)
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
@@ -267,6 +278,7 @@ namespace Test
 			delete eng;
 		}
 		else
+#endif
 		{
 			RHX* eng = new RHX();
 			OFB* cpr = new OFB(eng);
@@ -280,6 +292,7 @@ namespace Test
 
 	void CipherSpeedTest::HBASpeedTest(bool Encrypt, bool Parallel)
 	{
+#if defined(__AVX__)
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
@@ -289,6 +302,7 @@ namespace Test
 			delete eng;
 		}
 		else
+#endif
 		{
 			RHX* eng = new RHX();
 			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA256);

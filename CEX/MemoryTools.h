@@ -91,8 +91,6 @@ public:
 	inline static void PrefetchL1(Array &Input, size_t Offset, size_t Length)
 	{
 		const size_t ELMLEN = sizeof(Array::value_type);
-		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
-		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 #if defined(__AVX__)
 		PREFETCHT1(Input.data() + (Offset * ELMLEN), Length);
@@ -126,8 +124,6 @@ public:
 	inline static void PrefetchL2(Array &Input, size_t Offset, size_t Length)
 	{
 		const size_t ELMLEN = sizeof(Array::value_type);
-		CEXASSERT((Input.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
-		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 #if defined(__AVX__)
 		PREFETCHT2(Input.data() + (Offset * ELMLEN), Length);
@@ -167,8 +163,6 @@ public:
 		if (Length != 0)
 		{
 			const size_t ELMLEN = sizeof(Array::value_type);
-			CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
-			CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 			pctr = 0;
 
@@ -418,7 +412,6 @@ public:
 	inline static void CopyToValue(const Array &Input, size_t InOffset, V &Value, size_t Length)
 	{
 		CEXASSERT((Input.size() - InOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input size");
-		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
 
 		std::memcpy(&Value, &Input[InOffset], Length);
 	}
@@ -437,7 +430,6 @@ public:
 	inline static void CopyFromValue(const V Value, Array &Output, size_t OutOffset, size_t Length)
 	{
 		CEXASSERT((Output.size() - OutOffset) * sizeof(Array::value_type) >= Length, "Length is larger than input size");
-		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
 
 		std::memcpy(&Output[OutOffset], &Value, Length);
 	}
@@ -592,10 +584,10 @@ public:
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination object pointer</param>
 	template <typename Object, typename Array>
-	inline static void COPY128TOOBJECT(Array &Input, size_t InOffset, const Object* Output)
+	inline static void COPY128TOOBJECT(Array &Input, size_t InOffset, Object* Output)
 	{
 #if defined(__AVX__)
-		_mm_storeu_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(Output), reinterpret_cast<__m128i*>(&Input[OutOffset])));
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(Output), _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])));
 #else
 		std::memcpy(Output, &Input[InOffset], 16);
 #endif
@@ -764,11 +756,11 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void Move(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
+		CEXASSERT((Input.size() - InOffset) * sizeof(ArrayA::value_type) >= Length, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * sizeof(ArrayB::value_type) >= Length, "Length is larger than output size");
+
 		if (Length != 0)
 		{
-			CEXASSERT((Input.size() - InOffset) * sizeof(ArrayA::value_type) >= Length, "Length is larger than input size");
-			CEXASSERT((Output.size() - OutOffset) * sizeof(ArrayB::value_type) >= Length, "Length is larger than output size");
-
 			std::memmove(&Output[OutOffset], &Input[InOffset], Length);
 		}
 	}
@@ -791,7 +783,6 @@ public:
 		size_t pctr;
 
 		CEXASSERT((Output.size() - Offset) * ELMLEN >= Length, "Length is larger than output size");
-		CEXASSERT(ELMLEN <= Length, "Integer type is larger than length");
 
 		if (Length != 0)
 		{
@@ -940,7 +931,7 @@ public:
 #elif defined(__AVX2__)
 				XOR256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #elif defined(__AVX__)
-				COPY128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
+				XOR128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #endif
 				pctr += SMDBLK;
 			}

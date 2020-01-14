@@ -114,6 +114,7 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 {
 #if defined(CEX_OS_WINDOWS)
 	static bool getCurrentThreadImplemented = true;
+	ulong high;
 
 	if (getCurrentThreadImplemented)
 	{
@@ -131,7 +132,10 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 			throw CryptoProcessingException(std::string("GetCurrentTimerValue"), std::string("Timer"), std::string("GetThreadTimes failed!"), Enumeration::ErrorCodes::Unreachable);
 		}
 
-		return now.dwLowDateTime + ((TimerWord)(ulong)now.dwHighDateTime << 32);
+		high = (ulong)now.dwHighDateTime;
+		high <<= 32;
+
+		return now.dwLowDateTime + ((TimerWord)high);
 	}
 GetCurrentThreadNotImplemented:
 	return (TimerWord)clock() * (10 * 1000 * 1000 / CLOCKS_PER_SEC);

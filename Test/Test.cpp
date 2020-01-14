@@ -337,23 +337,28 @@ int main()
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
 
+#if defined(__AVX__)
 			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
 				TestRun(new AesAvsTest(true));
 			}
+#endif
 
 			PrintHeader("Testing the AES software implementation (AES)");
 			TestRun(new AesAvsTest(false));
 
+#if defined(__AVX__)
 			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
 				TestRun(new RijndaelTest(true));
 			}
+#endif
 
 			PrintHeader("Testing the AES software implementation (RHX)");
 			TestRun(new RijndaelTest(false));
+
 			PrintHeader("Testing the Serpent software implementation (SHX)");
 			TestRun(new SerpentTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
@@ -386,10 +391,14 @@ int main()
 			TestRun(new Poly1305Test());
 			PrintHeader("TESTING RANDOM ENTROPY PROVIDERS");
 			TestRun(new ACPTest());
+#if defined(__AVX__)
 			TestRun(new CJPTest());
+#endif
 			TestRun(new CSPTest());
 			TestRun(new ECPTest());
+#if defined(__AVX__)
 			TestRun(new RDPTest());
+#endif
 			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
 			TestRun(new BCRTest());
 			TestRun(new CSRTest());
