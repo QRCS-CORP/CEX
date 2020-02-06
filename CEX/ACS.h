@@ -132,7 +132,7 @@ private:
 	static const size_t BLOCK_SIZE = 32;
 	static const size_t INFO_SIZE = 16;
 	static const size_t MAX_PRLALLOC = 100000000;
-	static const std::vector<byte> OMEGA_INFO;
+	static const std::vector<byte> RCS_INFO;
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_THRESHOLD = 838;
 	static const byte UPDATE_PREFIX = 0x80;

@@ -484,7 +484,9 @@ void RHX::ExpandRotBlock(SecureVector<uint> &RoundKeys, size_t KeyIndex, size_t 
 	size_t kctr;
 
 	kctr = KeyIndex - KeyOffset;
-	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ SubByte(static_cast<uint>(RoundKeys[KeyIndex - 1] << 8) | static_cast<uint>(RoundKeys[KeyIndex - 1] >> 24) & 0xFF) ^ Rcon[RconIndex];
+	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ 
+		SubWord(static_cast<uint>(RoundKeys[KeyIndex - 1] << 8) | static_cast<uint>(RoundKeys[KeyIndex - 1] >> 24) & 0xFF, SBox) ^ 
+		Rcon[RconIndex];
 	++KeyIndex;
 	++kctr;
 	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
@@ -501,7 +503,7 @@ void RHX::ExpandSubBlock(SecureVector<uint> &RoundKeys, size_t KeyIndex, size_t 
 	size_t kctr;
 
 	kctr = KeyIndex - KeyOffset;
-	RoundKeys[KeyIndex] = SubByte(RoundKeys[KeyIndex - 1]) ^ RoundKeys[kctr];
+	RoundKeys[KeyIndex] = SubWord(RoundKeys[KeyIndex - 1], SBox) ^ RoundKeys[kctr];
 	++KeyIndex;
 	++kctr;
 	RoundKeys[KeyIndex] = RoundKeys[kctr] ^ RoundKeys[KeyIndex - 1];
@@ -611,7 +613,7 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 	MemoryTools::Copy(Input, InOffset, state, 0, BLOCK_SIZE);
 
-	AddRoundKey(state, m_rhxState->RoundKeys, m_rhxState->Rounds << 2);
+	KeyAddition(state, m_rhxState->RoundKeys, m_rhxState->Rounds << 2);
 
 	// pre-load the s-box into L1 cache
 #if defined(CEX_PREFETCH_RHX_TABLES)
@@ -622,13 +624,13 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	{
 		InvShiftRows(state);
 		InvSubBytes(state);
-		AddRoundKey(state, m_rhxState->RoundKeys, (i << 2));
+		KeyAddition(state, m_rhxState->RoundKeys, (i << 2));
 		InvMixColumns(state);
 	}
 
 	InvShiftRows(state);
 	InvSubBytes(state);
-	AddRoundKey(state, m_rhxState->RoundKeys, 0);
+	KeyAddition(state, m_rhxState->RoundKeys, 0);
 
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
@@ -686,19 +688,7 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	PrefetchTables();
 #endif
 
-	// row 0 = 0,4,8,12
-	// row 1 = 1,5,9,13
-	// row 2 = 2,6,10,14
-	// row 3 = 3,7,11,15
-	// shifted to:
-	// row 0 = 0,4,8,12
-	// row 1 = 5,9,13,1
-	// row 2 = 10,14,2,6
-	// row 3 = 15,3,7,11
-
 	// round 1
-	// byte= 0,5,10,15
-	// byte= 4,6,11,3
 	Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[4];
 	Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[5];
 	Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[6];
@@ -761,8 +751,7 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	size_t i;
 
 	MemoryTools::Copy(Input, InOffset, state, 0, BLOCK_SIZE);
-
-	AddRoundKey(state, m_rhxState->RoundKeys, 0);
+	KeyAddition(state, m_rhxState->RoundKeys, 0);
 
 	// pre-load the s-box into L1 cache
 #if defined(CEX_PREFETCH_RHX_TABLES)
@@ -771,16 +760,15 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 	for (i = 1; i < m_rhxState->Rounds; ++i)
 	{
-		SubBytes(state);
-		ShiftRows(state);
+		Substitution(state);
+		ShiftRows128(state);
 		MixColumns(state);
-		AddRoundKey(state, m_rhxState->RoundKeys, (i << 2));
+		KeyAddition(state, m_rhxState->RoundKeys, (i << 2));
 	}
 
-	SubBytes(state);
-	ShiftRows(state);
-	AddRoundKey(state, m_rhxState->RoundKeys, (m_rhxState->Rounds << 2));
-
+	Substitution(state);
+	ShiftRows128(state);
+	KeyAddition(state, m_rhxState->RoundKeys, (m_rhxState->Rounds << 2));
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
 
@@ -810,7 +798,7 @@ void RHX::Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vect
 
 std::vector<SymmetricKeySize> RHX::CalculateKeySizes(BlockCipherExtensions Extension)
 {
-	std::vector<SymmetricKeySize> keys(0);
+	std::vector<SymmetricKeySize> keys(3);
 
 	// Note: the hkdf variants info-size calculation: block-size - (name-size + hash-size + 1-byte hkdf counter + sha2 padding) fills one sha2 final block,
 	// this avoids permuting a partially empty block, for security and performance reasons.
@@ -820,51 +808,51 @@ std::vector<SymmetricKeySize> RHX::CalculateKeySizes(BlockCipherExtensions Exten
 	{
 		case BlockCipherExtensions::None:
 		{
-			keys.push_back(SymmetricKeySize(16, BLOCK_SIZE, 0));
-			keys.push_back(SymmetricKeySize(24, BLOCK_SIZE, 0));
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 0));
+			keys[0] = SymmetricKeySize(16, BLOCK_SIZE, 0);
+			keys[1] = SymmetricKeySize(24, BLOCK_SIZE, 0);
+			keys[2] = SymmetricKeySize(32, BLOCK_SIZE, 0);
 			break;
 		}
 		case BlockCipherExtensions::HKDF256:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 13));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 13));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 13));
+			keys[0] = SymmetricKeySize(32, BLOCK_SIZE, 13);
+			keys[1] = SymmetricKeySize(64, BLOCK_SIZE, 13);
+			keys[2] = SymmetricKeySize(128, BLOCK_SIZE, 13);
 			break;
 		}
 		case BlockCipherExtensions::HKDF512:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 37));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 37));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 37));
+			keys[0] = SymmetricKeySize(32, BLOCK_SIZE, 37);
+			keys[1] = SymmetricKeySize(64, BLOCK_SIZE, 37);
+			keys[2] = SymmetricKeySize(128, BLOCK_SIZE, 37);
 			break;
 		}
 		case BlockCipherExtensions::SHAKE256:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 127));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 127));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 127));
+			keys[0] = SymmetricKeySize(32, BLOCK_SIZE, 127);
+			keys[1] = SymmetricKeySize(64, BLOCK_SIZE, 127);
+			keys[2] = SymmetricKeySize(128, BLOCK_SIZE, 127);
 			break;
 		}
 		case BlockCipherExtensions::SHAKE128:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 159));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 159));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 159));
+			keys[0] = SymmetricKeySize(32, BLOCK_SIZE, 159);
+			keys[1] = SymmetricKeySize(64, BLOCK_SIZE, 159);
+			keys[2] = SymmetricKeySize(128, BLOCK_SIZE, 159);
 			break;
 		}
 		case BlockCipherExtensions::SHAKE512:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 63));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 63));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 63));
+			keys[0] = SymmetricKeySize(32, BLOCK_SIZE, 63);
+			keys[1] = SymmetricKeySize(64, BLOCK_SIZE, 63);
+			keys[2] = SymmetricKeySize(128, BLOCK_SIZE, 63);
 			break;
 		}
 		case BlockCipherExtensions::SHAKE1024:
 		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 62));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 62));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 62));
+			keys[0] = SymmetricKeySize(32, BLOCK_SIZE, 62);
+			keys[1] = SymmetricKeySize(64, BLOCK_SIZE, 62);
+			keys[2] = SymmetricKeySize(128, BLOCK_SIZE, 62);
 			break;
 		}
 	}
@@ -887,22 +875,6 @@ void RHX::PrefetchSbox()
 	MemoryTools::PrefetchL1(SBox, 0, SBox.size());
 }
 CEX_OPTIMIZE_RESUME
-
-uint RHX::SubByte(uint Rot)
-{
-	uint val;
-	uint res;
-
-	val = 0xFF & Rot;
-	res = SBox[val];
-	val = 0xFF & (Rot >> 8);
-	res |= (static_cast<uint>(SBox[val]) << 8);
-	val = 0xFF & (Rot >> 16);
-	res |= (static_cast<uint>(SBox[val]) << 16);
-	val = 0xFF & (Rot >> 24);
-
-	return res | (static_cast<uint>(SBox[val]) << 24);
-}
 
 #if defined(CEX_RIJNDAEL_TABLES)
 

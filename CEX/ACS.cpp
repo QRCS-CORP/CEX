@@ -13,7 +13,7 @@ using Utility::MemoryTools;
 using Enumeration::ShakeModes;
 using Enumeration::StreamCipherConvert;
 
-const std::vector<byte> ACS::OMEGA_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x63 };
+const std::vector<byte> ACS::RCS_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x63 };
 const __m128i ACS::BLEND_MASK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
 const __m128i ACS::SHIFT_MASK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
 
@@ -406,11 +406,11 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	m_acsState->Rounds = Parameters.KeySizes().KeySize() != 128 ? static_cast<ushort>((Parameters.KeySizes().KeySize() / 4)) + 14 : 38;
 
 	// create the cSHAKE customization string
-	m_acsState->Custom.resize(Parameters.KeySizes().InfoSize() + OMEGA_INFO.size());
+	m_acsState->Custom.resize(Parameters.KeySizes().InfoSize() + RCS_INFO.size());
 	// copy the version string to the customization parameter
-	MemoryTools::Copy(OMEGA_INFO, 0, m_acsState->Custom, 0, OMEGA_INFO.size());
+	MemoryTools::Copy(RCS_INFO, 0, m_acsState->Custom, 0, RCS_INFO.size());
 	// copy the user defined string to the customization parameter
-	MemoryTools::Copy(Parameters.Info(), 0, m_acsState->Custom, OMEGA_INFO.size(), Parameters.KeySizes().InfoSize());
+	MemoryTools::Copy(Parameters.Info(), 0, m_acsState->Custom, RCS_INFO.size(), Parameters.KeySizes().InfoSize());
 
 	// create the cSHAKE name string
 	std::string tmpn = Name();

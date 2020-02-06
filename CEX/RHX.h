@@ -336,7 +336,6 @@ private:
 	static void PrefetchTables();
 	static void SecureExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState> &State, std::unique_ptr<IKdf> &Generator);
 	static void StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<RhxState> &State);
-	static uint SubByte(uint Rot);
 
 	void Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);

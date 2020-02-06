@@ -94,7 +94,7 @@ namespace Test
 			Finalization(rcsc512h512, m_message[0], m_key[1], m_nonce[0], m_expected[4], m_code[6], m_code[7]);
 			Finalization(rcsc512k512, m_message[0], m_key[1], m_nonce[0], m_expected[5], m_code[8], m_code[9]);
 			Finalization(rcsc1024k1024, m_message[0], m_key[2], m_nonce[0], m_expected[6], m_code[10], m_code[11]);
-			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer finalization tests.")); 
+			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer finalization tests."));
 
 			// original known answer test vectors generated with this implementation
 			Kat(rcs256s, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
@@ -111,7 +111,7 @@ namespace Test
 			Sequential(rcsc512h512, m_message[0], m_expected[13], m_expected[14], m_expected[15]);
 			Sequential(rcsc512k512, m_message[0], m_expected[16], m_expected[17], m_expected[18]);
 			Sequential(rcsc1024k1024, m_message[0], m_expected[19], m_expected[20], m_expected[21]);
-			OnProgress(std::string("AeadTest: Passed RCS sequential transformation calls test.."));
+			OnProgress(std::string("RCSTest: Passed RCS sequential transformation calls test.."));
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
 			MonteCarlo(rcs256s, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
