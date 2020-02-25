@@ -9,8 +9,10 @@ namespace Test
 	using Cipher::Block::Mode::IAeadMode;
 
 	/// <summary>
-	/// Tests the AEAD cipher mode HBA.
-	/// <para>Tests each AEAD mode for correct operation, including KAT, parallel-mode, auto-increment, exception handling, and stress tests.</para>
+	/// Tests the AEAD cipher modes.
+	/// <para>Tests each AEAD mode for correct operation, including KAT, parallel-mode, auto-increment, exception handling, and stress tests.
+	/// HBA KAT tests are original vectors, generated with this library.
+	/// GCM KAT vectors are talken from: The Galois/Counter Mode of Operation (GCM), "https://eprint.iacr.org/2004/193.pdf"</para>
 	/// </summary>
 	class AeadTest final : public ITest
 	{

@@ -2,14 +2,14 @@
 #define CEX_TIMER_H
 
 #include "CexDomain.h"
-#ifndef HIGHRES_TIMER_AVAILABLE
+#ifndef CEX_HIGHRES_TIMER
 #	include <time.h>
 #endif
 
 NAMESPACE_UTILITY
 
-#ifdef HIGHRES_TIMER_AVAILABLE
-typedef word64 TimerWord;
+#ifdef CEX_HIGHRES_TIMER
+typedef uint64_t TimerWord;
 #else
 typedef clock_t TimerWord;
 #endif

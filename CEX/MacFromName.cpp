@@ -31,17 +31,27 @@ IMac* MacFromName::GetInstance(Macs MacType)
 	{
 		switch (MacType)
 		{
-		case Macs::CMAC:
+			case Macs::CMAC:
 			{
 				mptr = new CMAC(BlockCiphers::AES);
 				break;
 			}
-			case Macs::CMACAHXS256:
+			case Macs::CMACRHXH256:
+			{
+				mptr = new CMAC(BlockCiphers::RHXH256);
+				break;
+			}
+			case Macs::CMACRHXH512:
+			{
+				mptr = new CMAC(BlockCiphers::RHXH512);
+				break;
+			}
+			case Macs::CMACRHXS256:
 			{
 				mptr = new CMAC(BlockCiphers::RHXS256);
 				break;
 			}
-			case Macs::CMACAHXS512:
+			case Macs::CMACRHXS512:
 			{
 				mptr = new CMAC(BlockCiphers::RHXS512);
 				break;
@@ -51,12 +61,22 @@ IMac* MacFromName::GetInstance(Macs MacType)
 				mptr = new GMAC(BlockCiphers::AES);
 				break;
 			}
-			case Macs::GMACAHXS256:
+			case Macs::GMACRHXH256:
+			{
+				mptr = new GMAC(BlockCiphers::RHXH256);
+				break;
+			}
+			case Macs::GMACRHXH512:
+			{
+				mptr = new GMAC(BlockCiphers::RHXH512);
+				break;
+			}
+			case Macs::GMACRHXS256:
 			{
 				mptr = new GMAC(BlockCiphers::RHXS256);
 				break;
 			}
-			case Macs::GMACAHXS512:
+			case Macs::GMACRHXS512:
 			{
 				mptr = new GMAC(BlockCiphers::RHXS512);
 				break;

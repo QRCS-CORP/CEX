@@ -3,15 +3,15 @@
 
 #include "CexDomain.h"
 #include "CryptoSocketException.h"
-#include "Event.h"
-#include "IntegerTools.h"
-#include "MemoryStream.h"
-#include "MemoryTools.h"
-#include "Mutex.h"
 #include "Wait.h"
+#include "WindowsHandle.h"
 
 #if defined(CEX_WINDOWS_SOCKETS)
 #	include <winsock2.h>
+#	include <ws2def.h>
+#	include <WS2tcpip.h>
+#	include <inaddr.h>
+#	pragma comment(lib, "ws2_32.lib")
 #else
 #	include <sys/time.h>
 #	include <sys/types.h>
@@ -21,50 +21,44 @@
 
 NAMESPACE_NETWORK
 
-#if !defined(INADDR_NONE)
-#	define INADDR_NONE 0xFFFFFFFF
-#endif
+using Exception::CryptoSocketException;
+using Enumeration::ErrorCodes;
+using Utility::WindowsHandle;
 
 #if defined(CEX_WINDOWS_SOCKETS)
-	const int SOCKET_EINVAL = WSAEINVAL;
-	const int SOCKET_EWOULDBLOCK = WSAEWOULDBLOCK;
 	typedef int socklen_t;
 	typedef ::SOCKET socket_t;
 #else
 	typedef int socket_t;
-	const socket_t INVALID_SOCKET = -1;
-	const int SD_RECEIVE = 0;
-	const int SD_SEND = 1;
-	const int SD_BOTH = 2;
-	const int SOCKET_ERROR = -1;
-	const int SOCKET_EINVAL = EINVAL;
-	const int SOCKET_EWOULDBLOCK = EWOULDBLOCK;
 #endif
 
-using Exception::CryptoSocketException;
-using Enumeration::ErrorCodes;
-using Routing::Event;
-using Utility::IntegerTools;
-using IO::MemoryStream;
-using Utility::MemoryTools;
-
-enum class SocketAddressFamilyTypes : int
+/// <summary>
+/// The socket address family type
+/// </summary>
+enum class SocketAddressFamilies : int
 {
 	/// <summary>
 	/// No address family is specified
 	/// </summary>
-	None = 0x00000000L,
+	None = AF_UNSPEC,
+	/// <summary>
+	/// Unix local to host (pipes, portals)
+	/// </summary>
+	UNIX = AF_UNIX,
 	/// <summary>
 	/// The Internet Protocol 4 address family
 	/// </summary>
-	IPv4 = 0x00000002L,
+	IPv4 = AF_INET,
 	/// <summary>
 	/// The Internet Protocol 6 address family
 	/// </summary>
-	IPv6 = 0x00000017L
+	IPv6 = AF_INET6
 };
 
-enum class SocketConnectionTypes : int
+/// <summary>
+/// The socket transmission type
+/// </summary>
+enum class SocketTypes : int
 {
 	/// <summary>
 	/// No flag is used
@@ -73,25 +67,131 @@ enum class SocketConnectionTypes : int
 	/// <summary>
 	/// Streaming connection
 	/// </summary>
-	Stream = 0x00000001L,
+	Stream = SOCK_STREAM,
 	/// <summary>
 	/// Datagram connection
 	/// </summary>
-	Datagram = 0x00000002L,
+	Datagram = SOCK_DGRAM,
 	/// <summary>
 	/// TCP Raw socket
 	/// </summary>
-	Raw = 0x00000003L,
+	Raw = SOCK_RAW,
 	/// <summary>
 	/// Reliable protocol
 	/// </summary>
-	Reliable = 0x00000004L,
+	Reliable = SOCK_RDM,
 	/// <summary>
 	/// Sequenced packets
 	/// </summary>
-	Sequenced = 0x00000005L
+	Sequenced = SOCK_SEQPACKET
 };
 
+/// <summary>
+/// The socket IP protocol type
+/// </summary>
+enum class SocketProtocols : int
+{
+	/// <summary>
+	/// IPv6 Hop-by-Hop options
+	/// </summary>
+	IPv6HopOpts = IPPROTO_HOPOPTS,
+	/// <summary>
+	/// Internet Control Messaging Protocol
+	/// </summary>
+	ICMP = IPPROTO_ICMP,
+	/// <summary>
+	/// Internet Gateway Messaging Protocol
+	/// </summary>
+	IGMP = IPPROTO_IGMP,
+	/// <summary>
+	/// Internet Protocol version 4
+	/// </summary>
+	IPv4 = IPPROTO_IPV4,
+	/// <summary>
+	/// Transport Control Protocol
+	/// </summary>
+	TCP = IPPROTO_TCP,
+	/// <summary>
+	/// Exterior Gateway Protocol
+	/// </summary>
+	EGP = IPPROTO_EGP,
+	/// <summary>
+	/// Interior Gateway Protocol
+	/// </summary>
+	IGP = IPPROTO_IGP,
+	/// <summary>
+	/// Unreliable Delivery Protocol
+	/// </summary>
+	UDP = IPPROTO_UDP,
+	/// <summary>
+	/// IPSEC Discovery Protocol
+	/// </summary>
+	IDP = IPPROTO_IDP,
+	/// <summary>
+	/// Reliable Datagram Protocol
+	/// </summary>
+	RDP = IPPROTO_RDP,
+	/// <summary>
+	/// IPv6 header
+	/// </summary>
+	IPv6 = IPPROTO_IPV6,
+	/// <summary>
+	/// IPv6 Routing header
+	/// </summary>
+	IPv6Routing = IPPROTO_ROUTING,
+	/// <summary>
+	/// IPv6 fragmentation header
+	/// </summary>
+	IPv6Fragment = IPPROTO_FRAGMENT,
+	/// <summary>
+	/// Encapsulating security payload
+	/// </summary>
+	ESP = IPPROTO_ESP,
+	/// <summary>
+	/// IPv6 authentication header
+	/// </summary>
+	AH = IPPROTO_AH,
+	/// <summary>
+	/// ICMPv6
+	/// </summary>
+	ICMPv6 = IPPROTO_ICMPV6,
+	/// <summary>
+	/// IPv6 no next header
+	/// </summary>
+	IPv6NoHeader = IPPROTO_NONE,
+	/// <summary>
+	/// IPv6 Destination options
+	/// </summary>
+	DSTOPTS = IPPROTO_DSTOPTS,
+	/// <summary>
+	/// Neighbor Discovery?
+	/// </summary>
+	ND = IPPROTO_ND,
+	/// <summary>
+	/// Protocol Independant Multicast
+	/// </summary>
+	PIM = IPPROTO_PIM,
+	/// <summary>
+	///	Pragmatic General Multicast
+	/// </summary>
+	PGM = IPPROTO_PGM,
+	/// <summary>
+	///	Layer 2 Tunneling Protocol
+	/// </summary>
+	L2TP = IPPROTO_L2TP,
+	/// <summary>
+	/// Stream Control Transmission Protocol
+	/// </summary>
+	SCTP = IPPROTO_SCTP,
+	/// <summary>
+	/// Raw Packet
+	/// </summary>
+	RAW = IPPROTO_RAW
+};
+
+/// <summary>
+/// The socket recieve api flags
+/// </summary>
 enum class SocketRecieveFlags : int
 {
 	/// <summary>
@@ -112,6 +212,9 @@ enum class SocketRecieveFlags : int
 	WaitAll = 0x00000008L
 };
 
+/// <summary>
+/// The socket send api flags
+/// </summary>
 enum class SocketSendFlags : int
 {
 	/// <summary>
@@ -128,11 +231,82 @@ enum class SocketSendFlags : int
 	SendOOB = 0x00000001L
 };
 
+/// <summary>
+/// The socket shutdown api flags
+/// </summary>
 enum class SocketShutdownFlags : int
 {
+	/// <summary>
+	/// Shut down the receiving channel
+	/// </summary>
 	Receive = 0x00000000L,
+	/// <summary>
+	/// Shut down the sending channel
+	/// </summary>
 	Send = 0x00000001L,
+	/// <summary>
+	/// Shut down both channels
+	/// </summary>
 	Both = 0x00000002L
+};
+
+/// <summary>
+/// The socket event flags
+/// </summary>
+enum class SocketEvent : int
+{
+	/// <summary>
+	/// The socket process has completed successfully
+	/// </summary>
+	Success = 0x00000000L,
+	/// <summary>
+	/// The socket process has started successfully
+	/// </summary>
+	Started = 0x00000001L,
+	/// <summary>
+	/// The socket process has shutdown successfully
+	/// </summary>
+	Shutdown = 0x00000002L,
+	/// <summary>
+	/// The socket connection was accepted
+	/// </summary>
+	Accepted = 0x00000003L,
+	/// <summary>
+	/// The socket connection was accepted
+	/// </summary>
+	Bound = 0x00000004L,
+	/// <summary>
+	/// The socket was closed successfully
+	/// </summary>
+	Closed = 0x00000005L,
+	/// <summary>
+	/// The socket was connected successfully
+	/// </summary>
+	Connected = 0x00000006L,
+	/// <summary>
+	/// The socket was created successfully
+	/// </summary>
+	Created = 0x00000007L,
+	/// <summary>
+	/// The socket was detached from the server
+	/// </summary>
+	Detached = 0x00000008L,
+	/// <summary>
+	/// The socket is in the listening state
+	/// </summary>
+	Listening = 0x00000009L,
+	/// <summary>
+	/// The socket has received data
+	/// </summary>
+	Received = 0x0000000AL,
+	/// <summary>
+	/// The socket has sent the data
+	/// </summary>
+	Sent = 0x0000000BL,
+	/// <summary>
+	/// The socket process has failed
+	/// </summary>
+	Failure = 0x00FFFFFFL
 };
 
 /// <summary>
@@ -140,24 +314,10 @@ enum class SocketShutdownFlags : int
 /// </summary>
 class Socket
 {
-private:
-	
-	socket_t m_socket;
-	bool m_owner;
-
 public:
 
-	//~~~Events~~~//
-
-	/// <summary>
-	/// The socket changed event; raised when a socket operation has completed
-	/// </summary>
-	Event<int> SocketChanged;
-
-	/// <summary>
-	/// The socket received event; raised when data has been received on a socket connection
-	/// </summary>
-	Event<std::vector<byte>&> SocketReceived;
+	socket_t m_rawSocket;
+	bool m_isOwner;
 
 	//~~~Constructors~~~//
 
@@ -167,24 +327,27 @@ public:
 	Socket();
 
 	/// <summary>
-	/// Initialize the class with a socket_t
+	/// Initialize the class with a socket_t type
 	/// </summary>
 	/// 
-	/// <param name="Socket">The socket used to initialize the socket state</param>
-	/// <param name="Owner">The owner of the socket</param>
-	Socket(socket_t Socket = INVALID_SOCKET, bool Owner = false);
-
-	/// <summary>
-	/// Copy constructor; initialize the class with a Socket class
-	/// </summary>
-	/// 
-	/// <param name="Socket">The socket used to initialize the socket state</param>
-	Socket(const Socket &Socket);
+	/// <param name="Socket">The pointer to the socket used to initialize the socket state</param>
+	/// <param name="Owner">The owner of the socket; local ownership is true, remote false</param>
+	Socket(socket_t &Socket, bool Owner);
 
 	/// <summary>
 	/// The destructor
 	/// </summary>
-	~Socket();
+	virtual ~Socket();
+
+	operator socket_t()
+	{
+		return m_rawSocket;
+	}
+
+	socket_t GetSocket() const
+	{
+		return m_rawSocket;
+	}
 
 	//~~~Public Functions~~~//
 
@@ -197,9 +360,9 @@ public:
 	/// <param name="PsaLength">The connecting sockets address buffer length</param>
 	///
 	/// <returns>Returns true if the connection has been accepted</returns>
-	/// <exception cref="CryptoSocketException">Thrown if the socket is rejected</exception>
-	/// <remarks>Successful connection raises the SocketChanged event</remarks>
-	bool Accept(Socket &Target, sockaddr* Psa, socklen_t* PsaLength);
+	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
+	/// <remarks>Successful connection raises the SocketChanged event with the SocketEvent::Accepted flag</remarks>
+	bool Accept(Socket &Target, sockaddr* Psa = nullptr, socklen_t* PsaLength = nullptr);
 
 	/// <summary>
 	/// Attach a socket to the local socket
@@ -215,10 +378,11 @@ public:
 	/// 
 	/// <param name="Target">The address port number</param>
 	/// <param name="Psa">The address string</param>
+	/// <param name="AddressFamily">The address family type; default is IPv4</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the IP addres is invalid</exception>
-	/// <remarks>Successful binding raises the SocketChanged event</remarks>
-	void Bind(ushort Port, std::string &Address);
+	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
+	/// <remarks>Successful binding raises the SocketChanged event with the SocketEvent::Bound flag</remarks>
+	void Bind(ushort Port, const std::string &Address, SocketAddressFamilies AddressFamily = SocketAddressFamilies::IPv4);
 
 	/// <summary>
 	/// The Bind function associates an address with a socket
@@ -227,8 +391,8 @@ public:
 	/// <param name="Psa">A pointer to the socket address structure</param>
 	/// <param name="PsaLength">The size of the socket address structure</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the address structure is invalid</exception>
-	/// <remarks>Successful binding raises the SocketChanged event</remarks>
+	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
+	/// <remarks>Successful binding raises the SocketChanged event with the SocketEvent::Bound flag</remarks>
 	void Bind(const sockaddr* Psa, socklen_t PsaLength);
 
 	/// <summary>
@@ -237,16 +401,14 @@ public:
 	/// 
 	/// <param name="SocketType">A pointer to the socket address structure</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the address structure is invalid</exception>
-	/// <remarks>Successful socket creation raises the SocketChanged event</remarks>
-	void Create(SocketAddressFamilyTypes SocketType);
+	/// <remarks>Successful socket creation raises the SocketChanged event with the SocketEvent::Created flag</remarks>
+	void Create(SocketAddressFamilies FamilyType = SocketAddressFamilies::IPv4, SocketTypes SocketType = SocketTypes::Stream, SocketProtocols ProtocolType = SocketProtocols::IPv4);
 
 	/// <summary>
 	/// The CloseSocket function closes and disposes of the socket
 	/// </summary>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the close socket operation fails</exception>
-	/// <remarks>Successful socket closure raises the SocketChanged event</remarks>
+	/// <remarks>Successful socket closure raises the SocketChanged event with the SocketEvent::Closed flag</remarks>
 	void CloseSocket();
 
 	/// <summary>
@@ -255,11 +417,11 @@ public:
 	/// 
 	/// <param name="Address">The IP protocol address string</param>
 	/// <param name="Port">The application port number</param>
+	/// <param name="AddressFamily">The address family type; default is IPv4</param>
 	///
 	/// <returns>Returns true if the connection has been accepted</returns>
-	/// <exception cref="CryptoSocketException">Thrown if the host can not be found</exception>
-	/// <remarks>Successful connection raises the SocketChanged event</remarks>
-	bool Connect(std::string &Address, ushort Port);
+	/// <remarks>Successful connection raises the SocketChanged event with the SocketEvent::Connected flag</remarks>
+	bool Connect(const std::string &Address, ushort Port, SocketAddressFamilies AddressFamily = SocketAddressFamilies::IPv4);
 
 	/// <summary>
 	/// The Connect function establishes a connection to a specified socket
@@ -269,8 +431,7 @@ public:
 	/// <param name="PsaLength">The size of the address structure</param>
 	///
 	/// <returns>Returns true if the connection has been accepted</returns>
-	/// <exception cref="CryptoSocketException">Thrown if the connection fails</exception>
-	/// <remarks>Successful connection raises the SocketChanged event</remarks>
+	/// <remarks>Successful connection raises the SocketChanged event with the SocketEvent::Connected flag</remarks>
 	bool Connect(const sockaddr* Psa, socklen_t PsaLength);
 
 	/// <summary>
@@ -278,8 +439,14 @@ public:
 	/// </summary>
 	///
 	/// <returns>Returns the disconnected socket</returns>
-	/// <remarks>Successful disconnection raises the SocketChanged event</remarks>
 	socket_t DetachSocket();
+
+	/// <summary>
+	/// Get the last error generated by the internal socket library
+	/// </summary>
+	///
+	/// <returns>Returns the last error state</returns>
+	static int GetLastError();
 
 	/// <summary>
 	/// Retrieves the address of the connected peer
@@ -287,8 +454,6 @@ public:
 	/// 
 	/// <param name="Psa">The IP protocol address structure containing the data</param>
 	/// <param name="PsaLength">The size of the address structure</param>
-	///
-	/// <exception cref="CryptoSocketException">Thrown if the query fails</exception>
 	void GetPeerName(sockaddr* Psa, socklen_t* SaLength);
 
 	/// <summary>
@@ -297,8 +462,6 @@ public:
 	/// 
 	/// <param name="Psa">The IP protocol address structure containing the data</param>
 	/// <param name="PsaLength">The size of the address structure</param>
-	///
-	/// <exception cref="CryptoSocketException">Thrown if the query fails</exception>
 	void GetSocketName(sockaddr* Psa, socklen_t* PsaLength);
 
 	/// <summary>
@@ -308,8 +471,7 @@ public:
 	/// <param name="Command">The command to pass to the socket</param>
 	/// <param name="Arguments">The command arguments</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the IO mode change fails</exception>
-	/// <remarks>Successful IO operation raises the SocketChanged event</remarks>
+	/// <remarks>Successful completion raises the SocketChanged event with the SocketEvent::Success flag</remarks>
 	void IOCtl(long Command, unsigned long* Arguments);
 
 	/// <summary>
@@ -319,8 +481,8 @@ public:
 	/// <param name="BackLog">The maximum pending connections queue length</param>
 	///
 	/// <exception cref="CryptoSocketException">Thrown if the socket fails to go into listening state</exception>
-	/// <remarks>Successful change to listening state raises the SocketChanged event</remarks>
-	void Listen(int BackLog);
+	/// <remarks>Successful change to listening state raises the SocketChanged event with the SocketEvent::Listening flag</remarks>
+	void Listen(int BackLog = 5);
 
 	/// <summary>
 	/// Get the port number using the connection parameters
@@ -329,8 +491,8 @@ public:
 	/// <param name="Name">The service name</param>
 	/// <param name="Protocol">The protocol name</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the socket fails to go into listening state</exception>
-	ushort PortNameToNumber(const std::string &Name, const std::string &Protocol);
+	/// <returns>The port number, or zero on failure</returns>
+	static ushort PortNameToNumber(const std::string &Name, const std::string &Protocol = std::string("tcp"));
 
 	/// <summary>
 	/// Receive data from a connected socket or a bound connectionless socket
@@ -339,9 +501,8 @@ public:
 	/// <param name="Output">The buffer that receives incoming data</param>
 	/// <param name="Flags">Flags that influence the behavior of the receive function</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the socket fails to go into listening state</exception>
-	/// <remarks>Successful receive operation raises the SocketChanged event</remarks>
-	uint Receive(std::vector<byte>& Output, SocketRecieveFlags Flags);
+	/// <remarks>Successful receive operation raises the SocketChanged event with the SocketEvent::Received flag</remarks>
+	uint Receive(std::vector<byte> &Output, SocketRecieveFlags Flags);
 
 	/// <summary>
 	/// Determines the status of a socket waiting for a synchronous connection
@@ -350,7 +511,7 @@ public:
 	/// <param name="Buffer">The buffer that receives incoming data</param>
 	/// <param name="Flags">Flags that influence the behavior of this function</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the socket fails to go into listening state</exception>
+	/// <returns>Returns the ready state of the receive operation</returns>
 	bool ReceiveReady(const timeval* Timeout);
 
 	/// <summary>
@@ -361,8 +522,7 @@ public:
 	/// <param name="Length">The number of bytes to send</param>
 	/// <param name="Flags">Flags that influence the behavior of the send function</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the socket fails to go into listening state</exception>
-	/// <remarks>Successful send operation raises the SocketChanged event</remarks>
+	/// <remarks>Successful send operation raises the SocketChanged event with the SocketEvent::Sent flag</remarks>
 	uint Send(const std::vector<byte>& Input, size_t Length, SocketSendFlags Flags);
 
 	/// <summary>
@@ -371,8 +531,15 @@ public:
 	/// 
 	/// <param name="Timeout">The maximum time to wait for a response from the socket</param>
 	///
-	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
+	/// <returns>Returns the ready state of the send operation</returns>
 	bool SendReady(const timeval* Timeout);
+
+	/// <summary>
+	/// Set the last error generated by the socket library
+	/// </summary>
+	/// 
+	/// <param name="ErrorCode">The error code</param>
+	static void SetLastError(int ErrorCode);
 
 	/// <summary>
 	/// Tests the socket to see if it is ready to send data
@@ -381,41 +548,42 @@ public:
 	/// <param name="Parameters">The shutdown parameters</param>
 	///
 	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
-	/// <remarks>Successful change to shutdown state raises the SocketChanged event</remarks>
+	/// <remarks>Successful change to shutdown state raises the SocketChanged event with the SocketEvent::ShutDown flag</remarks>
 	void ShutDown(SocketShutdownFlags Parameters);
 
-private:
+	/// <summary>
+	/// Shut down the sockets library
+	/// </summary>
+	static void ShutDownSockets();
 
 	/// <summary>
-	/// Terminates the winsock2 dll connection
+	/// Start the sockets library
 	/// </summary>
-	///
-	/// <exception cref="CryptoSocketException">Thrown if the socket returns an error</exception>
-	/// <remarks>Successful change to shutdown state raises the SocketChanged event</remarks>
-	void ShutDownSockets();
-
-	/// <summary>
-	/// Initializes the winsock2 dll connection
-	/// </summary>
-	///
-	/// <exception cref="CryptoSocketException">Thrown if winsock initialization returns an error</exception>
-	/// <remarks>Successful winsock initialization raises the SocketChanged event</remarks>
-	void StartSockets();
-
-	int GetLastError();
-
-	void SetLastError(int ErrorCode);
+	static void StartSockets();
 };
 
 
-/*class SocketsInitializer
+class SocketsInitializer
 {
 public:
-	SocketsInitializer() { Socket::StartSockets(); }
-	~SocketsInitializer() { try { Socket::ShutdownSockets(); } catch (...) {} }
+	SocketsInitializer() 
+	{ 
+		Socket::StartSockets();
+	}
+
+	~SocketsInitializer() 
+	{ 
+		try 
+		{ 
+			Socket::ShutDownSockets(); 
+		} 
+		catch (...) 
+		{
+		} 
+	}
 };
 
-class SocketReceiver : public NetworkReceiver
+class SocketReceiver //: public NetworkReceiver
 {
 public:
 	SocketReceiver(Socket &s);
@@ -445,9 +613,9 @@ private:
 #else
 	unsigned int m_lastResult;
 #endif
-};*/
+};
 
-/*class SocketSender //: public NetworkSender
+class SocketSender //: public NetworkSender
 {
 public:
 	SocketSender(Socket &s);
@@ -477,9 +645,10 @@ private:
 #else
 	unsigned int m_lastResult;
 #endif
-};*/
+};
 
-/* //! socket-based implementation of NetworkSource
+
+/*//! socket-based implementation of NetworkSource
 class SocketSource : public NetworkSource, public Socket
 {
 public:

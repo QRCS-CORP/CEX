@@ -21,6 +21,7 @@ private:
 
 	static const std::string CLASS_NAME;
 	static const bool HAS_CMUL;
+	static const size_t TAG_SIZE = 16;
 
 	class GhashState;
 	std::unique_ptr<GhashState> m_dgtState;
@@ -61,9 +62,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">The destination array</param>
-	/// <param name="Counter">The size of the AD</param>
-	/// <param name="Length">The plain text size</param>
-	void Finalize(std::vector<byte> &Output, size_t Counter, size_t Length);
+	/// <param name="ADLength">The size of the AD</param>
+	/// <param name="TxtLength">The plain text size</param>
+	void Finalize(std::vector<byte> &Output, size_t ADLength, size_t TxtLength);
 
 	/// <summary>
 	/// Initialize the hash key
@@ -85,6 +86,11 @@ public:
 	/// Reset the hash function
 	/// </summary>
 	void Reset();
+
+	/// <summary>
+	/// Read Only: The hash code length in bytes
+	/// </summary>
+	const size_t TagSize();
 
 	/// <summary>
 	/// Update the hash function

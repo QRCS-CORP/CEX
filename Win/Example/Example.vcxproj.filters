@@ -13,33 +13,51 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Examples">
+      <UniqueIdentifier>{625240cb-69d3-471e-be63-6edebaf5a7d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Support">
+      <UniqueIdentifier>{262db880-6e5d-45e4-87b5-9f0f58c27555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Examples">
+      <UniqueIdentifier>{005c2d24-5a98-45bd-9290-42da357d1b6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Support">
+      <UniqueIdentifier>{1380deb2-ae90-455b-ab42-24957a8826a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ExampleUtils.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="CFES.cpp">
+      <Filter>Source Files\Examples</Filter>
     </ClCompile>
     <ClCompile Include="Examples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileTools.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ExampleUtils.cpp">
+      <Filter>Source Files\Support</Filter>
     </ClCompile>
-    <ClCompile Include="FileEncryption.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="FileTools.cpp">
+      <Filter>Source Files\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="CDES.cpp">
+      <Filter>Source Files\Examples</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ExampleUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FileTools.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="CFES.h">
+      <Filter>Header Files\Examples</Filter>
     </ClInclude>
-    <ClInclude Include="FileEncryption.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ExampleUtils.h">
+      <Filter>Header Files\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTools.h">
+      <Filter>Header Files\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="CDES.h">
+      <Filter>Header Files\Examples</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,11 @@
 #include "ExampleUtils.h"
+#include <algorithm>
+#include <codecvt>
 #include <iostream>
+#include <locale.h>
 #include <stdio.h>
+#include <string>
+
 #if defined(_WIN32)
 #	include <Windows.h>
 #else
@@ -10,6 +15,56 @@
 
 namespace Example
 {
+	std::string ExampleUtils::GetLanguage()
+	{
+		setlocale(LC_ALL, "");
+		std::string lng;
+
+		lng = "";
+		char* tmpl = setlocale(LC_CTYPE, NULL);
+
+		if (tmpl != nullptr)
+		{
+			lng = std::string(tmpl);
+		}
+
+		if (lng.empty())
+		{
+			lng = std::string("EN_CH");
+		}
+		else
+		{
+			std::transform(lng.begin(), lng.end(), lng.begin(), ::toupper);
+		}
+
+		if (lng.find("EN") != std::string::npos)
+		{
+			lng = std::string("EN");
+		}
+		else if (lng.find("FR") != std::string::npos)
+		{
+			lng = std::string("FR");
+		}
+		else if (lng.find("DE") != std::string::npos)
+		{
+			lng = std::string("DE");
+		}
+		else if (lng.find("PT") != std::string::npos)
+		{
+			lng = std::string("PT");
+		}
+		else if (lng.find("ES") != std::string::npos)
+		{
+			lng = std::string("ES");
+		}
+		else
+		{
+			lng = std::string("EN");
+		}
+
+		return lng;
+	}
+
 	std::string ExampleUtils::GetResponse()
 	{
 		std::string resp = "";
@@ -72,6 +127,31 @@ namespace Example
 #endif
 	}
 
+	std::wstring ExampleUtils::NarrowToWide(const std::string &Input)
+	{
+		try
+		{
+			std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+			return converter.from_bytes(Input);
+		}
+		catch (std::range_error &e)
+		{
+			std::wstring result;
+			size_t i;
+			size_t length;
+
+			length = Input.length();
+			result.reserve(length);
+
+			for (i = 0; i < length; i++)
+			{
+				result.push_back(Input[i] & 0xFF);
+			}
+
+			return result;
+		}
+	}
+
 	void ExampleUtils::Print(const std::string &Data)
 	{
 		std::cout << Data << std::endl;
@@ -123,7 +203,8 @@ namespace Example
 	{
 		try
 		{
-			std::cout << Data << std::endl;
+			std::wstring ws = NarrowToWide(Data);
+			std::wcout << ws << std::endl;
 		}
 		catch (std::exception&)
 		{

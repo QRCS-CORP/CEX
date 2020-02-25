@@ -77,6 +77,12 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+
+
+		bool TestRijndael256();
+
+
+
 		//~~~Public Functions~~~//
 
 		/// <summary>

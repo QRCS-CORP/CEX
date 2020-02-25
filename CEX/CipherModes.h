@@ -35,37 +35,41 @@ enum class CipherModes : byte
 	/// </summary>
 	ECB = 5,
 	/// <summary>
+	/// Galois Counter Mode; Counter mode encryption with GMAC authentication
+	/// </summary>
+	GCM = 6,
+	/// <summary>
 	/// Block cipher counter-mode with Hash-based Authentication prefix name
 	/// </summary>
-	HBA = 6,
+	HBA = 7,
 	/// <summary>
 	/// HBA AEAD mode, parameters: CTR(RHXH-256) with HMAC(SHA2-256) Authentication
 	/// </summary>
-	HBAH256 = 7,
+	HBAH256 = 8,
 	/// <summary>
 	/// HBA AEAD mode, parameters: CTR(RHXH-512) with HMAC(SHA2-512) Authentication
 	/// </summary>
-	HBAH512 = 8,
+	HBAH512 = 9,
 	/// <summary>
 	/// HBA AEAD mode, parameters: CTR(RHXS-256) with KMAC-256 Authentication
 	/// </summary>
-	HBAS256 = 9,
+	HBAS256 = 10,
 	/// <summary>
 	/// HBA AEAD mode, parameters: CTR(RHXS-512) with KMAC-512 Authentication
 	/// </summary>
-	HBAS512 = 10,
+	HBAS512 = 11,
 	/// <summary>
 	/// HBA AEAD mode, parameters: CTR(RHXS-1024) with KMAC-1024 Authentication
 	/// </summary>
-	HBAS1024 = 11,
+	HBAS1024 = 12,
 	/// <summary>
 	/// Little Endian Integer Counter Mode
 	/// </summary>
-	ICM = 12,
+	ICM = 13,
 	/// <summary>
 	/// Output FeedBack Mode
 	/// </summary>
-	OFB = 13
+	OFB = 14
 };
 
 class CipherModeConvert

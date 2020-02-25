@@ -104,6 +104,8 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -125,6 +127,8 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,6 +154,8 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,6 +180,8 @@
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -295,7 +303,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Test\ACPTest.h" />
-    <ClInclude Include="..\..\Test\MCSTest.h" />
     <ClInclude Include="..\..\Test\AeadTest.h" />
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\AsymmetricKeyTest.h" />
@@ -306,6 +313,7 @@
     <ClInclude Include="..\..\Test\DilithiumTest.h" />
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\HCRTest.h" />
+    <ClInclude Include="..\..\Test\NetworkTest.h" />
     <ClInclude Include="..\..\Test\NistRng.h" />
     <ClInclude Include="..\..\Test\RainbowTest.h" />
     <ClInclude Include="..\..\Test\RandomUtils.h" />
@@ -367,7 +375,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\ACPTest.cpp" />
-    <ClCompile Include="..\..\Test\MCSTest.cpp" />
     <ClCompile Include="..\..\Test\AeadTest.cpp" />
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\AsymmetricKeyTest.cpp" />
@@ -378,6 +385,7 @@
     <ClCompile Include="..\..\Test\DilithiumTest.cpp" />
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
     <ClCompile Include="..\..\Test\HCRTest.cpp" />
+    <ClCompile Include="..\..\Test\NetworkTest.cpp" />
     <ClCompile Include="..\..\Test\NistRng.cpp" />
     <ClCompile Include="..\..\Test\RainbowTest.cpp" />
     <ClCompile Include="..\..\Test\RandomUtils.cpp" />

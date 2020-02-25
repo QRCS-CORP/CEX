@@ -203,7 +203,7 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: The CTR initialization vector (exposed for MCS)
+	/// Read Only: The CTR initialization vector
 	/// </summary>
 	const std::vector<byte> &Nonce();
 

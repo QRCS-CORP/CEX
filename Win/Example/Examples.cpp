@@ -1,6 +1,6 @@
 #include "Common.h"
 #include "ExampleUtils.h"
-#include "FileEncryption.h"
+#include "CFES.h"
 
 using namespace Example;
 
@@ -22,12 +22,12 @@ int main()
 
 	try
 	{
-		FileEncryption::Help();
-		FileEncryption::PrintTitle();
-			
+		CFES::PrintTitle();
+		CFES::Help();
+
 		while (true)
 		{
-			FileEncryption::Run();
+			CFES::Run();
 			ExampleUtils::WriteLine("");
 			ExampleUtils::WriteLine("Press Y and enter to encrypt another file, any other key to exit.");
 

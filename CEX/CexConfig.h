@@ -117,13 +117,18 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	include <unistd.h>
 #endif
 
+#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_UNIX)
+#	define CEX_HIGHRES_TIMER
+#endif
+
+//! used to represent infinite time
+const unsigned long CEX_INFINITE_TIME = ULONG_MAX;
 
 #if defined(_MSC_VER)
 #	define CEX_NO_VTABLE __declspec(novtable)
 #else
 #	define CEX_NO_VTABLE
 #endif
-
 
 // 32 or 64 bit architecture
 #if (defined(__x86_64__) || defined(__amd64__) || defined(_M_X64))
@@ -145,6 +150,10 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	else
 #		define TYPE_OF_SOCKLEN_T ::socklen_t
 #	endif
+#endif
+
+#if defined(CEX_HIGHRES_TIMER) && (defined(CEX_BERKELY_SOCKETS) || defined(CEX_WINDOWS_SOCKETS))
+#	define CEX_SOCKETS_AVAILABLE
 #endif
 
 #if defined(_WIN32)
@@ -216,6 +225,12 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	elif defined(__alpha)
 #		define CEX_ARCH_ALPHA
 #	endif
+#endif
+
+#if defined(_MSC_VER)
+#	define CEX_NO_VTABLE __declspec(novtable)
+#else
+#	define CEX_NO_VTABLE
 #endif
 
 #if defined(CEX_ARCH_IX86)

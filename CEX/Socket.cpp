@@ -1,38 +1,57 @@
 #include "Socket.h"
 #include "IntegerTools.h"
-#include "inaddr.h"
 #include <assert.h>
 
 NAMESPACE_NETWORK
 
+/*
+* TODO:
+* Flesh out socket ErrorCodes enum and SetError constants and apply them
+* Can enums be hard coded or not (do they align to standard values in *nix/Win?)
+* Move more to .cpp file, and verify all includes are necessary
+* Can and should reverences be used over pointers with Psa?
+* Add the Message wait class
+* Add server and client classes
+* Network sink? QOS? Compression? What else is required?
+* Write tests for every function
+* Test on *nix..
+*/
+
 using Utility::IntegerTools;
+
+#if !defined(INADDR_NONE)
+#	define INADDR_NONE 0xFFFFFFFF* 
+#endif
+
+#if defined(CEX_WINDOWS_SOCKETS)
+	const int SOCKET_EINVAL = WSAEINVAL;
+	const int SOCKET_EWOULDBLOCK = WSAEWOULDBLOCK;
+#else
+	const socket_t INVALID_SOCKET = -1;
+	const int SD_RECEIVE = 0;
+	const int SD_SEND = 1;
+	const int SD_BOTH = 2;
+	const int SOCKET_ERROR = -1;
+	const int SOCKET_EINVAL = EINVAL;
+	const int SOCKET_EWOULDBLOCK = EWOULDBLOCK;
+#endif
 
 //~~~Socket Class~~~//
 
 Socket::Socket()
 	:
-	m_socket(),
-	m_owner(false)
+	m_isOwner(true),
+	m_rawSocket(INVALID_SOCKET)
 {
 #if defined(CEX_WINDOWS_SOCKETS)
 	StartSockets();
 #endif
 }
 
-Socket::Socket(socket_t Socket, bool Owner)
+Socket::Socket(socket_t &Socket, bool IsOwner)
 	:
-	m_socket(Socket),
-	m_owner(Owner)
-{
-#if defined(CEX_WINDOWS_SOCKETS)
-	StartSockets();
-#endif
-}
-
-Socket::Socket(const Socket& Socket)
-	:
-	m_socket(Socket.m_socket),
-	m_owner(false)
+	m_isOwner(IsOwner),
+	m_rawSocket(Socket)
 {
 #if defined(CEX_WINDOWS_SOCKETS)
 	StartSockets();
@@ -41,13 +60,13 @@ Socket::Socket(const Socket& Socket)
 
 Socket::~Socket()
 {
-	if (m_socket != SOCKET_ERROR && m_socket != SOCKET_EINVAL)
+	if (m_rawSocket != SOCKET_ERROR && m_rawSocket != SOCKET_EINVAL)
 	{
 		CloseSocket();
-		m_socket = NULL;
+		m_rawSocket = NULL;
 	}
 
-	m_owner = false;
+	m_isOwner = false;
 
 #if defined(CEX_WINDOWS_SOCKETS)
 	ShutDownSockets();
@@ -56,48 +75,49 @@ Socket::~Socket()
 
 //~~~Public Functions~~~//
 
-bool Socket::Accept(Socket& Target, sockaddr* Psa, socklen_t* PsaLength)
+bool Socket::Accept(Socket &Target, sockaddr* Psa, socklen_t* PsaLength)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(Psa != nullptr, "the socket address has not been initialized.");
+	CEXASSERT(PsaLength != nullptr, "the socket address length has not been initialized.");
 
 	socket_t skt;
 	bool ret;
 
-	skt = accept(m_socket, Psa, PsaLength);
+	skt = accept(m_rawSocket, Psa, PsaLength);
+	ret = (skt != INVALID_SOCKET && skt != SOCKET_ERROR);
 
-	if (skt == SOCKET_ERROR)
+	if (!ret)
 	{
+		closesocket(skt);
 		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("Accept"), std::string("The connection could not be established!"), ErrorCodes::Disconnected);
+
+		throw CryptoSocketException(std::string("Socket"), std::string("Accept"), std::string("The underlying sockets library would not accept the connection!"), ErrorCodes::SocketFailure);
 	}
 
-	ret = (skt != INVALID_SOCKET && GetLastError() != SOCKET_EWOULDBLOCK);
 	Target.AttachSocket(skt, true);
-	SocketChanged(ret);
 
 	return ret;
 }
 
-void Socket::AttachSocket(socket_t& Socket, bool Owner)
+void Socket::AttachSocket(socket_t &Socket, bool IsOwner)
 {
-	if (Owner)
+	if (IsOwner)
 	{
 		CloseSocket();
 	}
 
-	m_socket = Socket;
-	m_owner = Owner;
+	m_rawSocket = Socket;
+	m_isOwner = IsOwner;
 }
 
-//#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
-
-void Socket::Bind(ushort Port, std::string& Address)
+void Socket::Bind(ushort Port, const std::string &Address, SocketAddressFamilies AddressFamily)
 {
-	/*sockaddr_in sadd;
+	sockaddr_in sadd;
 	uint res;
 
 	std::memset(&sadd, 0, sizeof(sadd));
-	sadd.sin_family = AF_INET;
+	sadd.sin_family = static_cast<int>(AddressFamily);
 
 	if (Address.size() == 0)
 	{
@@ -105,224 +125,251 @@ void Socket::Bind(ushort Port, std::string& Address)
 	}
 	else
 	{
-		res = inet_addr(Address.c_str());
-
-		if (res == INADDR_NONE)
+#if defined(CEX_WINDOWS_SOCKETS)
+		struct sockaddr_in sa;
+		res = inet_pton(AF_INET, Address.c_str(), &(sa.sin_addr));
+#else
+		res = inet_addr(addr);
+#endif
+		if (res != INADDR_NONE)
+		{
+			sadd.sin_addr.s_addr = res;
+		}
+		else
 		{
 			SetLastError(SOCKET_EINVAL);
-			throw CryptoSocketException(std::string("Socket"), std::string("Bind"), std::string("The ip address is invalid!"), ErrorCodes::InvalidAddress);
+			throw CryptoSocketException(std::string("Socket"), std::string("Bind"), std::string("The underlying sockets library would not accept the binding!"), ErrorCodes::SocketFailure);
 		}
-
-		sadd.sin_addr.s_addr = res;
 	}
 
-	sadd.sin_port = htons(static_cast<u_short>(Port));
-	Bind(reinterpret_cast<sockaddr*>(&sadd), sizeof(sadd));*/
+	sadd.sin_port = htons(static_cast<ushort>(Port));
+	Bind(reinterpret_cast<sockaddr*>(&sadd), sizeof(sadd));
 }
 
 void Socket::Bind(const sockaddr* Psa, socklen_t PsaLength)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
 	int res;
 
-	// cygwin workaround: needs const_cast
-	res = bind(m_socket, const_cast<sockaddr*>(Psa), PsaLength);
+	res = bind(m_rawSocket, const_cast<sockaddr*>(Psa), PsaLength);
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("Bind"), std::string("The connection binding has failed!"), ErrorCodes::InvalidSocket);
+		throw CryptoSocketException(std::string("Socket"), std::string("Bind"), std::string("The underlying sockets library would not accept the binding!"), ErrorCodes::SocketFailure);
 	}
-
-	SocketChanged(res);
-}
-
-void Socket::Create(SocketAddressFamilyTypes SocketType)
-{
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
-
-	m_socket = socket(AF_INET, static_cast<int>(SocketType), 0x00000000L);
-
-	if (m_socket == SOCKET_ERROR)
-	{
-		throw CryptoSocketException(std::string("Socket"), std::string("Create"), std::string("The socket could not be created!"), ErrorCodes::InvalidState);
-	}
-
-	SocketChanged(0x00000000L);
-
-	m_owner = true;
 }
 
 void Socket::CloseSocket()
 {
 	int res;
 
-	if (m_socket != INVALID_SOCKET)
+	if (m_rawSocket != INVALID_SOCKET)
 	{
 #if defined(CEX_WINDOWS_SOCKETS)
-		CancelIo(reinterpret_cast<HANDLE>(m_socket));
-		res = closesocket(m_socket);
+		res = shutdown(m_rawSocket, SD_SEND);
 
-		if (res == SOCKET_ERROR)
+		if (res != SOCKET_ERROR)
 		{
-			throw CryptoSocketException(std::string("Socket"), std::string("CloseSocket"), std::string("The socket could not be closed!"), ErrorCodes::SocketFailure);
+			closesocket(m_rawSocket);
 		}
-#else
-		res = close(m_socket);
-
-		if (res == SOCKET_ERROR)
-		{
-			throw CryptoSocketException(std::string("Socket"), std::string("CloseSocket"), std::string("The socket could not be closed!"), ErrorCodes::SocketFailure);
-		}
-#endif
-
-		m_socket = INVALID_SOCKET;
-		SocketChanged(res);
-	}
-}
-
-bool Socket::Connect(std::string& Address, ushort Port)
-{
-	/*CEXASSERT(Address.size() != 0, "the IP address is invalid.");
-
-	sockaddr_in sa;
-	hostent* lphost;
-
-	std::memset(&sa, 0, sizeof(sa));
-	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = inet_addr(Address.c_str());
-
-	if (sa.sin_addr.s_addr == INADDR_NONE)
-	{
-		//lphost = gethostbyname(Address.c_str());
-
-		if (lphost == NULL)
+		else
 		{
 			SetLastError(SOCKET_EINVAL);
-			throw CryptoSocketException(std::string("Socket"), std::string("Connect"), std::string("The destination host was not found!"), ErrorCodes::NotFound);
+			throw CryptoSocketException(std::string("Socket"), std::string("CloseSocket"), std::string("The socket closed abnormally!"), ErrorCodes::SocketFailure);
 		}
 
-		sa.sin_addr.s_addr = (reinterpret_cast<in_addr*>(lphost->h_addr))->s_addr;
+		m_rawSocket = INVALID_SOCKET;
+
+#else
+		res = close(m_rawSocket);
+
+		if (res == SOCKET_ERROR)
+		{
+			throw CryptoSocketException(std::string("Socket"), std::string("CloseSocket"), std::string("The socket closed abnormally!"), ErrorCodes::SocketFailure);
+		}
+#endif
 	}
-
-	sa.sin_port = htons(static_cast<u_short>(Port));
-
-	return Connect(reinterpret_cast<const sockaddr*>(&sa), sizeof(sa));*/
-	return false;
 }
 
-bool Socket::Connect(const sockaddr* Psa, socklen_t PsaLength)
+void Socket::Create(SocketAddressFamilies FamilyType, SocketTypes SocketType, SocketProtocols ProtocolType)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
+	m_rawSocket = socket(static_cast<int>(FamilyType), static_cast<int>(SocketType), static_cast<int>(ProtocolType));
+
+	if (m_rawSocket != SOCKET_ERROR)
+	{
+		m_isOwner = true;
+	}
+	else
+	{
+		throw CryptoSocketException(std::string("Socket"), std::string("Create"), std::string("The socket could not be created!"), ErrorCodes::SocketFailure);
+	}
+}
+
+bool Socket::Connect(const std::string &Address, ushort Port, SocketAddressFamilies AddressFamily)
+{
+	CEXASSERT(Address.size() != 0, "the IP address is invalid.");
+
+	sockaddr_in sa;
 	int res;
 	bool ret;
 
-	res = connect(m_socket, const_cast<sockaddr*>(Psa), PsaLength);
+	res = 0;
+	ret = false;
+	std::memset(&sa, 0, sizeof(sa));
+	sa.sin_family = AF_INET;
 
-	if (res == SOCKET_ERROR)
+#if defined(CEX_WINDOWS_SOCKETS)
+	inet_pton(AF_INET, Address.c_str(), &(sa.sin_addr));
+#else
+	sa.sin_addr.s_addr = inet_addr(Address.c_str());
+#endif
+
+	if (sa.sin_addr.s_addr == INADDR_NONE)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("Connect"), std::string("The connection could not be established!"), ErrorCodes::Disconnected);
+#if defined(CEX_WINDOWS_SOCKETS)
+		std::string pport = IntegerTools::ToString(Port);
+		addrinfo *result = NULL;
+		addrinfo hints;
+		ZeroMemory(&hints, sizeof(hints));
+		hints.ai_family = static_cast<int>(AddressFamily);
+		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_protocol = IPPROTO_TCP;
+
+		// resolve the server address and port
+		res = getaddrinfo(Address.c_str(), pport.c_str(), &hints, &result);
+
+		if (res == 0)
+		{
+			sa.sin_addr.s_addr = (reinterpret_cast<in_addr*>(result->ai_addr))->s_addr;
+			freeaddrinfo(result);
+		}
+#else
+		hostent* lphost;
+		sa.sin_addr.s_addr = inet_addr(Address.c_str());
+		lphost = gethostbyname(Address.c_str());
+
+		if (lphost != NULL)
+		{
+			sa.sin_addr.s_addr = (reinterpret_cast<in_addr*>(lphost->h_addr))->s_addr;
+		}
+		else
+		{
+			res = SOCKET_EINVAL;
+		}
+
+#endif
 	}
 
-	ret = (res != SOCKET_ERROR && GetLastError() != SOCKET_EWOULDBLOCK);
-
-	SocketChanged(ret);
+	if (res == 0)
+	{
+		sa.sin_port = htons(static_cast<u_short>(Port));
+		ret = Connect(reinterpret_cast<const sockaddr*>(&sa), sizeof(sa));
+	}
+	else
+	{
+		throw CryptoSocketException(std::string("Socket"), std::string("Connect"), std::string("The socket could not be connected!"), ErrorCodes::SocketFailure);
+	}
 
 	return ret;
 }
 
+bool Socket::Connect(const sockaddr* Psa, socklen_t PsaLength)
+{
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(Psa != nullptr, "the socket address can not be null.");
+
+	int res;
+
+	res = connect(m_rawSocket, const_cast<sockaddr*>(Psa), PsaLength);
+
+	if (res == SOCKET_ERROR)
+	{
+		throw CryptoSocketException(std::string("Socket"), std::string("Connect"), std::string("The socket could not be connected!"), ErrorCodes::SocketFailure);
+	}
+
+	return (GetLastError() != SOCKET_EWOULDBLOCK);
+}
+
 socket_t Socket::DetachSocket()
 {
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
+
 	socket_t skt;
 
-	skt = m_socket;
-	m_socket = INVALID_SOCKET;
-	SocketChanged(skt);
+	skt = m_rawSocket;
+	m_rawSocket = INVALID_SOCKET;
 
 	return skt;
 }
 
 void Socket::GetPeerName(sockaddr* Psa, socklen_t* SaLength)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
 	int res;
 
-	res = getpeername(m_socket, Psa, SaLength);
+	res = getpeername(m_rawSocket, Psa, SaLength);
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("GetPeerName"), std::string("The peer could not be found!"), ErrorCodes::NotFound);
+		throw CryptoSocketException(std::string("Socket"), std::string("GetPeerName"), std::string("The socket address is invalid!"), ErrorCodes::SocketFailure);
 	}
 }
 
 void Socket::GetSocketName(sockaddr* Psa, socklen_t* PsaLength)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
 	int res;
 
-	res = getsockname(m_socket, Psa, PsaLength);
+	res = getsockname(m_rawSocket, Psa, PsaLength);
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("GetSockName"), std::string("The host could not be found!"), ErrorCodes::NotFound);
+		throw CryptoSocketException(std::string("Socket"), std::string("GetSocketName"), std::string("The socket address is invalid!"), ErrorCodes::SocketFailure);
 	}
 }
 
 void Socket::IOCtl(long Command, unsigned long* Arguments)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
 	int res;
 
 #if defined(CEX_WINDOWS_SOCKETS)
-	res = ioctlsocket(m_socket, Command, Arguments);
-
-	if (res == SOCKET_ERROR)
-	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("IOCtl"), std::string("The command was refused or unrecognized!"), ErrorCodes::IllegalOperation);
-	}
-
-	SocketChanged(res);
+	res = ioctlsocket(m_rawSocket, Command, Arguments);
 #else
-	res = ioctl(m_socket, Command, Arguments);
+	res = ioctl(m_rawSocket, Command, Arguments);
+#endif
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("IOCtl"), std::string("The command was refused or unrecognized!"), ErrorCodes::IllegalOperation);
+		throw CryptoSocketException(std::string("Socket"), std::string("IOCtl"), std::string("The command is invalid or refused!"), ErrorCodes::SocketFailure);
 	}
-
-	SocketChanged(res);
-#endif
 }
 
 void Socket::Listen(int BackLog)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
 	int res;
 
-	res = listen(m_socket, BackLog);
+	res = listen(m_rawSocket, BackLog);
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("Listen"), std::string("The socket did not enter the listening state!"), ErrorCodes::Disconnected);
+		throw CryptoSocketException(std::string("Socket"), std::string("Listen"), std::string("The socket failed to enter the listening state!"), ErrorCodes::SocketFailure);
 	}
-
-	SocketChanged(res);
 }
 
-ushort Socket::PortNameToNumber(const std::string& Name, const std::string& Protocol)
+ushort Socket::PortNameToNumber(const std::string &Name, const std::string &Protocol)
 {
+	CEXASSERT(Name.size() != 0, "the name parameter is invalid");
+	CEXASSERT(Protocol.size() != 0, "the protocol parameter is invalid");
+
 	servent* se;
 	ushort port;
 
@@ -332,9 +379,9 @@ ushort Socket::PortNameToNumber(const std::string& Name, const std::string& Prot
 	{
 		se = getservbyname(Name.c_str(), Protocol.c_str());
 
-		if (!se)
+		if (se == nullptr)
 		{
-			throw CryptoSocketException(std::string("Socket"), std::string("PortNameToNumber"), std::string("The port number could not be parsed!"), ErrorCodes::InvalidAddress);
+			throw CryptoSocketException(std::string("Socket"), std::string("PortNameToNumber"), std::string("The socket failed to identify the port name!"), ErrorCodes::SocketFailure);
 		}
 
 		port = static_cast<ushort>(ntohs(se->s_port));
@@ -343,69 +390,58 @@ ushort Socket::PortNameToNumber(const std::string& Name, const std::string& Prot
 	return port;
 }
 
-uint Socket::Receive(std::vector<byte>& Output, SocketRecieveFlags Flags)
+uint Socket::Receive(std::vector<byte> &Output, SocketRecieveFlags Flags)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(Output.size() != 0, "the output parameter is invalid");
 
 	int res;
 
-	res = recv(m_socket, reinterpret_cast<char*>(Output.data()), IntegerTools::Min(static_cast<size_t>(INT_MAX), Output.size()), static_cast<int>(Flags));
+	res = recv(m_rawSocket, reinterpret_cast<char*>(Output.data()), Output.size(), static_cast<int>(Flags));
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("Receive"), std::string("The socket received an error!"), ErrorCodes::BadRead);
+		throw CryptoSocketException(std::string("Socket"), std::string("Receive"), std::string("The socket receive function has failed!"), ErrorCodes::SocketFailure);
 	}
 
-	SocketChanged(res);
-
-	return res;
+	return static_cast<uint>(res);
 }
 
 bool Socket::ReceiveReady(const timeval* Timeout)
 {
 	fd_set fds;
 	timeval tcopy;
-	int ready;
+	int res;
 
 	FD_ZERO(&fds);
-	FD_SET(m_socket, &fds);
+	FD_SET(m_rawSocket, &fds);
 
-	if (Timeout == NULL)
+	if (Timeout == nullptr)
 	{
-		ready = select((int)m_socket + 1, &fds, NULL, NULL, NULL);
+		res = select(static_cast<int>(m_rawSocket) + 1, &fds, nullptr, nullptr, nullptr);
 	}
 	else
 	{
 		// select() modified timeout on Linux
 		tcopy = *Timeout;
-		ready = select((int)m_socket + 1, &fds, NULL, NULL, &tcopy);
+		res = select(static_cast<int>(m_rawSocket) + 1, &fds, nullptr, nullptr, &tcopy);
 	}
 
-	if (ready == SOCKET_ERROR)
-	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("ReceiveReady"), std::string("The socket is not ready to receive data!"), ErrorCodes::Unreachable);
-	}
-
-	return ready > 0;
+	return static_cast<bool>(res > 0);
 }
 
-uint Socket::Send(const std::vector<byte>& Input, size_t Length, SocketSendFlags Flags)
+uint Socket::Send(const std::vector<byte> &Input, size_t Length, SocketSendFlags Flags)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
 	int res;
 
-	res = send(m_socket, reinterpret_cast<const char*>(Input.data()), IntegerTools::Min(static_cast<size_t>(INT_MAX), Length), static_cast<int>(Flags));
+	res = send(m_rawSocket, reinterpret_cast<const char*>(Input.data()), Length, static_cast<int>(Flags));
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("ReceiveReady"), std::string("The socket could not send data!"), ErrorCodes::Unreachable);
+		throw CryptoSocketException(std::string("Socket"), std::string("Send"), std::string("The socket send function has failed!"), ErrorCodes::SocketFailure);
 	}
-
-	SocketChanged(res);
 
 	return res;
 }
@@ -414,45 +450,56 @@ bool Socket::SendReady(const timeval* Timeout)
 {
 	fd_set fds;
 	timeval tcopy;
-	int ready;
+	int res;
 
 	FD_ZERO(&fds);
-	FD_SET(m_socket, &fds);
+	FD_SET(m_rawSocket, &fds);
 
 	if (Timeout == NULL)
 	{
-		ready = select((int)m_socket + 1, NULL, &fds, NULL, NULL);
+		res = select((int)m_rawSocket + 1, NULL, &fds, NULL, NULL);
 	}
 	else
 	{
 		tcopy = *Timeout;
-		ready = select((int)m_socket + 1, NULL, &fds, NULL, &tcopy);
+		res = select((int)m_rawSocket + 1, NULL, &fds, NULL, &tcopy);
 	}
 
-	if (ready == SOCKET_ERROR)
-	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("SendReady"), std::string("The socket is not ready to send data!"), ErrorCodes::SocketFailure);
-	}
-
-	return ready > 0;
+	return static_cast<bool>(res > 0);
 }
 
 void Socket::ShutDown(SocketShutdownFlags Parameters)
 {
-	CEXASSERT(m_socket != INVALID_SOCKET, "the socket has not been initialized.");
+	CEXASSERT(m_rawSocket != INVALID_SOCKET, "the socket has not been initialized.");
 
 	int res;
 
-	res = shutdown(m_socket, static_cast<int>(Parameters));
+	res = shutdown(m_rawSocket, static_cast<int>(Parameters));
 
 	if (res == SOCKET_ERROR)
 	{
-		SetLastError(SOCKET_EINVAL);
-		throw CryptoSocketException(std::string("Socket"), std::string("ShutDown"), std::string("The socket shutdown produced an error!"), ErrorCodes::SocketFailure);
+		throw CryptoSocketException(std::string("Socket"), std::string("ShutDown"), std::string("The socket shutdown function has errored!"), ErrorCodes::SocketFailure);
 	}
 
-	SocketChanged(res);
+	closesocket(m_rawSocket);
+}
+
+int Socket::GetLastError()
+{
+#ifdef USE_WINDOWS_STYLE_SOCKETS
+	return WSAGetLastError();
+#else
+	return errno;
+#endif
+}
+
+void Socket::SetLastError(int ErrorCode)
+{
+#ifdef USE_WINDOWS_STYLE_SOCKETS
+	WSASetLastError(errorCode);
+#else
+	errno = ErrorCode;
+#endif
 }
 
 //~~~Private Functions~~//
@@ -466,10 +513,8 @@ void Socket::ShutDownSockets()
 
 	if (res != 0)
 	{
-		throw CryptoSocketException(std::string("Socket"), std::string("ShutdownSockets"), std::string("The socket shutdown produced an error!"), ErrorCodes::SocketFailure);
+		throw CryptoSocketException(std::string("Socket"), std::string("ShutDownSockets"), std::string("The sockets library did not terminate correctly!"), ErrorCodes::InvalidState);
 	}
-
-	SocketChanged(res);
 #endif
 }
 
@@ -483,41 +528,23 @@ void Socket::StartSockets()
 
 	if (res != 0)
 	{
-		throw CryptoSocketException(std::string("Socket"), std::string("StartSockets"), std::string("The socket shutdown produced an error!"), ErrorCodes::SocketFailure);
+		throw CryptoSocketException(std::string("Socket"), std::string("StartSockets"), std::string("The sockets library could not be started!"), ErrorCodes::SocketFailure);
 	}
-
-	SocketChanged(res);
 #endif
 }
 
-int Socket::GetLastError()
-{
 #if defined(CEX_WINDOWS_SOCKETS)
-	return WSAGetLastError();
-#else
-	return errno;
-#endif
-}
 
-void Socket::SetLastError(int ErrorCode)
-{
-#if defined(CEX_WINDOWS_SOCKETS)
-	WSASetLastError(ErrorCode);
-#else
-	errno = errorCode;
-#endif
-}
+//~~~SocketReceiver~~~//
 
-//~~~SocketListener Class~~~//
-
-
-#if !defined (CEX_WINDOWS_SOCKETS)
-
-/*SocketReceiver::SocketReceiver(Socket &s)
-	: m_s(s), m_resultPending(false), m_eofReceived(false)
+SocketReceiver::SocketReceiver(Socket &s)
+	: 
+	m_s(s), 
+	m_resultPending(false), 
+	m_eofReceived(false)
 {
 	m_event.AttachHandle(CreateEvent(NULL, true, false, NULL), true);
-	//m_s.CheckAndHandleError("CreateEvent", m_event.HandleValid());
+	//m_rawSocket.CheckAndHandleError("CreateEvent", m_event.HandleValid());
 	memset(&m_overlapped, 0, sizeof(m_overlapped));
 	m_overlapped.hEvent = m_event;
 }
@@ -525,7 +552,7 @@ void Socket::SetLastError(int ErrorCode)
 SocketReceiver::~SocketReceiver()
 {
 #ifdef USE_WINDOWS_STYLE_SOCKETS
-	CancelIo((HANDLE)m_s.GetSocket());
+	CancelIo((HANDLE)m_rawSocket.GetSocket());
 #endif
 }
 
@@ -535,7 +562,11 @@ bool SocketReceiver::Receive(byte* buf, size_t bufLen)
 
 	DWORD flags = 0;
 	// don't queue too much at once, or we might use up non-paged memory
-	WSABUF wsabuf = { IntegerTools::Min((size_t)128 * 1024, bufLen), (char *)buf };
+	WSABUF wsabuf = 
+	{ 
+		IntegerTools::Min((size_t)128 * 1024, bufLen), (char *)buf 
+	};
+
 	if (WSARecv(m_s, &wsabuf, 1, &m_lastResult, &flags, &m_overlapped, NULL) == 0)
 	{
 		if (m_lastResult == 0)
@@ -546,7 +577,7 @@ bool SocketReceiver::Receive(byte* buf, size_t bufLen)
 		switch (WSAGetLastError())
 		{
 		default:
-			//m_s.CheckAndHandleError_int("WSARecv", SOCKET_ERROR);
+			//m_rawSocket.CheckAndHandleError_int("WSARecv", SOCKET_ERROR);
 		case WSAEDISCON:
 			m_lastResult = 0;
 			m_eofReceived = true;
@@ -581,7 +612,7 @@ unsigned int SocketReceiver::GetReceiveResult()
 			switch (WSAGetLastError())
 			{
 			default:
-				//m_s.CheckAndHandleError("WSAGetOverlappedResult", FALSE);
+				//m_rawSocket.CheckAndHandleError("WSAGetOverlappedResult", FALSE);
 			case WSAEDISCON:
 				m_lastResult = 0;
 				m_eofReceived = true;
@@ -590,21 +621,25 @@ unsigned int SocketReceiver::GetReceiveResult()
 		m_resultPending = false;
 	}
 	return m_lastResult;
-}*/
+}
+
+//~~~SocketSender~~~//
 
 SocketSender::SocketSender(Socket &s)
-	: m_s(s), m_resultPending(false), m_lastResult(0)
+	: 
+	m_s(s), 
+	m_resultPending(false), 
+	m_lastResult(0)
 {
 	m_event.AttachHandle(CreateEvent(NULL, true, false, NULL), true);
-	//m_s.CheckAndHandleError("CreateEvent", m_event.HandleValid());
+	//m_rawSocket.CheckAndHandleError("CreateEvent", m_event.HandleValid());
 	memset(&m_overlapped, 0, sizeof(m_overlapped));
 	m_overlapped.hEvent = m_event;
 }
 
-
 SocketSender::~SocketSender()
 {
-#ifdef USE_WINDOWS_STYLE_SOCKETS
+#if defined(CEX_WINDOWS_SOCKETS)
 	CancelIo((HANDLE)m_s.GetSocket());
 #endif
 }
@@ -612,9 +647,17 @@ SocketSender::~SocketSender()
 void SocketSender::Send(const byte* buf, size_t bufLen)
 {
 	assert(!m_resultPending);
-	DWORD written = 0;
+	DWORD written;
+
+	written = 0;
+
 	// don't queue too much at once, or we might use up non-paged memory
-	WSABUF wsabuf = { IntegerTools::Min((size_t)128 * 1024, bufLen), (char *)buf };
+	WSABUF wsabuf = 
+	{ 
+		IntegerTools::Min((size_t)128 * 1024, bufLen), 
+		(char*)buf 
+	};
+
 	if (WSASend(m_s, &wsabuf, 1, &written, 0, &m_overlapped, NULL) == 0)
 	{
 		m_resultPending = false;
@@ -624,7 +667,7 @@ void SocketSender::Send(const byte* buf, size_t bufLen)
 	{
 		if (WSAGetLastError() != WSA_IO_PENDING)
 		{
-			//m_s.CheckAndHandleError_int("WSASend", SOCKET_ERROR);
+			//m_rawSocket.CheckAndHandleError_int("WSASend", SOCKET_ERROR);
 		}
 
 		m_resultPending = true;
@@ -634,9 +677,9 @@ void SocketSender::Send(const byte* buf, size_t bufLen)
 void SocketSender::SendEof()
 {
 	assert(!m_resultPending);
-	m_s.ShutDown(SD_SEND);
-	//m_s.CheckAndHandleError("ResetEvent", ResetEvent(m_event));
-	//m_s.CheckAndHandleError_int("WSAEventSelect", WSAEventSelect(m_s, m_event, FD_CLOSE));
+	m_s.ShutDown(SocketShutdownFlags::Send);
+	ResetEvent(m_event);
+	WSAEventSelect(m_s, m_event, FD_CLOSE);
 	m_resultPending = true;
 }
 
@@ -645,11 +688,18 @@ bool SocketSender::EofSent()
 	if (m_resultPending)
 	{
 		WSANETWORKEVENTS events;
-		//m_s.CheckAndHandleError_int("WSAEnumNetworkEvents", WSAEnumNetworkEvents(m_s, m_event, &events));
+		WSAEnumNetworkEvents(m_s, m_event, &events);
+
 		if ((events.lNetworkEvents & FD_CLOSE) != FD_CLOSE)
-			throw Socket::Err(m_s, "WSAEnumNetworkEvents (FD_CLOSE not present)", E_FAIL);
+		{
+			throw;// Socket::Err(m_rawSocket, "WSAEnumNetworkEvents (FD_CLOSE not present)", E_FAIL);
+		}
+
 		if (events.iErrorCode[FD_CLOSE_BIT] != 0)
-			throw Socket::Err(m_s, "FD_CLOSE (via WSAEnumNetworkEvents)", events.iErrorCode[FD_CLOSE_BIT]);
+		{
+			throw;// Socket::Err(m_rawSocket, "FD_CLOSE (via WSAEnumNetworkEvents)", events.iErrorCode[FD_CLOSE_BIT]);
+		}
+
 		m_resultPending = false;
 	}
 	return m_lastResult != 0;
@@ -658,9 +708,13 @@ bool SocketSender::EofSent()
 void SocketSender::GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack)
 {
 	if (m_resultPending)
+	{
 		container.AddHandle(m_event, CallStack("SocketSender::GetWaitObjects() - result pending", &callStack));
+	}
 	else
+	{
 		container.SetNoWait(CallStack("SocketSender::GetWaitObjects() - result ready", &callStack));
+	}
 }
 
 unsigned int SocketSender::GetSendResult()
@@ -669,9 +723,10 @@ unsigned int SocketSender::GetSendResult()
 	{
 		DWORD flags = 0;
 		BOOL result = WSAGetOverlappedResult(m_s, &m_overlapped, &m_lastResult, false, &flags);
-		//m_s.CheckAndHandleError("WSAGetOverlappedResult", result);
+		//m_rawSocket.CheckAndHandleError("WSAGetOverlappedResult", result);
 		m_resultPending = false;
 	}
+
 	return m_lastResult;
 }
 
@@ -680,19 +735,19 @@ unsigned int SocketSender::GetSendResult()
 #if defined(CEX_BERKELEY_SOCKETS)
 
 SocketReceiver::SocketReceiver(Socket &s)
-	: m_s(s), m_lastResult(0), m_eofReceived(false)
+	: m_rawSocket(s), m_lastResult(0), m_eofReceived(false)
 {
 }
 
 void SocketReceiver::GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack)
 {
 	if (!m_eofReceived)
-		container.AddReadFd(m_s, CallStack("SocketReceiver::GetWaitObjects()", &callStack));
+		container.AddReadFd(m_rawSocket, CallStack("SocketReceiver::GetWaitObjects()", &callStack));
 }
 
 bool SocketReceiver::Receive(byte* buf, size_t bufLen)
 {
-	m_lastResult = m_s.Receive(buf, bufLen);
+	m_lastResult = m_rawSocket.Receive(buf, bufLen);
 	if (bufLen > 0 && m_lastResult == 0)
 		m_eofReceived = true;
 	return true;
@@ -704,18 +759,18 @@ unsigned int SocketReceiver::GetReceiveResult()
 }
 
 SocketSender::SocketSender(Socket &s)
-	: m_s(s), m_lastResult(0)
+	: m_rawSocket(s), m_lastResult(0)
 {
 }
 
 void SocketSender::Send(const byte* buf, size_t bufLen)
 {
-	m_lastResult = m_s.Send(buf, bufLen);
+	m_lastResult = m_rawSocket.Send(buf, bufLen);
 }
 
 void SocketSender::SendEof()
 {
-	m_s.ShutDown(SD_SEND);
+	m_rawSocket.ShutDown(SD_SEND);
 }
 
 unsigned int SocketSender::GetSendResult()
@@ -725,7 +780,7 @@ unsigned int SocketSender::GetSendResult()
 
 void SocketSender::GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack)
 {
-	container.AddWriteFd(m_s, CallStack("SocketSender::GetWaitObjects()", &callStack));
+	container.AddWriteFd(m_rawSocket, CallStack("SocketSender::GetWaitObjects()", &callStack));
 }
 
 #endif

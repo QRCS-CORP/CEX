@@ -35,7 +35,9 @@ void TimerBase::StartTimer()
 double TimerBase::ElapsedTimeAsDouble()
 {
 	if (m_stuckAtZero)
+	{
 		return 0;
+	}
 
 	if (m_started)
 	{
@@ -51,12 +53,15 @@ double TimerBase::ElapsedTimeAsDouble()
 	}
 
 	StartTimer();
+
 	return 0;
 }
 
 unsigned long TimerBase::ElapsedTime()
 {
-	double elapsed = ElapsedTimeAsDouble();
+	double elapsed;
+
+	elapsed = ElapsedTimeAsDouble();
 
 	assert(elapsed <= ULONG_MAX);
 
@@ -113,12 +118,15 @@ TimerWord Timer::TicksPerSecond()
 TimerWord ThreadUserTimer::GetCurrentTimerValue()
 {
 #if defined(CEX_OS_WINDOWS)
-	static bool getCurrentThreadImplemented = true;
+	static bool getCurrentThreadImplemented;
 	ulong high;
+
+	getCurrentThreadImplemented = true;
 
 	if (getCurrentThreadImplemented)
 	{
 		FILETIME now, ignored;
+
 		if (!GetThreadTimes(GetCurrentThread(), &ignored, &ignored, &ignored, &now))
 		{
 			DWORD lastError = GetLastError();
@@ -126,7 +134,7 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 			if (lastError == ERROR_CALL_NOT_IMPLEMENTED)
 			{
 				getCurrentThreadImplemented = false;
-				goto GetCurrentThreadNotImplemented;
+				goto GetCurrentThreadNotImplemented; // FIX this
 			}
 
 			throw CryptoProcessingException(std::string("GetCurrentTimerValue"), std::string("Timer"), std::string("GetThreadTimes failed!"), Enumeration::ErrorCodes::Unreachable);
@@ -137,8 +145,10 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 
 		return now.dwLowDateTime + ((TimerWord)high);
 	}
+
 GetCurrentThreadNotImplemented:
 	return (TimerWord)clock() * (10 * 1000 * 1000 / CLOCKS_PER_SEC);
+
 #elif defined(CEX_OS_UNIX)
 	tms now;
 	times(&now);

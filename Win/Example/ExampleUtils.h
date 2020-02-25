@@ -13,6 +13,13 @@ namespace Example
 	public:
 
 		/// <summary>
+		/// Returns the users language prefix
+		/// </summary>
+		///
+		/// <returns>The two letter language code</returns>
+		static std::string GetLanguage();
+
+		/// <summary>
 		/// Waits for and outputs the user response
 		/// </summary>
 		static std::string GetResponse();
@@ -21,6 +28,8 @@ namespace Example
 		/// Outputs the current time in milliseconds
 		/// </summary>
 		static uint64_t GetTimeMs64();
+
+		static std::wstring NarrowToWide(const std::string &Input);
 
 		/// <summary>
 		/// Outputs a string to console

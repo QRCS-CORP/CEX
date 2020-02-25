@@ -1044,14 +1044,23 @@
     <ClInclude Include="..\..\CEX\Timer.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Network.h">
-      <Filter>Header Files\Network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\HBA.h">
       <Filter>Header Files\Cipher\Block\AEAD</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\MCS.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
+    <ClInclude Include="..\..\CEX\CryptoNetworkingException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NetworkTools.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\WindowsHandle.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Filter.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\GCM.h">
+      <Filter>Header Files\Cipher\Block\AEAD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1625,14 +1634,23 @@
     <ClCompile Include="..\..\CEX\Timer.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Network.cpp">
-      <Filter>Source Files\Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\HBA.cpp">
       <Filter>Source Files\Cipher\Block\AEAD</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\MCS.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
+    <ClCompile Include="..\..\CEX\CryptoNetworkingException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NetworkTools.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\WindowsHandle.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Filter.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\GCM.cpp">
+      <Filter>Source Files\Cipher\Block\AEAD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

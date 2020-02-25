@@ -11,20 +11,32 @@ std::string MacConvert::ToName(Macs Enumeral)
 		case Macs::CMAC:
 			name = std::string("CMAC");
 			break;
-		case Macs::CMACAHXS256:
-			name = std::string("CMACAHXS256");
+		case Macs::CMACRHXH256:
+			name = std::string("CMACRHXH256");
 			break;
-		case Macs::CMACAHXS512:
-			name = std::string("CMACAHXS512");
+		case Macs::CMACRHXH512:
+			name = std::string("CMACRHXH512");
+			break;
+		case Macs::CMACRHXS256:
+			name = std::string("CMACRHXS256");
+			break;
+		case Macs::CMACRHXS512:
+			name = std::string("CMACRHXS512");
 			break;
 		case Macs::GMAC:
 			name = std::string("GMAC");
 			break;
-		case Macs::GMACAHXS256:
-			name = std::string("GMACAHXS256");
+		case Macs::GMACRHXH256:
+			name = std::string("GMACRHXH256");
 			break;
-		case Macs::GMACAHXS512:
-			name = std::string("GMACAHXS512");
+		case Macs::GMACRHXH512:
+			name = std::string("GMACRHXH512");
+			break;
+		case Macs::GMACRHXS256:
+			name = std::string("GMACRHXS256");
+			break;
+		case Macs::GMACRHXS512:
+			name = std::string("GMACRHXS512");
 			break;
 		case Macs::HMACSHA256:
 			name = std::string("HMACSHA256");
@@ -63,25 +75,41 @@ Macs MacConvert::FromName(std::string &Name)
 	{
 		tname = Macs::CMAC;
 	}
-	else if (Name == std::string("CMACAHXS256"))
+	else if (Name == std::string("CMACRHXH256"))
 	{
-		tname = Macs::CMACAHXS256;
+		tname = Macs::CMACRHXH256;
 	}
-	else if (Name == std::string("CMACAHXS512"))
+	else if (Name == std::string("CMACRHXH512"))
 	{
-		tname = Macs::CMACAHXS512;
+		tname = Macs::CMACRHXH512;
+	}
+	else if (Name == std::string("CMACRHXS256"))
+	{
+		tname = Macs::CMACRHXS256;
+	}
+	else if (Name == std::string("CMACRHXS512"))
+	{
+		tname = Macs::CMACRHXS512;
 	}
 	else if (Name == std::string("GMAC"))
 	{
 		tname = Macs::GMAC;
 	}
-	else if (Name == std::string("GMACAHXS256"))
+	else if (Name == std::string("GMACRHXH256"))
 	{
-		tname = Macs::GMACAHXS256;
+		tname = Macs::GMACRHXH256;
 	}
-	else if (Name == std::string("GMACAHXS512"))
+	else if (Name == std::string("GMACRHXH512"))
 	{
-		tname = Macs::GMACAHXS512;
+		tname = Macs::GMACRHXH512;
+	}
+	else if (Name == std::string("GMACRHXS256"))
+	{
+		tname = Macs::GMACRHXS256;
+	}
+	else if (Name == std::string("GMACRHXS512"))
+	{
+		tname = Macs::GMACRHXS512;
 	}
 	else if (Name == std::string("HMACSHA256"))
 	{

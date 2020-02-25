@@ -19,53 +19,69 @@ enum class Macs : byte
 	/// </summary>
 	CMAC = 1,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-256
+	/// A Cipher based Message Authentication Code generator using RHX and HKDF-256
 	/// </summary>
-	CMACAHXS256= 2,
+	CMACRHXH256= 2,
 	/// <summary>
-	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-512
+	/// A Cipher based Message Authentication Code generator using RHX and HKDF-512
 	/// </summary>
-	CMACAHXS512 = 3,
-	/// <summary>
-	/// A Cipher based Message Authentication Code generator using AES
-	/// </summary>
-	GMAC = 4,
+	CMACRHXH512 = 3,
 	/// <summary>
 	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-256
 	/// </summary>
-	GMACAHXS256 = 5,
+	CMACRHXS256 = 4,
 	/// <summary>
 	/// A Cipher based Message Authentication Code generator using RHX and cSHAKE-512
 	/// </summary>
-	GMACAHXS512 = 6,
+	CMACRHXS512 = 5,
+	/// <summary>
+	/// The GMAC authentication code generator using AES
+	/// </summary>
+	GMAC = 6,
+	/// <summary>
+	/// The GMAC authentication code generator using RHX and HKDF(HMAC(SHA2-256))
+	/// </summary>
+	GMACRHXH256 = 7,
+	/// <summary>
+	/// The GMAC authentication code generator using RHX and HKDF(HMAC(SHA2-512))
+	/// </summary>
+	GMACRHXH512 = 8,
+	/// <summary>
+	/// The GMAC authentication code generator using RHX and cSHAKE-256
+	/// </summary>
+	GMACRHXS256 = 9,
+	/// <summary>
+	/// The GMAC authentication code generator using RHX and cSHAKE-512
+	/// </summary>
+	GMACRHXS512 = 10,
 	/// <summary>
 	/// A Hash based Message Authentication Code generator using SHA256
 	/// </summary>
-	HMACSHA256 = 7,
+	HMACSHA256 = 11,
 	/// <summary>
 	/// A Hash based Message Authentication Code generator using SHA512
 	/// </summary>
-	HMACSHA512 = 8,
+	HMACSHA512 = 12,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator using Keccak-256
 	/// </summary>
-	KMAC128 = 9,
+	KMAC128 = 13,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator using Keccak-256
 	/// </summary>
-	KMAC256 = 10,
+	KMAC256 = 14,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator Keccak-512
 	/// </summary>
-	KMAC512 = 11,
+	KMAC512 = 15,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator Keccak-1024
 	/// </summary>
-	KMAC1024 = 12,
+	KMAC1024 = 16,
 	/// <summary>
 	/// The Poly1305 Message Authentication Code generator
 	/// </summary>
-	Poly1305 = 13
+	Poly1305 = 17
 };
 
 class MacConvert

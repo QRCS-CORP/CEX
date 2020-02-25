@@ -4,7 +4,6 @@
 #include "CSX256.h"
 #include "CSX512.h"
 #include "CryptoSymmetricException.h"
-#include "MCS.h"
 #include "RCS.h"
 #include "TSX256.h"
 #include "TSX512.h"
@@ -13,7 +12,6 @@
 NAMESPACE_HELPER
 
 using namespace Cipher::Stream;
-using Enumeration::BlockCiphers;
 using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
 using Enumeration::StreamAuthenticators;
@@ -91,61 +89,6 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 				cptr = new CSX256(StreamAuthenticators::Poly1305);
 				break;
 			}
-			case StreamCiphers::MCSRH256:
-			{
-				cptr = new MCS(BlockCiphers::AES, StreamAuthenticators::HMACSHA256);
-				break;
-			}
-			case StreamCiphers::MCSRH512:
-			{
-				cptr = new MCS(BlockCiphers::AES, StreamAuthenticators::HMACSHA512);
-				break;
-			}
-			case StreamCiphers::MCSRK256:
-			{
-				cptr = new MCS(BlockCiphers::AES, StreamAuthenticators::KMAC256);
-				break;
-			}
-			case StreamCiphers::MCSRK512:
-			{
-				cptr = new MCS(BlockCiphers::AES, StreamAuthenticators::KMAC512);
-				break;
-			}
-			case StreamCiphers::MCSRP256:
-			{
-				cptr = new MCS(BlockCiphers::AES, StreamAuthenticators::Poly1305);
-				break;
-			}
-			case StreamCiphers::MCSSH256:
-			{
-				cptr = new MCS(BlockCiphers::Serpent, StreamAuthenticators::HMACSHA256);
-				break;
-			}
-			case StreamCiphers::MCSSH512:
-			{
-				cptr = new MCS(BlockCiphers::Serpent, StreamAuthenticators::HMACSHA512);
-				break;
-			}
-			case StreamCiphers::MCSSK256:
-			{
-				cptr = new MCS(BlockCiphers::Serpent, StreamAuthenticators::KMAC256);
-				break;
-			}
-			case StreamCiphers::MCSSK512:
-			{
-				cptr = new MCS(BlockCiphers::Serpent, StreamAuthenticators::KMAC512);
-				break;
-			}
-			case StreamCiphers::MCSSP256:
-			{
-				cptr = new MCS(BlockCiphers::Serpent, StreamAuthenticators::Poly1305);
-				break;
-			}
-			case StreamCiphers::MCSR:
-			{
-				cptr = new MCS(BlockCiphers::AES, StreamAuthenticators::None);
-				break;
-			}
 			case StreamCiphers::RCS:
 			{
 #if defined(__AVX__)
@@ -160,6 +103,35 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 				}
 				break;
 			}
+			case StreamCiphers::RCSG256:
+			{
+#if defined(__AVX__)
+				if (dtc.AESNI())
+				{
+					cptr = new ACS(StreamAuthenticators::GMACRHXS256);
+				}
+				else
+#endif
+				{
+					cptr = new RCS(StreamAuthenticators::GMACRHXS256);
+				}
+				break;
+			}
+			case StreamCiphers::RCSG512:
+			{
+#if defined(__AVX__)
+				if (dtc.AESNI())
+				{
+					cptr = new ACS(StreamAuthenticators::GMACRHXS512);
+				}
+				else
+#endif
+				{
+					cptr = new RCS(StreamAuthenticators::GMACRHXS512);
+				}
+				break;
+			}
+
 			case StreamCiphers::RCSH256:
 			{
 #if defined(__AVX__)

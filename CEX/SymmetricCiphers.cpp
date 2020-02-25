@@ -80,39 +80,6 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 		case SymmetricCiphers::CSXR80P256:
 			name = std::string("CSXR80P256");
 			break;
-		case SymmetricCiphers::MCSRH256:
-			name = std::string("MCSRH256");
-			break;
-		case SymmetricCiphers::MCSRH512:
-			name = std::string("MCSRH512");
-			break;
-		case SymmetricCiphers::MCSRK256:
-			name = std::string("MCSRK256");
-			break;
-		case SymmetricCiphers::MCSRK512:
-			name = std::string("MCSRK512");
-			break;
-		case SymmetricCiphers::MCSRP256:
-			name = std::string("MCSRP256");
-			break;
-		case SymmetricCiphers::MCSSH256:
-			name = std::string("MCSSH256");
-			break;
-		case SymmetricCiphers::MCSSH512:
-			name = std::string("MCSSH512");
-			break;
-		case SymmetricCiphers::MCSSK256:
-			name = std::string("MCSSK256");
-			break;
-		case SymmetricCiphers::MCSSK512:
-			name = std::string("MCSSK512");
-			break;
-		case SymmetricCiphers::MCSSP256:
-			name = std::string("MCSSP256");
-			break;
-		case SymmetricCiphers::MCSR:
-			name = std::string("MCSR");
-			break;
 		case SymmetricCiphers::RCS:
 			name = std::string("RCS");
 			break;
@@ -307,50 +274,6 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	else if (Name == std::string("CSXR80P256"))
 	{
 		tname = SymmetricCiphers::CSXR80P256;
-	}
-	else if (Name == std::string("MCSRH256"))
-	{
-		tname = SymmetricCiphers::MCSRH256;
-	}
-	else if (Name == std::string("MCSRH512"))
-	{
-		tname = SymmetricCiphers::MCSRH512;
-	}
-	else if (Name == std::string("MCSRK256"))
-	{
-		tname = SymmetricCiphers::MCSRK256;
-	}
-	else if (Name == std::string("MCSRK512"))
-	{
-		tname = SymmetricCiphers::MCSRK512;
-	}
-	else if (Name == std::string("MCSRP256"))
-	{
-		tname = SymmetricCiphers::MCSRP256;
-	}
-	else if (Name == std::string("MCSSH256"))
-	{
-		tname = SymmetricCiphers::MCSSH256;
-	}
-	else if (Name == std::string("MCSSH512"))
-	{
-		tname = SymmetricCiphers::MCSSH512;
-	}
-	else if (Name == std::string("MCSSK256"))
-	{
-		tname = SymmetricCiphers::MCSSK256;
-	}
-	else if (Name == std::string("MCSSK512"))
-	{
-		tname = SymmetricCiphers::MCSSK512;
-	}
-	else if (Name == std::string("MCSSP256"))
-	{
-		tname = SymmetricCiphers::MCSSP256;
-	}
-	else if (Name == std::string("MCSR"))
-	{
-		tname = SymmetricCiphers::MCSR;
 	}
 	else if (Name == std::string("RCS"))
 	{

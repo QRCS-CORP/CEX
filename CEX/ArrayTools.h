@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CEX_ARRAYUTILS_H
-#define CEX_ARRAYUTILS_H
+#ifndef CEX_ARRAYTOOLS_H
+#define CEX_ARRAYTOOLS_H
 
 #include "CexDomain.h"
 #include "IntegerTools.h"

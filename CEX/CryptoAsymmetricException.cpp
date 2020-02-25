@@ -19,4 +19,3 @@ const std::string CryptoAsymmetricException::Name()
 }
 
 NAMESPACE_EXCEPTIONEND
-

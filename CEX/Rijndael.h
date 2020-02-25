@@ -47,7 +47,7 @@ static const std::array<uint, 30> Rcon =
 /// internal
 /// 
 
-//~~~Rijndael S-Box and Lookup Tables~~~//
+//~~~Rijndael S-Box Tables~~~//
 
 static const std::vector<byte> ISBox =
 {
@@ -383,7 +383,7 @@ static const std::vector<uint> IT3 =
 
 // Rijndael 128/256-bit block functions
 
-static byte Gf256Red(uint X)
+static byte Gf256Reduce(uint X)
 {
 	uint y;
 
@@ -441,10 +441,10 @@ static void InvMixColumns(ArrayU8 &State)
 		t3 = s0 ^ (s0 << 1) ^ (s0 << 3) ^ s1 ^ (s1 << 2) ^ (s1 << 3)
 			^ s2 ^ (s2 << 3) ^ (s3 << 1) ^ (s3 << 2) ^ (s3 << 3);
 
-		State[i + 0] = Gf256Red(t0);
-		State[i + 1] = Gf256Red(t1);
-		State[i + 2] = Gf256Red(t2);
-		State[i + 3] = Gf256Red(t3);
+		State[i + 0] = Gf256Reduce(t0);
+		State[i + 1] = Gf256Reduce(t1);
+		State[i + 2] = Gf256Reduce(t2);
+		State[i + 3] = Gf256Reduce(t3);
 	}
 }
 

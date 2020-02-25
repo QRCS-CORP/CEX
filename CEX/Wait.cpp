@@ -2,16 +2,18 @@
 #include "IntegerTools.h"
 #include <assert.h>
 
-/*#if defined(CEX_BERKELY_SOCKETS)
+#if defined(CEX_BERKELY_SOCKETS)
 #	include <errno.h>
 #	include <sys/types.h>
 #	include <sys/time.h>
 #	include <unistd.h>
-#endif*/
+#endif
 
 NAMESPACE_NETWORK
 
-/*unsigned int WaitObjectContainer::MaxWaitObjects()
+using Utility::IntegerTools;
+
+unsigned int WaitObjectContainer::MaxWaitObjects()
 {
 #if defined(CEX_WINDOWS_SOCKETS)
 	return MAXIMUM_WAIT_OBJECTS * (MAXIMUM_WAIT_OBJECTS - 1);
@@ -61,7 +63,7 @@ void WaitObjectContainer::DetectNoWait(LastResultType result, CallStack const& c
 			if (m_tracer)
 			{
 				std::string desc = "No wait loop detected - m_lastResult: ";
-				desc.append(IntToString(m_lastResult)).append(", call stack:");
+				desc.append(IntegerTools::ToString(m_lastResult)).append(", call stack:");
 				for (CallStack const* cs = &callStack; cs; cs = cs->Prev())
 					desc.append("\n- ").append(cs->Format());
 				m_tracer->TraceNoWaitLoop(desc);
@@ -212,7 +214,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 
 	if (m_firstEventTime)
 	{
-		double timeToFirstEvent = SaturatingSubtract(m_firstEventTime, m_eventTimer.ElapsedTimeAsDouble());
+		double timeToFirstEvent = IntegerTools::SaturatingSubtract(m_firstEventTime, m_eventTimer.ElapsedTimeAsDouble());
 
 		if (timeToFirstEvent <= milliseconds)
 		{
@@ -235,7 +237,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 		static const unsigned int WAIT_OBJECTS_PER_THREAD = MAXIMUM_WAIT_OBJECTS - 1;
 		unsigned int nThreads = (unsigned int)((m_handles.size() + WAIT_OBJECTS_PER_THREAD - 1) / WAIT_OBJECTS_PER_THREAD);
 		if (nThreads > MAXIMUM_WAIT_OBJECTS)	// still too many wait objects, maybe implement recursive threading later?
-			throw Err("WaitObjectContainer: number of wait objects exceeds limit");
+			throw; // Err("WaitObjectContainer: number of wait objects exceeds limit");
 		CreateThreads(nThreads);
 		DWORD error = S_OK;
 
@@ -247,7 +249,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 			if (i < nThreads)
 			{
 				thread.waitHandles = &m_handles[i * WAIT_OBJECTS_PER_THREAD];
-				thread.count = UnsignedMin(WAIT_OBJECTS_PER_THREAD, m_handles.size() - i * WAIT_OBJECTS_PER_THREAD);
+				thread.count = IntegerTools::Min((size_t)WAIT_OBJECTS_PER_THREAD, m_handles.size() - i * WAIT_OBJECTS_PER_THREAD);
 				thread.error = &error;
 			}
 			else
@@ -263,7 +265,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 			if (error == S_OK)
 				return true;
 			else
-				throw Err("WaitObjectContainer: WaitForMultipleObjects in thread failed with error " + IntToString(error));
+				throw; // Err("WaitObjectContainer: WaitForMultipleObjects in thread failed with error " + (IntegerTools::ToString(error));
 		}
 		SetEvent(m_stopWaiting);
 		if (result == WAIT_TIMEOUT)
@@ -272,7 +274,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 			return timeoutIsScheduledEvent;
 		}
 		else
-			throw Err("WaitObjectContainer: WaitForSingleObject failed with error " + IntToString(::GetLastError()));
+			throw; // Err("WaitObjectContainer: WaitForSingleObject failed with error " + (IntegerTools::ToString(::GetLastError()));
 	}
 	else
 	{
@@ -307,7 +309,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 			return timeoutIsScheduledEvent;
 		}
 		else
-			throw Err("WaitObjectContainer: WaitForMultipleObjects failed with error " + IntToString(::GetLastError()));
+			throw;// Err("WaitObjectContainer: WaitForMultipleObjects failed with error " + (IntegerTools::ToString(::GetLastError()));
 	}
 }
 
@@ -344,7 +346,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 
 	timeval tv, *timeout;
 
-	if (milliseconds == INFINITE_TIME)
+	if (milliseconds == CEX_INFINITE_TIME)
 		timeout = NULL;
 	else
 	{
@@ -363,7 +365,7 @@ bool WaitObjectContainer::Wait(unsigned long milliseconds)
 		throw Err("WaitObjectContainer: select failed with error " + errno);
 }
 
-#endif
+#endif*/
 
 // ********************************************************
 
@@ -372,7 +374,7 @@ std::string CallStack::Format() const
 	return m_info;
 }
 
-std::string CallStackWithNr::Format() const
+/*std::string CallStackWithNr::Format() const
 {
 	return std::string(m_info) + " / nr: " + IntToString(m_nr);
 }
@@ -380,13 +382,13 @@ std::string CallStackWithNr::Format() const
 std::string CallStackWithStr::Format() const
 {
 	return std::string(m_info) + " / " + std::string(m_z);
-}
+}*/
 
 bool Waitable::Wait(unsigned long milliseconds, CallStack const& callStack)
 {
 	WaitObjectContainer container;
 	GetWaitObjects(container, callStack);	// reduce clutter by not adding this func to stack
 	return container.Wait(milliseconds);
-}*/
+}
 
 NAMESPACE_NETWORKEND

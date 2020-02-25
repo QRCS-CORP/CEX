@@ -142,69 +142,6 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	CSXR80P256 = 107,
 
-	//~~~ Modular Cipher Stream Variants~~//
-
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRH256 = 64,
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRH512 = 65,
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and KMAC-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRK256 = 66,
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and KMAC-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRK512 = 67,
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and Poly1305 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRP256 = 68,
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSH256 = 69,
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSH512 = 70,
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and KMAC-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSK256 = 71,
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and KMAC-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSK512 = 72,
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and Poly1305 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSP256 = 73,
-	/// <summary>
-	/// The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication.
-	/// <para>Extended Rijndael-based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSR = 74,
-	/// <summary>
-	/// The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication.
-	/// <para>Extended Serpent-based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSS = 75,
-
 	//~~~ Rijndael-256 Extended Cipher Stream Variants~~//
 
 	/// <summary>
@@ -213,35 +150,45 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	RCS = 160,
 	/// <summary>
+	/// The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-256 for authentication.
+	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
+	/// </summary>
+	RCSG256 = 161,
+	/// <summary>
+	/// The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-512 for authentication.
+	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
+	/// </summary>
+	RCSG512 = 162,
+	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-256 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSH256 = 161,
+	RCSH256 = 163,
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-512 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSH512 = 162,
+	RCSH512 = 164,
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-256 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSK256 = 163,
+	RCSK256 = 165,
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-512 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSK512 = 164,
+	RCSK512 = 166,
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-1024 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSK1024 = 165,
+	RCSK1024 = 167,
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using Poly1305 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSP256 = 166,
+	RCSP256 = 168,
 
 	//~~~ Threefish Stream-cipher Extended Variants~~//
 

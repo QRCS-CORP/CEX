@@ -13,7 +13,6 @@
 #include "../CEX/ACS.h"
 #include "../CEX/CSX256.h"
 #include "../CEX/CSX512.h"
-#include "../CEX/MCS.h"
 #include "../CEX/RCS.h"
 #include "../CEX/TSX256.h"
 #include "../CEX/TSX512.h"
@@ -117,9 +116,6 @@ namespace Test
 			OnProgress(std::string("***CSX512: Monte Carlo test (K=512; R=40)***"));
 #endif
 			CSX512SpeedTest();
-
-			OnProgress(std::string("***MCS: Monte Carlo test (K=256; R=22)***"));
-			MCSSpeedTest();
 
 			OnProgress(std::string("***RCS: Monte Carlo test (K=256; R=22)***"));
 			RCSSpeedTest();
@@ -325,13 +321,6 @@ namespace Test
 	{
 		CSX512* cpr = new CSX512(StreamAuthenticators::None);
 		ParallelStreamLoop(cpr, 64, 0, 10, m_progressEvent);
-		delete cpr;
-	}
-
-	void CipherSpeedTest::MCSSpeedTest()
-	{
-		MCS* cpr = new MCS(Enumeration::BlockCiphers::AES, StreamAuthenticators::None);
-		ParallelStreamLoop(cpr, 32, 16, 10, m_progressEvent);
 		delete cpr;
 	}
 

@@ -294,6 +294,12 @@ public:
 		return Value & 1;
 	}
 
+	template <class T1, class T2>
+	inline static T1 SaturatingSubtract(const T1 &A, const T2 &B)
+	{
+		return T1((A > B) ? (A - B) : 0);
+	}
+
 	/// <summary>
 	/// Convert an array or vector of T to a hexadecimal string
 	/// </summary>
@@ -421,7 +427,7 @@ public:
 		{
 			for (j = VARLEN; j > 0; --j)
 			{
-				Output[OutOffset + i] |= static_cast<ArrayB::value_type>(Input[InOffset + (i * VARLEN) + (VARLEN - j)]) << (8 * (j - 1));
+				Output[OutOffset + i] |= static_cast<typename ArrayB::value_type>(Input[InOffset + (i * VARLEN) + (VARLEN - j)]) << (8 * (j - 1));
 			}
 		}
 #endif
@@ -453,7 +459,7 @@ public:
 		{
 			for (j = VARLEN; j > 0; --j)
 			{
-				Output[OutOffset + (i * VARLEN) + (j - 1)] = static_cast<ArrayB::value_type>(Input[InOffset + i] >> ((VARLEN - j) * 8));
+				Output[OutOffset + (i * VARLEN) + (j - 1)] = static_cast<typename ArrayB::value_type>(Input[InOffset + i] >> ((VARLEN - j) * 8));
 			}
 		}
 #endif
@@ -538,8 +544,6 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BeUL256ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(ArrayA::value_type) == sizeof(uint), "Input must be a 32bit integer vector");
-		CEXASSERT(sizeof(ArrayB::value_type) == sizeof(byte), "Output must be a byte vector");
 		CEXASSERT(Input.size() - InOffset >= 32 / sizeof(uint), "Length is larger than input size");
 		CEXASSERT(Output.size() - OutOffset >= 32, "Length is larger than output size");
 
@@ -569,7 +573,6 @@ public:
 	inline static void BeULL512ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
 		CEXASSERT(sizeof(ArrayA::value_type) == sizeof(ulong), "Input must be a 64bit integer vector");
-		CEXASSERT(sizeof(ArrayB::value_type) == sizeof(byte), "Output must be a byte vector");
 		CEXASSERT(Input.size() - InOffset >= 64 / sizeof(ulong), "Length is larger than input size");
 		CEXASSERT(Output.size() - OutOffset >= 64, "Length is larger than output size");
 
@@ -1829,7 +1832,7 @@ public:
 		CEXASSERT(Output.size() >= Input.size(), "Output size is too small");
 
 		MemoryTools::Copy(Input, 0, Output, 0, Input.size() * sizeof(Array::value_type));
-		Output[0] += static_cast<Array::value_type>(Length);
+		Output[0] += static_cast<typename Array::value_type>(Length);
 
 		if (Output[0] < Input[0])
 		{
@@ -1914,7 +1917,7 @@ public:
 		CEXASSERT(A.size() - AOffset >= Length, "Input size can not be less than length");
 		CEXASSERT(B.size() - BOffset >= Length, "Output size can not be less than length");
 
-		ArrayA::value_type delta;
+		typename ArrayA::value_type delta;
 		size_t i;
 
 		delta = 0;

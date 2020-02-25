@@ -2,7 +2,7 @@
 #define CEX_WAIT_H
 
 #include "CexDomain.h"
-/*#include "CryptoSocketException.h"
+#include "CryptoSocketException.h"
 #include "Timer.h"
 
 #if defined(CEX_WINDOWS_SOCKETS)
@@ -127,7 +127,7 @@ protected:
 };
 
 // An extended CallStack entry type with an additional string parameter.
-class CallStackWithStr : public CallStack
+/*class CallStackWithStr : public CallStack
 {
 public:
 	CallStackWithStr(char const* i, char const* z, CallStack const* p) : CallStack(i, p), m_z(z) {}
@@ -135,7 +135,7 @@ public:
 
 protected:
 	char const* m_z;
-};
+};*/
 
 CRYPTOPP_BEGIN_TRACER_CLASS_1(WaitObjectsTracer, Tracer)
 	CRYPTOPP_BEGIN_TRACER_EVENTS(0x48752841)
@@ -207,6 +207,29 @@ private:
 	void DetectNoWait(LastResultType result, CallStack const& callStack);
 };
 
-NAMESPACE_NETWORK*/
+
+//! interface for objects that you can wait for
+
+class CEX_NO_VTABLE Waitable
+{
+public:
+	virtual ~Waitable() {}
+
+	//! maximum number of wait objects that this object can return
+	virtual unsigned int GetMaxWaitObjectCount() const = 0;
+	//! put wait objects into container
+	/*! \param callStack is used for tracing no wait loops, example:
+				 something.GetWaitObjects(c, CallStack("my func after X", 0));
+			   - or in an outer GetWaitObjects() method that itself takes a callStack parameter:
+				 innerThing.GetWaitObjects(c, CallStack("MyClass::GetWaitObjects at X", &callStack)); */
+	virtual void GetWaitObjects(WaitObjectContainer &container, CallStack const& callStack) = 0;
+	//! wait on this object
+	/*! same as creating an empty container, calling GetWaitObjects(), and calling Wait() on the container */
+	bool Wait(unsigned long milliseconds, CallStack const& callStack);
+};
+
+
+
+NAMESPACE_NETWORKEND
 #endif
 

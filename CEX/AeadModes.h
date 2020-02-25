@@ -16,6 +16,10 @@ enum class AeadModes : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
+	/// Galois Counter Mode; Counter mode encryption with GMAC authentication
+	/// </summary>
+	GCM = static_cast<byte>(CipherModes::GCM),
+	/// <summary>
 	/// Counter-mode Hash-based Authentication AEAD mode
 	/// </summary>
 	HBA = static_cast<byte>(CipherModes::HBA),

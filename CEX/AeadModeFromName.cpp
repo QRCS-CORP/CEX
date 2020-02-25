@@ -2,6 +2,7 @@
 #include "BlockCipherFromName.h"
 #include "CryptoCipherModeException.h"
 #include "CryptoSymmetricException.h"
+#include "GCM.h"
 #include "HBA.h"
 
 NAMESPACE_HELPER
@@ -9,6 +10,8 @@ NAMESPACE_HELPER
 using Exception::CryptoCipherModeException;
 using Exception::CryptoSymmetricException;
 using Enumeration::ErrorCodes;
+using Cipher::Block::Mode::GCM;
+using Cipher::Block::Mode::HBA;
 
 const std::string AeadModeFromName::CLASS_NAME("AeadModeFromName");
 
@@ -24,6 +27,11 @@ IAeadMode* AeadModeFromName::GetInstance(IBlockCipher* Cipher, AeadModes CipherM
 	{
 		switch (CipherModeType)
 		{
+			case AeadModes::GCM:
+			{
+				mptr = new GCM(Cipher);
+				break;
+			}
 			case AeadModes::HBAH256:
 			{
 				mptr = new HBA(Cipher, Enumeration::StreamAuthenticators::HMACSHA256);
@@ -79,35 +87,40 @@ IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, AeadModes Ciph
 	{
 		switch (CipherModeType)
 		{
-		case AeadModes::HBAH256:
-		{
-			mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::HMACSHA256);
-			break;
-		}
-		case AeadModes::HBAH512:
-		{
-			mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::HMACSHA512);
-			break;
-		}
-		case AeadModes::HBAS256:
-		{
-			mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::KMAC256);
-			break;
-		}
-		case AeadModes::HBAS512:
-		{
-			mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::KMAC512);
-			break;
-		}
-		case AeadModes::HBAS1024:
-		{
-			mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::KMAC1024);
-			break;
-		}
-		default:
-		{
-			throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The AEAD cipher mode is not supported!"), ErrorCodes::InvalidParam);
-		}
+			case AeadModes::GCM:
+			{
+				mptr = new GCM(CipherType);
+				break;
+			}
+			case AeadModes::HBAH256:
+			{
+				mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::HMACSHA256);
+				break;
+			}
+			case AeadModes::HBAH512:
+			{
+				mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::HMACSHA512);
+				break;
+			}
+			case AeadModes::HBAS256:
+			{
+				mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::KMAC256);
+				break;
+			}
+			case AeadModes::HBAS512:
+			{
+				mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::KMAC512);
+				break;
+			}
+			case AeadModes::HBAS1024:
+			{
+				mptr = new HBA(CipherType, Enumeration::StreamAuthenticators::KMAC1024);
+				break;
+			}
+			default:
+			{
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The AEAD cipher mode is not supported!"), ErrorCodes::InvalidParam);
+			}
 		}
 	}
 	catch (CryptoCipherModeException &ex)

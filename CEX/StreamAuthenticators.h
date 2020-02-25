@@ -16,6 +16,22 @@ enum class StreamAuthenticators : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
+	/// The GMAC authentication code generator using RHX and HKDF(SHA2-256)
+	/// </summary>
+	GMACRHXH256 = static_cast<byte>(Macs::GMACRHXH256),
+	/// <summary>
+	/// The GMAC authentication code generator using RHX and HKDF(SHA2-512)
+	/// </summary>
+	GMACRHXH512 = static_cast<byte>(Macs::GMACRHXH512),
+	/// <summary>
+	/// The GMAC authentication code generator using RHX and cSHAKE-256
+	/// </summary>
+	GMACRHXS256 = static_cast<byte>(Macs::GMACRHXS256),
+	/// <summary>
+	/// The GMAC authentication code generator using RHX and cSHAKE-512
+	/// </summary>
+	GMACRHXS512 = static_cast<byte>(Macs::GMACRHXS512),
+	/// <summary>
 	/// A HMAC(SHA256) message authentication code generator
 	/// </summary>
 	HMACSHA256 = static_cast<byte>(Macs::HMACSHA256),

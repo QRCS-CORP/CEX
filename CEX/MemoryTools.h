@@ -204,6 +204,148 @@ public:
 	/// endcond
 
 	/// <summary>
+	/// Bitwise AND a specified number of 8-bit bytes to process.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to AND.
+	/// If the length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential AND operation.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	/// <param name="Length">The number of bytes to process</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void AND(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+		size_t i;
+		size_t pctr;
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output size");
+		CEXASSERT(Length > 0, "Length can not be zero");
+		CEXASSERT(INPLEN <= Length, "Integer type is larger than length");
+		CEXASSERT(OTPLEN <= Length, "Integer type is larger than length");
+
+
+		if (Length != 0)
+		{
+			const size_t ELMLEN = sizeof(ArrayA::value_type);
+			pctr = 0;
+
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#	if defined(__AVX512__)
+			const size_t SMDBLK = 64;
+#	elif defined(__AVX2__)
+			const size_t SMDBLK = 32;
+#	else
+			const size_t SMDBLK = 16;
+#	endif
+
+			if (Length >= SMDBLK)
+			{
+				const size_t ALNLEN = Length - (Length % SMDBLK);
+
+				while (pctr != ALNLEN)
+				{
+#if defined(__AVX512__)
+					AND512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
+#elif defined(__AVX2__)
+					AND256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
+#elif defined(__AVX__)
+					AND128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
+#endif
+					pctr += SMDBLK;
+				}
+			}
+#endif
+			for (i = 0; i < Length - (pctr * ELMLEN); ++i)
+			{
+				Output[OutOffset + pctr] &= Input[InOffset + pctr];
+			}
+		}
+	}
+
+	/// <summary>
+	/// Bitwise AND a 128 bit block
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void AND128(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output size");
+
+#if defined(__AVX__)
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_and_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+#else
+		for (size_t i = 0; i < (16 / OTPLEN); ++i)
+		{
+			Output[OutOffset + i] &= Input[InOffset + i];
+		}
+#endif
+	}
+
+	/// <summary>
+	/// Bitwise AND a 256 bit block
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void AND256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output size");
+
+#if defined(__AVX2__)
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_and_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
+#else
+		AND128(Input, InOffset, Output, OutOffset);
+		AND128(Input, InOffset + (16 / INPLEN), Output, OutOffset + (16 / OTPLEN));
+#endif
+	}
+
+	/// <summary>
+	/// Bitwise AND a 512 bit block
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void AND512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output size");
+
+#if defined(__AVX512__)
+		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_and_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
+#else
+		AND256(Input, InOffset, Output, OutOffset);
+		AND256(Input, InOffset + (32 / INPLEN), Output, OutOffset + (32 / OTPLEN));
+#endif
+	}
+
+	/// <summary>
 	/// Clear 128 bits from an integer array.
 	/// <para>This is an AVX vectorized function.</para>
 	/// </summary>
@@ -269,9 +411,6 @@ public:
 	template<typename Array>
 	inline static bool Compare(const Array &A, size_t AOffset, const Array &B, size_t BOffset, size_t Elements)
 	{
-		CEXASSERT((A.size() - AOffset) >= Length, "Length is larger than A size");
-		CEXASSERT((B.size() - BOffset) >= Length, "Length is larger than B size");
-
 		size_t diff;
 
 		diff = 0;
@@ -631,7 +770,7 @@ public:
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(Input)));
 #else
 		COPY128(Input, Output, OutOffset);
-		COPY128(Input + 16, Output, OutOffset + (16 / sizeof(ArrayB::value_type)));
+		COPY128(Input + 16, Output, OutOffset + (16 / sizeof(Array::value_type)));
 #endif
 	}
 
@@ -652,7 +791,7 @@ public:
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
 #else
 		COPY128(Input, InOffset, Output);
-		COPY128(Input + InOffset + (16 / sizeof(ArrayB::value_type)), Output + 16);
+		COPY128(Input + InOffset + (16 / sizeof(Array::value_type)), Output + 16);
 #endif
 	}
 
@@ -763,6 +902,147 @@ public:
 		{
 			std::memmove(&Output[OutOffset], &Input[InOffset], Length);
 		}
+	}
+
+	/// <summary>
+	/// Bitwise OR a specified number of 8-bit bytes to process.
+	/// <para>The Length is the number of *bytes* (8 bit integers) to OR.
+	/// If the length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential OR operation.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	/// <param name="Length">The number of bytes to process</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void OR(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+		const size_t ELMLEN = sizeof(ArrayA::value_type);
+		size_t i;
+		size_t pctr;
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output size");
+		CEXASSERT(Length > 0, "Length can not be zero");
+		CEXASSERT(INPLEN <= Length, "Integer type is larger than length");
+		CEXASSERT(OTPLEN <= Length, "Integer type is larger than length");
+
+		if (Length != 0)
+		{
+			pctr = 0;
+
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#	if defined(__AVX512__)
+			const size_t SMDBLK = 64;
+#	elif defined(__AVX2__)
+			const size_t SMDBLK = 32;
+#	else
+			const size_t SMDBLK = 16;
+#	endif
+
+			if (Length >= SMDBLK)
+			{
+				const size_t ALNLEN = Length - (Length % SMDBLK);
+
+				while (pctr != ALNLEN)
+				{
+#if defined(__AVX512__)
+					OR512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
+#elif defined(__AVX2__)
+					OR256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
+#elif defined(__AVX__)
+					OR128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
+#endif
+					pctr += SMDBLK;
+				}
+			}
+#endif
+			for (i = 0; i < Length - (pctr * ELMLEN); ++i)
+			{
+				Output[OutOffset + pctr] |= Input[InOffset + pctr];
+			}
+		}
+	}
+
+	/// <summary>
+	/// Bitwise OR a 128 bit block
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void OR128(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output size");
+
+#if defined(__AVX__)
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_or_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+#else
+		for (size_t i = 0; i < (16 / OTPLEN); ++i)
+		{
+			Output[OutOffset + i] &= Input[InOffset + i];
+		}
+#endif
+	}
+
+	/// <summary>
+	/// Bitwise OR a 256 bit block
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void OR256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output size");
+
+#if defined(__AVX2__)
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_or_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
+#else
+		OR128(Input, InOffset, Output, OutOffset);
+		OR128(Input, InOffset + (16 / INPLEN), Output, OutOffset + (16 / OTPLEN));
+#endif
+	}
+
+	/// <summary>
+	/// Bitwise OR a 512 bit block
+	/// </summary>
+	/// 
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void OR512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
+	{
+		const size_t INPLEN = sizeof(ArrayA::value_type);
+		const size_t OTPLEN = sizeof(ArrayB::value_type);
+
+		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input size");
+		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output size");
+
+#if defined(__AVX512__)
+		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_or_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
+#else
+		OR256(Input, InOffset, Output, OutOffset);
+		OR256(Input, InOffset + (32 / INPLEN), Output, OutOffset + (32 / OTPLEN));
+#endif
 	}
 
 	/// <summary>

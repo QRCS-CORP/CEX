@@ -105,6 +105,8 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +133,8 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OmitFramePointers>false</OmitFramePointers>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,6 +161,8 @@
       <Optimization>Full</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <CompileAs>Default</CompileAs>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,6 +192,8 @@
       </AdditionalOptions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ConformanceMode>false</ConformanceMode>
+      <CompileAsManaged>false</CompileAsManaged>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -200,14 +208,16 @@
     <ClInclude Include="..\..\CEX\AsymmetricCiphers.h" />
     <ClInclude Include="..\..\CEX\AsymmetricSignerFromName.h" />
     <ClInclude Include="..\..\CEX\AsymmetricSigners.h" />
+    <ClInclude Include="..\..\CEX\CryptoNetworkingException.h" />
     <ClInclude Include="..\..\CEX\CryptoSocketException.h" />
     <ClInclude Include="..\..\CEX\DLTMPolyMath.h" />
     <ClInclude Include="..\..\CEX\DLTMK4Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK5Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h" />
+    <ClInclude Include="..\..\CEX\Filter.h" />
+    <ClInclude Include="..\..\CEX\GCM.h" />
     <ClInclude Include="..\..\CEX\HBA.h" />
-    <ClInclude Include="..\..\CEX\MCS.h" />
-    <ClInclude Include="..\..\CEX\Network.h" />
+    <ClInclude Include="..\..\CEX\NetworkTools.h" />
     <ClInclude Include="..\..\CEX\SPXPFORS.h" />
     <ClInclude Include="..\..\CEX\ACP.h" />
     <ClInclude Include="..\..\CEX\AeadModeFromName.h" />
@@ -427,6 +437,7 @@
     <ClInclude Include="..\..\CEX\UShort128.h" />
     <ClInclude Include="..\..\CEX\SPXPWOTS.h" />
     <ClInclude Include="..\..\CEX\Wait.h" />
+    <ClInclude Include="..\..\CEX\WindowsHandle.h" />
     <ClInclude Include="..\..\CEX\X923.h" />
     <ClInclude Include="..\..\CEX\XMSS.h" />
     <ClInclude Include="..\..\CEX\XMSSCore.h" />
@@ -440,14 +451,16 @@
     <ClCompile Include="..\..\CEX\AsymmetricCiphers.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricSignerFromName.cpp" />
     <ClCompile Include="..\..\CEX\AsymmetricSigners.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoNetworkingException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoSocketException.cpp" />
     <ClCompile Include="..\..\CEX\DLTMPolyMath.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK4Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK5Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp" />
+    <ClCompile Include="..\..\CEX\Filter.cpp" />
+    <ClCompile Include="..\..\CEX\GCM.cpp" />
     <ClCompile Include="..\..\CEX\HBA.cpp" />
-    <ClCompile Include="..\..\CEX\MCS.cpp" />
-    <ClCompile Include="..\..\CEX\Network.cpp" />
+    <ClCompile Include="..\..\CEX\NetworkTools.cpp" />
     <ClCompile Include="..\..\CEX\RNBWGfMath.cpp" />
     <ClCompile Include="..\..\CEX\SPXPFORS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />
@@ -622,6 +635,7 @@
     <ClCompile Include="..\..\CEX\TimeStamp.cpp" />
     <ClCompile Include="..\..\CEX\SPXPWOTS.cpp" />
     <ClCompile Include="..\..\CEX\Wait.cpp" />
+    <ClCompile Include="..\..\CEX\WindowsHandle.cpp" />
     <ClCompile Include="..\..\CEX\X923.cpp" />
     <ClCompile Include="..\..\CEX\XMSS.cpp" />
     <ClCompile Include="..\..\CEX\XMSSCore.cpp" />

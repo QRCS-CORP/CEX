@@ -156,7 +156,6 @@ namespace Test
 		void CTRSpeedTest(bool Encrypt, bool Parallel);
 		void CSX256SpeedTest();
 		void CSX512SpeedTest();
-		void MCSSpeedTest();
 		void RCSSpeedTest();
 		void TSX256SpeedTest();
 		void TSX512SpeedTest();

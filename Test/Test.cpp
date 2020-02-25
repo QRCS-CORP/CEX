@@ -7,7 +7,6 @@
 #include "../Test/TestFiles.h"
 #include "../Test/TestUtils.h"
 #include "../Test/ACPTest.h"
-#include "../Test/MCSTest.h"
 #include "../Test/AeadTest.h"
 #include "../Test/AesAvsTest.h"
 #include "../Test/AsymmetricKeyTest.h"
@@ -42,6 +41,7 @@
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
 #include "../Test/KyberTest.h"
+#include "../Test/NetworkTest.h"
 #include "../Test/NTRUPrimeTest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
@@ -371,7 +371,6 @@ int main()
 			TestRun(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
 			TestRun(new ChaChaTest());
-			TestRun(new MCSTest());
 			TestRun(new RCSTest());
 			TestRun(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");

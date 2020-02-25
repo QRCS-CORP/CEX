@@ -34,7 +34,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 2
@@ -42,7 +42,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 3
@@ -50,7 +50,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 4
@@ -58,7 +58,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 5
@@ -66,7 +66,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 6
@@ -74,7 +74,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 7
@@ -82,7 +82,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 8
@@ -90,7 +90,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 9
@@ -98,7 +98,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 10
@@ -106,7 +106,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 11
@@ -114,7 +114,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 12
@@ -122,7 +122,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 13
@@ -130,7 +130,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 14
@@ -138,7 +138,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 15
@@ -146,7 +146,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 16
@@ -154,7 +154,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 17
@@ -162,7 +162,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 18
@@ -170,7 +170,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 19
@@ -178,7 +178,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 20
@@ -186,7 +186,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 21
@@ -194,7 +194,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 22
@@ -202,7 +202,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 23
@@ -210,7 +210,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 24
@@ -218,7 +218,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 25
@@ -226,7 +226,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 26
@@ -234,7 +234,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 27
@@ -242,7 +242,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 28
@@ -250,7 +250,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 29
@@ -258,7 +258,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 30
@@ -266,7 +266,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 31
@@ -274,7 +274,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 32
@@ -282,7 +282,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 33
@@ -290,7 +290,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 34
@@ -298,7 +298,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 35
@@ -306,7 +306,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 36
@@ -314,7 +314,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 37
@@ -322,7 +322,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 38
@@ -330,7 +330,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 39
@@ -338,7 +338,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 40
@@ -346,7 +346,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 41
@@ -354,7 +354,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 42
@@ -362,7 +362,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 43
@@ -370,7 +370,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 44
@@ -378,7 +378,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 45
@@ -386,7 +386,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 46
@@ -394,7 +394,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 47
@@ -402,7 +402,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 48
@@ -410,7 +410,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 49
@@ -418,7 +418,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 50
@@ -426,7 +426,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 51
@@ -434,7 +434,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 52
@@ -442,7 +442,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 53
@@ -450,7 +450,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 54
@@ -458,7 +458,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 55
@@ -466,7 +466,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 56
@@ -474,7 +474,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 57
@@ -482,7 +482,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 58
@@ -490,7 +490,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 59
@@ -498,7 +498,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 60
@@ -506,7 +506,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 61
@@ -514,7 +514,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 62
@@ -522,7 +522,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 63
@@ -530,7 +530,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 64
@@ -538,7 +538,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	mpos = 0x8000000000000000ULL;
@@ -548,7 +548,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 2
@@ -556,7 +556,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 3
@@ -564,7 +564,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 4
@@ -572,7 +572,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 5
@@ -580,7 +580,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 6
@@ -588,7 +588,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 7
@@ -596,7 +596,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 8
@@ -604,7 +604,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 9
@@ -612,7 +612,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 10
@@ -620,7 +620,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 11
@@ -628,7 +628,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 12
@@ -636,7 +636,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 13
@@ -644,7 +644,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 14
@@ -652,7 +652,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 15
@@ -660,7 +660,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 16
@@ -668,7 +668,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 17
@@ -676,7 +676,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 18
@@ -684,7 +684,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 19
@@ -692,7 +692,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 20
@@ -700,7 +700,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 21
@@ -708,7 +708,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 22
@@ -716,7 +716,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 23
@@ -724,7 +724,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 24
@@ -732,7 +732,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 25
@@ -740,7 +740,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 26
@@ -748,7 +748,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 27
@@ -756,7 +756,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 28
@@ -764,7 +764,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 29
@@ -772,7 +772,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 30
@@ -780,7 +780,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 31
@@ -788,7 +788,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 32
@@ -796,7 +796,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 33
@@ -804,7 +804,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 34
@@ -812,7 +812,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 35
@@ -820,7 +820,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 36
@@ -828,7 +828,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 37
@@ -836,7 +836,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 38
@@ -844,7 +844,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 39
@@ -852,7 +852,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 40
@@ -860,7 +860,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 41
@@ -868,7 +868,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 42
@@ -876,7 +876,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 43
@@ -884,7 +884,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 44
@@ -892,7 +892,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 45
@@ -900,7 +900,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 46
@@ -908,7 +908,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 47
@@ -916,7 +916,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 48
@@ -924,7 +924,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 49
@@ -932,7 +932,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 50
@@ -940,7 +940,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 51
@@ -948,7 +948,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 52
@@ -956,7 +956,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 53
@@ -964,7 +964,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 54
@@ -972,7 +972,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 55
@@ -980,7 +980,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 56
@@ -988,7 +988,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 57
@@ -996,7 +996,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 58
@@ -1004,7 +1004,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 59
@@ -1012,7 +1012,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 60
@@ -1020,7 +1020,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 61
@@ -1028,7 +1028,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 62
@@ -1036,7 +1036,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// round 63
@@ -1044,7 +1044,7 @@ void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 	mpos >>= 1;
 	Z0 ^= T0 & mask;
 	Z1 ^= T1 & mask;
-	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+	carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 	T1 = (T1 >> 1) | (T0 << 63);
 	T0 = (T0 >> 1) ^ carry;
 	// last round
@@ -1083,7 +1083,7 @@ void CMUL::PermuteR128P128C(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 		mpos >>= 1;
 		Z0 ^= T0 & mask;
 		Z1 ^= T1 & mask;
-		carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+		carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 		T1 = (T1 >> 1) | (T0 << 63);
 		T0 = (T0 >> 1) ^ carry;
 	}
@@ -1096,7 +1096,7 @@ void CMUL::PermuteR128P128C(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 		mpos >>= 1;
 		Z0 ^= T0 & mask;
 		Z1 ^= T1 & mask;
-		carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1);
+		carry = R & IntegerTools::ExpandMask<ulong>(T1 & 1ULL);
 		T1 = (T1 >> 1) | (T0 << 63);
 		T0 = (T0 >> 1) ^ carry;
 	}

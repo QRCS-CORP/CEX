@@ -81,69 +81,6 @@ enum class StreamCiphers : byte
 	/// </summary>
 	CSXR80P256 = static_cast<byte>(SymmetricCiphers::CSXR80P256),
 
-	//~~~ Modular Cipher Stream Variants~~//
-
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRH256 = static_cast<byte>(SymmetricCiphers::MCSRH256),
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRH512 = static_cast<byte>(SymmetricCiphers::MCSRH512),
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and KMAC-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRK256 = static_cast<byte>(SymmetricCiphers::MCSRK256),
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and KMAC-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRK512 = static_cast<byte>(SymmetricCiphers::MCSRK512),
-	/// <summary>
-	/// The Modular Cipher Stream; using the RHX cipher, and Poly1305 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSRP256 = static_cast<byte>(SymmetricCiphers::MCSRP256),
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSH256 = static_cast<byte>(SymmetricCiphers::MCSSH256),
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSH512 = static_cast<byte>(SymmetricCiphers::MCSSH512),
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and KMAC-256 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSK256 = static_cast<byte>(SymmetricCiphers::MCSSK256),
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and KMAC-512 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSK512 = static_cast<byte>(SymmetricCiphers::MCSSK512),
-	/// <summary>
-	/// The Modular Cipher Stream; using the SHX cipher, and Poly1305 for authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSSP256 = static_cast<byte>(SymmetricCiphers::MCSSP256),
-	/// <summary>
-	/// The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication.
-	/// <para>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSR = static_cast<byte>(SymmetricCiphers::MCSR),
-	/// <summary>
-	/// The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication.
-	/// <para>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	MCSS = static_cast<byte>(SymmetricCiphers::MCSS),
-
 	//~~~ Rijndael-256 Extended Cipher Stream Variants~~//
 
 	/// <summary>
@@ -151,6 +88,16 @@ enum class StreamCiphers : byte
 	/// <para>A Rijndael Extended cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes</para>
 	/// </summary>
 	RCS = static_cast<byte>(SymmetricCiphers::RCS),
+	/// <summary>
+	/// The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-256 for authentication.
+	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
+	/// </summary>
+	RCSG256 = static_cast<byte>(SymmetricCiphers::RCSG256),
+	/// <summary>
+	/// The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-512 for authentication.
+	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
+	/// </summary>
+	RCSG512 = static_cast<byte>(SymmetricCiphers::RCSG512),
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-256 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>

@@ -443,9 +443,6 @@
     <ClInclude Include="..\..\Test\RCSTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\MCSTest.h">
-      <Filter>Header Files\Test\CipherTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\NistRng.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
@@ -466,6 +463,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\NTRUPrimeTest.h">
       <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\NetworkTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -640,9 +640,6 @@
     <ClCompile Include="..\..\Test\RCSTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\MCSTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\NistRng.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -663,6 +660,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\NTRUPrimeTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\NetworkTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

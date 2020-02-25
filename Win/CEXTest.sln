@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CEX", "Static\CEXEngine.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Test\Test.vcxproj", "{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Example", "Example\Example.vcxproj", "{2B775B33-F00E-4D1D-9B2F-FB73873C7288}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -43,16 +41,6 @@ Global
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Release|x64.Build.0 = Release|x64
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Release|x86.ActiveCfg = Release|Win32
 		{3660E6D2-8C1D-4B62-8B68-51145B7D1A31}.Release|x86.Build.0 = Release|Win32
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Debug|ARM.ActiveCfg = Debug|Win32
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Debug|x64.ActiveCfg = Debug|x64
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Debug|x64.Build.0 = Debug|x64
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Debug|x86.ActiveCfg = Debug|Win32
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Debug|x86.Build.0 = Debug|Win32
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Release|ARM.ActiveCfg = Release|Win32
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Release|x64.ActiveCfg = Release|x64
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Release|x64.Build.0 = Release|x64
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Release|x86.ActiveCfg = Release|Win32
-		{2B775B33-F00E-4D1D-9B2F-FB73873C7288}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

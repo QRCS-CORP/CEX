@@ -69,62 +69,6 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 			}
 			break;
 		}
-		case StreamCiphers::MCSR:
-		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
-			{
-				name = StreamCiphers::MCSRH256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::MCSRH512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
-			{
-				name = StreamCiphers::MCSRK256;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC512)
-			{
-				name = StreamCiphers::MCSRK512;
-			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
-			{
-				name = StreamCiphers::MCSRP256;
-			}
-			else
-			{
-				name = StreamCiphers::MCSR;
-			}
-			break;
-		}
-		case StreamCiphers::MCSS:
-		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
-			{
-				name = StreamCiphers::MCSSH256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::MCSSH512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
-			{
-				name = StreamCiphers::MCSSK256;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC512)
-			{
-				name = StreamCiphers::MCSSK512;
-			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
-			{
-				name = StreamCiphers::MCSSP256;
-			}
-			else
-			{
-				name = StreamCiphers::MCSS;
-			}
-			break;
-		}
 		case StreamCiphers::RCS:
 		{
 			if (Authenticator == StreamAuthenticators::HMACSHA256)
