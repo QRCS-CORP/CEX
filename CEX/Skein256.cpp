@@ -312,7 +312,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		}
 		else
 		{
-			if (m_msgLength != 0 && (m_msgLength + Length >= Skein::SKEIN256_RATE_SIZE))
+			if (m_msgLength != 0 && (m_msgLength + Length > Skein::SKEIN256_RATE_SIZE))
 			{
 				const size_t RMDLEN = Skein::SKEIN256_RATE_SIZE - m_msgLength;
 				if (RMDLEN != 0)
