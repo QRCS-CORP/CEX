@@ -7,7 +7,7 @@ using Utility::MemoryTools;
 
 //~~~Constructor~~~//
 
-PrngBase::PrngBase(Prngs Enumeral, std::string &Name)
+PrngBase::PrngBase(Prngs Enumeral, std::string Name)
 	:
 	m_prngEnumeral(Enumeral),
 	m_prngName(Name)

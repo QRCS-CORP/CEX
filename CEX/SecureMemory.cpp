@@ -24,9 +24,7 @@ const std::string SecureMemory::CLASS_NAME = "SecureMemory";
 void* SecureMemory::Allocate(size_t Length)
 {
 	const size_t PGESZE = PageSize();
-	void* ptr;
 
-	ptr = nullptr;
 
 	if (Length % PGESZE != 0)
 	{
@@ -34,6 +32,10 @@ void* SecureMemory::Allocate(size_t Length)
 	}
 
 #if defined(CEX_OS_POSIX)
+
+	void* ptr;
+
+	ptr = nullptr;
 
 #	if !defined(MAP_NOCORE)
 #		define MAP_NOCORE 0
@@ -68,9 +70,13 @@ void* SecureMemory::Allocate(size_t Length)
 #	endif
 	}
 
+	return ptr;
+
 #elif defined(CEX_HAS_VIRTUALLOCK)
 
-	(LPVOID)ptr = ::VirtualAlloc(nullptr, Length, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	LPVOID ptr;
+
+	ptr = ::VirtualAlloc(nullptr, Length, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
 	if (ptr != nullptr)
 	{
@@ -84,14 +90,17 @@ void* SecureMemory::Allocate(size_t Length)
 		}
 	}
 
+	return ptr;
 
 #else
+	
+	byte* ptr;
 
 	ptr = (byte*)malloc(Length);
 
-#endif
-
 	return ptr;
+
+#endif
 }
 
 const bool SecureMemory::Available()

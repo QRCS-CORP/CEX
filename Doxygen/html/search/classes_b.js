@@ -4,7 +4,6 @@ var searchData=
   ['macfromname',['MacFromName',['../class_mac_from_name.html',1,'']]],
   ['macstream',['MacStream',['../class_mac_stream.html',1,'']]],
   ['mceliece',['McEliece',['../class_mc_eliece.html',1,'']]],
-  ['mcs',['MCS',['../class_m_c_s.html',1,'']]],
   ['memorypool',['MemoryPool',['../class_memory_pool.html',1,'']]],
   ['memorystream',['MemoryStream',['../class_memory_stream.html',1,'']]],
   ['memorytools',['MemoryTools',['../class_memory_tools.html',1,'']]],

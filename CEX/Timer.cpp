@@ -6,11 +6,11 @@
 #include <time.h>
 
 #if defined(CEX_OS_WINDOWS)
-#include <windows.h>
+#	include <windows.h>
 #elif defined(CEX_OS_UNIX)
-#include <sys/time.h>
-#include <sys/times.h>
-#include <unistd.h>
+#	include <sys/time.h>
+#	include <sys/times.h>
+#	include <unistd.h>
 #endif
 
 NAMESPACE_UTILITY
@@ -20,10 +20,11 @@ using Utility::IntegerTools;
 
 double TimerBase::ConvertTo(TimerWord t, Unit unit)
 {
-	static unsigned long unitsPerSecondTable[] = { 1, 1000, 1000 * 1000, 1000 * 1000 * 1000 };
+	static ulong unitsPerSecondTable[] = { 1, 1000, 1000 * 1000, 1000 * 1000 * 1000 };
 
 	assert(unit < sizeof(unitsPerSecondTable) / sizeof(unitsPerSecondTable[0]));
-	return (double)(long)t * unitsPerSecondTable[unit] / (long)TicksPerSecond();
+
+	return static_cast<double>(static_cast<long>(t) * unitsPerSecondTable[unit] / static_cast<long>(TicksPerSecond()));
 }
 
 void TimerBase::StartTimer()
@@ -34,30 +35,34 @@ void TimerBase::StartTimer()
 
 double TimerBase::ElapsedTimeAsDouble()
 {
-	if (m_stuckAtZero)
-	{
-		return 0;
-	}
+	double ret;
 
-	if (m_started)
-	{
-		TimerWord now = GetCurrentTimerValue();
+	ret = 0;
 
-		// protect against OS bugs where time goes backwards
-		if (m_last < now)
+	if (!m_stuckAtZero)
+	{
+		if (m_started)
 		{
-			m_last = now;
-		}
+			TimerWord now = GetCurrentTimerValue();
 
-		return ConvertTo(m_last - m_start, m_timerUnit);
+			// protect against OS bugs where time goes backwards
+			if (m_last < now)
+			{
+				m_last = now;
+			}
+
+			ret = ConvertTo(m_last - m_start, m_timerUnit);
+		}
+		else
+		{
+			StartTimer();
+		}
 	}
 
-	StartTimer();
-
-	return 0;
+	return ret;
 }
 
-unsigned long TimerBase::ElapsedTime()
+ulong TimerBase::ElapsedTime()
 {
 	double elapsed;
 
@@ -65,7 +70,7 @@ unsigned long TimerBase::ElapsedTime()
 
 	assert(elapsed <= ULONG_MAX);
 
-	return (unsigned long)elapsed;
+	return static_cast<ulong>(elapsed);
 }
 
 TimerWord Timer::GetCurrentTimerValue()
@@ -78,18 +83,16 @@ TimerWord Timer::GetCurrentTimerValue()
 		throw CryptoProcessingException(std::string("ElapsedTime"), std::string("Timer"), std::string("QueryPerformanceCounter failed!"), Enumeration::ErrorCodes::Unreachable);
 	}
 
-	return now.QuadPart;
+	return static_cast<TimerWord>(now.QuadPart);
 
 #elif defined(CEX_OS_UNIX)
 	timeval now;
 	gettimeofday(&now, NULL);
 
-	return (TimerWord)now.tv_sec * 1000000 + now.tv_usec;
+	return (static_cast<TimerWord>(now.tv_sec) * 1000000) + now.tv_usec;
 
 #else
-	clock_t now;
-
-	return clock();
+	return static_cast<TimerWord>(clock());
 #endif
 }
 
@@ -118,12 +121,15 @@ TimerWord Timer::TicksPerSecond()
 TimerWord ThreadUserTimer::GetCurrentTimerValue()
 {
 #if defined(CEX_OS_WINDOWS)
-	static bool getCurrentThreadImplemented;
+
+	TimerWord twrd;
 	ulong high;
+	static bool cthd;
 
-	getCurrentThreadImplemented = true;
+	cthd = true;
+	twrd = 0;
 
-	if (getCurrentThreadImplemented)
+	if (cthd)
 	{
 		FILETIME now, ignored;
 
@@ -133,21 +139,25 @@ TimerWord ThreadUserTimer::GetCurrentTimerValue()
 
 			if (lastError == ERROR_CALL_NOT_IMPLEMENTED)
 			{
-				getCurrentThreadImplemented = false;
-				goto GetCurrentThreadNotImplemented; // FIX this
+				cthd = false;
+				twrd = static_cast<TimerWord>(clock()) * (10 * 1000 * 1000 / CLOCKS_PER_SEC);
 			}
+			else
+			{
+				throw CryptoProcessingException(std::string("GetCurrentTimerValue"), std::string("Timer"), std::string("GetThreadTimes failed!"), Enumeration::ErrorCodes::Unreachable);
+			}
+		}
+		else
+		{
+			high = static_cast<ulong>(now.dwHighDateTime);
+			high <<= 32;
 
-			throw CryptoProcessingException(std::string("GetCurrentTimerValue"), std::string("Timer"), std::string("GetThreadTimes failed!"), Enumeration::ErrorCodes::Unreachable);
+			twrd = static_cast<TimerWord>(high) + now.dwLowDateTime;
 		}
 
-		high = (ulong)now.dwHighDateTime;
-		high <<= 32;
-
-		return now.dwLowDateTime + ((TimerWord)high);
 	}
 
-GetCurrentThreadNotImplemented:
-	return (TimerWord)clock() * (10 * 1000 * 1000 / CLOCKS_PER_SEC);
+	return twrd;
 
 #elif defined(CEX_OS_UNIX)
 	tms now;

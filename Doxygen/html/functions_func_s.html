@@ -124,9 +124,17 @@ $(function() {
 <li>SelfTest()
 : <a class="el" href="class_provider_self_test.html#afb1075f7333eb83f4334d4d83766e7f4">ProviderSelfTest</a>
 </li>
+<li>Send()
+: <a class="el" href="class_socket.html#a308ebaf245f90a975bdd10b22b74dd30">Socket</a>
+</li>
+<li>SendReady()
+: <a class="el" href="class_socket.html#a04f3ebf1deda331df3161e00396afd2f">Socket</a>
+</li>
 <li>Serialize()
-: <a class="el" href="class_asymmetric_key.html#aef44c4a8b903a9305116fb4da33f36bc">AsymmetricKey</a>
+: <a class="el" href="class_a_c_s.html#a8de16a33b0bdc1f3448a92d19e3d5152">ACS</a>
+, <a class="el" href="class_asymmetric_key.html#aef44c4a8b903a9305116fb4da33f36bc">AsymmetricKey</a>
 , <a class="el" href="class_asymmetric_secure_key.html#a39215c211c3dd63a3b8d67a8f175fa59">AsymmetricSecureKey</a>
+, <a class="el" href="class_r_c_s.html#a754aa1f22b90393cd76a8016e3c2b494">RCS</a>
 , <a class="el" href="class_symmetric_key.html#afab59b2ee051cbea285bc163c2b9a708">SymmetricKey</a>
 , <a class="el" href="class_symmetric_secure_key.html#a5bb27f1bbf02fce6bd169afd7f0ff3b5">SymmetricSecureKey</a>
 </li>
@@ -137,11 +145,10 @@ $(function() {
 : <a class="el" href="class_a_c_s.html#ac64a34cfb5f823b1fd31313b90473d03">ACS</a>
 , <a class="el" href="class_c_s_x256.html#a27db196d3d0c1318586e47df64da1ccc">CSX256</a>
 , <a class="el" href="class_c_s_x512.html#a81d9a4a147236829ca734890ef423f04">CSX512</a>
-, <a class="el" href="class_e_a_x.html#a2d4a0499158ef54f546bb8dad7bc852d">EAX</a>
 , <a class="el" href="class_g_c_m.html#aa5ba6a934f8b8fbd41a83cb232127e0d">GCM</a>
+, <a class="el" href="class_h_b_a.html#aef6f591b2c7ebc65bcb2695145d4ff26">HBA</a>
 , <a class="el" href="class_i_aead_mode.html#a6523ab4680898c42ad9aaf9963042163">IAeadMode</a>
 , <a class="el" href="class_i_stream_cipher.html#ac6bccba6291cbb123d273dbfefe0d03c">IStreamCipher</a>
-, <a class="el" href="class_m_c_s.html#a09ebbc14ad86ca8248e4749d47f0e71b">MCS</a>
 , <a class="el" href="class_r_c_s.html#abc780d616f4a1c0b1b8f7079b3838ffb">RCS</a>
 , <a class="el" href="class_t_s_x1024.html#a1d0245458c9b91161b8aa42f86468489">TSX1024</a>
 , <a class="el" href="class_t_s_x256.html#a69249d70caa928434d3f0de31d25ba7c">TSX256</a>
@@ -152,6 +159,9 @@ $(function() {
 </li>
 <li>SetBlockSize()
 : <a class="el" href="class_parallel_options.html#a7a2ed0a07d97816a71ca1678b2533b11">ParallelOptions</a>
+</li>
+<li>SetLastError()
+: <a class="el" href="class_socket.html#a2ed2c808e132fd1184381089d2c5be60">Socket</a>
 </li>
 <li>SetLength()
 : <a class="el" href="class_file_stream.html#abf05b149771e8d807944347f30ac2287">FileStream</a>
@@ -213,6 +223,12 @@ $(function() {
 : <a class="el" href="class_u_int128.html#a012777940b4b34550cc13575f4a8cf9c">UInt128</a>
 , <a class="el" href="class_u_int256.html#a2410e0d328e8d2b489fb25e75c2c4809">UInt256</a>
 </li>
+<li>ShutDown()
+: <a class="el" href="class_socket.html#a5e448cf2ac310cf57679ebd85bbb4530">Socket</a>
+</li>
+<li>ShutDownSockets()
+: <a class="el" href="class_socket.html#a1e11f64439222137de4fefdb314e500f">Socket</a>
+</li>
 <li>SHX()
 : <a class="el" href="class_s_h_x.html#a947459e40103c2a6914dd40975a8241e">SHX</a>
 </li>
@@ -241,7 +257,7 @@ $(function() {
 , <a class="el" href="class_u_short128.html#a92ec9c42a9f4f9d9a49906ed246c9685">UShort128</a>
 </li>
 <li>Skein1024()
-: <a class="el" href="class_skein1024.html#a236e2f7fd59675b546ec812f744babad">Skein1024</a>
+: <a class="el" href="class_skein1024.html#a708a0cc3f1edb68d70d4543e1ae2c006">Skein1024</a>
 </li>
 <li>Skein256()
 : <a class="el" href="class_skein256.html#a70d2fee38c5f9f933582882b92a43926">Skein256</a>
@@ -250,13 +266,16 @@ $(function() {
 : <a class="el" href="class_skein512.html#aa380d4b0e1cb38adcb512fc19593fa97">Skein512</a>
 </li>
 <li>SkeinParams()
-: <a class="el" href="class_skein_params.html#a17b52c50df593b1f0e0884017eeccf5c">SkeinParams</a>
+: <a class="el" href="class_skein_params.html#a0261e6c0644edb1741439cb2ae099416">SkeinParams</a>
 </li>
 <li>SMAP()
 : <a class="el" href="class_cpu_detect.html#acd3d30df605e0f437e231644fcde3a9e">CpuDetect</a>
 </li>
+<li>Socket()
+: <a class="el" href="class_socket.html#afdb73f7b2ad0598c27cdb302775d392c">Socket</a>
+</li>
 <li>SphincsPlus()
-: <a class="el" href="class_sphincs_plus.html#a718b20f23512ad094818bfd39b308aa4">SphincsPlus</a>
+: <a class="el" href="class_sphincs_plus.html#a6023f076b5b068762f5ad79d63d77403">SphincsPlus</a>
 </li>
 <li>Split()
 : <a class="el" href="class_array_tools.html#a61c8fe6c9b7ad7b9a59e14b9ca2ada09">ArrayTools</a>
@@ -294,6 +313,9 @@ $(function() {
 <li>StartNewBlockType()
 : <a class="el" href="class_skein_ubi_tweak.html#ab7a21120a575b94af8bafa9f10edb2d0">SkeinUbiTweak</a>
 </li>
+<li>StartSockets()
+: <a class="el" href="class_socket.html#a653d3bf891dceca75bee878574b98df3">Socket</a>
+</li>
 <li>StateCacheSize()
 : <a class="el" href="class_a_h_x.html#af8916a1789e3b9f5a3a2cdb63c7a552e">AHX</a>
 , <a class="el" href="class_i_block_cipher.html#a0aa770c83a60b635d25178010cb15594">IBlockCipher</a>
@@ -318,7 +340,7 @@ $(function() {
 : <a class="el" href="class_stream_reader.html#a466c73c110ffd3bb68902446e7122d6d">StreamReader</a>
 </li>
 <li>StreamWriter()
-: <a class="el" href="class_stream_writer.html#a32429aec746da2e546f147467cb1d8cb">StreamWriter</a>
+: <a class="el" href="class_stream_writer.html#adea7be050f003edae92700e669ad7afd">StreamWriter</a>
 </li>
 <li>Stress()
 : <a class="el" href="class_test_1_1_a_c_s_test.html#a67f45bd82828e0effca47a3e5050ef24">Test::ACSTest</a>
@@ -339,7 +361,7 @@ $(function() {
 : <a class="el" href="class_symmetric_key_size.html#a5f516b1e43d64d1b53c035ed15125c2e">SymmetricKeySize</a>
 </li>
 <li>SymmetricSecureKey()
-: <a class="el" href="class_symmetric_secure_key.html#a06b652b903079deb043f63f43c2992ab">SymmetricSecureKey</a>
+: <a class="el" href="class_symmetric_secure_key.html#ae16cb355134332b7a5c9cfea15ff2e7b">SymmetricSecureKey</a>
 </li>
 </ul>
 </div><!-- contents -->

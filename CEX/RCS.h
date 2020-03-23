@@ -18,7 +18,7 @@
 //
 //
 // Implementation Details:
-// An implementation of an Rijndael-256 authenticated Counter Mode (RCS).
+// An implementation of an Rijndael-256 authenticated Cryptographic Streamcipher.
 // Written by John G. Underhill, March 8, 2019
 // Updated January 09, 2020
 // Contact: develop@vtdev.com
@@ -36,7 +36,9 @@ using Mac::IMac;
 using Enumeration::StreamAuthenticators;
 
 /// <summary>
-/// An implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counter-mode, as an Authenticate, Encrypt, and Additional Data (AEAD) stream cipher implementation (Rijndael-256 Cipher Stream). \n
+/// Rijndael-256 authenticated Cryptographic Streamcipher. \n
+/// An implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counter-mode, as an Authenticate, Encrypt, 
+/// and Additional Data (AEAD) stream cipher implementation (Rijndael-256 Cipher Stream). \n
 /// <para>This is a fallback for the AES-NI implementation of this cipher ACS.
 /// This cipher uses an optional authentication mode; Poly1305, HMAC(SHA2), or KMAC set through the constructor to authenticate the stream.</para>
 /// </summary> 

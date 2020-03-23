@@ -104,8 +104,8 @@
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,8 +127,8 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,8 +154,8 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -180,8 +180,8 @@
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -313,6 +313,7 @@
     <ClInclude Include="..\..\Test\DilithiumTest.h" />
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\HCRTest.h" />
+    <ClInclude Include="..\..\Test\HKDFTest.h" />
     <ClInclude Include="..\..\Test\NetworkTest.h" />
     <ClInclude Include="..\..\Test\NistRng.h" />
     <ClInclude Include="..\..\Test\RainbowTest.h" />
@@ -330,7 +331,6 @@
     <ClInclude Include="..\..\Test\CSGTest.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
     <ClInclude Include="..\..\Test\GMACTest.h" />
-    <ClInclude Include="..\..\Test\HKDFTest.h" />
     <ClInclude Include="..\..\Test\HMACTest.h" />
     <ClInclude Include="..\..\Test\HCGTest.h" />
     <ClInclude Include="..\..\Test\KMACTest.h" />

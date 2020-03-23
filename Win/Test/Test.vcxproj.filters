@@ -335,9 +335,6 @@
     <ClInclude Include="..\..\Test\Blake2Test.h">
       <Filter>Header Files\Test\DigestTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\HKDFTest.h">
-      <Filter>Header Files\Test\KdfTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\PBKDF2Test.h">
       <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
@@ -466,6 +463,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\NetworkTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HKDFTest.h">
+      <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

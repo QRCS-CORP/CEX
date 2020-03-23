@@ -2,7 +2,7 @@ var searchData=
 [
   ['rainbow',['Rainbow',['../class_rainbow.html#a074f93e41594c6b97cf60e4a7abf3c5f',1,'Rainbow::Rainbow(const Rainbow &amp;)=delete'],['../class_rainbow.html#a4cdb98d85e36519f8faa1a6c9a07224e',1,'Rainbow::Rainbow(RainbowParameters Parameters=RainbowParameters::RNBWS2S192SHAKE512, Prngs PrngType=Prngs::BCR)'],['../class_rainbow.html#ac52df04e0c4b9977c6e6a6684f116729',1,'Rainbow::Rainbow(RainbowParameters Parameters, IPrng *Rng)']]],
   ['randomshuffle',['RandomShuffle',['../class_array_tools.html#a9ca64f08cc59fd4abdc2818c25ce058e',1,'ArrayTools']]],
-  ['rcs',['RCS',['../class_r_c_s.html#a53af795b5257d946bd13a8d22d56719a',1,'RCS::RCS(const RCS &amp;)=delete'],['../class_r_c_s.html#ae84aee45823fe0f87b1b73f0a25f9d26',1,'RCS::RCS(StreamAuthenticators AuthenticatorType=StreamAuthenticators::KMAC256)']]],
+  ['rcs',['RCS',['../class_r_c_s.html#a53af795b5257d946bd13a8d22d56719a',1,'RCS::RCS(const RCS &amp;)=delete'],['../class_r_c_s.html#ae84aee45823fe0f87b1b73f0a25f9d26',1,'RCS::RCS(StreamAuthenticators AuthenticatorType=StreamAuthenticators::KMAC256)'],['../class_r_c_s.html#ab3d7256fa6555c02545a41537c5ec3fb',1,'RCS::RCS(SecureVector&lt; byte &gt; &amp;State)']]],
   ['rdp',['RDP',['../class_r_d_p.html#a24f4c53233485ec18bdc2e0af7f592f3',1,'RDP::RDP(const RDP &amp;)=delete'],['../class_r_d_p.html#a6ce117b2eb890d7fe7791a7cf1f479c3',1,'RDP::RDP(DrandEngines DrandType=DrandEngines::RdRand)']]],
   ['rdrand',['RDRAND',['../class_cpu_detect.html#aec41688c0ef939fad121ec3e1f427821',1,'CpuDetect']]],
   ['rdseed',['RDSEED',['../class_cpu_detect.html#a8ddadbca2b9119d43e71f1db63082f38',1,'CpuDetect']]],
@@ -11,6 +11,8 @@ var searchData=
   ['readbyte',['ReadByte',['../class_file_stream.html#a15a257d8bab4fc54d4544babae6bf4c5',1,'FileStream::ReadByte()'],['../class_i_byte_stream.html#a056e44c32b9ced8bae6e8f61194d2eb6',1,'IByteStream::ReadByte()'],['../class_memory_stream.html#a29827537ab13af4a569483994e32805a',1,'MemoryStream::ReadByte()'],['../class_secure_stream.html#a7e825dd2fb5e529609bff044504bf256',1,'SecureStream::ReadByte()'],['../class_stream_reader.html#a33b83a0826d429386587c969b3926d4b',1,'StreamReader::ReadByte()']]],
   ['readbytes',['ReadBytes',['../class_stream_reader.html#a032ec5673c7e22717838a2138459422e',1,'StreamReader']]],
   ['readint',['ReadInt',['../class_stream_reader.html#aee95a33d52a26cc3f2955ad3a7338551',1,'StreamReader']]],
+  ['receive',['Receive',['../class_socket.html#a429ac6e8b651e9715f54a1be92b2d2bb',1,'Socket']]],
+  ['receiveready',['ReceiveReady',['../class_socket.html#aafb3061826ed2e1401940728b7d55467',1,'Socket']]],
   ['remove',['Remove',['../class_array_tools.html#a5f67d71cfe7dfe55f863bf16ab9b9114',1,'ArrayTools']]],
   ['reseedthreshold',['ReseedThreshold',['../class_b_c_g.html#ac04f934fb7c792f758ddee26a0195546',1,'BCG::ReseedThreshold()'],['../class_c_s_g.html#a11d758c403896a184e272f077d7a451b',1,'CSG::ReseedThreshold()'],['../class_h_c_g.html#a73d80a05fdc6923db4f0755acbb62392',1,'HCG::ReseedThreshold()'],['../class_i_drbg.html#abd2c3ac5a25f6abedc68c69f53374c24',1,'IDrbg::ReseedThreshold()']]],
   ['reserved',['Reserved',['../struct_blake_params.html#a3d49ff06f354249c43e00beec1fd14b6',1,'BlakeParams::Reserved()'],['../struct_s_h_a2.html#a59f621d1e5ca6786096aaa3db5523b8f',1,'SHA2::Reserved()'],['../class_keccak_params.html#acb33376faf8c12d883de795366b39f76',1,'KeccakParams::Reserved()'],['../class_s_h_a2_params.html#aa7f4c38ed498c1187736e617c59e7635',1,'SHA2Params::Reserved()']]],

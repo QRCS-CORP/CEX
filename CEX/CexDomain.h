@@ -67,6 +67,8 @@
 #define NAMESPACE_IOEND } } 
 #define NAMESPACE_KDF namespace CEX { namespace Kdf {
 #define NAMESPACE_KDFEND } } 
+#define NAMESPACE_KMS namespace CEX { namespace KeyManagement {
+#define NAMESPACE_KMSEND } } 
 
 #define NAMESPACE_MAC namespace CEX { namespace Mac {
 #define NAMESPACE_MACEND } } 

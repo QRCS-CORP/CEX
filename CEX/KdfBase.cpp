@@ -7,7 +7,7 @@ using Utility::IntegerTools;
 
 //~~~KdfBase~~~//
 
-KdfBase::KdfBase(Kdfs Enumeral, size_t MinimumKey, size_t MinimumSalt, std::string &Name, std::vector<SymmetricKeySize> &KeySizes)
+KdfBase::KdfBase(Kdfs Enumeral, size_t MinimumKey, size_t MinimumSalt, std::string Name, std::vector<SymmetricKeySize> KeySizes)
 	:
 	m_kdfEnumeral(Enumeral),
 	m_kdfName(Name),

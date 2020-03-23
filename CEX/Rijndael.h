@@ -35,6 +35,11 @@ static const size_t RJD128_BLOCK_SIZE = 16;
 /// </summary>
 static const size_t RJD256_BLOCK_SIZE = 32;
 
+/// <summary>
+/// The Rijndael-512 output size in bytes
+/// </summary>
+static const size_t RJD512_BLOCK_SIZE = 64;
+
 static const std::array<uint, 30> Rcon =
 {
 	0x00000000UL, 0x01000000UL, 0x02000000UL, 0x04000000UL, 0x08000000UL, 0x10000000UL, 0x20000000UL, 0x40000000UL,
@@ -521,6 +526,9 @@ static void ShiftRows128(ArrayU8 &State)
 {
 	byte tmp;
 
+	// X= 00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15
+	// Y= 00,05,10,15,00,09,14,03,00,13,02,07,00,01,06,11
+
 	// row 0 - unchanged
 
 	// row 1
@@ -549,6 +557,9 @@ static void ShiftRows128(ArrayU8 &State)
 template<typename ArrayU8>
 static void ShiftRows256(ArrayU8 &State)
 {
+	// X= 00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
+	// Y= 00,05,14,19,04,09,18,23,08,13,22,27,12,17,26,31,16,21,30,03,20,25,02,07,24,29,06,11,28,01,10,15
+
 	byte tmp;
 
 	tmp = State[1];
@@ -574,18 +585,104 @@ static void ShiftRows256(ArrayU8 &State)
 	tmp = State[3];
 	State[3] = State[19];
 	State[19] = tmp;
-
 	tmp = State[7];
 	State[7] = State[23];
 	State[23] = tmp;
- 
 	tmp = State[11];
 	State[11] = State[27];
 	State[27] = tmp;
-
 	tmp = State[15];
 	State[15] = State[31];
 	State[31] = tmp;
+}
+
+template<typename ArrayU8>
+static void ShiftRows512(ArrayU8 &State)
+{
+	byte tmp;
+
+	tmp = State[0];
+	State[0] = State[4];
+	State[4] = State[8];
+	State[8] = State[12];
+	State[12] = State[16];
+	State[16] = State[20];
+	State[20] = State[24];
+	State[24] = State[28]; 
+	State[28] = State[32];
+	State[32] = State[36];
+	State[36] = State[40];
+	State[40] = State[44];
+	State[44] = State[48];
+	State[48] = State[52];
+	State[52] = State[56];
+	State[56] = State[60];
+	State[60] = tmp;
+
+	tmp = State[1];
+	State[1] = State[9];
+	State[9] = State[17];
+	State[17] = State[25];
+	State[25] = State[33];
+	State[33] = State[41];
+	State[41] = State[49];
+	State[49] = State[57];
+	State[57] = tmp;
+	tmp = State[5];
+	State[5] = State[13];
+	State[13] = State[21];
+	State[21] = State[29];
+	State[29] = State[37];
+	State[37] = State[45];
+	State[45] = State[53];
+	State[53] = State[61];
+	State[61] = tmp;
+
+	tmp = State[2];
+	State[2] = State[18];
+	State[18] = State[34];
+	State[34] = State[50];
+	State[50] = tmp;
+	tmp = State[6];
+	State[6] = State[22];
+	State[22] = State[38];
+	State[38] = State[54];
+	State[54] = tmp;
+	tmp = State[10];
+	State[10] = State[26];
+	State[26] = State[42];
+	State[42] = State[58];
+	State[58] = tmp;
+	tmp = State[14];
+	State[14] = State[30];
+	State[30] = State[46];
+	State[46] = State[62];
+	State[62] = tmp;
+
+	tmp = State[3];
+	State[3] = State[35];
+	State[35] = tmp;
+	tmp = State[7];
+	State[7] = State[39];
+	State[39] = tmp;
+	tmp = State[11];
+	State[11] = State[43];
+	State[43] = tmp;
+	tmp = State[15];
+	State[15] = State[47];
+	State[47] = tmp;
+	tmp = State[19];
+	State[19] = State[51];
+	State[51] = tmp;
+	tmp = State[23];
+	State[23] = State[55];
+	State[55] = tmp;
+	tmp = State[27];
+	State[27] = State[59];
+	State[59] = tmp;
+	tmp = State[31];
+	State[31] = State[63];
+	State[63] = tmp;
 }
 
 template<typename ArrayU8>

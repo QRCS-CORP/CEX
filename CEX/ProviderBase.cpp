@@ -7,7 +7,7 @@ using Utility::MemoryTools;
 
 //~~~Constructor~~~//
 
-ProviderBase::ProviderBase(bool Available, Providers Enumeral, const std::string &Name)
+ProviderBase::ProviderBase(bool Available, Providers Enumeral, const std::string Name)
 	:
 	m_isAvailable(Available),
 	m_pvdEnumeral(Enumeral),

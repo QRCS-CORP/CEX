@@ -95,8 +95,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a5c630485924dc34c5b5fd86909f7c7f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a5c630485924dc34c5b5fd86909f7c7f8">More...</a><br /></td></tr>
 <tr class="separator:a5c630485924dc34c5b5fd86909f7c7f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae84aee45823fe0f87b1b73f0a25f9d26"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#ae84aee45823fe0f87b1b73f0a25f9d26">RCS</a> (<a class="el" href="group___enumeration.html#ga62629810dc7b52fdfb37d80f03d62274">StreamAuthenticators</a> AuthenticatorType=<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>)</td></tr>
-<tr class="memdesc:ae84aee45823fe0f87b1b73f0a25f9d26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name.  <a href="#ae84aee45823fe0f87b1b73f0a25f9d26">More...</a><br /></td></tr>
+<tr class="memdesc:ae84aee45823fe0f87b1b73f0a25f9d26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the stream cipher using a stream authentication generator type-name  <a href="#ae84aee45823fe0f87b1b73f0a25f9d26">More...</a><br /></td></tr>
 <tr class="separator:ae84aee45823fe0f87b1b73f0a25f9d26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3d7256fa6555c02545a41537c5ec3fb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#ab3d7256fa6555c02545a41537c5ec3fb">RCS</a> (SecureVector&lt; byte &gt; &amp;State)</td></tr>
+<tr class="memdesc:ab3d7256fa6555c02545a41537c5ec3fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the stream cipher using a secure-vector serialized state.  <a href="#ab3d7256fa6555c02545a41537c5ec3fb">More...</a><br /></td></tr>
+<tr class="separator:ab3d7256fa6555c02545a41537c5ec3fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b570d13028b7a6f089b07ef3c2b2170"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#a0b570d13028b7a6f089b07ef3c2b2170">~RCS</a> () override</td></tr>
 <tr class="memdesc:a0b570d13028b7a6f089b07ef3c2b2170"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a0b570d13028b7a6f089b07ef3c2b2170">More...</a><br /></td></tr>
 <tr class="separator:a0b570d13028b7a6f089b07ef3c2b2170"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,6 +124,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:afff568de05ea07eddff78766326cbf23"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#afff568de05ea07eddff78766326cbf23">Name</a> () override</td></tr>
 <tr class="memdesc:afff568de05ea07eddff78766326cbf23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers formal implementation name  <a href="#afff568de05ea07eddff78766326cbf23">More...</a><br /></td></tr>
 <tr class="separator:afff568de05ea07eddff78766326cbf23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9ec204bfaefa3461b1555a43150f5ba"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#ae9ec204bfaefa3461b1555a43150f5ba">Nonce</a> () override</td></tr>
+<tr class="memdesc:ae9ec204bfaefa3461b1555a43150f5ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The current value of the nonce counter array.  <a href="#ae9ec204bfaefa3461b1555a43150f5ba">More...</a><br /></td></tr>
+<tr class="separator:ae9ec204bfaefa3461b1555a43150f5ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a70259bff15f3b8ce81c315463a8af2c4"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#a70259bff15f3b8ce81c315463a8af2c4">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:a70259bff15f3b8ce81c315463a8af2c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#a70259bff15f3b8ce81c315463a8af2c4">More...</a><br /></td></tr>
 <tr class="separator:a70259bff15f3b8ce81c315463a8af2c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,6 +148,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae4dc3b1b1bcd84a4ff4e97d105b4df46"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#ae4dc3b1b1bcd84a4ff4e97d105b4df46">ParallelMaxDegree</a> (size_t Degree) override</td></tr>
 <tr class="memdesc:ae4dc3b1b1bcd84a4ff4e97d105b4df46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#ae4dc3b1b1bcd84a4ff4e97d105b4df46">More...</a><br /></td></tr>
 <tr class="separator:ae4dc3b1b1bcd84a4ff4e97d105b4df46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a754aa1f22b90393cd76a8016e3c2b494"><td class="memItemLeft" align="right" valign="top">SecureVector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#a754aa1f22b90393cd76a8016e3c2b494">Serialize</a> ()</td></tr>
+<tr class="memdesc:a754aa1f22b90393cd76a8016e3c2b494"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves the internal state of the cipher to a secure vector.  <a href="#a754aa1f22b90393cd76a8016e3c2b494">More...</a><br /></td></tr>
+<tr class="separator:a754aa1f22b90393cd76a8016e3c2b494"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc780d616f4a1c0b1b8f7079b3838ffb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_c_s.html#abc780d616f4a1c0b1b8f7079b3838ffb">SetAssociatedData</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length) override</td></tr>
 <tr class="memdesc:abc780d616f4a1c0b1b8f7079b3838ffb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the message authentication code generator.  <a href="#abc780d616f4a1c0b1b8f7079b3838ffb">More...</a><br /></td></tr>
 <tr class="separator:abc780d616f4a1c0b1b8f7079b3838ffb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,10 +175,9 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>An implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counter-mode, as an Authenticate, Encrypt, and Additional Data (AEAD) stream cipher implementation (Rijndael-256 Cipher Stream). <br />
 </p>
 <p>This is a fallback for the AES-NI implementation of this cipher ACS. This cipher uses an optional authentication mode; Poly1305, HMAC(SHA2), or KMAC set through the constructor to authenticate the stream.</p>
-<p>Encrypting an array of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><span class="comment">// initialize the Rijndael cipher with the SHAKE-256 key-schedule extension</span></div><div class="line"><a class="code" href="class_r_c_s.html">RCS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>);</div><div class="line"><span class="comment">// mac code is appended to the cipher-text stream in authentication mode</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and verify an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_r_c_s.html">RCS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"></div><div class="line"><span class="comment">// decrypt the ciphertext and catch authentication failures</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="class_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// authentication has failed, do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>Encrypting an array of bytes: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_r_c_s.html#ae9ec204bfaefa3461b1555a43150f5ba">Nonce</a>);</div><div class="line"><span class="comment">// initialize the Rijndael cipher with the SHAKE-256 key-schedule extension</span></div><div class="line"><a class="code" href="class_r_c_s.html">RCS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>);</div><div class="line"><span class="comment">// mac code is appended to the cipher-text stream in authentication mode</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and verify an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_r_c_s.html#ae9ec204bfaefa3461b1555a43150f5ba">Nonce</a>);</div><div class="line"><a class="code" href="class_r_c_s.html">RCS</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"></div><div class="line"><span class="comment">// decrypt the ciphertext and catch authentication failures</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="class_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// authentication has failed, do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>The RCS symmetric cipher is a 256-bit wide-block Rijndael based, Authenticate, Encrypt, and Additional Data (AEAD) authenticated stream-cipher. <br />
-RCS is an online cipher, meaning it can stream data of any size, without needing to know the data size in advance. <br />
-It also has provable security, based on the Rijndael-256 permutation function used by this cipher. <br />
+RCS has provable security, based on the Rijndael-256 permutation function used by this cipher. <br />
 RCS first encrypts the plain-text using a Little-Endian counter mode, then processes that cipher-text using a MAC function used for data authentication. <br />
 When each transform encryption call is completed, the MAC code is generated and appended to the output vector automatically. <br />
 Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, and if authentication succeeds, then decrypting the data to plain-text. <br />
@@ -182,9 +190,9 @@ Input blocks equal to, or divisble by the ParallelBlockSize() are processed in p
 <li>
 Supported key sizes are 32, 64, and 128 bytes (256, 512, and 1024 bits). </li>
 <li>
-The required Nonce size is 16 bytes (128 bits). </li>
+The required Nonce size is 32 bytes (256 bits). </li>
 <li>
-The ISymmetricKey info value can be used as a cipher tweak to create a unique ciphertext and MAC output. </li>
+The ISymmetricKey Info value can be used as a cipher tweak to create a unique ciphertext and MAC output. </li>
 <li>
 The ciphers Initialize function can use either a SymmetricKey, or an encrypted SymmetricSecureKey key container. </li>
 <li>
@@ -242,7 +250,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </ol>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a53af795b5257d946bd13a8d22d56719a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53af795b5257d946bd13a8d22d56719a">&#9670;&nbsp;</a></span>RCS() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a53af795b5257d946bd13a8d22d56719a">&#9670;&nbsp;</a></span>RCS() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -270,7 +278,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </div>
 </div>
 <a id="ae84aee45823fe0f87b1b73f0a25f9d26"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae84aee45823fe0f87b1b73f0a25f9d26">&#9670;&nbsp;</a></span>RCS() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae84aee45823fe0f87b1b73f0a25f9d26">&#9670;&nbsp;</a></span>RCS() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -285,11 +293,43 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
       </table>
 </div><div class="memdoc">
 
-<p>Initialize the Cipher Mode using a block cipher type name. </p>
-<p>The cipher instance is created and destroyed automatically.</p>
+<p>Initialize the stream cipher using a stream authentication generator type-name </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">AuthenticatorType</td><td>The authentication engine, the default is KMAC256</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoSymmetricException</td><td>Thrown if an invalid block cipher type is used</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab3d7256fa6555c02545a41537c5ec3fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3d7256fa6555c02545a41537c5ec3fb">&#9670;&nbsp;</a></span>RCS() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">RCS::RCS </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>State</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialize the stream cipher using a secure-vector serialized state. </p>
+<p>The Serialize function stores the internal state of the cipher, so that it can be reinitialized, without the need to call the Initialize function and key-schedule. If this constructor is used, the cipher is fully initialized to the values it had when the Serialize function was called.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">State</td><td>The serialized state, created by the Serialize() function</td></tr>
   </table>
   </dd>
 </dl>
@@ -588,6 +628,35 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 
 </div>
 </div>
+<a id="ae9ec204bfaefa3461b1555a43150f5ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9ec204bfaefa3461b1555a43150f5ba">&#9670;&nbsp;</a></span>Nonce()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; byte &gt; RCS::Nonce </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The current value of the nonce counter array. </p>
+
+<p>Implements <a class="el" href="class_i_stream_cipher.html#a8eb7fbc91347d04a8094c0404e1bc3d5">IStreamCipher</a>.</p>
+
+</div>
+</div>
 <a id="a5c630485924dc34c5b5fd86909f7c7f8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5c630485924dc34c5b5fd86909f7c7f8">&#9670;&nbsp;</a></span>operator=()</h2>
 
@@ -716,6 +785,27 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(bool, ISymmetricKey) function is called.</p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#abd0fdb581ea82a4146ed2cc2b671c675">IStreamCipher</a>.</p>
+
+</div>
+</div>
+<a id="a754aa1f22b90393cd76a8016e3c2b494"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a754aa1f22b90393cd76a8016e3c2b494">&#9670;&nbsp;</a></span>Serialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">SecureVector&lt; byte &gt; RCS::Serialize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Saves the internal state of the cipher to a secure vector. </p>
+<p>The Serialize function can store the internal state of the cipher at the time it is invoked. The cipher instance can be reinitialized through a constructor option, without the need to re-call the Initialize function and associated key-schedule functions. This is useful in situations where the cipher is required intermitantly, and the entire state can be stored rather than just the key and nonce.</p>
+<dl class="section return"><dt>Returns</dt><dd>The serialized cipher state</dd></dl>
 
 </div>
 </div>

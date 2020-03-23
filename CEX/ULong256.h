@@ -64,6 +64,8 @@ public:
 	/// Default constructor; does not initialize the register
 	/// </summary>
 	ULong256()
+		:
+		ymm()
 	{
 	}
 

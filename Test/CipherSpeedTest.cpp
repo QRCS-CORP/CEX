@@ -18,6 +18,8 @@
 #include "../CEX/TSX512.h"
 #include "../CEX/TSX1024.h"
 
+#include "../CEX/Keccak.h"
+
 namespace Test
 {
 	using namespace Cipher::Block;

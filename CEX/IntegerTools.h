@@ -572,7 +572,6 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BeULL512ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(ArrayA::value_type) == sizeof(ulong), "Input must be a 64bit integer vector");
 		CEXASSERT(Input.size() - InOffset >= 64 / sizeof(ulong), "Length is larger than input size");
 		CEXASSERT(Output.size() - OutOffset >= 64, "Length is larger than output size");
 

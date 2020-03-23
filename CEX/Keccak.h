@@ -937,6 +937,260 @@ public:
 	/// <param name="State">The permutations uint64 state array</param>
 	static void PermuteR48P1600U(std::array<ulong, KECCAK_STATE_SIZE> &State);
 
+	// experiment
+	static void PermuteR24P3200C(std::array<ulong, 50> &State)
+	{
+		std::array<ulong, 50> A;
+		std::array<ulong, 10> C;
+		std::array<ulong, 10> D;
+		std::array<ulong, 50> E;
+		size_t i;
+
+		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
+
+		for (i = 0; i < 24; i += 2)
+		{
+			// round n
+			// a
+			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+			C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+			C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+			C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+			C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+			// b
+			C[5] = A[25] ^ A[30] ^ A[35] ^ A[40] ^ A[45];
+			C[6] = A[26] ^ A[31] ^ A[36] ^ A[41] ^ A[46];
+			C[7] = A[27] ^ A[32] ^ A[37] ^ A[42] ^ A[47];
+			C[8] = A[28] ^ A[33] ^ A[38] ^ A[43] ^ A[48];
+			C[9] = A[29] ^ A[34] ^ A[39] ^ A[44] ^ A[49];
+
+			// a
+			D[0] = C[4] ^ IntegerTools::RotFL64(C[1], 1);
+			D[1] = C[0] ^ IntegerTools::RotFL64(C[2], 1);
+			D[2] = C[1] ^ IntegerTools::RotFL64(C[3], 1);
+			D[3] = C[2] ^ IntegerTools::RotFL64(C[4], 1);
+			D[4] = C[3] ^ IntegerTools::RotFL64(C[5], 1);
+			// b
+			D[5] = C[5] ^ IntegerTools::RotFL64(C[6], 1);
+			D[6] = C[6] ^ IntegerTools::RotFL64(C[7], 1);
+			D[7] = C[7] ^ IntegerTools::RotFL64(C[8], 1);
+			D[8] = C[8] ^ IntegerTools::RotFL64(C[9], 1);
+			D[9] = C[9] ^ IntegerTools::RotFL64(C[0], 1);
+
+			// TODO: Read the Keccak spec. Break these into function-level components,
+			// and build 48-round wide-keccak.
+			// max security would be: n=state-length, r=rate, s=security, s = ((n - r) / 2) * 8
+			// with double rounds and using 2 overlapping permutation calls, practical security could exceed 1600 bits
+			// r=72, n=400 s=1312 (true 1024 at r=144)
+			// r=36, n=400 s=1456 
+
+			// A
+			// 0+6+6+6+6				3+6+1+6+6				1+6+6+6+1				4+1+6+6+6				2+6+6+1+6
+			// 0,6,12,18,24				3,9,10,16,22			1,7,13,19,20			4,5,11,17,23			2,8,14,15,21
+			// 0+6+6+6+6+1+6+6+6
+			// 0,6,12,18,24,25,31,37,43
+
+			// C 0,1,2,3,4...
+			// D
+			// 0,1,2,3,4	3,4,0,1,2	1,2,3,4,0	4,0,1,2,3	2,3,4,0,1
+
+			// a
+			A[0] ^= D[0];
+			C[0] = A[0];
+			A[6] ^= D[1];
+			C[1] = IntegerTools::RotFL64(A[6], 44);
+			A[12] ^= D[2];
+			C[2] = IntegerTools::RotFL64(A[12], 43);
+			A[18] ^= D[3];
+			C[3] = IntegerTools::RotFL64(A[18], 21);
+			A[24] ^= D[4];
+			C[4] = IntegerTools::RotFL64(A[24], 14);
+			E[0] = C[0] ^ ((~C[1]) & C[2]);
+			E[0] ^= KECCAK_RC24[i];
+			E[1] = C[1] ^ ((~C[2]) & C[3]);
+			E[2] = C[2] ^ ((~C[3]) & C[4]);
+			E[3] = C[3] ^ ((~C[4]) & C[0]);
+			E[4] = C[4] ^ ((~C[0]) & C[1]);
+
+			// b
+			A[25] ^= D[5];
+			C[5] = A[25];
+			A[31] ^= D[6];
+			C[6] = IntegerTools::RotFL64(A[31], 44); // new shifts?
+			A[37] ^= D[7];
+			C[7] = IntegerTools::RotFL64(A[37], 43);
+			A[43] ^= D[8];
+			C[8] = IntegerTools::RotFL64(A[43], 21);
+			A[49] ^= D[9];
+			C[9] = IntegerTools::RotFL64(A[49], 14);
+			E[5] = C[5] ^ ((~C[6]) & C[7]);
+			E[5] ^= KECCAK_RC48[i + 1];
+			E[6] = C[6] ^ ((~C[7]) & C[8]);
+			E[7] = C[7] ^ ((~C[8]) & C[9]);
+			E[8] = C[8] ^ ((~C[9]) & C[5]);
+			E[9] = C[9] ^ ((~C[5]) & C[6]);
+
+			A[3] ^= D[3];
+			C[0] = IntegerTools::RotFL64(A[3], 28);
+			A[9] ^= D[4];
+			C[1] = IntegerTools::RotFL64(A[9], 20);
+			A[10] ^= D[0];
+			C[2] = IntegerTools::RotFL64(A[10], 3);
+			A[16] ^= D[1];
+			C[3] = IntegerTools::RotFL64(A[16], 45);
+			A[22] ^= D[2];
+			C[4] = IntegerTools::RotFL64(A[22], 61);
+
+			E[5] = C[0] ^ ((~C[1]) & C[2]);
+			E[6] = C[1] ^ ((~C[2]) & C[3]);
+			E[7] = C[2] ^ ((~C[3]) & C[4]);
+			E[8] = C[3] ^ ((~C[4]) & C[0]);
+			E[9] = C[4] ^ ((~C[0]) & C[1]);
+			
+			A[1] ^= D[1];
+			C[0] = IntegerTools::RotFL64(A[1], 1);
+			A[7] ^= D[2];
+			C[1] = IntegerTools::RotFL64(A[7], 6);
+			A[13] ^= D[3];
+			C[2] = IntegerTools::RotFL64(A[13], 25);
+			A[19] ^= D[4];
+			C[3] = IntegerTools::RotFL64(A[19], 8);
+			A[20] ^= D[0];
+			C[4] = IntegerTools::RotFL64(A[20], 18);
+
+			E[10] = C[0] ^ ((~C[1]) & C[2]);
+			E[11] = C[1] ^ ((~C[2]) & C[3]);
+			E[12] = C[2] ^ ((~C[3]) & C[4]);
+			E[13] = C[3] ^ ((~C[4]) & C[0]);
+			E[14] = C[4] ^ ((~C[0]) & C[1]);
+
+			A[4] ^= D[4];
+			C[0] = IntegerTools::RotFL64(A[4], 27);
+			A[5] ^= D[0];
+			C[1] = IntegerTools::RotFL64(A[5], 36);
+			A[11] ^= D[1];
+			C[2] = IntegerTools::RotFL64(A[11], 10);
+			A[17] ^= D[2];
+			C[3] = IntegerTools::RotFL64(A[17], 15);
+			A[23] ^= D[3];
+			C[4] = IntegerTools::RotFL64(A[23], 56);
+
+			E[15] = C[0] ^ ((~C[1]) & C[2]);
+			E[16] = C[1] ^ ((~C[2]) & C[3]);
+			E[17] = C[2] ^ ((~C[3]) & C[4]);
+			E[18] = C[3] ^ ((~C[4]) & C[0]);
+			E[19] = C[4] ^ ((~C[0]) & C[1]);
+
+			A[2] ^= D[2];
+			C[0] = IntegerTools::RotFL64(A[2], 62);
+			A[8] ^= D[3];
+			C[1] = IntegerTools::RotFL64(A[8], 55);
+			A[14] ^= D[4];
+			C[2] = IntegerTools::RotFL64(A[14], 39);
+			A[15] ^= D[0];
+			C[3] = IntegerTools::RotFL64(A[15], 41);
+			A[21] ^= D[1];
+			C[4] = IntegerTools::RotFL64(A[21], 2);
+
+			E[20] = C[0] ^ ((~C[1]) & C[2]);
+			E[21] = C[1] ^ ((~C[2]) & C[3]);
+			E[22] = C[2] ^ ((~C[3]) & C[4]);
+			E[23] = C[3] ^ ((~C[4]) & C[0]);
+			E[24] = C[4] ^ ((~C[0]) & C[1]);
+
+
+			// round n + 1
+			C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+			C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+			C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+			C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+			C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+			D[0] = C[4] ^ IntegerTools::RotFL64(C[1], 1);
+			D[1] = C[0] ^ IntegerTools::RotFL64(C[2], 1);
+			D[2] = C[1] ^ IntegerTools::RotFL64(C[3], 1);
+			D[3] = C[2] ^ IntegerTools::RotFL64(C[4], 1);
+			D[4] = C[3] ^ IntegerTools::RotFL64(C[0], 1);
+			E[0] ^= D[0];
+			C[0] = E[0];
+			E[6] ^= D[1];
+			C[1] = IntegerTools::RotFL64(E[6], 44);
+			E[12] ^= D[2];
+			C[2] = IntegerTools::RotFL64(E[12], 43);
+			E[18] ^= D[3];
+			C[3] = IntegerTools::RotFL64(E[18], 21);
+			E[24] ^= D[4];
+			C[4] = IntegerTools::RotFL64(E[24], 14);
+			A[0] = C[0] ^ ((~C[1]) & C[2]);
+			A[0] ^= KECCAK_RC48[i + 2];
+			A[1] = C[1] ^ ((~C[2]) & C[3]);
+			A[2] = C[2] ^ ((~C[3]) & C[4]);
+			A[3] = C[3] ^ ((~C[4]) & C[0]);
+			A[4] = C[4] ^ ((~C[0]) & C[1]);
+			E[3] ^= D[3];
+			C[0] = IntegerTools::RotFL64(E[3], 28);
+			E[9] ^= D[4];
+			C[1] = IntegerTools::RotFL64(E[9], 20);
+			E[10] ^= D[0];
+			C[2] = IntegerTools::RotFL64(E[10], 3);
+			E[16] ^= D[1];
+			C[3] = IntegerTools::RotFL64(E[16], 45);
+			E[22] ^= D[2];
+			C[4] = IntegerTools::RotFL64(E[22], 61);
+			A[5] = C[0] ^ ((~C[1]) & C[2]);
+			A[6] = C[1] ^ ((~C[2]) & C[3]);
+			A[7] = C[2] ^ ((~C[3]) & C[4]);
+			A[8] = C[3] ^ ((~C[4]) & C[0]);
+			A[9] = C[4] ^ ((~C[0]) & C[1]);
+			E[1] ^= D[1];
+			C[0] = IntegerTools::RotFL64(E[1], 1);
+			E[7] ^= D[2];
+			C[1] = IntegerTools::RotFL64(E[7], 6);
+			E[13] ^= D[3];
+			C[2] = IntegerTools::RotFL64(E[13], 25);
+			E[19] ^= D[4];
+			C[3] = IntegerTools::RotFL64(E[19], 8);
+			E[20] ^= D[0];
+			C[4] = IntegerTools::RotFL64(E[20], 18);
+			A[10] = C[0] ^ ((~C[1]) & C[2]);
+			A[11] = C[1] ^ ((~C[2]) & C[3]);
+			A[12] = C[2] ^ ((~C[3]) & C[4]);
+			A[13] = C[3] ^ ((~C[4]) & C[0]);
+			A[14] = C[4] ^ ((~C[0]) & C[1]);
+			E[4] ^= D[4];
+			C[0] = IntegerTools::RotFL64(E[4], 27);
+			E[5] ^= D[0];
+			C[1] = IntegerTools::RotFL64(E[5], 36);
+			E[11] ^= D[1];
+			C[2] = IntegerTools::RotFL64(E[11], 10);
+			E[17] ^= D[2];
+			C[3] = IntegerTools::RotFL64(E[17], 15);
+			E[23] ^= D[3];
+			C[4] = IntegerTools::RotFL64(E[23], 56);
+			A[15] = C[0] ^ ((~C[1]) & C[2]);
+			A[16] = C[1] ^ ((~C[2]) & C[3]);
+			A[17] = C[2] ^ ((~C[3]) & C[4]);
+			A[18] = C[3] ^ ((~C[4]) & C[0]);
+			A[19] = C[4] ^ ((~C[0]) & C[1]);
+			E[2] ^= D[2];
+			C[0] = IntegerTools::RotFL64(E[2], 62);
+			E[8] ^= D[3];
+			C[1] = IntegerTools::RotFL64(E[8], 55);
+			E[14] ^= D[4];
+			C[2] = IntegerTools::RotFL64(E[14], 39);
+			E[15] ^= D[0];
+			C[3] = IntegerTools::RotFL64(E[15], 41);
+			E[21] ^= D[1];
+			C[4] = IntegerTools::RotFL64(E[21], 2);
+			A[20] = C[0] ^ ((~C[1]) & C[2]);
+			A[21] = C[1] ^ ((~C[2]) & C[3]);
+			A[22] = C[2] ^ ((~C[3]) & C[4]);
+			A[23] = C[3] ^ ((~C[4]) & C[0]);
+			A[24] = C[4] ^ ((~C[0]) & C[1]);
+		}
+
+		MemoryTools::Copy(A, 0, State, 0, A.size() * sizeof(ulong));
+	}
+
 #if defined(__AVX2__)
 
 	/// <summary>

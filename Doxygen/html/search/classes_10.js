@@ -18,6 +18,7 @@ var searchData=
   ['skein512',['Skein512',['../class_skein512.html',1,'']]],
   ['skeinparams',['SkeinParams',['../class_skein_params.html',1,'']]],
   ['skeinubitweak',['SkeinUbiTweak',['../class_skein_ubi_tweak.html',1,'']]],
+  ['socket',['Socket',['../class_socket.html',1,'']]],
   ['sphincsplus',['SphincsPlus',['../class_sphincs_plus.html',1,'']]],
   ['spxpfors',['SPXPFORS',['../class_s_p_x_p_f_o_r_s.html',1,'']]],
   ['spxps128shake',['SPXPS128SHAKE',['../class_s_p_x_p_s128_s_h_a_k_e.html',1,'']]],

@@ -347,7 +347,7 @@ void SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, 
 
 	toff = 0;
 
-	if (!Options.IsParallel() && PRLBLK >= MFLWRD)
+	if (Options.IsParallel() && PRLBLK >= MFLWRD)
 	{
 		Utility::ParallelTools::ParallelFor(0, Options.ParallelMaxDegree(), [CPUCST, &statek, PRLBLK, MFLWRD](size_t i)
 		{
@@ -394,7 +394,9 @@ void SCRYPT::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length,
 void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Key, std::vector<byte> &Salt, std::unique_ptr<IDigest> &Generator)
 {
 	Kdf::PBKDF2 kdf(Generator.get(), 1);
-	kdf.Initialize(Cipher::SymmetricKey(Key, Salt));
+	Cipher::SymmetricKey kp(Key, Salt);
+
+	kdf.Initialize(kp);
 	kdf.Generate(Output, OutOffset, Length);
 	Generator->Reset();
 }

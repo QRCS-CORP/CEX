@@ -7,7 +7,7 @@ using Utility::IntegerTools;
 
 //~~~DrbgBase~~~//
 
-DrbgBase::DrbgBase(Drbgs Enumeral, std::string &Name, std::vector<SymmetricKeySize> &KeySizes, ulong MaxOutput, size_t MaxRequests, size_t MaxReseed)
+DrbgBase::DrbgBase(Drbgs Enumeral, std::string Name, std::vector<SymmetricKeySize> KeySizes, ulong MaxOutput, size_t MaxRequests, size_t MaxReseed)
 	:
 	m_cyclicReseed(false),
 	m_drbgEnumeral(Enumeral),

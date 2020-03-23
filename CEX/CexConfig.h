@@ -121,9 +121,6 @@ static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
 #	define CEX_HIGHRES_TIMER
 #endif
 
-//! used to represent infinite time
-const unsigned long CEX_INFINITE_TIME = ULONG_MAX;
-
 #if defined(_MSC_VER)
 #	define CEX_NO_VTABLE __declspec(novtable)
 #else
@@ -151,6 +148,7 @@ const unsigned long CEX_INFINITE_TIME = ULONG_MAX;
 #		define TYPE_OF_SOCKLEN_T ::socklen_t
 #	endif
 #endif
+
 
 #if defined(CEX_HIGHRES_TIMER) && (defined(CEX_BERKELY_SOCKETS) || defined(CEX_WINDOWS_SOCKETS))
 #	define CEX_SOCKETS_AVAILABLE

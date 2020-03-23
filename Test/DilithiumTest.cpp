@@ -23,7 +23,7 @@ namespace Test
 	using Prng::SecureRandom;
 
 	const std::string DilithiumTest::CLASSNAME = "DilithiumTest";
-	const std::string DilithiumTest::DESCRIPTION = "Dilithium key generation, signature generation, and verification tests..";
+	const std::string DilithiumTest::DESCRIPTION = "DilithiumTest key generation, signature generation, and verification tests..";
 	const std::string DilithiumTest::SUCCESS = "SUCCESS! DilithiumTest tests have executed succesfully.";
 
 	DilithiumTest::DilithiumTest()

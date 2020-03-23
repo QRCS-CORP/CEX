@@ -23,7 +23,7 @@ namespace Test
 	using Enumeration::SphincsPlusParameters;
 
 	const std::string SphincsPlusTest::CLASSNAME = "SphincsPlusTest";
-	const std::string SphincsPlusTest::DESCRIPTION = "SphincsPlus key generation, signature generation, and verification tests..";
+	const std::string SphincsPlusTest::DESCRIPTION = "SphincsPlusTest key generation, signature generation, and verification tests..";
 	const std::string SphincsPlusTest::SUCCESS = "SUCCESS! SphincsPlusTest tests have executed succesfully.";
 
 	SphincsPlusTest::SphincsPlusTest()

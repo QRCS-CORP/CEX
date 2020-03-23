@@ -301,7 +301,6 @@ NAMESPACE_ROOT
 		*  @brief Symmetric Stream Cipher Namespace
 		*/
 		NAMESPACE_STREAM
-			class MCS {};
 			class CSX256 {};
 			class CSX512 {};
 			class IStreamCipher {};
@@ -363,28 +362,31 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_ENUMERATION
 		enum class AeadModes {};
+		enum class AsymmetricCiphers {};
 		enum class AsymmetricKeyTypes {};
-		enum class AsymmetricPrimitives {};
 		enum class AsymmetricParameters {};
+		enum class AsymmetricPrimitives {};
+		enum class AsymmetricSigners {};
 		enum class Authenticators {};
 		enum class BlockCiphers {};
-		enum class BlockCipherExtensions {};
 		enum class CipherModes {};
 		enum class CpuCores {};
 		enum class Digests {};
 		enum class DilithiumParameters {};
+		enum class DrandEngines {};
 		enum class Drbgs {};
 		enum class Kdfs {};
+		enum class KmacModes {};
+		enum class Kms {};
 		enum class KeySizes {};
-		enum class Macs {};
 		enum class KyberParameters {};
+		enum class Macs {};
 		enum class McElieceParameters {};
+		enum class NewHopeParameters {};
 		enum class NTRUPrimeParameters {};
 		enum class PaddingModes {};
 		enum class Prngs {};
 		enum class Providers {};
-		enum class NewHopeParameters {};
-		enum class RoundCounts {};
 		enum class SHA2Digests {};
 		enum class ShakeModes {};
 		enum class SimdIntegers {};
@@ -471,6 +473,16 @@ NAMESPACE_ROOT
 		class SCRYPT {};
 		class SHAKE {};
 	NAMESPACE_KDFEND
+	/*! @} */
+
+	/*!
+	*  \addtogroup KMS
+	*  @{
+	*  @brief Key Management Systems
+	*/
+	NAMESPACE_KMS
+		class HKDS {};
+	NAMESPACE_KMSEND
 	/*! @} */
 
 	/*!

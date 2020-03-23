@@ -75,9 +75,17 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:ga69ec43083306f45cbe77033dfe17cbba"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga69ec43083306f45cbe77033dfe17cbba">AeadModes</a> { <a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaa6adf97f83acf6453d4a6a4b1070f3754">AeadModes::None</a> = 0, 
-<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaaeee994d8f3b3c70335763b9a4a2caeb1">AeadModes::EAX</a> = 5, 
-<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaaa1f1e49c9d7191ad667192b8a0f601d2">AeadModes::GCM</a> = 6
+<tr class="memitem:ga69ec43083306f45cbe77033dfe17cbba"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga69ec43083306f45cbe77033dfe17cbba">AeadModes</a> { <br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaa6adf97f83acf6453d4a6a4b1070f3754">AeadModes::None</a> = 0, 
+<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaaa1f1e49c9d7191ad667192b8a0f601d2">AeadModes::GCM</a> = static_cast&lt;byte&gt;(CipherModes::GCM), 
+<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaa0257640036aab302f5c8d56830d9117d">AeadModes::HBA</a> = static_cast&lt;byte&gt;(CipherModes::HBA), 
+<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaadc8b994cfc9c02b7714309dfebe0776a">AeadModes::HBAH256</a> = static_cast&lt;byte&gt;(CipherModes::HBAH256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaab6022ec69547e8a3ac2d644a3554204b">AeadModes::HBAH512</a> = static_cast&lt;byte&gt;(CipherModes::HBAH512), 
+<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaa889da8acba9f41d085851301649acdd1">AeadModes::HBAS256</a> = static_cast&lt;byte&gt;(CipherModes::HBAS256), 
+<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaa12981304f0f6b97a1e1d2e579cbac56c">AeadModes::HBAS512</a> = static_cast&lt;byte&gt;(CipherModes::HBAS512), 
+<a class="el" href="group___enumeration.html#gga69ec43083306f45cbe77033dfe17cbbaad5e8db88a900dab04b5eac19f8c49e8d">AeadModes::HBAS1024</a> = static_cast&lt;byte&gt;(CipherModes::HBAS1024)
+<br />
  }</td></tr>
 <tr class="separator:ga69ec43083306f45cbe77033dfe17cbba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4114ba401b449d01c1384163d0a888b1"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga4114ba401b449d01c1384163d0a888b1">AsymmetricKeyTypes</a> { <br />
@@ -230,12 +238,18 @@ Enumerations</h2></td></tr>
 <a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1ac4505d6c12a453d0df18636902420151">CipherModes::CFB</a> = 3, 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1aff2a7a5418a49af64a57ef3cf31d7721">CipherModes::CTR</a> = 4, 
-<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1aeee994d8f3b3c70335763b9a4a2caeb1">CipherModes::EAX</a> = 5, 
-<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1af9fc0fa06bb53a5be7b15ba189cf17ba">CipherModes::ECB</a> = 6, 
-<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1aa1f1e49c9d7191ad667192b8a0f601d2">CipherModes::GCM</a> = 7, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1af9fc0fa06bb53a5be7b15ba189cf17ba">CipherModes::ECB</a> = 5, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1aa1f1e49c9d7191ad667192b8a0f601d2">CipherModes::GCM</a> = 6, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1a0257640036aab302f5c8d56830d9117d">CipherModes::HBA</a> = 7, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1abb4bc45040e817266af6ef52bfa10045">CipherModes::ICM</a> = 8, 
-<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1ab877615f78df6433fb277f85eb006437">CipherModes::OFB</a> = 10
+&#160;&#160;<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1adc8b994cfc9c02b7714309dfebe0776a">CipherModes::HBAH256</a> = 8, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1ab6022ec69547e8a3ac2d644a3554204b">CipherModes::HBAH512</a> = 9, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1a889da8acba9f41d085851301649acdd1">CipherModes::HBAS256</a> = 10, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1a12981304f0f6b97a1e1d2e579cbac56c">CipherModes::HBAS512</a> = 11, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1ad5e8db88a900dab04b5eac19f8c49e8d">CipherModes::HBAS1024</a> = 12, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1abb4bc45040e817266af6ef52bfa10045">CipherModes::ICM</a> = 13, 
+<a class="el" href="group___enumeration.html#gga1d4ccc36db403dcb914cd7c4bac557a1ab877615f78df6433fb277f85eb006437">CipherModes::OFB</a> = 14
 <br />
  }</td></tr>
 <tr class="separator:ga1d4ccc36db403dcb914cd7c4bac557a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -312,21 +326,26 @@ Enumerations</h2></td></tr>
 <tr class="memitem:gad1c1c84ec8d7f4f165d4973062130aa3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a6adf97f83acf6453d4a6a4b1070f3754">Macs::None</a> = 0, 
 <a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a49cd74c73d9ceec0d43e3bbf52030609">Macs::CMAC</a> = 1, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a979edff4dfc5c3e6afbe2b186a433313">Macs::CMACAHXS256</a> = 2, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a775ec7eb871a3f60b2235d51cbdd7dca">Macs::CMACAHXS512</a> = 3, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ae12825118969a5d457642d5095d6f353">Macs::CMACRHXH256</a> = 2, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a8987601acfa34e99522eee36cd17b32f">Macs::CMACRHXH512</a> = 3, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7">Macs::GMAC</a> = 4, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3acfe0b6b3a385db8113ff44085d4443aa">Macs::GMACAHXS256</a> = 5, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a6d846dff64566d9d07e24ea08bccb42d">Macs::GMACAHXS512</a> = 6, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3acaa8d5adbe960815fb60b004502b7d55">Macs::HMACSHA256</a> = 7, 
+&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a358884635b7d94404e7c1e1792ce5a12">Macs::CMACRHXS256</a> = 4, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a87d0211fecc1a7c415bd39c7c6bceecc">Macs::CMACRHXS512</a> = 5, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7">Macs::GMAC</a> = 6, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a9d789637a054be70e304fa0a26bdf088">Macs::GMACRHXH256</a> = 7, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a0ff37e2df6d3d9e355c3039bb6358c1b">Macs::HMACSHA512</a> = 8, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ad448089350a14e557822d0363c63ce81">Macs::KMAC128</a> = 9, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a1421b85b6d4ee9a863d5b1588c880103">Macs::KMAC256</a> = 10, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ade80307d986a42c3fd894b2923057bf1">Macs::KMAC512</a> = 11, 
+&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a269c5aa13eaabe89a5064cc24a087200">Macs::GMACRHXH512</a> = 8, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a8b795c4602ce26176f91e17302220750">Macs::GMACRHXS256</a> = 9, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a1a4b82f69700560ea1b08b06f5928138">Macs::GMACRHXS512</a> = 10, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3acaa8d5adbe960815fb60b004502b7d55">Macs::HMACSHA256</a> = 11, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ac5ba8d97d4055160e3d16817de07618f">Macs::KMAC1024</a> = 12, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ab6fd733868a97b1057243c9e9e381074">Macs::Poly1305</a> = 13
+&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a0ff37e2df6d3d9e355c3039bb6358c1b">Macs::HMACSHA512</a> = 12, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ad448089350a14e557822d0363c63ce81">Macs::KMAC128</a> = 13, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a1421b85b6d4ee9a863d5b1588c880103">Macs::KMAC256</a> = 14, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ade80307d986a42c3fd894b2923057bf1">Macs::KMAC512</a> = 15, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ac5ba8d97d4055160e3d16817de07618f">Macs::KMAC1024</a> = 16, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ab6fd733868a97b1057243c9e9e381074">Macs::Poly1305</a> = 17
 <br />
  }</td></tr>
 <tr class="separator:gad1c1c84ec8d7f4f165d4973062130aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -445,6 +464,11 @@ Enumerations</h2></td></tr>
 <tr class="separator:ga8be2060176002fe2bfcafc81e9d0272c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga62629810dc7b52fdfb37d80f03d62274"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga62629810dc7b52fdfb37d80f03d62274">StreamAuthenticators</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a6adf97f83acf6453d4a6a4b1070f3754">StreamAuthenticators::None</a> = 0, 
+<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a9d789637a054be70e304fa0a26bdf088">StreamAuthenticators::GMACRHXH256</a> = static_cast&lt;byte&gt;(Macs::GMACRHXH256), 
+<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a269c5aa13eaabe89a5064cc24a087200">StreamAuthenticators::GMACRHXH512</a> = static_cast&lt;byte&gt;(Macs::GMACRHXH512), 
+<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a8b795c4602ce26176f91e17302220750">StreamAuthenticators::GMACRHXS256</a> = static_cast&lt;byte&gt;(Macs::GMACRHXS256), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1a4b82f69700560ea1b08b06f5928138">StreamAuthenticators::GMACRHXS512</a> = static_cast&lt;byte&gt;(Macs::GMACRHXS512), 
 <a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a> = static_cast&lt;byte&gt;(Macs::HMACSHA256), 
 <a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a0ff37e2df6d3d9e355c3039bb6358c1b">StreamAuthenticators::HMACSHA512</a> = static_cast&lt;byte&gt;(Macs::HMACSHA512), 
 <a class="el" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274a1421b85b6d4ee9a863d5b1588c880103">StreamAuthenticators::KMAC256</a> = static_cast&lt;byte&gt;(Macs::KMAC256), 
@@ -472,53 +496,41 @@ Enumerations</h2></td></tr>
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a0314d6b81c6e54cb79f747e1a66adf53">StreamCiphers::CSXR80K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR80K512), 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127af756b6b8a38709eef5a9b24d05dedcce">StreamCiphers::CSXR80P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::CSXR80P256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6c59a4c8ca7b1d2e29a48613ab5c686f">StreamCiphers::MCSRH256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRH256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aedcee530317adf99c9bed3c75e096dff">StreamCiphers::MCSRH512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRH512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aaaf31bb351279714ca6abf5a0c758112">StreamCiphers::MCSRK256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRK256), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa919ceebc053687496d9e4d805f1cc85">StreamCiphers::MCSRK512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRK512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a9d3138ff6abf0def0bc1de9dbb161a05">StreamCiphers::MCSRP256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSRP256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a27cc0c9c636bda3ebb4c240de169165f">StreamCiphers::MCSSH256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSH256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6fed2cdd66e9aebfb123617c7d8b5799">StreamCiphers::MCSSH512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSH512), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a7e712209a64dd93bb2bfc89d8e0ccfa7">StreamCiphers::MCSSK256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSK256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac6ce0869b25a2e37e95a4b3b13d4d81a">StreamCiphers::MCSSK512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSK512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2094b0cbced8031f6ba27dfeaa1e0e31">StreamCiphers::MCSSP256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSSP256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a2afa689ca12af7a68d7ec2998eeeb8f2">StreamCiphers::MCSR</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSR), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa469b38881a027d83e20b43c1ec30205">StreamCiphers::MCSS</a> = static_cast&lt;byte&gt;(SymmetricCiphers::MCSS), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a5852281688f5bba8ddab1a5c7a2a3c6b">StreamCiphers::RCS</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCS), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ae25f0d52fe9399665f0135b3853cddf3">StreamCiphers::RCSH256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSH256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6db2eacddb4f574894e0b4e5d16dec2c">StreamCiphers::RCSG256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSG256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa1048915a555962865aa97d454192ee9">StreamCiphers::RCSG512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSG512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ae25f0d52fe9399665f0135b3853cddf3">StreamCiphers::RCSH256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSH256), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ada244fa36dbcd674492d6a1d5f452858">StreamCiphers::RCSH512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSH512), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a87ff8ca88c78ac5ccf25c571da9a0f19">StreamCiphers::RCSK256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a87ff8ca88c78ac5ccf25c571da9a0f19">StreamCiphers::RCSK256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK256), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aca5b4a009862f795cccf6a407032cdd5">StreamCiphers::RCSK512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a3aaf1b1e627f76e88fe1d50b293b628e">StreamCiphers::RCSK1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK1024), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a3aaf1b1e627f76e88fe1d50b293b628e">StreamCiphers::RCSK1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSK1024), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a6718e0cb553f2279d28c618e2ab91c1b">StreamCiphers::RCSP256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::RCSP256), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34">StreamCiphers::TSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a542d77dbc16fc5a977920334221e5c34">StreamCiphers::TSX256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX256), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac3294e2eccd1538e59122fce2949b772">StreamCiphers::TSXR72H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72H256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a54e482aa136621746ea03eca7db3bbf1">StreamCiphers::TSXR72H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72H512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a54e482aa136621746ea03eca7db3bbf1">StreamCiphers::TSXR72H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72H512), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127acbd6cb7a36f7cdf3f808c8bcdd8d3ffd">StreamCiphers::TSXR72K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72K256), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a29b30e584965154ba752f39a11e0418a">StreamCiphers::TSXR72K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72K512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a29b30e584965154ba752f39a11e0418a">StreamCiphers::TSXR72K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72K512), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a7620a0f8b98b59a1d69b0d4d44426be5">StreamCiphers::TSXR72P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR72P256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba">StreamCiphers::TSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ab0a3c1572eaa1c8dcd068763921394ba">StreamCiphers::TSX512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX512), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a24cdf3cd94bb74191355aaf8846c1c2d">StreamCiphers::TSXR96H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96H256), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac342858f297612d7296f46e1903626bd">StreamCiphers::TSXR96H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96H512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac342858f297612d7296f46e1903626bd">StreamCiphers::TSXR96H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96H512), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a22acb14d0f87905024002a5ced6c3d63">StreamCiphers::TSXR96K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96K256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac24e3734b59446e8bd9ed4c768ce81f2">StreamCiphers::TSXR96K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96K512), 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ac24e3734b59446e8bd9ed4c768ce81f2">StreamCiphers::TSXR96K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96K512), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa5fa492f81c532c560d545318611e710">StreamCiphers::TSXR96P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR96P256), 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068">StreamCiphers::TSX1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a4824734e322b78f4894959edbd096068">StreamCiphers::TSX1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSX1024), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a66953cde9469e61bc737055854dd7874">StreamCiphers::TSXR120H256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120H256), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ad3e518758af5fa6a4e852d3968cdddd1">StreamCiphers::TSXR120H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120H512), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa86c1b935e9bdf312ac00dcecd93e8c2">StreamCiphers::TSXR120K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K256), 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ae050bd249a1dcdafa734ec75b154937f">StreamCiphers::TSXR120K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K512), 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ad3e518758af5fa6a4e852d3968cdddd1">StreamCiphers::TSXR120H512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120H512), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127aa86c1b935e9bdf312ac00dcecd93e8c2">StreamCiphers::TSXR120K256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K256), 
+<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127ae050bd249a1dcdafa734ec75b154937f">StreamCiphers::TSXR120K512</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K512), 
 <a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127adfa625df24ded54bf98e44a9c2221c7e">StreamCiphers::TSXR120K1024</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120K1024), 
-<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a0441feb05297b2a9d102829b05883305">StreamCiphers::TSXR120P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120P256)
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga62fe0a4066025a96f0d329627b1bf127a0441feb05297b2a9d102829b05883305">StreamCiphers::TSXR120P256</a> = static_cast&lt;byte&gt;(SymmetricCiphers::TSXR120P256)
 <br />
  }</td></tr>
 <tr class="separator:ga62fe0a4066025a96f0d329627b1bf127"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -560,53 +572,41 @@ Enumerations</h2></td></tr>
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a0314d6b81c6e54cb79f747e1a66adf53">SymmetricCiphers::CSXR80K512</a> = 106, 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8af756b6b8a38709eef5a9b24d05dedcce">SymmetricCiphers::CSXR80P256</a> = 107, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6c59a4c8ca7b1d2e29a48613ab5c686f">SymmetricCiphers::MCSRH256</a> = 64, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aedcee530317adf99c9bed3c75e096dff">SymmetricCiphers::MCSRH512</a> = 65, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aaaf31bb351279714ca6abf5a0c758112">SymmetricCiphers::MCSRK256</a> = 66, 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa919ceebc053687496d9e4d805f1cc85">SymmetricCiphers::MCSRK512</a> = 67, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a9d3138ff6abf0def0bc1de9dbb161a05">SymmetricCiphers::MCSRP256</a> = 68, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a27cc0c9c636bda3ebb4c240de169165f">SymmetricCiphers::MCSSH256</a> = 69, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6fed2cdd66e9aebfb123617c7d8b5799">SymmetricCiphers::MCSSH512</a> = 70, 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a7e712209a64dd93bb2bfc89d8e0ccfa7">SymmetricCiphers::MCSSK256</a> = 71, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac6ce0869b25a2e37e95a4b3b13d4d81a">SymmetricCiphers::MCSSK512</a> = 72, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2094b0cbced8031f6ba27dfeaa1e0e31">SymmetricCiphers::MCSSP256</a> = 73, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a2afa689ca12af7a68d7ec2998eeeb8f2">SymmetricCiphers::MCSR</a> = 74, 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa469b38881a027d83e20b43c1ec30205">SymmetricCiphers::MCSS</a> = 75, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a5852281688f5bba8ddab1a5c7a2a3c6b">SymmetricCiphers::RCS</a> = 160, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ae25f0d52fe9399665f0135b3853cddf3">SymmetricCiphers::RCSH256</a> = 161, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ada244fa36dbcd674492d6a1d5f452858">SymmetricCiphers::RCSH512</a> = 162, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6db2eacddb4f574894e0b4e5d16dec2c">SymmetricCiphers::RCSG256</a> = 161, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa1048915a555962865aa97d454192ee9">SymmetricCiphers::RCSG512</a> = 162, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a87ff8ca88c78ac5ccf25c571da9a0f19">SymmetricCiphers::RCSK256</a> = 163, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aca5b4a009862f795cccf6a407032cdd5">SymmetricCiphers::RCSK512</a> = 164, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a3aaf1b1e627f76e88fe1d50b293b628e">SymmetricCiphers::RCSK1024</a> = 165, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6718e0cb553f2279d28c618e2ab91c1b">SymmetricCiphers::RCSP256</a> = 166, 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ae25f0d52fe9399665f0135b3853cddf3">SymmetricCiphers::RCSH256</a> = 163, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ada244fa36dbcd674492d6a1d5f452858">SymmetricCiphers::RCSH512</a> = 164, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a87ff8ca88c78ac5ccf25c571da9a0f19">SymmetricCiphers::RCSK256</a> = 165, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aca5b4a009862f795cccf6a407032cdd5">SymmetricCiphers::RCSK512</a> = 166, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34">SymmetricCiphers::TSX256</a> = 128, 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a3aaf1b1e627f76e88fe1d50b293b628e">SymmetricCiphers::RCSK1024</a> = 167, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a6718e0cb553f2279d28c618e2ab91c1b">SymmetricCiphers::RCSP256</a> = 168, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34">SymmetricCiphers::TSX256</a> = 128, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac3294e2eccd1538e59122fce2949b772">SymmetricCiphers::TSXR72H256</a> = 129, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a54e482aa136621746ea03eca7db3bbf1">SymmetricCiphers::TSXR72H512</a> = 130, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a54e482aa136621746ea03eca7db3bbf1">SymmetricCiphers::TSXR72H512</a> = 130, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8acbd6cb7a36f7cdf3f808c8bcdd8d3ffd">SymmetricCiphers::TSXR72K256</a> = 131, 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a29b30e584965154ba752f39a11e0418a">SymmetricCiphers::TSXR72K512</a> = 132, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a29b30e584965154ba752f39a11e0418a">SymmetricCiphers::TSXR72K512</a> = 132, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a7620a0f8b98b59a1d69b0d4d44426be5">SymmetricCiphers::TSXR72P256</a> = 133, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba">SymmetricCiphers::TSX512</a> = 134, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ab0a3c1572eaa1c8dcd068763921394ba">SymmetricCiphers::TSX512</a> = 134, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a24cdf3cd94bb74191355aaf8846c1c2d">SymmetricCiphers::TSXR96H256</a> = 135, 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac342858f297612d7296f46e1903626bd">SymmetricCiphers::TSXR96H512</a> = 136, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac342858f297612d7296f46e1903626bd">SymmetricCiphers::TSXR96H512</a> = 136, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a22acb14d0f87905024002a5ced6c3d63">SymmetricCiphers::TSXR96K256</a> = 137, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac24e3734b59446e8bd9ed4c768ce81f2">SymmetricCiphers::TSXR96K512</a> = 138, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ac24e3734b59446e8bd9ed4c768ce81f2">SymmetricCiphers::TSXR96K512</a> = 138, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa5fa492f81c532c560d545318611e710">SymmetricCiphers::TSXR96P256</a> = 139, 
-<br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068">SymmetricCiphers::TSX1024</a> = 140, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a4824734e322b78f4894959edbd096068">SymmetricCiphers::TSX1024</a> = 140, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a66953cde9469e61bc737055854dd7874">SymmetricCiphers::TSXR120H256</a> = 141, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ad3e518758af5fa6a4e852d3968cdddd1">SymmetricCiphers::TSXR120H512</a> = 142, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa86c1b935e9bdf312ac00dcecd93e8c2">SymmetricCiphers::TSXR120K256</a> = 143, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ae050bd249a1dcdafa734ec75b154937f">SymmetricCiphers::TSXR120K512</a> = 144, 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ad3e518758af5fa6a4e852d3968cdddd1">SymmetricCiphers::TSXR120H512</a> = 142, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8aa86c1b935e9bdf312ac00dcecd93e8c2">SymmetricCiphers::TSXR120K256</a> = 143, 
+<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8ae050bd249a1dcdafa734ec75b154937f">SymmetricCiphers::TSXR120K512</a> = 144, 
 <a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8adfa625df24ded54bf98e44a9c2221c7e">SymmetricCiphers::TSXR120K1024</a> = 145, 
-<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a0441feb05297b2a9d102829b05883305">SymmetricCiphers::TSXR120P256</a> = 146
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga83e5aeee49605814f7a50b7521a86bf8a0441feb05297b2a9d102829b05883305">SymmetricCiphers::TSXR120P256</a> = 146
 <br />
  }</td></tr>
 <tr class="separator:ga83e5aeee49605814f7a50b7521a86bf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -664,9 +664,19 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaa6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>No cipher mode is specified </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaaeee994d8f3b3c70335763b9a4a2caeb1"></a>EAX&#160;</td><td class="fielddoc"><p>Encrypt and Authenticate AEAD Mode </p>
+<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaaa1f1e49c9d7191ad667192b8a0f601d2"></a>GCM&#160;</td><td class="fielddoc"><p>Galois Counter Mode; Counter mode encryption with GMAC authentication </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaaa1f1e49c9d7191ad667192b8a0f601d2"></a>GCM&#160;</td><td class="fielddoc"><p>Galois Counter AEAD Mode </p>
+<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaa0257640036aab302f5c8d56830d9117d"></a>HBA&#160;</td><td class="fielddoc"><p>Counter-mode Hash-based Authentication AEAD mode </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaadc8b994cfc9c02b7714309dfebe0776a"></a>HBAH256&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXH-256) with HMAC(SHA2-256) Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaab6022ec69547e8a3ac2d644a3554204b"></a>HBAH512&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXH-512) with HMAC(SHA2-512) Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaa889da8acba9f41d085851301649acdd1"></a>HBAS256&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXS-256) with KMAC-256 Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaa12981304f0f6b97a1e1d2e579cbac56c"></a>HBAS512&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXS-512) with KMAC-512 Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga69ec43083306f45cbe77033dfe17cbbaad5e8db88a900dab04b5eac19f8c49e8d"></a>HBAS1024&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXS-1024) with KMAC-1024 Authentication </p>
 </td></tr>
 </table>
 
@@ -1034,11 +1044,21 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1aff2a7a5418a49af64a57ef3cf31d7721"></a>CTR&#160;</td><td class="fielddoc"><p>Big Endian Segmented Integer Counter Mode </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1aeee994d8f3b3c70335763b9a4a2caeb1"></a>EAX&#160;</td><td class="fielddoc"><p>Encrypt and Authenticate AEAD Mode </p>
-</td></tr>
 <tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1af9fc0fa06bb53a5be7b15ba189cf17ba"></a>ECB&#160;</td><td class="fielddoc"><p>Electronic CodeBook Mode (not secure: should be used for testing or new constructions only) </p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1aa1f1e49c9d7191ad667192b8a0f601d2"></a>GCM&#160;</td><td class="fielddoc"><p>Galois Counter AEAD Mode </p>
+<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1aa1f1e49c9d7191ad667192b8a0f601d2"></a>GCM&#160;</td><td class="fielddoc"><p>Galois Counter Mode; Counter mode encryption with GMAC authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1a0257640036aab302f5c8d56830d9117d"></a>HBA&#160;</td><td class="fielddoc"><p>Block cipher counter-mode with Hash-based Authentication prefix name </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1adc8b994cfc9c02b7714309dfebe0776a"></a>HBAH256&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXH-256) with HMAC(SHA2-256) Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1ab6022ec69547e8a3ac2d644a3554204b"></a>HBAH512&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXH-512) with HMAC(SHA2-512) Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1a889da8acba9f41d085851301649acdd1"></a>HBAS256&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXS-256) with KMAC-256 Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1a12981304f0f6b97a1e1d2e579cbac56c"></a>HBAS512&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXS-512) with KMAC-512 Authentication </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1ad5e8db88a900dab04b5eac19f8c49e8d"></a>HBAS1024&#160;</td><td class="fielddoc"><p>HBA AEAD mode, parameters: CTR(RHXS-1024) with KMAC-1024 Authentication </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga1d4ccc36db403dcb914cd7c4bac557a1abb4bc45040e817266af6ef52bfa10045"></a>ICM&#160;</td><td class="fielddoc"><p>Little Endian Integer Counter Mode </p>
 </td></tr>
@@ -1316,15 +1336,23 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a49cd74c73d9ceec0d43e3bbf52030609"></a>CMAC&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using AES </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a979edff4dfc5c3e6afbe2b186a433313"></a>CMACAHXS256&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and cSHAKE-256 </p>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3ae12825118969a5d457642d5095d6f353"></a>CMACRHXH256&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and HKDF-256 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a775ec7eb871a3f60b2235d51cbdd7dca"></a>CMACAHXS512&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and cSHAKE-512 </p>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a8987601acfa34e99522eee36cd17b32f"></a>CMACRHXH512&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and HKDF-512 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7"></a>GMAC&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using AES </p>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a358884635b7d94404e7c1e1792ce5a12"></a>CMACRHXS256&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and cSHAKE-256 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3acfe0b6b3a385db8113ff44085d4443aa"></a>GMACAHXS256&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and cSHAKE-256 </p>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a87d0211fecc1a7c415bd39c7c6bceecc"></a>CMACRHXS512&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and cSHAKE-512 </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a6d846dff64566d9d07e24ea08bccb42d"></a>GMACAHXS512&#160;</td><td class="fielddoc"><p>A Cipher based Message Authentication Code generator using RHX and cSHAKE-512 </p>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7"></a>GMAC&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using AES </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a9d789637a054be70e304fa0a26bdf088"></a>GMACRHXH256&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and HKDF(HMAC(SHA2-256)) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a269c5aa13eaabe89a5064cc24a087200"></a>GMACRHXH512&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and HKDF(HMAC(SHA2-512)) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a8b795c4602ce26176f91e17302220750"></a>GMACRHXS256&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and cSHAKE-256 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3a1a4b82f69700560ea1b08b06f5928138"></a>GMACRHXS512&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and cSHAKE-512 </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ggad1c1c84ec8d7f4f165d4973062130aa3acaa8d5adbe960815fb60b004502b7d55"></a>HMACSHA256&#160;</td><td class="fielddoc"><p>A Hash based Message Authentication Code generator using SHA256 </p>
 </td></tr>
@@ -1782,6 +1810,14 @@ Enumerations</h2></td></tr>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274a6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"><p>No MAC is specified </p>
 </td></tr>
+<tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274a9d789637a054be70e304fa0a26bdf088"></a>GMACRHXH256&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and HKDF(SHA2-256) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274a269c5aa13eaabe89a5064cc24a087200"></a>GMACRHXH512&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and HKDF(SHA2-512) </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274a8b795c4602ce26176f91e17302220750"></a>GMACRHXS256&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and cSHAKE-256 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274a1a4b82f69700560ea1b08b06f5928138"></a>GMACRHXS512&#160;</td><td class="fielddoc"><p>The GMAC authentication code generator using RHX and cSHAKE-512 </p>
+</td></tr>
 <tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55"></a>HMACSHA256&#160;</td><td class="fielddoc"><p>A HMAC(SHA256) message authentication code generator </p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga62629810dc7b52fdfb37d80f03d62274a0ff37e2df6d3d9e355c3039bb6358c1b"></a>HMACSHA512&#160;</td><td class="fielddoc"><p>A HMAC(SHA512) message authentication code generator </p>
@@ -1856,44 +1892,14 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127af756b6b8a38709eef5a9b24d05dedcce"></a>CSXR80P256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with Poly1305 </p>
 <p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6c59a4c8ca7b1d2e29a48613ab5c686f"></a>MCSRH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aedcee530317adf99c9bed3c75e096dff"></a>MCSRH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aaaf31bb351279714ca6abf5a0c758112"></a>MCSRK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aa919ceebc053687496d9e4d805f1cc85"></a>MCSRK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a9d3138ff6abf0def0bc1de9dbb161a05"></a>MCSRP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and Poly1305 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a27cc0c9c636bda3ebb4c240de169165f"></a>MCSSH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6fed2cdd66e9aebfb123617c7d8b5799"></a>MCSSH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a7e712209a64dd93bb2bfc89d8e0ccfa7"></a>MCSSK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ac6ce0869b25a2e37e95a4b3b13d4d81a"></a>MCSSK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2094b0cbced8031f6ba27dfeaa1e0e31"></a>MCSSP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and Poly1305 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a2afa689ca12af7a68d7ec2998eeeb8f2"></a>MCSR&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aa469b38881a027d83e20b43c1ec30205"></a>MCSS&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
 <tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a5852281688f5bba8ddab1a5c7a2a3c6b"></a>RCS&#160;</td><td class="fielddoc"><p>The Rijndael wide-block based authenticated stream cipher. </p>
 <p>A Rijndael Extended cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127a6db2eacddb4f574894e0b4e5d16dec2c"></a>RCSG256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-256 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127aa1048915a555962865aa97d454192ee9"></a>RCSG512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-512 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga62fe0a4066025a96f0d329627b1bf127ae25f0d52fe9399665f0135b3853cddf3"></a>RCSH256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-256 for authentication. </p>
 <p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
@@ -2034,10 +2040,10 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a7cde8b0cc9c769422774241c9f7baf60"></a>Serpent&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher. </p>
 <p>Standards based implementation: uses a 128-bit block and 128/192/256-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ae606426b775d7d4769c42856528e1657"></a>RHXH256&#160;</td><td class="fielddoc"><p>An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA256) secure key schedule. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ae606426b775d7d4769c42856528e1657"></a>RHXH256&#160;</td><td class="fielddoc"><p>An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(HMAC-SHA2-256) secure key schedule. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a093cd78fd39859a6d7a281842b3fb1b4"></a>RHXH512&#160;</td><td class="fielddoc"><p>An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA512) secure key schedule. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a093cd78fd39859a6d7a281842b3fb1b4"></a>RHXH512&#160;</td><td class="fielddoc"><p>An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(HMAC-SHA2-512) secure key schedule. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6998f9a938091bca03e2eac93e8ff4d9"></a>RHXS256&#160;</td><td class="fielddoc"><p>An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an cSHAKE-256 secure key schedule. </p>
@@ -2049,10 +2055,10 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8afb7789a2d2a7c99d213d8c0e7789aaf6"></a>RHXS1024&#160;</td><td class="fielddoc"><p>An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an cSHAKE-1024 secure key schedule. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a00427ca7b27a6d9a11838ec25c87261b"></a>SHXH256&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher extended with an HKDF(SHA256) secure key schedule. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a00427ca7b27a6d9a11838ec25c87261b"></a>SHXH256&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher extended with an HKDF(HMAC-SHA2-256) secure key schedule. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ad663d9f4741a1ed5b0135ff258eab36f"></a>SHXH512&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher extended with an HKDF(SHA512) secure key schedule. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ad663d9f4741a1ed5b0135ff258eab36f"></a>SHXH512&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher extended with an HKDF(HMAC-SHA2-512) secure key schedule. </p>
 <p>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ae5fc1bb99b487c3ba19769dfb88db2bc"></a>SHXS256&#160;</td><td class="fielddoc"><p>An implementation of the Serpent Block Cipher extended with an cSHAKE-256 secure key schedule. </p>
@@ -2100,61 +2106,31 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8af756b6b8a38709eef5a9b24d05dedcce"></a>CSXR80P256&#160;</td><td class="fielddoc"><p>The extended ChaChaP80 stream cipher authenticated with Poly1305 </p>
 <p>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6c59a4c8ca7b1d2e29a48613ab5c686f"></a>MCSRH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aedcee530317adf99c9bed3c75e096dff"></a>MCSRH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and HMAC-SHA2-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aaaf31bb351279714ca6abf5a0c758112"></a>MCSRK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aa919ceebc053687496d9e4d805f1cc85"></a>MCSRK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and KMAC-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a9d3138ff6abf0def0bc1de9dbb161a05"></a>MCSRP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the RHX cipher, and Poly1305 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Rijndael cipher implementation (RHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a27cc0c9c636bda3ebb4c240de169165f"></a>MCSSH256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6fed2cdd66e9aebfb123617c7d8b5799"></a>MCSSH512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and HMAC-SHA2-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a7e712209a64dd93bb2bfc89d8e0ccfa7"></a>MCSSK256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-256 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ac6ce0869b25a2e37e95a4b3b13d4d81a"></a>MCSSK512&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and KMAC-512 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2094b0cbced8031f6ba27dfeaa1e0e31"></a>MCSSP256&#160;</td><td class="fielddoc"><p>The Modular Cipher Stream; using the SHX cipher, and Poly1305 for authentication. </p>
-<p>A symmetric stream-cipher using the extended Serpent cipher implementation (SHX): with a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a2afa689ca12af7a68d7ec2998eeeb8f2"></a>MCSR&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
-<p>Extended Rijndael-based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aa469b38881a027d83e20b43c1ec30205"></a>MCSS&#160;</td><td class="fielddoc"><p>The Modular Authenticated Stream Cipher; this version is a stream cipher only, with no authentication. </p>
-<p>Extended Serpent-based implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</p>
-</td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a5852281688f5bba8ddab1a5c7a2a3c6b"></a>RCS&#160;</td><td class="fielddoc"><p>The Rijndael wide-block based authenticated stream cipher. </p>
 <p>A Rijndael Extended cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6db2eacddb4f574894e0b4e5d16dec2c"></a>RCSG256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-256 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aa1048915a555962865aa97d454192ee9"></a>RCSG512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-512 for authentication. </p>
+<p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ae25f0d52fe9399665f0135b3853cddf3"></a>RCSH256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-256 for authentication. </p>
 <p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ada244fa36dbcd674492d6a1d5f452858"></a>RCSH512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using RHX-KMAC-512 for authentication. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8ada244fa36dbcd674492d6a1d5f452858"></a>RCSH512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-512 for authentication. </p>
 <p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a87ff8ca88c78ac5ccf25c571da9a0f19"></a>RCSK256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-256 for authentication. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a87ff8ca88c78ac5ccf25c571da9a0f19"></a>RCSK256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using KMAC-256 for authentication. </p>
 <p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aca5b4a009862f795cccf6a407032cdd5"></a>RCSK512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC-512 for authentication. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8aca5b4a009862f795cccf6a407032cdd5"></a>RCSK512&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using KMAC-512 for authentication. </p>
 <p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a3aaf1b1e627f76e88fe1d50b293b628e"></a>RCSK1024&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a3aaf1b1e627f76e88fe1d50b293b628e"></a>RCSK1024&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using KMAC-1024 for authentication. </p>
 <p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
-<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6718e0cb553f2279d28c618e2ab91c1b"></a>RCSP256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using SHX-KMAC1024 for authentication. </p>
+<tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a6718e0cb553f2279d28c618e2ab91c1b"></a>RCSP256&#160;</td><td class="fielddoc"><p>The authenticated Rijndael-256 Stream Cipher; using Poly1305 for authentication. </p>
 <p>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</p>
 </td></tr>
 <tr><td class="fieldname"><a id="gga83e5aeee49605814f7a50b7521a86bf8a542d77dbc16fc5a977920334221e5c34"></a>TSX256&#160;</td><td class="fielddoc"><p>A standard implementation of the Threefish-256 stream-cipher, this variant uses 72 rounds and has no athentication. </p>

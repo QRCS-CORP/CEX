@@ -64,6 +64,8 @@ public:
 	/// Default constructor; does not initialize the register
 	/// </summary>
 	UInt256() 
+		:
+		ymm()
 	{
 	}
 

@@ -120,6 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abb6fff87edcf79a7f797f5c99d0c7e2d"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_x256.html#abb6fff87edcf79a7f797f5c99d0c7e2d">Name</a> () override</td></tr>
 <tr class="memdesc:abb6fff87edcf79a7f797f5c99d0c7e2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The stream ciphers formal implementation name  <a href="#abb6fff87edcf79a7f797f5c99d0c7e2d">More...</a><br /></td></tr>
 <tr class="separator:abb6fff87edcf79a7f797f5c99d0c7e2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54af023cb07d8961d3708c5babd6c630"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_x256.html#a54af023cb07d8961d3708c5babd6c630">Nonce</a> () override</td></tr>
+<tr class="memdesc:a54af023cb07d8961d3708c5babd6c630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The current value of the nonce counter array.  <a href="#a54af023cb07d8961d3708c5babd6c630">More...</a><br /></td></tr>
+<tr class="separator:a54af023cb07d8961d3708c5babd6c630"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1174e75f4905c3dc3b2de341c7e2b9d"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_s_x256.html#ad1174e75f4905c3dc3b2de341c7e2b9d">ParallelBlockSize</a> () override</td></tr>
 <tr class="memdesc:ad1174e75f4905c3dc3b2de341c7e2b9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#ad1174e75f4905c3dc3b2de341c7e2b9d">More...</a><br /></td></tr>
 <tr class="separator:ad1174e75f4905c3dc3b2de341c7e2b9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,7 +167,7 @@ Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A parallelized and vectorized ChaCha-256 20-round stream cipher [CSX256] implementation. </p>
 <p>Uses an optional authentication mode; HMAC(SHA2-256) or KMAC-256 set through the constructor to authenticate the stream.</p>
-<p>Encrypt and add a MAC code to an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_c_s_x256.html">CSX256</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea3a90ac83535fb1f3d071e8beb25aa956">Nonce</a>);</div><div class="line"><a class="code" href="class_c_s_x256.html">CSX256</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"></div><div class="line"><span class="comment">// decrypt the ciphertext, if the authentication fails an exception is thrown</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="class_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
+<p>Encrypt and add a MAC code to an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_c_s_x256.html#a54af023cb07d8961d3708c5babd6c630">Nonce</a>);</div><div class="line"><a class="code" href="class_c_s_x256.html">CSX256</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for encryption</span></div><div class="line">cipher.Initialize(<span class="keyword">true</span>, kp);</div><div class="line">cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div></div><!-- fragment --><p>Decrypt and authenticate an array: </p><div class="fragment"><div class="line"><a class="code" href="class_symmetric_key.html">SymmetricKey</a> kp(<a class="code" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, <a class="code" href="class_c_s_x256.html#a54af023cb07d8961d3708c5babd6c630">Nonce</a>);</div><div class="line"><a class="code" href="class_c_s_x256.html">CSX256</a> cipher(<a class="code" href="group___enumeration.html#gga62629810dc7b52fdfb37d80f03d62274acaa8d5adbe960815fb60b004502b7d55">StreamAuthenticators::HMACSHA256</a>);</div><div class="line"><span class="comment">// initialize for decryption</span></div><div class="line">cipher.Initialize(<span class="keyword">false</span>, kp);</div><div class="line"></div><div class="line"><span class="comment">// decrypt the ciphertext, if the authentication fails an exception is thrown</span></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    cipher.Transform(Input, InOffset, Output, OutOffset, Length);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<a class="code" href="class_crypto_authentication_failure.html">CryptoAuthenticationFailure</a>)</div><div class="line">{</div><div class="line">    <span class="comment">// do something...</span></div><div class="line">}</div></div><!-- fragment --> <p><b>Overview:</b> </p>
 <p>The ChaCha stream cipher generates a key-stream by encrypting successive values of an incrementing 32bit unsigned integer counter array. <br />
 The key-stream is then XOR'd with the input message block to create the cipher-text output. <br />
 In parallel mode, the counter is increased by a number factored from the number and size of input blocks, allowing for a multi-threaded operation. <br />
@@ -586,6 +589,35 @@ Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">1
 <p>Read Only: The stream ciphers formal implementation name </p>
 
 <p>Implements <a class="el" href="class_i_stream_cipher.html#a2a1e6ebb86452e76be1e04424f54f71e">IStreamCipher</a>.</p>
+
+</div>
+</div>
+<a id="a54af023cb07d8961d3708c5babd6c630"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54af023cb07d8961d3708c5babd6c630">&#9670;&nbsp;</a></span>Nonce()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; byte &gt; CSX256::Nonce </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The current value of the nonce counter array. </p>
+
+<p>Implements <a class="el" href="class_i_stream_cipher.html#a8eb7fbc91347d04a8094c0404e1bc3d5">IStreamCipher</a>.</p>
 
 </div>
 </div>

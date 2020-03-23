@@ -23,7 +23,7 @@ namespace Test
 	using Enumeration::RainbowParameters;
 
 	const std::string RainbowTest::CLASSNAME = "RainbowTest";
-	const std::string RainbowTest::DESCRIPTION = "Rainbow key generation, signature generation, and verification tests..";
+	const std::string RainbowTest::DESCRIPTION = "RainbowTest key generation, signature generation, and verification tests..";
 	const std::string RainbowTest::SUCCESS = "SUCCESS! RainbowTest tests have executed succesfully.";
 
 	RainbowTest::RainbowTest()

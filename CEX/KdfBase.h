@@ -51,7 +51,7 @@ public:
 	/// <param name="MinimumSalt">The minimum number of bytes used to salt the generator</param>
 	/// <param name="Name">The KDFs formal class name</param>
 	/// <param name="KeySizes">A vector of legal SymmetricKeySize used by the KDF</param>
-	KdfBase(Kdfs Enumeral, size_t MinimumKey, size_t MinimumSalt, std::string &Name, std::vector<SymmetricKeySize> &KeySizes);
+	KdfBase(Kdfs Enumeral, size_t MinimumKey, size_t MinimumSalt, std::string Name, std::vector<SymmetricKeySize> KeySizes);
 
 	/// <summary>
 	/// Destructor: finalize this class

@@ -183,14 +183,28 @@ RHX is capable of processing up to 38 rounds, that is 24 rounds more than a stan
 RHX extended mode can use an HMAC based Key Derivation Function; HKDF(HMAC(SHA2)) or the Keccak XOF function cSHAKE, to expand the input cipher key to create the internal round-key integer array. <br />
 This provides better security, and allows for an implemetation to safely use an increased number of transformation rounds further strengthening the cipher. <br />
 The cipher can also use a user-definable cipher tweak through the Info parameter of the symmetric key container, this can be used to create a unique cipher-text output. <br />
-This tweak array is set as either the information string for HKDF, or as the cSHAKE name string.</p>
+This tweak array is set as either the information string for HKDF, or as the cSHAKE name string. <br />
+The Info parameter is a concatonation of the ciphers formal string name, two Little Endian bytes for the key size in bits, and an optional user defined tweak, which can be a secondary key or a salt value. </p>
+<p>The default Info parameters: </p><ul>
+<li>
+RHX256, HKDF(SHA2-256 variant) = RHXH25601. </li>
+<li>
+RHX512, HKDF(SHA2-512 variant) = RHXH51202. </li>
+<li>
+RHX256, (cSHAKE-256 variant) = RHXS25601. </li>
+<li>
+RHX512, (cSHAKE-512 variant) = RHXS51202. </li>
+</ul>
+<p>AHX, the Intel AES-NI implementation is considered the primary AES/eAES implementation, with this version used as a fallback. <br />
+There are two implementations in this version, the constant-time implementation which is the default, and the table-based implementation, which is fast but vulnerable to timing related side-channel attacks. <br />
+The table-based implementation can be enabled by unremming the CEX_RIJNDAEL_TABLES macro, in the user-configurable section of the CexConfig.h file.</p>
 <p>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. <br />
 RHX is capable of processing up to 38 transformation rounds in extended mode; a 256-bit key uses 22 rounds, a 512-bit key 30 rounds, and a 1024-bit key is set to 38 rounds.</p>
 <ul>
 <li>
-This cipher should only be used in conjunction with an AEAD or standard cipher mode, or as an component in another construction, ex. CMAC. </li>
+This cipher should only be used in conjunction with an AEAD or standard cipher mode, or as a component in another construction, ex. CMAC. </li>
 <li>
-Valid key sizes can be determined at run-time using the <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8" title="Read Only: A list of SymmetricKeySize structures containing valid key-sizes">LegalKeySizes</a> property. collection. </li>
+Valid key sizes can be determined at run-time using the <a class="el" href="class_r_h_x.html#acc0b157591f2be7c83540cd9498966b8" title="Read Only: A list of SymmetricKeySize structures containing valid key-sizes">LegalKeySizes</a> property. </li>
 <li>
 The internal block-size is fixed at 16 bytes (128 bits) wide. </li>
 <li>

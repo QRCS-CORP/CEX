@@ -421,7 +421,7 @@ public:
 	///
 	/// <returns>Returns true if the connection has been accepted</returns>
 	/// <remarks>Successful connection raises the SocketChanged event with the SocketEvent::Connected flag</remarks>
-	bool Connect(const std::string &Address, ushort Port, SocketAddressFamilies AddressFamily = SocketAddressFamilies::IPv4);
+	bool Connect(std::string &Address, ushort Port, SocketAddressFamilies AddressFamily = SocketAddressFamilies::IPv4);
 
 	/// <summary>
 	/// The Connect function establishes a connection to a specified socket
@@ -482,7 +482,7 @@ public:
 	///
 	/// <exception cref="CryptoSocketException">Thrown if the socket fails to go into listening state</exception>
 	/// <remarks>Successful change to listening state raises the SocketChanged event with the SocketEvent::Listening flag</remarks>
-	void Listen(int BackLog = 5);
+	void Listen(int BackLog);
 
 	/// <summary>
 	/// Get the port number using the connection parameters
@@ -502,7 +502,7 @@ public:
 	/// <param name="Flags">Flags that influence the behavior of the receive function</param>
 	///
 	/// <remarks>Successful receive operation raises the SocketChanged event with the SocketEvent::Received flag</remarks>
-	uint Receive(std::vector<byte> &Output, SocketRecieveFlags Flags);
+	uint Receive(std::vector<byte>& Output, SocketRecieveFlags Flags);
 
 	/// <summary>
 	/// Determines the status of a socket waiting for a synchronous connection
@@ -646,7 +646,6 @@ private:
 	unsigned int m_lastResult;
 #endif
 };
-
 
 /*//! socket-based implementation of NetworkSource
 class SocketSource : public NetworkSource, public Socket

@@ -105,8 +105,8 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase-</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,8 +133,8 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OmitFramePointers>false</OmitFramePointers>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <AdditionalOptions>/Zc:twoPhase-</AdditionalOptions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,8 +161,8 @@
       <Optimization>Full</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <CompileAs>Default</CompileAs>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalOptions>/Zc:twoPhase-</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,12 +188,10 @@
       <OpenMPSupport>true</OpenMPSupport>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions>/Zc:twoPhase-</AdditionalOptions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <ConformanceMode>false</ConformanceMode>
-      <CompileAsManaged>false</CompileAsManaged>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -214,10 +212,11 @@
     <ClInclude Include="..\..\CEX\DLTMK4Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK5Q8380417N256.h" />
     <ClInclude Include="..\..\CEX\DLTMK6Q8380417N256.h" />
-    <ClInclude Include="..\..\CEX\Filter.h" />
     <ClInclude Include="..\..\CEX\GCM.h" />
     <ClInclude Include="..\..\CEX\HBA.h" />
+    <ClInclude Include="..\..\CEX\Kms.h" />
     <ClInclude Include="..\..\CEX\NetworkTools.h" />
+    <ClInclude Include="..\..\CEX\QOT.h" />
     <ClInclude Include="..\..\CEX\SPXPFORS.h" />
     <ClInclude Include="..\..\CEX\ACP.h" />
     <ClInclude Include="..\..\CEX\AeadModeFromName.h" />
@@ -457,10 +456,11 @@
     <ClCompile Include="..\..\CEX\DLTMK4Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK5Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp" />
-    <ClCompile Include="..\..\CEX\Filter.cpp" />
     <ClCompile Include="..\..\CEX\GCM.cpp" />
     <ClCompile Include="..\..\CEX\HBA.cpp" />
+    <ClCompile Include="..\..\CEX\Kms.cpp" />
     <ClCompile Include="..\..\CEX\NetworkTools.cpp" />
+    <ClCompile Include="..\..\CEX\QOT.cpp" />
     <ClCompile Include="..\..\CEX\RNBWGfMath.cpp" />
     <ClCompile Include="..\..\CEX\SPXPFORS.cpp" />
     <ClCompile Include="..\..\CEX\ACP.cpp" />

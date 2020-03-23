@@ -93,9 +93,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4ada29348aef9dc2155582bd7e074579"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#a4ada29348aef9dc2155582bd7e074579">Clear</a> ()</td></tr>
 <tr class="memdesc:a4ada29348aef9dc2155582bd7e074579"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the message buffer but retain the key state  <a href="#a4ada29348aef9dc2155582bd7e074579">More...</a><br /></td></tr>
 <tr class="separator:a4ada29348aef9dc2155582bd7e074579"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed55c5e26b9ea0907bec4e482f6d3392"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#aed55c5e26b9ea0907bec4e482f6d3392">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t Counter, size_t Length)</td></tr>
-<tr class="memdesc:aed55c5e26b9ea0907bec4e482f6d3392"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize the GHASH block  <a href="#aed55c5e26b9ea0907bec4e482f6d3392">More...</a><br /></td></tr>
-<tr class="separator:aed55c5e26b9ea0907bec4e482f6d3392"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae304fd2ceaf523ef3b5373f84ab2220f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#ae304fd2ceaf523ef3b5373f84ab2220f">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t ADLength, size_t TxtLength)</td></tr>
+<tr class="memdesc:ae304fd2ceaf523ef3b5373f84ab2220f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize the GHASH block  <a href="#ae304fd2ceaf523ef3b5373f84ab2220f">More...</a><br /></td></tr>
+<tr class="separator:ae304fd2ceaf523ef3b5373f84ab2220f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb166ac9af8ae8951faf6bde33e6ad9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#aeb166ac9af8ae8951faf6bde33e6ad9f">Initialize</a> (const std::vector&lt; ulong &gt; &amp;<a class="el" href="group___enumeration.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)</td></tr>
 <tr class="memdesc:aeb166ac9af8ae8951faf6bde33e6ad9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the hash key  <a href="#aeb166ac9af8ae8951faf6bde33e6ad9f">More...</a><br /></td></tr>
 <tr class="separator:aeb166ac9af8ae8951faf6bde33e6ad9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -105,6 +105,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aaee9055c797fbc3d705b7cb6c4ea7639"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#aaee9055c797fbc3d705b7cb6c4ea7639">Reset</a> ()</td></tr>
 <tr class="memdesc:aaee9055c797fbc3d705b7cb6c4ea7639"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the hash function  <a href="#aaee9055c797fbc3d705b7cb6c4ea7639">More...</a><br /></td></tr>
 <tr class="separator:aaee9055c797fbc3d705b7cb6c4ea7639"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a758eb6bdb7a85535ee2e6ba72695c1e8"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#a758eb6bdb7a85535ee2e6ba72695c1e8">TagSize</a> ()</td></tr>
+<tr class="memdesc:a758eb6bdb7a85535ee2e6ba72695c1e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The hash code length in bytes  <a href="#a758eb6bdb7a85535ee2e6ba72695c1e8">More...</a><br /></td></tr>
+<tr class="separator:a758eb6bdb7a85535ee2e6ba72695c1e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af35383ed2ce5b00172555a7326b72b35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_h_a_s_h.html#af35383ed2ce5b00172555a7326b72b35">Update</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t Length)</td></tr>
 <tr class="memdesc:af35383ed2ce5b00172555a7326b72b35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the hash function  <a href="#af35383ed2ce5b00172555a7326b72b35">More...</a><br /></td></tr>
 <tr class="separator:af35383ed2ce5b00172555a7326b72b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -199,8 +202,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aed55c5e26b9ea0907bec4e482f6d3392"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed55c5e26b9ea0907bec4e482f6d3392">&#9670;&nbsp;</a></span>Finalize()</h2>
+<a id="ae304fd2ceaf523ef3b5373f84ab2220f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae304fd2ceaf523ef3b5373f84ab2220f">&#9670;&nbsp;</a></span>Finalize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -215,13 +218,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Counter</em>, </td>
+          <td class="paramname"><em>ADLength</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
+          <td class="paramname"><em>TxtLength</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -235,8 +238,8 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Output</td><td>The destination array</td></tr>
-    <tr><td class="paramname">Counter</td><td>The size of the AD</td></tr>
-    <tr><td class="paramname">Length</td><td>The plain text size</td></tr>
+    <tr><td class="paramname">ADLength</td><td>The size of the AD</td></tr>
+    <tr><td class="paramname">TxtLength</td><td>The plain text size</td></tr>
   </table>
   </dd>
 </dl>
@@ -357,6 +360,25 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Reset the hash function </p>
+
+</div>
+</div>
+<a id="a758eb6bdb7a85535ee2e6ba72695c1e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a758eb6bdb7a85535ee2e6ba72695c1e8">&#9670;&nbsp;</a></span>TagSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t GHASH::TagSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Read Only: The hash code length in bytes </p>
 
 </div>
 </div>

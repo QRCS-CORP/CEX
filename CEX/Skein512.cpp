@@ -317,7 +317,7 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		}
 		else
 		{
-			if (m_msgLength != 0 && (m_msgLength + Length >= Skein::SKEIN512_RATE_SIZE))
+			if (m_msgLength != 0 && (m_msgLength + Length > Skein::SKEIN512_RATE_SIZE))
 			{
 				const size_t RMDLEN = Skein::SKEIN512_RATE_SIZE - m_msgLength;
 				if (RMDLEN != 0)
@@ -355,12 +355,20 @@ void Skein512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Lengt
 {
 	// process message block
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
-	while (Length != 0)
+
+	if (Length != 0)
 	{
-		const size_t MSGRMD = (Length >= Skein::SKEIN512_RATE_SIZE) ? Skein::SKEIN512_RATE_SIZE : Length;
-		ProcessBlock(Input, InOffset, State, MSGRMD);
-		Length -= MSGRMD;
-		InOffset += MSGRMD;
+		while (Length != 0)
+		{
+			const size_t MSGRMD = (Length >= Skein::SKEIN512_RATE_SIZE) ? Skein::SKEIN512_RATE_SIZE : Length;
+			ProcessBlock(Input, InOffset, State, MSGRMD);
+			Length -= MSGRMD;
+			InOffset += MSGRMD;
+		}
+	}
+	else
+	{
+		ProcessBlock(Input, InOffset, State, 0);
 	}
 
 	// finalize block

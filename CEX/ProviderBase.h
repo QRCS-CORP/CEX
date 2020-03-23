@@ -45,7 +45,7 @@ public:
 	/// <param name="Available">The providers availability status</param>
 	/// <param name="Enumeral">The providers enumeration name</param>
 	/// <param name="Name">The providers string name</param>
-	ProviderBase(bool Available, Providers Enumeral, const std::string &Name);
+	ProviderBase(bool Available, Providers Enumeral, const std::string Name);
 
 	/// <summary>
 	/// Destructor: finalize this class

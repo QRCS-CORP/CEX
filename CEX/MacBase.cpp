@@ -7,7 +7,7 @@ using Utility::IntegerTools;
 
 //~~~MacBase~~~//
 
-MacBase::MacBase(size_t BlockSize, Macs Enumeral, std::string &Name, std::vector<SymmetricKeySize> &KeySizes, size_t MinimumKey, size_t MinimumSalt, size_t TagSize)
+MacBase::MacBase(size_t BlockSize, Macs Enumeral, std::string Name, std::vector<SymmetricKeySize> KeySizes, size_t MinimumKey, size_t MinimumSalt, size_t TagSize)
 	:
 	m_blockSize(BlockSize),
 	m_macEnumeral(Enumeral),

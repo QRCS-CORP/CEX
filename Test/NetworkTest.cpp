@@ -9,7 +9,7 @@ namespace Test
 {
 	using Exception::CryptoSocketException;
 	using Prng::SecureRandom;
-	using namespace Network;
+	using Network::Socket;
 
 	const std::string NetworkTest::CLASSNAME = "NetworkTest";
 	const std::string NetworkTest::DESCRIPTION = "Sockets and TCP/IP stack test; checks constructors, exceptions, initialization, and synchronization of the networking components.";
@@ -66,6 +66,65 @@ namespace Test
 		}
 	}
 
+
+	void ForwardTcpPort(const char *sourcePortName, const char *destinationHost, const char *destinationPortName)
+	{
+		/*SocketsInitializer sockInit;
+
+		Socket sockListen, sockSource, sockDestination;
+
+		int sourcePort = Socket::PortNameToNumber(sourcePortName);
+		int destinationPort = Socket::PortNameToNumber(destinationPortName);
+
+		sockListen.Create();
+		sockListen.Bind(sourcePort);
+		setsockopt(sockListen, IPPROTO_TCP, TCP_NODELAY, "\x01", 1);
+
+		std::cout << "Listing on port " << sourcePort << ".\n";
+		sockListen.Listen();
+
+		sockListen.Accept(sockSource);
+		cout << "Connection accepted on port " << sourcePort << ".\n";
+		sockListen.CloseSocket();
+
+		cout << "Making connection to " << destinationHost << ", port " << destinationPort << ".\n";
+		sockDestination.Create();
+		sockDestination.Connect(destinationHost, destinationPort);
+
+		cout << "Connection made to " << destinationHost << ", starting to forward.\n";
+
+		SocketSource out(sockSource, false, new SocketSink(sockDestination));
+		SocketSource in(sockDestination, false, new SocketSink(sockSource));
+
+		WaitObjectContainer waitObjects;
+
+		while (!(in.SourceExhausted() && out.SourceExhausted()))
+		{
+			waitObjects.Clear();
+
+			out.GetWaitObjects(waitObjects, CallStack("ForwardTcpPort - out", NULL));
+			in.GetWaitObjects(waitObjects, CallStack("ForwardTcpPort - in", NULL));
+
+			waitObjects.Wait(INFINITE_TIME);
+
+			if (!out.SourceExhausted())
+			{
+				cout << "o" << flush;
+				out.PumpAll2(false);
+				if (out.SourceExhausted())
+					cout << "EOF received on source socket.\n";
+			}
+
+			if (!in.SourceExhausted())
+			{
+				cout << "i" << flush;
+				in.PumpAll2(false);
+				if (in.SourceExhausted())
+					cout << "EOF received on destination socket.\n";
+			}
+		}*/
+	}
+
 	void NetworkTest::Exception()
 	{
 		// Initialization exception tests //
@@ -89,36 +148,35 @@ namespace Test
 
 	void NetworkTest::Forwarding(const std::string &SourceHost, const std::string &SourcePort, const std::string &DestinationHost, const std::string &DestinationPort)
 	{
-		SocketsInitializer sockInit;
+#ifdef CEX_SOCKETS_AVAILABLE
+		/*//SocketsInitializer sockInit;
 
-		Socket lstsck;
-		Socket srcsck;
-		Socket dstsck;
-		ushort srcport;
-		ushort dstport;
+		Socket sockListen;
+		Socket sockSource;
+		Socket sockDestination;
 
-		srcport = Socket::PortNameToNumber(SourcePort);
-		dstport = Socket::PortNameToNumber(DestinationPort);
+		ushort sourcePort = Socket::PortNameToNumber(SourcePort);
+		int destinationPort = Socket::PortNameToNumber(DestinationPort);
 
-		lstsck.Create();
-		lstsck.Bind(srcport, std::string("localhost"));
-		setsockopt(lstsck, IPPROTO_TCP, TCP_NODELAY, "\x01", 1);
+		sockListen.Create(Network::SocketAddressFamilyTypes::IPv4);
+		sockListen.Bind(sourcePort, SourceHost);
+		//setsockopt(sockListen, IPPROTO_TCP, TCP_NODELAY, "\x01", 1);
 
-		std::cout << "Listing on port " << srcport << ".\n";
-		lstsck.Listen();
+		std::cout << "Listing on port " << sourcePort << ".\n";
+		sockListen.Listen(0);
 
-		lstsck.Accept(srcsck);
-		std::cout << "Connection accepted on port " << srcport << ".\n";
-		lstsck.CloseSocket();
+		sockListen.Accept(sockSource);
+		std::cout << "Connection accepted on port " << sourcePort << ".\n";
+		sockListen.CloseSocket();
 
-		std::cout << "Making connection to " << DestinationHost << ", port " << dstport << ".\n";
-		dstsck.Create();
-		dstsck.Connect(DestinationHost, dstport);
+		std::cout << "Making connection to " << DestinationHost << ", port " << destinationPort << ".\n";
+		sockDestination.Create();
+		sockDestination.Connect(DestinationHost, destinationPort);
 
 		std::cout << "Connection made to " << DestinationHost << ", starting to forward.\n";
 
-		/*SocketSource out(srcsck, false, new SocketSink(dstsck));
-		SocketSource in(dstsck, false, new SocketSink(srcsck));
+		SocketSource out(sockSource, false, new SocketSink(sockDestination));
+		SocketSource in(sockDestination, false, new SocketSink(sockSource));
 
 		WaitObjectContainer waitObjects;
 
@@ -129,11 +187,11 @@ namespace Test
 			out.GetWaitObjects(waitObjects, CallStack("ForwardTcpPort - out", NULL));
 			in.GetWaitObjects(waitObjects, CallStack("ForwardTcpPort - in", NULL));
 
-			waitObjects.Wait(CEX_INFINITE_TIME);
+			waitObjects.Wait(INFINITE_TIME);
 
 			if (!out.SourceExhausted())
 			{
-				std::cout << "o" << std::flush;
+				std::cout << "o" << std::ostream::flush;
 				out.PumpAll2(false);
 
 				if (out.SourceExhausted())
@@ -144,7 +202,7 @@ namespace Test
 
 			if (!in.SourceExhausted())
 			{
-				std::cout << "i" << std::flush;
+				std::cout << "i" << std::ostream::flush;
 				in.PumpAll2(false);
 
 				if (in.SourceExhausted())
@@ -153,6 +211,10 @@ namespace Test
 				}
 			}
 		}*/
+#else
+		std::cout << "Socket support was not enabled at compile time.\n";
+		exit(-1);
+#endif
 	}
 
 	void NetworkTest::Initialization()

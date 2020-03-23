@@ -1056,11 +1056,14 @@
     <ClInclude Include="..\..\CEX\WindowsHandle.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Filter.h">
-      <Filter>Header Files\Network</Filter>
+    <ClInclude Include="..\..\CEX\QOT.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\GCM.h">
       <Filter>Header Files\Cipher\Block\AEAD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Kms.h">
+      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1646,11 +1649,14 @@
     <ClCompile Include="..\..\CEX\WindowsHandle.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Filter.cpp">
-      <Filter>Source Files\Network</Filter>
+    <ClCompile Include="..\..\CEX\QOT.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\GCM.cpp">
       <Filter>Source Files\Cipher\Block\AEAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Kms.cpp">
+      <Filter>Source Files\Enumeration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

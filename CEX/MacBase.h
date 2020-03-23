@@ -55,7 +55,7 @@ public:
 	/// <param name="MinimumKey">The minimum number of bytes of key that will initialize the generator</param>
 	/// <param name="MinimumSalt">The minimum number of bytes of salt that will initialize the generator</param>
 	/// <param name="TagSize">The output MAC tag size</param>
-	MacBase(size_t BlockSize, Macs Enumeral, std::string &Name, std::vector<SymmetricKeySize> &KeySizes, size_t MinimumKey, size_t MinimumSalt, size_t TagSize);
+	MacBase(size_t BlockSize, Macs Enumeral, std::string Name, std::vector<SymmetricKeySize> KeySizes, size_t MinimumKey, size_t MinimumSalt, size_t TagSize);
 
 	/// <summary>
 	/// Destructor: finalize this class

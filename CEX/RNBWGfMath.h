@@ -54,23 +54,23 @@ public:
 
 #ifdef CEX_ARCH_64
 
-	static void RNBWGfMath::Gf256vAddU32(std::vector<byte> &AccuB, size_t BOffset, const std::vector<byte> &A, size_t AOffset, size_t Length);
+	static void Gf256vAddU32(std::vector<byte> &AccuB, size_t BOffset, const std::vector<byte> &A, size_t AOffset, size_t Length);
 
-	static void RNBWGfMath::Gf256vMaddU32(std::vector<byte> &AccuC, size_t COffset, const std::vector<byte> &A, size_t AOffset, byte Gf256B, size_t Length);
+	static void Gf256vMaddU32(std::vector<byte> &AccuC, size_t COffset, const std::vector<byte> &A, size_t AOffset, byte Gf256B, size_t Length);
 
-	static void RNBWGfMath::Gf256vMulScalarU32(std::vector<byte> &A, size_t Offset, byte B, size_t Length);
+	static void Gf256vMulScalarU32(std::vector<byte> &A, size_t Offset, byte B, size_t Length);
 
-	static void RNBWGfMath::Gf256vPredicatedAddU32(std::vector<byte> &AccuB, size_t BOffset, byte Predicate, const std::vector<byte> &A, size_t AOffset, size_t Length);
+	static void Gf256vPredicatedAddU32(std::vector<byte> &AccuB, size_t BOffset, byte Predicate, const std::vector<byte> &A, size_t AOffset, size_t Length);
 
 #endif
 
-	static void RNBWGfMath::Gf256vAdd(std::vector<byte> &AccuB, size_t BOffset, const std::vector<byte> &A, size_t AOffset, size_t Length);
+	static void Gf256vAdd(std::vector<byte> &AccuB, size_t BOffset, const std::vector<byte> &A, size_t AOffset, size_t Length);
 
-	static void RNBWGfMath::Gf256vMadd(std::vector<byte> &AccuC, size_t COffset, const std::vector<byte> &A, size_t AOffset, byte Gf256B, size_t Length);
+	static void Gf256vMadd(std::vector<byte> &AccuC, size_t COffset, const std::vector<byte> &A, size_t AOffset, byte Gf256B, size_t Length);
 
-	static void RNBWGfMath::Gf256vMulScalar(std::vector<byte> &A, size_t Offset, byte B, size_t Length);
+	static void Gf256vMulScalar(std::vector<byte> &A, size_t Offset, byte B, size_t Length);
 
-	static void RNBWGfMath::Gf256vPredicatedAdd(std::vector<byte> &AccuB, size_t BOffset, byte Predicate, const std::vector<byte> &A, size_t AOffset, size_t Length);
+	static void Gf256vPredicatedAdd(std::vector<byte> &AccuB, size_t BOffset, byte Predicate, const std::vector<byte> &A, size_t AOffset, size_t Length);
 
 private:
 

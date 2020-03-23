@@ -14,6 +14,20 @@ enum class Kdfs : byte
 	/// No kdf is specified
 	/// </summary>
 	None = 0,
+
+	/// <summary>
+	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
+	/// </summary>
+	HKDS128 = 1,
+	/// <summary>
+	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
+	/// </summary>
+	HKDS256 = 2,
+	/// <summary>
+	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
+	/// </summary>
+	HKDS512 = 2,
+
 	/// <summary>
 	/// A Hash based Key Derivation Function: HKDF(SHA2-256)
 	/// </summary>

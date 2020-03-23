@@ -81,9 +81,8 @@ Inheritance diagram for IAeadMode:</div>
  <div class="center">
   <img src="class_i_aead_mode.png" usemap="#IAeadMode_map" alt=""/>
   <map id="IAeadMode_map" name="IAeadMode_map">
-<area href="class_i_cipher_mode.html" title="The block-cipher standard mode virtual interface class." alt="ICipherMode" shape="rect" coords="47,0,132,24"/>
-<area href="class_e_a_x.html" title="EAX: An Encrypt and Authenticate AEAD Block Cipher Mode" alt="EAX" shape="rect" coords="0,112,85,136"/>
-<area href="class_g_c_m.html" title="GCM: A Galois/Counter Authenticated Block Cipher Mode" alt="GCM" shape="rect" coords="95,112,180,136"/>
+<area href="class_g_c_m.html" title="GCM: A Galois/Counter Authenticated block cipher mode" alt="GCM" shape="rect" coords="0,56,77,80"/>
+<area href="class_h_b_a.html" title="A block cipher CTR mode with Hash Based Authentication, an AEAD cipher mode (HBA)...." alt="HBA" shape="rect" coords="87,56,164,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -101,103 +100,54 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a26f02f52967fd0cdc00311f69ac0f239"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a26f02f52967fd0cdc00311f69ac0f239">~IAeadMode</a> () noexcept</td></tr>
 <tr class="memdesc:a26f02f52967fd0cdc00311f69ac0f239"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a26f02f52967fd0cdc00311f69ac0f239">More...</a><br /></td></tr>
 <tr class="separator:a26f02f52967fd0cdc00311f69ac0f239"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a945fb5422ae3a0b5821ca6ab7d4dcef1"><td class="memItemLeft" align="right" valign="top">virtual bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a945fb5422ae3a0b5821ca6ab7d4dcef1">AutoIncrement</a> ()=0</td></tr>
-<tr class="memdesc:a945fb5422ae3a0b5821ca6ab7d4dcef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called.  <a href="#a945fb5422ae3a0b5821ca6ab7d4dcef1">More...</a><br /></td></tr>
-<tr class="separator:a945fb5422ae3a0b5821ca6ab7d4dcef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78b9f3137d60c26fd4a8a3776ee2880e"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a78b9f3137d60c26fd4a8a3776ee2880e">MaxTagSize</a> ()=0</td></tr>
-<tr class="memdesc:a78b9f3137d60c26fd4a8a3776ee2880e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum legal MAC tag length in bytes  <a href="#a78b9f3137d60c26fd4a8a3776ee2880e">More...</a><br /></td></tr>
-<tr class="separator:a78b9f3137d60c26fd4a8a3776ee2880e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a139ce4df79d754b41c7eb62220bbb7f6"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a139ce4df79d754b41c7eb62220bbb7f6">MinTagSize</a> ()=0</td></tr>
-<tr class="memdesc:a139ce4df79d754b41c7eb62220bbb7f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The minimum legal MAC tag length in bytes  <a href="#a139ce4df79d754b41c7eb62220bbb7f6">More...</a><br /></td></tr>
-<tr class="separator:a139ce4df79d754b41c7eb62220bbb7f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99fa6d52d3cb43703d3c0bc0f9adb6c1"><td class="memItemLeft" align="right" valign="top">virtual bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a99fa6d52d3cb43703d3c0bc0f9adb6c1">PreserveAD</a> ()=0</td></tr>
-<tr class="memdesc:a99fa6d52d3cb43703d3c0bc0f9adb6c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Persist a one-time associated data for the entire session.  <a href="#a99fa6d52d3cb43703d3c0bc0f9adb6c1">More...</a><br /></td></tr>
-<tr class="separator:a99fa6d52d3cb43703d3c0bc0f9adb6c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0762a0d5cfeeeae3cfe1bcbd45926a1a"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#ga69ec43083306f45cbe77033dfe17cbba">AeadModes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a0762a0d5cfeeeae3cfe1bcbd45926a1a">Enumeral</a> ()=0</td></tr>
+<tr class="memdesc:a0762a0d5cfeeeae3cfe1bcbd45926a1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Cipher Modes enumeration type name  <a href="#a0762a0d5cfeeeae3cfe1bcbd45926a1a">More...</a><br /></td></tr>
+<tr class="separator:a0762a0d5cfeeeae3cfe1bcbd45926a1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfc47cc44fe535fecdf2ea9035d31132"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#adfc47cc44fe535fecdf2ea9035d31132">IsEncryption</a> ()=0</td></tr>
+<tr class="memdesc:adfc47cc44fe535fecdf2ea9035d31132"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: True if initialized for encryption, False for decryption  <a href="#adfc47cc44fe535fecdf2ea9035d31132">More...</a><br /></td></tr>
+<tr class="separator:adfc47cc44fe535fecdf2ea9035d31132"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a78231c21ebe5b465920cdfde7750f1"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a5a78231c21ebe5b465920cdfde7750f1">IsInitialized</a> ()=0</td></tr>
+<tr class="memdesc:a5a78231c21ebe5b465920cdfde7750f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Block Cipher is ready to transform data  <a href="#a5a78231c21ebe5b465920cdfde7750f1">More...</a><br /></td></tr>
+<tr class="separator:a5a78231c21ebe5b465920cdfde7750f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf9d62806e790c57fb878ee9ccda1045"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#abf9d62806e790c57fb878ee9ccda1045">IsParallel</a> ()=0</td></tr>
+<tr class="memdesc:abf9d62806e790c57fb878ee9ccda1045"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="#abf9d62806e790c57fb878ee9ccda1045">More...</a><br /></td></tr>
+<tr class="separator:abf9d62806e790c57fb878ee9ccda1045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a2317dc86d6ee4d16260f5f816f7eb6"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a7a2317dc86d6ee4d16260f5f816f7eb6">LegalKeySizes</a> ()=0</td></tr>
+<tr class="memdesc:a7a2317dc86d6ee4d16260f5f816f7eb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A vector of allowed cipher-mode input key byte-sizes  <a href="#a7a2317dc86d6ee4d16260f5f816f7eb6">More...</a><br /></td></tr>
+<tr class="separator:a7a2317dc86d6ee4d16260f5f816f7eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9784e4725e9febe9d06c83bb328efb64"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a9784e4725e9febe9d06c83bb328efb64">Name</a> ()=0</td></tr>
+<tr class="memdesc:a9784e4725e9febe9d06c83bb328efb64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher-modes formal class name  <a href="#a9784e4725e9febe9d06c83bb328efb64">More...</a><br /></td></tr>
+<tr class="separator:a9784e4725e9febe9d06c83bb328efb64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83a824dc299cd19f0c7cf313b426c07e"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a83a824dc299cd19f0c7cf313b426c07e">ParallelBlockSize</a> ()=0</td></tr>
+<tr class="memdesc:a83a824dc299cd19f0c7cf313b426c07e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="#a83a824dc299cd19f0c7cf313b426c07e">More...</a><br /></td></tr>
+<tr class="separator:a83a824dc299cd19f0c7cf313b426c07e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a597d277f9b895a9f02451a46971da06a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_parallel_options.html">ParallelOptions</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a597d277f9b895a9f02451a46971da06a">ParallelProfile</a> ()=0</td></tr>
+<tr class="memdesc:a597d277f9b895a9f02451a46971da06a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Parallel and SIMD capability flags and sizes  <a href="#a597d277f9b895a9f02451a46971da06a">More...</a><br /></td></tr>
+<tr class="separator:a597d277f9b895a9f02451a46971da06a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad19fd97a58a68c9f8f02bc366135abf8"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ad19fd97a58a68c9f8f02bc366135abf8">Tag</a> ()=0</td></tr>
 <tr class="memdesc:ad19fd97a58a68c9f8f02bc366135abf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Returns the finalized MAC tag vector  <a href="#ad19fd97a58a68c9f8f02bc366135abf8">More...</a><br /></td></tr>
 <tr class="separator:ad19fd97a58a68c9f8f02bc366135abf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a311a22bb63bdd93990fc497a153d2004"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a311a22bb63bdd93990fc497a153d2004">Finalize</a> (std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
-<tr class="memdesc:a311a22bb63bdd93990fc497a153d2004"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output standard-vector.  <a href="#a311a22bb63bdd93990fc497a153d2004">More...</a><br /></td></tr>
-<tr class="separator:a311a22bb63bdd93990fc497a153d2004"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8d0d13fb5640530e83d74e2eb52ed69"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ad8d0d13fb5640530e83d74e2eb52ed69">Finalize</a> (SecureVector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
-<tr class="memdesc:ad8d0d13fb5640530e83d74e2eb52ed69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the MAC code (Tag) and copy it to the Output secure-vector.  <a href="#ad8d0d13fb5640530e83d74e2eb52ed69">More...</a><br /></td></tr>
-<tr class="separator:ad8d0d13fb5640530e83d74e2eb52ed69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9d19693f6cdeee2682a3172acf04354"><td class="memItemLeft" align="right" valign="top">virtual const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#ac9d19693f6cdeee2682a3172acf04354">Tag</a> (SecureVector&lt; byte &gt; &amp;Output)=0</td></tr>
+<tr class="memdesc:ac9d19693f6cdeee2682a3172acf04354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies the internal MAC tag to a secure-vector  <a href="#ac9d19693f6cdeee2682a3172acf04354">More...</a><br /></td></tr>
+<tr class="separator:ac9d19693f6cdeee2682a3172acf04354"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd71f9f704694974157f002883fdef4b"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#acd71f9f704694974157f002883fdef4b">TagSize</a> ()=0</td></tr>
+<tr class="memdesc:acd71f9f704694974157f002883fdef4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The maximum legal MAC tag length in bytes  <a href="#acd71f9f704694974157f002883fdef4b">More...</a><br /></td></tr>
+<tr class="separator:acd71f9f704694974157f002883fdef4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30ec3942cb83d43876b6437b2aa37933"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a30ec3942cb83d43876b6437b2aa37933">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters)=0</td></tr>
+<tr class="memdesc:a30ec3942cb83d43876b6437b2aa37933"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance  <a href="#a30ec3942cb83d43876b6437b2aa37933">More...</a><br /></td></tr>
+<tr class="separator:a30ec3942cb83d43876b6437b2aa37933"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abccf2f58eab5d4a42cb340d60895c225"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#abccf2f58eab5d4a42cb340d60895c225">ParallelMaxDegree</a> (size_t Degree)=0</td></tr>
+<tr class="memdesc:abccf2f58eab5d4a42cb340d60895c225"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="#abccf2f58eab5d4a42cb340d60895c225">More...</a><br /></td></tr>
+<tr class="separator:abccf2f58eab5d4a42cb340d60895c225"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6523ab4680898c42ad9aaf9963042163"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a6523ab4680898c42ad9aaf9963042163">SetAssociatedData</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
-<tr class="memdesc:a6523ab4680898c42ad9aaf9963042163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the nessage authentication code generator.  <a href="#a6523ab4680898c42ad9aaf9963042163">More...</a><br /></td></tr>
+<tr class="memdesc:a6523ab4680898c42ad9aaf9963042163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the message authentication code generator.  <a href="#a6523ab4680898c42ad9aaf9963042163">More...</a><br /></td></tr>
 <tr class="separator:a6523ab4680898c42ad9aaf9963042163"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0378ecf21cd9e507b9634e9e96791e1e"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a0378ecf21cd9e507b9634e9e96791e1e">Verify</a> (const std::vector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
-<tr class="memdesc:a0378ecf21cd9e507b9634e9e96791e1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input standard-vector.  <a href="#a0378ecf21cd9e507b9634e9e96791e1e">More...</a><br /></td></tr>
-<tr class="separator:a0378ecf21cd9e507b9634e9e96791e1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02a3bd719730b999002c9d83ca6bd8ae"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a02a3bd719730b999002c9d83ca6bd8ae">Verify</a> (const SecureVector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
-<tr class="memdesc:a02a3bd719730b999002c9d83ca6bd8ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the internal MAC code and compare it with the tag contained in the Input secure-vector.  <a href="#a02a3bd719730b999002c9d83ca6bd8ae">More...</a><br /></td></tr>
-<tr class="separator:a02a3bd719730b999002c9d83ca6bd8ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_class_i_cipher_mode"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_cipher_mode')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_cipher_mode.html">ICipherMode</a></td></tr>
-<tr class="memitem:a947413f3a4cdd09c69c72bdd75c91c06 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a947413f3a4cdd09c69c72bdd75c91c06">ICipherMode</a> (const <a class="el" href="class_i_cipher_mode.html">ICipherMode</a> &amp;)=delete</td></tr>
-<tr class="memdesc:a947413f3a4cdd09c69c72bdd75c91c06 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="class_i_cipher_mode.html#a947413f3a4cdd09c69c72bdd75c91c06">More...</a><br /></td></tr>
-<tr class="separator:a947413f3a4cdd09c69c72bdd75c91c06 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6860aaea83eaa2fa194247d03971ba73 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_i_cipher_mode.html">ICipherMode</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a6860aaea83eaa2fa194247d03971ba73">operator=</a> (const <a class="el" href="class_i_cipher_mode.html">ICipherMode</a> &amp;)=delete</td></tr>
-<tr class="memdesc:a6860aaea83eaa2fa194247d03971ba73 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="class_i_cipher_mode.html#a6860aaea83eaa2fa194247d03971ba73">More...</a><br /></td></tr>
-<tr class="separator:a6860aaea83eaa2fa194247d03971ba73 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa283a39fde808aedfd73820c6ae0feda inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#aa283a39fde808aedfd73820c6ae0feda">ICipherMode</a> ()</td></tr>
-<tr class="memdesc:aa283a39fde808aedfd73820c6ae0feda inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the ICipherMode virtual interface class  <a href="class_i_cipher_mode.html#aa283a39fde808aedfd73820c6ae0feda">More...</a><br /></td></tr>
-<tr class="separator:aa283a39fde808aedfd73820c6ae0feda inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a3ec68d89511d48a38aff60937f9e67 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a3a3ec68d89511d48a38aff60937f9e67">~ICipherMode</a> () noexcept</td></tr>
-<tr class="memdesc:a3a3ec68d89511d48a38aff60937f9e67 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="class_i_cipher_mode.html#a3a3ec68d89511d48a38aff60937f9e67">More...</a><br /></td></tr>
-<tr class="separator:a3a3ec68d89511d48a38aff60937f9e67 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84a1320fbd9b6a9b077072acf66715ae inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a84a1320fbd9b6a9b077072acf66715ae">BlockSize</a> ()=0</td></tr>
-<tr class="memdesc:a84a1320fbd9b6a9b077072acf66715ae inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers internal block-size in bytes  <a href="class_i_cipher_mode.html#a84a1320fbd9b6a9b077072acf66715ae">More...</a><br /></td></tr>
-<tr class="separator:a84a1320fbd9b6a9b077072acf66715ae inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af20a1f1a85bcc13ca03670b3cf94491a inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#af20a1f1a85bcc13ca03670b3cf94491a">CipherType</a> ()=0</td></tr>
-<tr class="memdesc:af20a1f1a85bcc13ca03670b3cf94491a inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block ciphers enumeration type name  <a href="class_i_cipher_mode.html#af20a1f1a85bcc13ca03670b3cf94491a">More...</a><br /></td></tr>
-<tr class="separator:af20a1f1a85bcc13ca03670b3cf94491a inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11c630e63903b83044397876f6276ce9 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a11c630e63903b83044397876f6276ce9">Engine</a> ()=0</td></tr>
-<tr class="memdesc:a11c630e63903b83044397876f6276ce9 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A pointer to the underlying block-cipher instance  <a href="class_i_cipher_mode.html#a11c630e63903b83044397876f6276ce9">More...</a><br /></td></tr>
-<tr class="separator:a11c630e63903b83044397876f6276ce9 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94f085c15d16a8f37192f302773e5bb2 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#ga1d4ccc36db403dcb914cd7c4bac557a1">CipherModes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a94f085c15d16a8f37192f302773e5bb2">Enumeral</a> ()=0</td></tr>
-<tr class="memdesc:a94f085c15d16a8f37192f302773e5bb2 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Cipher Modes enumeration type name  <a href="class_i_cipher_mode.html#a94f085c15d16a8f37192f302773e5bb2">More...</a><br /></td></tr>
-<tr class="separator:a94f085c15d16a8f37192f302773e5bb2 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b9e5e05b83c6e84e6082d0b6334d470 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a6b9e5e05b83c6e84e6082d0b6334d470">IsEncryption</a> ()=0</td></tr>
-<tr class="memdesc:a6b9e5e05b83c6e84e6082d0b6334d470 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The operation mode, returns true if initialized for encryption, false for decryption  <a href="class_i_cipher_mode.html#a6b9e5e05b83c6e84e6082d0b6334d470">More...</a><br /></td></tr>
-<tr class="separator:a6b9e5e05b83c6e84e6082d0b6334d470 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b57c47c070538abb55e96e09e7ce5a2 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a1b57c47c070538abb55e96e09e7ce5a2">IsInitialized</a> ()=0</td></tr>
-<tr class="memdesc:a1b57c47c070538abb55e96e09e7ce5a2 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The block-cipher mode has been keyed and is ready to transform data  <a href="class_i_cipher_mode.html#a1b57c47c070538abb55e96e09e7ce5a2">More...</a><br /></td></tr>
-<tr class="separator:a1b57c47c070538abb55e96e09e7ce5a2 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7851dee20f03d50db63ea951c0ad697d inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a7851dee20f03d50db63ea951c0ad697d">IsParallel</a> ()=0</td></tr>
-<tr class="memdesc:a7851dee20f03d50db63ea951c0ad697d inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Processor parallelization availability.  <a href="class_i_cipher_mode.html#a7851dee20f03d50db63ea951c0ad697d">More...</a><br /></td></tr>
-<tr class="separator:a7851dee20f03d50db63ea951c0ad697d inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a530595c8040b12a19a21d14f840547ab inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const std::vector&lt; <a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a530595c8040b12a19a21d14f840547ab">LegalKeySizes</a> ()=0</td></tr>
-<tr class="memdesc:a530595c8040b12a19a21d14f840547ab inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: A vector of allowed cipher-mode input key byte-sizes  <a href="class_i_cipher_mode.html#a530595c8040b12a19a21d14f840547ab">More...</a><br /></td></tr>
-<tr class="separator:a530595c8040b12a19a21d14f840547ab inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af060eb48e27685b266b7526be3e5db9e inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">Name</a> ()=0</td></tr>
-<tr class="memdesc:af060eb48e27685b266b7526be3e5db9e inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher-modes formal class name  <a href="class_i_cipher_mode.html#af060eb48e27685b266b7526be3e5db9e">More...</a><br /></td></tr>
-<tr class="separator:af060eb48e27685b266b7526be3e5db9e inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae39d8aaa19ad006669bfbc593b904c15 inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#ae39d8aaa19ad006669bfbc593b904c15">ParallelBlockSize</a> ()=0</td></tr>
-<tr class="memdesc:ae39d8aaa19ad006669bfbc593b904c15 inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.  <a href="class_i_cipher_mode.html#ae39d8aaa19ad006669bfbc593b904c15">More...</a><br /></td></tr>
-<tr class="separator:ae39d8aaa19ad006669bfbc593b904c15 inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0c45109dd147c8d8db02fb02561379f inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_parallel_options.html">ParallelOptions</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#ae0c45109dd147c8d8db02fb02561379f">ParallelProfile</a> ()=0</td></tr>
-<tr class="memdesc:ae0c45109dd147c8d8db02fb02561379f inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Parallel and SIMD capability flags and sizes  <a href="class_i_cipher_mode.html#ae0c45109dd147c8d8db02fb02561379f">More...</a><br /></td></tr>
-<tr class="separator:ae0c45109dd147c8d8db02fb02561379f inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f0210d1097cf69bce107824d4dfa6da inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a3f0210d1097cf69bce107824d4dfa6da">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
-<tr class="memdesc:a3f0210d1097cf69bce107824d4dfa6da inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a single block of bytes.  <a href="class_i_cipher_mode.html#a3f0210d1097cf69bce107824d4dfa6da">More...</a><br /></td></tr>
-<tr class="separator:a3f0210d1097cf69bce107824d4dfa6da inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a897f5c1fe92b891bed1aaba9f7f2338e inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a897f5c1fe92b891bed1aaba9f7f2338e">DecryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)=0</td></tr>
-<tr class="memdesc:a897f5c1fe92b891bed1aaba9f7f2338e inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a block of bytes with offset parameters.  <a href="class_i_cipher_mode.html#a897f5c1fe92b891bed1aaba9f7f2338e">More...</a><br /></td></tr>
-<tr class="separator:a897f5c1fe92b891bed1aaba9f7f2338e inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2662c08e4ca778ca45496506e954af4a inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a2662c08e4ca778ca45496506e954af4a">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
-<tr class="memdesc:a2662c08e4ca778ca45496506e954af4a inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a single block of bytes.  <a href="class_i_cipher_mode.html#a2662c08e4ca778ca45496506e954af4a">More...</a><br /></td></tr>
-<tr class="separator:a2662c08e4ca778ca45496506e954af4a inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46b801d441d51659d4df3b2cdec8c8ea inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a46b801d441d51659d4df3b2cdec8c8ea">EncryptBlock</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)=0</td></tr>
-<tr class="memdesc:a46b801d441d51659d4df3b2cdec8c8ea inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a block of bytes using offset parameters.  <a href="class_i_cipher_mode.html#a46b801d441d51659d4df3b2cdec8c8ea">More...</a><br /></td></tr>
-<tr class="separator:a46b801d441d51659d4df3b2cdec8c8ea inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a805bbcccd6f31a8a5250ca7766518a4a inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">Initialize</a> (bool Encryption, <a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;Parameters)=0</td></tr>
-<tr class="memdesc:a805bbcccd6f31a8a5250ca7766518a4a inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher instance  <a href="class_i_cipher_mode.html#a805bbcccd6f31a8a5250ca7766518a4a">More...</a><br /></td></tr>
-<tr class="separator:a805bbcccd6f31a8a5250ca7766518a4a inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9985b6851274ada2137ea7496a91671d inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a9985b6851274ada2137ea7496a91671d">ParallelMaxDegree</a> (size_t Degree)=0</td></tr>
-<tr class="memdesc:a9985b6851274ada2137ea7496a91671d inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the maximum number of threads allocated when using multi-threaded processing.  <a href="class_i_cipher_mode.html#a9985b6851274ada2137ea7496a91671d">More...</a><br /></td></tr>
-<tr class="separator:a9985b6851274ada2137ea7496a91671d inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a601e136fb56cd77209f583350a92d33e inherit pub_methods_class_i_cipher_mode"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_cipher_mode.html#a601e136fb56cd77209f583350a92d33e">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
-<tr class="memdesc:a601e136fb56cd77209f583350a92d33e inherit pub_methods_class_i_cipher_mode"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset parameters.  <a href="class_i_cipher_mode.html#a601e136fb56cd77209f583350a92d33e">More...</a><br /></td></tr>
-<tr class="separator:a601e136fb56cd77209f583350a92d33e inherit pub_methods_class_i_cipher_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38623af3de1429255606cf08e2358363"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#a38623af3de1429255606cf08e2358363">SetAssociatedData</a> (const SecureVector&lt; byte &gt; &amp;Input, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:a38623af3de1429255606cf08e2358363"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add additional data to the message authentication code generator using a memory-locked vector.  <a href="#a38623af3de1429255606cf08e2358363">More...</a><br /></td></tr>
+<tr class="separator:a38623af3de1429255606cf08e2358363"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc6e773b9a3940a62217d1c6caac4e8e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_aead_mode.html#afc6e773b9a3940a62217d1c6caac4e8e">Transform</a> (const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset, size_t Length)=0</td></tr>
+<tr class="memdesc:afc6e773b9a3940a62217d1c6caac4e8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transform a length of bytes with offset parameters.  <a href="#afc6e773b9a3940a62217d1c6caac4e8e">More...</a><br /></td></tr>
+<tr class="separator:afc6e773b9a3940a62217d1c6caac4e8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An AEAD block-cipher mode virtual interface class. </p>
@@ -286,8 +236,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a945fb5422ae3a0b5821ca6ab7d4dcef1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a945fb5422ae3a0b5821ca6ab7d4dcef1">&#9670;&nbsp;</a></span>AutoIncrement()</h2>
+<a id="a0762a0d5cfeeeae3cfe1bcbd45926a1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0762a0d5cfeeeae3cfe1bcbd45926a1a">&#9670;&nbsp;</a></span>Enumeral()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -296,7 +246,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual bool&amp; IAeadMode::AutoIncrement </td>
+          <td class="memname">virtual const <a class="el" href="group___enumeration.html#ga69ec43083306f45cbe77033dfe17cbba">AeadModes</a> IAeadMode::Enumeral </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -309,15 +259,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called. </p>
-<p>Treats the Nonce value loaded during Initialize as a monotonic counter; incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. If set to false, requires a re-key after each finalization cycle.</p>
+<p>Read Only: The Cipher Modes enumeration type name </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aba625323147d773ea7516fa4b8a81a38">GCM</a>, and <a class="el" href="class_e_a_x.html#af4498507ab74a60c1726a534c20c6839">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_h_b_a.html#a11fdd612fe04d2c5b5e2546c269a3e69">HBA</a>, and <a class="el" href="class_g_c_m.html#a76ece029769efcf452b2d7c48ce28103">GCM</a>.</p>
 
 </div>
 </div>
-<a id="a311a22bb63bdd93990fc497a153d2004"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a311a22bb63bdd93990fc497a153d2004">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[1/2]</span></h2>
+<a id="a30ec3942cb83d43876b6437b2aa37933"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30ec3942cb83d43876b6437b2aa37933">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -326,22 +275,16 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IAeadMode::Finalize </td>
+          <td class="memname">virtual void IAeadMode::Initialize </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>Encryption</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;&#160;</td>
+          <td class="paramname"><em>Parameters</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -356,30 +299,27 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Calculate the MAC code (Tag) and copy it to the Output standard-vector. </p>
-<p>The output vector must be of sufficient length to receive the MAC code. This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used, unless AutoIncrement is enabled.</p>
+<p>Initialize the Cipher instance </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Output</td><td>The output standard-vector that receives the authentication code</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of MAC code bytes to write to the output vector. </td></tr>
+    <tr><td class="paramname">Encryption</td><td>True if cipher is used for encryption, false to decrypt</td></tr>
+    <tr><td class="paramname">Parameters</td><td>The SymmetricKey containing key and vector</td></tr>
   </table>
   </dd>
 </dl>
-<p>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</p>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized, or output vector is too small</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if an invalid key or nonce is used</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a03a920a1727055f558677c986ba9763d">GCM</a>, and <a class="el" href="class_e_a_x.html#ae96b87a5745e4479a923b6313a84473f">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#a92b1bf2af48d75d828b53584b64ef7c2">GCM</a>, and <a class="el" href="class_h_b_a.html#aee06f19ab0bba52b3506670b2040a710">HBA</a>.</p>
 
 </div>
 </div>
-<a id="ad8d0d13fb5640530e83d74e2eb52ed69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8d0d13fb5640530e83d74e2eb52ed69">&#9670;&nbsp;</a></span>Finalize() <span class="overload">[2/2]</span></h2>
+<a id="adfc47cc44fe535fecdf2ea9035d31132"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfc47cc44fe535fecdf2ea9035d31132">&#9670;&nbsp;</a></span>IsEncryption()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -388,69 +328,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IAeadMode::Finalize </td>
-          <td>(</td>
-          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>OutOffset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Calculate the MAC code (Tag) and copy it to the Output secure-vector. </p>
-<p>The output vector must be of sufficient length to receive the MAC code. This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>The output secure-vector that receives the authentication code</td></tr>
-    <tr><td class="paramname">OutOffset</td><td>The starting offset within the output vector</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of MAC code bytes to write to the output vector. </td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Must be no greater than the MAC functions output size, and no less than the minimum Tag size.</p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized, or output vector is too small</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_g_c_m.html#ab29b6013d635491a5156eec566f74b96">GCM</a>, and <a class="el" href="class_e_a_x.html#ac3608783dae2c6fd0b13a1459d7c6387">EAX</a>.</p>
-
-</div>
-</div>
-<a id="a78b9f3137d60c26fd4a8a3776ee2880e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a78b9f3137d60c26fd4a8a3776ee2880e">&#9670;&nbsp;</a></span>MaxTagSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual const size_t IAeadMode::MaxTagSize </td>
+          <td class="memname">virtual const bool IAeadMode::IsEncryption </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -463,14 +341,14 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The maximum legal MAC tag length in bytes </p>
+<p>Read Only: True if initialized for encryption, False for decryption </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aed4760123c8ce8359059a2373283ffc2">GCM</a>, and <a class="el" href="class_e_a_x.html#a04dc2179a208f53e4eef5dd862f46aec">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_h_b_a.html#a61b0614f0d446e596359468177b9c3aa">HBA</a>, and <a class="el" href="class_g_c_m.html#aa141b66ec79ba0056dfa98c18982720c">GCM</a>.</p>
 
 </div>
 </div>
-<a id="a139ce4df79d754b41c7eb62220bbb7f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a139ce4df79d754b41c7eb62220bbb7f6">&#9670;&nbsp;</a></span>MinTagSize()</h2>
+<a id="a5a78231c21ebe5b465920cdfde7750f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a78231c21ebe5b465920cdfde7750f1">&#9670;&nbsp;</a></span>IsInitialized()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -479,7 +357,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const size_t IAeadMode::MinTagSize </td>
+          <td class="memname">virtual const bool IAeadMode::IsInitialized </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -492,9 +370,97 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read Only: The minimum legal MAC tag length in bytes </p>
+<p>Read Only: The Block Cipher is ready to transform data </p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a0dcad5861efd189611305b8118a37ec3">GCM</a>, and <a class="el" href="class_e_a_x.html#a441333d6375d256652617121f921ae85">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_h_b_a.html#a04f128d4537f308416123136bbe8e58b">HBA</a>, and <a class="el" href="class_g_c_m.html#a3ab23973cd53a46f48b9586602c6ca50">GCM</a>.</p>
+
+</div>
+</div>
+<a id="abf9d62806e790c57fb878ee9ccda1045"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf9d62806e790c57fb878ee9ccda1045">&#9670;&nbsp;</a></span>IsParallel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const bool IAeadMode::IsParallel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Processor parallelization availability. </p>
+<p>Indicates whether parallel processing is available with this mode. If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</p>
+
+<p>Implemented in <a class="el" href="class_h_b_a.html#af2b5aa7842dd6dc83e7f960351814380">HBA</a>, and <a class="el" href="class_g_c_m.html#aac6b00e3ee7d9b9a0f3ce481f5cc733d">GCM</a>.</p>
+
+</div>
+</div>
+<a id="a7a2317dc86d6ee4d16260f5f816f7eb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a2317dc86d6ee4d16260f5f816f7eb6">&#9670;&nbsp;</a></span>LegalKeySizes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const std::vector&lt;<a class="el" href="class_symmetric_key_size.html">SymmetricKeySize</a>&gt;&amp; IAeadMode::LegalKeySizes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: A vector of allowed cipher-mode input key byte-sizes </p>
+
+<p>Implemented in <a class="el" href="class_h_b_a.html#a3c1e88d4422db21cd7a47a92270cd2ca">HBA</a>, and <a class="el" href="class_g_c_m.html#ac17ad19a4888fc8305135c1bb805038d">GCM</a>.</p>
+
+</div>
+</div>
+<a id="a9784e4725e9febe9d06c83bb328efb64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9784e4725e9febe9d06c83bb328efb64">&#9670;&nbsp;</a></span>Name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const std::string IAeadMode::Name </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The cipher-modes formal class name </p>
+
+<p>Implemented in <a class="el" href="class_h_b_a.html#aa0b49018ce92bd9707fc31d6e7f2b29c">HBA</a>, and <a class="el" href="class_g_c_m.html#afd9c3c9f3981a7663c7d197374475c8b">GCM</a>.</p>
 
 </div>
 </div>
@@ -526,8 +492,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a99fa6d52d3cb43703d3c0bc0f9adb6c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99fa6d52d3cb43703d3c0bc0f9adb6c1">&#9670;&nbsp;</a></span>PreserveAD()</h2>
+<a id="a83a824dc299cd19f0c7cf313b426c07e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83a824dc299cd19f0c7cf313b426c07e">&#9670;&nbsp;</a></span>ParallelBlockSize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -536,7 +502,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual bool&amp; IAeadMode::PreserveAD </td>
+          <td class="memname">virtual const size_t IAeadMode::ParallelBlockSize </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -549,15 +515,88 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Read/Write: Persist a one-time associated data for the entire session. </p>
-<p>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments. Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.</p>
+<p>Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing. </p>
+<p>This value can be changed through the ParallelProfile class.</p>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#ac2a23fd6a442332eea4d31e3c3b68b70">GCM</a>, and <a class="el" href="class_e_a_x.html#ada22f030127e5c3bc0f8fc6d8a600956">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_h_b_a.html#a5cf064e0b1bcc3282edd6ba9db63c387">HBA</a>, and <a class="el" href="class_g_c_m.html#ae98e34b751e3a34436e5a0cdb65903e7">GCM</a>.</p>
+
+</div>
+</div>
+<a id="abccf2f58eab5d4a42cb340d60895c225"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abccf2f58eab5d4a42cb340d60895c225">&#9670;&nbsp;</a></span>ParallelMaxDegree()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void IAeadMode::ParallelMaxDegree </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Degree</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the maximum number of threads allocated when using multi-threaded processing. </p>
+<p>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. Thread count must be an even number, and not exceed the number of processor cores.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Degree</td><td>The number of threads to allocate</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if an invalid degree setting is used</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_g_c_m.html#a030de6a56f54d48aadfc84d4f76e4112">GCM</a>, and <a class="el" href="class_h_b_a.html#a73de9f4d595c5b7115cb52ff1f25145d">HBA</a>.</p>
+
+</div>
+</div>
+<a id="a597d277f9b895a9f02451a46971da06a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a597d277f9b895a9f02451a46971da06a">&#9670;&nbsp;</a></span>ParallelProfile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="class_parallel_options.html">ParallelOptions</a>&amp; IAeadMode::ParallelProfile </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read/Write: Parallel and SIMD capability flags and sizes </p>
+<p>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property. The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize(). Changes to these values must be made before the Initialize(SymmetricKey) function is called.</p>
+
+<p>Implemented in <a class="el" href="class_h_b_a.html#a32f7ea7cf798196d0c1cdd67fe52c4e0">HBA</a>, and <a class="el" href="class_g_c_m.html#a509d08e97f7066920e6a4b8f603edad0">GCM</a>.</p>
 
 </div>
 </div>
 <a id="a6523ab4680898c42ad9aaf9963042163"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6523ab4680898c42ad9aaf9963042163">&#9670;&nbsp;</a></span>SetAssociatedData()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6523ab4680898c42ad9aaf9963042163">&#9670;&nbsp;</a></span>SetAssociatedData() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -596,7 +635,7 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Add additional data to the nessage authentication code generator. </p>
+<p>Add additional data to the message authentication code generator. </p>
 <p>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input. This function can only be called once per each initialization/finalization cycle.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -613,12 +652,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#aa5ba6a934f8b8fbd41a83cb232127e0d">GCM</a>, and <a class="el" href="class_e_a_x.html#a2d4a0499158ef54f546bb8dad7bc852d">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#aa5ba6a934f8b8fbd41a83cb232127e0d">GCM</a>, and <a class="el" href="class_h_b_a.html#aef6f591b2c7ebc65bcb2695145d4ff26">HBA</a>.</p>
 
 </div>
 </div>
-<a id="ad19fd97a58a68c9f8f02bc366135abf8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad19fd97a58a68c9f8f02bc366135abf8">&#9670;&nbsp;</a></span>Tag()</h2>
+<a id="a38623af3de1429255606cf08e2358363"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38623af3de1429255606cf08e2358363">&#9670;&nbsp;</a></span>SetAssociatedData() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -627,99 +666,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const std::vector&lt;byte&gt; IAeadMode::Tag </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Read Only: Returns the finalized MAC tag vector </p>
-
-<p>Implemented in <a class="el" href="class_g_c_m.html#a8e924362ca77125c395fe7d3d3a5f23b">GCM</a>, and <a class="el" href="class_e_a_x.html#aab8a643c16f3f3812849580a98ba6584">EAX</a>.</p>
-
-</div>
-</div>
-<a id="a0378ecf21cd9e507b9634e9e96791e1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0378ecf21cd9e507b9634e9e96791e1e">&#9670;&nbsp;</a></span>Verify() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool IAeadMode::Verify </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Input</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Length</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Generate the internal MAC code and compare it with the tag contained in the Input standard-vector. </p>
-<p>This function finalizes the Decryption cycle and generates the MAC tag. The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function. Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>The input standard-vector containing the expected authentication code</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting offset within the input vector</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of bytes to compare. </td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</p>
-<dl class="section return"><dt>Returns</dt><dd>Returns true if the authentication codes match</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized for decryption</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_g_c_m.html#aa11db96f4d255f7977cc09ec78e4be54">GCM</a>, and <a class="el" href="class_e_a_x.html#a7597fe7adf5d24ee5e543a8cffa3f770">EAX</a>.</p>
-
-</div>
-</div>
-<a id="a02a3bd719730b999002c9d83ca6bd8ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02a3bd719730b999002c9d83ca6bd8ae">&#9670;&nbsp;</a></span>Verify() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual bool IAeadMode::Verify </td>
+          <td class="memname">virtual void IAeadMode::SetAssociatedData </td>
           <td>(</td>
           <td class="paramtype">const SecureVector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Input</em>, </td>
@@ -749,26 +696,187 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Generate the internal MAC code and compare it with the tag contained in the Input secure-vector. </p>
-<p>This function finalizes the Decryption cycle and generates the MAC tag. The cipher must be set for Decryption and the cipher-text bytes fully processed before calling this function. Verify can be called in place of a Finalize(Output, Offset, Length) call, or after finalization. Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</p>
+<p>Add additional data to the message authentication code generator using a memory-locked vector. </p>
+<p>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input. This function can only be called once per each initialization/finalization cycle.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Input</td><td>The input secure-vector containing the expected authentication code</td></tr>
+    <tr><td class="paramname">Input</td><td>The input standard-vector of bytes to process</td></tr>
     <tr><td class="paramname">Offset</td><td>The starting offset within the input vector</td></tr>
-    <tr><td class="paramname">Length</td><td>The number of bytes to compare. </td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to process</td></tr>
   </table>
   </dd>
 </dl>
-<p>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</p>
-<dl class="section return"><dt>Returns</dt><dd>Returns true if the authentication codes match</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if the cipher is not initialized for decryption</td></tr>
+    <tr><td class="paramname">CryptoCipherModeException</td><td>Thrown if state has been processed</td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_g_c_m.html#a798a428f295bf5505b07c1344468cf6c">GCM</a>, and <a class="el" href="class_e_a_x.html#abc23dba6ea34e52f97cfcf2f43a6dd73">EAX</a>.</p>
+<p>Implemented in <a class="el" href="class_g_c_m.html#af2bc2c6834df979648ff3a3fba700a0b">GCM</a>, and <a class="el" href="class_h_b_a.html#a19353e1d105e0843d2336304bdbd229b">HBA</a>.</p>
+
+</div>
+</div>
+<a id="ad19fd97a58a68c9f8f02bc366135abf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad19fd97a58a68c9f8f02bc366135abf8">&#9670;&nbsp;</a></span>Tag() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const std::vector&lt;byte&gt; IAeadMode::Tag </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: Returns the finalized MAC tag vector </p>
+
+<p>Implemented in <a class="el" href="class_g_c_m.html#a8e924362ca77125c395fe7d3d3a5f23b">GCM</a>, and <a class="el" href="class_h_b_a.html#a4c7f82c47d011e38a6d317ba6dd72839">HBA</a>.</p>
+
+</div>
+</div>
+<a id="ac9d19693f6cdeee2682a3172acf04354"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9d19693f6cdeee2682a3172acf04354">&#9670;&nbsp;</a></span>Tag() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const void IAeadMode::Tag </td>
+          <td>(</td>
+          <td class="paramtype">SecureVector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copies the internal MAC tag to a secure-vector </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The secure-vector receiving the MAC code</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_g_c_m.html#a34c829f0d66e19a54c0fb13669398c12">GCM</a>, and <a class="el" href="class_h_b_a.html#ae2719f6ca68afacc21e5a62148787523">HBA</a>.</p>
+
+</div>
+</div>
+<a id="acd71f9f704694974157f002883fdef4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd71f9f704694974157f002883fdef4b">&#9670;&nbsp;</a></span>TagSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAeadMode::TagSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The maximum legal MAC tag length in bytes </p>
+
+<p>Implemented in <a class="el" href="class_g_c_m.html#a07813eee02154e697952be003241fb91">GCM</a>, and <a class="el" href="class_h_b_a.html#a40289f111ccfcdb181e55a75b14c91db">HBA</a>.</p>
+
+</div>
+</div>
+<a id="afc6e773b9a3940a62217d1c6caac4e8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc6e773b9a3940a62217d1c6caac4e8e">&#9670;&nbsp;</a></span>Transform()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void IAeadMode::Transform </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>InOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>OutOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Transform a length of bytes with offset parameters. </p>
+<p>This method processes a specified length of bytes, utilizing offsets incremented by the caller. If IsParallel() is set to true, and the length is at least ParallelBlockSize(), the transform is run in parallel processing mode. To disable parallel processing, set the ParallelOptions().IsParallel() property to false. Initialize(bool, ISymmetricKey) must be called before this method can be used.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Input</td><td>The input vector of bytes to transform</td></tr>
+    <tr><td class="paramname">InOffset</td><td>Starting offset within the input vector</td></tr>
+    <tr><td class="paramname">Output</td><td>The output vector of transformed bytes</td></tr>
+    <tr><td class="paramname">OutOffset</td><td>Starting offset within the output vector</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of bytes to transform</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_g_c_m.html#ac655c5184ef5a14375c1363122e20523">GCM</a>, and <a class="el" href="class_h_b_a.html#af79ae58f777408fab9e07b77d7225e6e">HBA</a>.</p>
 
 </div>
 </div>

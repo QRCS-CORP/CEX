@@ -27,7 +27,7 @@ public:
 	size_t Rate;
 	size_t SigLen;
 
-	RainbowParams::RainbowParams(RainbowParameters Params)
+	RainbowParams(RainbowParameters Params)
 		:
 		O1(0),
 		O2(0),
@@ -45,7 +45,7 @@ public:
 		SetParams(Params);
 	}
 
-	RainbowParams::~RainbowParams()
+	~RainbowParams()
 	{
 		HLen = 0;
 		O1 = 0;
@@ -60,7 +60,7 @@ public:
 		V2 = 0;
 	}
 
-	void RainbowParams::SetParams(RainbowParameters Params)
+	void SetParams(RainbowParameters Params)
 	{
 		switch (Params)
 		{
@@ -108,7 +108,7 @@ public:
 		MaxO = (O1 > O2) ? O1 : O2;
 	}
 
-	static uint RainbowParams::TriangleTerms(uint Val)
+	static uint TriangleTerms(uint Val)
 	{
 		return (Val * (Val + 1)) / 2;
 	}

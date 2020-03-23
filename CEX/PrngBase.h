@@ -40,7 +40,7 @@ public:
 	///
 	/// <param name="Enumeral">The prngs enumeration name</param>
 	/// <param name="Name">The prngs formal name</param>
-	PrngBase(Prngs Enumeral, std::string &Name);
+	PrngBase(Prngs Enumeral, std::string Name);
 
 	/// <summary>
 	/// Destructor: finalize this class

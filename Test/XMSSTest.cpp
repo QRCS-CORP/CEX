@@ -23,7 +23,7 @@ namespace Test
 	using Enumeration::XmssParameters;
 
 	const std::string XMSSTest::CLASSNAME = "XMSSTest";
-	const std::string XMSSTest::DESCRIPTION = "XMSS key generation, signature generation, and verification tests..";
+	const std::string XMSSTest::DESCRIPTION = "XMSSTest key generation, signature generation, and verification tests..";
 	const std::string XMSSTest::SUCCESS = "SUCCESS! XMSSTest tests have executed succesfully.";
 
 	XMSSTest::XMSSTest()

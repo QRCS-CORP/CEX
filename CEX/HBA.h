@@ -153,7 +153,7 @@ private:
 	static const std::vector<byte> HBA_INFO;
 
 	class HbaState;
-	std::unique_ptr<HbaState> m_chaState;
+	std::unique_ptr<HbaState> m_hbaState;
 	std::unique_ptr<CTR> m_cipherMode;
 	std::unique_ptr<IMac> m_macAuthenticator;
 
