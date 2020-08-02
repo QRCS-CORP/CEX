@@ -1,0 +1,174 @@
+
+## Trajectory
+The current version is <B>1.0.0.7</B> (A7 version), which are the major, minor, patch, and release codes.
+The next planned release (1.0.0.8) is planned for February 2019.
+
+### New in Current Release 1.0.0.8 (version A8):
+* The Rainbow signature scheme
+* The 512-bit block Rijndael authenticated stream cipher RWS
+* The ChaCha derivitive CSX-512 authenticated styream cipher using 64-bit integers and a 1024-bit block
+* Changes to extended 1024-bit versions of KMAC, SHA3, and SHAKE
+* The integration of SecureVector (memory locked arrays) throughout
+* The addition of an IPv4/IPv6  networking stack
+* The addition of a Keccak-based passphrase based KDF: SCBKDF
+* The addition of a new hash-based AEAD mode: HBA
+* Asymmetric ciphers and signature schemes updated to NIST-PQ Round 2 versions (updated again in November after the Round-3 versions upload)
+
+### New in Current Release 1.0.0.7 (version A7):
+* The Dilithium asymmetric signature schemes
+* The SPHINCS+ 256F-SHAKE128/256 asymmetric signature schemes
+* The XMSS/XMSS-MT asymmetric signature schemes
+* The NTRU Prime asymmetric cipher
+* The cSHAKE XOF function added as an HX symmetric cipher key expansion option
+* Update of all base asymmetric ciphers and signature schemes to match NIST PQ entries
+* Message digests updated for performance and security
+* Integrated an optional built-in authentication generator (HMAC/KMAC) to each stream cipher
+* Added the Authenticate and Encrypt and AEAD stream cipher implementation (Authenticated Cipher Stream: ACS).
+* Threefish 256/512/1024 authenticated stream ciphers
+* ChaCha256-P20 and ChaCha512-P80 authenticated stream ciphers
+
+### Planned Release 1.0.0.8 (version A8):
+## ETA is August 1st, 2019
+* Authenticated stream ciphers ACS,ThreeFish-256/512/1024, and ChaCha256/512
+* Update secure key mechanisms and integrate internally
+* Full security, documentation, and code review cycles
+* Begin optimization and review of asymmetric primitives
+* Create accompanying website and publish documentation
+
+### Planned Release 1.2.0.1
+* DLL API (.NET/Java)
+* Direct Trust Model DTM-KEX (external?)
+* Post-Quantum Secure DNS, PQ-SECDNS (external)
+* Shared Trust Model STM-KEX (external?)
+
+### Planned Release 1.1.0.1
+* RingLWE
+* McEliece
+* ModuleLWE
+* NTRU Prime
+* Picnic
+* SPHINCS+
+* Dilithium
+* XMSS/XMSS-MT
+
+### Planned Release 1.2.0.1
+* PQ-TLS
+* STM-KEX
+* Android/iOS/Linux compatibility
+* DLL API
+
+## History
+  
+### Version 1.0.0.7q, April 07, 2019
+* The Dilithium asymmetric signature scheme
+* The SPHINCS+ asymmetric signature scheme
+* The NTRU Prime asymmetric cipher
+* The cSHAKE XOF function added as an HX symmetric cipher key expansion option
+* Update of all base asymmetric ciphers to match NIST PQ entries
+* Message digests updated for performance and security
+* Integrated an optional built-in authentication generator (HMAC/KMAC) to each stream cipher
+* Added the Authenticate and Encrypt and AEAD stream cipher implementation (Authenticated Cipher Stream: ACS).
+* Threefish 256/512/1024 authenticated stream ciphers
+* ChaCha256-P20 and ChaCha512-P80 authenticated stream ciphers
+
+### Version 1.0.0.5, March 16, 2018
+* The library is now Misra C++ 2014 compliant
+* Added the ModuleLWE asymmetric cipher
+* Added the SHAKE Key Derivation Function
+* Added the cSHAKE generator (CSG)
+* Added the KMAC message authentication code generator
+* Addition of asymmetric cipher Encapsulate/Decapsulate api
+
+### Version 1.0.0.4, November 11, 2017
+* Added the McEliece asymmetric cipher
+* Added the 1024bit Keccak digest
+* Added the Poly1305 Message Authentication Code generator
+* Many changes made towards future SEI-CERT and Misra compliance (Full Misra compliance by 1.0.0.5)
+* Full coding standards sweep of the library
+* Integration of std::array and std::unique_ptr throughout
+* A full optimization cycle completed
+
+### Version 1.0.0.3, June 30, 2017
+* Added asymmetric cipher interfaces and framework
+* Added RingLWE asymmetric cipher
+* Added the Auto Collection seed Provider (ACP)
+* Addition of the HCR prng
+* Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators
+* Overhaul of SecureRandom and prng classes
+
+### Version 1.0.0.2: April 23, 2017
+Last of 1.0 sweep of the symmetric library before the second half of the project engages, with thousands of changes made throughout, and the addition of (!experimental) AVX512 support.
+* Added a vectorized MemUtils class, with SIMD 128/256/512 copy, clear, set-value, and xor functions.
+* Integrated vectorized replacements for memcpy, xor, and memset throughout, including cipher mode support for AVX512, (I don't have a xeon to test this, maybe you can help?).
+* Reformatting of headers (inline accessors removed and the override hint added).
+* Many small TODOs finished, api synchronized, and formatting and documentation changes throughout.
+
+### Version 1.0: March 28, 2017
+The first official release of the library, (ciphers and protocols are now tested, documented, and ready for deployment).
+* Completed Code and Help review cycles.
+* Added parallelized HMAC implementation
+* Added multi-threaded Tree Hashing to all Skein and Keccak digest implementations.
+* Added SIMD parallelization to Skein512.
+* Rewrote SHA-2 paralellized tree hashing and added support for the SHA-NI SIMD to SHA-256.
+* Added a multi-threaded and SIMD parallelized implementation of the SCRYPT key derivation function.
+
+### Version 0.14: February 26, 2017
+* Added pipelined and parallelized EAX, GCM, and OCB authenticated cipher modes
+* Global integration of the ParallelOptions class for auto-calculating and independant SIMD and multi-threading controls
+* Addition of the GMAC message authentication generator
+* Implementation of cache management and constant-time timing attack counter-measures
+
+### Version 0.13: December 18, 2016
+Massive update! License changed from MIT to GPLv3, (it had to happen sooner or later). 
+Versioning changed to 0.x format, (project is not to be considered a major release until the symmetric cryptography is complete after 0.14).
+
+* Added pipelined and parallelized SHA-2 implementations. 
+* Kdfs and Drbgs seperated and rewritten. 
+* Drbgs completely rewritten (added forward prediction resistance), and added an HMAC based Drbg (HMG).
+* Addition of a symmetric key interface with ISymmetricKey replacing old KeyParams format and unifying access across function types (Drbg, Mac, cipher and Kdf all use the same interface).
+* Addition of a secure key and secure memory implementations.
+* Three new entropy providers added: Intel RdRand/RdSeed (RDP), Cpu Jitter (CJP), and a system state entropy collector (ECP).
+
+Some things shifted around in the namespace, and a lot of small optimizations throughout.
+Documentation expanded and rewritten, now each class (brevity permitting), contains a mathematical description of the main function, a usage example, a technical overview, external links, and implementation details.
+
+### Version 0.12: September 21, 2016
+* Added little endian counter mode ICM, updated and rewrote all block cipher modes.
+* Added Wide Block Vectorization (WBV) to CBC and ECB modes, (see header files for description). 
+* ECB and CBC-Decrypt parallelized and pipelined, CFB-Decrypt parallelized.
+* Updates to Salsa and ChaCha, updates to documentation, and some reorganization of code base.
+
+Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, all regularly clock over 9GB per second on my 'modest' HP desktop). The block/stream cipher portion of this release is stable; (aside from bug fixes or enhancements, existing cipher modes should be constant, but new modes will soon be added).
+
+### Version 0.11: August 12, 2016
+* Added AVX2 versions of Serpent and Twofish (Transform128, Encrypt128, and Decrypt128 functions)
+* Fixed bug in SIMD counter staggered offsets in Salsa and ChaCha implementations
+* Fixed bug in symmetric cipher Initialize() where disabling exceptions caused digest initialization to throw
+* Parallel mode and CipherStream tests extended and adjusted
+
+### Version 0.10: July 18, 2016
+* Added SIMD wrappers UInt128 and UInt256
+* Added intrinsics support to Twofish and Serpent (Transform64, Encrypt64 and Decrypt64 functions)
+* Added 128/256bit intrinsics to multi-threaded CTR block-cipher mode
+* Expanded intrinsic support in AES-NI (AHX) to 4 block (Encrypt64 and Decrypt64)
+* Serpent changed from outputting big endian to little endian (breaking change)
+* Added intrinsics integrity tests to ParallelModeTest.
+* SIMD intrinsics supported added to Serpent (SHX), Twofish (THX) and extended in Rijndael (AHX)
+* Block cipher CTR mode runtime switched (cpu check) to use 128 (SSE3) and 256 (AVX) intrinsics if available
+* 128 and 256 SIMD support added to ChaCha and Salsa implementations
+* Added various intrinsics tests to ParallelModeTest class
+
+### Version 0.09: July 08, 2016
+* Blake2 added; 2B, 2BP, 2S, and 2SP, sequential and parallel, integrated Mac and Drbg, optional intrinsics.
+* Added intrinsics to the parallelized ChaCha implementation
+* Work on CpuDetect, (all intrinsics are now runtime enabled automatically).
+* Set default SSE support to AVX /arch:AVX
+* Work begun on intrinsics symmetric mode chain
+
+### Version 0.08: June 04, 2016
+* AES-NI added (512 key and HKDF key expansion capable).
+
+### Versions 0.01 - 0.07: Jan 24 to June 04, 2016
+* Initial translation from CEX-NET
+* Updates to format and code
+* First review
