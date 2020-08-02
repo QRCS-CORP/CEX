@@ -1,12 +1,12 @@
 #include "CMUL.h"
 #include "IntegerTools.h"
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 #	include "Intrinsics.h"
 #endif
 
 NAMESPACE_NUMERIC
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 void CMUL::PermuteR128P128U(std::array<ulong, CMUL_STATE_SIZE> &State, std::array<byte, CMUL_BLOCK_SIZE> &Output)
 {
@@ -1110,7 +1110,7 @@ void CMUL::PermuteR128P128C(std::array<ulong, CMUL_STATE_SIZE> &State, std::arra
 
 void CMUL::PermuteR128P128V(std::array<ulong, CMUL_STATE_SIZE> &State, std::array<byte, CMUL_BLOCK_SIZE> &Output)
 {
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 
 	const __m128i MASK = _mm_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 	__m128i A;

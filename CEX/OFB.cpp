@@ -7,8 +7,8 @@ NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
 using Enumeration::CipherModeConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 class OFB::OfbState
 {
@@ -50,7 +50,8 @@ public:
 OFB::OFB(BlockCiphers CipherType)
 	:
 	m_ofbState(new OfbState(true)),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? 
+		Helper::BlockCipherFromName::GetInstance(CipherType) :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::OFB), std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_parallelProfile(m_blockCipher->BlockSize(), false, BLOCK_SIZE, false, 1)
 {
@@ -59,7 +60,8 @@ OFB::OFB(BlockCiphers CipherType)
 OFB::OFB(IBlockCipher* Cipher)
 	:
 	m_ofbState(new OfbState(false)),
-	m_blockCipher(Cipher != nullptr ? Cipher :
+	m_blockCipher(Cipher != nullptr ? 
+		Cipher :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::OFB), std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_parallelProfile(m_blockCipher->BlockSize(), false, BLOCK_SIZE, false, 1)
 {
@@ -182,13 +184,13 @@ void OFB::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vec
 
 void OFB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize(), Parameters.KeySizes().NonceSize()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize(), Parameters.KeySizes().IVSize()))
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a legal key-size, and the nonce must equal in size to the block ciphers block-size!"), ErrorCodes::InvalidKey);
 	}
 
 	m_blockCipher->Initialize(true, Parameters);
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_ofbState->IV, 0, m_ofbState->IV.size());
+	MemoryTools::Copy(Parameters.IV(), 0, m_ofbState->IV, 0, m_ofbState->IV.size());
 
 	m_ofbState->Encryption = Encryption;
 	m_ofbState->Initialized = true;
@@ -225,7 +227,7 @@ void OFB::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 	m_blockCipher->Transform(m_ofbState->IV, 0, m_ofbState->Buffer, 0);
 
-	// xor the iv with the plaintext producing the cipher text and the next input block
+	// xor the iv with the plaintext producing the cipher-text and the next input block
 	for (i = 0; i < BLOCK_SIZE; i++)
 	{
 		Output[OutOffset + i] = static_cast<byte>(m_ofbState->Buffer[i] ^ Input[InOffset + i]);

@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -19,27 +19,35 @@
 #ifndef CEX_KECCAK_H
 #define CEX_KECCAK_H
 
+/* TODO
+rename SecureVector? secvector<byte> x
+once all templates are done start looking at secure vector alternate api
+network tests?
+install doxygen and compile help
+redo git front page
+publish.. eta Friday?
+*/
+
+
 #include "CexDomain.h"
 #include "IntegerTools.h"
 #include "MemoryTools.h"
 
-#if defined(__AVX2__)
-#	include "ULong256.h"
-#endif
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 #	include "ULong512.h"
+#elif defined(CEX_HAS_AVX2)
+#	include "ULong256.h"
 #endif
 
 NAMESPACE_DIGEST
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
-#if defined(__AVX2__)
-	using Numeric::ULong256;
-#endif
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 	using Numeric::ULong512;
+#elif defined(CEX_HAS_AVX2)
+	using Numeric::ULong256;
 #endif
 
 /// <summary>
@@ -159,16 +167,36 @@ public:
 	/// <summary>
 	/// The Keccak-1024 input rate size in bytes
 	/// </summary>
-#if defined CEX_KECCAK_STRONG
-	static const size_t KECCAK1024_RATE_SIZE = 36;
-#else
-	static const size_t KECCAK1024_RATE_SIZE = 72;
-#endif
+	static const size_t KECCAK1024_RATE_SIZE = 32;
 
 	/// <summary>
 	/// The Keccak state size in uint64 integers
 	/// </summary>
 	static const size_t KECCAK_STATE_SIZE = 25;
+
+	/// <summary>
+	/// The Keccak absorb function; copy bytes from a byte array to the state array.
+	/// <para>Input length must be 64-bit aligned, domain code terminates the input.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
+	/// <param name="Rate">The Keccak aborbtion rate in bytes</param>
+	/// <param name="Domain">The Keccak implementation domain</param>
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void Absorb(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, ArrayU64x25 &State)
+	{
+		if (Rate != KECCAK1024_RATE_SIZE)
+		{
+			AbsorbR24(Input, InOffset, InLength, Rate, Domain, State);
+		}
+		else
+		{
+			AbsorbR48(Input, InOffset, InLength, Rate, Domain, State);
+		}
+	}
 
 	/// <summary>
 	/// The Keccak 24-round absorb function; copy bytes from a byte array to the state array.
@@ -181,19 +209,19 @@ public:
 	/// <param name="Rate">The Keccak aborbtion rate in bytes</param>
 	/// <param name="Domain">The Keccak implementation domain</param>
 	/// <param name="State">The permutations uint64 state array</param>
-	template<typename ArrayU8>
-	static void AbsorbR24(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void AbsorbR24(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, ArrayU64x25 &State)
 	{
 		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
 
 		while (InLength >= Rate)
 		{
-			Keccak::FastAbsorb(Input, InOffset, Rate, State);
+			FastAbsorb(Input, InOffset, Rate, State);
 
 #if defined(CEX_DIGEST_COMPACT)
-			Keccak::PermuteR24P1600C(State);
+			PermuteR24P1600C(State);
 #else
-			Keccak::PermuteR24P1600U(State);
+			PermuteR24P1600U(State);
 #endif
 
 			InLength -= Rate;
@@ -225,19 +253,19 @@ public:
 	/// <param name="Rate">The Keccak aborbtion rate in bytes</param>
 	/// <param name="Domain">The Keccak implementation domain</param>
 	/// <param name="State">The permutations uint64 state array</param>
-	template<typename ArrayU8>
-	static void AbsorbR48(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void AbsorbR48(const ArrayU8 &Input, size_t InOffset, size_t InLength, size_t Rate, byte Domain, ArrayU64x25 &State)
 	{
 		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
 
 		while (InLength >= Rate)
 		{
-			Keccak::FastAbsorb(Input, InOffset, Rate, State);
+			FastAbsorb(Input, InOffset, Rate, State);
 
 #if defined(CEX_DIGEST_COMPACT)
-			Keccak::PermuteR48P1600C(State);
+			PermuteR48P1600C(State);
 #else
-			Keccak::PermuteR48P1600U(State);
+			PermuteR48P1600U(State);
 #endif
 
 			InLength -= Rate;
@@ -259,6 +287,29 @@ public:
 	}
 
 	/// <summary>
+	/// A compact (stateless) form of the Keccak message digest function (SHA3); processes a message, and return the hash in the output array.
+	/// <para>Set the Rate parameter to match the desired SHA3 function; 128, 256, or 512-bit hash function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Message">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Offset">The starting offseet within the message byte array</param>
+	/// <param name="Length">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; returns a hash the size of the SHA3 mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayU8A, typename ArrayU8B>
+	static void Compute(const ArrayU8A &Message, size_t Offset, size_t Length, ArrayU8B &Output, size_t Rate)
+	{
+		if (Rate != KECCAK1024_RATE_SIZE)
+		{
+			Compute24(Message, Offset, Length, Output, size_t Rate);
+		}
+		else
+		{
+			Compute48(Message, Offset, Length, Output, size_t Rate);
+		}
+	}
+
+	/// <summary>
 	/// A compact (stateless) form of the Keccak message digest function (SHA3) using the standard 24 rounds; processes a message, and return the hash in the output array.
 	/// <para>Set the Rate parameter to match the desired SHA3 function; 128, 256, or 512-bit hash function.</para>
 	/// </summary>
@@ -268,8 +319,8 @@ public:
 	/// <param name="Length">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; returns a hash the size of the SHA3 mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
 	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
-	template<typename ArrayU8>
-	static void Compute(const ArrayU8 &Message, size_t Offset, size_t Length, ArrayU8 &Output, size_t Rate)
+	template<typename ArrayU8A, typename ArrayU8B>
+	static void Compute24(const ArrayU8A &Message, size_t Offset, size_t Length, ArrayU8B &Output, size_t Rate)
 	{
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
 		ArrayU8 hash(KECCAK256_DIGEST_SIZE);
@@ -278,12 +329,61 @@ public:
 		AbsorbR24(Message, Offset, Length, Rate, KECCAK_SHA3_DOMAIN, state);
 
 #if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR24P1600C(state);
+		PermuteR24P1600C(state);
 #else
-		Keccak::PermuteR24P1600U(state);
+		PermuteR24P1600U(state);
 #endif
 
 		MemoryTools::Copy(state, 0, Output, 0, OTPLEN);
+	}
+
+	/// <summary>
+	/// A compact (stateless) form of the Keccak message digest function (SHA3) using the standard 24 rounds; processes a message, and return the hash in the output array.
+	/// <para>Set the Rate parameter to match the desired SHA3 function; 128, 256, or 512-bit hash function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Message">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Offset">The starting offseet within the message byte array</param>
+	/// <param name="Length">The number of message bytes to process</param>
+	/// <param name="Output">The output hash array; returns a hash the size of the SHA3 mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayU8A, typename ArrayU8B>
+	static void Compute48(const ArrayU8A &Message, size_t Offset, size_t Length, ArrayU8B &Output, size_t Rate)
+	{
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		ArrayU8 hash(KECCAK256_DIGEST_SIZE);
+		const size_t OTPLEN = ((KECCAK_STATE_SIZE * sizeof(ulong)) - Rate) / 2;
+
+		AbsorbR48(Message, Offset, Length, Rate, KECCAK_SHA3_DOMAIN, state);
+
+#if defined(CEX_DIGEST_COMPACT)
+		PermuteR48P1600C(state);
+#else
+		PermuteR48P1600U(state);
+#endif
+
+		MemoryTools::Copy(state, 0, Output, 0, OTPLEN);
+	}
+
+	/// <summary>
+	/// Used by custom SHAKE functions to add customization and name strings to the state
+	/// </summary>
+	/// 
+	/// <param name="Customization">The input byte message array, can be either a standard array or vector</param>
+	/// <param name="Name">The starting offseet within the message byte array</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void Customize(const ArrayU8 &Customization, const ArrayU8 &Name, size_t Rate, ArrayU64x25 &State)
+	{
+		if (Rate != KECCAK1024_RATE_SIZE)
+		{
+			CustomizeR24(Customization, Name, Rate, State);
+		}
+		else
+		{
+			CustomizeR48(Customization, Name, Rate, State);
+		}
 	}
 
 	/// <summary>
@@ -294,16 +394,16 @@ public:
 	/// <param name="Name">The starting offseet within the message byte array</param>
 	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	/// <param name="State">The permutations uint64 state array</param>
-	template<typename ArrayU8>
-	static void CustomizeR24(const ArrayU8 &Customization, const ArrayU8 &Name, size_t Rate, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void CustomizeR24(const ArrayU8 &Customization, const ArrayU8 &Name, size_t Rate, ArrayU64x25 &State)
 	{
 		const size_t BUFFER_SIZE = KECCAK_STATE_SIZE * sizeof(ulong);
 		std::array<byte, BUFFER_SIZE> pad = { 0 };
 		size_t i;
 		size_t offset;
 
-		offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(Rate));
-		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
+		offset = LeftEncode(pad, 0, static_cast<ulong>(Rate));
+		offset += LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
 
 		if (Name.size() != 0)
 		{
@@ -311,7 +411,7 @@ public:
 			{
 				if (offset == Rate)
 				{
-					Keccak::FastAbsorb(pad, 0, Rate, State);
+					FastAbsorb(pad, 0, Rate, State);
 					PermuteR24P1600U(State);
 					offset = 0;
 				}
@@ -321,7 +421,7 @@ public:
 			}
 		}
 
-		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
+		offset += LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
 
 		if (Customization.size() != 0)
 		{
@@ -329,7 +429,7 @@ public:
 			{
 				if (offset == Rate)
 				{
-					Keccak::FastAbsorb(pad, 0, Rate, State);
+					FastAbsorb(pad, 0, Rate, State);
 					PermuteR24P1600U(State);
 					offset = 0;
 				}
@@ -354,16 +454,16 @@ public:
 	/// <param name="Name">The starting offseet within the message byte array</param>
 	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
 	/// <param name="State">The permutations uint64 state array</param>
-	template<typename ArrayU8>
-	static void CustomizeR48(const ArrayU8 &Customization, const ArrayU8 &Name, size_t Rate, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void CustomizeR48(const ArrayU8 &Customization, const ArrayU8 &Name, size_t Rate, ArrayU64x25 &State)
 	{
 		const size_t BUFFER_SIZE = KECCAK_STATE_SIZE * sizeof(ulong);
 		std::array<byte, BUFFER_SIZE> pad = { 0 };
 		size_t i;
 		size_t offset;
 
-		offset = Keccak::LeftEncode(pad, 0, static_cast<ulong>(Rate));
-		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
+		offset = LeftEncode(pad, 0, static_cast<ulong>(Rate));
+		offset += LeftEncode(pad, offset, static_cast<ulong>(Name.size()) * 8);
 
 		if (Name.size() != 0)
 		{
@@ -371,7 +471,7 @@ public:
 			{
 				if (offset == Rate)
 				{
-					Keccak::FastAbsorb(pad, 0, Rate, State);
+					FastAbsorb(pad, 0, Rate, State);
 					PermuteR48P1600U(State);
 					offset = 0;
 				}
@@ -381,7 +481,7 @@ public:
 			}
 		}
 
-		offset += Keccak::LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
+		offset += LeftEncode(pad, offset, static_cast<ulong>(Customization.size()) * 8);
 
 		if (Customization.size() != 0)
 		{
@@ -389,7 +489,7 @@ public:
 			{
 				if (offset == Rate)
 				{
-					Keccak::FastAbsorb(pad, 0, Rate, State);
+					FastAbsorb(pad, 0, Rate, State);
 					PermuteR48P1600U(State);
 					offset = 0;
 				}
@@ -422,13 +522,13 @@ public:
 	static void CXOFR24P1600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Name, ArrayU8 &Output, size_t Offset, size_t Length, size_t Rate)
 	{
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+
 		CustomizeR24(Customization, Name, Rate, state);
-		AbsorbR24(Key, 0, Key.size(), Rate, Keccak::KECCAK_CSHAKE_DOMAIN, state);
+		AbsorbR24(Key, 0, Key.size(), Rate, KECCAK_CSHAKE_DOMAIN, state);
 
 		while (Length != 0)
 		{
 			const size_t DIFF = IntegerTools::Min(Rate, Length);
-
 			PermuteR24P1600U(state);
 			MemoryTools::Copy(state, 0, Output, Offset, DIFF);
 			Offset += DIFF;
@@ -452,13 +552,13 @@ public:
 	static void CXOFPR481600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Name, ArrayU8 &Output, size_t Offset, size_t Length, size_t Rate)
 	{
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+
 		CustomizeR48(Customization, Name, Rate, state);
-		AbsorbR48(Key, 0, Key.size(), Rate, Keccak::KECCAK_CSHAKE_DOMAIN, state);
+		AbsorbR48(Key, 0, Key.size(), Rate, KECCAK_CSHAKE_DOMAIN, state);
 
 		while (Length != 0)
 		{
 			const size_t DIFF = IntegerTools::Min(Rate, Length);
-
 			PermuteR48P1600U(state);
 			MemoryTools::Copy(state, 0, Output, Offset, DIFF);
 			Offset += DIFF;
@@ -475,8 +575,8 @@ public:
 	/// <param name="InOffset">The starting offset withing the input array</param>
 	/// <param name="InLength">The number of bytes to process; must be 64-bit aligned</param>
 	/// <param name="State">The permutations uint64 state array</param>
-	template<typename ArrayU8>
-	static void FastAbsorb(const ArrayU8 &Input, size_t InOffset, size_t InLength, std::array<ulong, KECCAK_STATE_SIZE> &State)
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void FastAbsorb(const ArrayU8 &Input, size_t InOffset, size_t InLength, ArrayU64x25 &State)
 	{
 		CEXASSERT(InLength % sizeof(ulong) == 0, "The input length is not 64-bit aligned");
 
@@ -506,7 +606,7 @@ public:
 		ulong n;
 		ulong v;
 
-		for (v = Value, n = 0; v && (n < sizeof(ulong)); ++n, v >>= 8)
+		for (v = Value, n = 0; (v > 0) && (n < sizeof(ulong)); ++n, v >>= 8)
 		{
 		}
 
@@ -537,14 +637,13 @@ public:
 	/// <param name="Length">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; returns a hash the size of the KMAC mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
 	/// <param name="Rate">The block input rate of permutation calls; KMAC128=168, KMAC256=136, KMAC512=72</param>
-	template<typename ArrayU8>
-	static void MACR24P1600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Message, size_t Offset, size_t Length, ArrayU8 &Output, size_t Rate)
+	template<typename ArrayU8A, typename ArrayU8B, typename ArrayU8C>
+	static void MACR24P1600(const ArrayU8A &Key, const ArrayU8A &Customization, const ArrayU8B &Message, size_t Offset, size_t Length, ArrayU8C &Output, size_t Rate)
 	{
-		const size_t BUFLEN = Keccak::KECCAK_STATE_SIZE * sizeof(ulong);
+		const size_t BUFLEN = KECCAK_STATE_SIZE * sizeof(ulong);
 		const std::vector<byte> KNAME{ 0x4B, 0x4D, 0x41, 0x43 };
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
 		std::array<byte, BUFLEN> pad = { 0 };
-		std::vector<byte> buf(sizeof(size_t) + 1);
 		ulong poft;
 		size_t blen;
 		size_t i;
@@ -598,13 +697,12 @@ public:
 		}
 
 		// add the remaining message bytes to the state and finalize
-
-		blen = Keccak::RightEncode(pad, Length, static_cast<ulong>(Output.size()) * sizeof(ulong));
+		blen = RightEncode(pad, Length, static_cast<ulong>(Output.size()) * sizeof(ulong));
 
 		Length += blen;
-		pad[Length] = Keccak::KECCAK_KMAC_DOMAIN;
+		pad[Length] = KECCAK_KMAC_DOMAIN;
 		pad[Rate - 1] |= 128;
-		Keccak::FastAbsorb(pad, 0, Rate, state);
+		FastAbsorb(pad, 0, Rate, state);
 
 		// output the hash
 		Length = Output.size();
@@ -632,14 +730,13 @@ public:
 	/// <param name="Length">The number of message bytes to process</param>
 	/// <param name="Output">The output hash array; returns a hash the size of the KMAC mode, set by the Rate parameter; 16, 32, or 64 bytes</param>
 	/// <param name="Rate">The block input rate of permutation calls; KMAC128=168, KMAC256=136, KMAC512=72</param>
-	template<typename ArrayU8>
-	static void MACR48P1600(const ArrayU8 &Key, const ArrayU8 &Customization, const ArrayU8 &Message, size_t Offset, size_t Length, ArrayU8 &Output, size_t Rate)
+	template<typename ArrayU8A, typename ArrayU8B, typename ArrayU8C>
+	static void MACR48P1600(const ArrayU8A &Key, const ArrayU8A &Customization, const ArrayU8B &Message, size_t Offset, size_t Length, ArrayU8C &Output, size_t Rate)
 	{
-		const size_t BUFLEN = Keccak::KECCAK_STATE_SIZE * sizeof(ulong);
+		const size_t BUFLEN = KECCAK_STATE_SIZE * sizeof(ulong);
 		const std::vector<byte> KNAME{ 0x4B, 0x4D, 0x41, 0x43 };
 		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
 		std::array<byte, BUFLEN> pad = { 0 };
-		std::vector<byte> buf(sizeof(size_t) + 1);
 		ulong poft;
 		size_t blen;
 		size_t i;
@@ -693,13 +790,12 @@ public:
 		}
 
 		// add the remaining message bytes to the state and finalize
-
-		blen = Keccak::RightEncode(pad, Length, static_cast<ulong>(Output.size()) * sizeof(ulong));
+		blen = RightEncode(pad, Length, static_cast<ulong>(Output.size()) * sizeof(ulong));
 
 		Length += blen;
-		pad[Length] = Keccak::KECCAK_KMAC_DOMAIN;
+		pad[Length] = KECCAK_KMAC_DOMAIN;
 		pad[Rate - 1] |= 128;
-		Keccak::FastAbsorb(pad, 0, Rate, state);
+		FastAbsorb(pad, 0, Rate, state);
 
 		// output the hash
 		Length = Output.size();
@@ -716,188 +812,29 @@ public:
 	}
 
 	/// <summary>
-	/// The Keccak 24-round extraction function; extract blocks of state to an output 8-bit array
+	/// The Keccak permutation function
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
-	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
-	/// <param name="OutOffset">The starting offset withing the output array</param>
-	/// <param name="Blocks">The number of blocks to extract</param>
-	/// <param name="Rate">The Keccak extraction rate</param>
-	template<typename ArrayU8>
-	static void SqueezeR24(std::array<ulong, KECCAK_STATE_SIZE> &State, ArrayU8 &Output, size_t OutOffset, size_t Blocks, size_t Rate)
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72, SHAKE1024=32</param>
+	template<typename ArrayU64x25>
+	static void Permute(ArrayU64x25 &State, size_t Rate)
 	{
-		while (Blocks > 0)
+		if (Rate != KECCAK1024_RATE_SIZE)
 		{
-			Keccak::PermuteR24P1600U(State);
-
-#if defined(CEX_IS_LITTLE_ENDIAN)
-			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
-#else
-
-			for (size_t i = 0; i < (Rate >> 3); i++)
-			{
-				IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
-			}
-#endif
-
-			OutOffset += Rate;
-			--Blocks;
+#	if defined(CEX_DIGEST_COMPACT)
+			PermuteR24P1600C(State);
+#	else
+			PermuteR24P1600U(State);
+#	endif
 		}
-	}
-
-	/// <summary>
-	/// The Keccak 48-round extraction function; extract blocks of state to an output 8-bit array
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations uint64 state array</param>
-	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
-	/// <param name="OutOffset">The starting offset withing the output array</param>
-	/// <param name="Blocks">The number of blocks to extract</param>
-	/// <param name="Rate">The Keccak extraction rate</param>
-	template<typename ArrayU8>
-	static void SqueezeR48(std::array<ulong, KECCAK_STATE_SIZE> &State, ArrayU8 &Output, size_t OutOffset, size_t Blocks, size_t Rate)
-	{
-		while (Blocks > 0)
+		else
 		{
-			Digest::Keccak::PermuteR48P1600U(State);
-
-#if defined(CEX_IS_LITTLE_ENDIAN)
-			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
-#else
-
-			for (size_t i = 0; i < (Rate >> 3); i++)
-			{
-				IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
-			}
-#endif
-
-			OutOffset += Rate;
-			--Blocks;
-		}
-	}
-
-	/// <summary>
-	/// The Keccak XOF function using 24 rounds; process an input seed array and return a pseudo-random output array.
-	/// <para>A compact form of the SHAKE XOF function.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
-	/// <param name="InOffset">The starting offset withing the input array</param>
-	/// <param name="InLength">The number of seed bytes to process</param>
-	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
-	/// <param name="OutOffset">The starting offset withing the output array</param>
-	/// <param name="OutLength">The number of output bytes to produce</param>
-	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
-	template<typename ArrayU8A, typename ArrayU8B>
-	static void XOFR24P1600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
-	{
-		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
-		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
-		size_t blkcnt;
-		size_t i;
-
-		while (InLength >= Rate)
-		{
-			FastAbsorb(Input, InOffset, Rate, state);
-			PermuteR24P1600U(state);
-			InLength -= Rate;
-			InOffset += Rate;
-		}
-
-		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
-		msg[InLength] = KECCAK_SHAKE_DOMAIN;
-		MemoryTools::Clear(msg, InLength + 1, Rate - InLength + 1);
-		msg[Rate - 1] |= 128;
-
-#if defined(CEX_IS_LITTLE_ENDIAN)
-		MemoryTools::XOR(msg, 0, state, 0, Rate);
-#else
-		for (i = 0; i < (Rate >> 3); ++i)
-		{
-			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
-		}
-#endif
-
-		blkcnt = OutLength / Rate;
-		SqueezeR24(state, Output, OutOffset, blkcnt, Rate);
-		OutOffset += blkcnt * Rate;
-		OutLength -= blkcnt * Rate;
-
-		if (OutLength != 0)
-		{
-			PermuteR24P1600U(state);
-
-			const size_t FNLBLK = (OutLength % sizeof(ulong) == 0) ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
-
-			for (i = 0; i < FNLBLK; i++)
-			{
-				IntegerTools::Le64ToBytes(state[i], msg, (8 * i));
-			}
-
-			MemoryTools::Copy(msg, 0, Output, OutOffset, OutLength);
-		}
-	}
-
-	/// <summary>
-	/// The extended Keccak XOF function using 48 rounds; process an input seed array and return a pseudo-random output array.
-	/// <para>A compact form of the SHAKE XOF function.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
-	/// <param name="InOffset">The starting offset withing the input array</param>
-	/// <param name="InLength">The number of seed bytes to process</param>
-	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
-	/// <param name="OutOffset">The starting offset withing the output array</param>
-	/// <param name="OutLength">The number of output bytes to produce</param>
-	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
-	template<typename ArrayU8A, typename ArrayU8B>
-	static void XOFR48P1600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
-	{
-		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
-		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
-		size_t blkcnt;
-		size_t i;
-
-		while (InLength >= Rate)
-		{
-			FastAbsorb(Input, InOffset, Rate, state);
-			Keccak::PermuteR48P1600U(state);
-			InLength -= Rate;
-			InOffset += Rate;
-		}
-
-		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
-		msg[InLength] = KECCAK_SHAKE_DOMAIN;
-		MemoryTools::Clear(msg, InLength + 1, Rate - InLength + 1);
-		msg[Rate - 1] |= 128;
-
-#if defined(CEX_IS_LITTLE_ENDIAN)
-		MemoryTools::XOR(msg, 0, state, 0, Rate);
-#else
-		for (i = 0; i < (Rate >> 3); ++i)
-		{
-			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
-		}
-#endif
-
-		blkcnt = OutLength / Rate;
-		SqueezeR48(state, Output, OutOffset, blkcnt, Rate);
-		OutOffset += blkcnt * Rate;
-		OutLength -= blkcnt * Rate;
-
-		if (OutLength != 0)
-		{
-			Keccak::PermuteR48P1600U(state);
-
-			const size_t FNLBLK = (OutLength % sizeof(ulong) == 0) ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
-
-			for (i = 0; i < FNLBLK; ++i)
-			{
-				IntegerTools::Le64ToBytes(state[i], msg, (sizeof(ulong) * i));
-			}
-
-			MemoryTools::Copy(msg, 0, Output, OutOffset, OutLength);
+#	if defined(CEX_DIGEST_COMPACT)
+			PermuteR48P1600C(State);
+#	else
+			PermuteR48P1600U(State);
+#	endif
 		}
 	}
 
@@ -908,42 +845,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR24P1600C(std::array<ulong, KECCAK_STATE_SIZE> &State);
-
-	/// <summary>
-	/// The unrolled form of the 24 round (standard) SHA3 permutation function.
-	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
-	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR24P1600U(std::array<ulong, KECCAK_STATE_SIZE> &State);
-
-	/// <summary>
-	/// The compact form of the 48 round (extended) SHA3 permutation function.
-	/// <para>This function has been optimized for a small memory consumption.
-	/// To enable this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR48P1600C(std::array<ulong, KECCAK_STATE_SIZE> &State);
-
-	/// <summary>
-	/// The unrolled form of the 48 round (extended) SHA3 permutation function.
-	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
-	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations uint64 state array</param>
-	static void PermuteR48P1600U(std::array<ulong, KECCAK_STATE_SIZE> &State);
-
-	// experiment
-	static void PermuteR24P3200C(std::array<ulong, 50> &State)
+	template<typename ArrayU64x25>
+	static void PermuteR24P1600C(ArrayU64x25 &State)
 	{
-		std::array<ulong, 50> A;
-		std::array<ulong, 10> C;
-		std::array<ulong, 10> D;
-		std::array<ulong, 50> E;
+		std::array<ulong, 25> A;
+		std::array<ulong, 5> C;
+		std::array<ulong, 5> D;
+		std::array<ulong, 25> E;
 		size_t i;
 
 		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
@@ -951,50 +859,16 @@ public:
 		for (i = 0; i < 24; i += 2)
 		{
 			// round n
-			// a
 			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
 			C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
 			C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
 			C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
 			C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
-			// b
-			C[5] = A[25] ^ A[30] ^ A[35] ^ A[40] ^ A[45];
-			C[6] = A[26] ^ A[31] ^ A[36] ^ A[41] ^ A[46];
-			C[7] = A[27] ^ A[32] ^ A[37] ^ A[42] ^ A[47];
-			C[8] = A[28] ^ A[33] ^ A[38] ^ A[43] ^ A[48];
-			C[9] = A[29] ^ A[34] ^ A[39] ^ A[44] ^ A[49];
-
-			// a
 			D[0] = C[4] ^ IntegerTools::RotFL64(C[1], 1);
 			D[1] = C[0] ^ IntegerTools::RotFL64(C[2], 1);
 			D[2] = C[1] ^ IntegerTools::RotFL64(C[3], 1);
 			D[3] = C[2] ^ IntegerTools::RotFL64(C[4], 1);
-			D[4] = C[3] ^ IntegerTools::RotFL64(C[5], 1);
-			// b
-			D[5] = C[5] ^ IntegerTools::RotFL64(C[6], 1);
-			D[6] = C[6] ^ IntegerTools::RotFL64(C[7], 1);
-			D[7] = C[7] ^ IntegerTools::RotFL64(C[8], 1);
-			D[8] = C[8] ^ IntegerTools::RotFL64(C[9], 1);
-			D[9] = C[9] ^ IntegerTools::RotFL64(C[0], 1);
-
-			// TODO: Read the Keccak spec. Break these into function-level components,
-			// and build 48-round wide-keccak.
-			// max security would be: n=state-length, r=rate, s=security, s = ((n - r) / 2) * 8
-			// with double rounds and using 2 overlapping permutation calls, practical security could exceed 1600 bits
-			// r=72, n=400 s=1312 (true 1024 at r=144)
-			// r=36, n=400 s=1456 
-
-			// A
-			// 0+6+6+6+6				3+6+1+6+6				1+6+6+6+1				4+1+6+6+6				2+6+6+1+6
-			// 0,6,12,18,24				3,9,10,16,22			1,7,13,19,20			4,5,11,17,23			2,8,14,15,21
-			// 0+6+6+6+6+1+6+6+6
-			// 0,6,12,18,24,25,31,37,43
-
-			// C 0,1,2,3,4...
-			// D
-			// 0,1,2,3,4	3,4,0,1,2	1,2,3,4,0	4,0,1,2,3	2,3,4,0,1
-
-			// a
+			D[4] = C[3] ^ IntegerTools::RotFL64(C[0], 1);
 			A[0] ^= D[0];
 			C[0] = A[0];
 			A[6] ^= D[1];
@@ -1011,25 +885,6 @@ public:
 			E[2] = C[2] ^ ((~C[3]) & C[4]);
 			E[3] = C[3] ^ ((~C[4]) & C[0]);
 			E[4] = C[4] ^ ((~C[0]) & C[1]);
-
-			// b
-			A[25] ^= D[5];
-			C[5] = A[25];
-			A[31] ^= D[6];
-			C[6] = IntegerTools::RotFL64(A[31], 44); // new shifts?
-			A[37] ^= D[7];
-			C[7] = IntegerTools::RotFL64(A[37], 43);
-			A[43] ^= D[8];
-			C[8] = IntegerTools::RotFL64(A[43], 21);
-			A[49] ^= D[9];
-			C[9] = IntegerTools::RotFL64(A[49], 14);
-			E[5] = C[5] ^ ((~C[6]) & C[7]);
-			E[5] ^= KECCAK_RC48[i + 1];
-			E[6] = C[6] ^ ((~C[7]) & C[8]);
-			E[7] = C[7] ^ ((~C[8]) & C[9]);
-			E[8] = C[8] ^ ((~C[9]) & C[5]);
-			E[9] = C[9] ^ ((~C[5]) & C[6]);
-
 			A[3] ^= D[3];
 			C[0] = IntegerTools::RotFL64(A[3], 28);
 			A[9] ^= D[4];
@@ -1040,13 +895,11 @@ public:
 			C[3] = IntegerTools::RotFL64(A[16], 45);
 			A[22] ^= D[2];
 			C[4] = IntegerTools::RotFL64(A[22], 61);
-
 			E[5] = C[0] ^ ((~C[1]) & C[2]);
 			E[6] = C[1] ^ ((~C[2]) & C[3]);
 			E[7] = C[2] ^ ((~C[3]) & C[4]);
 			E[8] = C[3] ^ ((~C[4]) & C[0]);
 			E[9] = C[4] ^ ((~C[0]) & C[1]);
-			
 			A[1] ^= D[1];
 			C[0] = IntegerTools::RotFL64(A[1], 1);
 			A[7] ^= D[2];
@@ -1057,13 +910,11 @@ public:
 			C[3] = IntegerTools::RotFL64(A[19], 8);
 			A[20] ^= D[0];
 			C[4] = IntegerTools::RotFL64(A[20], 18);
-
 			E[10] = C[0] ^ ((~C[1]) & C[2]);
 			E[11] = C[1] ^ ((~C[2]) & C[3]);
 			E[12] = C[2] ^ ((~C[3]) & C[4]);
 			E[13] = C[3] ^ ((~C[4]) & C[0]);
 			E[14] = C[4] ^ ((~C[0]) & C[1]);
-
 			A[4] ^= D[4];
 			C[0] = IntegerTools::RotFL64(A[4], 27);
 			A[5] ^= D[0];
@@ -1074,13 +925,11 @@ public:
 			C[3] = IntegerTools::RotFL64(A[17], 15);
 			A[23] ^= D[3];
 			C[4] = IntegerTools::RotFL64(A[23], 56);
-
 			E[15] = C[0] ^ ((~C[1]) & C[2]);
 			E[16] = C[1] ^ ((~C[2]) & C[3]);
 			E[17] = C[2] ^ ((~C[3]) & C[4]);
 			E[18] = C[3] ^ ((~C[4]) & C[0]);
 			E[19] = C[4] ^ ((~C[0]) & C[1]);
-
 			A[2] ^= D[2];
 			C[0] = IntegerTools::RotFL64(A[2], 62);
 			A[8] ^= D[3];
@@ -1091,14 +940,11 @@ public:
 			C[3] = IntegerTools::RotFL64(A[15], 41);
 			A[21] ^= D[1];
 			C[4] = IntegerTools::RotFL64(A[21], 2);
-
 			E[20] = C[0] ^ ((~C[1]) & C[2]);
 			E[21] = C[1] ^ ((~C[2]) & C[3]);
 			E[22] = C[2] ^ ((~C[3]) & C[4]);
 			E[23] = C[3] ^ ((~C[4]) & C[0]);
 			E[24] = C[4] ^ ((~C[0]) & C[1]);
-
-
 			// round n + 1
 			C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
 			C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
@@ -1121,7 +967,7 @@ public:
 			E[24] ^= D[4];
 			C[4] = IntegerTools::RotFL64(E[24], 14);
 			A[0] = C[0] ^ ((~C[1]) & C[2]);
-			A[0] ^= KECCAK_RC48[i + 2];
+			A[0] ^= KECCAK_RC24[i + 1];
 			A[1] = C[1] ^ ((~C[2]) & C[3]);
 			A[2] = C[2] ^ ((~C[3]) & C[4]);
 			A[3] = C[3] ^ ((~C[4]) & C[0]);
@@ -1191,27 +1037,6720 @@ public:
 		MemoryTools::Copy(A, 0, State, 0, A.size() * sizeof(ulong));
 	}
 
-#if defined(__AVX2__)
-
 	/// <summary>
-	/// The horizontally vectorized 24 round (standard) form of the SHA3 permutation function.
-	/// <para>This function processes 4*25 blocks of state in parallel using AVX2 instructions.</para>
+	/// The unrolled form of the 24 round (standard) SHA3 permutation function.
+	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
+	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="State">The permutations ULong256 state array</param>
-	static void PermuteR24P4x1600H(std::vector<ULong256> &State);
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename ArrayU64x25>
+	static void PermuteR24P1600U(ArrayU64x25 &State)
+	{
+		ulong Aba;
+		ulong Abe;
+		ulong Abi;
+		ulong Abo;
+		ulong Abu;
+		ulong Aga;
+		ulong Age;
+		ulong Agi;
+		ulong Ago;
+		ulong Agu;
+		ulong Aka;
+		ulong Ake;
+		ulong Aki;
+		ulong Ako;
+		ulong Aku;
+		ulong Ama;
+		ulong Ame;
+		ulong Ami;
+		ulong Amo;
+		ulong Amu;
+		ulong Asa;
+		ulong Ase;
+		ulong Asi;
+		ulong Aso;
+		ulong Asu;
+		ulong Ca;
+		ulong Ce;
+		ulong Ci;
+		ulong Co;
+		ulong Cu;
+		ulong Da;
+		ulong De;
+		ulong Di;
+		ulong Do;
+		ulong Du;
+		ulong Eba;
+		ulong Ebe;
+		ulong Ebi;
+		ulong Ebo;
+		ulong Ebu;
+		ulong Ega;
+		ulong Ege;
+		ulong Egi;
+		ulong Ego;
+		ulong Egu;
+		ulong Eka;
+		ulong Eke;
+		ulong Eki;
+		ulong Eko;
+		ulong Eku;
+		ulong Ema;
+		ulong Eme;
+		ulong Emi;
+		ulong Emo;
+		ulong Emu;
+		ulong Esa;
+		ulong Ese;
+		ulong Esi;
+		ulong Eso;
+		ulong Esu;
+
+		Aba = State[0];
+		Abe = State[1];
+		Abi = State[2];
+		Abo = State[3];
+		Abu = State[4];
+		Aga = State[5];
+		Age = State[6];
+		Agi = State[7];
+		Ago = State[8];
+		Agu = State[9];
+		Aka = State[10];
+		Ake = State[11];
+		Aki = State[12];
+		Ako = State[13];
+		Aku = State[14];
+		Ama = State[15];
+		Ame = State[16];
+		Ami = State[17];
+		Amo = State[18];
+		Amu = State[19];
+		Asa = State[20];
+		Ase = State[21];
+		Asi = State[22];
+		Aso = State[23];
+		Asu = State[24];
+
+		// round 1
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000000000001ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 2
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000008082ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 3
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x800000000000808AULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 4
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000080008000ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 5
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000000000808BULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 6
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000080000001ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 7
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000080008081ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 8
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000008009ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 9
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000000000008AULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 10
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000000088ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 11
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000080008009ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 12
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x000000008000000AULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 13
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000008000808BULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 14
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x800000000000008BULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 15
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000008089ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 16
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000008003ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 17
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000008002ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 18
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000000080ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 19
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000000000800AULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 20
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x800000008000000AULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 21
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000080008081ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 22
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000008080ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 23
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000080000001ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 24
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000080008008ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+
+		State[0] = Aba;
+		State[1] = Abe;
+		State[2] = Abi;
+		State[3] = Abo;
+		State[4] = Abu;
+		State[5] = Aga;
+		State[6] = Age;
+		State[7] = Agi;
+		State[8] = Ago;
+		State[9] = Agu;
+		State[10] = Aka;
+		State[11] = Ake;
+		State[12] = Aki;
+		State[13] = Ako;
+		State[14] = Aku;
+		State[15] = Ama;
+		State[16] = Ame;
+		State[17] = Ami;
+		State[18] = Amo;
+		State[19] = Amu;
+		State[20] = Asa;
+		State[21] = Ase;
+		State[22] = Asi;
+		State[23] = Aso;
+		State[24] = Asu;
+	}
 
 	/// <summary>
-	/// The horizontally vectorized 48 round form (extended) of the SHA3 permutation function.
-	/// <para>This function processes 4*25 blocks of state in parallel using AVX2 instructions.</para>
+	/// The compact form of the 48 round (extended) SHA3 permutation function.
+	/// <para>This function has been optimized for a small memory consumption.
+	/// To enable this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="State">The permutations ULong256 state array</param>
-	static void PermuteR48P4x1600H(std::vector<ULong256> &State);
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename ArrayU64x25>
+	static void PermuteR48P1600C(ArrayU64x25 &State)
+	{
+		std::array<ulong, 25> A;
+		std::array<ulong, 5> C;
+		std::array<ulong, 5> D;
+		std::array<ulong, 25> E;
+		size_t i;
 
-#endif
+		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
 
-#if defined(__AVX512__)
+		for (i = 0; i < 48; i += 2)
+		{
+			// round n
+			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+			C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+			C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+			C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+			C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+			D[0] = C[4] ^ IntegerTools::RotFL64(C[1], 1);
+			D[1] = C[0] ^ IntegerTools::RotFL64(C[2], 1);
+			D[2] = C[1] ^ IntegerTools::RotFL64(C[3], 1);
+			D[3] = C[2] ^ IntegerTools::RotFL64(C[4], 1);
+			D[4] = C[3] ^ IntegerTools::RotFL64(C[0], 1);
+			A[0] ^= D[0];
+			C[0] = A[0];
+			A[6] ^= D[1];
+			C[1] = IntegerTools::RotFL64(A[6], 44);
+			A[12] ^= D[2];
+			C[2] = IntegerTools::RotFL64(A[12], 43);
+			A[18] ^= D[3];
+			C[3] = IntegerTools::RotFL64(A[18], 21);
+			A[24] ^= D[4];
+			C[4] = IntegerTools::RotFL64(A[24], 14);
+			E[0] = C[0] ^ ((~C[1]) & C[2]);
+			E[0] ^= KECCAK_RC48[i];
+			E[1] = C[1] ^ ((~C[2]) & C[3]);
+			E[2] = C[2] ^ ((~C[3]) & C[4]);
+			E[3] = C[3] ^ ((~C[4]) & C[0]);
+			E[4] = C[4] ^ ((~C[0]) & C[1]);
+			A[3] ^= D[3];
+			C[0] = IntegerTools::RotFL64(A[3], 28);
+			A[9] ^= D[4];
+			C[1] = IntegerTools::RotFL64(A[9], 20);
+			A[10] ^= D[0];
+			C[2] = IntegerTools::RotFL64(A[10], 3);
+			A[16] ^= D[1];
+			C[3] = IntegerTools::RotFL64(A[16], 45);
+			A[22] ^= D[2];
+			C[4] = IntegerTools::RotFL64(A[22], 61);
+			E[5] = C[0] ^ ((~C[1]) & C[2]);
+			E[6] = C[1] ^ ((~C[2]) & C[3]);
+			E[7] = C[2] ^ ((~C[3]) & C[4]);
+			E[8] = C[3] ^ ((~C[4]) & C[0]);
+			E[9] = C[4] ^ ((~C[0]) & C[1]);
+			A[1] ^= D[1];
+			C[0] = IntegerTools::RotFL64(A[1], 1);
+			A[7] ^= D[2];
+			C[1] = IntegerTools::RotFL64(A[7], 6);
+			A[13] ^= D[3];
+			C[2] = IntegerTools::RotFL64(A[13], 25);
+			A[19] ^= D[4];
+			C[3] = IntegerTools::RotFL64(A[19], 8);
+			A[20] ^= D[0];
+			C[4] = IntegerTools::RotFL64(A[20], 18);
+			E[10] = C[0] ^ ((~C[1]) & C[2]);
+			E[11] = C[1] ^ ((~C[2]) & C[3]);
+			E[12] = C[2] ^ ((~C[3]) & C[4]);
+			E[13] = C[3] ^ ((~C[4]) & C[0]);
+			E[14] = C[4] ^ ((~C[0]) & C[1]);
+			A[4] ^= D[4];
+			C[0] = IntegerTools::RotFL64(A[4], 27);
+			A[5] ^= D[0];
+			C[1] = IntegerTools::RotFL64(A[5], 36);
+			A[11] ^= D[1];
+			C[2] = IntegerTools::RotFL64(A[11], 10);
+			A[17] ^= D[2];
+			C[3] = IntegerTools::RotFL64(A[17], 15);
+			A[23] ^= D[3];
+			C[4] = IntegerTools::RotFL64(A[23], 56);
+			E[15] = C[0] ^ ((~C[1]) & C[2]);
+			E[16] = C[1] ^ ((~C[2]) & C[3]);
+			E[17] = C[2] ^ ((~C[3]) & C[4]);
+			E[18] = C[3] ^ ((~C[4]) & C[0]);
+			E[19] = C[4] ^ ((~C[0]) & C[1]);
+			A[2] ^= D[2];
+			C[0] = IntegerTools::RotFL64(A[2], 62);
+			A[8] ^= D[3];
+			C[1] = IntegerTools::RotFL64(A[8], 55);
+			A[14] ^= D[4];
+			C[2] = IntegerTools::RotFL64(A[14], 39);
+			A[15] ^= D[0];
+			C[3] = IntegerTools::RotFL64(A[15], 41);
+			A[21] ^= D[1];
+			C[4] = IntegerTools::RotFL64(A[21], 2);
+			E[20] = C[0] ^ ((~C[1]) & C[2]);
+			E[21] = C[1] ^ ((~C[2]) & C[3]);
+			E[22] = C[2] ^ ((~C[3]) & C[4]);
+			E[23] = C[3] ^ ((~C[4]) & C[0]);
+			E[24] = C[4] ^ ((~C[0]) & C[1]);
+			// round n + 1
+			C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+			C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+			C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+			C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+			C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+			D[0] = C[4] ^ IntegerTools::RotFL64(C[1], 1);
+			D[1] = C[0] ^ IntegerTools::RotFL64(C[2], 1);
+			D[2] = C[1] ^ IntegerTools::RotFL64(C[3], 1);
+			D[3] = C[2] ^ IntegerTools::RotFL64(C[4], 1);
+			D[4] = C[3] ^ IntegerTools::RotFL64(C[0], 1);
+			E[0] ^= D[0];
+			C[0] = E[0];
+			E[6] ^= D[1];
+			C[1] = IntegerTools::RotFL64(E[6], 44);
+			E[12] ^= D[2];
+			C[2] = IntegerTools::RotFL64(E[12], 43);
+			E[18] ^= D[3];
+			C[3] = IntegerTools::RotFL64(E[18], 21);
+			E[24] ^= D[4];
+			C[4] = IntegerTools::RotFL64(E[24], 14);
+			A[0] = C[0] ^ ((~C[1]) & C[2]);
+			A[0] ^= KECCAK_RC48[i + 1];
+			A[1] = C[1] ^ ((~C[2]) & C[3]);
+			A[2] = C[2] ^ ((~C[3]) & C[4]);
+			A[3] = C[3] ^ ((~C[4]) & C[0]);
+			A[4] = C[4] ^ ((~C[0]) & C[1]);
+			E[3] ^= D[3];
+			C[0] = IntegerTools::RotFL64(E[3], 28);
+			E[9] ^= D[4];
+			C[1] = IntegerTools::RotFL64(E[9], 20);
+			E[10] ^= D[0];
+			C[2] = IntegerTools::RotFL64(E[10], 3);
+			E[16] ^= D[1];
+			C[3] = IntegerTools::RotFL64(E[16], 45);
+			E[22] ^= D[2];
+			C[4] = IntegerTools::RotFL64(E[22], 61);
+			A[5] = C[0] ^ ((~C[1]) & C[2]);
+			A[6] = C[1] ^ ((~C[2]) & C[3]);
+			A[7] = C[2] ^ ((~C[3]) & C[4]);
+			A[8] = C[3] ^ ((~C[4]) & C[0]);
+			A[9] = C[4] ^ ((~C[0]) & C[1]);
+			E[1] ^= D[1];
+			C[0] = IntegerTools::RotFL64(E[1], 1);
+			E[7] ^= D[2];
+			C[1] = IntegerTools::RotFL64(E[7], 6);
+			E[13] ^= D[3];
+			C[2] = IntegerTools::RotFL64(E[13], 25);
+			E[19] ^= D[4];
+			C[3] = IntegerTools::RotFL64(E[19], 8);
+			E[20] ^= D[0];
+			C[4] = IntegerTools::RotFL64(E[20], 18);
+			A[10] = C[0] ^ ((~C[1]) & C[2]);
+			A[11] = C[1] ^ ((~C[2]) & C[3]);
+			A[12] = C[2] ^ ((~C[3]) & C[4]);
+			A[13] = C[3] ^ ((~C[4]) & C[0]);
+			A[14] = C[4] ^ ((~C[0]) & C[1]);
+			E[4] ^= D[4];
+			C[0] = IntegerTools::RotFL64(E[4], 27);
+			E[5] ^= D[0];
+			C[1] = IntegerTools::RotFL64(E[5], 36);
+			E[11] ^= D[1];
+			C[2] = IntegerTools::RotFL64(E[11], 10);
+			E[17] ^= D[2];
+			C[3] = IntegerTools::RotFL64(E[17], 15);
+			E[23] ^= D[3];
+			C[4] = IntegerTools::RotFL64(E[23], 56);
+			A[15] = C[0] ^ ((~C[1]) & C[2]);
+			A[16] = C[1] ^ ((~C[2]) & C[3]);
+			A[17] = C[2] ^ ((~C[3]) & C[4]);
+			A[18] = C[3] ^ ((~C[4]) & C[0]);
+			A[19] = C[4] ^ ((~C[0]) & C[1]);
+			E[2] ^= D[2];
+			C[0] = IntegerTools::RotFL64(E[2], 62);
+			E[8] ^= D[3];
+			C[1] = IntegerTools::RotFL64(E[8], 55);
+			E[14] ^= D[4];
+			C[2] = IntegerTools::RotFL64(E[14], 39);
+			E[15] ^= D[0];
+			C[3] = IntegerTools::RotFL64(E[15], 41);
+			E[21] ^= D[1];
+			C[4] = IntegerTools::RotFL64(E[21], 2);
+			A[20] = C[0] ^ ((~C[1]) & C[2]);
+			A[21] = C[1] ^ ((~C[2]) & C[3]);
+			A[22] = C[2] ^ ((~C[3]) & C[4]);
+			A[23] = C[3] ^ ((~C[4]) & C[0]);
+			A[24] = C[4] ^ ((~C[0]) & C[1]);
+		}
+
+		MemoryTools::Copy(A, 0, State, 0, A.size() * sizeof(ulong));
+	}
+
+	/// <summary>
+	/// The unrolled form of the 48 round (extended) SHA3 permutation function.
+	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
+	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations uint64 state array</param>
+	template<typename ArrayU64x25>
+	static void PermuteR48P1600U(ArrayU64x25 &State)
+	{
+		ulong Aba;
+		ulong Abe;
+		ulong Abi;
+		ulong Abo;
+		ulong Abu;
+		ulong Aga;
+		ulong Age;
+		ulong Agi;
+		ulong Ago;
+		ulong Agu;
+		ulong Aka;
+		ulong Ake;
+		ulong Aki;
+		ulong Ako;
+		ulong Aku;
+		ulong Ama;
+		ulong Ame;
+		ulong Ami;
+		ulong Amo;
+		ulong Amu;
+		ulong Asa;
+		ulong Ase;
+		ulong Asi;
+		ulong Aso;
+		ulong Asu;
+		ulong Ca;
+		ulong Ce;
+		ulong Ci;
+		ulong Co;
+		ulong Cu;
+		ulong Da;
+		ulong De;
+		ulong Di;
+		ulong Do;
+		ulong Du;
+		ulong Eba;
+		ulong Ebe;
+		ulong Ebi;
+		ulong Ebo;
+		ulong Ebu;
+		ulong Ega;
+		ulong Ege;
+		ulong Egi;
+		ulong Ego;
+		ulong Egu;
+		ulong Eka;
+		ulong Eke;
+		ulong Eki;
+		ulong Eko;
+		ulong Eku;
+		ulong Ema;
+		ulong Eme;
+		ulong Emi;
+		ulong Emo;
+		ulong Emu;
+		ulong Esa;
+		ulong Ese;
+		ulong Esi;
+		ulong Eso;
+		ulong Esu;
+
+		Aba = State[0];
+		Abe = State[1];
+		Abi = State[2];
+		Abo = State[3];
+		Abu = State[4];
+		Aga = State[5];
+		Age = State[6];
+		Agi = State[7];
+		Ago = State[8];
+		Agu = State[9];
+		Aka = State[10];
+		Ake = State[11];
+		Aki = State[12];
+		Ako = State[13];
+		Aku = State[14];
+		Ama = State[15];
+		Ame = State[16];
+		Ami = State[17];
+		Amo = State[18];
+		Amu = State[19];
+		Asa = State[20];
+		Ase = State[21];
+		Asi = State[22];
+		Aso = State[23];
+		Asu = State[24];
+
+		// round 1
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000000000001ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 2
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000008082ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 3
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x800000000000808AULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 4
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000080008000ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 5
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000000000808BULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 6
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000080000001ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 7
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000080008081ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 8
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000008009ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 9
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000000000008AULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 10
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000000088ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 11
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000080008009ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 12
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x000000008000000AULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 13
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000008000808BULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 14
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x800000000000008BULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 15
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000008089ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 16
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000008003ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 17
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000008002ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 18
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000000080ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 19
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000000000800AULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 20
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x800000008000000AULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 21
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000080008081ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 22
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000008080ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 23
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000080000001ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 24
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000080008008ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 25
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000080008082ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 26
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x800000008000800AULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 27
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000000003ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 28
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000080000009ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 29
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000008082ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 30
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000008009ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 31
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000000080ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 32
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000008083ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 33
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000000081ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 34
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000000001ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 35
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x000000000000800BULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 36
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000080008001ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 37
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000000000080ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 38
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000000008000ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 39
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000080008001ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 40
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000000009ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 41
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x800000008000808BULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 42
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000000000081ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 43
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000000000082ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 44
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x000000008000008BULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 45
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x8000000080008009ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 46
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x8000000080000000ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+		// round 47
+		Ca = Aba ^ Aga ^ Aka ^ Ama ^ Asa;
+		Ce = Abe ^ Age ^ Ake ^ Ame ^ Ase;
+		Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
+		Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
+		Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Aba ^= Da;
+		Ca = Aba;
+		Age ^= De;
+		Ce = IntegerTools::RotFL64(Age, 44);
+		Aki ^= Di;
+		Ci = IntegerTools::RotFL64(Aki, 43);
+		Amo ^= Do;
+		Co = IntegerTools::RotFL64(Amo, 21);
+		Asu ^= Du;
+		Cu = IntegerTools::RotFL64(Asu, 14);
+		Eba = Ca ^ ((~Ce) & Ci);
+		Eba ^= 0x0000000080000080ULL;
+		Ebe = Ce ^ ((~Ci) & Co);
+		Ebi = Ci ^ ((~Co) & Cu);
+		Ebo = Co ^ ((~Cu) & Ca);
+		Ebu = Cu ^ ((~Ca) & Ce);
+		Abo ^= Do;
+		Ca = IntegerTools::RotFL64(Abo, 28);
+		Agu ^= Du;
+		Ce = IntegerTools::RotFL64(Agu, 20);
+		Aka ^= Da;
+		Ci = IntegerTools::RotFL64(Aka, 3);
+		Ame ^= De;
+		Co = IntegerTools::RotFL64(Ame, 45);
+		Asi ^= Di;
+		Cu = IntegerTools::RotFL64(Asi, 61);
+		Ega = Ca ^ ((~Ce) & Ci);
+		Ege = Ce ^ ((~Ci) & Co);
+		Egi = Ci ^ ((~Co) & Cu);
+		Ego = Co ^ ((~Cu) & Ca);
+		Egu = Cu ^ ((~Ca) & Ce);
+		Abe ^= De;
+		Ca = IntegerTools::RotFL64(Abe, 1);
+		Agi ^= Di;
+		Ce = IntegerTools::RotFL64(Agi, 6);
+		Ako ^= Do;
+		Ci = IntegerTools::RotFL64(Ako, 25);
+		Amu ^= Du;
+		Co = IntegerTools::RotFL64(Amu, 8);
+		Asa ^= Da;
+		Cu = IntegerTools::RotFL64(Asa, 18);
+		Eka = Ca ^ ((~Ce) & Ci);
+		Eke = Ce ^ ((~Ci) & Co);
+		Eki = Ci ^ ((~Co) & Cu);
+		Eko = Co ^ ((~Cu) & Ca);
+		Eku = Cu ^ ((~Ca) & Ce);
+		Abu ^= Du;
+		Ca = IntegerTools::RotFL64(Abu, 27);
+		Aga ^= Da;
+		Ce = IntegerTools::RotFL64(Aga, 36);
+		Ake ^= De;
+		Ci = IntegerTools::RotFL64(Ake, 10);
+		Ami ^= Di;
+		Co = IntegerTools::RotFL64(Ami, 15);
+		Aso ^= Do;
+		Cu = IntegerTools::RotFL64(Aso, 56);
+		Ema = Ca ^ ((~Ce) & Ci);
+		Eme = Ce ^ ((~Ci) & Co);
+		Emi = Ci ^ ((~Co) & Cu);
+		Emo = Co ^ ((~Cu) & Ca);
+		Emu = Cu ^ ((~Ca) & Ce);
+		Abi ^= Di;
+		Ca = IntegerTools::RotFL64(Abi, 62);
+		Ago ^= Do;
+		Ce = IntegerTools::RotFL64(Ago, 55);
+		Aku ^= Du;
+		Ci = IntegerTools::RotFL64(Aku, 39);
+		Ama ^= Da;
+		Co = IntegerTools::RotFL64(Ama, 41);
+		Ase ^= De;
+		Cu = IntegerTools::RotFL64(Ase, 2);
+		Esa = Ca ^ ((~Ce) & Ci);
+		Ese = Ce ^ ((~Ci) & Co);
+		Esi = Ci ^ ((~Co) & Cu);
+		Eso = Co ^ ((~Cu) & Ca);
+		Esu = Cu ^ ((~Ca) & Ce);
+		// round 48
+		Ca = Eba ^ Ega ^ Eka ^ Ema ^ Esa;
+		Ce = Ebe ^ Ege ^ Eke ^ Eme ^ Ese;
+		Ci = Ebi ^ Egi ^ Eki ^ Emi ^ Esi;
+		Co = Ebo ^ Ego ^ Eko ^ Emo ^ Eso;
+		Cu = Ebu ^ Egu ^ Eku ^ Emu ^ Esu;
+		Da = Cu ^ IntegerTools::RotFL64(Ce, 1);
+		De = Ca ^ IntegerTools::RotFL64(Ci, 1);
+		Di = Ce ^ IntegerTools::RotFL64(Co, 1);
+		Do = Ci ^ IntegerTools::RotFL64(Cu, 1);
+		Du = Co ^ IntegerTools::RotFL64(Ca, 1);
+		Eba ^= Da;
+		Ca = Eba;
+		Ege ^= De;
+		Ce = IntegerTools::RotFL64(Ege, 44);
+		Eki ^= Di;
+		Ci = IntegerTools::RotFL64(Eki, 43);
+		Emo ^= Do;
+		Co = IntegerTools::RotFL64(Emo, 21);
+		Esu ^= Du;
+		Cu = IntegerTools::RotFL64(Esu, 14);
+		Aba = Ca ^ ((~Ce) & Ci);
+		Aba ^= 0x0000000080008003ULL;
+		Abe = Ce ^ ((~Ci) & Co);
+		Abi = Ci ^ ((~Co) & Cu);
+		Abo = Co ^ ((~Cu) & Ca);
+		Abu = Cu ^ ((~Ca) & Ce);
+		Ebo ^= Do;
+		Ca = IntegerTools::RotFL64(Ebo, 28);
+		Egu ^= Du;
+		Ce = IntegerTools::RotFL64(Egu, 20);
+		Eka ^= Da;
+		Ci = IntegerTools::RotFL64(Eka, 3);
+		Eme ^= De;
+		Co = IntegerTools::RotFL64(Eme, 45);
+		Esi ^= Di;
+		Cu = IntegerTools::RotFL64(Esi, 61);
+		Aga = Ca ^ ((~Ce) & Ci);
+		Age = Ce ^ ((~Ci) & Co);
+		Agi = Ci ^ ((~Co) & Cu);
+		Ago = Co ^ ((~Cu) & Ca);
+		Agu = Cu ^ ((~Ca) & Ce);
+		Ebe ^= De;
+		Ca = IntegerTools::RotFL64(Ebe, 1);
+		Egi ^= Di;
+		Ce = IntegerTools::RotFL64(Egi, 6);
+		Eko ^= Do;
+		Ci = IntegerTools::RotFL64(Eko, 25);
+		Emu ^= Du;
+		Co = IntegerTools::RotFL64(Emu, 8);
+		Esa ^= Da;
+		Cu = IntegerTools::RotFL64(Esa, 18);
+		Aka = Ca ^ ((~Ce) & Ci);
+		Ake = Ce ^ ((~Ci) & Co);
+		Aki = Ci ^ ((~Co) & Cu);
+		Ako = Co ^ ((~Cu) & Ca);
+		Aku = Cu ^ ((~Ca) & Ce);
+		Ebu ^= Du;
+		Ca = IntegerTools::RotFL64(Ebu, 27);
+		Ega ^= Da;
+		Ce = IntegerTools::RotFL64(Ega, 36);
+		Eke ^= De;
+		Ci = IntegerTools::RotFL64(Eke, 10);
+		Emi ^= Di;
+		Co = IntegerTools::RotFL64(Emi, 15);
+		Eso ^= Do;
+		Cu = IntegerTools::RotFL64(Eso, 56);
+		Ama = Ca ^ ((~Ce) & Ci);
+		Ame = Ce ^ ((~Ci) & Co);
+		Ami = Ci ^ ((~Co) & Cu);
+		Amo = Co ^ ((~Cu) & Ca);
+		Amu = Cu ^ ((~Ca) & Ce);
+		Ebi ^= Di;
+		Ca = IntegerTools::RotFL64(Ebi, 62);
+		Ego ^= Do;
+		Ce = IntegerTools::RotFL64(Ego, 55);
+		Eku ^= Du;
+		Ci = IntegerTools::RotFL64(Eku, 39);
+		Ema ^= Da;
+		Co = IntegerTools::RotFL64(Ema, 41);
+		Ese ^= De;
+		Cu = IntegerTools::RotFL64(Ese, 2);
+		Asa = Ca ^ ((~Ce) & Ci);
+		Ase = Ce ^ ((~Ci) & Co);
+		Asi = Ci ^ ((~Co) & Cu);
+		Aso = Co ^ ((~Cu) & Ca);
+		Asu = Cu ^ ((~Ca) & Ce);
+
+		State[0] = Aba;
+		State[1] = Abe;
+		State[2] = Abi;
+		State[3] = Abo;
+		State[4] = Abu;
+		State[5] = Aga;
+		State[6] = Age;
+		State[7] = Agi;
+		State[8] = Ago;
+		State[9] = Agu;
+		State[10] = Aka;
+		State[11] = Ake;
+		State[12] = Aki;
+		State[13] = Ako;
+		State[14] = Aku;
+		State[15] = Ama;
+		State[16] = Ame;
+		State[17] = Ami;
+		State[18] = Amo;
+		State[19] = Amu;
+		State[20] = Asa;
+		State[21] = Ase;
+		State[22] = Asi;
+		State[23] = Aso;
+		State[24] = Asu;
+	}
+
+#if defined(CEX_HAS_AVX512)
 
 	/// <summary>
 	/// The horizontally vectorized 24 round (standard) form of the SHA3 permutation function.
@@ -1219,7 +7758,197 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations ULong512 state array</param>
-	static void PermuteR24P8x1600H(std::vector<ULong512> &State);
+	template<typename ArrayU512>
+	static void PermuteR24P8x1600H(ArrayU512 &State)
+	{
+		std::array<ULong512, 25> A;
+		std::array<ULong512, 5> C;
+		std::array<ULong512, 5> D;
+		std::array<ULong512, 25> E;
+		size_t i;
+
+		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ULong512));
+
+		for (i = 0; i < 24; i += 2)
+		{
+			// round n
+			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+			C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+			C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+			C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+			C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+			D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+			A[0] ^= D[0];
+			C[0] = A[0];
+			A[6] ^= D[1];
+			C[1] = ULong512::RotL64(A[6], 44);
+			A[12] ^= D[2];
+			C[2] = ULong512::RotL64(A[12], 43);
+			A[18] ^= D[3];
+			C[3] = ULong512::RotL64(A[18], 21);
+			A[24] ^= D[4];
+			C[4] = ULong512::RotL64(A[24], 14);
+			E[0] = C[0] ^ ((~C[1]) & C[2]);
+			E[0] ^= ULong512(KECCAK_RC24[i]);
+			E[1] = C[1] ^ ((~C[2]) & C[3]);
+			E[2] = C[2] ^ ((~C[3]) & C[4]);
+			E[3] = C[3] ^ ((~C[4]) & C[0]);
+			E[4] = C[4] ^ ((~C[0]) & C[1]);
+			A[3] ^= D[3];
+			C[0] = ULong512::RotL64(A[3], 28);
+			A[9] ^= D[4];
+			C[1] = ULong512::RotL64(A[9], 20);
+			A[10] ^= D[0];
+			C[2] = ULong512::RotL64(A[10], 3);
+			A[16] ^= D[1];
+			C[3] = ULong512::RotL64(A[16], 45);
+			A[22] ^= D[2];
+			C[4] = ULong512::RotL64(A[22], 61);
+			E[5] = C[0] ^ ((~C[1]) & C[2]);
+			E[6] = C[1] ^ ((~C[2]) & C[3]);
+			E[7] = C[2] ^ ((~C[3]) & C[4]);
+			E[8] = C[3] ^ ((~C[4]) & C[0]);
+			E[9] = C[4] ^ ((~C[0]) & C[1]);
+			A[1] ^= D[1];
+			C[0] = ULong512::RotL64(A[1], 1);
+			A[7] ^= D[2];
+			C[1] = ULong512::RotL64(A[7], 6);
+			A[13] ^= D[3];
+			C[2] = ULong512::RotL64(A[13], 25);
+			A[19] ^= D[4];
+			C[3] = ULong512::RotL64(A[19], 8);
+			A[20] ^= D[0];
+			C[4] = ULong512::RotL64(A[20], 18);
+			E[10] = C[0] ^ ((~C[1]) & C[2]);
+			E[11] = C[1] ^ ((~C[2]) & C[3]);
+			E[12] = C[2] ^ ((~C[3]) & C[4]);
+			E[13] = C[3] ^ ((~C[4]) & C[0]);
+			E[14] = C[4] ^ ((~C[0]) & C[1]);
+			A[4] ^= D[4];
+			C[0] = ULong512::RotL64(A[4], 27);
+			A[5] ^= D[0];
+			C[1] = ULong512::RotL64(A[5], 36);
+			A[11] ^= D[1];
+			C[2] = ULong512::RotL64(A[11], 10);
+			A[17] ^= D[2];
+			C[3] = ULong512::RotL64(A[17], 15);
+			A[23] ^= D[3];
+			C[4] = ULong512::RotL64(A[23], 56);
+			E[15] = C[0] ^ ((~C[1]) & C[2]);
+			E[16] = C[1] ^ ((~C[2]) & C[3]);
+			E[17] = C[2] ^ ((~C[3]) & C[4]);
+			E[18] = C[3] ^ ((~C[4]) & C[0]);
+			E[19] = C[4] ^ ((~C[0]) & C[1]);
+			A[2] ^= D[2];
+			C[0] = ULong512::RotL64(A[2], 62);
+			A[8] ^= D[3];
+			C[1] = ULong512::RotL64(A[8], 55);
+			A[14] ^= D[4];
+			C[2] = ULong512::RotL64(A[14], 39);
+			A[15] ^= D[0];
+			C[3] = ULong512::RotL64(A[15], 41);
+			A[21] ^= D[1];
+			C[4] = ULong512::RotL64(A[21], 2);
+			E[20] = C[0] ^ ((~C[1]) & C[2]);
+			E[21] = C[1] ^ ((~C[2]) & C[3]);
+			E[22] = C[2] ^ ((~C[3]) & C[4]);
+			E[23] = C[3] ^ ((~C[4]) & C[0]);
+			E[24] = C[4] ^ ((~C[0]) & C[1]);
+			// round n + 1
+			C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+			C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+			C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+			C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+			C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+			D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+			E[0] ^= D[0];
+			C[0] = E[0];
+			E[6] ^= D[1];
+			C[1] = ULong512::RotL64(E[6], 44);
+			E[12] ^= D[2];
+			C[2] = ULong512::RotL64(E[12], 43);
+			E[18] ^= D[3];
+			C[3] = ULong512::RotL64(E[18], 21);
+			E[24] ^= D[4];
+			C[4] = ULong512::RotL64(E[24], 14);
+			A[0] = C[0] ^ ((~C[1]) & C[2]);
+			A[0] ^= ULong512(KECCAK_RC24[i + 1]);
+			A[1] = C[1] ^ ((~C[2]) & C[3]);
+			A[2] = C[2] ^ ((~C[3]) & C[4]);
+			A[3] = C[3] ^ ((~C[4]) & C[0]);
+			A[4] = C[4] ^ ((~C[0]) & C[1]);
+			E[3] ^= D[3];
+			C[0] = ULong512::RotL64(E[3], 28);
+			E[9] ^= D[4];
+			C[1] = ULong512::RotL64(E[9], 20);
+			E[10] ^= D[0];
+			C[2] = ULong512::RotL64(E[10], 3);
+			E[16] ^= D[1];
+			C[3] = ULong512::RotL64(E[16], 45);
+			E[22] ^= D[2];
+			C[4] = ULong512::RotL64(E[22], 61);
+			A[5] = C[0] ^ ((~C[1]) & C[2]);
+			A[6] = C[1] ^ ((~C[2]) & C[3]);
+			A[7] = C[2] ^ ((~C[3]) & C[4]);
+			A[8] = C[3] ^ ((~C[4]) & C[0]);
+			A[9] = C[4] ^ ((~C[0]) & C[1]);
+			E[1] ^= D[1];
+			C[0] = ULong512::RotL64(E[1], 1);
+			E[7] ^= D[2];
+			C[1] = ULong512::RotL64(E[7], 6);
+			E[13] ^= D[3];
+			C[2] = ULong512::RotL64(E[13], 25);
+			E[19] ^= D[4];
+			C[3] = ULong512::RotL64(E[19], 8);
+			E[20] ^= D[0];
+			C[4] = ULong512::RotL64(E[20], 18);
+			A[10] = C[0] ^ ((~C[1]) & C[2]);
+			A[11] = C[1] ^ ((~C[2]) & C[3]);
+			A[12] = C[2] ^ ((~C[3]) & C[4]);
+			A[13] = C[3] ^ ((~C[4]) & C[0]);
+			A[14] = C[4] ^ ((~C[0]) & C[1]);
+			E[4] ^= D[4];
+			C[0] = ULong512::RotL64(E[4], 27);
+			E[5] ^= D[0];
+			C[1] = ULong512::RotL64(E[5], 36);
+			E[11] ^= D[1];
+			C[2] = ULong512::RotL64(E[11], 10);
+			E[17] ^= D[2];
+			C[3] = ULong512::RotL64(E[17], 15);
+			E[23] ^= D[3];
+			C[4] = ULong512::RotL64(E[23], 56);
+			A[15] = C[0] ^ ((~C[1]) & C[2]);
+			A[16] = C[1] ^ ((~C[2]) & C[3]);
+			A[17] = C[2] ^ ((~C[3]) & C[4]);
+			A[18] = C[3] ^ ((~C[4]) & C[0]);
+			A[19] = C[4] ^ ((~C[0]) & C[1]);
+			E[2] ^= D[2];
+			C[0] = ULong512::RotL64(E[2], 62);
+			E[8] ^= D[3];
+			C[1] = ULong512::RotL64(E[8], 55);
+			E[14] ^= D[4];
+			C[2] = ULong512::RotL64(E[14], 39);
+			E[15] ^= D[0];
+			C[3] = ULong512::RotL64(E[15], 41);
+			E[21] ^= D[1];
+			C[4] = ULong512::RotL64(E[21], 2);
+			A[20] = C[0] ^ ((~C[1]) & C[2]);
+			A[21] = C[1] ^ ((~C[2]) & C[3]);
+			A[22] = C[2] ^ ((~C[3]) & C[4]);
+			A[23] = C[3] ^ ((~C[4]) & C[0]);
+			A[24] = C[4] ^ ((~C[0]) & C[1]);
+		}
+
+		MemoryTools::Copy(A, 0, State, 0, A.size() * sizeof(ULong512));
+	}
 
 	/// <summary>
 	/// The horizontally vectorized 48 round (extended) form of the SHA3 permutation function.
@@ -1227,9 +7956,939 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations ULong512 state array</param>
-	static void PermuteR48P8x1600H(std::vector<ULong512> &State);
+	template<typename ArrayU512>
+	static void PermuteR48P8x1600H(ArrayU512 &State)
+	{
+		std::array<ULong512, 25> A;
+		std::array<ULong512, 5> C;
+		std::array<ULong512, 5> D;
+		std::array<ULong512, 25> E;
+		size_t i;
+
+		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ULong512));
+
+		for (i = 0; i < 48; i += 2)
+		{
+			// round n
+			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+			C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+			C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+			C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+			C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+			D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+			A[0] ^= D[0];
+			C[0] = A[0];
+			A[6] ^= D[1];
+			C[1] = ULong512::RotL64(A[6], 44);
+			A[12] ^= D[2];
+			C[2] = ULong512::RotL64(A[12], 43);
+			A[18] ^= D[3];
+			C[3] = ULong512::RotL64(A[18], 21);
+			A[24] ^= D[4];
+			C[4] = ULong512::RotL64(A[24], 14);
+			E[0] = C[0] ^ ((~C[1]) & C[2]);
+			E[0] ^= ULong512(KECCAK_RC48[i]);
+			E[1] = C[1] ^ ((~C[2]) & C[3]);
+			E[2] = C[2] ^ ((~C[3]) & C[4]);
+			E[3] = C[3] ^ ((~C[4]) & C[0]);
+			E[4] = C[4] ^ ((~C[0]) & C[1]);
+			A[3] ^= D[3];
+			C[0] = ULong512::RotL64(A[3], 28);
+			A[9] ^= D[4];
+			C[1] = ULong512::RotL64(A[9], 20);
+			A[10] ^= D[0];
+			C[2] = ULong512::RotL64(A[10], 3);
+			A[16] ^= D[1];
+			C[3] = ULong512::RotL64(A[16], 45);
+			A[22] ^= D[2];
+			C[4] = ULong512::RotL64(A[22], 61);
+			E[5] = C[0] ^ ((~C[1]) & C[2]);
+			E[6] = C[1] ^ ((~C[2]) & C[3]);
+			E[7] = C[2] ^ ((~C[3]) & C[4]);
+			E[8] = C[3] ^ ((~C[4]) & C[0]);
+			E[9] = C[4] ^ ((~C[0]) & C[1]);
+			A[1] ^= D[1];
+			C[0] = ULong512::RotL64(A[1], 1);
+			A[7] ^= D[2];
+			C[1] = ULong512::RotL64(A[7], 6);
+			A[13] ^= D[3];
+			C[2] = ULong512::RotL64(A[13], 25);
+			A[19] ^= D[4];
+			C[3] = ULong512::RotL64(A[19], 8);
+			A[20] ^= D[0];
+			C[4] = ULong512::RotL64(A[20], 18);
+			E[10] = C[0] ^ ((~C[1]) & C[2]);
+			E[11] = C[1] ^ ((~C[2]) & C[3]);
+			E[12] = C[2] ^ ((~C[3]) & C[4]);
+			E[13] = C[3] ^ ((~C[4]) & C[0]);
+			E[14] = C[4] ^ ((~C[0]) & C[1]);
+			A[4] ^= D[4];
+			C[0] = ULong512::RotL64(A[4], 27);
+			A[5] ^= D[0];
+			C[1] = ULong512::RotL64(A[5], 36);
+			A[11] ^= D[1];
+			C[2] = ULong512::RotL64(A[11], 10);
+			A[17] ^= D[2];
+			C[3] = ULong512::RotL64(A[17], 15);
+			A[23] ^= D[3];
+			C[4] = ULong512::RotL64(A[23], 56);
+			E[15] = C[0] ^ ((~C[1]) & C[2]);
+			E[16] = C[1] ^ ((~C[2]) & C[3]);
+			E[17] = C[2] ^ ((~C[3]) & C[4]);
+			E[18] = C[3] ^ ((~C[4]) & C[0]);
+			E[19] = C[4] ^ ((~C[0]) & C[1]);
+			A[2] ^= D[2];
+			C[0] = ULong512::RotL64(A[2], 62);
+			A[8] ^= D[3];
+			C[1] = ULong512::RotL64(A[8], 55);
+			A[14] ^= D[4];
+			C[2] = ULong512::RotL64(A[14], 39);
+			A[15] ^= D[0];
+			C[3] = ULong512::RotL64(A[15], 41);
+			A[21] ^= D[1];
+			C[4] = ULong512::RotL64(A[21], 2);
+			E[20] = C[0] ^ ((~C[1]) & C[2]);
+			E[21] = C[1] ^ ((~C[2]) & C[3]);
+			E[22] = C[2] ^ ((~C[3]) & C[4]);
+			E[23] = C[3] ^ ((~C[4]) & C[0]);
+			E[24] = C[4] ^ ((~C[0]) & C[1]);
+			// round n + 1
+			C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+			C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+			C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+			C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+			C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+			D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+			E[0] ^= D[0];
+			C[0] = E[0];
+			E[6] ^= D[1];
+			C[1] = ULong512::RotL64(E[6], 44);
+			E[12] ^= D[2];
+			C[2] = ULong512::RotL64(E[12], 43);
+			E[18] ^= D[3];
+			C[3] = ULong512::RotL64(E[18], 21);
+			E[24] ^= D[4];
+			C[4] = ULong512::RotL64(E[24], 14);
+			A[0] = C[0] ^ ((~C[1]) & C[2]);
+			A[0] ^= ULong512(KECCAK_RC48[i + 1]);
+			A[1] = C[1] ^ ((~C[2]) & C[3]);
+			A[2] = C[2] ^ ((~C[3]) & C[4]);
+			A[3] = C[3] ^ ((~C[4]) & C[0]);
+			A[4] = C[4] ^ ((~C[0]) & C[1]);
+			E[3] ^= D[3];
+			C[0] = ULong512::RotL64(E[3], 28);
+			E[9] ^= D[4];
+			C[1] = ULong512::RotL64(E[9], 20);
+			E[10] ^= D[0];
+			C[2] = ULong512::RotL64(E[10], 3);
+			E[16] ^= D[1];
+			C[3] = ULong512::RotL64(E[16], 45);
+			E[22] ^= D[2];
+			C[4] = ULong512::RotL64(E[22], 61);
+			A[5] = C[0] ^ ((~C[1]) & C[2]);
+			A[6] = C[1] ^ ((~C[2]) & C[3]);
+			A[7] = C[2] ^ ((~C[3]) & C[4]);
+			A[8] = C[3] ^ ((~C[4]) & C[0]);
+			A[9] = C[4] ^ ((~C[0]) & C[1]);
+			E[1] ^= D[1];
+			C[0] = ULong512::RotL64(E[1], 1);
+			E[7] ^= D[2];
+			C[1] = ULong512::RotL64(E[7], 6);
+			E[13] ^= D[3];
+			C[2] = ULong512::RotL64(E[13], 25);
+			E[19] ^= D[4];
+			C[3] = ULong512::RotL64(E[19], 8);
+			E[20] ^= D[0];
+			C[4] = ULong512::RotL64(E[20], 18);
+			A[10] = C[0] ^ ((~C[1]) & C[2]);
+			A[11] = C[1] ^ ((~C[2]) & C[3]);
+			A[12] = C[2] ^ ((~C[3]) & C[4]);
+			A[13] = C[3] ^ ((~C[4]) & C[0]);
+			A[14] = C[4] ^ ((~C[0]) & C[1]);
+			E[4] ^= D[4];
+			C[0] = ULong512::RotL64(E[4], 27);
+			E[5] ^= D[0];
+			C[1] = ULong512::RotL64(E[5], 36);
+			E[11] ^= D[1];
+			C[2] = ULong512::RotL64(E[11], 10);
+			E[17] ^= D[2];
+			C[3] = ULong512::RotL64(E[17], 15);
+			E[23] ^= D[3];
+			C[4] = ULong512::RotL64(E[23], 56);
+			A[15] = C[0] ^ ((~C[1]) & C[2]);
+			A[16] = C[1] ^ ((~C[2]) & C[3]);
+			A[17] = C[2] ^ ((~C[3]) & C[4]);
+			A[18] = C[3] ^ ((~C[4]) & C[0]);
+			A[19] = C[4] ^ ((~C[0]) & C[1]);
+			E[2] ^= D[2];
+			C[0] = ULong512::RotL64(E[2], 62);
+			E[8] ^= D[3];
+			C[1] = ULong512::RotL64(E[8], 55);
+			E[14] ^= D[4];
+			C[2] = ULong512::RotL64(E[14], 39);
+			E[15] ^= D[0];
+			C[3] = ULong512::RotL64(E[15], 41);
+			E[21] ^= D[1];
+			C[4] = ULong512::RotL64(E[21], 2);
+			A[20] = C[0] ^ ((~C[1]) & C[2]);
+			A[21] = C[1] ^ ((~C[2]) & C[3]);
+			A[22] = C[2] ^ ((~C[3]) & C[4]);
+			A[23] = C[3] ^ ((~C[4]) & C[0]);
+			A[24] = C[4] ^ ((~C[0]) & C[1]);
+		}
+
+		MemoryTools::Copy(A, 0, State, 0, A.size() * sizeof(ULong512));
+	}
+
+#elif defined(CEX_HAS_AVX2)
+
+	/// <summary>
+	/// The horizontally vectorized 24 round (standard) form of the SHA3 permutation function.
+	/// <para>This function processes 4*25 blocks of state in parallel using AVX2 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations ULong256 state array</param>
+	template<typename ArrayU256>
+	static void PermuteR24P4x1600H(ArrayU256 &State)
+	{
+		std::array<ULong256, 25> A;
+		std::array<ULong256, 5> C;
+		std::array<ULong256, 5> D;
+		std::array<ULong256, 25> E;
+		size_t i;
+
+		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ULong256));
+
+		for (i = 0; i < 24; i += 2)
+		{
+			// round n
+			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+			C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+			C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+			C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+			C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+			D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
+			A[0] ^= D[0];
+			C[0] = A[0];
+			A[6] ^= D[1];
+			C[1] = ULong256::RotL64(A[6], 44);
+			A[12] ^= D[2];
+			C[2] = ULong256::RotL64(A[12], 43);
+			A[18] ^= D[3];
+			C[3] = ULong256::RotL64(A[18], 21);
+			A[24] ^= D[4];
+			C[4] = ULong256::RotL64(A[24], 14);
+			E[0] = C[0] ^ ((~C[1]) & C[2]);
+			E[0] ^= ULong256(KECCAK_RC24[i]);
+			E[1] = C[1] ^ ((~C[2]) & C[3]);
+			E[2] = C[2] ^ ((~C[3]) & C[4]);
+			E[3] = C[3] ^ ((~C[4]) & C[0]);
+			E[4] = C[4] ^ ((~C[0]) & C[1]);
+			A[3] ^= D[3];
+			C[0] = ULong256::RotL64(A[3], 28);
+			A[9] ^= D[4];
+			C[1] = ULong256::RotL64(A[9], 20);
+			A[10] ^= D[0];
+			C[2] = ULong256::RotL64(A[10], 3);
+			A[16] ^= D[1];
+			C[3] = ULong256::RotL64(A[16], 45);
+			A[22] ^= D[2];
+			C[4] = ULong256::RotL64(A[22], 61);
+			E[5] = C[0] ^ ((~C[1]) & C[2]);
+			E[6] = C[1] ^ ((~C[2]) & C[3]);
+			E[7] = C[2] ^ ((~C[3]) & C[4]);
+			E[8] = C[3] ^ ((~C[4]) & C[0]);
+			E[9] = C[4] ^ ((~C[0]) & C[1]);
+			A[1] ^= D[1];
+			C[0] = ULong256::RotL64(A[1], 1);
+			A[7] ^= D[2];
+			C[1] = ULong256::RotL64(A[7], 6);
+			A[13] ^= D[3];
+			C[2] = ULong256::RotL64(A[13], 25);
+			A[19] ^= D[4];
+			C[3] = ULong256::RotL64(A[19], 8);
+			A[20] ^= D[0];
+			C[4] = ULong256::RotL64(A[20], 18);
+			E[10] = C[0] ^ ((~C[1]) & C[2]);
+			E[11] = C[1] ^ ((~C[2]) & C[3]);
+			E[12] = C[2] ^ ((~C[3]) & C[4]);
+			E[13] = C[3] ^ ((~C[4]) & C[0]);
+			E[14] = C[4] ^ ((~C[0]) & C[1]);
+			A[4] ^= D[4];
+			C[0] = ULong256::RotL64(A[4], 27);
+			A[5] ^= D[0];
+			C[1] = ULong256::RotL64(A[5], 36);
+			A[11] ^= D[1];
+			C[2] = ULong256::RotL64(A[11], 10);
+			A[17] ^= D[2];
+			C[3] = ULong256::RotL64(A[17], 15);
+			A[23] ^= D[3];
+			C[4] = ULong256::RotL64(A[23], 56);
+			E[15] = C[0] ^ ((~C[1]) & C[2]);
+			E[16] = C[1] ^ ((~C[2]) & C[3]);
+			E[17] = C[2] ^ ((~C[3]) & C[4]);
+			E[18] = C[3] ^ ((~C[4]) & C[0]);
+			E[19] = C[4] ^ ((~C[0]) & C[1]);
+			A[2] ^= D[2];
+			C[0] = ULong256::RotL64(A[2], 62);
+			A[8] ^= D[3];
+			C[1] = ULong256::RotL64(A[8], 55);
+			A[14] ^= D[4];
+			C[2] = ULong256::RotL64(A[14], 39);
+			A[15] ^= D[0];
+			C[3] = ULong256::RotL64(A[15], 41);
+			A[21] ^= D[1];
+			C[4] = ULong256::RotL64(A[21], 2);
+			E[20] = C[0] ^ ((~C[1]) & C[2]);
+			E[21] = C[1] ^ ((~C[2]) & C[3]);
+			E[22] = C[2] ^ ((~C[3]) & C[4]);
+			E[23] = C[3] ^ ((~C[4]) & C[0]);
+			E[24] = C[4] ^ ((~C[0]) & C[1]);
+			// round n + 1
+			C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+			C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+			C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+			C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+			C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+			D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
+			E[0] ^= D[0];
+			C[0] = E[0];
+			E[6] ^= D[1];
+			C[1] = ULong256::RotL64(E[6], 44);
+			E[12] ^= D[2];
+			C[2] = ULong256::RotL64(E[12], 43);
+			E[18] ^= D[3];
+			C[3] = ULong256::RotL64(E[18], 21);
+			E[24] ^= D[4];
+			C[4] = ULong256::RotL64(E[24], 14);
+			A[0] = C[0] ^ ((~C[1]) & C[2]);
+			A[0] ^= ULong256(KECCAK_RC24[i + 1]);
+			A[1] = C[1] ^ ((~C[2]) & C[3]);
+			A[2] = C[2] ^ ((~C[3]) & C[4]);
+			A[3] = C[3] ^ ((~C[4]) & C[0]);
+			A[4] = C[4] ^ ((~C[0]) & C[1]);
+			E[3] ^= D[3];
+			C[0] = ULong256::RotL64(E[3], 28);
+			E[9] ^= D[4];
+			C[1] = ULong256::RotL64(E[9], 20);
+			E[10] ^= D[0];
+			C[2] = ULong256::RotL64(E[10], 3);
+			E[16] ^= D[1];
+			C[3] = ULong256::RotL64(E[16], 45);
+			E[22] ^= D[2];
+			C[4] = ULong256::RotL64(E[22], 61);
+			A[5] = C[0] ^ ((~C[1]) & C[2]);
+			A[6] = C[1] ^ ((~C[2]) & C[3]);
+			A[7] = C[2] ^ ((~C[3]) & C[4]);
+			A[8] = C[3] ^ ((~C[4]) & C[0]);
+			A[9] = C[4] ^ ((~C[0]) & C[1]);
+			E[1] ^= D[1];
+			C[0] = ULong256::RotL64(E[1], 1);
+			E[7] ^= D[2];
+			C[1] = ULong256::RotL64(E[7], 6);
+			E[13] ^= D[3];
+			C[2] = ULong256::RotL64(E[13], 25);
+			E[19] ^= D[4];
+			C[3] = ULong256::RotL64(E[19], 8);
+			E[20] ^= D[0];
+			C[4] = ULong256::RotL64(E[20], 18);
+			A[10] = C[0] ^ ((~C[1]) & C[2]);
+			A[11] = C[1] ^ ((~C[2]) & C[3]);
+			A[12] = C[2] ^ ((~C[3]) & C[4]);
+			A[13] = C[3] ^ ((~C[4]) & C[0]);
+			A[14] = C[4] ^ ((~C[0]) & C[1]);
+			E[4] ^= D[4];
+			C[0] = ULong256::RotL64(E[4], 27);
+			E[5] ^= D[0];
+			C[1] = ULong256::RotL64(E[5], 36);
+			E[11] ^= D[1];
+			C[2] = ULong256::RotL64(E[11], 10);
+			E[17] ^= D[2];
+			C[3] = ULong256::RotL64(E[17], 15);
+			E[23] ^= D[3];
+			C[4] = ULong256::RotL64(E[23], 56);
+			A[15] = C[0] ^ ((~C[1]) & C[2]);
+			A[16] = C[1] ^ ((~C[2]) & C[3]);
+			A[17] = C[2] ^ ((~C[3]) & C[4]);
+			A[18] = C[3] ^ ((~C[4]) & C[0]);
+			A[19] = C[4] ^ ((~C[0]) & C[1]);
+			E[2] ^= D[2];
+			C[0] = ULong256::RotL64(E[2], 62);
+			E[8] ^= D[3];
+			C[1] = ULong256::RotL64(E[8], 55);
+			E[14] ^= D[4];
+			C[2] = ULong256::RotL64(E[14], 39);
+			E[15] ^= D[0];
+			C[3] = ULong256::RotL64(E[15], 41);
+			E[21] ^= D[1];
+			C[4] = ULong256::RotL64(E[21], 2);
+			A[20] = C[0] ^ ((~C[1]) & C[2]);
+			A[21] = C[1] ^ ((~C[2]) & C[3]);
+			A[22] = C[2] ^ ((~C[3]) & C[4]);
+			A[23] = C[3] ^ ((~C[4]) & C[0]);
+			A[24] = C[4] ^ ((~C[0]) & C[1]);
+		}
+
+		MemoryTools::Copy(A, 0, State, 0, A.size() * sizeof(ULong256));
+	}
+
+	/// <summary>
+	/// The horizontally vectorized 48 round form (extended) of the SHA3 permutation function.
+	/// <para>This function processes 4*25 blocks of state in parallel using AVX2 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations ULong256 state array</param>
+	template<typename ArrayU256>
+	static void PermuteR48P4x1600H(ArrayU256 &State)
+	{
+		std::array<ULong256, 25> A;
+		std::array<ULong256, 5> C;
+		std::array<ULong256, 5> D;
+		std::array<ULong256, 25> E;
+		size_t i;
+
+		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ULong256));
+
+		for (i = 0; i < 48; i += 2)
+		{
+			// round n
+			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+			C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+			C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+			C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+			C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+			D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
+			A[0] ^= D[0];
+			C[0] = A[0];
+			A[6] ^= D[1];
+			C[1] = ULong256::RotL64(A[6], 44);
+			A[12] ^= D[2];
+			C[2] = ULong256::RotL64(A[12], 43);
+			A[18] ^= D[3];
+			C[3] = ULong256::RotL64(A[18], 21);
+			A[24] ^= D[4];
+			C[4] = ULong256::RotL64(A[24], 14);
+			E[0] = C[0] ^ ((~C[1]) & C[2]);
+			E[0] ^= ULong256(KECCAK_RC48[i]);
+			E[1] = C[1] ^ ((~C[2]) & C[3]);
+			E[2] = C[2] ^ ((~C[3]) & C[4]);
+			E[3] = C[3] ^ ((~C[4]) & C[0]);
+			E[4] = C[4] ^ ((~C[0]) & C[1]);
+			A[3] ^= D[3];
+			C[0] = ULong256::RotL64(A[3], 28);
+			A[9] ^= D[4];
+			C[1] = ULong256::RotL64(A[9], 20);
+			A[10] ^= D[0];
+			C[2] = ULong256::RotL64(A[10], 3);
+			A[16] ^= D[1];
+			C[3] = ULong256::RotL64(A[16], 45);
+			A[22] ^= D[2];
+			C[4] = ULong256::RotL64(A[22], 61);
+			E[5] = C[0] ^ ((~C[1]) & C[2]);
+			E[6] = C[1] ^ ((~C[2]) & C[3]);
+			E[7] = C[2] ^ ((~C[3]) & C[4]);
+			E[8] = C[3] ^ ((~C[4]) & C[0]);
+			E[9] = C[4] ^ ((~C[0]) & C[1]);
+			A[1] ^= D[1];
+			C[0] = ULong256::RotL64(A[1], 1);
+			A[7] ^= D[2];
+			C[1] = ULong256::RotL64(A[7], 6);
+			A[13] ^= D[3];
+			C[2] = ULong256::RotL64(A[13], 25);
+			A[19] ^= D[4];
+			C[3] = ULong256::RotL64(A[19], 8);
+			A[20] ^= D[0];
+			C[4] = ULong256::RotL64(A[20], 18);
+			E[10] = C[0] ^ ((~C[1]) & C[2]);
+			E[11] = C[1] ^ ((~C[2]) & C[3]);
+			E[12] = C[2] ^ ((~C[3]) & C[4]);
+			E[13] = C[3] ^ ((~C[4]) & C[0]);
+			E[14] = C[4] ^ ((~C[0]) & C[1]);
+			A[4] ^= D[4];
+			C[0] = ULong256::RotL64(A[4], 27);
+			A[5] ^= D[0];
+			C[1] = ULong256::RotL64(A[5], 36);
+			A[11] ^= D[1];
+			C[2] = ULong256::RotL64(A[11], 10);
+			A[17] ^= D[2];
+			C[3] = ULong256::RotL64(A[17], 15);
+			A[23] ^= D[3];
+			C[4] = ULong256::RotL64(A[23], 56);
+			E[15] = C[0] ^ ((~C[1]) & C[2]);
+			E[16] = C[1] ^ ((~C[2]) & C[3]);
+			E[17] = C[2] ^ ((~C[3]) & C[4]);
+			E[18] = C[3] ^ ((~C[4]) & C[0]);
+			E[19] = C[4] ^ ((~C[0]) & C[1]);
+			A[2] ^= D[2];
+			C[0] = ULong256::RotL64(A[2], 62);
+			A[8] ^= D[3];
+			C[1] = ULong256::RotL64(A[8], 55);
+			A[14] ^= D[4];
+			C[2] = ULong256::RotL64(A[14], 39);
+			A[15] ^= D[0];
+			C[3] = ULong256::RotL64(A[15], 41);
+			A[21] ^= D[1];
+			C[4] = ULong256::RotL64(A[21], 2);
+			E[20] = C[0] ^ ((~C[1]) & C[2]);
+			E[21] = C[1] ^ ((~C[2]) & C[3]);
+			E[22] = C[2] ^ ((~C[3]) & C[4]);
+			E[23] = C[3] ^ ((~C[4]) & C[0]);
+			E[24] = C[4] ^ ((~C[0]) & C[1]);
+			// round n + 1
+			C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+			C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+			C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+			C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+			C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+			D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
+			D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
+			D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
+			D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
+			D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
+			E[0] ^= D[0];
+			C[0] = E[0];
+			E[6] ^= D[1];
+			C[1] = ULong256::RotL64(E[6], 44);
+			E[12] ^= D[2];
+			C[2] = ULong256::RotL64(E[12], 43);
+			E[18] ^= D[3];
+			C[3] = ULong256::RotL64(E[18], 21);
+			E[24] ^= D[4];
+			C[4] = ULong256::RotL64(E[24], 14);
+			A[0] = C[0] ^ ((~C[1]) & C[2]);
+			A[0] ^= ULong256(KECCAK_RC48[i + 1]);
+			A[1] = C[1] ^ ((~C[2]) & C[3]);
+			A[2] = C[2] ^ ((~C[3]) & C[4]);
+			A[3] = C[3] ^ ((~C[4]) & C[0]);
+			A[4] = C[4] ^ ((~C[0]) & C[1]);
+			E[3] ^= D[3];
+			C[0] = ULong256::RotL64(E[3], 28);
+			E[9] ^= D[4];
+			C[1] = ULong256::RotL64(E[9], 20);
+			E[10] ^= D[0];
+			C[2] = ULong256::RotL64(E[10], 3);
+			E[16] ^= D[1];
+			C[3] = ULong256::RotL64(E[16], 45);
+			E[22] ^= D[2];
+			C[4] = ULong256::RotL64(E[22], 61);
+			A[5] = C[0] ^ ((~C[1]) & C[2]);
+			A[6] = C[1] ^ ((~C[2]) & C[3]);
+			A[7] = C[2] ^ ((~C[3]) & C[4]);
+			A[8] = C[3] ^ ((~C[4]) & C[0]);
+			A[9] = C[4] ^ ((~C[0]) & C[1]);
+			E[1] ^= D[1];
+			C[0] = ULong256::RotL64(E[1], 1);
+			E[7] ^= D[2];
+			C[1] = ULong256::RotL64(E[7], 6);
+			E[13] ^= D[3];
+			C[2] = ULong256::RotL64(E[13], 25);
+			E[19] ^= D[4];
+			C[3] = ULong256::RotL64(E[19], 8);
+			E[20] ^= D[0];
+			C[4] = ULong256::RotL64(E[20], 18);
+			A[10] = C[0] ^ ((~C[1]) & C[2]);
+			A[11] = C[1] ^ ((~C[2]) & C[3]);
+			A[12] = C[2] ^ ((~C[3]) & C[4]);
+			A[13] = C[3] ^ ((~C[4]) & C[0]);
+			A[14] = C[4] ^ ((~C[0]) & C[1]);
+			E[4] ^= D[4];
+			C[0] = ULong256::RotL64(E[4], 27);
+			E[5] ^= D[0];
+			C[1] = ULong256::RotL64(E[5], 36);
+			E[11] ^= D[1];
+			C[2] = ULong256::RotL64(E[11], 10);
+			E[17] ^= D[2];
+			C[3] = ULong256::RotL64(E[17], 15);
+			E[23] ^= D[3];
+			C[4] = ULong256::RotL64(E[23], 56);
+			A[15] = C[0] ^ ((~C[1]) & C[2]);
+			A[16] = C[1] ^ ((~C[2]) & C[3]);
+			A[17] = C[2] ^ ((~C[3]) & C[4]);
+			A[18] = C[3] ^ ((~C[4]) & C[0]);
+			A[19] = C[4] ^ ((~C[0]) & C[1]);
+			E[2] ^= D[2];
+			C[0] = ULong256::RotL64(E[2], 62);
+			E[8] ^= D[3];
+			C[1] = ULong256::RotL64(E[8], 55);
+			E[14] ^= D[4];
+			C[2] = ULong256::RotL64(E[14], 39);
+			E[15] ^= D[0];
+			C[3] = ULong256::RotL64(E[15], 41);
+			E[21] ^= D[1];
+			C[4] = ULong256::RotL64(E[21], 2);
+			A[20] = C[0] ^ ((~C[1]) & C[2]);
+			A[21] = C[1] ^ ((~C[2]) & C[3]);
+			A[22] = C[2] ^ ((~C[3]) & C[4]);
+			A[23] = C[3] ^ ((~C[4]) & C[0]);
+			A[24] = C[4] ^ ((~C[0]) & C[1]);
+		}
+
+		MemoryTools::Copy(A, 0, State, 0, A.size() * sizeof(ULong256));
+	}
 
 #endif
+
+	/// <summary>
+	/// The Keccak extraction function; extract blocks of state to an output 8-bit array
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations uint64 state array</param>
+	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="Blocks">The number of blocks to extract</param>
+	/// <param name="Rate">The Keccak extraction rate</param>
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void Squeeze(ArrayU64x25 &State, ArrayU8 &Output, size_t OutOffset, size_t Blocks, size_t Rate)
+	{
+		if (Rate != KECCAK1024_RATE_SIZE)
+		{
+			SqueezeR24(State, Output, OutOffset, Blocks, Rate);
+		}
+		else
+		{
+			SqueezeR48(State, Output, OutOffset, Blocks, Rate);
+		}
+	}
+
+	/// <summary>
+	/// The Keccak 24-round extraction function; extract blocks of state to an output 8-bit array
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations uint64 state array</param>
+	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="Blocks">The number of blocks to extract</param>
+	/// <param name="Rate">The Keccak extraction rate</param>
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void SqueezeR24(ArrayU64x25 &State, ArrayU8 &Output, size_t OutOffset, size_t Blocks, size_t Rate)
+	{
+		while (Blocks > 0)
+		{
+			PermuteR24P1600U(State);
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
+#else
+
+			for (size_t i = 0; i < (Rate >> 3); i++)
+			{
+				IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
+			}
+#endif
+
+			OutOffset += Rate;
+			--Blocks;
+		}
+	}
+
+	/// <summary>
+	/// The Keccak 48-round extraction function; extract blocks of state to an output 8-bit array
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations uint64 state array</param>
+	/// <param name="Output">The output byte array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="Blocks">The number of blocks to extract</param>
+	/// <param name="Rate">The Keccak extraction rate</param>
+	template<typename ArrayU8, typename ArrayU64x25>
+	static void SqueezeR48(ArrayU64x25 &State, ArrayU8 &Output, size_t OutOffset, size_t Blocks, size_t Rate)
+	{
+		while (Blocks > 0)
+		{
+			PermuteR48P1600U(State);
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+			MemoryTools::Copy(State, 0, Output, OutOffset, Rate);
+#else
+
+			for (size_t i = 0; i < (Rate >> 3); i++)
+			{
+				IntegerTools::Le64ToBytes(State[i], Output, OutOffset + (8 * i));
+			}
+#endif
+
+			OutOffset += Rate;
+			--Blocks;
+		}
+	}
+
+	/// <summary>
+	/// The Keccak XOF function using 24 rounds; process an input seed array and return a pseudo-random output array.
+	/// <para>A compact form of the SHAKE XOF function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayU8A, typename ArrayU8B>
+	static void XOFR24P1600(const ArrayU8A &Input, ArrayU8B &Output, size_t Rate)
+	{
+		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		size_t blkcnt;
+		size_t i;
+		size_t inplen;
+		size_t inpoft;
+		size_t otplen;
+		size_t otpoft;
+
+		inplen = Input.size();
+		inpoft = 0;
+		otplen = Output.size();
+		otpoft = 0;
+
+		while (inplen >= Rate)
+		{
+			FastAbsorb(Input, inpoft, Rate, state);
+			PermuteR24P1600U(state);
+			inplen -= Rate;
+			inpoft += Rate;
+		}
+
+		MemoryTools::Copy(Input, inpoft, msg, 0, inplen);
+		msg[inplen] = KECCAK_SHAKE_DOMAIN;
+		MemoryTools::Clear(msg, inplen + 1, Rate - inplen + 1);
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemoryTools::XOR(msg, 0, state, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+
+		blkcnt = otplen / Rate;
+		SqueezeR24(state, Output, otpoft, blkcnt, Rate);
+		otpoft += blkcnt * Rate;
+		otplen -= blkcnt * Rate;
+
+		if (otplen != 0)
+		{
+			PermuteR24P1600U(state);
+
+			const size_t FNLBLK = (otplen % sizeof(ulong) == 0) ? otplen / sizeof(ulong) : otplen / sizeof(ulong) + 1;
+
+			for (i = 0; i < FNLBLK; i++)
+			{
+				IntegerTools::Le64ToBytes(state[i], msg, (8 * i));
+			}
+
+			MemoryTools::Copy(msg, 0, Output, otpoft, otplen);
+		}
+	}
+
+	/// <summary>
+	/// The Keccak XOF function using 24 rounds; process an input seed array and return a pseudo-random output array.
+	/// <para>A compact form of the SHAKE XOF function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of seed bytes to process</param>
+	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="OutLength">The number of output bytes to produce</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayU8A, typename ArrayU8B>
+	static void XOFR24P1600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	{
+		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		size_t blkcnt;
+		size_t i;
+
+		while (InLength >= Rate)
+		{
+			FastAbsorb(Input, InOffset, Rate, state);
+			PermuteR24P1600U(state);
+			InLength -= Rate;
+			InOffset += Rate;
+		}
+
+		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
+		msg[InLength] = KECCAK_SHAKE_DOMAIN;
+		MemoryTools::Clear(msg, InLength + 1, Rate - InLength + 1);
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemoryTools::XOR(msg, 0, state, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+
+		blkcnt = OutLength / Rate;
+		SqueezeR24(state, Output, OutOffset, blkcnt, Rate);
+		OutOffset += blkcnt * Rate;
+		OutLength -= blkcnt * Rate;
+
+		if (OutLength != 0)
+		{
+			PermuteR24P1600U(state);
+
+			const size_t FNLBLK = (OutLength % sizeof(ulong) == 0) ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
+
+			for (i = 0; i < FNLBLK; i++)
+			{
+				IntegerTools::Le64ToBytes(state[i], msg, (8 * i));
+			}
+
+			MemoryTools::Copy(msg, 0, Output, OutOffset, OutLength);
+		}
+	}
+
+	/// <summary>
+	/// The Keccak XOF function using 48 rounds; process an input seed array and return a pseudo-random output array.
+	/// <para>A compact form of the SHAKE XOF function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayU8A, typename ArrayU8B>
+	static void XOFR48P1600(const ArrayU8A &Input, ArrayU8B &Output, size_t Rate)
+	{
+		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		size_t blkcnt;
+		size_t i;
+		size_t inplen;
+		size_t inpoft;
+		size_t otplen;
+		size_t otpoft;
+
+		inplen = Input.size();
+		inpoft = 0;
+		otplen = Output.size();
+		otpoft = 0;
+
+		while (inplen >= Rate)
+		{
+			FastAbsorb(Input, inpoft, Rate, state);
+			PermuteR48P1600U(state);
+			inplen -= Rate;
+			inpoft += Rate;
+		}
+
+		MemoryTools::Copy(Input, inpoft, msg, 0, inplen);
+		msg[inplen] = KECCAK_SHAKE_DOMAIN;
+		MemoryTools::Clear(msg, inplen + 1, Rate - inplen + 1);
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemoryTools::XOR(msg, 0, state, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+
+		blkcnt = otplen / Rate;
+		SqueezeR48(state, Output, otpoft, blkcnt, Rate);
+		otpoft += blkcnt * Rate;
+		otplen -= blkcnt * Rate;
+
+		if (otplen != 0)
+		{
+			PermuteR48P1600U(state);
+
+			const size_t FNLBLK = (otplen % sizeof(ulong) == 0) ? otplen / sizeof(ulong) : otplen / sizeof(ulong) + 1;
+
+			for (i = 0; i < FNLBLK; i++)
+			{
+				IntegerTools::Le64ToBytes(state[i], msg, (8 * i));
+			}
+
+			MemoryTools::Copy(msg, 0, Output, otpoft, otplen);
+		}
+	}
+
+	/// <summary>
+	/// The extended Keccak XOF function using 48 rounds; process an input seed array and return a pseudo-random output array.
+	/// <para>A compact form of the SHAKE XOF function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="InLength">The number of seed bytes to process</param>
+	/// <param name="Output">The input byte seed array, can be either an 8-bit array or vector</param>
+	/// <param name="OutOffset">The starting offset withing the output array</param>
+	/// <param name="OutLength">The number of output bytes to produce</param>
+	/// <param name="Rate">The block input rate of permutation calls; SHAKE128=168, SHAKE256=136, SHAKE512=72</param>
+	template<typename ArrayU8A, typename ArrayU8B>
+	static void XOFR48P1600(const ArrayU8A &Input, size_t InOffset, size_t InLength, ArrayU8B &Output, size_t OutOffset, size_t OutLength, size_t Rate)
+	{
+		std::array<byte, KECCAK_STATE_SIZE * sizeof(ulong)> msg = { 0 };
+		std::array<ulong, KECCAK_STATE_SIZE> state = { 0 };
+		size_t blkcnt;
+		size_t i;
+
+		while (InLength >= Rate)
+		{
+			FastAbsorb(Input, InOffset, Rate, state);
+			PermuteR48P1600U(state);
+			InLength -= Rate;
+			InOffset += Rate;
+		}
+
+		MemoryTools::Copy(Input, InOffset, msg, 0, InLength);
+		msg[InLength] = KECCAK_SHAKE_DOMAIN;
+		MemoryTools::Clear(msg, InLength + 1, Rate - InLength + 1);
+		msg[Rate - 1] |= 128;
+
+#if defined(CEX_IS_LITTLE_ENDIAN)
+		MemoryTools::XOR(msg, 0, state, 0, Rate);
+#else
+		for (i = 0; i < (Rate >> 3); ++i)
+		{
+			state[i] ^= IntegerTools::LeBytesTo64(msg, (8 * i));
+		}
+#endif
+
+		blkcnt = OutLength / Rate;
+		SqueezeR48(state, Output, OutOffset, blkcnt, Rate);
+		OutOffset += blkcnt * Rate;
+		OutLength -= blkcnt * Rate;
+
+		if (OutLength != 0)
+		{
+			PermuteR48P1600U(state);
+
+			const size_t FNLBLK = (OutLength % sizeof(ulong) == 0) ? OutLength / sizeof(ulong) : OutLength / sizeof(ulong) + 1;
+
+			for (i = 0; i < FNLBLK; ++i)
+			{
+				IntegerTools::Le64ToBytes(state[i], msg, (sizeof(ulong) * i));
+			}
+
+			MemoryTools::Copy(msg, 0, Output, OutOffset, OutLength);
+		}
+	}
 
 	/// <summary>
 	/// Keccak common function: Right encode a value onto an array
@@ -1247,7 +8906,7 @@ public:
 		ulong n;
 		ulong v;
 
-		for (v = Value, n = 0; v && (n < sizeof(ulong)); ++n, v >>= 8)
+		for (v = Value, n = 0; (v > 0) && (n < sizeof(ulong)); ++n, v >>= 8)
 		{
 		}
 

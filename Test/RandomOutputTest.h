@@ -61,7 +61,7 @@ namespace Test
 		void ECPGenerateFile(std::string FilePath, size_t FileSize);
 		void RDPGenerateFile(std::string FilePath, size_t FileSize);
 		// drbgs
-		void BCGGenerateFile(std::string FilePath, size_t FileSize, bool Parallel);
+		void BCGGenerateFile(std::string FilePath, size_t FileSize);
 		void CSGGenerateFile(std::string FilePath, size_t FileSize, bool Parallel);
 		void HCGGenerateFile(std::string FilePath, size_t FileSize);
 		// prngs

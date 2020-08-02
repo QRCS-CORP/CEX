@@ -9,99 +9,24 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.8d (A8).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.8i (A8).
 \brief
 CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.8d</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.8i</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John G. Underhill
-\version   v1.0.0.8d
-\date      January 09, 2020
+\version   v1.0.0.8i
+\date      August 01, 2020
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.8d (A8 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.8i (A8 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.8d (version A8):</B> \n
-
-The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
-The Rainbow asymmetric signature scheme \n
-The XMSS/MT asymmetric signature scheme \n
-The Dilithium asymmetric signature scheme \n
-The SPHINCS+ asymmetric signature scheme \n
-The NTRU-Prime asymmetric cipher \n
-Authenticated Threefish-256/512/1024 stream ciphers \n
-Authenticated ChaCha-256/512 stream ciphers \n
-The cSHAKE option (RHX/SHX) integrated into HX symmetric ciphers \n
-Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
-
-<B>Planned Release 1.1.0.1</B> \n
-NewHope \n
-McEliece \n
-Kyber \n
-NTRUPrime \n
-Dilithium \n
-SPHINCS+ \n \n
-
-<B>Planned Release 1.2.0.1</B> \n
-DTM-KEX \n
-STM-KEX \n
-Android/iOS/Linux Compatability \n
-DLL API \n \n
-
-<B>History</B> \n \n
-
-<B>Version 1.0.0.6, June 17, 2018 (with partial 1.0.0.7 release, Sept 27)</B> \n
-Added the NTRU-Prime asymmetric cipher \n
-Added the RSX symmetric cipher \n
-Added the Threefish 256/512/1024 symmetric ciphers \n
-Added CSX512-P80 symmetric cipher \n
-Asymmetric ciphers updated to the NIST PQ Round 1 versions \n \n
-
-<B>Version 1.0.0.5, February 22, 2018</B> \n
-Added the Kyber asymmetric cipher \n
-Added asymmetric cipher Encapsulate/Decapsulate api \n
-Added the 128/256/512/1024 SHAKE XOF function \n
-Updates to random providers and Prngs \n
-The library is now Misra C++ 2014 compliant \n \n
-
-<B>Version 1.0.0.4, November 11, 2017</B> \n
-Added the McEliece asymmetric cipher \n
-Added the 1024bit Keccak digest \n
-Added the Poly1305 Message Authentication Code generator \n
-The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5) \n
-Full coding standards sweep of the library \n
-Integration of std::array and std::unique_ptr throughout \n
-A full optimization cycle completed \n \n
-
-<B>Version 1.0.0.3, June 30, 2017</B> \n
-Added asymmetric cipher interfaces and framework \n
-Added NewHope asymmetric cipher \n
-Added the Auto Collection seed Provider (ACP) \n
-Addition of the HCR prng \n
-Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators \n
-Overhaul of SecureRandom and prng classes \n \n
-
-<B>Version 1.0.0.2: April 23, 2017</B> \n
-Last of 1.0 sweep of the symmetric library before the second half of the project engages, with thousands of changes made throughout, and the addition of (!experimental) AVX512 support. \n
-Added a vectorized MemoryTools class, with SIMD 128/256/512 copy, clear, set-value, and xor functions. \n
-Integrated vectorized replacements for memcpy, xor, and memset throughout, including cipher mode support for AVX512, (I don't have a xeon to test this, maybe you can help?). \n
-Reformatting of headers (inline accessors removed and the override hint added). \n
-Many small TODOs finished, api synchronized, and formatting and documentation changes throughout. \n \n
-
-<B>Version 1.0: March 28, 2017</B> \n
-The first official release of the library, (ciphers and protocols are now tested, documented, and ready for deployment). \n
-Completed Code and Help review cycles. \n
-Added parallelized HMAC implementation. \n
-Added multi-threaded Tree Hashing to all Skein and Keccak digest implementations. \n
-Added SIMD parallelization to Skein512. \n
-Rewrote SHA-2 paralellized tree hashing and added support for the SHA-NI SIMD to SHA-256. \n
-Added a multi-threaded and SIMD parallelized implementation of the SCRYPT key derivation function. \n \n
 
 \section intro_link Links
 The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html  \n
@@ -325,13 +250,13 @@ NAMESPACE_ROOT
 		class Blake2Params {};
 		class IDigest {};
 		class Keccak {};
-		class Keccak256 {};
-		class Keccak512 {};
-		class Keccak1024 {};
+		class SHA3256 {};
+		class SHA3512 {};
+		class SHA31024 {};
 		class KeccakParams {};
 		class SHA2 {};
-		class SHA256 {};
-		class SHA512 {};
+		class SHA2256 {};
+		class SHA2512 {};
 		class SHA2Params {};
 		class Skein {};
 		class Skein256 {};
@@ -577,7 +502,7 @@ NAMESPACE_ROOT
 	*  @{
 	*  @brief Library Utilities Classes
 	*/
-	NAMESPACE_UTILITY 
+	NAMESPACE_TOOLS 
 		class ArrayTools {};
 		class IntegerTools {};
 		class MemoryPool {};
@@ -585,7 +510,7 @@ NAMESPACE_ROOT
 		class ParallelTools {};
 		class SystemTools {};
 		class TimeStamp {};
-	NAMESPACE_UTILITYEND
+	NAMESPACE_TOOLSEND
 	/*! @} */
 
 NAMESPACE_ROOTEND

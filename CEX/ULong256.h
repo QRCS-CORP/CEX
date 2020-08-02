@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -119,7 +119,7 @@ public:
 	/// </summary>
 	const SimdIntegers Enumeral()
 	{
-		return SimdIntegers::ULong256;
+		return SimdIntegers::ULong256; //-V2571
 	}
 
 	//~~~Load and Store~~~//
@@ -546,7 +546,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">The value to AND</param>
-	inline ULong256 operator && (const ULong256 &X) const
+	inline ULong256 operator && (const ULong256 &X) const //-V2569
 	{
 		return ULong256(ymm) & X;
 	}
@@ -596,7 +596,7 @@ public:
 	/// </summary>
 	inline ULong256 operator ~ () const
 	{
-		return ULong256(_mm256_xor_si256(ymm, _mm256_set1_epi32(0xFFFFFFFF)));
+		return ULong256(_mm256_xor_si256(ymm, _mm256_set1_epi32(0xFFFFFFFFUL)));
 	}
 
 	/// <summary>

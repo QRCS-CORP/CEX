@@ -9,7 +9,7 @@ namespace Test
 	using Enumeration::BlockCiphers;
 	using Exception::CryptoMacException;
 	using Mac::GMAC;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
@@ -262,7 +262,7 @@ namespace Test
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> msg;
-		std::vector<byte> nonce(ks.NonceSize());
+		std::vector<byte> nonce(ks.IVSize());
 		std::vector<byte> otp1(Generator->TagSize());
 		std::vector<byte> otp2(Generator->TagSize());
 		SecureRandom rnd;
@@ -274,9 +274,9 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd); 
-			IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(msg, 0, msg.size());
+			rnd.Generate(nonce, 0, nonce.size());
 			SymmetricKey kp(key, nonce);
 
 			// generate the mac
@@ -298,7 +298,7 @@ namespace Test
 	{
 		SymmetricKeySize ks = Generator->LegalKeySizes()[0];
 		std::vector<byte> msg;
-		std::vector<byte> nonce(ks.NonceSize());
+		std::vector<byte> nonce(ks.IVSize());
 		std::vector<byte> otp(Generator->TagSize());
 		std::vector<byte> key(ks.KeySize());
 		SecureRandom rnd;
@@ -312,9 +312,9 @@ namespace Test
 			{
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
-				IntegerTools::Fill(key, 0, key.size(), rnd);
-				IntegerTools::Fill(msg, 0, msg.size(), rnd);
-				IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
+				rnd.Generate(key, 0, key.size());
+				rnd.Generate(msg, 0, msg.size());
+				rnd.Generate(nonce, 0, nonce.size());
 				SymmetricKey kp(key, nonce);
 
 				// generate with the kdf

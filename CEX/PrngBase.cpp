@@ -3,7 +3,7 @@
 
 NAMESPACE_PRNG
 
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 //~~~Constructor~~~//
 

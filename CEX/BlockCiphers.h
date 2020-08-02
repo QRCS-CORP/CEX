@@ -27,12 +27,12 @@ enum class BlockCiphers : byte
 	/// </summary>
 	Serpent = static_cast<byte>(SymmetricCiphers::Serpent),
 	/// <summary>
-	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA256) secure key schedule.
+	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA2256) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RHXH256 = static_cast<byte>(SymmetricCiphers::RHXH256),
 	/// <summary>
-	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA512) secure key schedule.
+	/// An Rijndael implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF(SHA2512) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	RHXH512 = static_cast<byte>(SymmetricCiphers::RHXH512),
@@ -52,12 +52,12 @@ enum class BlockCiphers : byte
 	/// </summary>
 	RHXS1024 = static_cast<byte>(SymmetricCiphers::RHXS1024),
 	/// <summary>
-	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA256) secure key schedule.
+	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA2256) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	SHXH256 = static_cast<byte>(SymmetricCiphers::SHXH256),
 	/// <summary>
-	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA512) secure key schedule.
+	/// An implementation of the Serpent Block Cipher extended with an HKDF(SHA2512) secure key schedule.
 	/// <para>Extended cipher implementation: uses a 128-bit block and 256/512/1024-bit key sizes.</para>
 	/// </summary>
 	SHXH512 = static_cast<byte>(SymmetricCiphers::SHXH512),

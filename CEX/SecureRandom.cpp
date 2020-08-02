@@ -7,26 +7,55 @@
 NAMESPACE_PRNG
 
 using IO::BitConverter;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
+
+class SecureRandom::ScrState
+{
+public:
+
+	SecureVector<byte> Buffer;
+	size_t Position;
+
+	ScrState(Providers ProviderType)
+		:
+		Buffer(BUFFER_SIZE),
+		Position(BUFFER_SIZE)
+	{
+	}
+
+	~ScrState()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+		Position = 0;
+	}
+};
 
 //~~~Constructor~~~//
 
 SecureRandom::SecureRandom(Prngs PrngType, Providers ProviderType)
 	:
-	m_rndBuffer(BUFFER_SIZE),
-	m_rndIndex(BUFFER_SIZE),
+	m_scrState(ProviderType != Providers::None && PrngType != Prngs::None ?
+		new ScrState(ProviderType) :
+		throw CryptoRandomException(std::string("SecureRandom"), std::string("Constructor"), std::string("Prng mode and Provider type can not be none!"), ErrorCodes::InvalidParam)),
 	m_rngEngine(Helper::PrngFromName::GetInstance(PrngType, ProviderType))
 {
 }
 
 SecureRandom::~SecureRandom()
 {
-	m_rndIndex = 0;
-	SecureClear(m_rndBuffer);
-
 	if (m_rngEngine != nullptr)
 	{
 		m_rngEngine.reset(nullptr);
+	}
+
+	if (m_scrState != nullptr)
+	{
+		m_scrState.reset(nullptr);
 	}
 }
 
@@ -97,7 +126,7 @@ std::vector<byte> SecureRandom::Generate(size_t Length)
 
 void SecureRandom::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+	const size_t BUFLEN = m_scrState->Buffer.size() - m_scrState->Position;
 
 	if (Length != 0)
 	{
@@ -105,32 +134,32 @@ void SecureRandom::Generate(std::vector<byte> &Output, size_t Offset, size_t Len
 		{
 			if (BUFLEN > 0)
 			{
-				SecureExtract(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+				SecureMove(m_scrState->Buffer, m_scrState->Position, Output, Offset, BUFLEN);
 			}
 
-			while (Length >= m_rndBuffer.size())
+			while (Length >= m_scrState->Buffer.size())
 			{
-				m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-				SecureExtract(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
-				Length -= m_rndBuffer.size();
-				Offset += m_rndBuffer.size();
+				m_rngEngine->Generate(m_scrState->Buffer, 0, m_scrState->Buffer.size());
+				SecureMove(m_scrState->Buffer, 0, Output, Offset, m_scrState->Buffer.size());
+				Length -= m_scrState->Buffer.size();
+				Offset += m_scrState->Buffer.size();
 			}
 
-			m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-			SecureExtract(m_rndBuffer, 0, Output, Offset, Length);
-			m_rndIndex = Length;
+			m_rngEngine->Generate(m_scrState->Buffer, 0, m_scrState->Buffer.size());
+			SecureMove(m_scrState->Buffer, 0, Output, Offset, Length);
+			m_scrState->Position = Length;
 		}
 		else
 		{
-			SecureExtract(m_rndBuffer, m_rndIndex, Output, Offset, Length);
-			m_rndIndex += Length;
+			SecureMove(m_scrState->Buffer, m_scrState->Position, Output, Offset, Length);
+			m_scrState->Position += Length;
 		}
 	}
 }
 
 void SecureRandom::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
-	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+	const size_t BUFLEN = m_scrState->Buffer.size() - m_scrState->Position;
 
 	if (Length != 0)
 	{
@@ -138,25 +167,25 @@ void SecureRandom::Generate(SecureVector<byte> &Output, size_t Offset, size_t Le
 		{
 			if (BUFLEN > 0)
 			{
-				SecureCopy(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+				SecureCopy(m_scrState->Buffer, m_scrState->Position, Output, Offset, BUFLEN);
 			}
 
-			while (Length >= m_rndBuffer.size())
+			while (Length >= m_scrState->Buffer.size())
 			{
-				m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-				SecureCopy(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
-				Length -= m_rndBuffer.size();
-				Offset += m_rndBuffer.size();
+				m_rngEngine->Generate(m_scrState->Buffer, 0, m_scrState->Buffer.size());
+				SecureCopy(m_scrState->Buffer, 0, Output, Offset, m_scrState->Buffer.size());
+				Length -= m_scrState->Buffer.size();
+				Offset += m_scrState->Buffer.size();
 			}
 
-			m_rngEngine->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-			SecureCopy(m_rndBuffer, 0, Output, Offset, Length);
-			m_rndIndex = Length;
+			m_rngEngine->Generate(m_scrState->Buffer, 0, m_scrState->Buffer.size());
+			SecureCopy(m_scrState->Buffer, 0, Output, Offset, Length);
+			m_scrState->Position = Length;
 		}
 		else
 		{
-			SecureCopy(m_rndBuffer, m_rndIndex, Output, Offset, Length);
-			m_rndIndex += Length;
+			SecureCopy(m_scrState->Buffer, m_scrState->Position, Output, Offset, Length);
+			m_scrState->Position += Length;
 		}
 	}
 }

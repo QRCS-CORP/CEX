@@ -18,8 +18,9 @@
 
 NAMESPACE_PROVIDER
 
-using Utility::IntegerTools;
 using Enumeration::ProviderConvert;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 #if defined(CEX_OS_WINDOWS)
 #	pragma comment(lib, "crypt32.lib")
@@ -36,7 +37,7 @@ using Enumeration::ProviderConvert;
 CSP::CSP()
 	:
 #if defined(CEX_FIPS140_ENABLED)
-	m_pvdSelfTest(),
+	m_pvdSelfTest(new ProviderSelfTest),
 #endif
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_POSIX)
 	ProviderBase(true, Providers::CSP, ProviderConvert::ToName(Providers::CSP))
@@ -48,6 +49,11 @@ CSP::CSP()
 
 CSP::~CSP()
 {
+	if (m_pvdSelfTest != nullptr)
+	{
+		m_pvdSelfTest.reset(nullptr);
+	}
+
 #if defined(CEX_OS_WINDOWS)
 	m_hProvider = 0;
 #endif
@@ -57,21 +63,21 @@ CSP::~CSP()
 
 void CSP::Generate(std::vector<byte> &Output)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output.data(), Output.size());
+	Generate(Output.data(), Output.size());
 }
 
 void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
@@ -79,31 +85,31 @@ void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output.data() + Offset, Length);
+	Generate(&Output[Offset], Length);
 }
 
 void CSP::Generate(SecureVector<byte> &Output)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output.data(), Output.size());
+	Generate(Output.data(), Output.size());
 }
 
 void CSP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
@@ -111,15 +117,15 @@ void CSP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output.data() + Offset, Length);
+	Generate(&Output[Offset], Length);
 }
 
-void CSP::GetRandom(byte* Output, size_t Length)
+void CSP::Generate(byte* Output, size_t Length)
 {
 	size_t poff = 0;
 
@@ -161,7 +167,7 @@ void CSP::GetRandom(byte* Output, size_t Length)
 			{
 				const size_t PRCRMD = IntegerTools::Min(sizeof(uint), Length);
 				uint rnd = arc4random();
-				Utility::MemoryTools::Copy(rnd, Output, poff, PRCRMD);
+				MemoryTools::Copy(rnd, Output, poff, PRCRMD);
 				poff += PRCRMD;
 				Length -= PRCRMD;
 			} while (Length != 0)
@@ -205,13 +211,14 @@ void CSP::GetRandom(byte* Output, size_t Length)
 
 			poff += rlen;
 			Length -= rlen;
-		} while (Length != 0)
+		} 
+		while (Length != 0)
 
-			if (fdhandle > 0)
-			{
-				::close(fdhandle);
-				fdhandle = 0;
-			}
+		if (fdhandle > 0)
+		{
+			::close(fdhandle);
+			fdhandle = 0;
+		}
 	}
 
 #else
@@ -235,11 +242,11 @@ bool CSP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
+	SecureVector<byte> smp(m_pvdSelfTest->SELFTEST_LENGTH);
 
-	GetRandom(smp.data(), smp.size());
+	Generate(smp.data(), smp.size());
 
-	if (!m_pvdSelfTest.SelfTest(smp))
+	if (!m_pvdSelfTest->SelfTest(smp))
 	{
 		fail = true;
 	}

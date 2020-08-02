@@ -3,7 +3,7 @@
 
 NAMESPACE_MAC
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 //~~~MacBase~~~//
 

@@ -18,8 +18,8 @@ private:
 	static const std::string CLASS_NAME;
 
 	size_t m_infoSize;
+	size_t m_ivSize;
 	size_t m_keySize;
-	size_t m_nonceSize;
 
 public:
 
@@ -44,9 +44,9 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeySize">The key parameters byte length</param>
-	/// <param name="NonceSize">The nonce parameters byte length</param>
+	/// <param name="IVSize">The nonce parameters byte length</param>
 	/// <param name="InfoSize">The info parameters byte length</param>
-	SymmetricKeySize(size_t KeySize, size_t NonceSize, size_t InfoSize);
+	SymmetricKeySize(size_t KeySize, size_t IVSize, size_t InfoSize);
 
 	//~~~Accessors~~~//
 
@@ -56,14 +56,14 @@ public:
 	const size_t InfoSize();
 
 	/// <summary>
+	/// Read/Write: The IV parameters length in bytes
+	/// </summary>
+	const size_t IVSize();
+
+	/// <summary>
 	/// Read/Write: The key parameters length in bytes
 	/// </summary>
 	const size_t KeySize();
-
-	/// <summary>
-	/// Read/Write: The nonce parameters length in bytes
-	/// </summary>
-	const size_t NonceSize();
 
 	//~~~Public Functions~~~//
 
@@ -73,11 +73,11 @@ public:
 	/// 
 	/// <param name="SymmetricKeySizes">A vector of SymmetricKeySizes</param>
 	/// <param name="KeySize">The key length to check</param>
-	/// <param name="NonceSize">The nonce length to check</param>
+	/// <param name="IVSize">The nonce length to check</param>
 	/// <param name="InfoSize">The info length to check</param>
 	/// 
 	/// <returns>Returns true if the SymmetricKeySize array contains the values</returns>
-	static bool Contains(std::vector<SymmetricKeySize> SymmetricKeySizes, size_t KeySize, size_t NonceSize = 0, size_t InfoSize = 0);
+	static bool Contains(std::vector<SymmetricKeySize> SymmetricKeySizes, size_t KeySize, size_t IVSize = 0, size_t InfoSize = 0);
 
 	/// <summary>
 	/// Set all struct members to defaults

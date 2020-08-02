@@ -44,6 +44,7 @@ IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
 			}
 			default:
 			{
+				// invalid parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The padding mode type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}

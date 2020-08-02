@@ -7,12 +7,14 @@
 
 NAMESPACE_DRBG
 
-using Utility::ArrayTools;
+using Tools::ArrayTools;
 using Enumeration::DigestConvert;
 using Enumeration::DrbgConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 using Enumeration::SHA2DigestConvert;
+
+const std::vector<char> HCG::CEX_PREFIX = { 0x43, 0x45, 0x58, 0x2D };
 
 class HCG::HcgState
 {
@@ -28,8 +30,10 @@ public:
 	size_t Reseed;
 	size_t Strength;
 	size_t Threshold;
+	bool IsDestroyed;
+	bool IsInitialized;
 
-	HcgState(size_t BlockSize, size_t ReseedMax)
+	HcgState(size_t BlockSize, size_t ReseedMax, bool Destroyed)
 		:
 		Buffer(BlockSize / 2),
 		Code(0),
@@ -39,7 +43,9 @@ public:
 		Rate(BlockSize),
 		Reseed(0),
 		Strength((BlockSize / 4) * 8),
-		Threshold(ReseedMax)
+		Threshold(ReseedMax),
+		IsDestroyed(Destroyed),
+		IsInitialized(false)
 	{
 	}
 
@@ -51,6 +57,8 @@ public:
 		Reseed = 0;
 		Strength = 0;
 		Threshold = 0;
+		IsDestroyed = false;
+		IsInitialized = false;
 		MemoryTools::Clear(Buffer, 0, Buffer.size());
 		MemoryTools::Clear(Code, 0, Code.size());
 		Code.resize(0);
@@ -76,7 +84,7 @@ HCG::HCG(SHA2Digests DigestType, Providers ProviderType)
 	DrbgBase(
 		Drbgs::HCG,
 		(DrbgConvert::ToName(Drbgs::HCG) + std::string("-") + SHA2DigestConvert::ToName(DigestType)),
-		DigestType == SHA2Digests::SHA256 ? 
+		DigestType == SHA2Digests::SHA2256 ? 
 			std::vector<SymmetricKeySize> {
 				SymmetricKeySize(16, COUNTER_SIZE, 8),
 				SymmetricKeySize(32, COUNTER_SIZE, 8),
@@ -88,12 +96,13 @@ HCG::HCG(SHA2Digests DigestType, Providers ProviderType)
 		MAX_OUTPUT,
 		MAX_REQUEST,
 		MAX_THRESHOLD),
-	m_hcgGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
+	m_hcgGenerator(DigestType != SHA2Digests::None ? 
+		new HMAC(DigestType) :
 		throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::HCG), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
-	m_hcgProvider(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
-	m_hcgState(new HcgState(m_hcgGenerator->BlockSize(), DEF_RESEED)),
-	m_isDestroyed(true),
-	m_isInitialized(false)
+	m_hcgProvider(ProviderType == Providers::None ? 
+		nullptr : 
+		Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_hcgState(new HcgState(m_hcgGenerator->BlockSize(), DEF_RESEED, true))
 {
 }
 
@@ -104,7 +113,7 @@ HCG::HCG(IDigest* Digest, IProvider* Provider)
 		(Digest != nullptr ? DrbgConvert::ToName(Drbgs::BCG) + std::string("-") + DigestConvert::ToName(Digest->Enumeral()) :
 			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::HCG), std::string("Constructor"), std::string("The digest can not be null!"), ErrorCodes::IllegalOperation)),
 		Digest != nullptr ? 
-			(Digest->Enumeral() == Digests::SHA256 ?
+			(Digest->Enumeral() == Digests::SHA2256 ?
 				std::vector<SymmetricKeySize> {
 					SymmetricKeySize(16, COUNTER_SIZE, 8),
 					SymmetricKeySize(32, COUNTER_SIZE, 8),
@@ -117,27 +126,23 @@ HCG::HCG(IDigest* Digest, IProvider* Provider)
 		MAX_OUTPUT,
 		MAX_REQUEST,
 		MAX_THRESHOLD),
-	m_hcgGenerator(Digest != nullptr && (Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() != Digests::SHA512) ? new HMAC(Digest) :
+	m_hcgGenerator(Digest != nullptr && (Digest->Enumeral() == Digests::SHA2256 || Digest->Enumeral() != Digests::SHA2512) ? 
+		new HMAC(Digest) :
 		throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::HCG), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::IllegalOperation)),
 	m_hcgProvider(Provider),
-	m_hcgState(new HcgState(m_hcgGenerator->BlockSize(), DEF_RESEED)),
-	m_isDestroyed(false),
-	m_isInitialized(false)
+	m_hcgState(new HcgState(m_hcgGenerator->BlockSize(), DEF_RESEED, false))
 {
 }
 
 HCG::~HCG()
 {
-	m_isInitialized = false;
-
-	if (m_isDestroyed)
+	if (m_hcgState->IsDestroyed)
 	{
-		m_isDestroyed = false;
-
 		if (m_hcgGenerator != nullptr)
 		{
 			m_hcgGenerator.reset(nullptr);
 		}
+
 		if (m_hcgProvider != nullptr)
 		{
 			m_hcgProvider.reset(nullptr);
@@ -149,10 +154,16 @@ HCG::~HCG()
 		{
 			m_hcgGenerator.release();
 		}
+
 		if (m_hcgProvider != nullptr)
 		{
 			m_hcgProvider.release();
 		}
+	}
+
+	if (m_hcgState != nullptr)
+	{
+		m_hcgState.reset(nullptr);
 	}
 }
 
@@ -160,7 +171,7 @@ HCG::~HCG()
 
 const bool HCG::IsInitialized() 
 {
-	return m_isInitialized; 
+	return m_hcgState->IsInitialized; 
 }
 
 size_t &HCG::ReseedThreshold()
@@ -187,7 +198,7 @@ void HCG::Generate(SecureVector<byte> &Output)
 
 void HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::NotInitialized);
 	}
@@ -228,9 +239,14 @@ void HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 void HCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
+	if ((Output.size() - OutOffset) < Length)
+	{
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+	}
+
 	std::vector<byte> tmpr(Length);
-	Generate(tmpr, 0, Length);
-	SecureMove(tmpr, Output, OutOffset);
+	Generate(tmpr, 0, tmpr.size());
+	SecureMove(tmpr, 0, Output, OutOffset, tmpr.size());
 }
 
 void HCG::Initialize(ISymmetricKey &Parameters)
@@ -250,17 +266,17 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	m_hcgState->Reset();
 
 	// assign the library name, the formal class name, and the security-strength to the information-code parameter
-	ArrayTools::AppendVector(CEX_LIBRARY_PREFIX, m_hcgState->Code);
+	ArrayTools::AppendVector(CEX_PREFIX, m_hcgState->Code);
 	ArrayTools::AppendString(Name(), m_hcgState->Code);
 	ArrayTools::AppendValue(static_cast<ushort>(SecurityStrength()), m_hcgState->Code);
 	// add the optional custom distribution code
 	ArrayTools::AppendVector(Parameters.Info(), m_hcgState->Code);
 
-	if (Parameters.KeySizes().NonceSize() != 0)
+	if (Parameters.KeySizes().IVSize() != 0)
 	{
 		// copy the nonce into the state counter
-		const size_t CTRLEN = IntegerTools::Min(Parameters.KeySizes().NonceSize(), m_hcgState->Nonce.size());
-		MemoryTools::Copy(Parameters.Nonce(), 0, m_hcgState->Nonce, 0, CTRLEN);
+		const size_t CTRLEN = IntegerTools::Min(Parameters.KeySizes().IVSize(), m_hcgState->Nonce.size());
+		MemoryTools::Copy(Parameters.IV(), 0, m_hcgState->Nonce, 0, CTRLEN);
 	}
 
 	// initialize the HMAC
@@ -275,7 +291,7 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	// pre-initialize the state buffer
 	m_hcgGenerator->Finalize(m_hcgState->Buffer, 0);
 	// ready to generate pseudo-random
-	m_isInitialized = true;
+	m_hcgState->IsInitialized = true;
 }
 
 void HCG::Update(const std::vector<byte> &Key)
@@ -324,15 +340,8 @@ void HCG::Update(const std::vector<byte> &Key)
 
 void HCG::Update(const SecureVector<byte> &Key)
 {
-#if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
-	{
-		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Key size is invalid; check the key property for accepted value!"), ErrorCodes::InvalidKey);
-	}
-#endif
-
-	std::vector<byte> tmpk = SecureUnlock(Key);
-
+	std::vector<byte> tmpk(Key.size());
+	MemoryTools::Copy(Key, 0, tmpk, 0, tmpk.size());
 	Update(tmpk);
 	MemoryTools::Clear(tmpk, 0, tmpk.size());
 }

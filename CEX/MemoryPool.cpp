@@ -1,82 +1,109 @@
 #include "MemoryPool.h"
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 using Enumeration::ErrorCodes;
 
+
 const std::string MemoryPool::CLASS_NAME("MemoryPool");
+
+class MemoryPool::PoolState
+{
+public:
+
+	byte AlignBit;
+	std::vector<std::pair<size_t, size_t>> FreeList;
+	size_t MaxAlloc;
+	byte* MemPool;
+	size_t MinAlloc;
+	size_t PageSize;
+	size_t PoolSize;
+
+	PoolState(byte* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, byte AlignBit)
+		:
+		AlignBit((AlignBit <= 6) ?
+			AlignBit : 
+			throw CryptoException(std::string("MemoryPool"), std::string("Constructor"), std::string("MemoryPool invalid align bit!"), ErrorCodes::InvalidParam)),
+		FreeList(0),
+		MaxAlloc(MaxAlloc),
+		MemPool((Pool != nullptr) ? 
+			Pool : 
+			throw CryptoException(std::string("MemoryPool"), std::string("Constructor"), std::string("MemoryPool pool was null!"), ErrorCodes::IllegalOperation)),
+		MinAlloc((MinAlloc <= MaxAlloc) ? 
+			MinAlloc :
+			throw CryptoException(std::string("MemoryPool"), std::string("Constructor"), std::string("MemoryPool min alloc is more than max alloc!"), ErrorCodes::InvalidSize)),
+		PageSize(PageSize),
+		PoolSize(PoolSize)
+	{
+	}
+
+	~PoolState()
+	{
+		AlignBit = 0;
+		FreeList.clear();
+		MaxAlloc = 0;
+		MemPool = nullptr;
+		MinAlloc = 0;
+		PageSize = 0;
+		PoolSize = 0;
+	}
+};
 
 MemoryPool::MemoryPool(byte* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, byte AlignBit)
 	:
-	m_alignBit(AlignBit),
-	m_freeList(0),
-	m_maxAlloc(MaxAlloc),
-	m_memPool(nullptr),
-	m_minAlloc(MinAlloc),
-	m_pageSize(PageSize),
-	m_poolSize(PoolSize)
+	m_poolState(new PoolState(Pool, PoolSize, PageSize, MinAlloc, MaxAlloc, AlignBit))
 {
-	if (Pool == nullptr)
-	{
-		throw CryptoException(CLASS_NAME, std::string("Constructor"), std::string("MemoryPool pool was null!"), ErrorCodes::IllegalOperation);
-	}
+	Reset();
+}
 
-	if (m_minAlloc > m_maxAlloc)
+MemoryPool::~MemoryPool()
+{
+	if (m_poolState != nullptr)
 	{
-		throw CryptoException(CLASS_NAME, std::string("Constructor"), std::string("MemoryPool min alloc is more than max alloc!"), ErrorCodes::InvalidSize);
+		m_poolState.reset(nullptr);
 	}
-
-	if (m_alignBit > 6)
-	{
-		throw CryptoException(CLASS_NAME, std::string("Constructor"), std::string("MemoryPool invalid align bit!"), ErrorCodes::InvalidParam);
-	}
-
-	Clear(Pool, 0, PoolSize);
-	m_memPool = Pool;
-	m_poolSize = PoolSize;
-	m_freeList.push_back(std::make_pair(0, m_poolSize));
 }
 
 void* MemoryPool::Allocate(size_t Length)
 {
-	const size_t ALNBIT = static_cast<size_t>(1) << m_alignBit;
 	std::vector<std::pair<size_t, size_t>>::iterator best;
 	std::vector<std::pair<size_t, size_t>>::iterator itrl;
+	std::mutex m;
 	void* poolr;
 
+	std::lock_guard<std::mutex> lock(m);
 	poolr = nullptr;
 
-	if (Length <= m_poolSize && Length >= m_minAlloc && Length <= m_maxAlloc)
+	if (Length <= m_poolState->PoolSize && Length >= m_poolState->MinAlloc && Length <= m_poolState->MaxAlloc)
 	{
-		lock_guard_type<mutex_type> lock(m_mutex);
+		const size_t ALNBIT = static_cast<size_t>(1) << m_poolState->AlignBit;
+		best = m_poolState->FreeList.end();
 
-		best = m_freeList.end();
-
-		for (itrl = m_freeList.begin(); itrl != m_freeList.end(); ++itrl)
+		for (itrl = m_poolState->FreeList.begin(); itrl != m_poolState->FreeList.end(); ++itrl)
 		{
 			// perfect fit
 			if (itrl->second == Length && (itrl->first % ALNBIT) == 0)
 			{
 				const size_t FSTOFT = itrl->first;
 
-				m_freeList.erase(itrl);
-				Clear(m_memPool, FSTOFT, Length);
+				m_poolState->FreeList.erase(itrl);
+				Clear(m_poolState->MemPool, FSTOFT, Length);
 
-				if ((reinterpret_cast<uintptr_t>(m_memPool) + FSTOFT) % ALNBIT != 0)
+				if ((reinterpret_cast<uintptr_t>(m_poolState->MemPool) + FSTOFT) % ALNBIT != 0)
 				{
 					throw CryptoException(CLASS_NAME, std::string("Constructor"), std::string("MemoryPool pool is misaligned!"), ErrorCodes::InvalidState);
 				}
 
-				poolr = m_memPool + FSTOFT;
+				poolr = m_poolState->MemPool + FSTOFT;
 			}
 
-			if (((best == m_freeList.end()) || (best->second > itrl->second)) && (itrl->second >= (Length + PadSize(itrl->first, ALNBIT))))
+			if (((best == m_poolState->FreeList.end()) || (best->second > itrl->second)) && (itrl->second >= (Length + PadSize(itrl->first, ALNBIT))))
 			{
 				best = itrl;
 			}
 		}
 
-		if (best != m_freeList.end())
+		if (best != m_poolState->FreeList.end())
 		{
 			const size_t FSTOFT = best->first;
 			const size_t ALNPAD = PadSize(FSTOFT, ALNBIT);
@@ -94,22 +121,28 @@ void* MemoryPool::Allocate(size_t Length)
 				}
 				else
 				{
-					m_freeList.insert(best, std::make_pair(FSTOFT, ALNPAD));
+					m_poolState->FreeList.insert(best, std::make_pair(FSTOFT, ALNPAD));
 				}
 			}
 
-			Clear(m_memPool, FSTOFT + ALNPAD, Length);
+			Clear(m_poolState->MemPool, FSTOFT + ALNPAD, Length);
 
-			if ((reinterpret_cast<uintptr_t>(m_memPool) + FSTOFT + ALNPAD) % ALNBIT != 0)
+			if ((reinterpret_cast<uintptr_t>(m_poolState->MemPool) + FSTOFT + ALNPAD) % ALNBIT != 0)
 			{
 				throw CryptoException(CLASS_NAME, std::string("Constructor"), std::string("MemoryPool pool is misaligned!"), ErrorCodes::InvalidState);
 			}
 
-			poolr = m_memPool + FSTOFT + ALNPAD;
+			poolr = m_poolState->MemPool + FSTOFT + ALNPAD;
 		}
 	}
 
 	return poolr;
+}
+
+void MemoryPool::Reset()
+{
+	Clear(m_poolState->MemPool, 0, m_poolState->PoolSize);
+	m_poolState->FreeList.push_back(std::make_pair(0, m_poolState->PoolSize));
 }
 
 bool MemoryPool::Deallocate(void* Pointer, size_t Length)
@@ -117,27 +150,27 @@ bool MemoryPool::Deallocate(void* Pointer, size_t Length)
 	bool status;
 	std::vector<std::pair<size_t, size_t>>::iterator itrl;
 	std::vector<std::pair<size_t, size_t>>::iterator prev;
+	std::mutex m;
+	std::lock_guard<std::mutex> lock(m);
 
 	status = false;
 
-	if (InPool(m_memPool, m_poolSize, Pointer, Length))
+	if (InPool(m_poolState->MemPool, m_poolState->PoolSize, Pointer, Length))
 	{
 		status = true;
 		Clear(Pointer, 0, Length);
 
-		lock_guard_type<mutex_type> lock(m_mutex);
+		const size_t FSTPTR = static_cast<byte*>(Pointer) - m_poolState->MemPool;
+		itrl = std::lower_bound(m_poolState->FreeList.begin(), m_poolState->FreeList.end(), std::make_pair(FSTPTR, 0), [](std::pair<size_t, size_t> x, std::pair<size_t, size_t> y) { return x.first < y.first; });
 
-		const size_t FSTPTR = static_cast<byte*>(Pointer) - m_memPool;
-		itrl = std::lower_bound(m_freeList.begin(), m_freeList.end(), std::make_pair(FSTPTR, 0), [](std::pair<size_t, size_t> x, std::pair<size_t, size_t> y) { return x.first < y.first; });
-
-		if (itrl != m_freeList.end() && FSTPTR + Length == itrl->first)
+		if (itrl != m_poolState->FreeList.end() && FSTPTR + Length == itrl->first)
 		{
 			itrl->first = FSTPTR;
 			itrl->second += Length;
 			Length = 0;
 		}
 
-		if (itrl != m_freeList.begin())
+		if (itrl != m_poolState->FreeList.begin())
 		{
 			prev = std::prev(itrl);
 
@@ -151,15 +184,16 @@ bool MemoryPool::Deallocate(void* Pointer, size_t Length)
 				else
 				{
 					prev->second += itrl->second;
-					m_freeList.erase(itrl);
+					m_poolState->FreeList.erase(itrl);
 				}
 			}
 		}
 
 		if (Length != 0)
 		{
-			m_freeList.insert(itrl, std::make_pair(FSTPTR, Length));
+			m_poolState->FreeList.insert(itrl, std::make_pair(FSTPTR, Length));
 		}
+
 	}
 
 	return status;
@@ -167,7 +201,6 @@ bool MemoryPool::Deallocate(void* Pointer, size_t Length)
 
 void MemoryPool::Clear(void* Pool, size_t Offset, size_t Length)
 {
-	// TODO: SecureMemory here?
 	std::memset(reinterpret_cast<byte*>(Pool) + Offset, 0x00, Length);
 }
 
@@ -186,4 +219,4 @@ size_t MemoryPool::PadSize(size_t Length, size_t Alignment)
 	return (MODVAL == 0) ? 0 : Alignment - MODVAL;
 }
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND

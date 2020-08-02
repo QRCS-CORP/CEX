@@ -26,23 +26,17 @@ std::string KdfConvert::ToName(Kdfs Enumeral)
 		case Kdfs::PBKDF2512:
 			name = std::string("PBKDF2512");
 			break;
-		case Kdfs::SCRYPT256:
-			name = std::string("SCRYPT256");
+		case Kdfs::SCBKDF128:
+			name = std::string("SCBKDF128");
 			break;
-		case Kdfs::SCRYPT512:
-			name = std::string("SCRYPT512");
+		case Kdfs::SCBKDF256:
+			name = std::string("SCBKDF256");
 			break;
-		case Kdfs::SHAKE128:
-			name = std::string("SHAKE128");
+		case Kdfs::SCBKDF512:
+			name = std::string("SCBKDF512");
 			break;
-		case Kdfs::SHAKE256:
-			name = std::string("SHAKE256");
-			break;
-		case Kdfs::SHAKE512:
-			name = std::string("SHAKE512");
-			break;
-		case Kdfs::SHAKE1024:
-			name = std::string("SHAKE1024");
+		case Kdfs::SCBKDF1024:
+			name = std::string("SCBKDF1024");
 			break;
 		default:
 			name = std::string("None");
@@ -80,29 +74,21 @@ Kdfs KdfConvert::FromName(std::string &Name)
 	{
 		tname = Kdfs::PBKDF2512;
 	}
-	else if (Name == std::string("SCRYPT256"))
+	else if (Name == std::string("SCBKDF128"))
 	{
-		tname = Kdfs::SCRYPT256;
+		tname = Kdfs::SCBKDF128;
 	}
-	else if (Name == std::string("SCRYPT512"))
+	else if (Name == std::string("SCBKDF256"))
 	{
-		tname = Kdfs::SCRYPT512;
+		tname = Kdfs::SCBKDF256;
 	}
-	else if (Name == std::string("SHAKE128"))
+	else if (Name == std::string("SCBKDF512"))
 	{
-		tname = Kdfs::SHAKE128;
+		tname = Kdfs::SCBKDF512;
 	}
-	else if (Name == std::string("SHAKE256"))
+	else if (Name == std::string("SCBKDF1024"))
 	{
-		tname = Kdfs::SHAKE256;
-	}
-	else if (Name == std::string("SHAKE512"))
-	{
-		tname = Kdfs::SHAKE512;
-	}
-	else if (Name == std::string("SHAKE1024"))
-	{
-		tname = Kdfs::SHAKE1024;
+		tname = Kdfs::SCBKDF1024;
 	}
 	else
 	{

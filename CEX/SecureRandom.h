@@ -1,9 +1,10 @@
+
 // The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -41,8 +42,10 @@ using Provider::IProvider;
 ///
 /// <remarks>
 /// <para>This class is an extension wrapper that uses one of the PRNG and random provider implementations. \n
-/// The PRNG and random provider type names are loaded through the constructor, instantiating internal instances of those classes and auto-initializing the base PRNG. \n
-/// The default configuration uses and AES-256 CTR mode generator (BCR), and the auto seed collection provider. \n
+/// The PRNG and random provider type names are loaded through the constructor, instantiating internal instances 
+/// of those classes and auto-initializing the base PRNG. \n
+/// The default configuration uses the wide-block Rijndael-256 in extended mode, with a CTR mode generator and a 256-bit key (BCR), 
+/// and the auto seed collection provider. \n
 /// The secure random class can use any combination of the base PRNGs and random providers.</para>
 /// </remarks>
 /// 
@@ -57,9 +60,9 @@ class SecureRandom
 private:
 
 	static const size_t BUFFER_SIZE = 1024;
+	class ScrState;
 
-	SecureVector<byte> m_rndBuffer;
-	size_t m_rndIndex;
+	std::unique_ptr<ScrState> m_scrState;
 	std::unique_ptr<IPrng> m_rngEngine;
 
 

@@ -3,7 +3,7 @@
 
 NAMESPACE_DRBG
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 //~~~DrbgBase~~~//
 

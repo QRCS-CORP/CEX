@@ -9,49 +9,49 @@ namespace Test
 	{
 		namespace AESAVS
 		{
-			const std::string AESAVSKEY128 = "Vectors/AESAVS/keyvect128.txt";
-			const std::string AESAVSKEY192 = "Vectors/AESAVS/keyvect192.txt";
-			const std::string AESAVSKEY256 = "Vectors/AESAVS/keyvect256.txt";
-			const std::string AESAVSPTEXT128 = "Vectors/AESAVS/plainvect128.txt";
-			const std::string AESAVSPTEXT192 = "Vectors/AESAVS/plainvect192.txt";
-			const std::string AESAVSPTEXT256 = "Vectors/AESAVS/plainvect256.txt";
+			const std::string AESCBC128_VARKEY = "../../Test/Vectors/AESAVS/CBC/KAT/CBCVarKey128.rsp";
+			const std::string AESCBC256_VARKEY = "../../Test/Vectors/AESAVS/CBC/KAT/CBCVarKey256.rsp";
+			const std::string AESCBC128_VARTXT = "../../Test/Vectors/AESAVS/CBC/KAT/CBCVarTxt128.rsp";
+			const std::string AESCBC256_VARTXT = "../../Test/Vectors/AESAVS/CBC/KAT/CBCVarTxt256.rsp";
+			const std::string AESECB128_VARKEY = "../../Test/Vectors/AESAVS/ECB/KAT/ECBVarKey128.rsp";
+			const std::string AESECB256_VARKEY = "../../Test/Vectors/AESAVS/ECB/KAT/ECBVarKey256.rsp";
+			const std::string AESECB128_VARTXT = "../../Test/Vectors/AESAVS/ECB/KAT/ECBVarTxt128.rsp";
+			const std::string AESECB256_VARTXT = "../../Test/Vectors/AESAVS/ECB/KAT/ECBVarTxt256.rsp";
+			const std::string AESCBC128_MCT = "../../Test/Vectors/AESAVS/CBC/MCT/CBCMCT128.rsp";
+			const std::string AESCBC256_MCT = "../../Test/Vectors/AESAVS/CBC/MCT/CBCMCT256.rsp";
+			const std::string AESECB128_MCT = "../../Test/Vectors/AESAVS/ECB/MCT/ECBMCT128.rsp";
+			const std::string AESECB256_MCT = "../../Test/Vectors/AESAVS/ECB/MCT/ECBMCT256.rsp";
+			const std::string AESCBC128_MMT = "../../Test/Vectors/AESAVS/CBC/MMT/CBCMMT128.rsp";
+			const std::string AESCBC256_MMT = "../../Test/Vectors/AESAVS/CBC/MMT/CBCMMT256.rsp";
+			const std::string AESECB128_MMT = "../../Test/Vectors/AESAVS/ECB/MMT/ECBMMT128.rsp";
+			const std::string AESECB256_MMT = "../../Test/Vectors/AESAVS/ECB/MMT/ECBMMT256.rsp";
 		}
 
 		namespace Blake2Kat
 		{
-			const std::string BLAKE2SKAT = "Vectors/Blake2/blake2s-kat.txt";
-			const std::string BLAKE2SPKAT = "Vectors/Blake2/blake2sp-kat.txt";
-			const std::string BLAKE2BKAT = "Vectors/Blake2/blake2b-kat.txt";
-			const std::string BLAKE2BPKAT = "Vectors/Blake2/blake2bp-kat.txt";
-		}
-
-		namespace Counterpane
-		{
-			const std::string TWOFISHCTEXT128 = "Vectors/Counterpane/twofishcipher128.txt";
-			const std::string TWOFISHCTEXT192 = "Vectors/Counterpane/twofishcipher192.txt";
-			const std::string TWOFISHCTEXT256 = "Vectors/Counterpane/twofishcipher256.txt";
-			const std::string TWOFISHKEY128 = "Vectors/Counterpane/twofishkey128.txt";
-			const std::string TWOFISHKEY192 = "Vectors/Counterpane/twofishkey192.txt";
-			const std::string TWOFISHKEY256 = "Vectors/Counterpane/twofishkey256.txt";
+			const std::string BLAKE2SKAT = "../../Test/Vectors/Blake2/blake2s-kat.txt";
+			const std::string BLAKE2SPKAT = "../../Test/Vectors/Blake2/blake2sp-kat.txt";
+			const std::string BLAKE2BKAT = "../../Test/Vectors/Blake2/blake2b-kat.txt";
+			const std::string BLAKE2BPKAT = "../../Test/Vectors/Blake2/blake2bp-kat.txt";
 		}
 
 		namespace Nessie
 		{
-			const std::string SERPENTCTEXT128 = "Vectors/Nessie/serpentcipher128.txt";
-			const std::string SERPENTCTEXT192 = "Vectors/Nessie/serpentcipher192.txt";
-			const std::string SERPENTCTEXT256 = "Vectors/Nessie/serpentcipher256.txt";
-			const std::string SERPENTKEY128 = "Vectors/Nessie/serpentkey128.txt";
-			const std::string SERPENTKEY192 = "Vectors/Nessie/serpentkey192.txt";
-			const std::string SERPENTKEY256 = "Vectors/Nessie/serpentkey256.txt";
-			const std::string SERPENTM100X128 = "Vectors/Nessie/serpentmonte100-128.txt";
-			const std::string SERPENTM100X192 = "Vectors/Nessie/serpentmonte100-192.txt";
-			const std::string SERPENTM100X256 = "Vectors/Nessie/serpentmonte100-256.txt";
-			const std::string SERPENTM1000X128 = "Vectors/Nessie/serpentmonte1000-128.txt";
-			const std::string SERPENTM1000X192 = "Vectors/Nessie/serpentmonte1000-192.txt";
-			const std::string SERPENTM1000X256 = "Vectors/Nessie/serpentmonte1000-256.txt";
-			const std::string SERPENTPTEXT128 = "Vectors/Nessie/serpentplain128.txt";
-			const std::string SERPENTPTEXT192 = "Vectors/Nessie/serpentplain192.txt";
-			const std::string SERPENTPTEXT256 = "Vectors/Nessie/serpentplain256.txt";
+			const std::string SERPENTCTEXT128 = "../../Test/Vectors/Nessie/serpentcipher128.txt";
+			const std::string SERPENTCTEXT192 = "../../Test/Vectors/Nessie/serpentcipher192.txt";
+			const std::string SERPENTCTEXT256 = "../../Test/Vectors/Nessie/serpentcipher256.txt";
+			const std::string SERPENTKEY128 = "../../Test/Vectors/Nessie/serpentkey128.txt";
+			const std::string SERPENTKEY192 = "../../Test/Vectors/Nessie/serpentkey192.txt";
+			const std::string SERPENTKEY256 = "../../Test/Vectors/Nessie/serpentkey256.txt";
+			const std::string SERPENTM100X128 = "../../Test/Vectors/Nessie/serpentmonte100-128.txt";
+			const std::string SERPENTM100X192 = "../../Test/Vectors/Nessie/serpentmonte100-192.txt";
+			const std::string SERPENTM100X256 = "../../Test/Vectors/Nessie/serpentmonte100-256.txt";
+			const std::string SERPENTM1000X128 = "../../Test/Vectors/Nessie/serpentmonte1000-128.txt";
+			const std::string SERPENTM1000X192 = "../../Test/Vectors/Nessie/serpentmonte1000-192.txt";
+			const std::string SERPENTM1000X256 = "../../Test/Vectors/Nessie/serpentmonte1000-256.txt";
+			const std::string SERPENTPTEXT128 = "../../Test/Vectors/Nessie/serpentplain128.txt";
+			const std::string SERPENTPTEXT192 = "../../Test/Vectors/Nessie/serpentplain192.txt";
+			const std::string SERPENTPTEXT256 = "../../Test/Vectors/Nessie/serpentplain256.txt";
 		}
 	}
 }

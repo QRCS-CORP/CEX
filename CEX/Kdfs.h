@@ -2,6 +2,7 @@
 #define CEX_KDFS_H
 
 #include "CexDomain.h"
+#include "Digests.h"
 
 NAMESPACE_ENUMERATION
 
@@ -14,68 +15,74 @@ enum class Kdfs : byte
 	/// No kdf is specified
 	/// </summary>
 	None = 0,
-
 	/// <summary>
 	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
 	/// </summary>
-	HKDS128 = 1,
-	/// <summary>
-	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
-	/// </summary>
-	HKDS256 = 2,
-	/// <summary>
-	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
-	/// </summary>
-	HKDS512 = 2,
-
+	HKDS512 = 1,
 	/// <summary>
 	/// A Hash based Key Derivation Function: HKDF(SHA2-256)
 	/// </summary>
-	HKDF256 = 1,
+	HKDF256 = 2,
 	/// <summary>
 	/// A Hash based Key Derivation Function: HKDF(SHA2-512)
 	/// </summary>
-	HKDF512 = 2,
+	HKDF512 = 3,
 	/// <summary>
 	/// An implementation of the Hash based Key Derivation Function: KDF2(SHA2-256)
 	/// </summary>
-	KDF2256 = 3,
+	KDF2256 = 4,
 	/// <summary>
 	/// An implementation of the Hash based Key Derivation Function: KDF2(SHA2-512)
 	/// </summary>
-	KDF2512 = 4,
+	KDF2512 = 5,
 	/// <summary>
 	/// An implementation of a Passphrase Based KDF: PBKDF2(SHA2-256)
 	/// </summary>
-	PBKDF2256 = 5,
+	PBKDF2256 = 6,
 	/// <summary>
 	/// An implementation of a Passphrase Based KDF: PBKDF2(SHA2-512)
 	/// </summary>
-	PBKDF2512 = 6,
-	/// <summary>
-	/// An implementation of the SCRYPT(SHA2-256)
-	/// </summary>
-	SCRYPT256 = 7,
-	/// <summary>
-	/// An implementation of the SCRYPT(SHA2-512)
-	/// </summary>
-	SCRYPT512 = 8,
+	PBKDF2512 = 7,
 	/// <summary>
 	/// An implementation of the SHAKE-128 XOF function
 	/// </summary>
-	SHAKE128 = 9,
+	SHAKE128 = static_cast<byte>(Digests::SHAKE128),
 	/// <summary>
 	/// An implementation of the SHAKE-256 XOF function
 	/// </summary>
-	SHAKE256 = 10,
+	SHAKE256 = static_cast<byte>(Digests::SHAKE256),
 	/// <summary>
 	/// An implementation of the SHAKE-512 XOF function
 	/// </summary>
-	SHAKE512 = 11,
+	SHAKE512 = static_cast<byte>(Digests::SHAKE512),
 	/// <summary>
 	/// An implementation of the SHAKE-1024 XOF function
 	/// </summary>
-	SHAKE1024 = 12
+	SHAKE1024 = static_cast<byte>(Digests::SHAKE1024),
+	/// <summary>
+	/// An implementation of SHAKE Cost Based Key Derivation Function SCBKDF(SHAKE128)
+	/// </summary>
+	SCBKDF128 = 13,
+	/// <summary>
+	/// An implementation of SHAKE Cost Based Key Derivation Function SCBKDF(SHAKE256)
+	/// </summary>
+	SCBKDF256 = 14,
+	/// <summary>
+	/// An implementation of SHAKE Cost Based Key Derivation Function SCBKDF(SHAKE512)
+	/// </summary>
+	SCBKDF512 = 15,
+	/// <summary>
+	/// An implementation of SHAKE Cost Based Key Derivation Function SCBKDF(SHAKE1024)
+	/// </summary>
+	SCBKDF1024 = 16,
+	/// <summary>
+	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
+	/// </summary>
+	HKDS128 = 20,
+	/// <summary>
+	/// The Hierarchal Key Distribution System: HKDS(SHAKE-128)
+	/// </summary>
+	HKDS256 = 21
 };
 
 class KdfConvert

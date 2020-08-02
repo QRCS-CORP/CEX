@@ -1,0 +1,17 @@
+digraph "Sign"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=box];
+  rankdir=LR;
+  Node6 [label="XMSS",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___x_m_s_s.html",tooltip="The XMSS/MT asymmetric signature scheme Namespace."];
+  Node1 [label="Sign",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Asymmetric Signature Namespace."];
+  Node2 [label="Asymmetric",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___asymmetric.html",tooltip="Asymmetric Ciphers Namespace."];
+  Node5 [label="SphincsPlus",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___sphincs_plus.html",tooltip="The SPHINCS+ asymmetric signature scheme Namespace."];
+  Node3 [label="Dilithium",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___dilithium.html",tooltip="The Dilithium asymmetric signature scheme Namespace."];
+  Node4 [label="Rainbow",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___rainbow.html",tooltip="The Rainbow asymmetric signature scheme Namespace."];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node3 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node4 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node5 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node6 [shape=plaintext, dir="back", style="solid"];
+}

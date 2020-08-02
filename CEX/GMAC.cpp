@@ -8,9 +8,9 @@ NAMESPACE_MAC
 
 using Enumeration::BlockCipherConvert;
 using Numeric::CMUL;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Enumeration::MacConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 const bool GMAC::HAS_CMUL = HasCMUL();
 
@@ -24,12 +24,16 @@ public:
 	std::vector<byte> Nonce;
 	size_t Counter;
 	size_t Position;
+	bool IsDestroyed;
+	bool IsInitialized;
 
-	GmacState()
+	GmacState(bool Destroyed)
 		:
 		Nonce(0),
 		Counter(0),
-		Position(0)
+		Position(0),
+		IsDestroyed(Destroyed),
+		IsInitialized(false)
 	{
 	}
 
@@ -46,6 +50,8 @@ public:
 		MemoryTools::Clear(Hash, 0, Hash.size() * sizeof(ulong));
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
 		MemoryTools::Clear(State, 0, State.size());
+		IsDestroyed = false;
+		IsInitialized = false;
 	}
 };
 
@@ -76,9 +82,7 @@ GMAC::GMAC(BlockCiphers CipherType)
 				CMUL::CMUL_BLOCK_SIZE),
 	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
 		throw CryptoMacException(std::string("GMAC"), std::string("Constructor"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam)),
-	m_gmacState(new GmacState()),
-	m_isDestroyed(true),
-	m_isInitialized(false)
+	m_gmacState(new GmacState(true))
 {
 }
 
@@ -108,33 +112,27 @@ GMAC::GMAC(IBlockCipher* Cipher)
 		CMUL::CMUL_BLOCK_SIZE),
 	m_blockCipher(Cipher != nullptr ? Cipher :
 		throw CryptoMacException(std::string("GMAC"), std::string("Constructor"), std::string("The cipher can not be null!"), ErrorCodes::IllegalOperation)),
-	m_gmacState(new GmacState()),
-	m_isDestroyed(false),
-	m_isInitialized(false)
+	m_gmacState(new GmacState(false))
 {
 }
 
 GMAC::~GMAC()
 {
-	m_isInitialized = false;
-
-	if (m_gmacState != nullptr)
-	{
-		m_gmacState->Reset();
-		m_gmacState.reset(nullptr);
-	}
-
 	if (m_blockCipher != nullptr)
 	{
-		if (m_isDestroyed)
+		if (m_gmacState->IsDestroyed)
 		{
 			m_blockCipher.reset(nullptr);
-			m_isDestroyed = false;
 		}
 		else
 		{
 			m_blockCipher.release();
 		}
+	}
+
+	if (m_gmacState != nullptr)
+	{
+		m_gmacState.reset(nullptr);
 	}
 }
 
@@ -147,14 +145,14 @@ const BlockCiphers GMAC::CipherType()
 
 const bool GMAC::IsInitialized()
 { 
-	return m_isInitialized; 
+	return m_gmacState->IsInitialized; 
 }
 
 //~~~Public Functions~~~//
 
 void GMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -169,7 +167,7 @@ void GMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -191,7 +189,7 @@ size_t GMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	std::vector<byte> tag(TagSize());
 
 	Finalize(tag, 0);
-	SecureMove(tag, Output, OutOffset);
+	SecureMove(tag, 0, Output, OutOffset, tag.size());
 
 	return TagSize();
 }
@@ -212,12 +210,12 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	}
 #endif
 
-	if (Parameters.KeySizes().NonceSize() < MinimumSaltSize())
+	if (Parameters.KeySizes().IVSize() < MinimumSaltSize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
 	}
 
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
@@ -240,8 +238,8 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	}
 
 	// initialize the nonce
-	m_gmacState->Nonce.resize(Parameters.KeySizes().NonceSize());
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_gmacState->Nonce, 0, m_gmacState->Nonce.size());
+	m_gmacState->Nonce.resize(Parameters.KeySizes().IVSize());
+	MemoryTools::Copy(Parameters.IV(), 0, m_gmacState->Nonce, 0, m_gmacState->Nonce.size());
 
 	if (m_gmacState->Nonce.size() == MINSALT_LENGTH)
 	{
@@ -268,7 +266,7 @@ void GMAC::Initialize(ISymmetricKey &Parameters)
 	}
 
 	m_blockCipher->Transform(m_gmacState->Nonce, m_gmacState->Nonce);
-	m_isInitialized = true;
+	m_gmacState->IsInitialized = true;
 }
 
 void GMAC::Reset()
@@ -278,7 +276,7 @@ void GMAC::Reset()
 
 void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}

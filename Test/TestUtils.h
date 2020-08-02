@@ -99,7 +99,7 @@ namespace Test
 				}
 
 				tmp = Prefix + tmp + Suffix;
-				printf(tmp.c_str());
+				printf("%s", tmp.c_str());
 				tmp.clear();
 
 				if (i % RowLength == 0)
@@ -139,7 +139,7 @@ namespace Test
 				}
 
 				tmp = Prefix + tmp + Suffix;
-				printf(tmp.c_str());
+				printf("%s", tmp.c_str());
 				tmp.clear();
 
 				if (i % RowLength == 0)
@@ -179,7 +179,7 @@ namespace Test
 				}
 
 				tmp = Prefix + tmp + Suffix;
-				printf(tmp.c_str());
+				printf("%s", tmp.c_str());
 				tmp.clear();
 
 				if (i % RowLength == 0)
@@ -219,7 +219,7 @@ namespace Test
 				}
 
 				tmp = Prefix + tmp + Suffix;
-				printf(tmp.c_str());
+				printf("%s", tmp.c_str());
 				tmp.clear();
 
 				if (i % RowLength == 0)
@@ -307,6 +307,7 @@ namespace Test
 		static bool OrderedRuns(const std::vector<byte> &Input, size_t Threshold = 6);
 		static std::string RandomReadableString(size_t Length);
 		static bool Read(const std::string &FilePath, std::string &Contents);
+		static std::ifstream OpenFile(std::string &FilePath);
 		static std::vector<byte> Reduce(std::vector<byte> Seed);
 		static void Reverse(std::vector<byte> &Data);
 		static bool SuccesiveZeros(const std::vector<byte> &Input, size_t Threshold = 4);

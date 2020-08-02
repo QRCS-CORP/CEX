@@ -1,5 +1,4 @@
 #include "BlakeParams.h"
-#include "IntegerTools.h"
 
 NAMESPACE_DIGEST
 
@@ -68,7 +67,7 @@ BlakeParams::BlakeParams(const std::vector<byte> &TreeArray)
 	std::memcpy(&m_keyLen, &TreeArray[1], 1);
 	std::memcpy(&m_fanOut, &TreeArray[2], 1);
 	std::memcpy(&m_maxDepth, &TreeArray[3], 1);
-	m_leafSize = Utility::IntegerTools::LeBytesTo32(TreeArray, 4);
+	m_leafSize = IntegerTools::LeBytesTo32(TreeArray, 4);
 	std::memcpy(&m_nodeOffset, &TreeArray[8], 1);
 	std::memcpy(&m_nodeDepth, &TreeArray[9], 1);
 	std::memcpy(&m_innerLen, &TreeArray[10], 1);
@@ -216,7 +215,7 @@ std::vector<byte> BlakeParams::ToBytes()
 	std::memcpy(&trs[1], &m_keyLen, 1);
 	std::memcpy(&trs[2], &m_fanOut, 1);
 	std::memcpy(&trs[3], &m_maxDepth, 1);
-	Utility::IntegerTools::Le32ToBytes(m_leafSize, trs, 4);
+	IntegerTools::Le32ToBytes(m_leafSize, trs, 4);
 	std::memcpy(&trs[8], &m_nodeOffset, 1);
 	std::memcpy(&trs[9], &m_nodeDepth, 1);
 	std::memcpy(&trs[10], &m_innerLen, 1);

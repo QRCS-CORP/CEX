@@ -9,7 +9,7 @@
 namespace Test
 {
 	using Cipher::Block::Mode::CTR;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 	using namespace Cipher::Block;
 
@@ -324,7 +324,7 @@ namespace Test
 		std::vector<byte> inp;
 		std::vector<byte> otp;
 		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
+		std::vector<byte> iv(ks.IVSize());
 		Prng::SecureRandom rnd;
 		size_t prlSize = Cipher->ParallelProfile().ParallelBlockSize();
 
@@ -341,8 +341,8 @@ namespace Test
 			inp.resize(INPLEN);
 			otp.resize(INPLEN);
 
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(inp, 0, INPLEN, rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(inp, 0, INPLEN);
 			SymmetricKey kp(key, iv);
 
 			Cipher->ParallelProfile().SetBlockSize(Cipher->ParallelProfile().ParallelBlockSize());
@@ -387,7 +387,7 @@ namespace Test
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
 		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
+		std::vector<byte> iv(ks.IVSize());
 		std::vector<byte> otp;
 		SecureRandom rnd;
 		size_t i;
@@ -403,8 +403,8 @@ namespace Test
 			inp.resize(INPLEN);
 			otp.resize(INPLEN);
 
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(inp, 0, INPLEN, rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(inp, 0, INPLEN);
 			SymmetricKey kp(key, iv);
 
 			// encrypt

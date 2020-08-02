@@ -16,7 +16,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Test::NistRng;
 	using Prng::SecureRandom;
 	using Asymmetric::Sign::RNBW::Rainbow;
@@ -250,7 +250,6 @@ namespace Test
 
 	void RainbowTest::Integrity()
 	{
-		std::vector<byte> cpt(0);
 		std::vector<byte> msg(0);
 		std::vector<byte> sig(0);
 		NistRng gen;
@@ -265,12 +264,12 @@ namespace Test
 		AsymmetricKeyPair* kp1 = sgn1.Generate();
 
 		// verify private and public keys
-		if (!IntegerTools::Compare(kp1->PublicKey()->Polynomial(), 0, m_pubexp[0], 0, 1024))
+		if (IntegerTools::Compare(kp1->PublicKey()->Polynomial(), 0, m_pubexp[0], 0, 1024) == false)
 		{
 			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Public key does not match expected! -RI1"));
 		}
 
-		if (!IntegerTools::Compare(kp1->PrivateKey()->Polynomial(), 0, m_priexp[0], 0, 1024))
+		if (IntegerTools::Compare(kp1->PrivateKey()->Polynomial(), 0, m_priexp[0], 0, 1024) == false)
 		{
 			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Private key does not match expected! -RI2"));
 		}
@@ -299,7 +298,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Messages do not match! -RI5"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp1;
@@ -312,12 +310,12 @@ namespace Test
 		// generate the key pair
 		AsymmetricKeyPair* kp2 = sgn2.Generate();
 
-		if (!IntegerTools::Compare(kp2->PublicKey()->Polynomial(), 0, m_pubexp[1], 0, 1024))
+		if (IntegerTools::Compare(kp2->PublicKey()->Polynomial(), 0, m_pubexp[1], 0, 1024) == false)
 		{
 			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Public key does not match expected! -RI6"));
 		}
 
-		if (!IntegerTools::Compare(kp2->PrivateKey()->Polynomial(), 0, m_priexp[1], 0, 1024))
+		if (IntegerTools::Compare(kp2->PrivateKey()->Polynomial(), 0, m_priexp[1], 0, 1024) == false)
 		{
 			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Private key does not match expected! -RI7"));
 		}
@@ -344,7 +342,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Messages do not match! -RI10"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp2;
@@ -358,12 +355,12 @@ namespace Test
 		// generate the key pair
 		AsymmetricKeyPair* kp3 = sgn3.Generate();
 
-		if (!IntegerTools::Compare(kp3->PublicKey()->Polynomial(), 0, m_pubexp[2], 0, 1024))
+		if (IntegerTools::Compare(kp3->PublicKey()->Polynomial(), 0, m_pubexp[2], 0, 1024) == false)
 		{
 			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Public key does not match expected! -RI6"));
 		}
 
-		if (!IntegerTools::Compare(kp3->PrivateKey()->Polynomial(), 0, m_priexp[2], 0, 1024))
+		if (IntegerTools::Compare(kp3->PrivateKey()->Polynomial(), 0, m_priexp[2], 0, 1024) == false)
 		{
 			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Private key does not match expected! -RI7"));
 		}
@@ -390,7 +387,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Messages do not match! -RI10"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp3;
@@ -398,7 +394,6 @@ namespace Test
 
 	void RainbowTest::Kat()
 	{
-		std::vector<byte> cpt(0);
 		std::vector<byte> msg(0);
 		std::vector<byte> sig(0);
 		NistRng gen;
@@ -435,7 +430,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Messages do not match! -RK3"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp1;
@@ -470,7 +464,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Messages do not match! -RK6"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp2;
@@ -506,7 +499,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Messages do not match! -RK9"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp3;
@@ -589,6 +581,8 @@ namespace Test
 			{
 				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Public key serialization test has failed! -XR2"));
 			}
+
+			delete kp;
 		}
 	}
 

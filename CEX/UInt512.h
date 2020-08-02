@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -22,7 +22,7 @@
 #include "CexDomain.h"
 #include "SimdIntegers.h"
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 #	include "Intrinsics.h"
 #endif
 
@@ -38,7 +38,7 @@ using Enumeration::SimdIntegers;
 /// </summary>
 class UInt512
 {
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 
 public:
 
@@ -542,7 +542,7 @@ public:
 			tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 
-		// TODO: finish this
+		// TODO: optimize this
 		//return UInt512(_mm512_cvtps_epi32(_mm512_div_ps(_mm512_cvtepi32_ps(zmm), _mm512_cvtepi32_ps(X.zmm))));
 	}
 
@@ -565,7 +565,7 @@ public:
 			tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 
-		// TODO: finish this
+		// TODO: optimize this
 		//zmm = _mm512_cvtps_epi32(_mm512_div_ps(_mm512_cvtepi32_ps(zmm), _mm512_cvtepi32_ps(X.zmm)));
 	}
 

@@ -6,7 +6,7 @@
 #	include <future>
 #endif
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 size_t ParallelTools::ProcessorCount()
 {
@@ -76,4 +76,4 @@ void ParallelTools::Vectorize(const std::function<void()> &F)
 #endif
 }
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND

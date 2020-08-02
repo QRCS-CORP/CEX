@@ -10,14 +10,14 @@
 
 NAMESPACE_CIPHER
 
-using Utility::ArrayTools;
+using Tools::ArrayTools;
 using Enumeration::ErrorCodes;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 using Kdf::SHAKE;
 using Enumeration::ShakeModes;
 using Helper::StreamCipherFromName;
-using Utility::SystemTools;
+using Tools::SystemTools;
 
 const std::string SymmetricSecureKey::CLASS_NAME = "SymmetricSecureKey";
 
@@ -59,50 +59,50 @@ public:
 	{
 	}
 
-	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, SecurityPolicy SecPolicy)
+	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &IVState, SecurityPolicy SecPolicy)
 		:
 		Salt(0),
-		State(KeyState.size() + NonceState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), 0),
+		State(KeyState.size() + IVState.size()),
+		KeySizes(KeyState.size(), IVState.size(), 0),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
 	}
 
-	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, SecurityPolicy SecPolicy, const std::vector<byte> &SaltState)
+	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &IVState, SecurityPolicy SecPolicy, const std::vector<byte> &SaltState)
 		:
 		Salt(SecureLock(SaltState)),
-		State(KeyState.size() + NonceState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), 0),
+		State(KeyState.size() + IVState.size()),
+		KeySizes(KeyState.size(), IVState.size(), 0),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
 	}
 
-	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, const std::vector<byte> &InfoState, SecurityPolicy SecPolicy)
+	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &IVState, const std::vector<byte> &InfoState, SecurityPolicy SecPolicy)
 		:
 		Salt(0),
-		State(KeyState.size() + NonceState.size() + InfoState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), InfoState.size()),
+		State(KeyState.size() + IVState.size() + InfoState.size()),
+		KeySizes(KeyState.size(), IVState.size(), InfoState.size()),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
-		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + NonceState.size(), InfoState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
+		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + IVState.size(), InfoState.size());
 	}
 
-	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, const std::vector<byte> &InfoState, SecurityPolicy SecPolicy, const std::vector<byte> &SaltState)
+	SecureKeyState(const std::vector<byte> &KeyState, const std::vector<byte> &IVState, const std::vector<byte> &InfoState, SecurityPolicy SecPolicy, const std::vector<byte> &SaltState)
 		:
 		Salt(SecureLock(SaltState)),
-		State(KeyState.size() + NonceState.size() + InfoState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), InfoState.size()),
+		State(KeyState.size() + IVState.size() + InfoState.size()),
+		KeySizes(KeyState.size(), IVState.size(), InfoState.size()),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
-		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + NonceState.size(), InfoState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
+		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + IVState.size(), InfoState.size());
 	}
 
 	SecureKeyState(const SecureVector<byte> &KeyState, SecurityPolicy SecPolicy)
@@ -123,50 +123,50 @@ public:
 	{
 	}
 
-	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &NonceState, SecurityPolicy SecPolicy)
+	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &IVState, SecurityPolicy SecPolicy)
 		:
 		Salt(0),
-		State(KeyState.size() + NonceState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), 0),
+		State(KeyState.size() + IVState.size()),
+		KeySizes(KeyState.size(), IVState.size(), 0),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
 	}
 
-	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &NonceState, SecurityPolicy SecPolicy, const SecureVector<byte> &SaltState)
+	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &IVState, SecurityPolicy SecPolicy, const SecureVector<byte> &SaltState)
 		:
 		Salt(SaltState),
-		State(KeyState.size() + NonceState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), 0),
+		State(KeyState.size() + IVState.size()),
+		KeySizes(KeyState.size(), IVState.size(), 0),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
 	}
 
-	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &NonceState, const SecureVector<byte> &InfoState, SecurityPolicy SecPolicy)
+	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &IVState, const SecureVector<byte> &InfoState, SecurityPolicy SecPolicy)
 		:
 		Salt(0),
-		State(KeyState.size() + NonceState.size() + InfoState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), InfoState.size()),
+		State(KeyState.size() + IVState.size() + InfoState.size()),
+		KeySizes(KeyState.size(), IVState.size(), InfoState.size()),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
-		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + NonceState.size(), InfoState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
+		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + IVState.size(), InfoState.size());
 	}
 
-	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &NonceState, const SecureVector<byte> &InfoState, SecurityPolicy SecPolicy, const SecureVector<byte> &SaltState)
+	SecureKeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &IVState, const SecureVector<byte> &InfoState, SecurityPolicy SecPolicy, const SecureVector<byte> &SaltState)
 		:
 		Salt(SaltState),
-		State(KeyState.size() + NonceState.size() + InfoState.size()),
-		KeySizes(KeyState.size(), NonceState.size(), InfoState.size()),
+		State(KeyState.size() + IVState.size() + InfoState.size()),
+		KeySizes(KeyState.size(), IVState.size(), InfoState.size()),
 		Policy(SecPolicy)
 	{
 		MemoryTools::Copy(KeyState, 0, State, 0, KeyState.size());
-		MemoryTools::Copy(NonceState, 0, State, KeyState.size(), NonceState.size());
-		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + NonceState.size(), InfoState.size());
+		MemoryTools::Copy(IVState, 0, State, KeyState.size(), IVState.size());
+		MemoryTools::Copy(InfoState, 0, State, KeyState.size() + IVState.size(), InfoState.size());
 	}
 
 	~SecureKeyState()
@@ -193,17 +193,17 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key)
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce)
+SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &IV)
 	:
-	m_secureState((Key.size() + Nonce.size() != 0) ? new SecureKeyState(Key, Nonce, SecurityPolicy::SPL256) :
+	m_secureState((Key.size() + IV.size() != 0) ? new SecureKeyState(Key, IV, SecurityPolicy::SPL256) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
+SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &IV, const std::vector<byte> &Info)
 	:
-	m_secureState((Key.size() + Nonce.size() + Info.size() != 0) ? new SecureKeyState(Key, Nonce, Info, SecurityPolicy::SPL256) :
+	m_secureState((Key.size() + IV.size() + Info.size() != 0) ? new SecureKeyState(Key, IV, Info, SecurityPolicy::SPL256) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key, nonce, and info can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
@@ -217,17 +217,17 @@ SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key)
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce)
+SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV)
 	:
-	m_secureState((Key.size() + Nonce.size() != 0) ? new SecureKeyState(Key, Nonce, SecurityPolicy::SPL256) :
+	m_secureState((Key.size() + IV.size() != 0) ? new SecureKeyState(Key, IV, SecurityPolicy::SPL256) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key and nonce can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info)
+SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV, const SecureVector<byte> &Info)
 	:
-	m_secureState((Key.size() + Nonce.size() + Info.size() != 0) ? new SecureKeyState(Key, Nonce, Info, SecurityPolicy::SPL256) :
+	m_secureState((Key.size() + IV.size() + Info.size() != 0) ? new SecureKeyState(Key, IV, Info, SecurityPolicy::SPL256) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key, nonce, and info can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
@@ -241,17 +241,17 @@ SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, SecurityPo
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, SecurityPolicy Policy, const SecureVector<byte> &Salt)
+SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV, SecurityPolicy Policy, const SecureVector<byte> &Salt)
 	:
-	m_secureState((Key.size() + Nonce.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, Nonce, Policy, Salt) :
+	m_secureState((Key.size() + IV.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, IV, Policy, Salt) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key, nonce, and salt can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info, SecurityPolicy Policy, const SecureVector<byte> &Salt)
+SymmetricSecureKey::SymmetricSecureKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV, const SecureVector<byte> &Info, SecurityPolicy Policy, const SecureVector<byte> &Salt)
 	:
-	m_secureState((Key.size() + Nonce.size() + Info.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, Nonce, Info, Policy, Salt) :
+	m_secureState((Key.size() + IV.size() + Info.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, IV, Info, Policy, Salt) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key, nonce, info, and salt can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
@@ -265,17 +265,17 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, SecurityPol
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, SecurityPolicy Policy, const std::vector<byte> &Salt)
+SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &IV, SecurityPolicy Policy, const std::vector<byte> &Salt)
 	:
-	m_secureState((Key.size() + Nonce.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, Nonce, Policy, Salt) :
+	m_secureState((Key.size() + IV.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, IV, Policy, Salt) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key, nonce, and salt can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, SecurityPolicy Policy, const std::vector<byte> &Salt)
+SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &IV, const std::vector<byte> &Info, SecurityPolicy Policy, const std::vector<byte> &Salt)
 	:
-	m_secureState((Key.size() + Nonce.size() + Info.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, Nonce, Info, Policy, Salt) :
+	m_secureState((Key.size() + IV.size() + Info.size() != 0) && Salt.size() != 0 && Policy != SecurityPolicy::None ? new SecureKeyState(Key, IV, Info, Policy, Salt) :
 		throw CryptoSymmetricException(CLASS_NAME, std::string("Constructor"), std::string("The key, nonce, info, and salt can not be zero sized!"), ErrorCodes::InvalidParam))
 {
 	Encipher(m_secureState);
@@ -296,7 +296,7 @@ const std::vector<byte> SymmetricSecureKey::Info()
 
 	try
 	{
-		Extract(m_secureState, m_secureState->KeySizes.KeySize() + m_secureState->KeySizes.NonceSize(), tmps, m_secureState->KeySizes.InfoSize());
+		Extract(m_secureState, m_secureState->KeySizes.KeySize() + m_secureState->KeySizes.IVSize(), tmps, m_secureState->KeySizes.InfoSize());
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
@@ -327,17 +327,17 @@ SymmetricKeySize &SymmetricSecureKey::KeySizes() const
 	return m_secureState->KeySizes; 
 }
 
-const std::vector<byte> SymmetricSecureKey::Nonce()
+const std::vector<byte> SymmetricSecureKey::IV()
 {
-	SecureVector<byte> tmps(m_secureState->KeySizes.NonceSize());
+	SecureVector<byte> tmps(m_secureState->KeySizes.IVSize());
 
 	try
 	{
-		Extract(m_secureState, m_secureState->KeySizes.KeySize(), tmps, m_secureState->KeySizes.NonceSize());
+		Extract(m_secureState, m_secureState->KeySizes.KeySize(), tmps, m_secureState->KeySizes.IVSize());
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
-		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Nonce"), ex.Message(), ErrorCodes::AuthenticationFailure);
+		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("IV"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
 	return SecureUnlock(tmps);
@@ -349,7 +349,7 @@ const SecureVector<byte> SymmetricSecureKey::SecureInfo()
 
 	try
 	{
-		Extract(m_secureState, m_secureState->KeySizes.KeySize() + m_secureState->KeySizes.NonceSize(), tmpr, m_secureState->KeySizes.InfoSize());
+		Extract(m_secureState, m_secureState->KeySizes.KeySize() + m_secureState->KeySizes.IVSize(), tmpr, m_secureState->KeySizes.InfoSize());
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
@@ -375,17 +375,17 @@ const SecureVector<byte> SymmetricSecureKey::SecureKey()
 	return tmpr;
 }
 
-const SecureVector<byte> SymmetricSecureKey::SecureNonce()
+const SecureVector<byte> SymmetricSecureKey::SecureIV()
 {
-	SecureVector<byte> tmpr(m_secureState->KeySizes.NonceSize());
+	SecureVector<byte> tmpr(m_secureState->KeySizes.IVSize());
 
 	try
 	{
-		Extract(m_secureState, m_secureState->KeySizes.KeySize(), tmpr, m_secureState->KeySizes.NonceSize());
+		Extract(m_secureState, m_secureState->KeySizes.KeySize(), tmpr, m_secureState->KeySizes.IVSize());
 	}
 	catch (CryptoAuthenticationFailure &ex)
 	{
-		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("Nonce"), ex.Message(), ErrorCodes::AuthenticationFailure);
+		throw CryptoAuthenticationFailure(CLASS_NAME, std::string("IV"), ex.Message(), ErrorCodes::AuthenticationFailure);
 	}
 
 	return tmpr;
@@ -395,7 +395,7 @@ const SecureVector<byte> SymmetricSecureKey::SecureNonce()
 
 SymmetricSecureKey* SymmetricSecureKey::Clone()
 {
-	return new SymmetricSecureKey(Key(), Nonce(), Info(), m_secureState->Policy, SecureUnlock(m_secureState->Salt));
+	return new SymmetricSecureKey(Key(), IV(), Info(), m_secureState->Policy, SecureUnlock(m_secureState->Salt));
 }
 
 void SymmetricSecureKey::Reset()
@@ -446,7 +446,7 @@ SecureVector<byte> SymmetricSecureKey::Serialize(SymmetricSecureKey &KeyParams)
 	ushort tlen;
 
 	klen = static_cast<ushort>(KeyParams.Key().size());
-	nlen = static_cast<ushort>(KeyParams.Nonce().size());
+	nlen = static_cast<ushort>(KeyParams.IV().size());
 	ilen = static_cast<ushort>(KeyParams.Info().size());
 	tlen = 6 + klen + nlen + ilen;
 
@@ -460,7 +460,7 @@ SecureVector<byte> SymmetricSecureKey::Serialize(SymmetricSecureKey &KeyParams)
 	}
 	if (nlen > 0)
 	{
-		ArrayTools::AppendVector(KeyParams.Nonce(), tmpr);
+		ArrayTools::AppendVector(KeyParams.IV(), tmpr);
 	}
 	if (ilen > 0)
 	{
@@ -476,10 +476,10 @@ void SymmetricSecureKey::Encipher(std::unique_ptr<SecureKeyState> &State)
 {
 	IStreamCipher* cpr = GetStreamCipher(State->Policy);
 	SymmetricKeySize ksc = cpr->LegalKeySizes()[0];
-	SecureVector<byte> seed(ksc.KeySize() + ksc.NonceSize());
+	SecureVector<byte> seed(ksc.KeySize() + ksc.IVSize());
 	std::vector<byte> tmpt(0);
 	std::vector<byte> tmpk(ksc.KeySize());
-	std::vector<byte> tmpn(ksc.NonceSize());
+	std::vector<byte> tmpn(ksc.IVSize());
 	std::vector<byte> cpt(State->State.size());
 
 	// transfer from the secure-vector to a working state
@@ -508,10 +508,10 @@ void SymmetricSecureKey::Extract(std::unique_ptr<SecureKeyState> &State, size_t 
 	IStreamCipher* cpr = GetStreamCipher(State->Policy);
 	const size_t CPTSZE = cpr->IsAuthenticator() ? State->State.size() - cpr->TagSize() : State->State.size();
 	SymmetricKeySize ksc = cpr->LegalKeySizes()[0];
-	SecureVector<byte> seed(ksc.KeySize() + ksc.NonceSize());
+	SecureVector<byte> seed(ksc.KeySize() + ksc.IVSize());
 	std::vector<byte> tmpt(State->State.size());
 	std::vector<byte> tmpk(ksc.KeySize());
-	std::vector<byte> tmpn(ksc.NonceSize());
+	std::vector<byte> tmpn(ksc.IVSize());
 
 	// assemble the cipher key
 	GetSystemKey(State->Policy, State->Salt, seed);
@@ -564,12 +564,13 @@ IStreamCipher* SymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 		}
 		case SecurityPolicy::SPL1024AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR120K512);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR120K1024);
 			break;
 		}
 		default:
 		{
 			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR96K512);
+			break;
 		}
 	}
 
@@ -613,6 +614,7 @@ void SymmetricSecureKey::GetSystemKey(SecurityPolicy Policy, const SecureVector<
 		default:
 		{
 			mode = ShakeModes::SHAKE1024;
+			break;
 		}
 	}
 

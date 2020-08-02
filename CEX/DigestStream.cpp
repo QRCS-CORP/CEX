@@ -60,13 +60,6 @@ DigestStream::~DigestStream()
 			m_digestEngine.reset(nullptr);
 		}
 	}
-	else
-	{
-		if (m_digestEngine != nullptr)
-		{
-			m_digestEngine.release();
-		}
-	}
 }
 
 //~~~Accessors~~~//
@@ -135,12 +128,15 @@ void DigestStream::CalculateInterval(size_t Length)
 
 void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 {
+	double prc;
 	double prg;
 	size_t blk;
 
+	prc = static_cast<double>(Processed);
+
 	if (Length >= Processed)
 	{
-		prg = 100.0 * (static_cast<double>(Processed) / Length);
+		prg = 100.0 * (prc / static_cast<double>(Length));
 
 		if (prg > 100.0)
 		{
@@ -162,6 +158,10 @@ void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 			else if (Processed % blk == 0)
 			{
 				ProgressPercent(static_cast<int>(prg));
+			}
+			else
+			{
+				// misra
 			}
 		}
 	}

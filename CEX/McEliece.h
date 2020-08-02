@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -37,7 +37,7 @@ using Enumeration::McElieceParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// McEliece cpr(McElieceParameters::MPKCS1N4096T62, [PrngType], [CipherType]);
+/// McEliece cpr(McElieceParameters::MPKCS2N6960T119, [PrngType]);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// // serialize the public key
 /// IAsymmetricKey* pubk = kp->PublicKey();
@@ -51,7 +51,7 @@ using Enumeration::McElieceParameters;
 /// std::vector&lt;byte&gt; ssk(0);
 ///
 /// // initialize the cipher
-/// McEliece cpr(McElieceParameters::MPKCS1N4096T62, Prng-Type);
+/// McEliece cpr(McElieceParameters::MPKCS2N6960T119, [PrngType]);
 /// cpr.Initialize(PublicKey);
 /// // encrypt the secret
 /// cpr.Encapsulate(cpt, ssk);
@@ -62,7 +62,7 @@ using Enumeration::McElieceParameters;
 /// std::vector&lt;byte&gt; ssk(0);
 /// bool status;
 ///
-/// McEliece cpr(McElieceParameters::MPKCS1N4096T62, Prng-Type);
+/// McEliece cpr(McElieceParameters::MPKCS2N6960T119, [PrngType]);
 /// // initialize the cipher
 /// cpr.Initialize(PrivateKey);
 /// // decrypt the secret, status returns authentication outcome, false for failure
@@ -74,8 +74,7 @@ using Enumeration::McElieceParameters;
 /// <description>Implementation Notes:</description>
 /// <para>.</para>
 ///
-/// <para>This implementation is based on two different implementations of the asymmetric primitive; the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/."> 'McBits'</a>,  \n
-/// and the NIST PQ Round 2 implementation by the same authors (using the recommended version contained in the SUPERCOP package). \n
+/// <para>This implementation was written by Daniel Bernstien, Tung Chou, and Peter Schwabe: as the NIST PQ Round 2 submission (using the recommended version contained in the SUPERCOP package). \n
 /// The McElieceParameters enumeration member is passed to the constructor along with the Prng enum type value (required: the default is BCR), or an initialized instance of a Prng through the secondary advanced constructor option. \n
 /// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key-tag byte array. \n
 /// The encryption method uses an encapsulation KEM interface: Encapsulate(CipherText [out], SharedSecret [out]), the decryption method uses: Decapsulate(CipherText [in], SharedSecret [out]).</para>
@@ -93,7 +92,7 @@ using Enumeration::McElieceParameters;
 ///
 /// <list type="bullet">
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MPKCPublicKey, or MPKCPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>There are three parameters available: MPKCS1N4096T62 with medium security, MPKCS1N6960T119 with medium-high security, and MPKCS1N8192T128 with high-security</description></item>
+/// <item><description>There are two parameters available: MPKCS2N6960T119 with medium-high security, and MPKCS3N8192T128 with high-security</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The default prng used to generate the public key and private keys (default is BCR), is an auto-seeded AES256/CTR-BE construction</description></item>
 /// </list>
@@ -116,8 +115,8 @@ private:
 	const size_t SECRET_SIZE = 32;
 	class MpkcState;
 	std::unique_ptr<MpkcState> m_mpkcState;
-	std::unique_ptr<AsymmetricKey> m_privateKey;
-	std::unique_ptr<AsymmetricKey> m_publicKey;
+	AsymmetricKey* m_privateKey;
+	AsymmetricKey* m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -142,7 +141,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	McEliece(McElieceParameters Parameters = McElieceParameters::MPKCS1N4096T62, Prngs PrngType = Prngs::BCR);
+	McEliece(McElieceParameters Parameters = McElieceParameters::MPKCS2N6960T119, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances

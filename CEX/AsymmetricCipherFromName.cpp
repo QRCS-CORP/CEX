@@ -17,34 +17,33 @@ IAsymmetricCipher* AsymmetricCipherFromName::GetInstance(AsymmetricCiphers Ciphe
 
 	IAsymmetricCipher* mptr;
 
-	mptr = nullptr;
-
 	try
 	{
 		switch (CipherType)
 		{
 			case AsymmetricCiphers::Kyber:
 			{
-				mptr = new MLWE::Kyber(static_cast<Enumeration::KyberParameters>(Parameters));
+				mptr = new MLWE::Kyber(static_cast<Enumeration::KyberParameters>(Parameters)); 
 				break;
 			}
 			case AsymmetricCiphers::McEliece:
 			{
-				mptr = new MPKC::McEliece(static_cast<Enumeration::McElieceParameters>(Parameters));
+				mptr = new MPKC::McEliece(static_cast<Enumeration::McElieceParameters>(Parameters)); 
 				break;
 			}
 			case AsymmetricCiphers::NewHope:
 			{
-				mptr = new RLWE::NewHope(static_cast<Enumeration::NewHopeParameters>(Parameters));
+				mptr = new RLWE::NewHope(static_cast<Enumeration::NewHopeParameters>(Parameters)); 
 				break;
 			}
 			case AsymmetricCiphers::NTRUPrime:
 			{
-				mptr = new NTRUP::NTRUPrime(static_cast<Enumeration::NTRUPrimeParameters>(Parameters));
+				mptr = new NTRUP::NTRUPrime(static_cast<Enumeration::NTRUPrimeParameters>(Parameters)); 
 				break;
 			}
 			default:
 			{
+				mptr = nullptr;
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The asymmetric cipher is not recognized!"), ErrorCodes::InvalidParam);
 			}
 		}

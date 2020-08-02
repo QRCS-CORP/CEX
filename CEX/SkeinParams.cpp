@@ -5,6 +5,7 @@ NAMESPACE_DIGEST
 
 using Exception::CryptoDigestException;
 using Enumeration::ErrorCodes;
+using Tools::IntegerTools;
 
 const std::string SkeinParams::CLASS_NAME("SkeinParams");
 
@@ -70,14 +71,14 @@ SkeinParams::SkeinParams(const std::vector<byte> &TreeArray)
 	}
 
 	std::memcpy(&m_treeSchema[0], &TreeArray[0], 4);
-	m_treeVersion = Utility::IntegerTools::LeBytesTo16(TreeArray, 4);
-	m_reserved1 = Utility::IntegerTools::LeBytesTo16(TreeArray, 6);
-	m_outputSize = Utility::IntegerTools::LeBytesTo64(TreeArray, 8);
+	m_treeVersion = IntegerTools::LeBytesTo16(TreeArray, 4);
+	m_reserved1 = IntegerTools::LeBytesTo16(TreeArray, 6);
+	m_outputSize = IntegerTools::LeBytesTo64(TreeArray, 8);
 	std::memcpy(&m_leafSize, &TreeArray[16], 1);
 	std::memcpy(&m_treeDepth, &TreeArray[17], 1);
 	std::memcpy(&m_treeFanout, &TreeArray[18], 1);
 	std::memcpy(&m_reserved2, &TreeArray[19], 1);
-	m_reserved3 = Utility::IntegerTools::LeBytesTo32(TreeArray, 20);
+	m_reserved3 = IntegerTools::LeBytesTo32(TreeArray, 20);
 	m_dstCode.resize(DistributionCodeMax());
 	std::memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 }
@@ -162,7 +163,7 @@ std::vector<ulong> SkeinParams::GetConfig()
 	std::vector<ulong> config(m_outputSize / sizeof(ulong));
 
 	// set schema bytes
-	config[0] = Utility::IntegerTools::LeBytesTo32(m_treeSchema, 0);
+	config[0] = IntegerTools::LeBytesTo32(m_treeSchema, 0);
 	// version and key size
 	config[0] |= (static_cast<ulong>(m_treeVersion) << 32);
 	config[0] |= (static_cast<ulong>(m_reserved1) << 48);
@@ -178,7 +179,7 @@ std::vector<ulong> SkeinParams::GetConfig()
 	// distribution code
 	for (size_t i = 3; i < config.size(); ++i)
 	{
-		config[i] = Utility::IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
+		config[i] = IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
 	}
 
 	return config;
@@ -246,14 +247,14 @@ std::vector<byte> SkeinParams::ToBytes()
 	std::vector<byte> trs(GetHeaderSize(), 0);
 
 	std::memcpy(&trs[0], &m_treeSchema[0], 4);
-	Utility::IntegerTools::Le16ToBytes(m_treeVersion, trs, 4);
-	Utility::IntegerTools::Le16ToBytes(m_reserved1, trs, 6);
-	Utility::IntegerTools::Le64ToBytes(m_outputSize, trs, 8);
+	IntegerTools::Le16ToBytes(m_treeVersion, trs, 4);
+	IntegerTools::Le16ToBytes(m_reserved1, trs, 6);
+	IntegerTools::Le64ToBytes(m_outputSize, trs, 8);
 	std::memcpy(&trs[16], &m_leafSize, 1);
 	std::memcpy(&trs[17], &m_treeDepth, 1);
 	std::memcpy(&trs[18], &m_treeFanout, 1);
 	std::memcpy(&trs[19], &m_reserved2, 1);
-	Utility::IntegerTools::Le32ToBytes(m_reserved3, trs, 20);
+	IntegerTools::Le32ToBytes(m_reserved3, trs, 20);
 	std::memcpy(&trs[24], &m_dstCode[0], m_dstCode.size());
 
 	return trs;

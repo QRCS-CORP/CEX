@@ -7,7 +7,7 @@
 namespace Test
 {
 	using Mac::CryptoMacException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Mac::Poly1305;
 	using Prng::SecureRandom;
 	using Cipher::SymmetricKey;
@@ -341,8 +341,8 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(msg, 0, msg.size());
 			SymmetricKey kp(key);
 
 			// generate the mac
@@ -380,8 +380,8 @@ namespace Test
 				const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXMSG, MINMSG));
 				msg.resize(INPLEN);
 
-				IntegerTools::Fill(key, 0, key.size(), rnd);
-				IntegerTools::Fill(msg, 0, msg.size(), rnd);
+				rnd.Generate(key, 0, key.size());
+				rnd.Generate(msg, 0, msg.size());
 				SymmetricKey kp(key);
 
 				// compute

@@ -4,9 +4,9 @@
 
 NAMESPACE_CIPHER
 
-using Utility::ArrayTools;
+using Tools::ArrayTools;
 using Enumeration::ErrorCodes;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 //~~~State Container~~~//
 
@@ -15,15 +15,15 @@ class SymmetricKey::KeyState
 public:
 
 	SecureVector<byte> Key;
-	SecureVector<byte> Nonce;
 	SecureVector<byte> Info;
+	SecureVector<byte> IV;
 	SymmetricKeySize KeySizes;
 
 	KeyState()
 		:
 		Key(0),
-		Nonce(0),
 		Info(0),
+		IV(0),
 		KeySizes(0, 0, 0)
 	{
 	}
@@ -31,8 +31,8 @@ public:
 	KeyState(const std::vector<byte> &KeyState)
 		:
 		Key(SecureLock(KeyState)),
-		Nonce(0),
 		Info(0),
+		IV(0),
 		KeySizes(Key.size(), 0, 0)
 	{
 	}
@@ -40,8 +40,8 @@ public:
 	KeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState)
 		:
 		Key(SecureLock(KeyState)),
-		Nonce(SecureLock(NonceState)),
 		Info(0),
+		IV(SecureLock(NonceState)),
 		KeySizes(KeyState.size(), NonceState.size(), 0)
 	{
 	}
@@ -49,8 +49,8 @@ public:
 	KeyState(const std::vector<byte> &KeyState, const std::vector<byte> &NonceState, const std::vector<byte> &InfoState)
 		:
 		Key(SecureLock(KeyState)),
-		Nonce(SecureLock(NonceState)),
 		Info(SecureLock(InfoState)),
+		IV(SecureLock(NonceState)),
 		KeySizes(KeyState.size(), NonceState.size(), InfoState.size())
 	{
 	}
@@ -58,8 +58,8 @@ public:
 	KeyState(const SecureVector<byte> &KeyState)
 		:
 		Key(KeyState),
-		Nonce(0),
 		Info(0),
+		IV(0),
 		KeySizes(KeyState.size(), 0, 0)
 	{
 	}
@@ -67,8 +67,8 @@ public:
 	KeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &NonceState)
 		:
 		Key(KeyState),
-		Nonce(NonceState),
 		Info(0),
+		IV(NonceState),
 		KeySizes(KeyState.size(), NonceState.size(), 0)
 	{
 	}
@@ -76,8 +76,8 @@ public:
 	KeyState(const SecureVector<byte> &KeyState, const SecureVector<byte> &NonceState, const SecureVector<byte> &InfoState)
 		:
 		Key(KeyState),
-		Nonce(NonceState),
 		Info(InfoState),
+		IV(NonceState),
 		KeySizes(KeyState.size(), NonceState.size(), InfoState.size())
 	{
 	}
@@ -90,8 +90,8 @@ public:
 	void Reset()
 	{
 		SecureClear(Key);
+		SecureClear(IV);
 		SecureClear(Info);
-		SecureClear(Nonce);
 		KeySizes.Reset();
 	}
 };
@@ -112,37 +112,36 @@ SymmetricKey::SymmetricKey(const SecureVector<byte> &Key)
 {
 }
 
-SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce)
+SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &IV)
 	:
-	m_keyState((Key.size() + Nonce.size() != 0) ? new KeyState(Key, Nonce):
+	m_keyState((Key.size() + IV.size() != 0) ? new KeyState(Key, IV):
 		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key and nonce can not both be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
-SymmetricKey::SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce)
+SymmetricKey::SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV)
 	:
-	m_keyState((Key.size() + Nonce.size() != 0) ? new KeyState(Key, Nonce) : 
+	m_keyState((Key.size() + IV.size() != 0) ? new KeyState(Key, IV) : 
 		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key and nonce can not both be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
-SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
+SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &IV, const std::vector<byte> &Info)
 	:
-	m_keyState((Key.size() + Nonce.size() + Info.size() != 0) ? new KeyState(Key, Nonce, Info) :
+	m_keyState((Key.size() + IV.size() + Info.size() != 0) ? new KeyState(Key, IV, Info) :
 		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key, nonce, and info can not all be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
-SymmetricKey::SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info)
+SymmetricKey::SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV, const SecureVector<byte> &Info)
 	:
-	m_keyState((Key.size() + Nonce.size() + Info.size() != 0) ? new KeyState(Key, Nonce, Info) :
+	m_keyState((Key.size() + IV.size() + Info.size() != 0) ? new KeyState(Key, IV, Info) :
 		throw CryptoSymmetricException(std::string("SymmetricKey"), std::string("Constructor"), std::string("The key, nonce, and info can not all be be zero sized!"), ErrorCodes::InvalidParam))
 {
 }
 
 SymmetricKey::~SymmetricKey()
 {
-	Reset();
 }
 
 //~~~Accessors~~~//
@@ -164,9 +163,9 @@ SymmetricKeySize &SymmetricKey::KeySizes() const
 	return m_keyState->KeySizes;
 }
 
-const std::vector<byte> SymmetricKey::Nonce() 
+const std::vector<byte> SymmetricKey::IV() 
 { 
-	std::vector<byte> tmp = SecureUnlock(m_keyState->Nonce);
+	std::vector<byte> tmp = SecureUnlock(m_keyState->IV);
 	return tmp;
 }
 
@@ -186,10 +185,10 @@ const SecureVector<byte> SymmetricKey::SecureKey()
 	return tmpr;
 }
 
-const SecureVector<byte> SymmetricKey::SecureNonce()
+const SecureVector<byte> SymmetricKey::SecureIV()
 {
 	SecureVector<byte> tmpr(0);
-	SecureInsert(m_keyState->Nonce, tmpr);
+	SecureInsert(m_keyState->IV, tmpr);
 
 	return tmpr;
 }
@@ -198,7 +197,7 @@ const SecureVector<byte> SymmetricKey::SecureNonce()
 
 SymmetricKey* SymmetricKey::Clone()
 {
-	return new SymmetricKey(Key(), Nonce(), Info());
+	return new SymmetricKey(Key(), IV(), Info());
 }
 
 void SymmetricKey::Reset()
@@ -249,7 +248,7 @@ SecureVector<byte> SymmetricKey::Serialize(SymmetricKey &KeyParams)
 	ushort tlen;
 
 	klen = static_cast<ushort>(KeyParams.Key().size());
-	nlen = static_cast<ushort>(KeyParams.Nonce().size());
+	nlen = static_cast<ushort>(KeyParams.IV().size());
 	ilen = static_cast<ushort>(KeyParams.Info().size());
 	tlen = 6 + klen + nlen + ilen;
 
@@ -263,7 +262,7 @@ SecureVector<byte> SymmetricKey::Serialize(SymmetricKey &KeyParams)
 	}
 	if (nlen > 0)
 	{
-		ArrayTools::AppendVector(KeyParams.Nonce(), tmpr);
+		ArrayTools::AppendVector(KeyParams.IV(), tmpr);
 	}
 	if (ilen > 0)
 	{

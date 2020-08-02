@@ -8,7 +8,7 @@ namespace Test
 {
 	using Provider::ACP;
 	using Exception::CryptoRandomException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 
 	const std::string ACPTest::CLASSNAME = "ACPTest";

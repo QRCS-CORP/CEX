@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -150,7 +150,6 @@ private:
 	static const size_t BLOCK_SIZE = 16;
 	static const size_t MAX_PRLALLOC = 100000000;
 	static const size_t MIN_TAGSIZE = 32;
-	static const std::vector<byte> HBA_INFO;
 
 	class HbaState;
 	std::unique_ptr<HbaState> m_hbaState;

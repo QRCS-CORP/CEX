@@ -7,7 +7,7 @@
 NAMESPACE_DILITHIUM
 
 using Digest::Keccak;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 void DLTMK4Q8380417N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
@@ -228,10 +228,7 @@ void DLTMK4Q8380417N256::Sign(std::vector<byte> &Signature, const std::vector<by
 
 bool DLTMK4Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey)
 {
-	std::vector<byte> rho(DILITHIUM_SEED_SIZE);
-	std::vector<byte> mu(DILITHIUM_CRH_SIZE);
 	std::vector<std::vector<std::array<uint, 256>>> mat(DILITHIUM_K, std::vector<std::array<uint, 256>>(DILITHIUM_L));
-	std::vector<std::array<uint, 256>> z(DILITHIUM_L);
 	std::vector<std::array<uint, 256>> t1(DILITHIUM_K);
 	std::vector<std::array<uint, 256>> w1(DILITHIUM_K);
 	std::vector<std::array<uint, 256>> h(DILITHIUM_K);
@@ -253,6 +250,9 @@ bool DLTMK4Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 
 	if (bsig == 0)
 	{
+		std::vector<byte> rho(DILITHIUM_SEED_SIZE);
+		std::vector<std::array<uint, 256>> z(DILITHIUM_L);
+
 		msglen = Signature.size() - DILITHIUM_SIGNATURE_SIZE;
 		DLTMPolyMath::UnpackPk(rho, t1, PublicKey, DILITHIUM_POLT1_SIZE_PACKED);
 
@@ -270,6 +270,8 @@ bool DLTMK4Q8380417N256::Verify(std::vector<byte> &Message, const std::vector<by
 
 			if (bsig == 0)
 			{
+				std::vector<byte> mu(DILITHIUM_CRH_SIZE);
+
 				// compute CRH(CRH(rho, t1), msg) using message as "playground" buffer 
 				if (Signature != Message)
 				{

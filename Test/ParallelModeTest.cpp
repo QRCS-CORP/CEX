@@ -10,7 +10,7 @@
 namespace Test
 {
 	using namespace Cipher::Block::Mode;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
@@ -95,7 +95,7 @@ namespace Test
 		std::vector<byte> inp;
 		std::vector<byte> otp;
 		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
+		std::vector<byte> iv(ks.IVSize());
 		Prng::SecureRandom rnd;
 
 		cpt1.reserve(MAXSMP);
@@ -106,15 +106,18 @@ namespace Test
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 			size_t plen = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
-
+			cpt1.clear();
+			cpt2.clear();
+			inp.clear();
+			otp.clear();
 			inp.resize(plen);
 			otp.resize(plen);
 
-			cpt1.resize(plen + ((IAeadMode*)Cipher)->TagSize());
+			cpt1.resize(plen + (reinterpret_cast<IAeadMode*>(Cipher)->TagSize()));
 			cpt2.resize(cpt1.size());
 
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(inp, 0, plen, rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(inp, 0, plen);
 			SymmetricKey k(key, iv);
 
 			// sequential
@@ -157,7 +160,7 @@ namespace Test
 		std::vector<byte> inp;
 		std::vector<byte> otp;
 		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
+		std::vector<byte> iv(ks.IVSize());
 		Prng::SecureRandom rnd;
 
 		cpt1.reserve(MAXSMP);
@@ -183,8 +186,8 @@ namespace Test
 			cpt1.resize(plen);
 			cpt2.resize(plen);
 
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(inp, 0, plen, rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(inp, 0, plen);
 			SymmetricKey k(key, iv);
 
 			// sequential

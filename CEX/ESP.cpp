@@ -3,7 +3,7 @@
 
 NAMESPACE_PADDING
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 const std::string ESP::CLASS_NAME("ESP");
 
@@ -59,7 +59,7 @@ size_t ESP::GetBlockLength(const std::vector<byte> &Input)
 
 	while (ctr != 0)
 	{
-		inp |= ~IntegerTools::IsEqual<uint8_t>(size_t(Input[ctr - 1]), size_t(Input[ctr]) - 1) & IntegerTools::ExpandMask<uint8_t>(ctr > pos);
+		inp |= ~IntegerTools::IsEqual<uint8_t>(static_cast<size_t>(Input[ctr - 1]), static_cast<size_t>(Input[ctr]) - 1) & IntegerTools::ExpandMask<uint8_t>(ctr > pos);
 		--ctr;
 	}
 
@@ -88,7 +88,7 @@ size_t ESP::GetBlockLength(const std::vector<byte> &Input, size_t Offset, size_t
 
 	while (ctr != Offset)
 	{
-		inp |= ~IntegerTools::IsEqual<uint8_t>(size_t(Input[ctr - 1]), size_t(Input[ctr]) - 1) & IntegerTools::ExpandMask<uint8_t>(ctr > pos);
+		inp |= ~IntegerTools::IsEqual<uint8_t>(static_cast<size_t>(Input[ctr - 1]), static_cast<size_t>(Input[ctr]) - 1) & IntegerTools::ExpandMask<uint8_t>(ctr > pos);
 		--ctr;
 	}
 

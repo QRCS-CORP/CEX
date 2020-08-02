@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -49,7 +49,7 @@ using Enumeration::SHA2Digests;
 /// <example>
 /// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
-/// HCG rnd(Digests::SHA512, [Providers::ACP]);
+/// HCG rnd(Digests::SHA2512, [Providers::ACP]);
 /// // initialize
 /// rnd.Initialize(Key, [Nonce], [Info]);
 /// // generate bytes
@@ -60,7 +60,7 @@ using Enumeration::SHA2Digests;
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>The HMAC based generator uses a hash function in a keyed HMAC to generate pseudo-random output. \n
-/// The HMAC is initialized with the input key, when an entropy provider is specified, at intervals of ReseedThreshold,an internal key strengthening/derivation function extracts a key equal to the underlying hash functions internal block size,
+/// The HMAC is initialized with the input key, when an entropy provider is specified, at intervals of ReseedThreshold, an internal key strengthening/derivation function extracts a key equal to the underlying hash functions internal block size,
 /// this is the most secure key-size when generating pseudo-random using an HMAC. \n
 /// The key derivation function takes as input the next unused pseudo-random state, which is finalized and added to the second half of the new key, and new entropy from the random provider, is used to populate the first half of the key. \n
 /// The generator function uses the HMAC to process a state counter, (which can be set at initialization with the key containers Nonce parameter, or as a zeroed array of 8 bytes), 
@@ -77,7 +77,7 @@ using Enumeration::SHA2Digests;
 /// <para>The Initialize functions have three different parameter options: the Key which is the primary key, 
 /// the Nonce used to initialize the internal state-counter, and the Info which is used by the Generate function to pass a complete block to the HMAC update function. \n
 /// The Key value must be one of the LegalKeySizes() in length, and must be a secret and random value. \n
-/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value. \n
+/// The eight byte (IVSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value. \n
 /// The Info parameter maps to the DistributionCode() property, and is used as message state when generating the pseudo-random output. \n
 /// The Info is recommended, and for best security, should be secret, random, and should be no more than 20 bytes in length \n 
 /// The Update function uses the seed value to re-key the HMAC via the internal key derivation function. \n
@@ -131,13 +131,12 @@ private:
 	static const size_t MAX_THRESHOLD = 10000;
 	// the minimum key length that will initialize the generator
 	static const size_t MINKEY_LENGTH = 16;
+	static const std::vector<char> CEX_PREFIX;
 
 	class HcgState;
 	std::unique_ptr<HMAC> m_hcgGenerator;
 	std::unique_ptr<IProvider> m_hcgProvider;
 	std::unique_ptr<HcgState> m_hcgState;
-	bool m_isDestroyed;
-	bool m_isInitialized;
 
 public:
 
@@ -162,7 +161,7 @@ public:
 	/// Instantiate the class using a SHA2 digest type name, and an optional entropy source type
 	/// </summary>
 	///
-	/// <param name="DigestType">The hash digests enumeration type name; SHA256/SHA512 are legal options</param>
+	/// <param name="DigestType">The hash digests enumeration type name; SHA2256/SHA2512 are legal options</param>
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance, the default is ACP</param>
 	///
 	/// <exception cref="CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
@@ -172,7 +171,7 @@ public:
 	/// Instantiate the class using a digest instance, and an optional entropy source 
 	/// </summary>
 	/// 
-	/// <param name="Digest">The hash digest instance; SHA256/SHA512 are legal options</param>
+	/// <param name="Digest">The hash digest instance; SHA2256/SHA2512 are legal options</param>
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if a null digest is used</exception>
@@ -188,7 +187,7 @@ public:
 	/// <summary>
 	/// Read Only: Generator is ready to produce random
 	/// </summary>
-	const bool IsInitialized() override;
+	const bool IsInitialized() override; 
 
 	/// <summary>
 	/// Read/Write: The maximum output generated between auto-seed generation when using an entropy provider

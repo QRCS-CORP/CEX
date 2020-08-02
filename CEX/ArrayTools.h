@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -25,10 +25,10 @@
 #include <algorithm>
 #include <iterator>
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 /// <summary>
 /// Array functions class
@@ -148,11 +148,12 @@ public:
 	/// Return true if the char array contains the value
 	/// </summary>
 	/// 
-	/// <param name="Container">The vector array of values</param>
+	/// <param name="Container">The char array of values</param>
+	/// <param name="Length">The number of array values to check</param>
 	/// <param name="Value">The value to find</param>
 	/// 
 	/// <returns>True if the value exists</returns>
-	static bool Contains(const char* Container, char Value);
+	static bool Contains(const char* Container, size_t Length, char Value);
 
 	/// <summary>
 	/// Return true if the vector array contains the value
@@ -246,13 +247,13 @@ public:
 	template <typename T>
 	static std::vector<byte> ToByteArray(T* Input, size_t Length)
 	{
-		const size_t ELMLEN = sizeof(Input[0]);
+		const size_t ELMLEN = sizeof(T);
 		const size_t RETLEN = Length * ELMLEN;
 		std::vector<byte> elems(RETLEN);
 
 		if (Length != 0)
 		{
-			std::memcpy(&elems[0], &Input[0], RETLEN);
+			std::memcpy(elems.data(), Input, RETLEN);
 		}
 
 		return elems;
@@ -263,22 +264,21 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The array to convert</param>
+	/// <param name="Length">The length of the character array</param>
 	/// 
 	/// <returns>The string representation</returns>
 	template <typename T>
-	static std::string ToString(T* Input)
+	static std::string ToString(T* Input, size_t Length)
 	{
 		std::string ret;
 
 		if (sizeof(T) == 1)
 		{
-			size_t len = strlen(reinterpret_cast<char*>(Input));
-			ret = std::string(reinterpret_cast<char*>(Input), len);
+			ret = std::string(reinterpret_cast<char*>(Input), Length);
 		}
 		else
 		{
-			size_t len = wcslen(reinterpret_cast<wchar_t*>(Input));
-			std::wstring tmp(reinterpret_cast<wchar_t*>(Input), len);
+			std::wstring tmp(reinterpret_cast<wchar_t*>(Input), Length * sizeof(T));
 			ret.assign(tmp.begin(), tmp.end());
 		}
 
@@ -301,5 +301,5 @@ public:
 	}
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif

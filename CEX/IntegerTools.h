@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -24,9 +24,9 @@
 #include <iomanip>
 #include <sstream>
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 /// <summary>
 /// An integer utility functions class
@@ -163,14 +163,18 @@ public:
 	/// <returns>The cropped integer</returns>
 	inline static ulong Crop(ulong Value, size_t Length)
 	{
+		ulong ret;
+
 		if (Length < 8 * sizeof(Value))
 		{
-			return (Value & ((1ULL << Length) - 1ULL));
+			ret = (Value & ((1ULL << Length) - 1ULL));
 		}
 		else
 		{
-			return Value;
+			ret = Value;
 		}
+
+		return ret;
 	}
 
 	/// <summary>
@@ -189,6 +193,29 @@ public:
 		std::memcpy(otp.data(), Input.data(), Input.size());
 
 		return otp;
+	}
+
+	/// <summary>
+	/// Convert a string to a value of T
+	/// </summary>
+	/// 
+	/// <param name="Input">The value string</param>
+	/// <param name="Offset">The starting offset within the string</param>
+	/// <param name="Length">The number of string characters to read</param>
+	/// 
+	/// <returns>The integer value</returns>
+	template <typename T>
+	static T FromString(std::string &Input, size_t Offset, size_t Length)
+	{
+		CEXASSERT(Input.size() - Offset >= sizeof(T), "Length can not be longer than input");
+
+		std::string sval;
+		T num;
+
+		sval = Input.substr(Offset, Length);
+		num = static_cast<T>(strtol(sval.c_str(), NULL, 10));
+
+		return num;
 	}
 
 	/// <summary>
@@ -282,7 +309,7 @@ public:
 	/// <param name="Value">The initial value</param>
 	/// 
 	/// <returns>The parity 32-bit value</returns>
-	inline static ulong Parity(ulong Value)
+	static ulong Parity(ulong Value)
 	{
 		size_t i;
 
@@ -310,7 +337,7 @@ public:
 	/// 
 	/// <returns>The hex string representation</returns>
 	template <typename Array>
-	inline static std::string ToHex(Array &Input, size_t Offset, size_t Length)
+	static std::string ToHex(Array &Input, size_t Offset, size_t Length)
 	{
 		CEXASSERT(Length <= Input.size() - Offset, "Length can not be longer than input");
 
@@ -335,13 +362,63 @@ public:
 	/// 
 	/// <returns>The hex string representation</returns>
 	template <typename T>
-	inline static std::string ToHex(T Value)
+	static std::string ToHex(T Value)
 	{
 		std::stringstream ss;
 		ss << std::hex << std::uppercase;
 		ss << Value;
 
 		return ss.str();
+	}
+
+	/// <summary>
+	/// Convert a hexadecimal string to a value of T
+	/// </summary>
+	/// 
+	/// <param name="Input">The hexadecimal string</param>
+	/// <param name="Offset">The starting offset within the hexadecimal string</param>
+	/// 
+	/// <returns>The integer value</returns>
+	template <typename T>
+	static T HexToInt(std::string &Input, size_t Offset)
+	{
+		CEXASSERT(Input.size() - Offset >= sizeof(T), "Length can not be longer than input");
+
+		const size_t INTLEN = sizeof(T) * 2;
+		std::string nhex;
+		T num;
+
+		nhex = Input.substr(Offset, INTLEN);
+		num = static_cast<T>(strtol(nhex.c_str(), NULL, 16));
+
+		return num;
+	}
+
+	/// <summary>
+	/// Convert an integer of type T to a hexadecimal string
+	/// </summary>
+	/// 
+	/// <param name="Value">The integer value</param>
+	/// 
+	/// <returns>The hexidecimal string</returns>
+	template <typename T>
+	static std::string IntToHex(T Value)
+	{
+		const char* digits = "0123456789ABCDEF";
+		const size_t HEXLEN = sizeof(T) << 1;
+		size_t idx;
+		size_t i;
+		size_t j;
+
+		std::string rc(HEXLEN, '0');
+
+		for (i = 0, j = (HEXLEN - 1) * 4; i < HEXLEN; ++i, j -= 4)
+		{
+			idx = (Value >> j) & 0x0F;
+			rc[i] = digits[idx];
+		}
+
+		return rc;
 	}
 
 	/// <summary>
@@ -395,9 +472,13 @@ public:
 	/// </summary>
 	inline static bool IsBigEndian()
 	{
-		int num = 1;
+		int num;
+		bool ret;
 
-		return (*(byte*)&num != 1);
+		num = 1;
+		ret = (num >> 24) == 1;
+
+		return ret;
 	}
 
 	/// <summary>
@@ -975,8 +1056,13 @@ public:
 	/// </summary>
 	inline static bool IsLittleEndian()
 	{
-		int num = 1;
-		return (*(byte*)&num == 1);
+		int num;
+		bool ret;
+
+		num = 1;
+		ret = (num >> 24) != 1;
+
+		return ret;
 	}
 
 	/// <summary>
@@ -1193,7 +1279,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert a Little Endian 4 * 64bit word vector to a byte vector
+	/// Convert a Little Endian 4 * 64bit dword vector to a byte vector
 	/// </summary>
 	/// 
 	/// <param name="Input">The 64bit integer vector</param>
@@ -1219,7 +1305,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert a Little Endian 8 * 64bit word vector to a byte vector
+	/// Convert a Little Endian 8 * 64bit dword vector to a byte vector
 	/// </summary>
 	/// 
 	/// <param name="Input">The 64bit integer vector</param>
@@ -1249,7 +1335,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert a Little Endian 16 * 64bit word vector to a byte vector
+	/// Convert a Little Endian 16 * 64bit dword vector to a byte vector
 	/// </summary>
 	/// 
 	/// <param name="Input">The 64bit integer vector</param>
@@ -1423,8 +1509,6 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeBytesToUL512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(ArrayA::value_type) == sizeof(byte), "Input must be a byte vector");
-		CEXASSERT(sizeof(ArrayB::value_type) == sizeof(uint), "Output must be a 32bit integer vector");
 		CEXASSERT(Input.size() - InOffset >= 64, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(uint) >= 64, "Length is larger than output size");
 
@@ -1451,7 +1535,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert a byte vector to a Little Endian 4 * 64bit word vector
+	/// Convert a byte vector to a Little Endian 4 * 64bit dword vector
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte vector</param>
@@ -1477,7 +1561,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert a byte vector to a Little Endian 8 * 64bit word vector
+	/// Convert a byte vector to a Little Endian 8 * 64bit dword vector
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte vector</param>
@@ -1507,7 +1591,7 @@ public:
 	}
 
 	/// <summary>
-	/// Convert a byte vector to a Little Endian 16 * 64bit word vector
+	/// Convert a byte vector to a Little Endian 16 * 64bit dword vector
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte vector</param>
@@ -1517,8 +1601,6 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeBytesToULL1024(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(ArrayA::value_type) == sizeof(byte), "Input must be a byte vector");
-		CEXASSERT(sizeof(ArrayB::value_type) == sizeof(ulong), "Output must be a 64bit integer vector");
 		CEXASSERT(Input.size() - InOffset >= 128, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 128, "Length is larger than output size");
 
@@ -1811,7 +1893,7 @@ public:
 
 		if (Output[0] < Length)
 		{
-			Output[1] += 1;
+			++Output[1];
 		}
 	}
 
@@ -1958,7 +2040,7 @@ public:
 	/// <param name="Array">The vector to wipe</param>
 	/// <param name="Length">The number of bits to copy</param>
 	template<typename T>
-	inline static void ConditionalZeroMem(T Condition, T* Array, size_t Length)
+	inline static void ConditionalZeroMem(T Condition, std::vector<T> &Array, size_t Length)
 	{
 		const T MASK = ExpandMask<T>(Condition);
 		const T ZERO(0);
@@ -2157,7 +2239,7 @@ public:
 	}
 
 	/// <summary>
-	/// Constant time: value comparison between two arrays with offset and length parameters.
+	/// Constant time: value comparison between two arrays with a length parameter.
 	/// <para>Array container types can vary (standard vector, vector, or SecureVector), but vector elements must be of equal size.</para>
 	/// </summary>
 	/// 
@@ -2181,6 +2263,38 @@ public:
 		for (i = 0; i < Length; ++i)
 		{
 			delta |= (A[i] ^ B[i]);
+		}
+
+		return delta;
+	}
+
+	/// <summary>
+	/// Constant time: value comparison between two arrays with offset and length parameters.
+	/// <para>Array container types can vary (standard vector, vector, or SecureVector), but vector elements must be of equal size.</para>
+	/// </summary>
+	/// 
+	/// <param name="A">The first vector to compare</param>
+	/// <param name="AOffset">The starting offset in the first vector</param>
+	/// <param name="B">The second vector to compare</param>
+	/// <param name="BOffset">The starting offset in the second vector</param>
+	/// <param name="Length">The number of elements to compare</param>
+	/// 
+	/// <returns>A positive integer for each different value, or zero if the arrays are identical</returns>
+	template <typename ArrayA, typename ArrayB>
+	inline static size_t Verify(const ArrayA &A, size_t AOffset, const ArrayB &B, size_t BOffset, size_t Length)
+	{
+		CEXASSERT(!std::is_signed<ArrayA::value_type>::value, "Input must be an unsigned integer vector");
+		CEXASSERT(A.size() >= Length, "Input size can not be less than length");
+		CEXASSERT(B.size() >= Length, "Output size can not be less than length");
+
+		size_t delta;
+		size_t i;
+
+		delta = 0;
+
+		for (i = 0; i < Length; ++i)
+		{
+			delta |= (A[AOffset + i] ^ B[BOffset + i]);
 		}
 
 		return delta;
@@ -2263,7 +2377,7 @@ public:
 	{
 		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
 
-		return Shift ? _rotl(Value, static_cast<int>(Shift)) : Value;
+		return (Shift != 0) ? _rotl(Value, static_cast<int>(Shift)) : Value;
 	}
 
 	/// <summary>
@@ -2278,7 +2392,7 @@ public:
 	{
 		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 
-		return Shift ? _rotl64(Value, static_cast<int>(Shift)) : Value;
+		return (Shift != 0) ? _rotl64(Value, static_cast<int>(Shift)) : Value;
 	}
 
 	/// <summary>
@@ -2293,7 +2407,7 @@ public:
 	{
 		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
 
-		return Shift ? _rotr(Value, static_cast<int>(Shift)) : Value;
+		return (Shift != 0) ? _rotr(Value, static_cast<int>(Shift)) : Value;
 	}
 
 	/// <summary>
@@ -2308,7 +2422,7 @@ public:
 	{
 		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 
-		return Shift ? _rotr64(Value, static_cast<int>(Shift)) : Value;
+		return (Shift != 0) ? _rotr64(Value, static_cast<int>(Shift)) : Value;
 	}
 
 #else
@@ -2436,6 +2550,6 @@ public:
 #endif
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif
 

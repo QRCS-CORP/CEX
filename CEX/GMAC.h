@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -99,8 +99,6 @@ private:
 	class GmacState;
 	std::unique_ptr<IBlockCipher> m_blockCipher;
 	std::unique_ptr<GmacState> m_gmacState;
-	bool m_isDestroyed;
-	bool m_isInitialized;
 
 public:
 

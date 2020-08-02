@@ -32,7 +32,7 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 		{
 			case Drbgs::BCG:
 			{
-				dptr = new BCG(BlockCiphers::AES);
+				dptr = new BCG;
 				break;
 			}
 			case Drbgs::CSG:
@@ -42,11 +42,12 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 			}
 			case Drbgs::HCG:
 			{
-				dptr = new HCG(SHA2Digests::SHA512);
+				dptr = new HCG(SHA2Digests::SHA2512);
 				break;
 			}
 			default:
 			{
+				// invalid parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
@@ -77,35 +78,8 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 		{
 			case Drbgs::BCG:
 			{
-				if (DigestType == Digests::SHA256)
-				{
-					dptr = new BCG(BlockCiphers::RHXH256, ProviderType);
-					break;
-				}
-				else if (DigestType == Digests::SHAKE256)
-				{
-					dptr = new BCG(BlockCiphers::RHXS256, ProviderType);
-					break;
-				}
-				else if (DigestType == Digests::SHA512)
-				{
-					dptr = new BCG(BlockCiphers::RHXH512, ProviderType);
-					break;
-				}
-				else if (DigestType == Digests::SHAKE512)
-				{
-					dptr = new BCG(BlockCiphers::RHXS512, ProviderType);
-					break;
-				}
-				else if (DigestType == Digests::SHAKE1024)
-				{
-					dptr = new BCG(BlockCiphers::RHXS1024, ProviderType);
-					break;
-				}
-				else
-				{
-					throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
-				}
+				dptr = new BCG(ProviderType);
+				break;
 			}
 			case Drbgs::CSG:
 			{
@@ -119,6 +93,7 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 			}
 			default:
 			{
+				// invalid parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The drbg type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}

@@ -45,7 +45,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DrbgType">The DRBG generators enumeration name</param>
-	/// <param name="DigestType">The primary engine with HCG and DCG, or the (optional, invokes HX cipher) key expansion function in BCG (must be SHA256/SHA512 or SHAKE256/SHAKE512)</param>
+	/// <param name="DigestType">The primary engine with HCG and CSG</param>
 	/// <param name="ProviderType">The entropy providers enumeration name</param>
 	/// 
 	/// <returns>An uninitialized DRBG generator</returns>

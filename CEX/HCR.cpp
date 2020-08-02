@@ -7,23 +7,52 @@
 NAMESPACE_PRNG
 
 using Drbg::HCG;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::PrngConvert;
 using Enumeration::ProviderConvert;
 using Enumeration::SHA2DigestConvert;
 using Enumeration::SHA2Digests;
+
+class HCR::HcrState
+{
+public:
+
+	SecureVector<byte> Buffer;
+	size_t Position;
+	SHA2Digests DigestType;
+	Providers ProviderType;
+
+	HcrState(SHA2Digests DigestType, Providers ProviderType)
+		:
+		Buffer(BUFFER_SIZE),
+		Position(0),
+		DigestType(DigestType),
+		ProviderType(ProviderType)
+	{
+	}
+
+	~HcrState()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+		Position = 0;
+		DigestType = SHA2Digests::None;
+		ProviderType = Providers::None;
+	}
+};
 
 //~~~Constructor~~~//
 
 HCR::HCR(SHA2Digests DigestType, Providers ProviderType)
 	:
 	PrngBase(Prngs::HCR, PrngConvert::ToName(Prngs::HCR) + std::string("-") + SHA2DigestConvert::ToName(DigestType) + std::string("-") + ProviderConvert::ToName(ProviderType)),
-	m_digestType(DigestType != SHA2Digests::None ? DigestType :
-		throw CryptoRandomException(PrngConvert::ToName(Prngs::HCR), std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
-	m_pvdType(ProviderType != Providers::None ? ProviderType :
-		throw CryptoRandomException(PrngConvert::ToName(Prngs::HCR), std::string("Constructor"), std::string("Provider type can not be none!"), ErrorCodes::InvalidParam)),
-	m_rndBuffer(BUFFER_SIZE),
-	m_rndIndex(BUFFER_SIZE),
+	m_hcrState(DigestType != SHA2Digests::None && ProviderType != Providers::None ? 
+		new HcrState(DigestType, ProviderType) : 
+		throw CryptoRandomException(PrngConvert::ToName(Prngs::HCR), std::string("Constructor"), std::string("Digest and Provider types can not be none!"), ErrorCodes::IllegalOperation)),
 	m_rngGenerator(new HCG(static_cast<SHA2Digests>(DigestType)))
 {
 	Reset();
@@ -31,14 +60,14 @@ HCR::HCR(SHA2Digests DigestType, Providers ProviderType)
 
 HCR::~HCR()
 {
-	m_digestType = SHA2Digests::None;
-	m_pvdType = Providers::None;
-	m_rndIndex = 0;
-	SecureClear(m_rndBuffer);
-
 	if (m_rngGenerator != nullptr)
 	{
 		m_rngGenerator.reset(nullptr);
+	}
+
+	if (m_hcrState != nullptr)
+	{
+		m_hcrState.reset(nullptr);
 	}
 }
 
@@ -48,7 +77,10 @@ HCR::~HCR()
 
 void HCR::Generate(std::vector<byte> &Output)
 {
-	GetRandom(Output, 0, Output.size(), m_rngGenerator);
+	SecureVector<byte> tmp(Output.size());
+
+	Generate(tmp, 0, Output.size(), m_rngGenerator);
+	SecureMove(tmp, 0, Output, 0, tmp.size());
 }
 
 void HCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -58,13 +90,15 @@ void HCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
-	GetRandom(Output, Offset, Length, m_rngGenerator);
+	SecureVector<byte> tmp(Length);
+
+	Generate(tmp, 0, Output.size(), m_rngGenerator);
+	SecureMove(tmp, 0, Output, Offset, tmp.size());
 }
 
 void HCR::Generate(SecureVector<byte> &Output)
 {
-
-	GetRandom(Output, 0, Output.size(), m_rngGenerator);
+	Generate(Output, 0, Output.size(), m_rngGenerator);
 }
 
 void HCR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
@@ -74,33 +108,41 @@ void HCR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
-	GetRandom(Output, Offset, Length, m_rngGenerator);
+	Generate(Output, Offset, Length, m_rngGenerator);
 }
 
 void HCR::Reset()
 {
-	Provider::IProvider* pvd = Helper::ProviderFromName::GetInstance(m_pvdType == Providers::None ? Providers::CSP : m_pvdType);
+	// initialize the random provider
+	Provider::IProvider* pvd = Helper::ProviderFromName::GetInstance(m_hcrState->ProviderType == Providers::None ? 
+		Providers::CSP : 
+		m_hcrState->ProviderType);
 
 	if (!pvd->IsAvailable())
 	{
 		throw CryptoRandomException(Name(), std::string("Reset"), std::string("The random provider can not be instantiated!"), ErrorCodes::NoAccess);
 	}
 
+	// use the provider to generate the key
 	Cipher::SymmetricKeySize ks = m_rngGenerator->LegalKeySizes()[1];
 	std::vector<byte> key(ks.KeySize());
 	pvd->Generate(key);
 	delete pvd;
 
+	// initialize the drbg
 	Cipher::SymmetricKey kp(key);
 	m_rngGenerator->Initialize(kp);
 	MemoryTools::Clear(key, 0, key.size());
+
+	// fill the buffer
+	m_rngGenerator->Generate(m_hcrState->Buffer, 0, m_hcrState->Buffer.size());
 }
 
 //~~~Private Functions~~~//
 
-void HCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
+void HCR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
-	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+	const size_t BUFLEN = m_hcrState->Buffer.size() - m_hcrState->Position;
 
 	if (Length != 0)
 	{
@@ -108,60 +150,25 @@ void HCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std
 		{
 			if (BUFLEN > 0)
 			{
-				SecureExtract(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+				SecureMove(m_hcrState->Buffer, m_hcrState->Position, Output, Offset, BUFLEN);
 			}
 
-			while (Length >= m_rndBuffer.size())
+			while (Length >= m_hcrState->Buffer.size())
 			{
-				Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-				SecureExtract(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
-				Length -= m_rndBuffer.size();
-				Offset += m_rndBuffer.size();
+				Generator->Generate(m_hcrState->Buffer, 0, m_hcrState->Buffer.size());
+				SecureMove(m_hcrState->Buffer, 0, Output, Offset, m_hcrState->Buffer.size());
+				Length -= m_hcrState->Buffer.size();
+				Offset += m_hcrState->Buffer.size();
 			}
 
-			Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-			SecureExtract(m_rndBuffer, 0, Output, Offset, Length);
-			m_rndIndex = Length;
+			Generator->Generate(m_hcrState->Buffer, 0, m_hcrState->Buffer.size());
+			SecureMove(m_hcrState->Buffer, 0, Output, Offset, Length);
+			m_hcrState->Position = Length;
 		}
 		else
 		{
-			SecureExtract(m_rndBuffer, m_rndIndex, Output, Offset, Length);
-			m_rndIndex += Length;
-		}
-	}
-
-	Generator->Generate(Output, Offset, Length);
-}
-
-void HCR::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
-{
-	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
-
-	if (Length != 0)
-	{
-		if (Length > BUFLEN)
-		{
-			if (BUFLEN > 0)
-			{
-				SecureCopy(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
-			}
-
-			while (Length >= m_rndBuffer.size())
-			{
-				Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-				SecureCopy(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
-				Length -= m_rndBuffer.size();
-				Offset += m_rndBuffer.size();
-			}
-
-			Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-			SecureCopy(m_rndBuffer, 0, Output, Offset, Length);
-			m_rndIndex = Length;
-		}
-		else
-		{
-			SecureCopy(m_rndBuffer, m_rndIndex, Output, Offset, Length);
-			m_rndIndex += Length;
+			SecureMove(m_hcrState->Buffer, m_hcrState->Position, Output, Offset, Length);
+			m_hcrState->Position += Length;
 		}
 	}
 }

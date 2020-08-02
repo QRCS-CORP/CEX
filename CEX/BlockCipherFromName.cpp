@@ -1,7 +1,7 @@
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
 #include "CryptoSymmetricException.h"
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 #	include "AHX.h"
 #endif
 #include "RHX.h"
@@ -30,7 +30,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 		{
 			case BlockCiphers::AES:
 			{
-	#if defined(__AVX__)
+	#if defined(CEX_HAS_AVX)
 				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::None);
@@ -44,7 +44,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 			case BlockCiphers::RHXH256:
 			{
-	#if defined(__AVX__)
+	#if defined(CEX_HAS_AVX)
 				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::HKDF256);
@@ -58,7 +58,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 			case BlockCiphers::RHXH512:
 			{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::HKDF512);
@@ -72,7 +72,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 			case BlockCiphers::RHXS256:
 			{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::SHAKE256);
@@ -86,7 +86,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 			case BlockCiphers::RHXS512:
 			{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::SHAKE512);
@@ -100,7 +100,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 			case BlockCiphers::RHXS1024:
 			{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 				if (dtc.AESNI())
 				{
 					cptr = new AHX(BlockCipherExtensions::SHAKE1024);
@@ -144,6 +144,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType)
 			}
 			default:
 			{
+				// invalid parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}

@@ -1,0 +1,9 @@
+digraph "CSX256"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="CSX256",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="A parallelized and vectorized ChaCha-256 20-round stream cipher [CSX256] implementation."];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="IStreamCipher",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_i_stream_cipher.html",tooltip="The stream-cipher virtual interface class."];
+}

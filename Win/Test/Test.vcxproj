@@ -72,8 +72,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>$(SourcePath)</SourcePath>
-    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\Vectors;$(ReferencePath)</ReferencePath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -83,8 +83,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
-    <ReferencePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\Vectors;$(ReferencePath)</ReferencePath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -99,7 +99,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -146,7 +146,7 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -207,99 +207,25 @@
     <Text Include="..\..\Test\Diehard Results\10mb\hmg10.txt" />
     <Text Include="..\..\Test\Diehard Results\10mb\rdp10.txt" />
     <Text Include="..\..\Test\NistStsResults.txt" />
-    <Content Include="Vectors\AESAVS\keyvect128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\AESAVS\keyvect192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\AESAVS\keyvect256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\AESAVS\plainvect128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\AESAVS\plainvect192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\AESAVS\plainvect256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2b-kat.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2bp-kat.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2s-kat.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2sp-kat.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishcipher128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishcipher192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishcipher256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishkey128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishkey192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishkey256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentcipher128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentcipher192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentcipher256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentkey128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentkey192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentkey256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte100-128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte100-192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte100-256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte1000-128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte1000-192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte1000-256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentplain128.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentplain192.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentplain256.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Text Include="..\..\Test\Vectors\Blake2\blake2b-kat.txt" />
+    <Text Include="..\..\Test\Vectors\Blake2\blake2bp-kat.txt" />
+    <Text Include="..\..\Test\Vectors\Blake2\blake2s-kat.txt" />
+    <Text Include="..\..\Test\Vectors\Blake2\blake2sp-kat.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentcipher128.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentcipher192.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentcipher256.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentkey128.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentkey192.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentkey256.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte100-128.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte100-192.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte100-256.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte1000-128.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte1000-192.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte1000-256.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentplain128.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentplain192.txt" />
+    <Text Include="..\..\Test\Vectors\Nessie\serpentplain256.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Test\ACPTest.h" />
@@ -311,11 +237,13 @@
     <ClInclude Include="..\..\Test\CSPTest.h" />
     <ClInclude Include="..\..\Test\CSRTest.h" />
     <ClInclude Include="..\..\Test\DilithiumTest.h" />
+    <ClInclude Include="..\..\Test\DUKPTTest.h" />
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\HCRTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
-    <ClInclude Include="..\..\Test\NetworkTest.h" />
+    <ClInclude Include="..\..\Test\HKDSTest.h" />
     <ClInclude Include="..\..\Test\NistRng.h" />
+    <ClInclude Include="..\..\Test\RWSTest.h" />
     <ClInclude Include="..\..\Test\RainbowTest.h" />
     <ClInclude Include="..\..\Test\RandomUtils.h" />
     <ClInclude Include="..\..\Test\RCSTest.h" />
@@ -344,7 +272,7 @@
     <ClInclude Include="..\..\Test\Poly1305Test.h" />
     <ClInclude Include="..\..\Test\RandomOutputTest.h" />
     <ClInclude Include="..\..\Test\NewHopeTest.h" />
-    <ClInclude Include="..\..\Test\SCRYPTTest.h" />
+    <ClInclude Include="..\..\Test\SCBKDFTest.h" />
     <ClInclude Include="..\..\Test\SecureStreamTest.h" />
     <ClInclude Include="..\..\Test\SHAKETest.h" />
     <ClInclude Include="..\..\Test\SimdSpeedTest.h" />
@@ -357,7 +285,7 @@
     <ClInclude Include="..\..\Test\HexConverter.h" />
     <ClInclude Include="..\..\Test\ITest.h" />
     <ClInclude Include="..\..\Test\KDF2Test.h" />
-    <ClInclude Include="..\..\Test\KeccakTest.h" />
+    <ClInclude Include="..\..\Test\SHA3Test.h" />
     <ClInclude Include="..\..\Test\ParallelModeTest.h" />
     <ClInclude Include="..\..\Test\PBKDF2Test.h" />
     <ClInclude Include="..\..\Test\SerpentTest.h" />
@@ -383,10 +311,12 @@
     <ClCompile Include="..\..\Test\CSPTest.cpp" />
     <ClCompile Include="..\..\Test\CSRTest.cpp" />
     <ClCompile Include="..\..\Test\DilithiumTest.cpp" />
+    <ClCompile Include="..\..\Test\DUKPTTest.cpp" />
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
     <ClCompile Include="..\..\Test\HCRTest.cpp" />
-    <ClCompile Include="..\..\Test\NetworkTest.cpp" />
+    <ClCompile Include="..\..\Test\HKDSTest.cpp" />
     <ClCompile Include="..\..\Test\NistRng.cpp" />
+    <ClCompile Include="..\..\Test\RWSTest.cpp" />
     <ClCompile Include="..\..\Test\RainbowTest.cpp" />
     <ClCompile Include="..\..\Test\RandomUtils.cpp" />
     <ClCompile Include="..\..\Test\RCSTest.cpp" />
@@ -409,7 +339,8 @@
     <ClCompile Include="..\..\Test\HMACTest.cpp" />
     <ClCompile Include="..\..\Test\HCGTest.cpp" />
     <ClCompile Include="..\..\Test\KDF2Test.cpp" />
-    <ClCompile Include="..\..\Test\KeccakTest.cpp" />
+    <ClCompile Include="..\..\Test\SCBKDFTest.cpp" />
+    <ClCompile Include="..\..\Test\SHA3Test.cpp" />
     <ClCompile Include="..\..\Test\KMACTest.cpp" />
     <ClCompile Include="..\..\Test\MacStreamTest.cpp" />
     <ClCompile Include="..\..\Test\McElieceTest.cpp" />
@@ -422,7 +353,6 @@
     <ClCompile Include="..\..\Test\Poly1305Test.cpp" />
     <ClCompile Include="..\..\Test\RandomOutputTest.cpp" />
     <ClCompile Include="..\..\Test\NewHopeTest.cpp" />
-    <ClCompile Include="..\..\Test\SCRYPTTest.cpp" />
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />
     <ClCompile Include="..\..\Test\SerpentTest.cpp" />
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />
@@ -444,6 +374,26 @@
     <ProjectReference Include="..\Static\CEXEngine.vcxproj">
       <Project>{ff7ab9cb-bf7b-4e0e-a3ef-f4141810b24a}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarKey128.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarKey256.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarTxt128.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarTxt256.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MCT\CBCMCT128.rsp">
+      <DeploymentContent>false</DeploymentContent>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MCT\CBCMCT256.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MMT\CBCMMT128.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MMT\CBCMMT256.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarKey128.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarKey256.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarTxt128.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarTxt256.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MCT\ECBMCT128.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MCT\ECBMCT256.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MMT\ECBMMT128.rsp" />
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MMT\ECBMMT256.rsp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

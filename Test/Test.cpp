@@ -1,8 +1,28 @@
+// Development Map
+// 1.0.0.8f
+// re-work asymmetric keys -done
+// change key naming nonce to iv -done
+// complete documentation review -done
+// complete code review -done
+// changes to RCS/HBA key schedule -done
+// network tests -
+// aes KATS to NIST file format -done
+
+// 1.0.0.9a
+// internal migration to secure vectors
+// 
+// 1.0.0.9b
+// linux, gcc
+// 
+// 1.0.0.9c
+// upgrade asymmetric ciphers to round 3 versions
+// 
+// 1.0.0.9d
+// Post quantum TLS
+
 #include <iostream>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string>
-#include <time.h>
 #include "../CEX/CpuDetect.h"
 #include "../Test/TestFiles.h"
 #include "../Test/TestUtils.h"
@@ -27,13 +47,15 @@
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
 #include "../Test/DilithiumTest.h"
+#include "../Test/DUKPTTest.h"
 #include "../Test/ECPTest.h"
 #include "../Test/GMACTest.h"
 #include "../Test/HCRTest.h"
 #include "../Test/KDF2Test.h"
-#include "../Test/KeccakTest.h"
+#include "../Test/SHA3Test.h"
 #include "../Test/KMACTest.h"
 #include "../Test/HKDFTest.h"
+#include "../Test/HKDSTest.h"
 #include "../Test/HMACTest.h"
 #include "../Test/HCGTest.h"
 #include "../Test/ITest.h"
@@ -41,7 +63,7 @@
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
 #include "../Test/KyberTest.h"
-#include "../Test/NetworkTest.h"
+#include "../Test/NewHopeTest.h"
 #include "../Test/NTRUPrimeTest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
@@ -52,8 +74,8 @@
 #include "../Test/RCSTest.h"
 #include "../Test/RDPTest.h"
 #include "../Test/RijndaelTest.h"
-#include "../Test/NewHopeTest.h"
-#include "../Test/SCRYPTTest.h"
+#include "../Test/SCBKDFTest.h"
+#include "../Test/RWSTest.h"
 #include "../Test/SecureStreamTest.h"
 #include "../Test/SerpentTest.h"
 #include "../Test/Sha2Test.h"
@@ -143,9 +165,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.8d (A8)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.8i (A8)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      January 09, 2020                 *");
+	ConsoleUtils::WriteLine("* Date:      August 01, 2020                   *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -218,28 +240,25 @@ void TestRun(ITest* Test)
 
 int main()
 {
-	bool hasAes;
+	bool hasAesni;
 	bool hasAvx;
 	bool hasAvx2;
 	bool isx86emu;
-	bool is64;
+	bool is64bit;
 
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
 
 #if !defined(_OPENMP)
-	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
-	PrintHeader("An error has occurred! Press any key to close..", "");
-	TestUtils::WaitForInput();
-
-	return 0;
+	PrintHeader("Warning! This library uses OpenMP which was not detected, performance may be sub-optimal!");
+	PrintHeader("");
 #endif
 
 	std::string data("");
 
 	try
 	{
-		TestUtils::Read(TestFiles::AESAVS::AESAVSKEY128, data);
+		TestUtils::Read(TestFiles::AESAVS::AESCBC128_VARKEY, data);
 	}
 	catch (std::exception&) 
 	{
@@ -255,22 +274,26 @@ int main()
 
 		return 0;
 	}
+	else
+	{
+		data.clear();
+	}
 
-	hasAes = false;
+	hasAesni = false;
 	hasAvx = false;
 	hasAvx2 = false;
 	isx86emu = false;
-	is64 = false;
+	is64bit = false;
 
 	try
 	{
 		CpuDetect detect;
 
-		hasAes = detect.AESNI();
+		hasAesni = detect.AESNI();
 		hasAvx = detect.AVX();
 		hasAvx2 = detect.AVX2();
 		isx86emu = detect.IsX86Emulation();
-		is64 = detect.IsX64();
+		is64bit = detect.IsX64();
 	}
 	catch (std::exception&)
 	{
@@ -281,7 +304,7 @@ int main()
 	}
 
 #if (!defined(_M_X64) && !defined(__x86_64__) && !defined(_DEBUG))
-	if (is64 || isx86emu)
+	if (is64bit || isx86emu)
 	{
 		PrintHeader("Warning! Compiling x86/Release on a 64bit system will cause memory alignment errors.", "");
 		PrintHeader("To test x86/Release, compile on a true x86 system, or run in x86/Debug mode.", "");
@@ -292,7 +315,7 @@ int main()
 	}
 #endif
 
-	if (hasAes)
+	if (hasAesni)
 	{
 		PrintHeader("AES-NI intrinsics support has been detected on this system.");
 	}
@@ -338,7 +361,7 @@ int main()
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
 
 #if defined(__AVX__)
-			if (hasAes)
+			if (hasAesni)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
 				TestRun(new AesAvsTest(true));
@@ -349,7 +372,7 @@ int main()
 			TestRun(new AesAvsTest(false));
 
 #if defined(__AVX__)
-			if (hasAes)
+			if (hasAesni)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
 				TestRun(new RijndaelTest(true));
@@ -358,7 +381,6 @@ int main()
 
 			PrintHeader("Testing the AES software implementation (RHX)");
 			TestRun(new RijndaelTest(false));
-
 			PrintHeader("Testing the Serpent software implementation (SHX)");
 			TestRun(new SerpentTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
@@ -372,6 +394,7 @@ int main()
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
 			TestRun(new ChaChaTest());
 			TestRun(new RCSTest());
+			TestRun(new RWSTest());
 			TestRun(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
 			TestRun(new CipherStreamTest());
@@ -379,7 +402,7 @@ int main()
 			TestRun(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
 			TestRun(new Blake2Test());
-			TestRun(new KeccakTest());
+			TestRun(new SHA3Test());
 			TestRun(new SHA2Test());
 			TestRun(new SkeinTest());
 			PrintHeader("TESTING MESSAGE AUTHENTICATION CODE GENERATORS");
@@ -406,8 +429,11 @@ int main()
 			TestRun(new HKDFTest());
 			TestRun(new KDF2Test());
 			TestRun(new PBKDF2Test());
-			TestRun(new SCRYPTTest());
+			TestRun(new SCBKDFTest());
 			TestRun(new SHAKETest());
+			PrintHeader("TESTING KEY MANAGEMENT SYSTEMS");
+			TestRun(new DUKPTTest());
+			TestRun(new HKDSTest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			TestRun(new BCGTest());
 			TestRun(new CSGTest());
@@ -423,10 +449,10 @@ int main()
 			PrintHeader("TESTING UTILITY CLASS FUNCTIONS");
 			TestRun(new UtilityTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
-			TestRun(new McElieceTest());
 			TestRun(new KyberTest());
-			TestRun(new NTRUPrimeTest());
+			TestRun(new McElieceTest());
 			TestRun(new NewHopeTest());
+			TestRun(new NTRUPrimeTest());
 			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
 			TestRun(new DilithiumTest());
 			TestRun(new RainbowTest());

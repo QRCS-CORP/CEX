@@ -8,7 +8,7 @@ NAMESPACE_MAC
 using Exception::CryptoDigestException;
 using Enumeration::Digests;
 using Enumeration::MacConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Digest::SHA2;
 using Enumeration::SHA2DigestConvert;
 
@@ -20,13 +20,17 @@ public:
 	std::vector<byte> OutputPad;
 	size_t BlockSize;
 	size_t HashSize;
+	bool IsDestroyed;
+	bool IsInitialized;
 
-	HmacState(size_t InputSize, size_t OutputSize)
+	HmacState(size_t InputSize, size_t OutputSize, bool Destroyed)
 		:
 		InputPad(InputSize),
 		OutputPad(InputSize),
 		BlockSize(InputSize),
-		HashSize(OutputSize)
+		HashSize(OutputSize),
+		IsDestroyed(Destroyed),
+		IsInitialized(false)
 	{
 	}
 
@@ -36,49 +40,50 @@ public:
 		HashSize = 0;
 		MemoryTools::Clear(InputPad, 0, InputPad.size());
 		MemoryTools::Clear(OutputPad, 0, OutputPad.size());
+		IsDestroyed = false;
+		IsInitialized = false;
 	}
 
 	void Reset()
 	{
 		MemoryTools::Clear(InputPad, 0, InputPad.size());
 		MemoryTools::Clear(OutputPad, 0, OutputPad.size());
+		IsInitialized = false;
 	}
 };
 
 //~~~Constructor~~~//
 
-HMAC::HMAC(SHA2Digests DigestType, bool Parallel)
+HMAC::HMAC(SHA2Digests DigestType)
 	:
 	MacBase(
-		(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_RATE_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_RATE_SIZE : 0),
-		(DigestType == SHA2Digests::SHA256 ? Macs::HMACSHA256 : DigestType == SHA2Digests::SHA512 ? Macs::HMACSHA512 : Macs::None),
-		(DigestType == SHA2Digests::SHA256 ? MacConvert::ToName(Macs::HMACSHA256) : DigestType == SHA2Digests::SHA512 ? MacConvert::ToName(Macs::HMACSHA512) : std::string("")),
+		(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_RATE_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_RATE_SIZE : 0),
+		(DigestType == SHA2Digests::SHA2256 ? Macs::HMACSHA2256 : DigestType == SHA2Digests::SHA2512 ? Macs::HMACSHA2512 : Macs::None),
+		(DigestType == SHA2Digests::SHA2256 ? MacConvert::ToName(Macs::HMACSHA2256) : DigestType == SHA2Digests::SHA2512 ? MacConvert::ToName(Macs::HMACSHA2512) : std::string("")),
 		std::vector<SymmetricKeySize> {
 			SymmetricKeySize(
-				(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_DIGEST_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_DIGEST_SIZE : 0),
+				(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_DIGEST_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_DIGEST_SIZE : 0),
 				0,
 				0),
 			SymmetricKeySize(
-				(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_RATE_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_RATE_SIZE : 0),
+				(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_RATE_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_RATE_SIZE : 0),
 				0,
-				(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_DIGEST_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_DIGEST_SIZE : 0)),
+				(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_DIGEST_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_DIGEST_SIZE : 0)),
 			SymmetricKeySize(
-				(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_RATE_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_RATE_SIZE : 0),
+				(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_RATE_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_RATE_SIZE : 0),
 				0,
-				(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_RATE_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_RATE_SIZE : 0))},
+				(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_RATE_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_RATE_SIZE : 0))},
 #if defined(CEX_ENFORCE_LEGALKEY)
-		(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_RATE_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_RATE_SIZE : 0),
-		(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_RATE_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_RATE_SIZE : 0),
+		(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_RATE_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_RATE_SIZE : 0),
+		(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_RATE_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_RATE_SIZE : 0),
 #else
 		MINKEY_LENGTH,
 		MINSALT_LENGTH,
 #endif
-		(DigestType == SHA2Digests::SHA256 ? SHA2::SHA256_DIGEST_SIZE : DigestType == SHA2Digests::SHA512 ? SHA2::SHA512_DIGEST_SIZE : 0)),
-	m_hmacGenerator(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType), Parallel) :
+		(DigestType == SHA2Digests::SHA2256 ? SHA2::SHA2256_DIGEST_SIZE : DigestType == SHA2Digests::SHA2512 ? SHA2::SHA2512_DIGEST_SIZE : 0)),
+	m_hmacGenerator(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType)) :
 		throw CryptoMacException(std::string("HMAC"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
-	m_hmacState(new HmacState(m_hmacGenerator->BlockSize(), m_hmacGenerator->DigestSize())),
-	m_isDestroyed(true),
-	m_isInitialized(false)
+	m_hmacState(new HmacState(m_hmacGenerator->BlockSize(), m_hmacGenerator->DigestSize(), true))
 {
 }
 
@@ -86,8 +91,8 @@ HMAC::HMAC(IDigest* Digest)
 	:
 	MacBase(
 		(Digest != nullptr ? Digest->BlockSize() : 0),
-		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Macs::HMACSHA256 : Macs::HMACSHA512) : Macs::None),
-		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? MacConvert::ToName(Macs::HMACSHA256) : MacConvert::ToName(Macs::HMACSHA512)) : std::string("")),
+		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA2256 ? Macs::HMACSHA2256 : Macs::HMACSHA2512) : Macs::None),
+		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA2256 ? MacConvert::ToName(Macs::HMACSHA2256) : MacConvert::ToName(Macs::HMACSHA2512)) : std::string("")),
 		(Digest != nullptr ? std::vector<SymmetricKeySize> {
 			SymmetricKeySize(
 				(Digest != nullptr ? Digest->DigestSize() : 0),
@@ -112,32 +117,27 @@ HMAC::HMAC(IDigest* Digest)
 		(Digest != nullptr ? Digest->DigestSize() : 0)),
 	m_hmacGenerator(Digest != nullptr ? Digest :
 		throw CryptoMacException(std::string("HMAC"), std::string("Constructor"), std::string("The digest can not be null!"), ErrorCodes::IllegalOperation)),
-	m_hmacState(new HmacState(m_hmacGenerator->BlockSize(), m_hmacGenerator->DigestSize())),
-	m_isDestroyed(false),
-	m_isInitialized(false)
+	m_hmacState(new HmacState(m_hmacGenerator->BlockSize(), m_hmacGenerator->DigestSize(), true))
 {
 }
 
 HMAC::~HMAC()
 {
-	m_isInitialized = false;
-
-	if (m_hmacState != nullptr)
-	{
-		m_hmacState.reset(nullptr);
-	}
-
 	if (m_hmacGenerator != nullptr)
 	{
-		if (m_isDestroyed)
+		if (m_hmacState->IsDestroyed)
 		{
 			m_hmacGenerator.reset(nullptr);
-			m_isDestroyed = false;
 		}
 		else
 		{
 			m_hmacGenerator.release();
 		}
+	}
+
+	if (m_hmacState != nullptr)
+	{
+		m_hmacState.reset(nullptr);
 	}
 }
 
@@ -145,29 +145,14 @@ HMAC::~HMAC()
 
 const bool HMAC::IsInitialized() 
 { 
-	return m_isInitialized; 
-}
-
-const bool HMAC::IsParallel()
-{
-	return m_hmacGenerator->IsParallel(); 
-}
-
-const size_t HMAC::ParallelBlockSize() 
-{
-	return m_hmacGenerator->ParallelBlockSize();
-}
-
-ParallelOptions &HMAC::ParallelProfile() 
-{ 
-	return m_hmacGenerator->ParallelProfile(); 
+	return m_hmacState->IsInitialized; 
 }
 
 //~~~Public Functions~~~//
 
 void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -184,7 +169,7 @@ size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	std::vector<byte> tmpv(m_hmacGenerator->DigestSize(), 0x00);
 
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -207,7 +192,7 @@ size_t HMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	std::vector<byte> tag(TagSize());
 
 	Finalize(tag, 0);
-	SecureMove(tag, Output, OutOffset);
+	SecureMove(tag, 0, Output, OutOffset, tag.size());
 
 	return TagSize();
 }
@@ -228,7 +213,7 @@ void HMAC::Initialize(ISymmetricKey &Parameters)
 	}
 #endif
 
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
@@ -256,31 +241,19 @@ void HMAC::Initialize(ISymmetricKey &Parameters)
 	MemoryTools::XorPad(m_hmacState->OutputPad, OPAD);
 	m_hmacGenerator->Update(m_hmacState->InputPad, 0, m_hmacState->InputPad.size());
 
-	m_isInitialized = true;
-}
-
-void HMAC::ParallelMaxDegree(size_t Degree)
-{
-	try
-	{
-		m_hmacGenerator->ParallelMaxDegree(Degree);
-	}
-	catch (CryptoDigestException &ex)
-	{
-		throw CryptoMacException(Name(), std::string("ParallelMaxDegree"), ex.Message(), ex.ErrorCode());
-	}
+	m_hmacState->IsInitialized = true;
 }
 
 void HMAC::Reset()
 {
 	m_hmacGenerator->Reset();
 	m_hmacState->Reset();
-	m_isInitialized = false;
+	m_hmacState->IsInitialized = false;
 }
 
 void HMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}

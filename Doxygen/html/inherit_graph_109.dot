@@ -1,0 +1,8 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="RLWEQ12289N2048",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_r_l_w_e_q12289_n2048.html",tooltip="The NewHope FFT using a modulus of 12289 with 2048 coefficients"];
+}

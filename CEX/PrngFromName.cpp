@@ -11,6 +11,8 @@ NAMESPACE_HELPER
 
 using Exception::CryptoRandomException;
 using Enumeration::ErrorCodes;
+using Enumeration::SHA2Digests;
+using Enumeration::ShakeModes;
 
 const std::string PrngFromName::CLASS_NAME("PrngFromName");
 
@@ -18,9 +20,7 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType)
 {
 	using namespace Prng;
 
-	IPrng* rptr;
-
-	rptr = nullptr;
+	IPrng* rptr(nullptr);
 
 	try
 	{
@@ -28,17 +28,7 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType)
 		{
 			case Prngs::BCR:
 			{
-				rptr = new BCR(Enumeration::BlockCiphers::AES, ProviderType);
-				break;
-			}
-			case Prngs::BCRAHXS256:
-			{
-				rptr = new BCR(Enumeration::BlockCiphers::RHXS256, ProviderType);
-				break;
-			}
-			case Prngs::BCRAHXS512:
-			{
-				rptr = new BCR(Enumeration::BlockCiphers::RHXS512, ProviderType);
+				rptr = new BCR(ProviderType);
 				break;
 			}
 			case Prngs::CSR:
@@ -58,17 +48,18 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType)
 			}
 			case Prngs::HCR:
 			{
-				rptr = new HCR(Enumeration::SHA2Digests::SHA256, ProviderType);
+				rptr = new HCR(SHA2Digests::SHA2256, ProviderType);
 				break;
 			}
 			case Prngs::HCRS512:
 			{
-				rptr = new HCR(Enumeration::SHA2Digests::SHA512, ProviderType);
+				rptr = new HCR(SHA2Digests::SHA2256, ProviderType);
 				break;
 			}
 			default:
 			{
-				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The prng type is not supported!"), ErrorCodes::InvalidParam);
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The Prng type can not be null!"), ErrorCodes::InvalidParam);
+				break;
 			}
 		}
 	}

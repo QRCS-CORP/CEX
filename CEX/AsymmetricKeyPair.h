@@ -14,8 +14,8 @@ class AsymmetricKeyPair final
 {
 private:
 
-	std::unique_ptr<AsymmetricKey> m_privateKey;
-	std::unique_ptr<AsymmetricKey> m_publicKey;
+	AsymmetricKey* m_privateKey;
+	AsymmetricKey* m_publicKey;
 	std::vector<byte> m_keyTag;
 
 public:

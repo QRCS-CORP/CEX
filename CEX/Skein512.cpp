@@ -7,9 +7,9 @@
 NAMESPACE_DIGEST
 
 using Enumeration::DigestConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
-using Utility::ParallelTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 
 class Skein512::Skein512State
 {
@@ -48,12 +48,16 @@ public:
 
 Skein512::Skein512(bool Parallel)
 	:
-	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_msgBuffer(Parallel ? DEF_PRLDEGREE * Skein::SKEIN512_RATE_SIZE : 
+	m_dgtState(Parallel ? 
+		DEF_PRLDEGREE : 
+		1),
+	m_msgBuffer(Parallel ? 
+		DEF_PRLDEGREE * Skein::SKEIN512_RATE_SIZE : 
 		Skein::SKEIN512_RATE_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(Skein::SKEIN512_RATE_SIZE, Parallel, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeParams(Parallel ? SkeinParams(Skein::SKEIN512_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN512_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) : 
+	m_treeParams(Parallel ? 
+		SkeinParams(Skein::SKEIN512_DIGEST_SIZE, static_cast<byte>(Skein::SKEIN512_RATE_SIZE), static_cast<byte>(DEF_PRLDEGREE)) : 
 		SkeinParams(Skein::SKEIN512_DIGEST_SIZE, 0x00, 0x00))
 {
 	Initialize(m_dgtState, m_treeParams);
@@ -61,7 +65,8 @@ Skein512::Skein512(bool Parallel)
 
 Skein512::Skein512(SkeinParams &Params)
 	:
-	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? Params.FanOut() :
+	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? 
+		Params.FanOut() :
 		throw CryptoDigestException(DigestConvert::ToName(Digests::Skein512), std::string("Constructor"), std::string("The FanOut parameter can not be zero or exceed the maximum of 64!"), ErrorCodes::IllegalOperation)),
 	m_msgBuffer(Skein::SKEIN512_RATE_SIZE),
 	m_msgLength(0),
@@ -423,7 +428,7 @@ void Skein512::LoadState(Skein512State &State, std::array<ulong, 8> &Config)
 
 void Skein512::Permute(std::array<ulong, 8> &Message, Skein512State &State)
 {
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 	Skein::PemuteR72P512V(Message, State.T, State.S);
 #else
 #	if defined(CEX_DIGEST_COMPACT)

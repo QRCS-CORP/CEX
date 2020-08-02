@@ -65,12 +65,12 @@ void NTRUSQ4591P761::Hash(std::vector<byte> &Output, size_t OutOffset, int B, co
 	x[0] = B;
 	MemoryTools::Copy(Input, 0, x, 1, Input.size());
 
-	SHA512 dgt;
+	SHA2512 dgt;
 	dgt.Compute(x, h);
 	MemoryTools::Copy(h, 0, Output, OutOffset, NTRUP_HASH_SIZE);
 }
 
-void NTRUSQ4591P761::HashConfirm(std::vector<byte> &H, size_t HOffset, const std::vector<byte> &R, const std::vector<byte> &Pk, const std::vector<byte> &Cache) // is pk supposed to be hashed here?
+void NTRUSQ4591P761::HashConfirm(std::vector<byte> &H, size_t HOffset, const std::vector<byte> &R, const std::vector<byte> &Cache) // is pk supposed to be hashed here?
 {
 	// h = HashConfirm(r,pk,cache); cache is Hash4(pk)
 
@@ -99,7 +99,7 @@ void NTRUSQ4591P761::Hide(std::vector<byte> &C, std::vector<byte> &REnc, const s
 	NTRUPolyMath::SmallEncode(REnc, 0, R);
 	ZEncrypt(C, R, Pk);
 
-	HashConfirm(C, C.size() - NTRUP_HASH_SIZE, REnc, Pk, Cache);
+	HashConfirm(C, C.size() - NTRUP_HASH_SIZE, REnc, Cache);
 }
 
 void NTRUSQ4591P761::KeyGen(std::vector<int16_t> &H, std::vector<int8_t> &F, std::vector<int8_t> &GInv, std::unique_ptr<Prng::IPrng> &Rng)

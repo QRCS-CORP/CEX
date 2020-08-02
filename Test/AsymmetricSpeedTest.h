@@ -29,9 +29,11 @@ namespace Test
 		static const uint64_t GB1 = MB1 * 1000;
 		static const uint64_t DEF_DATA_SIZE = MB100;
 #if defined (_DEBUG)
-		static const uint64_t TEST_ITERATIONS = 10;
+		static const uint64_t TEST_ITERATIONSF = 1;
+		static const uint64_t TEST_ITERATIONSL = 1;
 #else
-		static const uint64_t TEST_ITERATIONS = 100;
+		static const uint64_t TEST_ITERATIONSF = 100;
+		static const uint64_t TEST_ITERATIONSL = 10;
 #endif
 
 		TestEventHandler m_progressEvent;
@@ -65,12 +67,12 @@ namespace Test
 
 	private:
 
-		void CipherDecryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters);
-		void CipherEncryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters);
-		void CipherGenerateLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters);
-		void SignerGenerateLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters);
-		void SignerSignLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters);
-		void SignerVerifyLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters);
+		void CipherDecryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations);
+		void CipherEncryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations);
+		void CipherGenerateLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations);
+		void SignerGenerateLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations);
+		void SignerSignLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations);
+		void SignerVerifyLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations);
 		uint64_t GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count);
 		void OnProgress(const std::string &Data);
 	};

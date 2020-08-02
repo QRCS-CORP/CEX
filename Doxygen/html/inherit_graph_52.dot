@@ -1,0 +1,10 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="IBlockCipher",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_i_block_cipher.html",tooltip="The block-cipher virtual interface class."];
+  Node0 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="AHX",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_a_h_x.html",tooltip="A Rijndael cipher using either standard modes, or extended modes of operation using a HKDF(SHA2) or c..."];
+}

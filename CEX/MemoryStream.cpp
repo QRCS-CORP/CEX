@@ -1,9 +1,10 @@
-#include "MemoryStream.h"
 #include "IntegerTools.h"
+#include "MemoryStream.h"
 
 NAMESPACE_IO
 
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 const std::string MemoryStream::CLASS_NAME("MemoryStream");
 
@@ -120,7 +121,7 @@ void MemoryStream::Destroy()
 	{
 		m_isDestroyed = true;
 		m_streamPosition = 0;
-		Utility::IntegerTools::Clear(m_streamData);
+		IntegerTools::Clear(m_streamData);
 	}
 }
 

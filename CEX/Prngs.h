@@ -15,25 +15,9 @@ enum class Prngs : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator using AES
+	/// A Symmetric Cipher Counter mode random number generator using a wide-block Rijndael
 	/// </summary>
 	BCR = 1,
-	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator using RHX and cSHAKE-256
-	/// </summary>
-	BCRAHXS256 = 2,
-	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator using RHX and cSHAKE-512
-	/// </summary>
-	BCRAHXS512 = 3,
-	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator using Serpent and cSHAKE-256
-	/// </summary>
-	BCRSHXS256 = 4,
-	/// <summary>
-	/// A Symmetric Cipher Counter mode random number generator using Serpent and cSHAKE-512
-	/// </summary>
-	BCRSHXS512 = 5,
 	/// <summary>
 	/// A SHAKE based random number generator using cSHAKE-256
 	/// </summary>
@@ -47,11 +31,11 @@ enum class Prngs : byte
 	/// </summary>
 	CSRC1024 = 8,
 	/// <summary>
-	/// An HMAC based random number generator using SHA256
+	/// An HMAC based random number generator using SHA2256
 	/// </summary>
 	HCR = 9,
 	/// <summary>
-	/// An HMAC based random number generator using SHA512
+	/// An HMAC based random number generator using SHA2512
 	/// </summary>
 	HCRS512 = 10
 };

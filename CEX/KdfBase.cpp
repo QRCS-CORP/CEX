@@ -3,7 +3,7 @@
 
 NAMESPACE_KDF
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 //~~~KdfBase~~~//
 

@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -85,7 +85,6 @@ private:
 	static const size_t STATE_SIZE = 25;
 
 	class KmacState;
-	bool m_isInitialized;
 	std::unique_ptr<KmacState> m_kmacState;
 
 public:
@@ -201,10 +200,9 @@ public:
 
 private:
 
-	static void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::unique_ptr<KmacState> &State);
-	static void LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &State);
+	static void LoadKey(const SecureVector<byte> &Key, std::unique_ptr<KmacState> &State);
 	static void Permute(std::unique_ptr<KmacState> &State);
-	static void Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<KmacState> &State);
+	static void Squeeze(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<KmacState> &State);
 };
 
 NAMESPACE_MACEND

@@ -4,7 +4,7 @@
 
 namespace Test
 {
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 
 	const std::string UtilityTest::CLASSNAME = "UtilityTest";
 	const std::string UtilityTest::DESCRIPTION = "Utility test; tests various math helper functions.";

@@ -14,8 +14,8 @@
 
 namespace Test
 {
-	using Utility::MemoryTools;
-	using Utility::IntegerTools;
+	using Tools::MemoryTools;
+	using Tools::IntegerTools;
 
 #if defined(__AVX512__)
 	using Numeric::UInt512;
@@ -137,6 +137,7 @@ namespace Test
 		std::string glen = "";
 		uint64_t start = 0;
 		uint64_t dur = 0;
+		size_t i;
 
 		// Large Block Clear
 #if defined(__AVX__)
@@ -144,14 +145,14 @@ namespace Test
 		glen = "SpeedTest: BLOCK CLEAR " + TESTSIZE;
 		// sequential clear: 512 byte buffers
 		OnProgress(glen + std::string(" using 512 byte buffers with sequential clear "));
-		buffer1.resize(B512, (byte)0xff);
+		buffer1.resize(B512, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0x0, buffer1.size());
+				std::memset(&buffer1[0], 0x00, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -162,10 +163,10 @@ namespace Test
 		// highest available simd clear
 		glen = "SpeedTest: CLEAR " + TESTSIZE;
 		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized clear "));
-		buffer2.resize(B512, (byte)0xff);
+		buffer2.resize(B512, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -187,6 +188,7 @@ namespace Test
 		std::string glen = "";
 		uint64_t start = 0;
 		uint64_t dur = 0;
+		size_t i;
 
 		// Vector Aligned Clear
 #if defined(__AVX512__)
@@ -197,7 +199,7 @@ namespace Test
 		buffer1.resize(64, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -215,7 +217,7 @@ namespace Test
 		buffer2.resize(64, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -231,14 +233,14 @@ namespace Test
 		// sequential clear: 32 byte buffers
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
 		OnProgress(glen + std::string(" using 32 byte buffers with sequential clear "));
-		buffer1.resize(32, (byte)0xff);
+		buffer1.resize(32, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0x0, buffer1.size());
+				std::memset(&buffer1[0], 0x00, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -249,10 +251,10 @@ namespace Test
 
 		// simd256 clear
 		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized clear "));
-		buffer2.resize(32, (byte)0xff);
+		buffer2.resize(32, 0xFF);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -272,7 +274,7 @@ namespace Test
 		buffer1.resize(16, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -290,7 +292,7 @@ namespace Test
 		buffer2.resize(16, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -307,14 +309,15 @@ namespace Test
 
 	void SimdSpeedTest::CopyBlockSpeed(uint64_t Length, size_t Loops)
 	{
-		std::vector<byte> buffer1(B512, (byte)0xff);
+		std::vector<byte> buffer1(B512, 0xFF);
 		std::vector<byte> buffer2(B512);
-		std::vector<byte> buffer3(B512, (byte)0xff);
+		std::vector<byte> buffer3(B512, 0xFF);
 		std::vector<byte> buffer4(B512);
 		uint64_t blkCtr = 0;
 		std::string glen = "SpeedTest: BLOCK COPY " + TESTSIZE;
 		uint64_t start = 0;
 		uint64_t dur = 0;
+		size_t i;
 
 		// Large Block Copy
 #if defined(__AVX__)
@@ -322,7 +325,7 @@ namespace Test
 		OnProgress(glen + std::string(" using 512 byte buffers with sequential memcpy: "));
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -339,7 +342,7 @@ namespace Test
 		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized memcpy "));
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -364,6 +367,7 @@ namespace Test
 		std::string glen = "SpeedTest: VECTOR COPY " + TESTSIZE;
 		uint64_t start = 0;
 		uint64_t dur = 0;
+		size_t i;
 
 		// Vector Aligned Copy
 #if defined(__AVX512__)
@@ -373,7 +377,7 @@ namespace Test
 		buffer2.resize(64);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -392,7 +396,7 @@ namespace Test
 		buffer4.resize(64);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -408,11 +412,11 @@ namespace Test
 #elif defined(__AVX2__)
 		OnProgress(glen + std::string(" using 32 byte buffers with sequential copy "));
 		// sequential copy: 32 byte buffers
-		buffer1.resize(32, (byte)0xff);
+		buffer1.resize(32, 0xFF);
 		buffer2.resize(32);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -427,11 +431,11 @@ namespace Test
 
 		// simd256 memcpy
 		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized memcpy "));
-		buffer3.resize(32, (byte)0xff);
+		buffer3.resize(32, 0xFF);
 		buffer4.resize(32);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -451,7 +455,7 @@ namespace Test
 		buffer2.resize(16);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -471,7 +475,7 @@ namespace Test
 		buffer4.resize(16);
 		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
 			while (blkCtr < Length)
 			{
@@ -490,16 +494,16 @@ namespace Test
 	{
 		const size_t TSTCYCS = Loops;
 		const size_t TSTCYCL = TSTCYCS / 4;
-
+		size_t i;
 		uint A1 = 11111111;
 		uint B1 = 22222222;
 		uint C1 = 0;
 
 		OnProgress(std::string("***Multiplication***"));
-		Utility::TimeStamp ts;
+		Tools::TimeStamp ts;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = A1 * B1;
 		}
@@ -507,7 +511,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			A1 *= B1;
 		}
@@ -521,7 +525,7 @@ namespace Test
 		Numeric::UInt256 C2;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = A2 * B2;
 		}
@@ -529,7 +533,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			A2 *= B2;
 		}
@@ -544,7 +548,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = A1 + B1;
 		}
@@ -552,7 +556,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			A1 += B1;
 		}
@@ -566,7 +570,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = A2 + B2;
 		}
@@ -574,7 +578,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			A2 += B2;
 		}
@@ -589,7 +593,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 - A1;
 		}
@@ -597,7 +601,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 -= 1;
 		}
@@ -611,7 +615,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 - A2;
 		}
@@ -620,7 +624,7 @@ namespace Test
 
 		C2.Load(1, 1, 1, 1, 1, 1, 1, 1);
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 -= C2;
 		}
@@ -635,7 +639,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 ^ A1;
 		}
@@ -643,7 +647,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 ^= A1;
 		}
@@ -657,7 +661,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 ^ A2;
 		}
@@ -665,7 +669,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 ^= A2;
 		}
@@ -680,17 +684,17 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
-			IntegerTools::RotFL32(A1, 3);
+			A1 = IntegerTools::RotFL32(A1, 3);
 		}
 		OnProgress(std::string("SEQRL: ") + IntegerTools::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
-			IntegerTools::RotFR32(A1, 3);
+			A1 = IntegerTools::RotFR32(A1, 3);
 		}
 		OnProgress(std::string("SEQRR: ") + IntegerTools::ToString(ts.Elapsed()));
 		ts.Reset();
@@ -702,7 +706,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			Numeric::UInt256::RotL32(A2, 3);
 		}
@@ -710,7 +714,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			Numeric::UInt256::RotR32(A2, 3);
 		}
@@ -725,7 +729,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 | A1;
 		}
@@ -733,7 +737,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 |= A1;
 		}
@@ -747,7 +751,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 | A2;
 		}
@@ -755,7 +759,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 |= A2;
 		}
@@ -770,7 +774,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 & A1;
 		}
@@ -778,7 +782,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 &= A1;
 		}
@@ -792,7 +796,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 & A2;
 		}
@@ -800,7 +804,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 &= A2;
 		}
@@ -818,12 +822,13 @@ namespace Test
 		ulong A1 = 11111111;
 		ulong B1 = 22222222;
 		ulong C1 = 0;
+		size_t i;
 
 		OnProgress(std::string("***Multiplication***"));
-		Utility::TimeStamp ts;
+		Tools::TimeStamp ts;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = A1 * B1;
 		}
@@ -831,7 +836,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			A1 *= B1;
 		}
@@ -845,7 +850,7 @@ namespace Test
 		Numeric::ULong256 C2;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = A2 * B2;
 		}
@@ -853,7 +858,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			A2 *= B2;
 		}
@@ -868,7 +873,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = A1 + B1;
 		}
@@ -876,7 +881,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			A1 += B1;
 		}
@@ -890,7 +895,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = A2 + B2;
 		}
@@ -898,7 +903,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			A2 += B2;
 		}
@@ -913,7 +918,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 - A1;
 		}
@@ -921,7 +926,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 -= 1;
 		}
@@ -935,7 +940,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 - A2;
 		}
@@ -944,7 +949,7 @@ namespace Test
 
 		C2.Load(1, 1, 1, 1);
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 -= C2;
 		}
@@ -959,7 +964,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 ^ A1;
 		}
@@ -967,7 +972,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 ^= A1;
 		}
@@ -981,7 +986,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 ^ A2;
 		}
@@ -990,7 +995,7 @@ namespace Test
 
 		C2.Load(1, 1, 1, 1);
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 ^= A2;
 		}
@@ -1005,17 +1010,17 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
-			IntegerTools::RotFL64(A1, 3);
+			A1 = IntegerTools::RotFL64(A1, 3);
 		}
 		OnProgress(std::string("SEQRL: ") + IntegerTools::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
-			IntegerTools::RotFR64(A1, 3);
+			A1 = IntegerTools::RotFR64(A1, 3);
 		}
 		OnProgress(std::string("SEQRR: ") + IntegerTools::ToString(ts.Elapsed()));
 		ts.Reset();
@@ -1027,7 +1032,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			Numeric::ULong256::RotL64(A2, 3);
 		}
@@ -1036,7 +1041,7 @@ namespace Test
 
 		C2.Load(1, 1, 1, 1);
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			Numeric::ULong256::RotR64(A2, 3);
 		}
@@ -1051,7 +1056,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 | A1;
 		}
@@ -1059,7 +1064,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 |= A1;
 		}
@@ -1073,7 +1078,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 | A2;
 		}
@@ -1082,7 +1087,7 @@ namespace Test
 
 		C2.Load(1, 1, 1, 1);
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 |= A2;
 		}
@@ -1097,7 +1102,7 @@ namespace Test
 		C1 = 0;
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			C1 = B1 & A1;
 		}
@@ -1105,7 +1110,7 @@ namespace Test
 		ts.Reset();
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCS; ++i)
+		for (i = 0; i < TSTCYCS; ++i)
 		{
 			B1 &= A1;
 		}
@@ -1119,7 +1124,7 @@ namespace Test
 		C2.Load(0, 0, 0, 0);
 
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			C2 = B2 & A2;
 		}
@@ -1128,7 +1133,7 @@ namespace Test
 
 		C2.Load(1, 1, 1, 1);
 		ts.Start();
-		for (size_t i = 0; i < TSTCYCL; ++i)
+		for (i = 0; i < TSTCYCL; ++i)
 		{
 			B2 &= A2;
 		}
@@ -1158,7 +1163,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0xff, buffer1.size());
+				std::memset(&buffer1[0], 0xFF, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -1176,7 +1181,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				MemoryTools::SetValue(buffer2, 0, buffer2.size(), (byte)0xff);
+				MemoryTools::SetValue(buffer2, 0, buffer2.size(), 0xFF);
 				blkCtr += buffer2.size();
 			}
 			blkCtr = 0;
@@ -1244,7 +1249,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				std::memset(&buffer1[0], (byte)0xff, buffer1.size());
+				std::memset(&buffer1[0], 0xFF, buffer1.size());
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -1262,7 +1267,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				MemoryTools::SETVAL256(buffer2, 0, (byte)0xff);
+				MemoryTools::SETVAL256(buffer2, 0, 0xFF);
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -1325,8 +1330,8 @@ namespace Test
 #if defined(__AVX__)
 		// sequential memset: 512 byte buffers
 		OnProgress(glen + std::string(" using 512 byte buffers with sequential XOR "));
-		buffer1.resize(B512, (byte)0x7);
-		buffer2.resize(B512, (byte)0x11);
+		buffer1.resize(B512, 0x07);
+		buffer2.resize(B512, 0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -1347,8 +1352,8 @@ namespace Test
 
 		// highest available simd xor
 		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized XOR "));
-		buffer3.resize(B512, (byte)0x7);
-		buffer4.resize(B512, (byte)0x11);
+		buffer3.resize(B512, 0x07);
+		buffer4.resize(B512, 0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -1424,8 +1429,8 @@ namespace Test
 #elif defined(__AVX2__)
 		// sequential xor: 32 byte buffers
 		OnProgress(glen + std::string(" using 32 byte buffers with sequential XOR "));
-		buffer1.resize(32, (byte)0x7);
-		buffer2.resize(32, (byte)0x11);
+		buffer1.resize(32, 0x07);
+		buffer2.resize(32, 0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -1445,8 +1450,8 @@ namespace Test
 
 		// simd256 xor
 		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized XOR "));
-		buffer3.resize(32, (byte)0x7);
-		buffer4.resize(32, (byte)0x11);
+		buffer3.resize(32, 0x07);
+		buffer4.resize(32, 0x11);
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -1510,7 +1515,7 @@ namespace Test
 	{
 		uint64_t rate = GetBytesPerSecond(Duration, Length);
 		std::string mbps = TestUtils::ToString((rate / MB1));
-		std::string secs = TestUtils::ToString((double)Duration / 1000.0);
+		std::string secs = TestUtils::ToString(static_cast<double>(Duration) / 1000.0);
 		std::string resp = std::string(Message + TESTSIZE + std::string(" of data in ") + secs + std::string(" seconds, avg. ") + mbps + std::string(" MB per Second"));
 
 		OnProgress(resp);
@@ -1520,10 +1525,13 @@ namespace Test
 
 	uint64_t SimdSpeedTest::GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize)
 	{
-		double sec = (double)DurationTicks / 1000.0;
-		double sze = (double)DataSize;
+		double sec;
+		double sze;
 
-		return (uint64_t)(sze / sec);
+		sec = static_cast<double>(DurationTicks) / 1000.0;
+		sze = static_cast<double>(DataSize);
+
+		return static_cast<uint64_t>(sze / sec);
 	}
 
 	void SimdSpeedTest::Initialize()

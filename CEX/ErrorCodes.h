@@ -62,66 +62,82 @@ enum class ErrorCodes : byte
 	/// Invalid size parameter
 	/// </summary>
 	InvalidSize = 12,
-	/// <summary> 
-	/// The socket parameters are invalid
-	/// </summary>
-	InvalidSocket = 13,
 	/// <summary>
 	/// Invalid state
 	/// </summary>
-	InvalidState = 14,
+	InvalidState = 13,
 	/// <summary>
 	/// Maximum value exceeded
 	/// </summary>
-	MaxExceeded = 15,
+	MaxExceeded = 14,
 	/// <summary>
 	/// Access was denied
 	/// </summary>
-	NoAccess = 16,
+	NoAccess = 15,
 	/// <summary>
 	/// The resource was not found
 	/// </summary>
-	NotFound = 17,
+	NotFound = 16,
 	/// <summary>
 	/// The host could not be found
 	/// </summary>
-	NoHost = 18,
+	NoHost = 17,
 	/// <summary>
 	/// The algorithm was not initialized
 	/// </summary>
-	NotInitialized = 19,
+	NotInitialized = 18,
 	/// <summary>
 	/// The operation is not supported
 	/// </summary>
-	NotSupported = 20,
+	NotSupported = 19,
 	/// <summary>
 	/// The stream is read only
 	/// </summary>
-	ReadOnly = 21,
+	ReadOnly = 20,
 	/// <summary>
 	/// The number of retries was exceeded
 	/// </summary>
-	RetriesExceeded = 22,
+	RetriesExceeded = 21,
+	/// <summary>
+	/// The socket was unexpectedly disconnected
+	/// </summary>
+	SocketDisconnected = 22,
+	/// <summary>
+	/// The socket operation experienced and unrecoverable error
+	/// </summary>
+	SocketError = 23,
 	/// <summary>
 	/// The socket operation has failed
 	/// </summary>
-	SocketFailure = 23,
+	SocketFailure = 24,
+	/// <summary> 
+	/// The socket parameters are invalid
+	/// </summary>
+	SocketInvalid = 25,
+	/// <summary>
+	/// The socket operation was refused
+	/// </summary>
+	SocketRefused = 26,
+	/// <summary>
+	/// The socket destination is unreachable
+	/// </summary>
+	SocketUnreachable = 27,
 	/// <summary>
 	/// The destination host is unreachable
 	/// </summary>
-	Unreachable = 24,
+	Unreachable = 28,
 	/// <summary>
 	/// The stream is write only
 	/// </summary>
-	WriteOnly = 25,
+	WriteOnly = 29,
 	/// <summary>
 	/// The behavior is undefined
 	/// </summary>
-	UnDefined = 26,
+	UnDefined = 30,
 	/// <summary>
 	/// An error of unknown origin has occured
 	/// </summary>
-	UnKnown = 27
+	UnKnown = 254
 };
 
 class ErrorCodeConvert

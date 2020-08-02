@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -22,7 +22,7 @@
 #include "CexDomain.h"
 #include <functional>
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 /// <summary>
 /// Parallel functions class
@@ -61,5 +61,5 @@ public:
 
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif

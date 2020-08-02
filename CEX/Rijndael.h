@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -40,6 +40,10 @@ static const size_t RJD256_BLOCK_SIZE = 32;
 /// </summary>
 static const size_t RJD512_BLOCK_SIZE = 64;
 
+/// 
+/// internal
+/// 
+
 static const std::array<uint, 30> Rcon =
 {
 	0x00000000UL, 0x01000000UL, 0x02000000UL, 0x04000000UL, 0x08000000UL, 0x10000000UL, 0x20000000UL, 0x40000000UL,
@@ -47,10 +51,6 @@ static const std::array<uint, 30> Rcon =
 	0x2F000000UL, 0x5E000000UL, 0xBC000000UL, 0x63000000UL, 0xC6000000UL, 0x97000000UL, 0x35000000UL, 0x6A000000UL,
 	0xD4000000UL, 0xB3000000UL, 0x7D000000UL, 0xFA000000UL, 0xEF000000UL, 0xC5000000UL
 };
-
-/// 
-/// internal
-/// 
 
 //~~~Rijndael S-Box Tables~~~//
 
@@ -526,9 +526,6 @@ static void ShiftRows128(ArrayU8 &State)
 {
 	byte tmp;
 
-	// X= 00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15
-	// Y= 00,05,10,15,00,09,14,03,00,13,02,07,00,01,06,11
-
 	// row 0 - unchanged
 
 	// row 1
@@ -557,9 +554,6 @@ static void ShiftRows128(ArrayU8 &State)
 template<typename ArrayU8>
 static void ShiftRows256(ArrayU8 &State)
 {
-	// X= 00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
-	// Y= 00,05,14,19,04,09,18,23,08,13,22,27,12,17,26,31,16,21,30,03,20,25,02,07,24,29,06,11,28,01,10,15
-
 	byte tmp;
 
 	tmp = State[1];

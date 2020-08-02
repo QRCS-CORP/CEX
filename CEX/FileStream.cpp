@@ -141,7 +141,7 @@ void FileStream::CopyTo(IByteStream* Destination)
 		{
 			while (bteCtr != ALNLEN)
 			{
-				m_fileStream.read((char*)buffer.data(), CHUNK_SIZE);
+				m_fileStream.read(reinterpret_cast<char*>(buffer.data()), CHUNK_SIZE);
 				Destination->Write(buffer, bteCtr, CHUNK_SIZE);
 				bteCtr += CHUNK_SIZE;
 			}
@@ -149,7 +149,7 @@ void FileStream::CopyTo(IByteStream* Destination)
 
 		if (ALNLEN != m_fileSize)
 		{
-			m_fileStream.read((char*)buffer.data(), m_fileSize - ALNLEN);
+			m_fileStream.read(reinterpret_cast<char*>(buffer.data()), m_fileSize - ALNLEN);
 			Destination->Write(buffer, ALNLEN, m_fileSize - ALNLEN);
 		}
 	}
@@ -179,13 +179,17 @@ bool FileStream::FileExists(const std::string &FileName)
 
 ulong FileStream::FileSize(const std::string &FileName)
 {
-	if (!FileExists(FileName))
+	ulong res;
+
+	res = 0;
+
+	if (FileExists(FileName))
 	{
-		return 0;
+		std::ifstream in(FileName.c_str(), std::ifstream::ate | std::ifstream::binary);
+		res = static_cast<ulong>(in.tellg());
 	}
 
-	std::ifstream in(FileName.c_str(), std::ifstream::ate | std::ifstream::binary);
-	return static_cast<ulong>(in.tellg());
+	return res;
 }
 
 void FileStream::Flush()
@@ -210,7 +214,7 @@ size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 	if (Length > 0)
 	{
 		// read the data:
-		m_fileStream.read((char*)&Output[Offset], Length);
+		m_fileStream.read(reinterpret_cast<char*>(&Output[Offset]), Length);
 		m_filePosition += Length;
 	}
 
@@ -223,7 +227,7 @@ byte FileStream::ReadByte()
 	CEXASSERT(m_fileAccess != FileAccess::Write, "File is write only");
 
 	byte data(1);
-	m_fileStream.read((char*)&data, 1);
+	m_fileStream.read(reinterpret_cast<char*>(&data), 1);
 	m_filePosition += 1;
 
 	return data;
@@ -270,7 +274,7 @@ void FileStream::SetLength(ulong Length)
 		truncate(m_fileName.c_str(), Length);
 #endif
 	}
-	else if (Length > m_fileSize)
+	else
 	{
 		m_fileStream.seekg(Length - 1, std::ios::beg);
 		m_fileStream.write("", 1);
@@ -282,7 +286,7 @@ void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Len
 {
 	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 
-	m_fileStream.write((char*)&Input[Offset], Length);
+	m_fileStream.write(reinterpret_cast<const char*>(&Input[Offset]), Length);
 	m_filePosition += Length;
 	m_fileSize += Length;
 	m_fileWritten += Length;
@@ -298,7 +302,7 @@ void FileStream::WriteByte(byte Value)
 {
 	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 
-	m_fileStream.write((char*)&Value, 1);
+	m_fileStream.write(reinterpret_cast<char*>(&Value), 1);
 	m_filePosition++;
 	m_fileSize++;
 	m_fileWritten++;

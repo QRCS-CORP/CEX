@@ -38,9 +38,14 @@ public:
 
 Dilithium::Dilithium(DilithiumParameters Parameters, Prngs PrngType)
 	:
-	m_dilithiumState(new DilithiumState(Parameters != DilithiumParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_dilithiumState(new DilithiumState(Parameters == DilithiumParameters::DLTMS1N256Q8380417 || 
+		Parameters == DilithiumParameters::DLTMS2N256Q8380417 || 
+		Parameters == DilithiumParameters::DLTMS3N256Q8380417 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
@@ -48,9 +53,14 @@ Dilithium::Dilithium(DilithiumParameters Parameters, Prngs PrngType)
 
 Dilithium::Dilithium(DilithiumParameters Parameters, IPrng* Rng)
 	:
-	m_dilithiumState(new DilithiumState(Parameters != DilithiumParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_dilithiumState(new DilithiumState(Parameters == DilithiumParameters::DLTMS1N256Q8380417 ||
+		Parameters == DilithiumParameters::DLTMS2N256Q8380417 ||
+		Parameters == DilithiumParameters::DLTMS3N256Q8380417 ?
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Rng != nullptr ? Rng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Dilithium), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
@@ -58,16 +68,8 @@ Dilithium::Dilithium(DilithiumParameters Parameters, IPrng* Rng)
 
 Dilithium::~Dilithium()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_dilithiumState->Destroyed)
 	{
@@ -122,17 +124,21 @@ const size_t Dilithium::PrivateKeySize()
 		case DilithiumParameters::DLTMS1N256Q8380417:
 		{
 			klen = DLTMK4Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+			break;
 		}
 		case DilithiumParameters::DLTMS2N256Q8380417:
 		{
 			klen = DLTMK5Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+			break;
 		}
 		case DilithiumParameters::DLTMS3N256Q8380417:
 		{
 			klen = DLTMK6Q8380417N256::DILITHIUM_SECRETKEY_SIZE;
+			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -149,17 +155,21 @@ const size_t Dilithium::PublicKeySize()
 		case DilithiumParameters::DLTMS1N256Q8380417:
 		{
 			klen = DLTMK4Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+			break;
 		}
 		case DilithiumParameters::DLTMS2N256Q8380417:
 		{
 			klen = DLTMK5Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+			break;
 		}
 		case DilithiumParameters::DLTMS3N256Q8380417:
 		{
 			klen = DLTMK6Q8380417N256::DILITHIUM_PUBLICKEY_SIZE;
+			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -179,17 +189,21 @@ const size_t Dilithium::SignatureSize()
 		case DilithiumParameters::DLTMS1N256Q8380417:
 		{
 			slen = DLTMK4Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+			break;
 		}
 		case DilithiumParameters::DLTMS2N256Q8380417:
 		{
 			slen = DLTMK5Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+			break;
 		}
 		case DilithiumParameters::DLTMS3N256Q8380417:
 		{
 			slen = DLTMK6Q8380417N256::DILITHIUM_SIGNATURE_SIZE;
+			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("SignatureSize"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -209,7 +223,6 @@ AsymmetricKeyPair* Dilithium::Generate()
 			pk.resize(DLTMK4Q8380417N256::DILITHIUM_PUBLICKEY_SIZE);
 			sk.resize(DLTMK4Q8380417N256::DILITHIUM_SECRETKEY_SIZE);
 			DLTMK4Q8380417N256::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		case DilithiumParameters::DLTMS2N256Q8380417:
@@ -217,7 +230,6 @@ AsymmetricKeyPair* Dilithium::Generate()
 			pk.resize(DLTMK5Q8380417N256::DILITHIUM_PUBLICKEY_SIZE);
 			sk.resize(DLTMK5Q8380417N256::DILITHIUM_SECRETKEY_SIZE);
 			DLTMK5Q8380417N256::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		case DilithiumParameters::DLTMS3N256Q8380417:
@@ -225,11 +237,11 @@ AsymmetricKeyPair* Dilithium::Generate()
 			pk.resize(DLTMK6Q8380417N256::DILITHIUM_PUBLICKEY_SIZE);
 			sk.resize(DLTMK6Q8380417N256::DILITHIUM_SECRETKEY_SIZE);
 			DLTMK6Q8380417N256::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -254,13 +266,13 @@ const void Dilithium::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::SignaturePublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_dilithiumState->Parameters = static_cast<DilithiumParameters>(m_publicKey->Parameters());
 		m_dilithiumState->Signer = false;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_dilithiumState->Parameters = static_cast<DilithiumParameters>(m_privateKey->Parameters());
 		m_dilithiumState->Signer = true;
 	}
@@ -291,25 +303,23 @@ size_t Dilithium::Sign(const std::vector<byte> &Message, std::vector<byte> &Sign
 		{
 			Signature.resize(DLTMK4Q8380417N256::DILITHIUM_SIGNATURE_SIZE + Message.size());
 			DLTMK4Q8380417N256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
-
 			break;
 		}
 		case DilithiumParameters::DLTMS2N256Q8380417:
 		{
 			Signature.resize(DLTMK5Q8380417N256::DILITHIUM_SIGNATURE_SIZE + Message.size());
 			DLTMK5Q8380417N256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
-
 			break;
 		}
 		case DilithiumParameters::DLTMS3N256Q8380417:
 		{
 			Signature.resize(DLTMK6Q8380417N256::DILITHIUM_SIGNATURE_SIZE + Message.size());
 			DLTMK6Q8380417N256::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator);
-
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -338,7 +348,6 @@ bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Me
 			res = DLTMK4Q8380417N256::Verify(tmpm, Signature, m_publicKey->Polynomial());
 			Message.resize(Signature.size() - DLTMK4Q8380417N256::DILITHIUM_SIGNATURE_SIZE);
 			MemoryTools::Copy(tmpm, 0, Message, 0, Message.size());
-
 			break;
 		}
 		case DilithiumParameters::DLTMS2N256Q8380417:
@@ -346,7 +355,6 @@ bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Me
 			res = DLTMK5Q8380417N256::Verify(tmpm, Signature, m_publicKey->Polynomial());
 			Message.resize(Signature.size() - DLTMK5Q8380417N256::DILITHIUM_SIGNATURE_SIZE);
 			MemoryTools::Copy(tmpm, 0, Message, 0, Message.size());
-
 			break;
 		}
 		case DilithiumParameters::DLTMS3N256Q8380417:
@@ -354,11 +362,11 @@ bool Dilithium::Verify(const std::vector<byte> &Signature, std::vector<byte> &Me
 			res = DLTMK6Q8380417N256::Verify(tmpm, Signature, m_publicKey->Polynomial());
 			Message.resize(Signature.size() - DLTMK6Q8380417N256::DILITHIUM_SIGNATURE_SIZE);
 			MemoryTools::Copy(tmpm, 0, Message, 0, Message.size());
-
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Dilithium parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}

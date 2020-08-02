@@ -3,7 +3,7 @@
 
 NAMESPACE_PADDING
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 const std::string ZeroOne::CLASS_NAME("ZeroOne");
 
@@ -64,7 +64,7 @@ size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input)
 	}
 	inp |= ~seen;
 
-	IntegerTools::ConditionalCopy(size_t(inp), &pos, &BLKSZE, &pos, 1);
+	IntegerTools::ConditionalCopy(static_cast<size_t>(inp), &pos, &BLKSZE, &pos, 1);
 
 	return pos;
 }
@@ -96,7 +96,7 @@ size_t ZeroOne::GetBlockLength(const std::vector<byte> &Input, size_t Offset, si
 	}
 	inp |= ~seen;
 
-	IntegerTools::ConditionalCopy(size_t(inp), &pos, &BLKSZE, &pos, 1);
+	IntegerTools::ConditionalCopy(static_cast<size_t>(inp), &pos, &BLKSZE, &pos, 1);
 
 	return pos;
 }

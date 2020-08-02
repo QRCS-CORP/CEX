@@ -1,11 +1,14 @@
 #ifndef CEX_STREAMREADER_H
 #define CEX_STREAMREADER_H
 
-#include "MemoryStream.h"
 #include "IntegerTools.h"
+#include "MemoryStream.h"
 #include "MemoryTools.h"
 
 NAMESPACE_IO
+
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 /// <summary>
 /// Methods for reading integer types from a binary stream
@@ -86,10 +89,10 @@ public:
 
 		if (sizeof(Array::value_type) > 1)
 		{
-			Utility::IntegerTools::BlockToLe(m_streamData.ToArray(), m_streamData.Position(), Output, OutOffset, OTPLEN);
+			IntegerTools::BlockToLe(m_streamData.ToArray(), m_streamData.Position(), Output, OutOffset, OTPLEN);
 		}
 		{
-			Utility::MemoryTools::Copy(m_streamData.ToArray(), m_streamData.Position(), val, OTPLEN);
+			MemoryTools::Copy(m_streamData.ToArray(), m_streamData.Position(), val, OTPLEN);
 		}
 
 		m_streamData.Seek(m_streamData.Position() + OTPLEN, SeekOrigin::Begin);
@@ -111,22 +114,23 @@ public:
 		{
 			case 8:
 			{
-				val = Utility::IntegerTools::LeBytesTo64(m_streamData.ToArray(), m_streamData.Position());
+				val = IntegerTools::LeBytesTo64(m_streamData.ToArray(), m_streamData.Position());
 				break;
 			}
 			case 4:
 			{
-				val = Utility::IntegerTools::LeBytesTo32(m_streamData.ToArray(), m_streamData.Position());
+				val = IntegerTools::LeBytesTo32(m_streamData.ToArray(), m_streamData.Position());
 				break;
 			}
 			case 2:
 			{
-				val = Utility::IntegerTools::LeBytesTo16(m_streamData.ToArray(), m_streamData.Position());
+				val = IntegerTools::LeBytesTo16(m_streamData.ToArray(), m_streamData.Position());
 				break;
 			}
 			default:
 			{
-				Utility::MemoryTools::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, VALLEN);
+				MemoryTools::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, VALLEN);
+				break;
 			}
 		}
 

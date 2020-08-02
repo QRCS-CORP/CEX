@@ -2,6 +2,8 @@
 
 NAMESPACE_IO
 
+using Tools::MemoryTools;
+
 //~~~Constructor~~~//
 
 StreamWriter::StreamWriter(size_t Length)
@@ -28,7 +30,7 @@ StreamWriter::StreamWriter(MemoryStream &DataStream)
 StreamWriter::~StreamWriter()
 {
 	m_streamPosition = 0;
-	Utility::MemoryTools::Clear(m_streamState, 0, m_streamState.size());
+	MemoryTools::Clear(m_streamState, 0, m_streamState.size());
 }
 
 //~~~Accessors~~~//

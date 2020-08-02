@@ -5,6 +5,7 @@ NAMESPACE_DIGEST
 
 using Exception::CryptoDigestException;
 using Enumeration::ErrorCodes;
+using Tools::IntegerTools;
 
 const std::string SHA2Params::CLASS_NAME("SHA2Params");
 
@@ -60,13 +61,13 @@ SHA2Params::SHA2Params(const std::vector<byte> &TreeArray)
 		throw CryptoDigestException(CLASS_NAME, std::string("Constructor"), std::string("The TreeArray buffer is too short!"), ErrorCodes::IllegalOperation);
 	}
 
-	m_nodeOffset = Utility::IntegerTools::LeBytesTo32(TreeArray, 0);
-	m_treeVersion = Utility::IntegerTools::LeBytesTo16(TreeArray, 4);
-	m_outputSize = Utility::IntegerTools::LeBytesTo64(TreeArray, 6);
-	m_leafSize = Utility::IntegerTools::LeBytesTo32(TreeArray, 14);
+	m_nodeOffset = IntegerTools::LeBytesTo32(TreeArray, 0);
+	m_treeVersion = IntegerTools::LeBytesTo16(TreeArray, 4);
+	m_outputSize = IntegerTools::LeBytesTo64(TreeArray, 6);
+	m_leafSize = IntegerTools::LeBytesTo32(TreeArray, 14);
 	std::memcpy(&m_treeDepth, &TreeArray[18], 1);
 	std::memcpy(&m_treeFanout, &TreeArray[19], 1);
-	m_reserved = Utility::IntegerTools::LeBytesTo32(TreeArray, 20);
+	m_reserved = IntegerTools::LeBytesTo32(TreeArray, 20);
 	m_dstCode.resize(DistributionCodeMax());
 	std::memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 }
@@ -126,14 +127,18 @@ std::vector<byte> &SHA2Params::DistributionCode()
 
 const size_t SHA2Params::DistributionCodeMax()
 {
+	size_t res;
+
 	if (m_outputSize == 32)
 	{
-		return 112;
+		res = 112;
 	}
 	else
 	{
-		return 48;
+		res = 48;
 	}
+
+	return res;
 }
 
 ushort &SHA2Params::Version()
@@ -155,12 +160,14 @@ SHA2Params* SHA2Params::DeepCopy()
 
 bool SHA2Params::Equals(SHA2Params &Input)
 {
+	bool res(true);
+
 	if (this->GetHashCode() != Input.GetHashCode())
 	{
-		return false;
+		res = false;
 	}
 
-	return true;
+	return res;
 }
 
 int SHA2Params::GetHashCode()
@@ -202,13 +209,13 @@ std::vector<byte> SHA2Params::ToBytes()
 {
 	std::vector<byte> config(GetHeaderSize());
 
-	Utility::IntegerTools::Le32ToBytes(m_nodeOffset, config, 0);
-	Utility::IntegerTools::Le16ToBytes(m_treeVersion, config, 4);
-	Utility::IntegerTools::Le64ToBytes(m_outputSize, config, 6);
-	Utility::IntegerTools::Le32ToBytes(m_leafSize, config, 14);
+	IntegerTools::Le32ToBytes(m_nodeOffset, config, 0);
+	IntegerTools::Le16ToBytes(m_treeVersion, config, 4);
+	IntegerTools::Le64ToBytes(m_outputSize, config, 6);
+	IntegerTools::Le32ToBytes(m_leafSize, config, 14);
 	std::memcpy(&config[18], &m_treeDepth, 1);
 	std::memcpy(&config[19], &m_treeFanout, 1);
-	Utility::IntegerTools::Le32ToBytes(m_reserved, config, 20);
+	IntegerTools::Le32ToBytes(m_reserved, config, 20);
 	std::memcpy(&config[24], &m_dstCode[0], m_dstCode.size());
 
 	return config;

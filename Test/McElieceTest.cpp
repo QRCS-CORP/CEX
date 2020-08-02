@@ -17,7 +17,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Asymmetric::Encrypt::MPKC::McEliece;
 	using Enumeration::McElieceParameters;
 	using Test::NistRng;
@@ -65,7 +65,6 @@ namespace Test
 
 			NistRngKat();
 			OnProgress(std::string("McElieceTest: Passed the Nist Rng known answer test.."));
-
 			Authentication();
 			OnProgress(std::string("McElieceTest: Passed message authentication test.."));
 			CipherText();
@@ -103,28 +102,9 @@ namespace Test
 		std::vector<byte> ssk1(32);
 		std::vector<byte> ssk2(32);
 
-		// MPKCS1N4096T62
+		// MPKCS2N6960T119
 
-		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
-		AsymmetricKeyPair* kp1 = cpr1.Generate();
-		cpr1.Initialize(kp1->PublicKey());
-		cpr1.Encapsulate(cpt, ssk1);
-		cpr1.Initialize(kp1->PrivateKey());
-
-		// decapsulate
-		if (!cpr1.Decapsulate(cpt, ssk2))
-		{
-			throw TestException(std::string("Authentication"), cpr1.Name(), std::string("Message authentication test failed! -MA1"));
-		}
-
-		// MPKCS1N6960T119
-
-		cpt.clear();
-		ssk1.clear();
-		ssk2.clear();
-		delete kp1;
-
-		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS2N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
@@ -136,14 +116,14 @@ namespace Test
 			throw TestException(std::string("Authentication"), cpr2.Name(), std::string("Message authentication test failed! -MA2"));
 		}
 
-		// MPKCS1N8192T128
+		// MPKCS3N8192T128
 
 		cpt.clear();
 		ssk1.clear();
 		ssk2.clear();
 		delete kp2;
 
-		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
+		McEliece cpr3(McElieceParameters::MPKCS3N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 		cpr3.Initialize(kp3->PublicKey());
 		cpr3.Encapsulate(cpt, ssk1);
@@ -165,30 +145,13 @@ namespace Test
 		std::vector<byte> ssk2(32);
 		SecureRandom gen;
 
-		// MPKCS1N4096T62
-
-		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
-		AsymmetricKeyPair* kp1 = cpr1.Generate();
-		cpr1.Initialize(kp1->PublicKey());
-		cpr1.Encapsulate(cpt, ssk1);
-		// alter ciphertext
-		gen.Generate(cpt, 0, 4);
-		cpr1.Initialize(kp1->PrivateKey());
-
-		// decapsulate with altered ciphertext, throw if succesful
-		if (cpr1.Decapsulate(cpt, ssk2))
-		{
-			throw TestException(std::string("Authentication"), cpr1.Name(), std::string("Message authentication test failed! -MA1"));
-		}
-
-		// MPKCS1N6960T119
+		// MPKCS2N6960T119
 
 		cpt.clear();
 		ssk1.clear();
 		ssk2.clear();
-		delete kp1;
 
-		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS2N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
@@ -204,13 +167,13 @@ namespace Test
 
 		delete kp2;
 
-		// MPKCS1N8192T128
+		// MPKCS3N8192T128
 
 		cpt.clear();
 		ssk1.clear();
 		ssk2.clear();
 
-		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
+		McEliece cpr3(McElieceParameters::MPKCS3N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 		cpr3.Initialize(kp3->PublicKey());
 		cpr3.Encapsulate(cpt, ssk1);
@@ -246,7 +209,7 @@ namespace Test
 
 		try
 		{
-			McEliece cpr(McElieceParameters::MPKCS1N4096T62, Enumeration::Prngs::None);
+			McEliece cpr(McElieceParameters::MPKCS2N6960T119, Enumeration::Prngs::None);
 
 			throw TestException(std::string("Exception"), cpr.Name(), std::string("Exception handling failure! -ME2"));
 		}
@@ -261,7 +224,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			McEliece cpr(McElieceParameters::MPKCS1N4096T62, Enumeration::Prngs::BCR);
+			McEliece cpr(McElieceParameters::MPKCS2N6960T119, Enumeration::Prngs::BCR);
 			Asymmetric::Encrypt::RLWE::NewHope cprb;
 			// create an invalid key set
 			AsymmetricKeyPair* kp = cprb.Generate();
@@ -285,46 +248,15 @@ namespace Test
 		std::vector<byte> ssk2(32);
 		NistRng gen;
 
-		// MPKCS1N4096T62
-
-		gen.Initialize(m_cprseed);
-
-		McEliece cpr1(McElieceParameters::MPKCS1N4096T62, &gen);
-		AsymmetricKeyPair* kp1 = cpr1.Generate();
-		cpr1.Initialize(kp1->PublicKey());
-		cpr1.Encapsulate(cpt, ssk1);
-		cpr1.Initialize(kp1->PrivateKey());
-
-		if (!cpr1.Decapsulate(cpt, ssk2))
-		{
-			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Failed authentication test! -MK1"));
-		}
-
-		if (ssk1 != ssk2)
-		{
-			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Shared secrets do not match! -MK2"));
-		}
-
-		if (ssk1 != m_sskexp[0])
-		{
-			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Shared secret does not match expected! -MK3"));
-		}
-
-		if (cpt != m_cptexp[0])
-		{
-			throw TestException(std::string("Kat"), cpr1.Name(), std::string("Cipher-text arrays do not match! -MK4"));
-		}
-
-		// MPKCS1N6960T119
+		// MPKCS2N6960T119
 
 		cpt.clear();
 		ssk1.clear();
 		ssk2.clear();
-		delete kp1;
 
 		gen.Initialize(m_cprseed);
 
-		McEliece cpr2(McElieceParameters::MPKCS1N6960T119, &gen);
+		McEliece cpr2(McElieceParameters::MPKCS2N6960T119, &gen);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 		cpr2.Initialize(kp2->PublicKey());
 		cpr2.Encapsulate(cpt, ssk1);
@@ -350,7 +282,7 @@ namespace Test
 			throw TestException(std::string("Kat"), cpr2.Name(), std::string("Cipher-text arrays do not match! -MK8"));
 		}
 
-		// MPKCS1N8192T128
+		// MPKCS3N8192T128
 
 		cpt.clear();
 		ssk1.clear();
@@ -359,7 +291,7 @@ namespace Test
 
 		gen.Initialize(m_cprseed);
 
-		McEliece cpr3(McElieceParameters::MPKCS1N8192T128, &gen);
+		McEliece cpr3(McElieceParameters::MPKCS3N8192T128, &gen);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 		cpr3.Initialize(kp3->PublicKey());
 		cpr3.Encapsulate(cpt, ssk1);
@@ -416,43 +348,20 @@ namespace Test
 		std::vector<byte> ssk2(32);
 		SecureRandom gen;
 
-		// MPKCS1N4096T62
-
-		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
-		AsymmetricKeyPair* kp1 = cpr1.Generate();
-
-		// alter public key
-		std::vector<byte> pk1 = kp1->PublicKey()->Polynomial();
-		gen.Generate(pk1, 0, 2048);
-
-		AsymmetricKey* ak1 = new AsymmetricKey(pk1, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS1N4096T62));
-		cpr1.Initialize(ak1);
-		cpr1.Encapsulate(cpt, ssk1);
-		cpr1.Initialize(kp1->PrivateKey());
-
-		// fail on decapsulation success
-		if (cpr1.Decapsulate(cpt, ssk2))
-		{
-			throw TestException(std::string("PublicKey"), cpr1.Name(), std::string("Public key integrity test failed! -MP1"));
-		}
-
-		delete kp1;
-		delete ak1;
-
-		// MPKCS1N6960T119
+		// MPKCS2N6960T119
 
 		cpt.clear();
 		ssk1.clear();
 		ssk2.clear();
 
-		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS2N6960T119);
 		AsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
 		std::vector<byte> pk2 = kp2->PublicKey()->Polynomial();
 		gen.Generate(pk2, 0, 4096);
 
-		AsymmetricKey* ak2 = new AsymmetricKey(pk2, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS1N6960T119));
+		AsymmetricKey* ak2 = new AsymmetricKey(pk2, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS2N6960T119));
 		cpr2.Initialize(ak2);
 		cpr2.Encapsulate(cpt, ssk1);
 		cpr2.Initialize(kp2->PrivateKey());
@@ -465,7 +374,7 @@ namespace Test
 		delete kp2;
 		delete ak2;
 
-		// MPKCS1N8192T128
+		// MPKCS3N8192T128
 
 		cpt.clear();
 		ssk1.clear();
@@ -473,14 +382,14 @@ namespace Test
 		ssk2.clear();
 		ssk2.resize(32);
 
-		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
+		McEliece cpr3(McElieceParameters::MPKCS3N8192T128);
 		AsymmetricKeyPair* kp3 = cpr3.Generate();
 
 		// alter public key
 		std::vector<byte> pk3 = kp3->PublicKey()->Polynomial();
 		gen.Generate(pk3, 0, 8192);
 
-		AsymmetricKey* ak3 = new AsymmetricKey(pk3, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS1N8192T128));
+		AsymmetricKey* ak3 = new AsymmetricKey(pk3, AsymmetricPrimitives::McEliece, AsymmetricKeyTypes::CipherPublicKey, static_cast<AsymmetricParameters>(McElieceParameters::MPKCS3N8192T128));
 		cpr3.Initialize(ak3);
 		cpr3.Encapsulate(cpt, ssk1);
 		cpr3.Initialize(kp3->PrivateKey());
@@ -497,7 +406,7 @@ namespace Test
 	{
 		SecureVector<byte> skey(0);
 
-		McEliece cpr(McElieceParameters::MPKCS1N4096T62);
+		McEliece cpr(McElieceParameters::MPKCS2N6960T119);
 		AsymmetricKeyPair* kp = cpr.Generate();
 		AsymmetricKey* prik1 = kp->PrivateKey();
 		skey = AsymmetricKey::Serialize(*prik1);
@@ -518,22 +427,22 @@ namespace Test
 		}
 
 		delete kp;
-		delete prik1;
 		delete prik2;
-		delete pubk1;
 		delete pubk2;
 	}
 
 	void McElieceTest::Stress()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> ssk1(32);
+		std::vector<byte> ssk1(32, 0xFF);
 		std::vector<byte> ssk2(32);
-		McEliece cpr1(McElieceParameters::MPKCS1N4096T62);
+		AsymmetricKeyPair* kp;
+
+		McEliece cpr1(McElieceParameters::MPKCS2N6960T119);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			AsymmetricKeyPair* kp = cpr1.Generate();
+			kp = cpr1.Generate();
 			cpr1.Initialize(kp->PublicKey());
 			cpr1.Encapsulate(cpt, ssk1);
 
@@ -541,64 +450,34 @@ namespace Test
 
 			if (!cpr1.Decapsulate(cpt, ssk2))
 			{
-				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test authentication has failed! -MS1"));
+				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test authentication has failed! -MS3"));
 			}
 
 			if (ssk1 != ssk2)
 			{
-				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test has failed! -MS2"));
+				throw TestException(std::string("Stress"), cpr1.Name(), std::string("Stress test has failed! -MS4"));
 			}
 
 			delete kp;
 		}
 
-		ssk1.clear();
-		ssk2.clear();
-
-		McEliece cpr2(McElieceParameters::MPKCS1N6960T119);
+		McEliece cpr2(McElieceParameters::MPKCS3N8192T128);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			AsymmetricKeyPair* kp = cpr2.Generate();
+			kp = cpr2.Generate();
 			cpr2.Initialize(kp->PublicKey());
 			cpr2.Encapsulate(cpt, ssk1);
-
 			cpr2.Initialize(kp->PrivateKey());
 
 			if (!cpr2.Decapsulate(cpt, ssk2))
 			{
-				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test authentication has failed! -MS3"));
+				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test authentication has failed! -MS5"));
 			}
 
 			if (ssk1 != ssk2)
 			{
-				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test has failed! -MS4"));
-			}
-
-			delete kp;
-		}
-
-		ssk1.clear();
-		ssk2.clear();
-
-		McEliece cpr3(McElieceParameters::MPKCS1N8192T128);
-
-		for (size_t i = 0; i < TEST_CYCLES; ++i)
-		{
-			AsymmetricKeyPair* kp = cpr3.Generate();
-			cpr3.Initialize(kp->PublicKey());
-			cpr3.Encapsulate(cpt, ssk1);
-
-			cpr3.Initialize(kp->PrivateKey());
-
-			if (!cpr3.Decapsulate(cpt, ssk2))
-			{
-				throw TestException(std::string("Stress"), cpr3.Name(), std::string("Stress test authentication has failed! -MS5"));
-			}
-
-			if (ssk1 != ssk2)
-			{
-				throw TestException(std::string("Stress"), cpr3.Name(), std::string("Stress test has failed! -MS6"));
+				throw TestException(std::string("Stress"), cpr2.Name(), std::string("Stress test has failed! -MS6"));
 			}
 
 			delete kp;

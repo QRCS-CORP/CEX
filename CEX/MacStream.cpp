@@ -61,13 +61,6 @@ MacStream::~MacStream()
 			m_macEngine.reset(nullptr);
 		}
 	}
-	else
-	{
-		if (m_macEngine != nullptr)
-		{
-			m_macEngine.release();
-		}
-	}
 }
 
 //~~~Accessors~~~//
@@ -149,12 +142,15 @@ void MacStream::CalculateInterval(size_t Length)
 
 void MacStream::CalculateProgress(size_t Length, size_t Processed)
 {
+	double prc;
 	double prg;
 	size_t blk;
 
+	prc = static_cast<double>(Processed);
+
 	if (Length >= Processed)
 	{
-		prg = 100.0 * (static_cast<double>(Processed) / Length);
+		prg = 100.0 * (prc / static_cast<double>(Length));
 
 		if (prg > 100.0)
 		{
@@ -170,6 +166,10 @@ void MacStream::CalculateProgress(size_t Length, size_t Processed)
 		else if (Processed % blk == 0)
 		{
 			ProgressPercent(static_cast<int>(prg));
+		}
+		else
+		{
+			// misra
 		}
 	}
 }

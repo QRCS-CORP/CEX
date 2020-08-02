@@ -71,7 +71,8 @@ namespace Test
 		/// <param name="Key">The input key</param>
 		/// <param name="Info">The info array</param>
 		/// <param name="Expected">The expected output</param>
-		void Kat(IKdf* Generator, std::vector<byte> &Salt, std::vector<byte> &Key, std::vector<byte> &Info, std::vector<byte> &Expected);
+		void Kat(IKdf* Generator, const std::vector<byte> &Salt, const std::vector<byte> &Key, 
+			const std::vector<byte> &Info, const std::vector<byte> &Expected);
 
 		/// <summary>
 		/// Test the different initialization options

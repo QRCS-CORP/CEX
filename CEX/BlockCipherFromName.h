@@ -2,13 +2,11 @@
 #define CEX_BLOCKCIPHERFROMNAME_H
 
 #include "CexDomain.h"
-#include "BlockCipherExtensions.h"
 #include "CryptoException.h"
 #include "IBlockCipher.h"
 
 NAMESPACE_HELPER
 
-using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Exception::CryptoException;
 using Cipher::Block::IBlockCipher;
@@ -25,8 +23,7 @@ private:
 public:
 
 	/// <summary>
-	/// Get a symmetric block cipher instance.
-	/// <para>If an extended (RHX or SHX) block cipher type is selected, the default key-schedule hash engine is None which invokes the standard cipher.</para>
+	/// Get a symmetric block cipher instance by it's enumeration name.
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The block cipher enumeration name</param>

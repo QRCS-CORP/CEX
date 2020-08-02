@@ -13,7 +13,7 @@
 namespace Test
 {
 	using namespace Cipher::Block::Mode;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using IO::MemoryStream;
 	using Enumeration::PaddingModes;
 	using Prng::SecureRandom;
@@ -52,11 +52,11 @@ namespace Test
 			// Not tested: used for internal testing
 			//FileStreamTest();
 
-			CipherStream* cfbm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CFB, PaddingModes::ESP);
-			CipherStream* cbcm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
-			CipherStream* ctrm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CTR, PaddingModes::None);
-			CipherStream* icmm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::ICM, PaddingModes::None);
-			CipherStream* ofbm = new CipherStream(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::OFB, PaddingModes::ESP);
+			CipherStream* cfbm = new CipherStream(BlockCiphers::AES, CipherModes::CFB, PaddingModes::ESP);
+			CipherStream* cbcm = new CipherStream(BlockCiphers::AES, CipherModes::CBC, PaddingModes::ESP);
+			CipherStream* ctrm = new CipherStream(BlockCiphers::AES, CipherModes::CTR, PaddingModes::None);
+			CipherStream* icmm = new CipherStream(BlockCiphers::AES, CipherModes::ICM, PaddingModes::None);
+			CipherStream* ofbm = new CipherStream(BlockCiphers::AES, CipherModes::OFB, PaddingModes::ESP);
 
 			Memory();
 			OnProgress(std::string("Passed MemoryStream self test.. "));
@@ -128,7 +128,7 @@ namespace Test
 		std::vector<byte> data(1025, 3);
 
 		// initialize the cipher and key container
-		CipherStream cs(BlockCiphers::AES, BlockCipherExtensions::None, CipherModes::CBC, PaddingModes::ESP);
+		CipherStream cs(BlockCiphers::AES, CipherModes::CBC, PaddingModes::ESP);
 		SymmetricKey kp(key, iv);
 
 		// encrypt the file in-place
@@ -433,7 +433,7 @@ namespace Test
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
 		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.NonceSize());
+		std::vector<byte> nonce(ks.IVSize());
 		std::vector<byte> otp;
 		SecureRandom rnd;
 		size_t i;
@@ -451,9 +451,9 @@ namespace Test
 			inp.resize(ALNLEN);
 			otp.resize(ALNLEN);
 
-			IntegerTools::Fill(inp, 0, ALNLEN, rnd);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
+			rnd.Generate(inp, 0, ALNLEN);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(nonce, 0, nonce.size());
 			SymmetricKey kp(key, nonce);
 
 			// encrypt
@@ -464,7 +464,7 @@ namespace Test
 			Cipher->Initialize(false, kp);
 			Cipher->Write(cpt, 0, otp, 0);
 
-			if (!IntegerTools::Compare(inp, 0, otp, 0, otp.size()))
+			if (IntegerTools::Compare(inp, 0, otp, 0, otp.size()) == false)
 			{
 				throw TestException(std::string("Stress"), Cipher->Name(), std::string("Transformation output is not equal! -TS1"));
 			}

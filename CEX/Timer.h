@@ -8,7 +8,7 @@
 #	include <time.h>
 #endif
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 #ifdef CEX_HIGHRES_TIMER
 	typedef uint64_t TimerWord;
@@ -16,16 +16,19 @@ NAMESPACE_UTILITY
 	typedef clock_t TimerWord;
 #endif
 
+/// <summary>
+/// Internal class used for timer functions
+/// </summary>
 class TimerBase
 {
 public:
 
-	enum Unit 
+	enum class Unit : uint
 	{ 
 		SECONDS = 0, 
-		MILLISECONDS, 
-		MICROSECONDS, 
-		NANOSECONDS 
+		MILLISECONDS = 1, 
+		MICROSECONDS = 2, 
+		NANOSECONDS = 3
 	};
 
 	TimerBase(Unit unit, bool stuckAtZero) 
@@ -61,7 +64,7 @@ class ThreadUserTimer : public TimerBase
 {
 public:
 
-	ThreadUserTimer(Unit unit = TimerBase::SECONDS, bool stuckAtZero = false) 
+	ThreadUserTimer(Unit unit = Unit::SECONDS, bool stuckAtZero = false)
 		: 
 		TimerBase(unit, stuckAtZero) 
 	{
@@ -76,7 +79,7 @@ class Timer : public TimerBase
 {
 public:
 
-	Timer(Unit unit = TimerBase::SECONDS, bool stuckAtZero = false) 
+	Timer(Unit unit = Unit::SECONDS, bool stuckAtZero = false)
 		: 
 		TimerBase(unit, stuckAtZero) 
 	{
@@ -86,5 +89,5 @@ public:
 	TimerWord TicksPerSecond();
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif

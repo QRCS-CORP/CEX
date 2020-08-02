@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -69,12 +69,10 @@ class HCR final : public PrngBase
 private:
 
 	static const size_t BUFFER_SIZE = CEX_PRNG_BUFFER_SIZE;
+	class HcrState;
 
-	SHA2Digests m_digestType;
-	Providers m_pvdType;
-	SecureVector<byte> m_rndBuffer;
-	size_t m_rndIndex;
 	std::unique_ptr<IDrbg> m_rngGenerator;
+	std::unique_ptr<HcrState> m_hcrState;
 
 public:
 
@@ -94,11 +92,11 @@ public:
 	/// Initialize the class with parameters
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The digest that powers the rng; default is SHA512</param>
+	/// <param name="DigestType">The digest that powers the rng; default is SHA2512</param>
 	/// <param name="ProviderType">The random provider used to create keyng material; default is ACP</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the digest or provider type is invalid</exception>
-	HCR(SHA2Digests DigestType = SHA2Digests::SHA512, Providers ProviderType = Providers::ACP);
+	HCR(SHA2Digests DigestType = SHA2Digests::SHA2512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -152,8 +150,7 @@ public:
 
 private:
 
-	void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
-	void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
 };
 
 NAMESPACE_PRNGEND

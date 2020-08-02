@@ -50,29 +50,29 @@ namespace Test
 			DigestBlockLoop(Digests::Blake512, MB100, 10, true);
 
 			OnProgress(std::string("***The sequential Keccak 256 digest***"));
-			DigestBlockLoop(Digests::Keccak256, MB100);
+			DigestBlockLoop(Digests::SHA3256, MB100);
 			OnProgress(std::string("***The parallel Keccak 256 digest***"));
-			DigestBlockLoop(Digests::Keccak256, MB100, 10, true);
+			DigestBlockLoop(Digests::SHA3256, MB100, 10, true);
 
 			OnProgress(std::string("***The sequential Keccak 512 digest***"));
-			DigestBlockLoop(Digests::Keccak512, MB100);
+			DigestBlockLoop(Digests::SHA3512, MB100);
 			OnProgress(std::string("***The parallel Keccak 512 digest***"));
-			DigestBlockLoop(Digests::Keccak512, MB100, 10, true);
+			DigestBlockLoop(Digests::SHA3512, MB100, 10, true);
 
 			OnProgress(std::string("***The sequential Keccak 1024 digest***"));
-			DigestBlockLoop(Digests::Keccak1024, MB100);
+			DigestBlockLoop(Digests::SHA31024, MB100);
 			OnProgress(std::string("***The parallel Keccak 1024 digest***"));
-			DigestBlockLoop(Digests::Keccak1024, MB100, 10, true);
+			DigestBlockLoop(Digests::SHA31024, MB100, 10, true);
 
 			OnProgress(std::string("***The sequential SHA2 256 digest***"));
-			DigestBlockLoop(Digests::SHA256, MB100);
+			DigestBlockLoop(Digests::SHA2256, MB100);
 			OnProgress(std::string("***The parallel SHA2 256 digest***"));
-			DigestBlockLoop(Digests::SHA256, MB100, 10, true);
+			DigestBlockLoop(Digests::SHA2256, MB100, 10, true);
 
 			OnProgress(std::string("***The sequential SHA2 512 digest***"));
-			DigestBlockLoop(Digests::SHA512, MB100);
+			DigestBlockLoop(Digests::SHA2512, MB100);
 			OnProgress(std::string("***The parallel SHA2 512 digest***"));
-			DigestBlockLoop(Digests::SHA512, MB100, 10, true);
+			DigestBlockLoop(Digests::SHA2512, MB100, 10, true);
 
 			OnProgress(std::string("***The sequential Skein 256 digest***"));
 			DigestBlockLoop(Digests::Skein256, MB100);
@@ -103,40 +103,60 @@ namespace Test
 
 	void DigestSpeedTest::DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
 	{
-		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType, Parallel);
-		size_t bufSze = dgt->BlockSize();
+		Digest::IDigest* dgt;
+		std::vector<byte> hash(0);
+		std::vector<byte> buffer(0);
+		std::string calc;
+		std::string glen;
+		std::string mbps;
+		std::string secs;
+		std::string resp;
+		uint64_t dur;
+		uint64_t len;
+		uint64_t rate;
+		uint64_t lstart;
+		uint64_t start;
+		size_t buflen;
+		size_t counter;
+		size_t i;
+
+		dgt = Helper::DigestFromName::GetInstance(DigestType, Parallel);
+		buflen = dgt->BlockSize();
+
 		if (Parallel)
 		{
-			bufSze = dgt->ParallelBlockSize();
+			buflen = dgt->ParallelBlockSize();
 		}
 
-		std::vector<byte> hash(dgt->DigestSize(), 0);
-		std::vector<byte> buffer(bufSze, 0);
-		uint64_t start = TestUtils::GetTimeMs64();
+		hash.resize(dgt->DigestSize(), 0);
+		buffer.resize(buflen, 0);
+		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < Loops; ++i)
+		for (i = 0; i < Loops; ++i)
 		{
-			size_t counter = 0;
-			uint64_t lstart = TestUtils::GetTimeMs64();
+			counter = 0;
+			lstart = TestUtils::GetTimeMs64();
 
 			while (counter < SampleSize)
 			{
 				dgt->Update(buffer, 0, buffer.size());
 				counter += buffer.size();
 			}
-			std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+
+			calc = TestUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			OnProgress(calc);
 		}
+
 		dgt->Finalize(hash, 0);
 		delete dgt;
 
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-		uint64_t len = Loops * SampleSize;
-		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string glen = TestUtils::ToString(len / GB1);
-		std::string mbps = TestUtils::ToString((rate / MB1));
-		std::string secs = TestUtils::ToString((double)dur / 1000.0);
-		std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
+		dur = TestUtils::GetTimeMs64() - start;
+		len = static_cast<ulong>(Loops) * SampleSize;
+		rate = GetBytesPerSecond(dur, len);
+		glen = TestUtils::ToString(len / GB1);
+		mbps = TestUtils::ToString((rate / MB1));
+		secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
+		resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 
 		OnProgress(resp);
 		OnProgress(std::string(""));
@@ -144,10 +164,13 @@ namespace Test
 
 	uint64_t DigestSpeedTest::GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize)
 	{
-		double sec = (double)DurationTicks / 1000.0;
-		double sze = (double)DataSize;
+		double sec;
+		double sze;
 
-		return (uint64_t)(sze / sec);
+		sec = static_cast<double>(DurationTicks) / 1000.0;
+		sze = static_cast<double>(DataSize);
+
+		return static_cast<uint64_t>(sze / sec);
 	}
 
 	void DigestSpeedTest::OnProgress(const std::string &Data)

@@ -2,6 +2,8 @@
 
 NAMESPACE_ASYMMETRIC
 
+using Tools::MemoryTools;
+
 //~~~Constructor~~~//
 
 AsymmetricKeyPair::AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* PublicKey)
@@ -22,31 +24,19 @@ AsymmetricKeyPair::AsymmetricKeyPair(AsymmetricKey* PrivateKey, AsymmetricKey* P
 
 AsymmetricKeyPair::~AsymmetricKeyPair()
 {
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
-	if (m_keyTag.size() != 0)
-	{
-		Utility::MemoryTools::Clear(m_keyTag, 0, m_keyTag.size());
-		m_keyTag.clear();
-	}
+	Reset();
 }
 
 //~~~Accessors~~~//
 
 AsymmetricKey* AsymmetricKeyPair::PrivateKey()
 {
-	return m_privateKey.get();
+	return m_privateKey;
 }
 
 AsymmetricKey* AsymmetricKeyPair::PublicKey()
 {
-	return m_publicKey.get();
+	return m_publicKey;
 }
 
 std::vector<byte> &AsymmetricKeyPair::Tag()
@@ -60,15 +50,19 @@ void AsymmetricKeyPair::Reset()
 {
 	if (m_privateKey != nullptr)
 	{
-		m_privateKey->Reset();
+		delete m_privateKey;
+		m_privateKey = nullptr;
 	}
+
 	if (m_publicKey != nullptr)
 	{
-		m_publicKey->Reset();
+		delete m_publicKey;
+		m_publicKey = nullptr;
 	}
+
 	if (m_keyTag.size() != 0)
 	{
-		Utility::MemoryTools::Clear(m_keyTag, 0, m_keyTag.size());
+		MemoryTools::Clear(m_keyTag, 0, m_keyTag.size());
 		m_keyTag.clear();
 	}
 }

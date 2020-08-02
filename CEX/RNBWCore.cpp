@@ -6,9 +6,9 @@
 
 NAMESPACE_RAINBOW
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 class RNBWCore::RainbowParams
 {
@@ -64,42 +64,43 @@ public:
 	{
 		switch (Params)
 		{
-		case RainbowParameters::RNBWS1S128SHAKE256:
-		{
-			O1 = 32;
-			O2 = 32;
-			V1 = 48;
-			HLen = 32;
-			PriLen = 277536;
-			PubLen = 404992;
-			Rate = Keccak::KECCAK256_RATE_SIZE;
-			SigLen = 128;
-			break;
-		}
-		case RainbowParameters::RNBWS3S256SHAKE512:
-		{
-			O1 = 48;
-			O2 = 48;
-			V1 = 92;
-			HLen = 64;
-			PriLen = 1227104;
-			PubLen = 1705536;
-			Rate = Keccak::KECCAK512_RATE_SIZE;
-			SigLen = 204;
-			break;
-		}
-		default:
-		{
-			// RNBWS2S192SHAKE512
-			O1 = 36;
-			O2 = 36;
-			V1 = 68;
-			HLen = 48;
-			PriLen = 511448;
-			PubLen = 710640;
-			Rate = Keccak::KECCAK512_RATE_SIZE;
-			SigLen = 156;
-		}
+			case RainbowParameters::RNBWS1S128SHAKE256:
+			{
+				O1 = 32;
+				O2 = 32;
+				V1 = 48;
+				HLen = 32;
+				PriLen = 277536;
+				PubLen = 404992;
+				Rate = Keccak::KECCAK256_RATE_SIZE;
+				SigLen = 128;
+				break;
+			}
+			case RainbowParameters::RNBWS3S256SHAKE512:
+			{
+				O1 = 48;
+				O2 = 48;
+				V1 = 92;
+				HLen = 64;
+				PriLen = 1227104;
+				PubLen = 1705536;
+				Rate = Keccak::KECCAK512_RATE_SIZE;
+				SigLen = 204;
+				break;
+			}
+			default:
+			{
+				// RNBWS2S192SHAKE512
+				O1 = 36;
+				O2 = 36;
+				V1 = 68;
+				HLen = 48;
+				PriLen = 511448;
+				PubLen = 710640;
+				Rate = Keccak::KECCAK512_RATE_SIZE;
+				SigLen = 156;
+				break;
+			}
 		}
 
 		PubM = static_cast<size_t>(O1) + O2;
@@ -1024,20 +1025,17 @@ int32_t RNBWCore::RainbowSignClassic(RainbowParams &Params, std::vector<byte> &S
 	std::vector<byte> y(Params.PubM);
 	std::vector<byte> z(Params.PubM);
 	const size_t SIGOFF = Signature.size() - Params.SigLen;
-	uint l1succ;
-	uint nattempt;
-	uint succ;
-	int32_t ret;
+	uint l1succ(0);
+	uint nattempt(0);
+	uint succ(0);
+	int32_t ret(0);
 
 	MemoryTools::Copy(Sk.SkSeed, 0, preseed, 0, RAINBOW_LEN_SKSEED);
 	MemoryTools::Copy(Digest, 0, preseed, RAINBOW_LEN_SKSEED, Params.HLen);
 	XOF(preseed, 0, preseed.size(), seed, 0, seed.size(), Params.Rate);
-	l1succ = 0;
-	nattempt = 0;
-	ret = 0;
 
 	// roll vinegars
-	while (!l1succ)
+	while (l1succ == 0)
 	{
 		if (RAINBOW_MAX_ATTEMPT_FRMAT <= nattempt)
 		{
@@ -1062,9 +1060,8 @@ int32_t RNBWCore::RainbowSignClassic(RainbowParams &Params, std::vector<byte> &S
 	RNBWGfMath::Gf256MatProd(matl2F3, Sk.L2F3, Params.O2 * Params.O2, Params.V1, vinegar, 0);
 	RNBWGfMath::Gf256MatProd(matl2F2, Sk.L2F2, Params.O1 * Params.O2, Params.V1, vinegar, 0);
 	MemoryTools::Copy(Digest, 0, digestsalt, 0, Params.HLen);
-	succ = 0;
 
-	while (!succ)
+	while (succ == 0)
 	{
 		if (RAINBOW_MAX_ATTEMPT_FRMAT <= nattempt)
 		{
@@ -1140,7 +1137,6 @@ int32_t RNBWCore::RainbowSignClassic(RainbowParams &Params, std::vector<byte> &S
 int32_t RNBWCore::RainbowVerifyClassic(RainbowParams &Params, const std::vector<byte> &Digest, const std::vector<byte> &Signature, const std::vector<byte> &Pk)
 {
 	std::vector<byte> digest_ck(Params.PubM);
-	std::vector<byte> correct(Params.PubM);
 	std::vector<byte> digestsalt(Params.HLen + RAINBOW_SALT_BYTE);
 	std::vector<byte> tmpc(Params.PubM);
 	size_t i;
@@ -1193,7 +1189,6 @@ int32_t RNBWCore::RainbowSign(RainbowParams &Params, std::vector<byte> &Signatur
 
 int32_t RNBWCore::RainbowVerify(RainbowParams &Params, std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &Pk)
 {
-	std::vector<byte> tmpd(Params.HLen);
 	int32_t ret;
 
 	if (Signature.size() >= Params.SigLen)
@@ -1207,6 +1202,7 @@ int32_t RNBWCore::RainbowVerify(RainbowParams &Params, std::vector<byte> &Messag
 
 	if (ret == 0)
 	{
+		std::vector<byte> tmpd(Params.HLen);
 		MemoryTools::Copy(Signature, 0, Message, 0, Signature.size() - Params.SigLen);
 		XOF(Message, 0, Message.size(), tmpd, 0, tmpd.size(), Params.Rate);
 		ret = RainbowVerifyClassic(Params, tmpd, Signature, Pk);
@@ -1227,6 +1223,27 @@ void RNBWCore::XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLen
 	Keccak::XOFR24P1600(Input, InOffset, InLength, Output, OutOffset, OutLength, Rate);
 }
 
+size_t RNBWCore::GetPublicKeySize(RainbowParameters Parameters)
+{
+	RainbowParams params(Parameters);
+
+	return params.PubLen;
+}
+
+size_t RNBWCore::GetPrivateKeySize(RainbowParameters Parameters)
+{
+	RainbowParams params(Parameters);
+
+	return params.PriLen;
+}
+
+size_t RNBWCore::GetSignatureSize(RainbowParameters Parameters)
+{
+	RainbowParams params(Parameters);
+
+	return params.SigLen;
+}
+
 void RNBWCore::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, RainbowParameters Parameters)
 {
 	RainbowParams params = GetParams(Parameters);
@@ -1237,7 +1254,7 @@ void RNBWCore::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Private
 	RainbowGenerate(params, PublicKey, PrivateKey, Rng);
 }
 
-size_t RNBWCore::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, RainbowParameters Parameters)
+size_t RNBWCore::Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, RainbowParameters Parameters)
 {
 	RainbowParams params = GetParams(Parameters);
 

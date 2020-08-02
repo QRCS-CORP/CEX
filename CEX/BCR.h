@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -36,13 +36,13 @@ using Enumeration::Providers;
 
 /// <summary>
 /// An implementation of a Block cipher Counter mode PRNG.
-/// <para>Uses a keyed block cipher run in counter mode to generate pseudo-random output..</para>
+/// <para>Uses the keyed wide-block Rijndael DRBG to generate pseudo-random output.</para>
 /// </summary> 
 /// 
 /// <example>
 /// <description>Example of generating a pseudo-random integer:</description>
 /// <code>
-/// BCR rnd([BlockCiphers], [Providers]);
+/// BCR rnd([Providers]);
 /// // get random int
 /// int num = rnd.NextUInt32([Minimum], [Maximum]);
 /// </code>
@@ -52,9 +52,7 @@ using Enumeration::Providers;
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Wraps the Counter Mode Generator (BCG) DRBG implementation.</description></item>
-/// <item><description>Can be initialized with any of the implemented block-ciphers run in CTR mode.</description></item>
 /// <item><description>Uses an internal entropy provider to seed the underlying DRBG.</description></item>
-/// <item><description>The underlying DRBG instance can be optionally multi-threaded through the constructors Parallel parameter.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -70,11 +68,9 @@ class BCR final : public PrngBase
 private:
 
 	static const size_t BUFFER_SIZE = CEX_PRNG_BUFFER_SIZE;
+	class BcrState;
 
-	bool m_isParallel;
-	Providers m_pvdType;
-	SecureVector<byte> m_rndBuffer;
-	size_t m_rndIndex;
+	std::unique_ptr<BcrState> m_bcrState;
 	std::unique_ptr<IDrbg> m_rngGenerator;
 
 public:
@@ -95,12 +91,10 @@ public:
 	/// Initialize this class with parameters
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The block cipher that powers the rng; default is RHX</param>
 	/// <param name="ProviderType">The random provider used to create keyng material; default is ACP</param>
-	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode; default is sequential operation</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the cipher or provider type is invalid</exception>
-	BCR(BlockCiphers CipherType = BlockCiphers::AES, Providers ProviderType = Providers::ACP, bool Parallel = false);
+	BCR(Providers ProviderType = Providers::ACP);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -154,8 +148,7 @@ public:
 
 private:
 
-	void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
-	void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
 };
 
 NAMESPACE_PRNGEND

@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -119,7 +119,7 @@ public:
 	/// </summary>
 	const SimdIntegers Enumeral()
 	{
-		return SimdIntegers::UInt128;
+		return SimdIntegers::UInt128; //-V2571
 	}
 
 	//~~~ Load and Store~~~//
@@ -404,7 +404,7 @@ public:
 	/// <summary>
 	/// Type cast operator
 	/// </summary>
-	operator __m128i() const
+	operator __m128i() const 
 	{
 		return xmm;
 	}
@@ -508,14 +508,14 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UInt128 operator / (const UInt128 &X) const
 	{
-		std::array<uint, 4> tmpA;
-		std::array<uint, 4> tmpB;
-		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
-		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
+		std::array<uint, 4> tmpa;
+		std::array<uint, 4> tmpb;
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpa.data()), xmm);
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpb.data()), X.xmm);
+		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0, "Division by zero");
 
-		return UInt128(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
-		// TODO: finish this
+		return UInt128(tmpa[3] / tmpb[3], tmpa[2] / tmpb[2], tmpa[1] / tmpb[1], tmpa[0] / tmpb[0]);
+		// TODO: optimize this
 		//return UInt128(_mm_cvtps_epi32(_mm_round_ps(_mm_div_ps(_mm_cvtepi32_ps(xmm), _mm_cvtepi32_ps(X.xmm)), _MM_FROUND_TO_ZERO)));
 	}
 
@@ -526,13 +526,13 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UInt128 &X)
 	{
-		std::array<uint, 4> tmpA;
-		std::array<uint, 4> tmpB;
-		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
-		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
+		std::array<uint, 4> tmpa;
+		std::array<uint, 4> tmpb;
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpa.data()), xmm);
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(tmpb.data()), X.xmm);
+		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0, "Division by zero");
 
-		xmm = _mm_set_epi32(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
+		xmm = _mm_set_epi32(tmpa[3] / tmpb[3], tmpa[2] / tmpb[2], tmpa[1] / tmpb[1], tmpa[0] / tmpb[0]);
 	}
 
 	/// <summary>
@@ -720,7 +720,7 @@ public:
 	/// </summary>
 	inline UInt128 operator ~ () const
 	{
-		return UInt128(_mm_xor_si128(xmm, _mm_set1_epi32(0xFFFFFFFF)));
+		return UInt128(_mm_xor_si128(xmm, _mm_set1_epi32(0xFFFFFFFFUL)));
 	}
 
 	/// <summary>

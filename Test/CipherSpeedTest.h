@@ -98,7 +98,7 @@ namespace Test
 			rate = GetBytesPerSecond(dur, len);
 			glen = TestUtils::ToString(len / GB1);
 			mbps = TestUtils::ToString((rate / MB1));
-			secs = TestUtils::ToString((double)dur / 1000.0);
+			secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
 			resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 			Handler(resp);
 			Handler(std::string(""));
@@ -143,7 +143,7 @@ namespace Test
 			len = Loops * DATA_SIZE;
 			rate = GetBytesPerSecond(dur, len);
 			mbps = TestUtils::ToString((rate / MB1));
-			secs = TestUtils::ToString((double)dur / 1000.0);
+			secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
 			resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 			Handler(const_cast<char*>(resp.c_str()));
 			Handler("");

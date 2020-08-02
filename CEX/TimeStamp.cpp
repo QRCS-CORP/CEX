@@ -1,18 +1,20 @@
 #include "TimeStamp.h"
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
+
+using Tools::SystemTools;
 
 TimeStamp::TimeStamp()
 	:
-	m_hasTsc(Utility::SystemTools::HasRdtsc()),
+	m_hasTsc(SystemTools::HasRdtsc()),
 	m_msCounter(0),
-	m_tmFrequency(m_hasTsc ? Utility::SystemTools::GetRdtscFrequency() : 100)
+	m_tmFrequency(m_hasTsc ? SystemTools::GetRdtscFrequency() : 100)
 {
 }
 
 ulong TimeStamp::Elapsed()
 {
-	return Utility::SystemTools::TimeStamp(m_hasTsc) - m_msCounter;
+	return SystemTools::TimeStamp(m_hasTsc) - m_msCounter;
 }
 
 ulong TimeStamp::Frequency()
@@ -27,7 +29,7 @@ void TimeStamp::Reset()
 
 void TimeStamp::Start()
 {
-	m_msCounter = Utility::SystemTools::TimeStamp(m_hasTsc);
+	m_msCounter = SystemTools::TimeStamp(m_hasTsc);
 }
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND

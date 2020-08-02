@@ -1,184 +1,178 @@
 #include "BCG.h"
-#include "ArrayTools.h"
 #include "BlockCipherFromName.h"
 #include "IntegerTools.h"
+#include "MemoryTools.h"
 #include "ParallelTools.h"
 #include "ProviderFromName.h"
+#include "Rijndael.h"
 #include "SHA2Digests.h"
 #include "SHAKE.h"
 #include "ShakeModes.h"
 
 NAMESPACE_DRBG
 
+using namespace Cipher::Block::RijndaelBase;
 using Enumeration::BlockCipherConvert;
 using Enumeration::DrbgConvert;
-using Utility::ArrayTools;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 using Enumeration::ProviderConvert;
 using Enumeration::ShakeModes;
+
+const std::vector<byte> BCG::BCG_INFO =
+{
+	0x42, 0x43, 0x47, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62
+};
 
 class BCG::BcgState
 {
 public:
 	
-	std::vector<byte> Code;
-	std::vector<byte> Nonce;
-	size_t Counter;
+	SecureVector<uint> RoundKeys;
+	SecureVector<byte> Custom;
+	SecureVector<byte> Name;
+	SecureVector<byte> Nonce;
+	ulong Counter;
 	size_t KeySize;
 	size_t Reseed;
 	size_t Threshold;
-	ushort Strength;
+	uint Rounds;
+	bool IsDestroyed;
+	bool IsInitialized;
 	bool IsParallel;
 
-	BcgState(size_t ReseedMax, bool Parallel)
+	BcgState(size_t ReseedMax, bool Destroyed, bool Parallel)
 		:
-		Nonce(BLOCK_SIZE),
+		RoundKeys(0),
+		Custom(0),
+		Name(0),
+		Nonce(BLOCK_SIZE, 0x00),
 		Counter(0),
 		KeySize(0),
 		Reseed(0),
 		Threshold(ReseedMax),
-		Strength(0),
+		Rounds(0),
+		IsDestroyed(Destroyed),
+		IsInitialized(false),
 		IsParallel(Parallel)
 	{
 	}
 
 	~BcgState()
 	{
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(Custom, 0, Custom.size());
+		MemoryTools::Clear(Name, 0, Name.size());
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
+
 		Counter = 0;
 		KeySize = 0;
 		Reseed = 0;
+		Rounds = 0;
 		Threshold = 0;
-		Strength = 0;
+		IsDestroyed = false;
+		IsInitialized = false;
 		IsParallel = false;
 	}
 
 	void Reset()
 	{
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+		MemoryTools::Clear(Custom, 0, Custom.size());
+		MemoryTools::Clear(Name, 0, Name.size());
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
+
 		Counter = 0;
 		KeySize = 0;
-		Reseed = 0;
-		Strength = 0;
+		Rounds = 0;
+		IsDestroyed = false;
+		IsInitialized = false;
 	}
 };
 
 //~~~Constructor~~~//
 
-BCG::BCG(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
+BCG::BCG(Providers ProviderType, bool Parallel)
 	:
 	DrbgBase(
 		Drbgs::BCG, 
-		(DrbgConvert::ToName(Drbgs::BCG) + std::string("-") + BlockCipherConvert::ToName(CipherType)),
-		((CipherType == BlockCiphers::AES || CipherType == BlockCiphers::Serpent) ?
-			std::vector<SymmetricKeySize> {
-				SymmetricKeySize(16, BLOCK_SIZE, 0),
-				SymmetricKeySize(24, BLOCK_SIZE, 0),
-				SymmetricKeySize(32, BLOCK_SIZE, 0)} :
-			std::vector<SymmetricKeySize> {
-				SymmetricKeySize(32, BLOCK_SIZE, 16),
-				SymmetricKeySize(64, BLOCK_SIZE, 16),
-				SymmetricKeySize(128, BLOCK_SIZE, 16)}),
+		DrbgConvert::ToName(Drbgs::BCG),
+		std::vector<SymmetricKeySize> {
+			SymmetricKeySize(32, BLOCK_SIZE, 16),
+			SymmetricKeySize(64, BLOCK_SIZE, 16),
+			SymmetricKeySize(128, BLOCK_SIZE, 16)},
 		MAX_OUTPUT,
 		MAX_REQUEST,
 		MAX_THRESHOLD),
-	m_bcgCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
-		throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::BCG), std::string("Constructor"), std::string("The Cipher type can not be none!"), ErrorCodes::InvalidParam)),
-	m_bcgProvider(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
-	m_bcgState(new BcgState(DEF_RESEED, Parallel)),
-	m_isDestroyed(true),
-	m_isInitialized(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_bcgCipher->StateCacheSize(), false)
+	m_bcgProvider(ProviderType == Providers::None ? 
+		nullptr : 
+		Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_bcgState(new BcgState(DEF_RESEED, true, Parallel)),
+	m_parallelProfile(BLOCK_SIZE, true, RESERVE_CACHE, false)
 {
 }
 
-BCG::BCG(IBlockCipher* Cipher, IProvider* Provider, bool Parallel)
+BCG::BCG(IProvider* Provider, bool Parallel)
 	:
 	DrbgBase(
 		Drbgs::BCG,
-		(Cipher != nullptr ? DrbgConvert::ToName(Drbgs::BCG) + std::string("-") + BlockCipherConvert::ToName(Cipher->Enumeral()) :
-			throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::BCG), std::string("Constructor"), std::string("The Cipher can not be null!"), ErrorCodes::InvalidParam)),
-		(Cipher != nullptr ? (Cipher->Enumeral() == BlockCiphers::AES || Cipher->Enumeral() == BlockCiphers::Serpent) ?
-			std::vector<SymmetricKeySize> {
-				SymmetricKeySize(16, BLOCK_SIZE, 0),
-				SymmetricKeySize(24, BLOCK_SIZE, 0),
-				SymmetricKeySize(32, BLOCK_SIZE, 0)} :
-			std::vector<SymmetricKeySize>{
-				SymmetricKeySize(32, BLOCK_SIZE, 16),
-				SymmetricKeySize(64, BLOCK_SIZE, 16),
-				SymmetricKeySize(128, BLOCK_SIZE, 16)} :
-					throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::BCG), std::string("Constructor"), std::string("The Cipher can not be null!"), ErrorCodes::InvalidParam)),
+		DrbgConvert::ToName(Drbgs::BCG),
+		std::vector<SymmetricKeySize> {
+			SymmetricKeySize(32, BLOCK_SIZE, 16),
+			SymmetricKeySize(64, BLOCK_SIZE, 16),
+			SymmetricKeySize(128, BLOCK_SIZE, 16)},
 		MAX_OUTPUT,
 		MAX_REQUEST,
 		MAX_THRESHOLD),
-	m_bcgCipher(Cipher),
-	m_bcgProvider(Provider),
-	m_bcgState(new BcgState(DEF_RESEED, Parallel)),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_bcgCipher->StateCacheSize(), false)
+	m_bcgProvider(Provider != nullptr ? 
+		Provider :
+		throw CryptoGeneratorException(DrbgConvert::ToName(Drbgs::BCG), std::string("Constructor"), std::string("The provider can not be null!"), ErrorCodes::IllegalOperation)),
+	m_bcgState(new BcgState(DEF_RESEED, true, Parallel)),
+	m_parallelProfile(BLOCK_SIZE, true, RESERVE_CACHE, false)
 {
 }
 
 BCG::~BCG()
 {
-	m_isInitialized = false;
-
-	if (m_isDestroyed)
+	if (m_bcgProvider != nullptr)
 	{
-		m_isDestroyed = false;
-
-		if (m_bcgCipher != nullptr)
-		{
-			m_bcgCipher.reset(nullptr);
-		}
-
-		if (m_bcgProvider != nullptr)
+		if (m_bcgState->IsDestroyed)
 		{
 			m_bcgProvider.reset(nullptr);
 		}
-	}
-	else
-	{
-		if (m_bcgCipher != nullptr)
-		{
-			m_bcgCipher.release();
-		}
-
-		if (m_bcgProvider != nullptr)
+		else
 		{
 			m_bcgProvider.release();
 		}
+	}
+
+	if (m_bcgState != nullptr)
+	{
+		m_bcgState.reset(nullptr);
 	}
 }
 
 //~~~Accessors~~~//
 
-const size_t BCG::DistributionCodeMax()
-{ 
-	SymmetricKeySize ks = m_bcgCipher->LegalKeySizes()[2];
-	return ks.InfoSize();
-}
-
 const bool BCG::IsInitialized() 
 { 
-	return m_isInitialized; 
+	return m_bcgState->IsInitialized;
 }
 
 const bool BCG::IsParallel()
-{ 
+{
 	return m_parallelProfile.IsParallel();
 }
 
-const size_t BCG::ParallelBlockSize() 
-{ 
+const size_t BCG::ParallelBlockSize()
+{
 	return m_parallelProfile.ParallelBlockSize();
 }
 
-ParallelOptions &BCG::ParallelProfile() 
+ParallelOptions &BCG::ParallelProfile()
 {
-	return m_parallelProfile; 
+	return m_parallelProfile;
 }
 
 size_t &BCG::ReseedThreshold()
@@ -188,7 +182,7 @@ size_t &BCG::ReseedThreshold()
 
 const size_t BCG::SecurityStrength()
 {
-	return static_cast<size_t>(m_bcgState->Strength);
+	return m_bcgState->KeySize * 8;
 }
 
 //~~~Public Functions~~~//
@@ -203,9 +197,9 @@ void BCG::Generate(SecureVector<byte> &Output)
 	Generate(Output, 0, Output.size());
 }
 
-void BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void BCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::NotInitialized);
 	}
@@ -219,7 +213,7 @@ void BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 
 	// fill the output vector with pseudo-random bytes
-	Expand(Output, OutOffset, Length);
+	Process(Output, OutOffset, Length);
 
 	if (m_bcgProvider != nullptr)
 	{
@@ -238,12 +232,10 @@ void BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 			}
 
 			// the next unused block of output is key material
-			std::vector<byte> tmpk(m_bcgState->KeySize);
+			SecureVector<byte> tmpk(GEN_STRENGTH / 8);
 			// fill the key with pseudo-random
-			Expand(tmpk, 0, tmpk.size());
-			// create the new key; this new key is combined with entropy from the provider to create the next key
-			Derive(tmpk, m_bcgState, m_bcgProvider);
-			// re-initialize the generator, the nonce and distribution codes are preserved
+			Process(tmpk, 0, tmpk.size());
+			// re-initialize the generator
 			Update(tmpk);
 			// reset the reseed counter
 			m_bcgState->Counter = 0;
@@ -251,61 +243,87 @@ void BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 }
 
-void BCG::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
+void BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	std::vector<byte> tmpr(Length);
+	if (IsInitialized() == false)
+	{
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The generator must be initialized before use!"), ErrorCodes::NotInitialized);
+	}
+	if ((Output.size() - OutOffset) < Length)
+	{
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
+	}
+	if (Length > MaxRequestSize())
+	{
+		throw CryptoGeneratorException(Name(), std::string("Generate"), std::string("The output buffer is too large, max request is 64KB!"), ErrorCodes::MaxExceeded);
+	}
+
+	SecureVector<byte> tmpr(Length);
 	Generate(tmpr, 0, Length);
-	SecureMove(tmpr, Output, OutOffset);
+	SecureMove(tmpr, 0, Output, OutOffset, Length);
 }
 
 void BCG::Initialize(ISymmetricKey &Parameters)
 {
-#if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize(), Parameters.Nonce.KeySizes()))
-	{
-		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
-	}
-#else
-	if (Parameters.KeySizes().KeySize() < MINKEY_LENGTH)
-	{
-		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Key size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidNonce);
-	}
-	if (Parameters.KeySizes().NonceSize() != BLOCK_SIZE)
-	{
-		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Nonce size is invalid; check LegalKeySizes for accepted values!"), ErrorCodes::InvalidNonce);
-	}
-#endif
+	size_t i;
 
-	// set state initialization values
-	m_bcgState->Reset();
-	m_parallelProfile.IsParallel() = m_bcgState->IsParallel;
-	m_bcgState->KeySize = Parameters.KeySizes().KeySize();
-	m_bcgState->Strength = static_cast<ushort>(Parameters.KeySizes().KeySize()) * 8;
-
-	if (m_bcgCipher->Enumeral() == BlockCiphers::AES || m_bcgCipher->Enumeral() == BlockCiphers::Serpent)
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), Parameters.KeySizes().KeySize()))
 	{
-		// standard block-cipher initializion, generator will emit CTR(cipher) output
-		SymmetricKey kp(Parameters.Key());
-		m_bcgCipher->Initialize(true, kp);
+		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	else
+	if (Parameters.KeySizes().IVSize() != BLOCK_SIZE)
 	{
-		// using extended cipher version and custom distribution-code
-		// add the library prefix
-		ArrayTools::AppendVector(CEX_LIBRARY_PREFIX, m_bcgState->Code);
-		// assign the formal class name, and the security-strength to the distribution code parameter
-		ArrayTools::AppendString(Name(), m_bcgState->Code);
-		ArrayTools::AppendValue(static_cast<ushort>(SecurityStrength()), m_bcgState->Code);
-		// add the optional custom distribution code
-		ArrayTools::AppendVector(Parameters.Info(), m_bcgState->Code);
-		// initialize the block cipher
-		SymmetricKey kp(Parameters.Key(), Parameters.Nonce(), m_bcgState->Code);
-		m_bcgCipher->Initialize(true, kp);
+		throw CryptoGeneratorException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}
 
+	// reset for a new key
+	if (IsInitialized() == true)
+	{
+		m_bcgState->Reset();
+	}
+
+	m_bcgState->KeySize = Parameters.KeySizes().KeySize() > 256 ? 256 : Parameters.KeySizes().KeySize();
+	// set the number of rounds
+	m_bcgState->Rounds = Parameters.KeySizes().KeySize() != 128 ? static_cast<ushort>((Parameters.KeySizes().KeySize() / 4)) + 14 : 38;
+	// create the cSHAKE customization string
+	m_bcgState->Custom.resize(Parameters.KeySizes().InfoSize() + BCG_INFO.size());
+	// copy the version string to the customization parameter
+	MemoryTools::Copy(BCG_INFO, 0, m_bcgState->Custom, 0, BCG_INFO.size());
+	// copy the user defined string to the customization parameter
+	MemoryTools::Copy(Parameters.Info(), 0, m_bcgState->Custom, BCG_INFO.size(), Parameters.KeySizes().InfoSize());
+
+	// create the cSHAKE name string
+	std::string tmpn = Name();
+	// add key-size bits, and algorithm name to name string
+	m_bcgState->Name.resize(sizeof(ushort) + tmpn.size());
+	// add the cipher key size in bits as an unsigned short integer
+	ushort kbits = static_cast<ushort>(Parameters.KeySizes().KeySize() * 8);
+	IntegerTools::Le16ToBytes(kbits, m_bcgState->Name, 0);
+	// copy the name string to state
+	MemoryTools::CopyFromObject(tmpn.data(), m_bcgState->Name, sizeof(ushort), tmpn.size());
 	// copy the nonce to state
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_bcgState->Nonce, 0, BLOCK_SIZE);
-	m_isInitialized = true;
+	MemoryTools::Copy(Parameters.IV(), 0, m_bcgState->Nonce, 0, BLOCK_SIZE);
+
+	// initialize cSHAKE with k,c,n
+	Kdf::SHAKE gen(ShakeModes::SHAKE256);
+	gen.Initialize(Parameters.SecureKey(), m_bcgState->Custom, m_bcgState->Name);
+
+	// size the round key array
+	const size_t RNKLEN = (BLOCK_SIZE / sizeof(uint)) * (static_cast<size_t>(m_bcgState->Rounds) + 1UL);
+	m_bcgState->RoundKeys.resize(RNKLEN);
+	// generate the round keys to a temporary byte array
+	SecureVector<byte> tmpr(RNKLEN * sizeof(uint));
+	// generate the ciphers round-keys
+	gen.Generate(tmpr);
+
+	// realign in big endian format
+	for (i = 0; i < tmpr.size() / sizeof(uint); ++i)
+	{
+		m_bcgState->RoundKeys[i] = IntegerTools::BeBytesTo32(tmpr, i * sizeof(uint));
+	}
+
+	MemoryTools::Clear(tmpr, 0, tmpr.size());
+	m_bcgState->IsInitialized = true;
 }
 
 void BCG::ParallelMaxDegree(size_t Degree)
@@ -320,46 +338,10 @@ void BCG::ParallelMaxDegree(size_t Degree)
 
 void BCG::Update(const std::vector<byte> &Key)
 {
-#if defined(CEX_ENFORCE_LEGALKEY)
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), Key.size()))
-	{
-		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Invalid key size, the key length must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
-	}
-#else
-	if (Key.size() < MINKEY_LENGTH)
-	{
-		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("Key size is invalid; check the legalkey property for accepted value!"), ErrorCodes::InvalidKey);
-	}
-#endif
-
-	if (Key.size() < SecurityStrength() / 8)
-	{
-		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("The key is too small; check the legalkey property for accepted value!"), ErrorCodes::InvalidKey);
-	}
-
-	// increment the reseed count
-	++m_bcgState->Reseed;
-
-	if (m_bcgState->Reseed > MaxReseedCount())
-	{
-		throw CryptoGeneratorException(Name(), std::string("Update"), std::string("The maximum reseed requests can not be exceeded, re-initialize the generator!"), ErrorCodes::MaxExceeded);
-	}
-
-	// create the new key; this new key is combined with entropy from the provider to create the next key
-	std::vector<byte> tmpk(Key.size());
+	SecureVector<byte> tmpk(Key.size());
 	MemoryTools::Copy(Key, 0, tmpk, 0, tmpk.size());
-
-	// add new entropy to the key state with the random provider
-	if (m_bcgProvider != nullptr)
-	{
-		Derive(tmpk, m_bcgState, m_bcgProvider);
-	}
-
-	// reinitialize the generator with the nonce and distribution codes preserved
-	SymmetricKey kp(tmpk, m_bcgState->Nonce, m_bcgState->Code);
-	m_bcgCipher->Initialize(true, kp);
-	// reset the reseed counter
-	m_bcgState->Counter = 0;
+	Update(tmpk);
+	MemoryTools::Clear(tmpk, 0, tmpk.size());
 }
 
 void BCG::Update(const SecureVector<byte> &Key)
@@ -385,48 +367,28 @@ void BCG::Update(const SecureVector<byte> &Key)
 	}
 
 	// create the new key; this new key is combined with entropy from the provider to create the next key
-	std::vector<byte> tmpk(Key.size());
+	SecureVector<byte> tmpk(Key.size());
 	MemoryTools::Copy(Key, 0, tmpk, 0, tmpk.size());
 
 	// add new entropy to the key state with the random provider
 	if (m_bcgProvider != nullptr)
 	{
-		Derive(tmpk, m_bcgState, m_bcgProvider);
+		Derive(tmpk, m_bcgProvider);
 	}
 
 	// reinitialize the generator with the nonce and distribution codes preserved
-	SymmetricKey kp(tmpk, m_bcgState->Nonce, m_bcgState->Code);
-	m_bcgCipher->Initialize(true, kp);
+	SymmetricKey kp(tmpk, m_bcgState->Nonce, m_bcgState->Custom);
+	Initialize(kp);
 	// reset the reseed counter
 	m_bcgState->Counter = 0;
 }
 
 //~~~Private Functions~~~//
 
-void BCG::Derive(std::vector<byte> &Key, std::unique_ptr<BcgState> &State, std::unique_ptr<IProvider> &Provider)
+void BCG::Derive(SecureVector<byte> &Key, std::unique_ptr<IProvider> &Provider)
 {
-	ShakeModes mode;
-
-	switch (State->Strength)
-	{
-	case 128:
-		mode = ShakeModes::SHAKE128;
-		break;
-	case 256:
-		mode = ShakeModes::SHAKE256;
-		break;
-	case 512:
-		mode = ShakeModes::SHAKE512;
-		break;
-	case 1024:
-		mode = ShakeModes::SHAKE1024;
-		break;
-	default:
-		mode = ShakeModes::SHAKE256;
-	}
-
-	Kdf::SHAKE gen(mode);
-	std::vector<byte> tmpc(State->KeySize);
+	Kdf::SHAKE gen(ShakeModes::SHAKE256);
+	SecureVector<byte> tmpc(GEN_STRENGTH / 8);
 
 	// use random provider to pre-initialize shake to random values: cSHAKE
 	Provider->Generate(tmpc);
@@ -436,12 +398,158 @@ void BCG::Derive(std::vector<byte> &Key, std::unique_ptr<BcgState> &State, std::
 	gen.Generate(Key);
 }
 
-void BCG::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+CEX_OPTIMIZE_IGNORE
+void BCG::PrefetchSbox()
+{
+	// timing defence: pre-load sbox into l1 cache
+	MemoryTools::PrefetchL1(SBox, 0, SBox.size());
+}
+CEX_OPTIMIZE_RESUME
+
+void BCG::Transform(SecureVector<byte> &Output, size_t OutOffset, size_t Length, SecureVector<byte> &Counter)
+{
+	size_t bctr;
+
+	bctr = 0;
+
+	// Note: The counter length passed into LEIncrement, only processes the first 16 bytes
+	// as the full counter length. This is because this cipher is not expected to encrypt
+	// more that 2^128 bytes of data with a single key.
+
+#if defined(CEX_HAS_AVX512)
+
+	const size_t AVX512BLK = 16 * BLOCK_SIZE;
+
+	if (Length >= AVX512BLK)
+	{
+		const size_t PBKALN = Length - (Length % AVX512BLK);
+		std::vector<byte> tmpc(AVX512BLK);
+
+		// stagger counters and process 8 blocks with avx512
+		while (bctr != PBKALN)
+		{
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 256, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 288, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 320, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 352, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 384, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 416, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 448, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 480, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			Transform4096(tmpc, 0, Output, OutOffset + bctr);
+			bctr += AVX512BLK;
+}
+	}
+
+#elif defined(CEX_HAS_AVX2)
+
+	const size_t AVX2BLK = 8 * BLOCK_SIZE;
+
+	if (Length >= AVX2BLK)
+	{
+		const size_t PBKALN = Length - (Length % AVX2BLK);
+		SecureVector<byte> tmpc(AVX2BLK);
+
+		// stagger counters and process 8 blocks with avx2
+		while (bctr != PBKALN)
+		{
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			Transform2048(tmpc, 0, Output, OutOffset + bctr);
+			bctr += AVX2BLK;
+		}
+	}
+
+#elif defined(CEX_HAS_AVX)
+
+	const size_t AVXBLK = 4 * BLOCK_SIZE;
+
+	if (Length >= AVXBLK)
+	{
+		const size_t PBKALN = Length - (Length % AVXBLK);
+		std::vector<byte> tmpc(AVXBLK);
+
+		// 4 blocks with avx
+		while (bctr != PBKALN)
+		{
+			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
+			IntegerTools::LeIncrement(Counter, 16);
+			Transform1024(tmpc, 0, Output, OutOffset + bctr);
+			bctr += AVXBLK;
+		}
+	}
+
+#endif
+
+	const size_t BLKALN = Length - (Length % BLOCK_SIZE);
+
+	while (bctr != BLKALN)
+	{
+		Transform256(Counter, 0, Output, OutOffset + bctr);
+		IntegerTools::LeIncrement(Counter, 16);
+		bctr += BLOCK_SIZE;
+	}
+
+	if (bctr != Length)
+	{
+		SecureVector<byte> otp(BLOCK_SIZE);
+		Transform256(Counter, 0, otp, 0);
+		IntegerTools::LeIncrement(Counter, 16);
+		const size_t RMDLEN = Length % BLOCK_SIZE;
+		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - RMDLEN), RMDLEN);
+	}
+}
+
+void BCG::Process(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (!IsParallel() || Length < ParallelBlockSize())
 	{
 		// not parallel or too small; generate pseudo-random directly to output
-		Permute(Output, OutOffset, Length, m_bcgState->Nonce, m_bcgCipher);
+		Transform(Output, OutOffset, Length, m_bcgState->Nonce);
 	}
 	else
 	{
@@ -450,14 +558,14 @@ void BCG::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 		std::vector<byte> tmpc(BLOCK_SIZE);
 
-		Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
+		ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 		{
 			// thread level counter
-			std::vector<byte> thdCtr(BLOCK_SIZE);
+			SecureVector<byte> thdCtr(BLOCK_SIZE);
 			// offset counter by chunk size / block size  
 			IntegerTools::BeIncrease8(m_bcgState->Nonce, thdCtr, static_cast<uint>(CTRLEN * i));
 			// generate random at output offset
-			this->Permute(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr, m_bcgCipher);
+			this->Transform(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{
@@ -473,141 +581,57 @@ void BCG::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		if (ALNLEN < OUTLEN)
 		{
 			const size_t FNLLEN = Length % ALNLEN;
-			Permute(Output, ALNLEN, FNLLEN, m_bcgState->Nonce, m_bcgCipher);
+			Transform(Output, ALNLEN, FNLLEN, m_bcgState->Nonce);
 		}
 	}
 }
 
-void BCG::Permute(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter, std::unique_ptr<IBlockCipher> &Cipher)
+void BCG::Transform256(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset)
 {
-	size_t bctr = 0;
+	SecureVector<byte> state(BLOCK_SIZE, 0x00);
+	size_t i;
 
-#if defined(__AVX512__)
+	MemoryTools::Copy(Input, InOffset, state, 0, BLOCK_SIZE);
+	KeyAddition(state, m_bcgState->RoundKeys, 0);
 
-	const size_t AVX512BLK = 16 * BLOCK_SIZE;
-
-	if (Length >= AVX512BLK)
-	{
-		const size_t PBKALN = Length - (Length % AVX512BLK);
-		std::vector<byte> tmpc(AVX512BLK);
-
-		// stagger counters and process 8 blocks with avx512
-		while (bctr != PBKALN)
-		{
-			MemoryTools::COPY128(Counter, 0, tmpc, 0);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 16);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 32);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 48);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 64);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 80);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 96);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 112);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 128);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 144);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 160);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 176);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 192);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 208);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 224);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 240);
-			IntegerTools::BeIncrement8(Counter);
-			Cipher->Transform2048(tmpc, 0, Output, OutOffset + bctr);
-			bctr += AVX512BLK;
-		}
-	}
-
-#elif defined(__AVX2__)
-
-	const size_t AVX2BLK = 8 * BLOCK_SIZE;
-
-	if (Length >= AVX2BLK)
-	{
-		const size_t PBKALN = Length - (Length % AVX2BLK);
-		std::vector<byte> tmpc(AVX2BLK);
-
-		// stagger counters and process 8 blocks with avx2
-		while (bctr != PBKALN)
-		{
-			MemoryTools::COPY128(Counter, 0, tmpc, 0);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 16);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 32);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 48);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 64);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 80);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 96);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 112);
-			IntegerTools::BeIncrement8(Counter);
-			Cipher->Transform1024(tmpc, 0, Output, OutOffset + bctr);
-			bctr += AVX2BLK;
-		}
-	}
-
-#elif defined(__AVX__)
-
-	const size_t AVXBLK = 4 * BLOCK_SIZE;
-
-	if (Length >= AVXBLK)
-	{
-		const size_t PBKALN = Length - (Length % AVXBLK);
-		std::vector<byte> tmpc(AVXBLK);
-
-		// 4 blocks with avx
-		while (bctr != PBKALN)
-		{
-			MemoryTools::COPY128(Counter, 0, tmpc, 0);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 16);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 32);
-			IntegerTools::BeIncrement8(Counter);
-			MemoryTools::COPY128(Counter, 0, tmpc, 48);
-			IntegerTools::BeIncrement8(Counter);
-			Cipher->Transform512(tmpc, 0, Output, OutOffset + bctr);
-			bctr += AVXBLK;
-		}
-	}
-
+	// pre-load the s-box into L1 cache
+#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
+	PrefetchSbox();
 #endif
 
-	const size_t BLKALN = Length - (Length % BLOCK_SIZE);
-
-	while (bctr != BLKALN)
+	for (i = 1; i < m_bcgState->Rounds; ++i)
 	{
-		Cipher->EncryptBlock(Counter, 0, Output, OutOffset + bctr);
-		IntegerTools::BeIncrement8(Counter);
-		bctr += BLOCK_SIZE;
+		Substitution(state);
+		ShiftRows256(state);
+		MixColumns(state);
+		KeyAddition(state, m_bcgState->RoundKeys, (i << 3UL));
 	}
 
-	if (bctr != Length)
-	{
-		std::vector<byte> tmps(BLOCK_SIZE);
-		Cipher->EncryptBlock(Counter, tmps);
-		const size_t FNLLEN = Length % BLOCK_SIZE;
-		MemoryTools::Copy(tmps, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
-		IntegerTools::BeIncrement8(Counter);
-	}
+	Substitution(state);
+	ShiftRows256(state);
+	KeyAddition(state, m_bcgState->RoundKeys, static_cast<size_t>(m_bcgState->Rounds) << 3UL);
+
+	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
+}
+
+void BCG::Transform1024(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset)
+{
+	Transform256(Input, InOffset, Output, OutOffset);
+	Transform256(Input, InOffset + 32, Output, OutOffset + 32);
+	Transform256(Input, InOffset + 64, Output, OutOffset + 64);
+	Transform256(Input, InOffset + 96, Output, OutOffset + 96);
+}
+
+void BCG::Transform2048(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset)
+{
+	Transform1024(Input, InOffset, Output, OutOffset);
+	Transform1024(Input, InOffset + 128, Output, OutOffset + 128);
+}
+
+void BCG::Transform4096(const SecureVector<byte> &Input, size_t InOffset, SecureVector<byte> &Output, size_t OutOffset)
+{
+	Transform2048(Input, InOffset, Output, OutOffset);
+	Transform2048(Input, InOffset + 256, Output, OutOffset + 256);
 }
 
 NAMESPACE_DRBGEND

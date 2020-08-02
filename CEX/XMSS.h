@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -38,7 +38,7 @@ using Enumeration::XmssParameters;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// XMSS sgn(XmssParameters::XMSSSHA256H16);
+/// XMSS sgn(XmssParameters::XMSSSHA2256H16);
 /// IAsymmetricKeyPair* kp = sgn.Generate();
 /// 
 /// // serialize the public key
@@ -48,7 +48,7 @@ using Enumeration::XmssParameters;
 ///
 /// <description>Sign:</description>
 /// <code>
-/// XMSS sgn(XmssParameters::XMSSSHA256H16);
+/// XMSS sgn(XmssParameters::XMSSSHA2256H16);
 /// sgn.Initialize(PrivateKey);
 /// 
 /// std::vector&lt;byte&gt; msg(32);
@@ -59,7 +59,7 @@ using Enumeration::XmssParameters;
 ///
 /// <description>Verify:</description>
 /// <code>
-/// XMSS sgn(XmssParameters::XMSSSHA256H16);
+/// XMSS sgn(XmssParameters::XMSSSHA2256H16);
 /// sgn.Initialize(PublicKey);
 /// std::vector&lt;byte&gt; message(0);
 ///
@@ -82,7 +82,7 @@ using Enumeration::XmssParameters;
 /// 
 /// <list type="bullet">
 /// <item><description>There are 10 XMSS parameter choices, and 32 different XMMS-MT parameter sets to choose from contained in the XmssParameters enumeration and set through the constructor</description></item>
-/// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
+/// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The signature schemes operational mode (signing/verifying) is determined by the IAsymmetricKey key-type used to Initialize the cipher; the Public key is used for verification, and use the Private for signing a message.</description></item>
 /// <item><description>Use the Generate function to create a public/private key-pair, and the Sign function to sign a message</description></item>
 /// <item><description>The message-signature is tested using the Verify function, which checks the signature, populates the message array, and returns false on authentication failure</description></item>
@@ -101,8 +101,8 @@ private:
 
 	class XmssState;
 	std::unique_ptr<XmssState> m_xmssState;
-	std::unique_ptr<AsymmetricKey> m_privateKey;
-	std::unique_ptr<AsymmetricKey> m_publicKey;
+	AsymmetricKey* m_privateKey;
+	AsymmetricKey* m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -121,11 +121,11 @@ public:
 	/// Constructor: Instantiate this class
 	/// </summary>
 	/// 
-	/// <param name="Parameters">The XMSS parameter set; default is XMSSSHA256H16</param>
+	/// <param name="Parameters">The XMSS parameter set; default is XMSSSHA2256H16</param>
 	/// <param name="PrngType">The random prng provider; default is Block-cipher Counter Rng (BCR)</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	XMSS(XmssParameters Parameters = XmssParameters::XMSSSHA256H16, Prngs PrngType = Prngs::BCR);
+	XMSS(XmssParameters Parameters = XmssParameters::XMSSSHA2256H16, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using an external Prng instance

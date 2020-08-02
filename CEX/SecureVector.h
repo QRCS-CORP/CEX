@@ -9,9 +9,9 @@
 
 NAMESPACE_ROOT
 
-using Utility::LockingAllocator;
-using Utility::MemoryPool;
-using Utility::MemoryTools;
+using Tools::LockingAllocator;
+using Tools::MemoryPool;
+using Tools::MemoryTools;
 
 /// <summary>
 /// A secure allocator template used internally to create locked memory allocations
@@ -110,7 +110,7 @@ inline static void SecureClear(SecureVector<T> &Input)
 CEX_OPTIMIZE_RESUME
 
 /// <summary>
-/// Copy a length of bytes between two SecureVector arrays.</para>
+/// Copy a length of bytes between two SecureVector arrays.
 /// </summary>
 ///
 /// <param name="Input">The SecureVector source array</param>
@@ -322,13 +322,13 @@ inline static SecureVector<T> SecureLockClear(std::vector<T> &Input)
 CEX_OPTIMIZE_RESUME
 
 /// <summary>
-/// Move a standard-vector to another SecureVector array, clearing the source</para>
+/// Move a vector to another vector array, clearing the source.
+/// <para> Clears the source array.</para>
 /// </summary>
 ///
-/// <param name="Input">The SecureVector source array; will be cleared after copying</param>
-/// <param name="Output">The SecureVector destination array</param>
-/// <param name="OutOffset">The starting offset within the standard-vector</param>
-/// <param name="Length">The number of bytes to copy</param>
+/// <param name="Input">The vector source array; will be cleared after copying</param>
+/// <param name="Output">The vector destination array</param>
+/// <param name="OutOffset">The starting offset within the output vector</param>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
 inline static void SecureMove(std::vector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
@@ -342,13 +342,33 @@ inline static void SecureMove(std::vector<T> &Input, SecureVector<T> &Output, si
 CEX_OPTIMIZE_RESUME
 
 /// <summary>
-/// Move a SecureVector array to another SecureVector array, clearing the source</para>
+/// Move a vector to another vector array, clearing the source.
+/// <para> Clears the source array.</para>
 /// </summary>
 ///
-/// <param name="Input">The SecureVector source array; will be cleared after copying</param>
-/// <param name="Output">The SecureVector destination array</param>
-/// <param name="OutOffset">The starting offset within the standard-vector</param>
-/// <param name="Length">The number of bytes to copy</param>
+/// <param name="Input">The vector source array; will be cleared after copying</param>
+/// <param name="Output">The vector destination array</param>
+/// <param name="OutOffset">The starting offset within the output vector</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void SecureMove(SecureVector<T> &Input, std::vector<T> &Output, size_t OutOffset)
+{
+	CEXASSERT(Output.size() - OutOffset >= Input.size(), "The input array is longer than the output array");
+
+	MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size() * sizeof(T));
+	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
+	Input.clear();
+}
+CEX_OPTIMIZE_RESUME
+
+/// <summary>
+/// Move a vector to another vector array, clearing the source.
+/// <para> Clears the source array.</para>
+/// </summary>
+///
+/// <param name="Input">The vector source array; will be cleared after copying</param>
+/// <param name="Output">The vector destination array</param>
+/// <param name="OutOffset">The starting offset within the output vector</param>
 CEX_OPTIMIZE_IGNORE
 template<typename T>
 inline static void SecureMove(SecureVector<T> &Input, SecureVector<T> &Output, size_t OutOffset)
@@ -358,6 +378,70 @@ inline static void SecureMove(SecureVector<T> &Input, SecureVector<T> &Output, s
 	MemoryTools::Copy(Input, 0, Output, OutOffset, Input.size() * sizeof(T));
 	MemoryTools::Clear(Input, 0, Input.size() * sizeof(T));
 	Input.clear();
+}
+CEX_OPTIMIZE_RESUME
+
+/// <summary>
+/// Move a vector to another vector array, zeroes the source array.
+/// <para> Zeroes the source array.</para>
+/// </summary>
+///
+/// <param name="Input">The vector source array; will be zeroed after copying</param>
+/// <param name="InOffset">The starting offset within the input vector</param>
+/// <param name="Output">The vector destination array</param>
+/// <param name="OutOffset">The starting offset within the output vector</param>
+/// <param name="Length">The number of bytes to move</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void SecureMove(std::vector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Length)
+{
+	CEXASSERT(Length <= (Input.size() - InOffset) * sizeof(T), "The input array is too small");
+	CEXASSERT(Length <= (Output.size() - OutOffset) * sizeof(T), "The output array is too small");
+
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
+	MemoryTools::Clear(Input, InOffset, Length);
+}
+CEX_OPTIMIZE_RESUME
+
+/// <summary>
+/// Move a vector to another vector array, zeroes the source array.
+/// <para> Zeroes the source array.</para>
+/// </summary>
+///
+/// <param name="Input">The vector source array; will be zeroed after copying</param>
+/// <param name="Output">The standard vector destination array</param>
+/// <param name="OutOffset">The starting offset within the output vector</param>
+/// <param name="Length">The number of bytes to move</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void SecureMove(SecureVector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Length)
+{
+	CEXASSERT(Length <= (Input.size() - InOffset) * sizeof(T), "The input array is too small");
+	CEXASSERT(Length <= (Output.size() - OutOffset) * sizeof(T), "The output array is too small");
+
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
+	MemoryTools::Clear(Input, InOffset, Length);
+}
+CEX_OPTIMIZE_RESUME
+
+/// <summary>
+/// Move a vector to another vector array, zeroes the source array.
+/// <para> Zeroes the source array.</para>
+/// </summary>
+///
+/// <param name="Input">The vector source array; will be zeroed after copying</param>
+/// <param name="Output">The SecureVector destination array</param>
+/// <param name="OutOffset">The starting offset within the output vector</param>
+/// <param name="Length">The number of bytes to move</param>
+CEX_OPTIMIZE_IGNORE
+template<typename T>
+inline static void SecureMove(SecureVector<T> &Input, size_t InOffset, SecureVector<T> &Output, size_t OutOffset, size_t Length)
+{
+	CEXASSERT(Length <= (Input.size() - InOffset) * sizeof(T), "The input array is too small");
+	CEXASSERT(Length <= (Output.size() - OutOffset) * sizeof(T), "The output array is too small");
+
+	MemoryTools::Copy(Input, InOffset, Output, OutOffset, Length);
+	MemoryTools::Clear(Input, InOffset, Length);
 }
 CEX_OPTIMIZE_RESUME
 

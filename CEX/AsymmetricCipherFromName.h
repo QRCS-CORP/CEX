@@ -15,7 +15,7 @@ using Exception::CryptoException;
 using Asymmetric::Encrypt::IAsymmetricCipher;
 
 /// <summary>
-/// Get an initialized asymmetric cipher instance from it's enumeration name.
+/// Get an asymmetric cipher instance from it's enumeration name.
 /// <para>Use the Parameter field to set the ciphers instance parameters.</para>
 /// </summary>
 class AsymmetricCipherFromName
@@ -27,13 +27,13 @@ private:
 public:
 
 	/// <summary>
-	/// Get an initialized asymmetric cipher instance by enumeration name
+	/// Get an asymmetric cipher instance by enumeration name
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The asymmetric ciphers enumeration name</param>
 	/// <param name="Parameters">The asymmetric ciphers parameters enumeration name</param>
 	/// 
-	/// <returns>An initialized asymmetric cipher instance</returns>
+	/// <returns>An asymmetric cipher instance</returns>
 	/// 
 	/// <exception cref="CryptoException">Thrown if the cipher or parameters are not supported</exception>
 	static IAsymmetricCipher* GetInstance(AsymmetricCiphers CipherType, AsymmetricParameters Parameters);

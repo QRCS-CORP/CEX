@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -21,10 +21,12 @@
 
 #include "CexDomain.h"
 #include "CryptoDigestException.h"
+#include "IntegerTools.h"
 
 NAMESPACE_DIGEST
 
 using Exception::CryptoDigestException;
+using Tools::IntegerTools;
 
 /// <summary>
 /// The parallel Blake2 parameters structure
@@ -194,7 +196,7 @@ public:
 
 			for (size_t i = 3; i < Config.size(); ++i)
 			{
-				Config[i] = Utility::IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
+				Config[i] = IntegerTools::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
 			}
 		}
 		else
@@ -211,7 +213,7 @@ public:
 
 			for (size_t i = 5; i < Config.size(); ++i)
 			{
-				Config[i] = Utility::IntegerTools::LeBytesTo32(m_dstCode, (i - 5) * sizeof(uint));
+				Config[i] = IntegerTools::LeBytesTo32(m_dstCode, (i - 5) * sizeof(uint));
 			}
 		}
 	}

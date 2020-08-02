@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -24,14 +24,14 @@
 #include "IntegerTools.h"
 #include "IPrng.h"
 #include "MemoryTools.h"
-#include "SHA512.h"
+#include "SHA2512.h"
 
 NAMESPACE_NTRUPRIME
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Prng::IPrng;
-using Utility::MemoryTools;
-using Digest::SHA512;
+using Tools::MemoryTools;
+using Digest::SHA2512;
 
 /// 
 /// internal
@@ -106,29 +106,18 @@ public:
 
 private:
 
-	static void Hash(std::vector<byte> &Output, size_t OutOffset, int32_t B, const std::vector<byte> &Input);
-
-	static void HashConfirm(std::vector<byte> &H, size_t HOffset, const std::vector<byte> &R, const std::vector<byte> &Pk, const std::vector<byte> &Cache);
-
-	static void HashSession(std::vector<byte> &K, int32_t B, const std::vector<byte> &Y, const std::vector<byte> &Z);
-
+	static void Hash(std::vector<byte> &Output, size_t OutOffset, int B, const std::vector<byte> &Input);
+	static void HashConfirm(std::vector<byte> &H, size_t HOffset, const std::vector<byte> &R, const std::vector<byte> &Cache);
+	static void HashSession(std::vector<byte> &K, int B, const std::vector<byte> &Y, const std::vector<byte> &Z);
 	static void Hide(std::vector<byte> &C, std::vector<byte> &REnc, const std::vector<int8_t> &R, const std::vector<byte> &Pk, const std::vector<byte> &Cache);
-
 	static void KeyGen(std::vector<int16_t> &H, std::vector<int8_t> &F, std::vector<int8_t> &GInv, std::unique_ptr<Prng::IPrng> &Rng);
-
 	static void ShortFromList(std::vector<int8_t> &Output, const std::vector<uint> &Input);
-
 	static void ShortRandom(std::vector<int8_t> &Output, std::unique_ptr<Prng::IPrng> &Rng);
-
 	static void SmallRandom(std::vector<int8_t> &Output, std::unique_ptr<Prng::IPrng> &Rng);
-
 	static uint URandom32(std::unique_ptr<Prng::IPrng> &Rng);
-
-	static void ZKeyGen(std::vector<byte> &Pk, std::vector<byte> &Sk, std::unique_ptr<Prng::IPrng> &Rng);
-
 	static void ZDecrypt(std::vector<int8_t> &R, const std::vector<byte> &C, const std::vector<byte> &Sk);
-
 	static void ZEncrypt(std::vector<byte> &C, const std::vector<int8_t> &R, const std::vector<byte> &Pk);
+	static void ZKeyGen(std::vector<byte> &Pk, std::vector<byte> &Sk, std::unique_ptr<Prng::IPrng> &Rng);
 };
 
 NAMESPACE_NTRUPRIMEEND

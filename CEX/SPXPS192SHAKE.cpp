@@ -7,8 +7,8 @@
 
 NAMESPACE_SPHINCSPLUS
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 void SPXPS192SHAKE::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
@@ -136,23 +136,22 @@ bool SPXPS192SHAKE::Verify(std::vector<byte> &Message, const std::vector<byte> &
 	std::vector<byte> pkroot(SPX_N);
 	std::vector<byte> pkseed(SPX_N);
 	std::vector<byte> root(SPX_N);
-	std::vector<byte> sig(SPX_BYTES);
 	std::vector<byte> tmsg(Signature.size());
 	std::vector<byte> wotspk(SPX_WOTS_BYTES);
-	std::vector<byte> mhash(SPX_FORS_MSG_BYTES);
-	std::array<uint, 8> treeaddr = { 0 };
-	std::array<uint, 8> wotsaddr = { 0 };
-	std::array<uint, 8> wotspkaddr = { 0 };
 	ulong tree;
 	size_t idxsig;
 	uint idx;
 	uint idxleaf;
-	bool res;
-
-	res = false;
+	bool res(false);
 
 	if (Signature.size() >= SPX_BYTES)
 	{
+		std::vector<byte> sig(SPX_BYTES);
+		std::vector<byte> mhash(SPX_FORS_MSG_BYTES);
+		std::array<uint, 8> treeaddr = { 0 };
+		std::array<uint, 8> wotsaddr = { 0 };
+		std::array<uint, 8> wotspkaddr = { 0 };
+
 		// the API caller does not necessarily know what size a signature 
 		// should be but SPHINCS+ signatures are always exactly SPX_BYTES.
 		idxsig = 0;

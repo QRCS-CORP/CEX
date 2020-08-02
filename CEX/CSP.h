@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -56,7 +56,7 @@ class CSP final : public ProviderBase
 private:
 
 #if defined(CEX_FIPS140_ENABLED)
-	ProviderSelfTest m_pvdSelfTest;
+	std::unique_ptr<ProviderSelfTest> m_pvdSelfTest;
 #endif
 
 public:
@@ -133,7 +133,7 @@ public:
 private:
 
 	bool FipsTest();
-	static void GetRandom(byte* Output, size_t Length);
+	static void Generate(byte* Output, size_t Length);
 };
 
 NAMESPACE_PROVIDEREND

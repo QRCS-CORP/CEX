@@ -3,10 +3,10 @@
 
 #include "CexDomain.h"
 #include "CryptoException.h"
-#include "Mutex.h"
 #include <cstdlib>
+#include <mutex>
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 using Exception::CryptoException;
 
@@ -19,15 +19,9 @@ class MemoryPool
 private:
 
 	static const std::string CLASS_NAME;
+	class PoolState;
 
-	byte m_alignBit;
-	std::vector<std::pair<size_t, size_t>> m_freeList;
-	size_t m_maxAlloc;
-	byte* m_memPool;
-	size_t m_minAlloc;
-	size_t m_pageSize;
-	size_t m_poolSize;
-	mutex_type m_mutex;
+	std::unique_ptr<PoolState> m_poolState;
 
 public:
 
@@ -44,6 +38,11 @@ public:
 	///
 	/// <exception cref="CryptoException">Thrown if invalid parameters are passed</exception>
 	MemoryPool(byte* Pool, size_t PoolSize, size_t PageSize, size_t MinAlloc, size_t MaxAlloc, byte AlignBit);
+
+	/// <summary>
+	/// Class destructor
+	/// </summary>
+	~MemoryPool();
 
 	/// <summary>
 	/// Allocate a length of bytes and return a pointer to the memory
@@ -66,14 +65,17 @@ public:
 	/// <returns>Returns true if the operation was successful</returns>
 	bool Deallocate(void* Pointer, size_t Length);
 
+	/// <summary>
+	/// Reset the memory pool
+	/// </summary>
+	void Reset();
+
 private:
 
 	static void Clear(void* Pool, size_t Offset, size_t Length);
-
 	static bool InPool(const void* Pointer, size_t PoolSize, const void* Buffer, size_t BufferSize);
-
 	static size_t PadSize(size_t Length, size_t Alignment);
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif

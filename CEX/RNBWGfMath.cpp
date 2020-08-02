@@ -3,7 +3,7 @@
 
 NAMESPACE_RAINBOW
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 byte RNBWGfMath::Gf256vGetEle(const std::vector<byte> &A, size_t Offset, uint Index)
 {
@@ -21,7 +21,7 @@ byte RNBWGfMath::Gf256vSetEle(std::vector<byte> &A, size_t Offset, uint Index, b
 	return V;
 }
 
-#ifdef CEX_ARCH_64
+#if defined(CEX_ARCH_64)
 
 void RNBWGfMath::Gf256vAddU32(std::vector<byte> &AccuB, size_t BOffset, const std::vector<byte> &A, size_t AOffset, size_t Length)
 {
@@ -79,7 +79,7 @@ void RNBWGfMath::Gf256vMaddU32(std::vector<byte> &AccuC, size_t COffset, const s
 
 	for (i = 0; i < rem; ++i)
 	{
-		tmp32 |= ((uint)A[AOffset + i] << (i * 8));
+		tmp32 |= (static_cast<uint>(A[AOffset + i]) << (i * 8));
 	}
 
 	tmp32 = Gf256vMulU32(tmp32, Gf256B);
@@ -113,7 +113,7 @@ void RNBWGfMath::Gf256vMulScalarU32(std::vector<byte> &A, size_t Offset, byte B,
 
 	for (i = 0; i < rem; ++i)
 	{
-		tmp32 |= ((uint)A[Offset + i] << (i * 8));
+		tmp32 |= (static_cast<uint>(A[Offset + i]) << (i * 8));
 	}
 
 	tmp32 = Gf256vMulU32(tmp32, B);
@@ -134,7 +134,7 @@ void RNBWGfMath::Gf256vPredicatedAddU32(std::vector<byte> &AccuB, size_t BOffset
 	size_t i;
 	size_t nu32;
 
-	pru32 = 0UL - ((uint)Predicate);
+	pru32 = 0UL - (static_cast<uint>(Predicate));
 	pru8 = pru32 & 0xff;
 	nu32 = Length >> 2;
 
@@ -332,7 +332,7 @@ void RNBWGfMath::Gf256vMadd(std::vector<byte> &AccuC, size_t COffset, const std:
 
 	for (i = 0; i < rem; ++i)
 	{
-		tmp32 |= ((uint)A[AOffset + i] << (i * 8));
+		tmp32 |= (static_cast<uint>(A[AOffset + i]) << (i * 8));
 	}
 
 	tmp32 = Gf256vMulU32(tmp32, Gf256B);
@@ -433,14 +433,14 @@ void RNBWGfMath::Gf256MatProdRef(std::vector<byte> &C, const std::vector<byte> &
 
 uint RNBWGfMath::Gf256MatGaussElimRef(std::vector<byte> &Mat, uint H, uint W)
 {
-	byte pivot;
-	uint align4;
-	uint r8;
 	size_t aoff;
 	size_t i;
 	size_t j;
 	size_t joff;
-
+	uint align4;
+	uint r8;
+	byte pivot;
+	
 	r8 = 1;
 
 	for (i = 0; i < H; ++i)
@@ -451,7 +451,9 @@ uint RNBWGfMath::Gf256MatGaussElimRef(std::vector<byte> &Mat, uint H, uint W)
 		for (j = i + 1; j < H; ++j)
 		{
 			joff = j * W;
-			Gf256vPredicatedAdd(Mat, aoff + align4, !Gf256IsNonZero(Mat[aoff + i]), Mat, joff + align4, W - align4);
+			pivot = Gf256IsNonZero(Mat[aoff + i]) > 0 ? 0 : 1;
+
+			Gf256vPredicatedAdd(Mat, aoff + align4, pivot, Mat, joff + align4, W - align4);
 		}
 
 		r8 &= Gf256IsNonZero(Mat[aoff + i]);
@@ -501,7 +503,6 @@ unsigned RNBWGfMath::Gf256MatGaussElim(std::vector<byte> &Mat, uint H, uint W)
 uint RNBWGfMath::Gf256MatInv(std::vector<byte> &InvA, const std::vector<byte> &A, uint H, std::vector<byte> &Buffer)
 {
 	std::vector<byte> aa;
-	std::vector<byte> ai;
 	size_t i;
 	byte r8;
 	size_t aoff;

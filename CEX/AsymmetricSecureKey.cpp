@@ -11,18 +11,18 @@
 
 NAMESPACE_ASYMMETRIC
 
-using Utility::ArrayTools;
+using Tools::ArrayTools;
 
 using Exception::CryptoAuthenticationFailure;
 using Enumeration::ErrorCodes;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 using Kdf::SHAKE;
 using Enumeration::ShakeModes;
 using Helper::StreamCipherFromName;
 using Cipher::SymmetricKey;
 using Cipher::SymmetricKeySize;
-using Utility::SystemTools;
+using Tools::SystemTools;
 
 const std::string AsymmetricSecureKey::CLASS_NAME = "AsymmetricSecureKey";
 
@@ -199,10 +199,10 @@ void AsymmetricSecureKey::Encipher(std::unique_ptr<AsymmetricSecureKeyState> &St
 {
 	IStreamCipher* cpr = GetStreamCipher(State->Policy);
 	SymmetricKeySize ksc = cpr->LegalKeySizes()[0];
-	SecureVector<byte> seed(ksc.KeySize() + ksc.NonceSize());
+	SecureVector<byte> seed(ksc.KeySize() + ksc.IVSize());
 	std::vector<byte> tmpt(0);
 	std::vector<byte> tmpk(ksc.KeySize());
-	std::vector<byte> tmpn(ksc.NonceSize());
+	std::vector<byte> tmpn(ksc.IVSize());
 	std::vector<byte> cpt(State->Polynomial.size());
 
 	// transfer from the secure-vector to a working state
@@ -231,10 +231,10 @@ void AsymmetricSecureKey::Extract(std::unique_ptr<AsymmetricSecureKeyState> &Sta
 	IStreamCipher* cpr = GetStreamCipher(State->Policy);
 	const size_t CPTSZE = cpr->IsAuthenticator() ? State->Polynomial.size() - cpr->TagSize() : State->Polynomial.size();
 	SymmetricKeySize ksc = cpr->LegalKeySizes()[0];
-	SecureVector<byte> seed(ksc.KeySize() + ksc.NonceSize());
+	SecureVector<byte> seed(ksc.KeySize() + ksc.IVSize());
 	std::vector<byte> tmpt(State->Polynomial.size());
 	std::vector<byte> tmpk(ksc.KeySize());
-	std::vector<byte> tmpn(ksc.NonceSize());
+	std::vector<byte> tmpn(ksc.IVSize());
 
 	// assemble the cipher key
 	GetSystemKey(State->Policy, State->Salt, seed);
@@ -267,7 +267,7 @@ IStreamCipher* AsymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 		}
 		case SecurityPolicy::SPL256AE:
 		{
-			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR120K256);
+			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR120K1024);
 			break;
 		}
 		case SecurityPolicy::SPL512:
@@ -293,6 +293,7 @@ IStreamCipher* AsymmetricSecureKey::GetStreamCipher(SecurityPolicy Policy)
 		default:
 		{
 			cpr = StreamCipherFromName::GetInstance(Enumeration::StreamCiphers::TSXR96K512);
+			break;
 		}
 	}
 
@@ -336,6 +337,7 @@ void AsymmetricSecureKey::GetSystemKey(SecurityPolicy Policy, const SecureVector
 		default:
 		{
 			mode = ShakeModes::SHAKE1024;
+			break;
 		}
 	}
 

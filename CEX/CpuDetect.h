@@ -40,7 +40,7 @@ public:
 
 private:
 
-	enum CpuidFlags : uint
+	enum class CpuidFlags : uint
 	{
 		// EAX=1
 		CPUID_SSE3 = 0, // ecx 0
@@ -443,10 +443,23 @@ public:
 	/// <returns>Returns true if the feature is available</returns>
 	const bool XOP();
 
+	/// <summary>
+	/// Returns true if the AVX feature set is detected
+	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
+	static bool AvxEnabled();
+
+	/// <summary>
+	/// Returns true if the AVX2 feature set is detected
+	/// </summary>
+	///
+	/// <returns>Returns true if the feature is available</returns>
+	static bool Avx2Enabled();
+
 private:
 
-	static bool AvxEnabled();
-	static bool Avx2Enabled();
+
 	void BusInfo();
 	static void Cpuid(int Flag, std::array<uint, 4> &Output);
 	static void CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output);

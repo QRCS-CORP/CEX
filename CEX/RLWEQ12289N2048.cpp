@@ -5,15 +5,15 @@
 
 NAMESPACE_RINGLWE
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 //~~~Constant Tables~~~//
 
 const std::string RLWEQ12289N2048::Name = "Q12289N2048";
 
-const std::array<ushort, 1024> RLWEQ12289N2048::OmegasMontgomery =
+const std::vector<ushort> RLWEQ12289N2048::OmegasMontgomery =
 {
 	0x0FEBU, 0x1B3EU, 0x1334U, 0x10E4U, 0x1C2AU, 0x0CBEU, 0x0879U, 0x2DF7U, 0x2247U, 0x2BF0U, 0x18DCU, 0x03FAU, 0x15C6U, 0x07B5U, 0x04FEU, 0x0928U,
 	0x2586U, 0x2B5BU, 0x17E6U, 0x2117U, 0x1E49U, 0x2BE7U, 0x1ABCU, 0x0F14U, 0x1550U, 0x1161U, 0x2134U, 0x0093U, 0x15A1U, 0x1D74U, 0x1D4CU, 0x1173U,
@@ -81,7 +81,7 @@ const std::array<ushort, 1024> RLWEQ12289N2048::OmegasMontgomery =
 	0x08A5U, 0x1FC8U, 0x2124U, 0x2D02U, 0x2F29U, 0x2FCFU, 0x1A6BU, 0x0301U, 0x034DU, 0x0E8BU, 0x2871U, 0x0007U, 0x1108U, 0x0CD5U, 0x23AFU, 0x1C43U
 };
 
-const std::array<ushort, 1024> RLWEQ12289N2048::OmegasInvMontgomery =
+const std::vector<ushort> RLWEQ12289N2048::OmegasInvMontgomery =
 {
 	0x0FEBU, 0x14C3U, 0x1F1DU, 0x1CCDU, 0x020AU, 0x2788U, 0x2343U, 0x13D7U, 0x26D9U, 0x2B03U, 0x284CU, 0x1A3BU, 0x2C07U, 0x1725U, 0x0411U, 0x0DBAU,
 	0x1E8EU, 0x12B5U, 0x128DU, 0x1A60U, 0x2F6EU, 0x0ECDU, 0x1EA0U, 0x1AB1U, 0x20EDU, 0x1545U, 0x041AU, 0x11B8U, 0x0EEAU, 0x181BU, 0x04A6U, 0x0A7BU,
@@ -149,7 +149,7 @@ const std::array<ushort, 1024> RLWEQ12289N2048::OmegasInvMontgomery =
 	0x1199U, 0x08D1U, 0x0589U, 0x19D5U, 0x23F2U, 0x16CBU, 0x1313U, 0x207AU, 0x1363U, 0x0EA0U, 0x2621U, 0x2411U, 0x192CU, 0x1A2DU, 0x019CU, 0x1C13U
 };
 
-const std::array<ushort, 2048> RLWEQ12289N2048::PsisBitrevMontgomery =
+const std::vector<ushort> RLWEQ12289N2048::PsisBitrevMontgomery =
 {
 	0x0FEBU, 0x1B3EU, 0x1334U, 0x10E4U, 0x1C2AU, 0x0CBEU, 0x0879U, 0x2DF7U, 0x2247U, 0x2BF0U, 0x18DCU, 0x03FAU, 0x15C6U, 0x07B5U, 0x04FEU, 0x0928U,
 	0x2586U, 0x2B5BU, 0x17E6U, 0x2117U, 0x1E49U, 0x2BE7U, 0x1ABCU, 0x0F14U, 0x1550U, 0x1161U, 0x2134U, 0x0093U, 0x15A1U, 0x1D74U, 0x1D4CU, 0x1173U,
@@ -281,7 +281,7 @@ const std::array<ushort, 2048> RLWEQ12289N2048::PsisBitrevMontgomery =
 	0x1266U, 0x06EDU, 0x0EA8U, 0x152CU, 0x0D69U, 0x27FFU, 0x1B0DU, 0x1B27U, 0x2753U, 0x1437U, 0x19F7U, 0x011FU, 0x1A3AU, 0x2E13U, 0x16E9U, 0x06A3U
 };
 
-const std::array<ushort, 2048> RLWEQ12289N2048::PsisInvMontgomery =
+const std::vector<ushort> RLWEQ12289N2048::PsisInvMontgomery =
 {
 	0x0080U, 0x27D2U, 0x198FU, 0x2617U, 0x1601U, 0x2984U, 0x0F10U, 0x237EU, 0x07E4U, 0x015DU, 0x20D1U, 0x1A8FU, 0x15B9U, 0x191EU, 0x15B0U, 0x0B11U,
 	0x1684U, 0x2604U, 0x1858U, 0x0098U, 0x1D49U, 0x275AU, 0x1E3BU, 0x1121U, 0x0D4CU, 0x11E3U, 0x0C25U, 0x155FU, 0x1C9FU, 0x1DF8U, 0x288AU, 0x28CCU,
@@ -413,7 +413,7 @@ const std::array<ushort, 2048> RLWEQ12289N2048::PsisInvMontgomery =
 	0x1782U, 0x2287U, 0x264FU, 0x2D6DU, 0x19B2U, 0x1CBAU, 0x181EU, 0x260EU, 0x07F4U, 0x2A58U, 0x2A03U, 0x2552U, 0x1279U, 0x064EU, 0x1792U, 0x1B81U
 };
 
-const std::array<ushort, 2048> RLWEQ12289N2048::BitRevTable =
+const std::vector<ushort> RLWEQ12289N2048::BitRevTable =
 {
 	0x0000U, 0x0400U, 0x0200U, 0x0600U, 0x0100U, 0x0500U, 0x0300U, 0x0700U, 0x0080U, 0x0480U, 0x0280U, 0x0680U, 0x0180U, 0x0580U, 0x0380U, 0x0780U,
 	0x0040U, 0x0440U, 0x0240U, 0x0640U, 0x0140U, 0x0540U, 0x0340U, 0x0740U, 0x00C0U, 0x04C0U, 0x02C0U, 0x06C0U, 0x01C0U, 0x05C0U, 0x03C0U, 0x07C0U,
@@ -822,7 +822,7 @@ ushort RLWEQ12289N2048::MontgomeryReduce(uint X)
 	return static_cast<ushort>(X >> RLWE_RLOG);
 }
 
-void RLWEQ12289N2048::MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::array<ushort, RLWE_N> &Factors)
+void RLWEQ12289N2048::MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::vector<ushort> &Factors)
 {
 	const uint RLSH = (1UL << RLWE_RLOG) - 1;
 	size_t i;
@@ -841,9 +841,9 @@ void RLWEQ12289N2048::MulCoefficients(std::array<ushort, RLWE_N> &Poly, const st
 	}
 }
 
-void RLWEQ12289N2048::Ntt(std::array<ushort, RLWE_N> &A, const std::array<ushort, RLWE_N / 2> &Omega)
+void RLWEQ12289N2048::Ntt(std::array<ushort, RLWE_N> &A, const std::vector<ushort> &Omega)
 {
-	uint distance;
+	size_t distance;
 	size_t start;
 	size_t i;
 	size_t j;
@@ -873,7 +873,7 @@ void RLWEQ12289N2048::Ntt(std::array<ushort, RLWE_N> &A, const std::array<ushort
 		// odd level
 		if (i + 1 < 11)
 		{
-			distance <<= 1L;
+			distance <<= 1UL;
 
 			for (start = 0; start < distance; ++start)
 			{
@@ -1123,8 +1123,8 @@ void RLWEQ12289N2048::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 	size_t j;
 	ushort val;
 
-	MemoryTools::Copy(Seed, 0, tmpk, 0, RLWE_SEED_SIZE);
 	ctr = 0;
+	MemoryTools::Copy(Seed, 0, tmpk, 0, RLWE_SEED_SIZE);
 
 	// generate a in blocks of 64 coefficients
 	for (i = 0; i < RLWE_N / 64; ++i)

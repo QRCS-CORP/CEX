@@ -8,7 +8,7 @@
 NAMESPACE_SPHINCSPLUS
 
 using Enumeration::AsymmetricPrimitiveConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::SphincsPlusParameterConvert;
 
 class SphincsPlus::SphincsState
@@ -43,6 +43,8 @@ SphincsPlus::SphincsPlus(SphincsPlusParameters Parameters, Prngs PrngType)
 	m_sphincsState(new SphincsState(Parameters != SphincsPlusParameters::None ? Parameters :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::SphincsPlus), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::SphincsPlus), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
@@ -53,6 +55,8 @@ SphincsPlus::SphincsPlus(SphincsPlusParameters Parameters, IPrng* Rng)
 	m_sphincsState(new SphincsState(Parameters != SphincsPlusParameters::None ? Parameters :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::SphincsPlus), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Rng != nullptr ? Rng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::SphincsPlus), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
@@ -60,16 +64,8 @@ SphincsPlus::SphincsPlus(SphincsPlusParameters Parameters, IPrng* Rng)
 
 SphincsPlus::~SphincsPlus()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_sphincsState->Destroyed)
 	{
@@ -138,6 +134,7 @@ const size_t SphincsPlus::PrivateKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -168,6 +165,7 @@ const size_t SphincsPlus::PublicKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -198,6 +196,7 @@ const size_t SphincsPlus::SignatureSize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("SignatureSize"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -217,7 +216,6 @@ AsymmetricKeyPair* SphincsPlus::Generate()
 			pk.resize(SPXPS128SHAKE::SPHINCS_PUBLICKEY_SIZE);
 			sk.resize(SPXPS128SHAKE::SPHINCS_SECRETKEY_SIZE);
 			SPXPS128SHAKE::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		case SphincsPlusParameters::SPXPS2S192SHAKE:
@@ -225,7 +223,6 @@ AsymmetricKeyPair* SphincsPlus::Generate()
 			pk.resize(SPXPS192SHAKE::SPHINCS_PUBLICKEY_SIZE);
 			sk.resize(SPXPS192SHAKE::SPHINCS_SECRETKEY_SIZE);
 			SPXPS192SHAKE::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		case SphincsPlusParameters::SPXPS3S256SHAKE:
@@ -233,11 +230,11 @@ AsymmetricKeyPair* SphincsPlus::Generate()
 			pk.resize(SPXPS256SHAKE::SPHINCS_PUBLICKEY_SIZE);
 			sk.resize(SPXPS256SHAKE::SPHINCS_SECRETKEY_SIZE);
 			SPXPS256SHAKE::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -262,13 +259,13 @@ const void SphincsPlus::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::SignaturePublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_sphincsState->Parameters = static_cast<SphincsPlusParameters>(m_publicKey->Parameters());
 		m_sphincsState->Signer = false;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_sphincsState->Parameters = static_cast<SphincsPlusParameters>(m_privateKey->Parameters());
 		m_sphincsState->Signer = true;
 	}
@@ -314,6 +311,7 @@ size_t SphincsPlus::Sign(const std::vector<byte> &Message, std::vector<byte> &Si
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -354,6 +352,7 @@ bool SphincsPlus::Verify(const std::vector<byte> &Signature, std::vector<byte> &
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The SphincsPlus parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}

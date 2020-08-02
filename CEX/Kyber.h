@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -107,8 +107,8 @@ private:
 	const size_t SECRET_SIZE = 32;
 	class MlweState;
 	std::unique_ptr<MlweState> m_mlweState;
-	std::unique_ptr<AsymmetricKey> m_privateKey;
-	std::unique_ptr<AsymmetricKey> m_publicKey;
+	AsymmetricKey* m_privateKey;
+	AsymmetricKey* m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -130,7 +130,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Parameters">The parameter set enumeration name; the default is S2/K3</param>
-	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
+	/// <param name="PrngType">The seed prng function type; the default is the BCR (Rijndael-256 CTR) generator</param>
 	/// 
 	/// <exception cref="CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
 	Kyber(KyberParameters Parameters = KyberParameters::MLWES2Q3329N256, Prngs PrngType = Prngs::BCR);

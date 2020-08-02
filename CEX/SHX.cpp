@@ -3,20 +3,20 @@
 #include "IntegerTools.h"
 #include "KdfFromName.h"
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 #	include "UInt512.h"
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 #	include "UInt256.h"
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 #	include "UInt128.h"
 #endif
 
 NAMESPACE_BLOCK
 
 using namespace Cipher::Block::SerpentBase;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Enumeration::Kdfs;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 class SHX::ShxState
 {
@@ -67,7 +67,8 @@ public:
 SHX::SHX(BlockCipherExtensions CipherExtension)
 	:
 	m_shxState(new ShxState(CipherExtension, true)),
-	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
+	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? 
+		nullptr :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_legalKeySizes(CalculateKeySizes(CipherExtension))
 {
@@ -75,7 +76,8 @@ SHX::SHX(BlockCipherExtensions CipherExtension)
 
 SHX::SHX(IKdf* Kdf)
 	:
-	m_shxState(new ShxState(Kdf != nullptr ? static_cast<BlockCipherExtensions>(Kdf->Enumeral()) :
+	m_shxState(new ShxState(Kdf != nullptr ? 
+		static_cast<BlockCipherExtensions>(Kdf->Enumeral()) :
 		BlockCipherExtensions::None,
 		false)),
 	m_kdfGenerator(Kdf),
@@ -91,13 +93,6 @@ SHX::~SHX()
 		if (m_kdfGenerator != nullptr)
 		{
 			m_kdfGenerator.reset(nullptr);
-		}
-	}
-	else
-	{
-		if (m_kdfGenerator != nullptr)
-		{
-			m_kdfGenerator.release();
 		}
 	}
 
@@ -148,6 +143,7 @@ const BlockCiphers SHX::Enumeral()
 		default:
 		{
 			tmpn = BlockCiphers::Serpent;
+			break;
 		}
 	}
 
@@ -535,7 +531,7 @@ void SHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 void SHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
+#if (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
@@ -547,9 +543,9 @@ void SHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 void SHX::Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if (!defined(__AVX512__)) && defined(__AVX2__)
+#if (!defined(CEX_HAS_AVX512)) && defined(CEX_HAS_AVX2)
 	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
-#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
+#elif (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
 #else
@@ -566,12 +562,12 @@ void SHX::Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vect
 
 void SHX::Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 	DecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
-#elif (!defined(__AVX512__)) && defined(__AVX2__)
+#elif (!defined(CEX_HAS_AVX512)) && defined(CEX_HAS_AVX2)
 	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 	DecryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);
-#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
+#elif (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
 	DecryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);
@@ -688,7 +684,7 @@ void SHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 void SHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
+#if (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
@@ -700,9 +696,9 @@ void SHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 void SHX::Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if (!defined(__AVX512__)) && defined(__AVX2__)
+#if (!defined(CEX_HAS_AVX512)) && defined(CEX_HAS_AVX2)
 	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
-#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
+#elif (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
 #else
@@ -719,12 +715,12 @@ void SHX::Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vect
 
 void SHX::Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 	EncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
-#elif (!defined(__AVX512__)) && defined(__AVX2__)
+#elif (!defined(CEX_HAS_AVX512)) && defined(CEX_HAS_AVX2)
 	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 	EncryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);
-#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
+#elif (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
 	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_shxState->RoundKeys);
 	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_shxState->RoundKeys);
 	EncryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_shxState->RoundKeys);

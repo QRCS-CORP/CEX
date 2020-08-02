@@ -5,9 +5,9 @@ NAMESPACE_MAC
 
 using Enumeration::BlockCipherConvert;
 using Cipher::Block::Mode::CBC;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Enumeration::MacConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 class CMAC::CmacState
 {
@@ -16,12 +16,16 @@ public:
 	std::vector<byte> Buffer;
 	std::vector<byte> State;
 	size_t Position;
+	bool IsInitialized;
+	std::unique_ptr<SymmetricKey> LuKey;
 
 	CmacState(size_t StateSize, size_t BufferSize)
 		:
 		Buffer(BufferSize),
 		State(StateSize),
-		Position(0)
+		Position(0),
+		IsInitialized(false),
+		LuKey(nullptr)
 	{
 	}
 
@@ -35,6 +39,8 @@ public:
 		Position = 0;
 		MemoryTools::Clear(Buffer, 0, Buffer.size());
 		MemoryTools::Clear(State, 0, State.size());
+		IsInitialized = false;
+		LuKey.reset(nullptr);
 	}
 };
 
@@ -58,12 +64,10 @@ CMAC::CMAC(BlockCiphers CipherType)
 		MINSALT_LENGTH,
 #endif
 		BLOCK_SIZE),
-	m_cbcMode(CipherType != BlockCiphers::None ? new CBC(CipherType) :
+	m_cbcMode(CipherType != BlockCiphers::None ? 
+		new CBC(CipherType) :
 		throw CryptoMacException(std::string("CMAC"), std::string("Constructor"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam)),
-	m_cmacState(new CmacState(BLOCK_SIZE, BLOCK_SIZE)),
-	m_isDestroyed(true),
-	m_isInitialized(false),
-	m_luKey(nullptr)
+	m_cmacState(new CmacState(BLOCK_SIZE, BLOCK_SIZE))
 {
 }
 
@@ -72,7 +76,8 @@ CMAC::CMAC(IBlockCipher* Cipher)
 	MacBase(
 		BLOCK_SIZE,
 		Macs::CMAC,
-		(Cipher != nullptr ? MacConvert::ToName(Macs::CMAC) + std::string("-") + BlockCipherConvert::ToName(Cipher->Enumeral()) :
+		(Cipher != nullptr ? 
+			MacConvert::ToName(Macs::CMAC) + std::string("-") + BlockCipherConvert::ToName(Cipher->Enumeral()) :
 			std::string("")),
 		std::vector<SymmetricKeySize> {
 			SymmetricKeySize(32, 0, 32),
@@ -86,39 +91,23 @@ CMAC::CMAC(IBlockCipher* Cipher)
 		MINSALT_LENGTH,
 #endif
 		BLOCK_SIZE),
-	m_cbcMode(Cipher != nullptr ? new CBC(Cipher) :
+	m_cbcMode(Cipher != nullptr ? 
+		new CBC(Cipher) :
 		throw CryptoMacException(std::string("CMAC"), std::string("Constructor"), std::string("The cipher can not be null!"), ErrorCodes::IllegalOperation)),
-	m_cmacState(new CmacState(BLOCK_SIZE, BLOCK_SIZE)),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_luKey(nullptr)
+	m_cmacState(new CmacState(BLOCK_SIZE, BLOCK_SIZE))
 {
 }
 
 CMAC::~CMAC()
 {
-	m_isInitialized = false;
+	if (m_cbcMode != nullptr)
+	{
+		m_cbcMode.reset(nullptr);
+	}
 
 	if (m_cmacState != nullptr)
 	{
 		m_cmacState.reset(nullptr);
-	}
-	if (m_luKey != nullptr)
-	{
-		m_luKey.reset(nullptr);
-	}
-
-	if (m_cbcMode != nullptr)
-	{
-		if (m_isDestroyed)
-		{
-			m_cbcMode.reset(nullptr);
-			m_isDestroyed = false;
-		}
-		else
-		{
-			m_cbcMode.release();
-		}
 	}
 }
 
@@ -131,7 +120,7 @@ const BlockCiphers CMAC::CipherType()
 
 const bool CMAC::IsInitialized() 
 { 
-	return m_isInitialized;
+	return m_cmacState->IsInitialized;
 }
 
 //~~~Public Functions~~~//
@@ -144,7 +133,7 @@ void CMAC::Clear()
 
 void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -164,7 +153,7 @@ void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -177,11 +166,11 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 	if (m_cmacState->Position != BLOCK_SIZE)
 	{
-		MemoryTools::XOR(m_luKey->Nonce(), 0, m_cmacState->Buffer, 0, TagSize());
+		MemoryTools::XOR(m_cmacState->LuKey->IV(), 0, m_cmacState->Buffer, 0, TagSize());
 	}
 	else
 	{
-		MemoryTools::XOR(m_luKey->Key(), 0, m_cmacState->Buffer, 0, TagSize());
+		MemoryTools::XOR(m_cmacState->LuKey->Key(), 0, m_cmacState->Buffer, 0, TagSize());
 	}
 
 	m_cbcMode->EncryptBlock(m_cmacState->Buffer, 0, m_cmacState->State, 0);
@@ -195,7 +184,7 @@ size_t CMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	std::vector<byte> tag(TagSize());
 
 	Finalize(tag, 0);
-	SecureMove(tag, Output, OutOffset);
+	SecureMove(tag, 0, Output, OutOffset, tag.size());
 	Reset();
 
 	return TagSize();
@@ -221,7 +210,7 @@ void CMAC::Initialize(ISymmetricKey &Parameters)
 	}
 #endif
 
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
@@ -236,11 +225,11 @@ void CMAC::Initialize(ISymmetricKey &Parameters)
 	DoubleLu(k1, k2);
 
 	// store them in a symmetric-key
-	m_luKey.reset(new SymmetricKey(k1, k2));
+	m_cmacState->LuKey.reset(new SymmetricKey(k1, k2));
 
 	// re-initialize the cipher
 	m_cbcMode->Initialize(true, kp);
-	m_isInitialized = true;
+	m_cmacState->IsInitialized = true;
 }
 
 void CMAC::Reset()
@@ -248,17 +237,17 @@ void CMAC::Reset()
 	MemoryTools::Clear(m_cbcMode->IV(), 0, BLOCK_SIZE);
 	m_cmacState->Reset();
 
-	if (m_luKey != nullptr)
+	if (m_cmacState->LuKey != nullptr)
 	{
-		m_luKey.reset(nullptr);
+		m_cmacState->LuKey.reset(nullptr);
 	}
 
-	m_isInitialized = false;
+	m_cmacState->IsInitialized = false;
 }
 
 void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}

@@ -14,7 +14,7 @@ void MPKCUtils::LayerIn(ulong Data[2][64], const ulong* Bits, uint Lgs)
 	size_t i;
 	size_t j;
 	size_t k;
-	uint s;
+	size_t s;
 
 	k = 0;
 	s = 1UL << Lgs;
@@ -144,7 +144,8 @@ void MPKCUtils::ApplyBenes(byte* R, const byte* Bits, bool Reverse)
 
 		bptr += inc;
 		LayerIn(riv, biv, iter);
-	} while (iter != 0);
+	} 
+	while (iter != 0);
 
 	Transpose64x64(rih[0], riv[0]);
 	Transpose64x64(rih[1], riv[1]);
@@ -163,7 +164,8 @@ void MPKCUtils::ApplyBenes(byte* R, const byte* Bits, bool Reverse)
 		bptr += inc;
 		Transpose64x64(bih, biv);
 		LayerEx(rih[0], bih, iter);
-	} while (iter != 0);
+	}
+	while (iter != 0);
 
 	Transpose64x64(riv[0], rih[0]);
 	Transpose64x64(riv[1], rih[1]);
@@ -557,7 +559,6 @@ void MPKCUtils::Transpose64x64(ulong* Output, const ulong* Input)
 	do
 	{
 		--d;
-
 		s = 1ULL << d;
 
 		for (i = 0; i < 64; i += s * 2)
@@ -570,7 +571,8 @@ void MPKCUtils::Transpose64x64(ulong* Output, const ulong* Input)
 				Output[j + s] = y;
 			}
 		}
-	} while (d != 0);
+	} 
+	while (d != 0);
 }
 
 // util.c //
@@ -617,22 +619,22 @@ void MPKCUtils::Clear64(ulong* A, size_t Count)
 
 uint MPKCUtils::Le8To32(const byte* Input)
 {
-	return ((ulong)Input[0]) |
-		((ulong)Input[1] << 8) |
-		((ulong)Input[2] << 16) |
-		((ulong)Input[3] << 24);
+	return (static_cast<ulong>(Input[0])) |
+		(static_cast<ulong>(Input[1]) << 8) |
+		(static_cast<ulong>(Input[2]) << 16) |
+		(static_cast<ulong>(Input[3]) << 24);
 }
 
 ulong MPKCUtils::Le8To64(const byte* Input)
 {
-	return ((ulong)Input[0]) |
-		((ulong)Input[1] << 8) |
-		((ulong)Input[2] << 16) |
-		((ulong)Input[3] << 24) |
-		((ulong)Input[4] << 32) |
-		((ulong)Input[5] << 40) |
-		((ulong)Input[6] << 48) |
-		((ulong)Input[7] << 56);
+	return (static_cast<ulong>(Input[0])) |
+		(static_cast<ulong>(Input[1]) << 8) |
+		(static_cast<ulong>(Input[2]) << 16) |
+		(static_cast<ulong>(Input[3]) << 24) |
+		(static_cast<ulong>(Input[4]) << 32) |
+		(static_cast<ulong>(Input[5]) << 40) |
+		(static_cast<ulong>(Input[6]) << 48) |
+		(static_cast<ulong>(Input[7]) << 56);
 }
 
 void MPKCUtils::Le32To8(byte* Output, uint Value)
@@ -732,7 +734,7 @@ int32_t MPKCUtils::Verify(const byte* A, const byte* B, size_t Length)
 		d |= A[i] ^ B[i];
 	}
 
-	return (int32_t)(1 & ((d - 1) >> 8)) - 1;
+	return static_cast<int>(1 & ((d - 1) >> 8)) - 1;
 }
 
 //~~~N4096T12~~~//

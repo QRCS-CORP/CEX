@@ -1,19 +1,22 @@
 #include "ACS.h"
 #include "CpuDetect.h"
 #include "IntegerTools.h"
-#include "MacFromName.h"
+#include "KMAC.h"
 #include "MemoryTools.h"
 #include "SHAKE.h"
+#include "StreamAuthenticators.h"
 #include <wmmintrin.h>
 
 NAMESPACE_STREAM
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Mac::KMAC;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 using Enumeration::ShakeModes;
+using Enumeration::StreamAuthenticators;
 using Enumeration::StreamCipherConvert;
 
-const std::vector<byte> ACS::RCS_INFO = { 0x52, 0x43, 0x53, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x63 };
 const __m128i ACS::BLEND_MASK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
 const __m128i ACS::SHIFT_MASK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
 
@@ -27,15 +30,17 @@ public:
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
 	SecureVector<byte> Name;
+	std::vector<SymmetricKeySize> LegalKeySizes;
 	std::vector<byte> Nonce;
 	ulong Counter;
 	ushort Rounds;
-	StreamAuthenticators Authenticator;
+	KmacModes Authenticator;
 	ShakeModes Mode;
-	bool Encryption;
+	bool IsAuthenticated;
+	bool IsEncryption;
 	bool Initialized;
 
-	AcsState()
+	AcsState(bool Authenticate)
 		:
 		RoundKeys(0),
 		Associated(0),
@@ -43,12 +48,17 @@ public:
 		MacKey(0),
 		MacTag(0),
 		Name(0),
+		LegalKeySizes{
+			SymmetricKeySize(IK256_SIZE, BLOCK_SIZE, INFO_SIZE),
+			SymmetricKeySize(IK512_SIZE, BLOCK_SIZE, INFO_SIZE),
+			SymmetricKeySize(IK1024_SIZE, BLOCK_SIZE, INFO_SIZE) },
 		Nonce(BLOCK_SIZE, 0x00),
 		Counter(0),
 		Rounds(0),
-		Authenticator(StreamAuthenticators::None),
+		Authenticator(Authenticator),
 		Mode(ShakeModes::None),
-		Encryption(false),
+		IsAuthenticated(Authenticate),
+		IsEncryption(false),
 		Initialized(false)
 	{
 	}
@@ -61,12 +71,17 @@ public:
 		MacKey(0),
 		MacTag(0),
 		Name(0),
+		LegalKeySizes{
+			SymmetricKeySize(IK256_SIZE, BLOCK_SIZE, INFO_SIZE),
+			SymmetricKeySize(IK512_SIZE, BLOCK_SIZE, INFO_SIZE),
+			SymmetricKeySize(IK1024_SIZE, BLOCK_SIZE, INFO_SIZE) },
 		Nonce(BLOCK_SIZE, 0x00),
 		Counter(0),
 		Rounds(0),
-		Authenticator(StreamAuthenticators::None),
+		Authenticator(KmacModes::None),
 		Mode(ShakeModes::None),
-		Encryption(false),
+		IsAuthenticated(false),
+		IsEncryption(false),
 		Initialized(false)
 	{
 		DeSerialize(State);
@@ -80,12 +95,14 @@ public:
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
 		MemoryTools::Clear(Name, 0, Name.size());
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
+		LegalKeySizes.clear();
 
 		Counter = 0;
 		Rounds = 0;
-		Authenticator = StreamAuthenticators::None;
+		Authenticator = KmacModes::None;
 		Mode = ShakeModes::None;
-		Encryption = false;
+		IsAuthenticated = false;
+		IsEncryption = false;
 		Initialized = false;
 	}
 
@@ -142,12 +159,14 @@ public:
 		MemoryTools::CopyToObject(SecureState, soff, &Rounds, sizeof(ushort));
 		soff += sizeof(ushort);
 
-		MemoryTools::CopyToObject(SecureState, soff, &Authenticator, sizeof(StreamAuthenticators));
-		soff += sizeof(StreamAuthenticators);
+		MemoryTools::CopyToObject(SecureState, soff, &Authenticator, sizeof(KmacModes));
+		soff += sizeof(KmacModes);
 		MemoryTools::CopyToObject(SecureState, soff, &Mode, sizeof(ShakeModes));
 		soff += sizeof(ShakeModes);
 
-		MemoryTools::CopyToObject(SecureState, soff, &Encryption, sizeof(bool));
+		MemoryTools::CopyToObject(SecureState, soff, &IsAuthenticated, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyToObject(SecureState, soff, &IsEncryption, sizeof(bool));
 		soff += sizeof(bool);
 		MemoryTools::CopyToObject(SecureState, soff, &Initialized, sizeof(bool));
 	}
@@ -161,17 +180,16 @@ public:
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
 		MemoryTools::Clear(Name, 0, Name.size());
 		MemoryTools::Clear(Nonce, 0, Nonce.size());
-
 		Counter = 0;
 		Rounds = 0;
-		Encryption = false;
+		IsEncryption = false;
 		Initialized = false;
 	}
 
 	SecureVector<byte> Serialize()
 	{
 		const size_t STASZE = (RoundKeys.size() * sizeof(__m128i)) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
-			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(StreamAuthenticators) + sizeof(ShakeModes) + (2 * sizeof(bool)) + (7 * sizeof(ushort));
+			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(KmacModes) + sizeof(ShakeModes) + (3 * sizeof(bool)) + (7 * sizeof(ushort));
 
 		size_t soff;
 		ushort vlen;
@@ -225,12 +243,14 @@ public:
 		MemoryTools::CopyFromObject(&Rounds, state, soff, sizeof(ushort));
 		soff += sizeof(ushort);
 
-		MemoryTools::CopyFromObject(&Authenticator, state, soff, sizeof(StreamAuthenticators));
-		soff += sizeof(StreamAuthenticators);
+		MemoryTools::CopyFromObject(&Authenticator, state, soff, sizeof(KmacModes));
+		soff += sizeof(KmacModes);
 		MemoryTools::CopyFromObject(&Mode, state, soff, sizeof(ShakeModes));
 		soff += sizeof(ShakeModes);
 
-		MemoryTools::CopyFromObject(&Encryption, state, soff, sizeof(bool));
+		MemoryTools::CopyFromObject(&IsAuthenticated, state, soff, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyFromObject(&IsEncryption, state, soff, sizeof(bool));
 		soff += sizeof(bool);
 		MemoryTools::CopyFromObject(&Initialized, state, soff, sizeof(bool));
 
@@ -240,15 +260,10 @@ public:
 
 //~~~Constructor~~~//
 
-ACS::ACS(StreamAuthenticators AuthenticatorType)
+ACS::ACS(bool Authenticate)
 	:
-	m_acsState(new AcsState()),
-	m_legalKeySizes{
-		SymmetricKeySize(32, BLOCK_SIZE, INFO_SIZE),
-		SymmetricKeySize(64, BLOCK_SIZE, INFO_SIZE),
-		SymmetricKeySize(128, BLOCK_SIZE, INFO_SIZE)},
-	m_macAuthenticator(AuthenticatorType == StreamAuthenticators::None ? nullptr :
-		Helper::MacFromName::GetInstance(AuthenticatorType)),
+	m_acsState(new AcsState(Authenticate)),
+	m_macAuthenticator(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 #if !defined(CEX_AVX_INTRINSICS)
@@ -260,19 +275,16 @@ ACS::ACS(SecureVector<byte> &State)
 	:
 	m_acsState(State.size() > STATE_THRESHOLD ? new AcsState(State) :
 		throw CryptoSymmetricException(std::string("ACS"), std::string("Constructor"), std::string("The State array is invalid!"), ErrorCodes::InvalidKey)),
-	m_legalKeySizes{
-		SymmetricKeySize(32, BLOCK_SIZE, INFO_SIZE),
-		SymmetricKeySize(64, BLOCK_SIZE, INFO_SIZE),
-		SymmetricKeySize(128, BLOCK_SIZE, INFO_SIZE) },
-	m_macAuthenticator(m_acsState->Authenticator == StreamAuthenticators::None ? nullptr :
-		Helper::MacFromName::GetInstance(m_acsState->Authenticator)),
+	m_macAuthenticator(m_acsState->Authenticator == KmacModes::None ?
+		nullptr :
+		new KMAC(m_acsState->Authenticator)),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 #if !defined(CEX_AVX_INTRINSICS)
 	throw CryptoSymmetricException(StreamCipherConvert::ToName(StreamCiphers::RCS), std::string("Constructor"), std::string("AVX is not supported on this system!"), ErrorCodes::NotSupported);
 #endif
 
-	if (m_acsState->Authenticator != StreamAuthenticators::None)
+	if (m_acsState->Authenticator != KmacModes::None)
 	{
 		// initialize the mac
 		SymmetricKey kpm(m_acsState->MacKey);
@@ -295,7 +307,10 @@ const StreamCiphers ACS::Enumeral()
 	StreamAuthenticators auth;
 	StreamCiphers tmpn;
 
-	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
+	auth = IsAuthenticator() && m_macAuthenticator != nullptr ?
+		static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) :
+		StreamAuthenticators::None;
+
 	tmpn = StreamCipherConvert::FromDescription(StreamCiphers::RCS, auth);
 
 	return tmpn;
@@ -303,12 +318,12 @@ const StreamCiphers ACS::Enumeral()
 
 const bool ACS::IsAuthenticator()
 {
-	return (m_macAuthenticator != nullptr);
+	return m_acsState->IsAuthenticated;
 }
 
 const bool ACS::IsEncryption()
 {
-	return m_acsState->Encryption;
+	return m_acsState->IsEncryption;
 }
 
 const bool ACS::IsInitialized()
@@ -323,7 +338,7 @@ const bool ACS::IsParallel()
 
 const std::vector<SymmetricKeySize> &ACS::LegalKeySizes()
 {
-	return m_legalKeySizes;
+	return m_acsState->LegalKeySizes;
 }
 
 const std::string ACS::Name()
@@ -352,16 +367,31 @@ ParallelOptions &ACS::ParallelProfile()
 
 const std::vector<byte> ACS::Tag()
 {
+	if (m_acsState->MacTag.size() == 0 || IsAuthenticator() == false)
+	{
+		throw CryptoSymmetricException(std::string("RCS"), std::string("Tag"), std::string("The cipher is not initialized for authentication or has not run!"), ErrorCodes::NotInitialized);
+	}
+
 	return SecureUnlock(m_acsState->MacTag);
 }
 
 const void ACS::Tag(SecureVector<byte> &Output)
 {
+	if (m_acsState->MacTag.size() == 0 || IsAuthenticator() == false)
+	{
+		throw CryptoSymmetricException(std::string("RCS"), std::string("Tag"), std::string("The cipher is not initialized for authentication or has not run!"), ErrorCodes::NotInitialized);
+	}
+
 	SecureCopy(m_acsState->MacTag, 0, Output, 0, m_acsState->MacTag.size());
 }
 
 const size_t ACS::TagSize()
 {
+	if (IsInitialized() == false)
+	{
+		throw CryptoSymmetricException(std::string("RCS"), std::string("TagSize"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
+	}
+
 	return IsAuthenticator() ? m_macAuthenticator->TagSize() : 0;
 }
 
@@ -375,7 +405,7 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.KeySizes().NonceSize() != BLOCK_SIZE)
+	if (Parameters.KeySizes().IVSize() != BLOCK_SIZE)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}
@@ -393,24 +423,39 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 
 	// reset for a new key
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
 
-	// set up the state members
-	m_acsState->Authenticator = m_macAuthenticator != nullptr ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
 	// set the initial processed-bytes count to one
 	m_acsState->Counter = 1;
-	// set the number of rounds
-	m_acsState->Rounds = Parameters.KeySizes().KeySize() != 128 ? static_cast<ushort>((Parameters.KeySizes().KeySize() / 4)) + 14 : 38;
 
-	// create the cSHAKE customization string
-	m_acsState->Custom.resize(Parameters.KeySizes().InfoSize() + RCS_INFO.size());
-	// copy the version string to the customization parameter
-	MemoryTools::Copy(RCS_INFO, 0, m_acsState->Custom, 0, RCS_INFO.size());
-	// copy the user defined string to the customization parameter
-	MemoryTools::Copy(Parameters.Info(), 0, m_acsState->Custom, RCS_INFO.size(), Parameters.KeySizes().InfoSize());
+	// set the number of rounds -v1.0d
+	m_acsState->Rounds = (Parameters.KeySizes().KeySize() == IK256_SIZE) ?
+		RK256_COUNT :
+		(Parameters.KeySizes().KeySize() == IK512_SIZE) ?
+			RK512_COUNT :
+			RK1024_COUNT;
+
+	if (m_acsState->IsAuthenticated)
+	{
+		m_acsState->Authenticator = (Parameters.KeySizes().KeySize() == IK1024_SIZE) ?
+			KmacModes::KMAC1024 :
+			(Parameters.KeySizes().KeySize() == IK512_SIZE) ?
+			KmacModes::KMAC512 :
+			KmacModes::KMAC256;
+
+		m_macAuthenticator.reset(new KMAC(m_acsState->Authenticator));
+	}
+
+	// store the customization string -v1.0d
+	if (Parameters.KeySizes().InfoSize() != 0)
+	{
+		m_acsState->Custom.resize(Parameters.KeySizes().InfoSize());
+		// copy the user defined string to the customization parameter
+		MemoryTools::Copy(Parameters.Info(), 0, m_acsState->Custom, 0, Parameters.KeySizes().InfoSize());
+	}
 
 	// create the cSHAKE name string
 	std::string tmpn = Name();
@@ -425,16 +470,22 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	MemoryTools::CopyFromObject(tmpn.data(), m_acsState->Name, sizeof(ulong) + sizeof(ushort), tmpn.size());
 
 	// copy the nonce to state
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_acsState->Nonce, 0, BLOCK_SIZE);
+	MemoryTools::Copy(Parameters.IV(), 0, m_acsState->Nonce, 0, BLOCK_SIZE);
+
 	// cipher key size determines key expansion function and Mac generator type; 256 or 512-bit
-	m_acsState->Mode = (Parameters.KeySizes().KeySize() == 64) ? ShakeModes::SHAKE512 : (Parameters.KeySizes().KeySize() == 32) ? ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
+	m_acsState->Mode = (Parameters.KeySizes().KeySize() == IK512_SIZE) ?
+		ShakeModes::SHAKE512 : 
+		(Parameters.KeySizes().KeySize() == IK256_SIZE) ?
+			ShakeModes::SHAKE256 : 
+			ShakeModes::SHAKE1024;
+
 	// initialize the generator
 	Kdf::SHAKE gen(m_acsState->Mode);
 	// key with cSHAKE(k,c,n)
 	gen.Initialize(Parameters.SecureKey(), m_acsState->Custom, m_acsState->Name);
 
 	// calculate the size of the round-key array
-	const size_t RNKLEN = (BLOCK_SIZE / sizeof(__m128i)) * (m_acsState->Rounds + 1);
+	const size_t RNKLEN = static_cast<size_t>(BLOCK_SIZE / sizeof(__m128i)) * static_cast<size_t>(m_acsState->Rounds + 1UL);
 	m_acsState->RoundKeys.resize(RNKLEN);
 	SecureVector<byte> tmpr(RNKLEN * sizeof(__m128i));
 	// generate the cipher round-keys
@@ -459,11 +510,11 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_macAuthenticator->Initialize(kpm);
 		// store the key
 		m_acsState->MacKey.resize(mack.size());
-		SecureMove(mack, m_acsState->MacKey, 0);
-		m_acsState->MacTag.resize(TagSize());
+		SecureMove(mack, 0, m_acsState->MacKey, 0, mack.size());
+		m_acsState->MacTag.resize(m_macAuthenticator->TagSize());
 	}
 
-	m_acsState->Encryption = Encryption;
+	m_acsState->IsEncryption = Encryption;
 	m_acsState->Initialized = true;
 }
 
@@ -479,7 +530,7 @@ void ACS::ParallelMaxDegree(size_t Degree)
 
 void ACS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -498,9 +549,9 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the block-size!");
 
-	if (IsEncryption())
+	if (IsEncryption() == true)
 	{
-		if (IsAuthenticator())
+		if (IsAuthenticator() == true)
 		{
 			if (Output.size() < Length + OutOffset + m_macAuthenticator->TagSize())
 			{
@@ -589,7 +640,7 @@ void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Auth
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
-	SecureMove(mack, State->MacKey, 0);
+	SecureMove(mack, 0, State->MacKey, 0, mack.size());
 }
 
 void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
@@ -598,7 +649,8 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 	bctr = 0;
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
+
 	const size_t AVX512BLK = 16 * BLOCK_SIZE;
 	if (Length >= AVX512BLK)
 	{
@@ -644,7 +696,9 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 			bctr += AVX512BLK;
 		}
 	}
-#elif defined(__AVX2__)
+
+#elif defined(CEX_HAS_AVX2)
+
 	const size_t AVX2BLK = 8 * BLOCK_SIZE;
 	if (Length >= AVX2BLK)
 	{
@@ -674,7 +728,9 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 			bctr += AVX2BLK;
 		}
 	}
-#elif defined(__AVX__)
+
+#elif defined(CEX_HAS_AVX)
+
 	const size_t AVXBLK = 4 * BLOCK_SIZE;
 	if (Length >= AVXBLK)
 	{
@@ -696,6 +752,7 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 			bctr += AVXBLK;
 		}
 	}
+
 #endif
 
 	const size_t BLKALN = Length - (Length % BLOCK_SIZE);
@@ -752,7 +809,7 @@ void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 	std::vector<byte> tmpc(BLOCK_SIZE);
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
+	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
 		std::vector<byte> thdc(BLOCK_SIZE);

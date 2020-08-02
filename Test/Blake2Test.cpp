@@ -28,8 +28,8 @@ namespace Test
 	using Digest::Blake512;
 	using Digest::BlakeParams;
 	using Exception::CryptoDigestException;
-	using Utility::IntegerTools;
-	using Utility::MemoryTools;
+	using Tools::IntegerTools;
+	using Tools::MemoryTools;
 	using Prng::SecureRandom;
 #if defined(__AVX2__)
 	using Numeric::UInt256;
@@ -653,7 +653,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
 			msg.resize(INPLEN);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
+			rnd.Generate(msg, 0, msg.size());
 			reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
 
 			try
@@ -697,7 +697,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
 			msg.resize(INPLEN);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
+			rnd.Generate(msg, 0, msg.size());
 
 			try
 			{

@@ -16,7 +16,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Test::NistRng;
 	using Asymmetric::Sign::SPXP::SphincsPlus;
 	using Prng::SecureRandom;
@@ -250,7 +250,6 @@ namespace Test
 
 	void SphincsPlusTest::Integrity()
 	{
-		std::vector<byte> cpt(0);
 		std::vector<byte> msg(0);
 		std::vector<byte> sig(0);
 		NistRng gen;
@@ -302,7 +301,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Messages do not match! -SI5"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp1;
@@ -348,7 +346,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Messages do not match! -SI10"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp2;
@@ -394,7 +391,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Messages do not match! -SI15"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp3;
@@ -402,7 +398,6 @@ namespace Test
 
 	void SphincsPlusTest::Kat()
 	{
-		std::vector<byte> cpt(0);
 		std::vector<byte> msg(0);
 		std::vector<byte> sig(0);
 		NistRng gen;
@@ -443,7 +438,6 @@ namespace Test
 				throw TestException(std::string("Kat"), sgn.Name(), std::string("Messages do not match! -SK3"));
 			}
 
-			cpt.clear();
 			msg.clear();
 			sig.clear();
 			delete kp;
@@ -482,7 +476,6 @@ namespace Test
 				throw TestException(std::string("Kat"), sgn.Name(), std::string("Messages do not match! -SK6"));
 			}
 
-			cpt.clear();
 			msg.clear();
 			sig.clear();
 			delete kp;
@@ -521,7 +514,6 @@ namespace Test
 				throw TestException(std::string("Kat"), sgn.Name(), std::string("Messages do not match! -SK9"));
 			}
 
-			cpt.clear();
 			msg.clear();
 			sig.clear();
 			delete kp;
@@ -605,6 +597,8 @@ namespace Test
 			{
 				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Public key serialization test has failed! -SR2"));
 			}
+
+			delete kp;
 		}
 	}
 

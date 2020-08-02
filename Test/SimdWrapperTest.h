@@ -63,7 +63,7 @@ namespace Test
 
 			for (size_t i = 0; i < ret.size(); ++i)
 			{
-				ret[i] = Utility::IntegerTools::LeBytesTo32(Input, i * sizeof(uint));
+				ret[i] = Tools::IntegerTools::LeBytesTo32(Input, i * sizeof(uint));
 			}
 
 			return ret;

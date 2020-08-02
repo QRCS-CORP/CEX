@@ -25,11 +25,11 @@ namespace Test
 	{
 		try
 		{
-			Evaluate(Enumeration::Digests::SHA256);
-			OnProgress(std::string("Passed DigestStream SHA256 comparison tests.."));
+			Evaluate(Enumeration::Digests::SHA2256);
+			OnProgress(std::string("Passed DigestStream SHA2256 comparison tests.."));
 
-			Evaluate(Enumeration::Digests::SHA512);
-			OnProgress(std::string("Passed DigestStream SHA512 comparison tests.."));
+			Evaluate(Enumeration::Digests::SHA2512);
+			OnProgress(std::string("Passed DigestStream SHA2512 comparison tests.."));
 
 			return SUCCESS;
 		}
@@ -55,6 +55,7 @@ namespace Test
 
 		// digest instance for baseline
 		Digest::IDigest* gen = Helper::DigestFromName::GetInstance(Engine);
+		const std::string GENNME = gen->Name();
 		size_t dgtSze = gen->DigestSize();
 		std::vector<byte> hash1(dgtSze);
 		gen->Compute(data, hash1);
@@ -68,7 +69,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("Evaluate"), gen->Name(), std::string("DigestStreamTest: Expected hash is not equal! -DE1"));
+			throw TestException(std::string("Evaluate"), GENNME, std::string("DigestStreamTest: Expected hash is not equal! -DE1"));
 		}
 
 		// test byte access method
@@ -76,7 +77,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException(std::string("Evaluate"), gen->Name(), std::string("DigestStreamTest: Expected hash is not equal! -DE2"));
+			throw TestException(std::string("Evaluate"), GENNME, std::string("DigestStreamTest: Expected hash is not equal! -DE2"));
 		}
 	}
 

@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -35,13 +35,13 @@ using Enumeration::ShakeModes;
 
 /// <summary>
 /// An implementation of an cSHAKE based PRNG.
-/// <para>Uses a keyed instance of cSHAKE to generate pseudo-random output..</para>
+/// <para>Uses a keyed instance of cSHAKE to generate pseudo-random output.</para>
 /// </summary> 
 /// 
 /// <example>
 /// <description>Example of generating a pseudo-random integer:</description>
 /// <code>
-/// CSR rnd([ShakeModes], [Providers], [Buffer Size]);
+/// CSR rnd([ShakeModes], [Providers]);
 /// int num = rnd.NextUInt32([Minimum], [Maximum]);
 /// </code>
 /// </example>
@@ -70,11 +70,10 @@ private:
 
 	static const size_t BUFFER_SIZE = CEX_PRNG_BUFFER_SIZE;
 
-	Providers m_pvdType;
-	SecureVector<byte> m_rndBuffer;
-	size_t m_rndIndex;
+	class CsrState;
+
+	std::unique_ptr<CsrState> m_csrState;
 	std::unique_ptr<IDrbg> m_rngGenerator;
-	ShakeModes m_shakeModeType;
 
 public:
 
@@ -94,11 +93,11 @@ public:
 	/// Initialize the class with parameters
 	/// </summary>
 	/// 
-	/// <param name="ShakeModeType">The underlying SHAKE instance type; default is SHAKE512</param>
+	/// <param name="ShakeType">The underlying SHAKE instance type; default is SHAKE512</param>
 	/// <param name="ProviderType">The random provider used to create keyng material; default is ACP</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if the shake or provider type is invalid</exception>
-	CSR(ShakeModes ShakeModeType = ShakeModes::SHAKE512, Providers ProviderType = Providers::ACP);
+	CSR(ShakeModes ShakeType = ShakeModes::SHAKE512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -154,8 +153,7 @@ public:
 
 private:
 
-	void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
-	void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
+	void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator);
 };
 
 NAMESPACE_PRNGEND

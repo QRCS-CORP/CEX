@@ -6,7 +6,7 @@
 NAMESPACE_RAINBOW
 
 using Enumeration::AsymmetricPrimitiveConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::RainbowParameterConvert;
 
 class Rainbow::RainbowState
@@ -38,19 +38,29 @@ public:
 
 Rainbow::Rainbow(RainbowParameters Parameters, Prngs PrngType)
 	:
-	m_rainbowState(new RainbowState(Parameters != RainbowParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Rainbow), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_rainbowState(new RainbowState(Parameters == RainbowParameters::RNBWS1S128SHAKE256 || 
+		Parameters == RainbowParameters::RNBWS2S192SHAKE512 || 
+		Parameters == RainbowParameters::RNBWS3S256SHAKE512 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Rainbow), std::string("Constructor"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Rainbow), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
 }
 
 Rainbow::Rainbow(RainbowParameters Parameters, IPrng* Rng)
-	:
-	m_rainbowState(new RainbowState(Parameters != RainbowParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Rainbow), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	: 
+	m_rainbowState(new RainbowState(Parameters == RainbowParameters::RNBWS1S128SHAKE256 ||
+		Parameters == RainbowParameters::RNBWS2S192SHAKE512 ||
+		Parameters == RainbowParameters::RNBWS3S256SHAKE512 ?
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Rainbow), std::string("Constructor"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Rng != nullptr ? Rng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Rainbow), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
@@ -58,16 +68,8 @@ Rainbow::Rainbow(RainbowParameters Parameters, IPrng* Rng)
 
 Rainbow::~Rainbow()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_rainbowState->Destroyed)
 	{
@@ -117,28 +119,7 @@ const size_t Rainbow::PrivateKeySize()
 {
 	size_t klen;
 
-	switch (m_rainbowState->Parameters)
-	{
-		case RainbowParameters::RNBWS1S128SHAKE256:
-		{
-			klen = 0;
-			break;
-		}
-		case RainbowParameters::RNBWS2S192SHAKE512:
-		{
-			klen = 0;
-			break;
-		}
-		case RainbowParameters::RNBWS3S256SHAKE512:
-		{
-			klen = 0;
-			break;
-		}
-		default:
-		{
-			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam);
-		}
-	}
+	klen = RNBWCore::GetPrivateKeySize(m_rainbowState->Parameters);
 
 	return klen;
 }
@@ -147,28 +128,7 @@ const size_t Rainbow::PublicKeySize()
 {
 	size_t klen;
 
-	switch (m_rainbowState->Parameters)
-	{
-		case RainbowParameters::RNBWS1S128SHAKE256:
-		{
-			klen = 0;
-			break;
-		}
-		case RainbowParameters::RNBWS2S192SHAKE512:
-		{
-			klen = 0;
-			break;
-		}
-		case RainbowParameters::RNBWS3S256SHAKE512:
-		{
-			klen = 0;
-			break;
-		}
-		default:
-		{
-			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam);
-		}
-	}
+	klen = RNBWCore::GetPublicKeySize(m_rainbowState->Parameters);
 
 	return klen;
 }
@@ -177,28 +137,7 @@ const size_t Rainbow::SignatureSize()
 {
 	size_t slen;
 
-	switch (m_rainbowState->Parameters)
-	{
-		case RainbowParameters::RNBWS1S128SHAKE256:
-		{
-			slen = 0;
-			break;
-		}
-		case RainbowParameters::RNBWS2S192SHAKE512:
-		{
-			slen = 0;
-			break;
-		}
-		case RainbowParameters::RNBWS3S256SHAKE512:
-		{
-			slen = 0;
-			break;
-		}
-		default:
-		{
-			throw CryptoAsymmetricException(Name(), std::string("SignatureSize"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam);
-		}
-	}
+	slen = RNBWCore::GetSignatureSize(m_rainbowState->Parameters);
 
 	return slen;
 }
@@ -209,29 +148,6 @@ AsymmetricKeyPair* Rainbow::Generate()
 	std::vector<byte> sk(0);
 
 	RNBWCore::Generate(pk, sk, m_rndGenerator, m_rainbowState->Parameters);
-
-	switch (m_rainbowState->Parameters)
-	{
-		case RainbowParameters::RNBWS1S128SHAKE256:
-		{
-
-			break;
-		}
-		case RainbowParameters::RNBWS2S192SHAKE512:
-		{
-
-			break;
-		}
-		case RainbowParameters::RNBWS3S256SHAKE512:
-		{
-
-			break;
-		}
-		default:
-		{
-			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam);
-		}
-	}
 
 	AsymmetricKey* apk = new AsymmetricKey(pk, AsymmetricPrimitives::Rainbow, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(m_rainbowState->Parameters));
 	AsymmetricKey* ask = new AsymmetricKey(sk, AsymmetricPrimitives::Rainbow, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(m_rainbowState->Parameters));
@@ -252,13 +168,13 @@ const void Rainbow::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::SignaturePublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_rainbowState->Parameters = static_cast<RainbowParameters>(m_publicKey->Parameters());
 		m_rainbowState->Signer = false;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_rainbowState->Parameters = static_cast<RainbowParameters>(m_privateKey->Parameters());
 		m_rainbowState->Signer = true;
 	}
@@ -285,30 +201,7 @@ size_t Rainbow::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 		throw CryptoAsymmetricException(Name(), std::string("Sign"), std::string("The signature scheme is not initialized for signing!"), ErrorCodes::InvalidParam);
 	}
 
-	RNBWCore::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_rainbowState->Parameters);
-
-	switch (m_rainbowState->Parameters)
-	{
-		case RainbowParameters::RNBWS1S128SHAKE256:
-		{
-
-			break;
-		}
-		case RainbowParameters::RNBWS2S192SHAKE512:
-		{
-
-			break;
-		}
-		case RainbowParameters::RNBWS3S256SHAKE512:
-		{
-
-			break;
-		}
-		default:
-		{
-			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam);
-		}
-	}
+	RNBWCore::Sign(Signature, Message, m_privateKey->Polynomial(), m_rainbowState->Parameters);
 
 	return slen;
 }
@@ -327,29 +220,6 @@ bool Rainbow::Verify(const std::vector<byte> &Signature, std::vector<byte> &Mess
 	}
 
 	res = RNBWCore::Verify(Message, Signature, m_publicKey->Polynomial(), m_rainbowState->Parameters);
-
-	switch (m_rainbowState->Parameters)
-	{
-		case RainbowParameters::RNBWS1S128SHAKE256:
-		{
-
-			break;
-		}
-		case RainbowParameters::RNBWS2S192SHAKE512:
-		{
-
-			break;
-		}
-		case RainbowParameters::RNBWS3S256SHAKE512:
-		{
-
-			break;
-		}
-		default:
-		{
-			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Rainbow parameter set is invalid!"), ErrorCodes::InvalidParam);
-		}
-	}
 
 	return res;
 }

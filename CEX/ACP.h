@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -46,7 +46,7 @@ using Enumeration::ShakeModes;
 /// <remarks>
 /// <para>The Auto Collection Provider is a two stage entropy provider; it first collects system sources of entropy, and then uses them to initialize a cSHAKE pseudo-random generator. \n 
 /// The first stage combines RdRand, cpu/memory jitter, and the system random provider, with high resolution timers and statistics for various hardware devices and system operations. \n
-/// These sources of entropy are compressedand used to create the cSHAKE-512 XOF functions key and customization arrays.
+/// These sources of entropy are compressed and used to create the cSHAKE-512 XOF functions key and customization arrays.
 /// </para>
 /// 
 /// <description>Guiding Publications::</description>
@@ -68,9 +68,9 @@ private:
 	static const bool HAS_TSC;
 
 #if defined(CEX_FIPS140_ENABLED)
-	ProviderSelfTest m_pvdSelfTest;
+	std::unique_ptr<ProviderSelfTest> m_pvdSelfTest;
 #endif
-	std::unique_ptr<SHAKE> m_kdfGenerator;
+	std::unique_ptr<SHAKE> m_rngGenerator;
 
 public:
 
@@ -151,8 +151,7 @@ private:
 	static std::vector<byte> Collect();
 	static std::vector<byte> Compress(std::vector<byte> &State);
 	static void Filter(std::vector<byte> &State);
-	static void GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator);
-	static void GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator);
+	static void Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator);
 	static std::vector<byte> MemoryInfo();
 	static std::vector<byte> ProcessInfo();
 	static std::vector<byte> SystemInfo();

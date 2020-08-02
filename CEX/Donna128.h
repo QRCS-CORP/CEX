@@ -1,16 +1,6 @@
 /*
-* A minimal 128-bit integer type for curve25519-donna
-* (C) 2014 Jack Lloyd
-*
-* Botan is released under the Simplified BSD License (see license.txt)
+* Based on 128-bit integer type for curve25519-donna in Botan, by Jack Lloyd
 */
-/*
-* 64x64->128 bit multiply operation
-* (C) 2013,2015 Jack Lloyd
-*
-* Botan is released under the Simplified BSD License (see license.txt)
-*/
-
 #ifndef CEX_DONNA128_H
 #define CEX_DONNA128_H
 
@@ -271,7 +261,7 @@ public:
 	/// <param name="Shift">The shift register</param>
 	///
 	/// <returns>The sum value</returns>
-	inline static ulong CarryShift(ulong &X, size_t Shift)
+	inline static ulong CarryShift(const ulong &X, size_t Shift)
 	{
 		return X >> Shift;
 	}

@@ -4,14 +4,14 @@
 #include "../CEX/IntegerTools.h"
 #include "../CEX/PBKDF2.h"
 #include "../CEX/SecureRandom.h"
-#include "../CEX/SHA256.h"
-#include "../CEX/SHA512.h"
+#include "../CEX/SHA2256.h"
+#include "../CEX/SHA2512.h"
 #include "../CEX/SymmetricKeySize.h"
 
 namespace Test
 {
 	using Exception::CryptoKdfException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Kdf::PBKDF2;
 	using Prng::SecureRandom;
 	using Enumeration::SHA2Digests;
@@ -55,22 +55,22 @@ namespace Test
 			Exception();
 			OnProgress(std::string("PBKDF2Test: Passed PBKDF2 exception handling tests.."));
 
-			PBKDF2* gen1 = new PBKDF2(SHA2Digests::SHA256);
-			PBKDF2* gen2 = new PBKDF2(SHA2Digests::SHA512);
+			PBKDF2* gen1 = new PBKDF2(SHA2Digests::SHA2256);
+			PBKDF2* gen2 = new PBKDF2(SHA2Digests::SHA2512);
 
-			// official SHA256 vectors
+			// official SHA2256 vectors
 			Kat(gen1, m_key[0], m_salt[0], m_expected[0], 1);
 			Kat(gen1, m_key[0], m_salt[0], m_expected[1], 2);
 			Kat(gen1, m_key[0], m_salt[0], m_expected[2], 4096);
 			Kat(gen1, m_key[1], m_salt[1], m_expected[3], 4096);
-			OnProgress(std::string("PBKDF2Test: Passed PBKDF2 SHA256 KAT vector tests.."));
+			OnProgress(std::string("PBKDF2Test: Passed PBKDF2 SHA2256 KAT vector tests.."));
 
-			// original SHA512 vectors
+			// original SHA2512 vectors
 			Kat(gen2, m_key[2], m_salt[2], m_expected[4], 1);
 			Kat(gen2, m_key[2], m_salt[2], m_expected[5], 2);
 			Kat(gen2, m_key[3], m_salt[3], m_expected[6], 1024);
 			Kat(gen2, m_key[3], m_salt[3], m_expected[7], 4096);
-			OnProgress(std::string("PBKDF2Test: Passed PBKDF2 SHA512 KAT vector tests.."));
+			OnProgress(std::string("PBKDF2Test: Passed PBKDF2 SHA2512 KAT vector tests.."));
 
 			gen1->Iterations() = 1;
 			gen2->Iterations() = 1;
@@ -127,7 +127,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			PBKDF2 gen(SHA2Digests::SHA256);
+			PBKDF2 gen(SHA2Digests::SHA2256);
 			// invalid key size
 			std::vector<byte> key(1);
 			SymmetricKey kp(key);
@@ -146,7 +146,7 @@ namespace Test
 		// test generator state -1
 		try
 		{
-			PBKDF2 gen(SHA2Digests::SHA256);
+			PBKDF2 gen(SHA2Digests::SHA2256);
 			std::vector<byte> otp(32);
 			// generator was not initialized
 			gen.Generate(otp);
@@ -164,7 +164,7 @@ namespace Test
 		// test generator state -2
 		try
 		{
-			PBKDF2 gen(SHA2Digests::SHA256);
+			PBKDF2 gen(SHA2Digests::SHA2256);
 			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> otp(32);
@@ -257,7 +257,7 @@ namespace Test
 			const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			otp1.resize(OTPLEN);
 			otp2.resize(OTPLEN);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
+			rnd.Generate(key, 0, key.size());
 
 			// generate with the kdf
 			SymmetricKey kp(key);
@@ -290,7 +290,7 @@ namespace Test
 			{
 				const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				otp.resize(OTPLEN);
-				IntegerTools::Fill(key, 0, key.size(), rnd);
+				rnd.Generate(key, 0, key.size());
 
 				// generate with the kdf
 				SymmetricKey kp(key);

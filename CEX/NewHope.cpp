@@ -10,9 +10,9 @@
 NAMESPACE_RINGLWE
 
 using Enumeration::AsymmetricPrimitiveConvert;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::NewHopeParameterConvert;
 
 class NewHope::RlweState
@@ -49,9 +49,13 @@ public:
 
 NewHope::NewHope(NewHopeParameters Parameters, Prngs PrngType)
 	:
-	m_rlweState(new RlweState(Parameters != NewHopeParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NewHope), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_rlweState(new RlweState(Parameters == NewHopeParameters::RLWES1Q12289N1024 || 
+		Parameters == NewHopeParameters::RLWES2Q12289N2048 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NewHope), std::string("Constructor"), std::string("The NewHope parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NewHope), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
@@ -59,9 +63,13 @@ NewHope::NewHope(NewHopeParameters Parameters, Prngs PrngType)
 
 NewHope::NewHope(NewHopeParameters Parameters, IPrng* Prng)
 	:
-	m_rlweState(new RlweState(Parameters != NewHopeParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NewHope), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_rlweState(new RlweState(Parameters == NewHopeParameters::RLWES1Q12289N1024 ||
+		Parameters == NewHopeParameters::RLWES2Q12289N2048 ?
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NewHope), std::string("Constructor"), std::string("The NewHope parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NewHope), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
@@ -69,16 +77,8 @@ NewHope::NewHope(NewHopeParameters Parameters, IPrng* Prng)
 
 NewHope::~NewHope()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_rlweState->Destroyed)
 	{
@@ -118,6 +118,7 @@ const size_t NewHope::CipherTextSize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The NewHope parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -179,6 +180,7 @@ const size_t NewHope::PrivateKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The NewHope parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -204,6 +206,7 @@ const size_t NewHope::PublicKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The NewHope parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -240,6 +243,7 @@ bool NewHope::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The NewHope parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -280,6 +284,7 @@ void NewHope::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The NewHope parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -301,7 +306,6 @@ AsymmetricKeyPair* NewHope::Generate()
 
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
-	std::vector<byte> buff(0);
 
 	switch (m_rlweState->Parameters)
 	{
@@ -310,7 +314,6 @@ AsymmetricKeyPair* NewHope::Generate()
 			pk.resize(RLWEQ12289N1024::PUBLICKEY_SIZE);
 			sk.resize(RLWEQ12289N1024::PRIVATEKEY_SIZE);
 			RLWEQ12289N1024::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		case (NewHopeParameters::RLWES2Q12289N2048):
@@ -318,11 +321,11 @@ AsymmetricKeyPair* NewHope::Generate()
 			pk.resize(RLWEQ12289N2048::PUBLICKEY_SIZE);
 			sk.resize(RLWEQ12289N2048::PRIVATEKEY_SIZE);
 			RLWEQ12289N2048::Generate(pk, sk, m_rndGenerator);
-
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The asymmetric cipher parameter setting is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -347,13 +350,13 @@ void NewHope::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_rlweState->Parameters = static_cast<NewHopeParameters>(m_publicKey->Parameters());
 		m_rlweState->Encryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_rlweState->Parameters = static_cast<NewHopeParameters>(m_privateKey->Parameters());
 		m_rlweState->Encryption = false;
 	}

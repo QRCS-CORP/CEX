@@ -4,7 +4,7 @@
 #include "HKDF.h"
 #include "KDF2.h"
 #include "PBKDF2.h"
-#include "SCRYPT.h"
+#include "SCBKDF.h"
 #include "SHA2Digests.h"
 #include "SHAKE.h"
 
@@ -31,42 +31,52 @@ IKdf* KdfFromName::GetInstance(Kdfs KdfType)
 		{
 			case Kdfs::HKDF256:
 			{
-				kptr = new HKDF(SHA2Digests::SHA256);
+				kptr = new HKDF(SHA2Digests::SHA2256);
 				break;
 			}
 			case Kdfs::HKDF512:
 			{
-				kptr = new HKDF(SHA2Digests::SHA512);
+				kptr = new HKDF(SHA2Digests::SHA2512);
 				break;
 			}
 			case Kdfs::KDF2256:
 			{
-				kptr = new KDF2(SHA2Digests::SHA256);
+				kptr = new KDF2(SHA2Digests::SHA2256);
 				break;
 			}
 			case Kdfs::KDF2512:
 			{
-				kptr = new KDF2(SHA2Digests::SHA512);
+				kptr = new KDF2(SHA2Digests::SHA2512);
 				break;
 			}
 			case Kdfs::PBKDF2256:
 			{
-				kptr = new PBKDF2(SHA2Digests::SHA256);
+				kptr = new PBKDF2(SHA2Digests::SHA2256);
 				break;
 			}
 			case Kdfs::PBKDF2512:
 			{
-				kptr = new PBKDF2(SHA2Digests::SHA512);
+				kptr = new PBKDF2(SHA2Digests::SHA2512);
 				break;
 			}
-			case Kdfs::SCRYPT256:
+			case Kdfs::SCBKDF128:
 			{
-				kptr = new SCRYPT(SHA2Digests::SHA256);
+				kptr = new SCBKDF(ShakeModes::SHAKE128);
 				break;
 			}
-			case Kdfs::SCRYPT512:
+			case Kdfs::SCBKDF256:
 			{
-				kptr = new SCRYPT(SHA2Digests::SHA512);
+				kptr = new SCBKDF(ShakeModes::SHAKE256);
+				break;
+			}
+			case Kdfs::SCBKDF512:
+			{
+				kptr = new SCBKDF(ShakeModes::SHAKE512);
+				break;
+			}
+			case Kdfs::SCBKDF1024:
+			{
+				kptr = new SCBKDF(ShakeModes::SHAKE1024);
 				break;
 			}
 			case Kdfs::SHAKE128:
@@ -91,6 +101,7 @@ IKdf* KdfFromName::GetInstance(Kdfs KdfType)
 			}
 			default:
 			{
+				// invaild parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The kdf type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
@@ -119,33 +130,89 @@ IKdf* KdfFromName::GetInstance(BlockCipherExtensions ExtensionType)
 	{
 		switch (ExtensionType)
 		{
-			case BlockCipherExtensions::HKDF256:
+		case BlockCipherExtensions::HKDF256:
+		{
+			kptr = new HKDF(SHA2Digests::SHA2256);
+			break;
+		}
+		case BlockCipherExtensions::HKDF512:
+		{
+			kptr = new HKDF(SHA2Digests::SHA2512);
+			break;
+		}
+		case BlockCipherExtensions::SHAKE256:
+		{
+			kptr = new SHAKE(ShakeModes::SHAKE256);
+			break;
+		}
+		case BlockCipherExtensions::SHAKE512:
+		{
+			kptr = new SHAKE(ShakeModes::SHAKE512);
+			break;
+		}
+		case BlockCipherExtensions::SHAKE1024:
+		{
+			kptr = new SHAKE(ShakeModes::SHAKE1024);
+			break;
+		}
+		default:
+		{
+			throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The kdf type is not supported!"), ErrorCodes::InvalidParam);
+		}
+		}
+	}
+	catch (CryptoKdfException &ex)
+	{
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), ex.Message(), ex.ErrorCode());
+	}
+	catch (const std::exception &ex)
+	{
+		throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string(ex.what()), ErrorCodes::UnKnown);
+	}
+
+	return kptr;
+}
+
+IKdf* KdfFromName::GetInstance(KdfDigests DigestType)
+{
+	using namespace Kdf;
+
+	IKdf* kptr;
+
+	kptr = nullptr;
+
+	try
+	{
+		switch (DigestType)
+		{
+		case KdfDigests::SHA2256:
 			{
-				kptr = new HKDF(SHA2Digests::SHA256);
+				kptr = new HKDF(SHA2Digests::SHA2256);
 				break;
 			}
-			case BlockCipherExtensions::HKDF512:
+		case KdfDigests::SHA2512:
 			{
-				kptr = new HKDF(SHA2Digests::SHA512);
+				kptr = new HKDF(SHA2Digests::SHA2512);
 				break;
 			}
-			case BlockCipherExtensions::SHAKE256:
+			case KdfDigests::SHAKE256:
 			{
 				kptr = new SHAKE(ShakeModes::SHAKE256);
 				break;
 			}
-			case BlockCipherExtensions::SHAKE512:
+			case KdfDigests::SHAKE512:
 			{
 				kptr = new SHAKE(ShakeModes::SHAKE512);
 				break;
 			}
-			case BlockCipherExtensions::SHAKE1024:
+			case KdfDigests::SHAKE1024:
 			{
 				kptr = new SHAKE(ShakeModes::SHAKE1024);
 				break;
 			}
 			default:
 			{
+				// invaild parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The kdf type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}

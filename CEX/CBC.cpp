@@ -8,8 +8,9 @@ NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
 using Enumeration::CipherModeConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 
 class CBC::CbcState
 {
@@ -48,7 +49,8 @@ public:
 CBC::CBC(BlockCiphers CipherType)
 	:
 	m_cbcState(new CbcState(true)),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? 
+		Helper::BlockCipherFromName::GetInstance(CipherType) :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::CBC), std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
@@ -57,7 +59,8 @@ CBC::CBC(BlockCiphers CipherType)
 CBC::CBC(IBlockCipher* Cipher)
 	:
 	m_cbcState(new CbcState(false)),
-	m_blockCipher(Cipher != nullptr ? Cipher : 
+	m_blockCipher(Cipher != nullptr ? 
+		Cipher : 
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::CBC), std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
@@ -183,7 +186,7 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vec
 
 void CBC::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.KeySizes().NonceSize() != BLOCK_SIZE)
+	if (Parameters.KeySizes().IVSize() != BLOCK_SIZE)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid nonce size; nonce must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidNonce);
 	}
@@ -205,7 +208,7 @@ void CBC::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 
 	m_blockCipher->Initialize(Encryption, Parameters);
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_cbcState->IV, 0, m_cbcState->IV.size());
+	MemoryTools::Copy(Parameters.IV(), 0, m_cbcState->IV, 0, m_cbcState->IV.size());
 	m_cbcState->Encryption = Encryption;
 	m_cbcState->Initialized = true;
 }
@@ -231,7 +234,7 @@ void CBC::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 void CBC::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the block-size!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the block-size!");
 
 	std::vector<byte> tmpv(BLOCK_SIZE);
 	MemoryTools::COPY128(Input, InOffset, tmpv, 0);
@@ -246,7 +249,7 @@ void CBC::DecryptParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t BLKCNT = (SEGLEN / BLOCK_SIZE);
 	std::vector<byte> tmpv(BLOCK_SIZE);
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpv, SEGLEN, BLKCNT](size_t i)
+	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpv, SEGLEN, BLKCNT](size_t i)
 	{
 		std::vector<byte> thdv(BLOCK_SIZE);
 
@@ -277,7 +280,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 
 	bctr = BlockCount;
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 	if (bctr > 15)
 	{
 		// 512bit avx512
@@ -311,7 +314,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 
 		MemoryTools::COPY128(tmpn, 0, Iv, 0);
 	}
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 	if (bctr > 7)
 	{
 		// 256bit avx2
@@ -344,7 +347,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 
 		MemoryTools::COPY128(tmpn, 0, Iv, 0);
 	}
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 	if (bctr > 3)
 	{
 		// 128bit avx
@@ -410,7 +413,7 @@ void CBC::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<b
 
 	bctr = Length / BLOCK_SIZE;
 
-	if (IsEncryption())
+	if (IsEncryption() == true)
 	{
 		for (i = 0; i < bctr; ++i)
 		{

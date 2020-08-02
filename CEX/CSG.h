@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -48,7 +48,7 @@ using Enumeration::ShakeModes;
 /// <code>
 /// CSG gen(ShakeModes::SHAKE256, [Providers::ACP]);
 /// // initialize
-/// gen.Initialize(Key, [Nonce], [Info]);
+/// gen.Initialize(Key, [Custom], [Name]);
 /// // generate bytes
 /// gen.Generate(Output, [Offset], [Size]);
 /// </code>
@@ -111,12 +111,11 @@ private:
 	static const size_t MAX_THRESHOLD = 10000;
 	// the minimum key length that will initialize the generator
 	static const size_t MINKEY_LENGTH = 16;
+	static const std::vector<char> CEX_PREFIX;
 
 	class CsgState;
 	std::unique_ptr<IProvider> m_csgProvider;
 	std::unique_ptr<CsgState> m_csgState;
-	bool m_isDestroyed;
-	bool m_isInitialized;
 
 public:
 
@@ -149,14 +148,14 @@ public:
 	explicit CSG(ShakeModes ShakeModeType, Providers ProviderType = Providers::ACP, bool Parallel = false);
 
 	/// <summary>
-	/// Instantiate the class using a SHAKE mode type, and an optional instance pointer to an entropy source 
+	/// Instantiate the class using a SHAKE mode type, and an instance pointer to an entropy source 
 	/// </summary>
 	/// 
 	/// <param name="ShakeModeType">The underlying shake implementation mode type</param>
-	/// <param name="Provider">Provides an entropy source enabling predictive resistance, can be null</param>
+	/// <param name="Provider">Provides an entropy source enabling predictive resistance, can not be null</param>
 	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	/// 
-	/// <exception cref="CryptoGeneratorException">Thrown if a null digest is used</exception>
+	/// <exception cref="CryptoGeneratorException">Thrown if a null provider is used</exception>
 	CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel = false);
 
 	/// <summary>
@@ -262,14 +261,14 @@ public:
 	/// <param name="Key">The secure-vector containing the new key material</param>
 	/// 
 	/// <exception cref="CryptoGeneratorException">Thrown if the key is too small</exception>
-	void Update(const SecureVector<byte> &Key) override;
+	void Update(const SecureVector<byte> &Key) override; 
 
 private:
 
-	static void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<CsgState> &State);
-	static void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::unique_ptr<CsgState> &State);
+	static void Absorb(const SecureVector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<CsgState> &State);
+	static void Customize(const SecureVector<byte> &Customization, const SecureVector<byte> &Name, std::unique_ptr<CsgState> &State);
 	static void Derive(std::unique_ptr<IProvider> &Provider, std::unique_ptr<CsgState> &State);
-	static void Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<CsgState> &State);
+	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<CsgState> &State);
 	static void Fill(std::unique_ptr<CsgState> &State);
 	static void Permute(std::unique_ptr<CsgState> &State);
 	static void PermuteW(std::unique_ptr<CsgState> &State);

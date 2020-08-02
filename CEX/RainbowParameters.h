@@ -16,15 +16,15 @@ enum class RainbowParameters : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S1 parameters; (Medium Security) The Rainbow SHA256, S128 parameter set
+	/// The S1 parameters; (Medium Security) The Rainbow SHAKE-256, S128 parameter set
 	/// </summary>
 	RNBWS1S128SHAKE256 = static_cast<byte>(AsymmetricParameters::RNBWS1S128SHAKE256),
 	/// <summary>
-	/// The S2 parameters; (High Security) The Rainbow SHA384, S192 parameter set
+	/// The S2 parameters; (High Security) The Rainbow SHAKE-512, S192 parameter set
 	/// </summary>
 	RNBWS2S192SHAKE512 = static_cast<byte>(AsymmetricParameters::RNBWS2S192SHAKE512),
 	/// <summary>
-	/// The S3 parameters; (Highest Security) The Rainbow SHA512, S256 parameter set
+	/// The S3 parameters; (Highest Security) The Rainbow SHAKE-512, S256 parameter set
 	/// </summary>
 	RNBWS3S256SHAKE512 = static_cast<byte>(AsymmetricParameters::RNBWS3S256SHAKE512)
 };

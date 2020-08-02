@@ -5,10 +5,10 @@
 
 NAMESPACE_MAC
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
 using Enumeration::MacConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::KmacModeConvert;
 
 class KMAC::KmacState
@@ -21,13 +21,15 @@ public:
 	size_t MacSize;
 	size_t Position;
 	KmacModes KmacMode;
+	bool IsInitialized;
 
 	KmacState(size_t InputSize, size_t OutputSize, KmacModes Mode)
 		:
 		Rate(InputSize),
 		MacSize(OutputSize),
 		Position(0),
-		KmacMode(Mode)
+		KmacMode(Mode),
+		IsInitialized(false)
 	{
 	}
 
@@ -108,7 +110,6 @@ KMAC::KMAC(KmacModes KmacModeType)
 			KmacModeType == KmacModes::KMAC256 ? Keccak::KECCAK256_DIGEST_SIZE :
 			KmacModeType == KmacModes::KMAC512 ? Keccak::KECCAK512_DIGEST_SIZE :
 			Keccak::KECCAK1024_DIGEST_SIZE)),
-	m_isInitialized(false),
 	m_kmacState(KmacModeType != KmacModes::None ? new KmacState(BlockSize(), TagSize(), KmacModeType) :
 		throw CryptoMacException(std::string("KMAC"), std::string("Constructor"), std::string("The kmac mode type is not supported!"), ErrorCodes::InvalidParam))
 {
@@ -116,8 +117,6 @@ KMAC::KMAC(KmacModes KmacModeType)
 
 KMAC::~KMAC()
 {
-	m_isInitialized = false;
-
 	if (m_kmacState != nullptr)
 	{
 		m_kmacState.reset(nullptr);
@@ -133,7 +132,7 @@ const size_t KMAC::DistributionCodeMax()
 
 const bool KMAC::IsInitialized()
 {
-	return m_isInitialized;
+	return m_kmacState->IsInitialized;
 }
 
 const KmacModes KMAC::KmacMode()
@@ -145,7 +144,7 @@ const KmacModes KMAC::KmacMode()
 
 void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -160,12 +159,22 @@ void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
+	SecureVector<byte> tmph(Output.size() - OutOffset);
+
+	Finalize(tmph, 0);
+	SecureMove(tmph, 0, Output, OutOffset, tmph.size());
+
+	return tmph.size();
+}
+
+size_t KMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
+{
 	std::vector<byte> buf(sizeof(size_t) + 1);
 	size_t blen;
 	size_t i;
 	size_t olen;
 
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -196,16 +205,6 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	return olen;
 }
 
-size_t KMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
-{
-	std::vector<byte> tag(TagSize());
-
-	Finalize(tag, 0);
-	SecureMove(tag, Output, OutOffset);
-
-	return TagSize();
-}
-
 void KMAC::Initialize(ISymmetricKey &Parameters)
 {
 #if defined(CEX_ENFORCE_LEGALKEY)
@@ -220,40 +219,39 @@ void KMAC::Initialize(ISymmetricKey &Parameters)
 	}
 #endif
 
-	if (Parameters.KeySizes().NonceSize() != 0 && Parameters.KeySizes().NonceSize() < MinimumSaltSize())
+	if (Parameters.KeySizes().IVSize() != 0 && Parameters.KeySizes().IVSize() < MinimumSaltSize())
 	{
 		throw CryptoMacException(Name(), std::string("Initialize"), std::string("Invalid salt size, must be at least MinimumSaltSize in length!"), ErrorCodes::InvalidSalt);
 	}
 
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
 
 	if (Parameters.KeySizes().InfoSize() > 0)
 	{
-		Customize(Parameters.Nonce(), Parameters.Info(), m_kmacState);
+		Keccak::Customize(Parameters.SecureIV(), Parameters.SecureInfo(), m_kmacState->Rate, m_kmacState->State);
 	}
 	else
 	{
-		std::vector<byte> name{ 0x4B, 0x4D, 0x41, 0x43 };
-		Customize(Parameters.Nonce(), name, m_kmacState);
+		SecureVector<byte> name{ 0x4B, 0x4D, 0x41, 0x43 };
+		Keccak::Customize(Parameters.SecureIV(), name, m_kmacState->Rate, m_kmacState->State);
 	}
 
-	LoadKey(Parameters.Key(), m_kmacState);
-
-	m_isInitialized = true;
+	LoadKey(Parameters.SecureKey(), m_kmacState);
+	m_kmacState->IsInitialized = true;
 }
 
 void KMAC::Reset()
 {
 	m_kmacState->Reset();
-	m_isInitialized = false;
+	m_kmacState->IsInitialized = false;
 }
 
 void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -300,19 +298,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 //~~~Private Functions~~~//
 
-void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::unique_ptr<KmacState> &State)
-{
-	if (State->KmacMode != KmacModes::KMAC1024)
-	{
-		Keccak::CustomizeR24(Customization, Name, State->Rate, State->State);
-	}
-	else
-	{
-		Keccak::CustomizeR48(Customization, Name, State->Rate, State->State);
-	}
-}
-
-void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &State)
+void KMAC::LoadKey(const SecureVector<byte> &Key, std::unique_ptr<KmacState> &State)
 {
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
@@ -351,25 +337,10 @@ void KMAC::LoadKey(const std::vector<byte> &Key, std::unique_ptr<KmacState> &Sta
 
 void KMAC::Permute(std::unique_ptr<KmacState> &State)
 {
-	if (State->KmacMode != KmacModes::KMAC1024)
-	{
-#if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR24P1600C(State->State);
-#else
-		Keccak::PermuteR24P1600U(State->State);
-#endif
-	}
-	else
-	{
-#if defined(CEX_DIGEST_COMPACT)
-		Keccak::PermuteR48P1600C(State->State);
-#else
-		Keccak::PermuteR48P1600U(State->State);
-#endif
-	}
+	Keccak::Permute(State->State, State->Rate);
 }
 
-void KMAC::Squeeze(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<KmacState> &State)
+void KMAC::Squeeze(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<KmacState> &State)
 {
 	size_t i;
 	

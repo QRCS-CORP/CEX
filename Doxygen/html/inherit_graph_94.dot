@@ -1,0 +1,8 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="NTRUSQ5167P857",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_n_t_r_u_s_q5167_p857.html",tooltip="The NTRU S-Prime functions"];
+}

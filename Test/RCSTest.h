@@ -15,10 +15,9 @@ namespace Test
 	/// <remarks>
 	/// <description>References:</description>
 	/// <list type="number">
-	/// <item><description>The Skein Hash Function Family <a href="https://www.schneier.com/academic/paperfiles/skein1.3.pdf">Skein V1.1</a>.</description></item>
-	/// <item><description>NIST Round 3 <a href="https://www.schneier.com/academic/paperfiles/skein-1.3-modifications.pdf">Tweak Description</a>.</description></item>
-	/// <item><description>Skein <a href="https://www.schneier.com/academic/paperfiles/skein-proofs.pdf">Provable Security</a> Support for the Skein Hash Family.</description></item>
-	/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition>.</description></item>
+	/// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
+	/// <item><description>FIPS 202: <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">Permutation Based Hash</a> and Extendable Output Functions</description></item>
+	/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SP800-185</a> SHA-3 Derived Functions.</description></item>
 	/// </list>
 	/// </remarks>
 	class RCSTest final : public ITest
@@ -76,12 +75,6 @@ namespace Test
 		/// Start the tests
 		/// </summary>
 		std::string Run() override;
-
-
-
-		bool TestRijndael256();
-
-
 
 		//~~~Public Functions~~~//
 
@@ -149,12 +142,14 @@ namespace Test
 		/// </summary>
 		///
 		/// <param name="Cipher">The cipher instance</param>
-		/// <param name="PlainText">The plain-text array</param>
+		/// <param name="Message">The plain-text array</param>
+		/// <param name="Key">The input cipher key</param>
+		/// <param name="Nonce">The cipher initialization vector</param>
 		/// <param name="Output1">The first expected output</param>
 		/// <param name="Output2">The second expected output</param>
 		/// <param name="Output3">The third expected output</param>
-		void Sequential(IStreamCipher* Cipher, const std::vector<byte>& PlainText, const std::vector<byte>& Output1,
-			const std::vector<byte>& Output2, const std::vector<byte>& Output3);
+		void Sequential(IStreamCipher* Cipher, const std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce,
+			const std::vector<byte> &Output1, const std::vector<byte> &Output2, const std::vector<byte> &Output3);
 
 		/// <summary>
 		/// Test transformation and inverse with random in a looping [TEST_CYCLES] stress-test

@@ -10,11 +10,11 @@
 
 NAMESPACE_PROVIDER
 
-using Utility::ArrayTools;
+using Tools::ArrayTools;
 using Enumeration::ErrorCodes;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::ProviderConvert;
-using Utility::SystemTools;
+using Tools::SystemTools;
 
 const bool ACP::HAS_RDRAND = SystemTools::HasRdRand();
 const bool ACP::HAS_TSC = SystemTools::HasRdtsc();
@@ -24,43 +24,51 @@ const bool ACP::HAS_TSC = SystemTools::HasRdtsc();
 ACP::ACP()
 	:
 #if defined(CEX_FIPS140_ENABLED)
-	m_pvdSelfTest(),
+	m_pvdSelfTest(new ProviderSelfTest),
 #endif
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
 	ProviderBase(true, Providers::ACP, ProviderConvert::ToName(Providers::ACP)),
 #else
 	ProviderBase(false, Providers::ACP, ProviderConvert::ToName(Providers::ACP)),
 #endif
-	m_kdfGenerator(new Kdf::SHAKE(SHAKE_MODE))
+	m_rngGenerator(new Kdf::SHAKE(SHAKE_MODE))
 {
 	Reset();
 }
 
 ACP::~ACP()
 {
-	if (m_kdfGenerator != nullptr)
+	if (m_pvdSelfTest != nullptr)
 	{
-		m_kdfGenerator.reset(nullptr);
+		m_pvdSelfTest.reset(nullptr);
+	}
+
+	if (m_rngGenerator != nullptr)
+	{
+		m_rngGenerator.reset(nullptr);
 	}
 }
 
 void ACP::Generate(std::vector<byte> &Output)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
+	SecureVector<byte> tmp(Output.size());
+
+	Generate(tmp, 0, Output.size(), m_rngGenerator);
+	SecureMove(tmp, 0, Output, 0, tmp.size());
 }
 
 void ACP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
@@ -68,31 +76,34 @@ void ACP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output, Offset, Length, m_kdfGenerator);
+	SecureVector<byte> tmp(Length);
+
+	Generate(tmp, 0, Output.size(), m_rngGenerator);
+	SecureMove(tmp, 0, Output, Offset, tmp.size());
 }
 
 void ACP::Generate(SecureVector<byte> &Output)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output, 0, Output.size(), m_kdfGenerator);
+	Generate(Output, 0, Output.size(), m_rngGenerator);
 }
 
 void ACP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
@@ -100,12 +111,12 @@ void ACP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(Output, Offset, Length, m_kdfGenerator);
+	Generate(Output, Offset, Length, m_rngGenerator);
 }
 
 void ACP::Reset()
@@ -132,7 +143,7 @@ void ACP::Reset()
 	std::vector<byte> cust(32);
 	cvd.Generate(cust);
 	// initialize cSHAKE-512
-	m_kdfGenerator->Initialize(seed, cust);
+	m_rngGenerator->Initialize(seed, cust);
 }
 
 //~~~Private Functions~~~//
@@ -211,11 +222,11 @@ bool ACP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
+	SecureVector<byte> smp(m_pvdSelfTest->SELFTEST_LENGTH);
 
-	GetRandom(smp, 0, smp.size(), m_kdfGenerator);
+	Generate(smp, 0, smp.size(), m_rngGenerator);
 
-	if (!m_pvdSelfTest.SelfTest(smp))
+	if (!m_pvdSelfTest->SelfTest(smp))
 	{
 		fail = true;
 	}
@@ -225,12 +236,7 @@ bool ACP::FipsTest()
 	return (fail == false);
 }
 
-void ACP::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
-{
-	Generator->Generate(Output, Offset, Length);
-}
-
-void ACP::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
+void ACP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<SHAKE> &Generator)
 {
 	Generator->Generate(Output, Offset, Length);
 }
@@ -282,7 +288,7 @@ std::vector<byte> ACP::ProcessInfo()
 			for (i = 0; i < info.size(); ++i)
 			{
 				ArrayTools::AppendValue(info[i].pcPriClassBase, state);
-				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExeFile), state);
+				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExeFile, sizeof(info[i].szExeFile)), state);
 				ArrayTools::AppendValue(info[i].th32ParentProcessID, state);
 				ArrayTools::AppendValue(info[i].th32ProcessID, state);
 			}
@@ -305,7 +311,7 @@ std::vector<byte> ACP::ProcessInfo()
 				ArrayTools::AppendValue(info[i].modBaseAddr, state);
 				ArrayTools::AppendValue(info[i].modBaseSize, state);
 				ArrayTools::AppendValue(info[i].ProccntUsage, state);
-				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExePath), state);
+				ArrayTools::AppendString(ArrayTools::ToString(info[i].szExePath, sizeof(info[i].szExePath)), state);
 				ArrayTools::AppendValue(info[i].szModule, state);
 				ArrayTools::AppendValue(info[i].th32ModuleID, state);
 				ArrayTools::AppendValue(info[i].th32ProcessID, state);

@@ -16,17 +16,13 @@ enum class McElieceParameters : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The S1 parameters (Medium Security) A field dimension of 4096 and an error correction capability of 62
-	/// </summary>
-	MPKCS1N4096T62 = static_cast<byte>(AsymmetricParameters::MPKCS1N4096T62),
-	/// <summary>
 	/// The S2 parameters (Medium-High Security) A field dimension of 6960 and an error correction capability of 119
 	/// </summary>
-	MPKCS1N6960T119 = static_cast<byte>(AsymmetricParameters::MPKCS1N6960T119),
+	MPKCS2N6960T119 = static_cast<byte>(AsymmetricParameters::MPKCS2N6960T119),
 	/// <summary>
 	/// The S3 parameters (High Security) A field dimension of 8192 and an error correction capability of 128
 	/// </summary>
-	MPKCS1N8192T128 = static_cast<byte>(AsymmetricParameters::MPKCS1N8192T128)
+	MPKCS3N8192T128 = static_cast<byte>(AsymmetricParameters::MPKCS3N8192T128)
 };
 
 class McElieceParameterConvert

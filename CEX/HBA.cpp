@@ -12,9 +12,10 @@ NAMESPACE_MODE
 using Enumeration::AeadModeConvert;
 using Enumeration::BlockCipherConvert;
 using Enumeration::Digests;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 using Enumeration::SHA2Digests;
+using Kdf::SHAKE;
 using Enumeration::ShakeModes;
 using Enumeration::StreamAuthenticatorConvert;
 using Enumeration::StreamCipherConvert;
@@ -78,22 +79,17 @@ public:
 
 //~~~Constant Tables~~//
 
-const std::vector<byte> HBA::HBA_INFO =
-{
-	0x48, 0x42, 0x41, 0x20, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6F, 0x6E, 0x20, 0x31, 0x2E, 0x30, 0x62
-};
-
 //~~~Constructor~~~//
 
 HBA::HBA(BlockCiphers CipherType, StreamAuthenticators AuthenticatorType)
 	:
 	m_hbaState(new HbaState(true)),
-	m_cipherMode(CipherType != BlockCiphers::None ? 
+	m_cipherMode(CipherType != BlockCiphers::None ?
 		new CTR(CipherType) :
-		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The block cipher enumeration type can nor be none!"), ErrorCodes::InvalidParam)),
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The block cipher enumeration type can nor be none!"), ErrorCodes::InvalidParam)), //-V2571
 	m_macAuthenticator(AuthenticatorType != StreamAuthenticators::None ? 
 		Helper::MacFromName::GetInstance(AuthenticatorType) :
-		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The MAC generator enumeration type can not be none!"), ErrorCodes::IllegalOperation))
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The MAC generator enumeration type can not be none!"), ErrorCodes::IllegalOperation)) //-V2571
 {
 }
 
@@ -101,11 +97,11 @@ HBA::HBA(IBlockCipher* Cipher, StreamAuthenticators AuthenticatorType)
 	:
 	m_hbaState(new HbaState(false)),
 	m_cipherMode(Cipher != nullptr ? 
-		new CTR(Cipher) :
-		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The block cipher instance can not be null!"), ErrorCodes::IllegalOperation)),
+		new CTR(Cipher) : 
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The block cipher instance can not be null!"), ErrorCodes::IllegalOperation)), //-V2571
 	m_macAuthenticator(AuthenticatorType != StreamAuthenticators::None ?
 		Helper::MacFromName::GetInstance(AuthenticatorType) :
-		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The MAC generator enumeration type can not be none!"), ErrorCodes::IllegalOperation))
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The MAC generator enumeration type can not be none!"), ErrorCodes::IllegalOperation)) //-V2571
 {
 	m_hbaState->Destroy = false;
 }
@@ -122,13 +118,6 @@ HBA::~HBA()
 		if (m_cipherMode != nullptr)
 		{
 			m_cipherMode.reset(nullptr);
-		}
-	}
-	else
-	{
-		if (m_cipherMode != nullptr)
-		{
-			m_cipherMode.release();
 		}
 	}
 }
@@ -207,7 +196,7 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.KeySizes().NonceSize() != BLOCK_SIZE)
+	if (Parameters.KeySizes().IVSize() != BLOCK_SIZE)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a nonce equal in size to the ciphers block size!"), ErrorCodes::InvalidNonce);
 	}
@@ -225,7 +214,7 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 
 	// reset for a new key
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		m_hbaState->Reset();
 		m_macAuthenticator->Reset();
@@ -240,12 +229,13 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	// size the mac-tag
 	m_hbaState->MacTag.resize(m_macAuthenticator->TagSize());
 
-	// create the cSHAKE customization string
-	m_hbaState->Custom.resize(Parameters.KeySizes().InfoSize() + HBA_INFO.size());
-	// copy the version string to the customization parameter
-	MemoryTools::Copy(HBA_INFO, 0, m_hbaState->Custom, 0, HBA_INFO.size());
-	// copy the user defined string to the customization parameter
-	MemoryTools::Copy(Parameters.Info(), 0, m_hbaState->Custom, HBA_INFO.size(), Parameters.KeySizes().InfoSize());
+	// store the customization string -v1.0b
+	if (Parameters.KeySizes().InfoSize() != 0)
+	{
+		m_hbaState->Custom.resize(Parameters.KeySizes().InfoSize());
+		// copy the user defined string to the customization parameter
+		MemoryTools::Copy(Parameters.Info(), 0, m_hbaState->Custom, 0, Parameters.KeySizes().InfoSize());
+	}
 
 	// create the HBA name string 
 	std::string tmpn = Name();
@@ -259,7 +249,7 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	// copy the name string to state
 	MemoryTools::CopyFromObject(tmpn.data(), m_hbaState->Name, sizeof(ulong) + sizeof(ushort), tmpn.size());
 
-	if (m_hbaState->Authenticator != StreamAuthenticators::HMACSHA256 && m_hbaState->Authenticator != StreamAuthenticators::HMACSHA512)
+	if (m_hbaState->Authenticator != StreamAuthenticators::HMACSHA2256 && m_hbaState->Authenticator != StreamAuthenticators::HMACSHA2512)
 	{
 		// SHA3 Mode //
 		// cipher authenticator size determines key expansion function and Mac generator type; 256, 512, or 1024-bit
@@ -267,10 +257,15 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 			ShakeModes::SHAKE512 : (m_hbaState->Authenticator == StreamAuthenticators::KMAC256) ? 
 			ShakeModes::SHAKE256 : ShakeModes::SHAKE1024;
 
-		const size_t KEYLEN = (m_hbaState->Mode == ShakeModes::SHAKE512) ? 64 : (m_hbaState->Mode == ShakeModes::SHAKE256) ? 32 : 128;
+		const size_t KEYLEN = (m_hbaState->Mode == ShakeModes::SHAKE512) ? 
+			64 : 
+			(m_hbaState->Mode == ShakeModes::SHAKE256) ? 
+				32 :
+				128;
+
 		SecureVector<byte> mack(KEYLEN);
 
-		Kdf::SHAKE gen(m_hbaState->Mode);
+		SHAKE gen(m_hbaState->Mode);
 
 		// initialize cSHAKE with k,c,n
 		gen.Initialize(Parameters.SecureKey(), m_hbaState->Custom, m_hbaState->Name);
@@ -279,7 +274,7 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		gen.Generate(tmpk);
 
 		// initialize the CTR mode
-		SymmetricKey ckp(tmpk, Parameters.SecureNonce(), Parameters.SecureInfo());
+		SymmetricKey ckp(tmpk, Parameters.SecureIV(), Parameters.SecureInfo());
 		m_cipherMode->Initialize(true, ckp);
 
 		// generate the mac key
@@ -291,13 +286,19 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 		// store the mac key
 		m_hbaState->MacKey.resize(mack.size());
-		SecureMove(mack, m_hbaState->MacKey, 0);
+		SecureMove(mack, 0, m_hbaState->MacKey, 0, mack.size());
 	}
 	else
 	{
 		// SHA2 Mode //
-		m_hbaState->Digest = (Parameters.KeySizes().KeySize() == 64) ? SHA2Digests::SHA512 : SHA2Digests::SHA256;
-		const size_t KEYLEN = (m_hbaState->Digest == SHA2Digests::SHA512) ? 64 : 32;
+		m_hbaState->Digest = (Parameters.KeySizes().KeySize() == 64) ? 
+			SHA2Digests::SHA2512 : 
+			SHA2Digests::SHA2256;
+
+		const size_t KEYLEN = (m_hbaState->Digest == SHA2Digests::SHA2512) ? 
+			64 : 
+			32;
+
 		SecureVector<byte> mack(KEYLEN);
 		SecureVector<byte> tmpk(KEYLEN);
 		SecureVector<byte> zero(0);
@@ -315,7 +316,7 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		gen.Generate(tmpk);
 
 		// initialize the CTR mode
-		SymmetricKey ckp(tmpk, Parameters.SecureNonce(), Parameters.SecureInfo());
+		SymmetricKey ckp(tmpk, Parameters.SecureIV(), Parameters.SecureInfo());
 		m_cipherMode->Initialize(true, ckp);
 
 		// generate the mac key
@@ -327,7 +328,7 @@ void HBA::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 		// store the mac key
 		m_hbaState->MacKey.resize(mack.size());
-		SecureMove(mack, m_hbaState->MacKey, 0);
+		SecureMove(mack, 0, m_hbaState->MacKey, 0, mack.size());
 	}
 
 	m_hbaState->Initialized = true;
@@ -345,7 +346,7 @@ void HBA::ParallelMaxDegree(size_t Degree)
 
 void HBA::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -356,7 +357,7 @@ void HBA::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 
 void HBA::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -367,7 +368,7 @@ void HBA::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size
 
 void HBA::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Transform"), std::string("The cipher mode has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -375,7 +376,7 @@ void HBA::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 	// add the starting position of the nonce to the mac
 	m_macAuthenticator->Update(m_cipherMode->Nonce(), 0, m_cipherMode->Nonce().size());
 
-	if (IsEncryption())
+	if (IsEncryption() == true)
 	{
 		if (Output.size() - OutOffset < Length + TagSize())
 		{
@@ -451,7 +452,7 @@ void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	if (m_hbaState->Mode != ShakeModes::None)
 	{
 		// generate the new mac key
-		Kdf::SHAKE gen(m_hbaState->Mode);
+		SHAKE gen(m_hbaState->Mode);
 
 		// bytes counter provides cSHAKE domain seperation in the stream; will generate a unique mac-key each time
 		gen.Initialize(m_hbaState->MacKey, m_hbaState->Custom, m_hbaState->Name);
@@ -466,7 +467,10 @@ void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	else
 	{
 		SecureVector<byte> zero(0);
-		const size_t KEYLEN = (m_hbaState->Digest == SHA2Digests::SHA512) ? 64 : 32;
+		const size_t KEYLEN = (m_hbaState->Digest == SHA2Digests::SHA2512) ? 
+			64 : 
+			32;
+
 		SecureVector<byte> tmpk(KEYLEN);
 
 		// generate the new mac key
@@ -489,7 +493,7 @@ void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	m_macAuthenticator->Initialize(kpm);
 
 	// store the new key and erase the temporary key
-	SecureMove(mack, m_hbaState->MacKey, 0);
+	SecureMove(mack, 0, m_hbaState->MacKey, 0, mack.size());
 }
 
 bool HBA::Verify(const std::vector<byte> &Input, size_t InOffset, size_t Length)

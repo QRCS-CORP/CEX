@@ -1,0 +1,8 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="Poly1305",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_poly1305.html",tooltip="An implementation of the Poly1305 Message Authentication Code generator: Poly1305"];
+}

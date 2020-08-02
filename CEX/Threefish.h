@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -20,21 +20,24 @@
 #define CEX_THREEFISH_H
 
 #include "CexDomain.h"
+#include "IntegerTools.h"
+#include "MemoryTools.h"
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 #	include "ULong256.h"
-#endif
-#if defined(__AVX512__)
+#elif defined(CEX_HAS_AVX512)
 #	include "ULong512.h"
 #endif
 
 NAMESPACE_STREAM
 
-#if defined(__AVX2__)
-using Numeric::ULong256;
-#endif
-#if defined(__AVX512__)
-using Numeric::ULong512;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+
+#if defined(CEX_HAS_AVX512)
+	using Numeric::ULong512;
+#elif defined(CEX_HAS_AVX2)
+	using Numeric::ULong256;
 #endif
 
 /// <summary>
@@ -46,64 +49,17 @@ using Numeric::ULong512;
 /// The H suffix denotes functions that take an SIMD wrapper class (ULongXXX) as the state values, and process state in SIMD parallel blocks.</para>
 /// <para>This class contains wide forms of the functions; PemuteP4x256H, PemuteP4x512H, and PemuteP4x1024H use AVX2 instructions. \n
 /// Experimental functions using AVX512 instructions are also implemented; PemuteP8x256H, PemuteP8x512H, and PemuteP8x1024H. \n
-/// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitly declared.</para>
+/// These functions are not visible until run-time on some compiler platforms unless the compiler flag (CEX_HAS_AVX2 or CEX_HAS_AVX512) is explicitly declared.</para>
 /// </summary>
 class Threefish
 {
 private:
 
-	// AVX2
-	template<typename T>
-	static void Store4xULL256(std::array<T, 4> &C, std::array<ulong, 16> &State)
-	{
-		std::array<ulong, 4> tmp;
-		size_t i;
-
-		for (i = 0; i < 4; ++i)
-		{
-			C[i].Store(tmp, 0);
-			State[i] = tmp[0];
-			State[i + 4] = tmp[1];
-			State[i + 8] = tmp[2];
-			State[i + 12] = tmp[3];
-		}
-	}
-
-	template<typename T>
-	static void Store8xULL256(std::array<T, 8> &C, std::array<ulong, 32> &State)
-	{
-		std::array<ulong, 4> tmp;
-		size_t i;
-
-		for (i = 0; i < 8; ++i)
-		{
-			C[i].Store(tmp, 0);
-			State[i] = tmp[0];
-			State[i + 8] = tmp[1];
-			State[i + 16] = tmp[2];
-			State[i + 24] = tmp[3];
-		}
-	}
-
-	template<typename T>
-	static void Store16xULL256(std::array<T, 16> &C, std::array<ulong, 64> &State)
-	{
-		std::array<ulong, 4> tmp;
-		size_t i;
-
-		for (i = 0; i < 16; ++i)
-		{
-			C[i].Store(tmp, 0);
-			State[i] = tmp[0];
-			State[i + 16] = tmp[1];
-			State[i + 32] = tmp[2];
-			State[i + 48] = tmp[3];
-		}
-	}
+#if defined(CEX_HAS_AVX512)
 
 	// AVX512
-	template<typename T>
-	static void Store4xULL512(std::array<T, 4> &C, std::array<ulong, 32> &State)
+	template<typename T, typename ArrayU64x32>
+	static void Store4xULL512(std::array<T, 4> &C, ArrayU64x32 &State)
 	{
 		std::array<ulong, 8> tmp;
 		size_t i;
@@ -122,8 +78,8 @@ private:
 		}
 	}
 
-	template<typename T>
-	static void Store8xULL512(std::array<T, 8> &C, std::array<ulong, 64> &State)
+	template<typename T, typename ArrayU64x64>
+	static void Store8xULL512(std::array<T, 8> &C, ArrayU64x64 &State)
 	{
 		std::array<ulong, 8> tmp;
 		size_t i;
@@ -142,8 +98,8 @@ private:
 		}
 	}
 
-	template<typename T>
-	static void Store16xULL512(std::array<T, 16> &C, std::array<ulong, 128> &State)
+	template<typename T, typename ArrayU64x128>
+	static void Store16xULL512(std::array<T, 16> &C, ArrayU64x128 &State)
 	{
 		std::array<ulong, 8> tmp;
 		size_t i;
@@ -162,6 +118,59 @@ private:
 		}
 	}
 
+#elif defined(CEX_HAS_AVX2)
+
+	// AVX2
+	template<typename T, typename ArrayU64x16>
+	static void Store4xULL256(std::array<T, 4> &C, ArrayU64x16 &State)
+	{
+		std::array<ulong, 4> tmp;
+		size_t i;
+
+		for (i = 0; i < 4; ++i)
+		{
+			C[i].Store(tmp, 0);
+			State[i] = tmp[0];
+			State[i + 4] = tmp[1];
+			State[i + 8] = tmp[2];
+			State[i + 12] = tmp[3];
+		}
+	}
+
+	template<typename T, typename ArrayU64x32>
+	static void Store8xULL256(std::array<T, 8> &C, ArrayU64x32 &State)
+	{
+		std::array<ulong, 4> tmp;
+		size_t i;
+
+		for (i = 0; i < 8; ++i)
+		{
+			C[i].Store(tmp, 0);
+			State[i] = tmp[0];
+			State[i + 8] = tmp[1];
+			State[i + 16] = tmp[2];
+			State[i + 24] = tmp[3];
+		}
+	}
+
+	template<typename T, typename ArrayU64x64>
+	static void Store16xULL256(std::array<T, 16> &C, ArrayU64x64 &State)
+	{
+		std::array<ulong, 4> tmp;
+		size_t i;
+
+		for (i = 0; i < 16; ++i)
+		{
+			C[i].Store(tmp, 0);
+			State[i] = tmp[0];
+			State[i + 16] = tmp[1];
+			State[i + 32] = tmp[2];
+			State[i + 48] = tmp[3];
+		}
+	}
+
+#endif
+
 public:
 
 	//~~~Threefish-256~~~//
@@ -173,12 +182,90 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
+	/// <param name="Key">The input cipher key array (4x uint64)</param>
+	/// <param name="Counter">The cipher counter array (2x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (4x uint64)</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
-	static void PemuteP256C(const std::array<ulong, 4> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 4> &State, size_t Rounds);
+	template<typename ArrayU64x2, typename ArrayU64x4>
+	static void PemuteP256C(const ArrayU64x4 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x4 &State, size_t Rounds)
+	{
+		std::array<ulong, 4> C;
+		std::array<ulong, 5> K;
+		std::array<ulong, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(ulong));
+		MemoryTools::SetValue(C, 2, 2 * sizeof(ulong), 0xFF);
+		MemoryTools::Copy(Key, 0, K, 0, 4 * sizeof(ulong));
+		K[4] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ 0x1BD11BDAA9FC1A22ULL;
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 4;
+			C[0] += C[1] + K[x];
+			C[1] = IntegerTools::RotL64(C[1], 14) ^ C[0];
+			// mix
+			x > 1 ? x -= 2 : x += 3;
+			C[3] += K[x] + (static_cast<ulong>(i) * 2);
+			x > 0 ? x -= 1 : x += 4;
+			y != 2 ? y += 1 : y -= 2;
+			C[2] += C[3] + K[x] + T[y];
+			C[3] = IntegerTools::RotL64(C[3], 16) ^ C[2];
+			C[0] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 52) ^ C[0];
+			C[2] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 57) ^ C[2];
+			C[0] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 23) ^ C[0];
+			C[2] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 40) ^ C[2];
+			C[0] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 5) ^ C[0];
+			C[2] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 37) ^ C[2];
+			// inject
+			C[1] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 4;
+			C[0] += C[1] + K[x];
+			C[1] = IntegerTools::RotL64(C[1], 25) ^ C[0];
+			// mix
+			x > 1 ? x -= 2 : x += 3;
+			C[3] += K[x] + (static_cast<ulong>(i) * 2) + 1;
+			x != 0 ? x -= 1 : x += 4;
+			y != 2 ? y += 1 : y -= 2;
+			C[2] += C[3] + K[x] + T[y];
+			C[3] = IntegerTools::RotL64(C[3], 33) ^ C[2];
+			C[0] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 46) ^ C[0];
+			C[2] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 12) ^ C[2];
+			C[0] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 58) ^ C[0];
+			C[2] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 22) ^ C[2];
+			C[0] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 32) ^ C[0];
+			C[2] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 32) ^ C[2];
+		}
+
+		State[0] = C[0] + K[3];
+		State[1] = C[1] + K[4] + T[0];
+		State[2] = C[2] + K[0] + T[1];
+		State[3] = C[3] + K[1] + (Rounds / 4);
+	}
 
 	/// <summary>
 	/// The unrolled form of the Threefish-256 permutation function.
@@ -186,30 +273,383 @@ public:
 	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
-	static void PemuteR72P256U(const std::array<ulong, 4> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 4> &State);
+	/// <param name="Key">The input cipher key array (4x uint64)</param>
+	/// <param name="Counter">The cipher counter array (2x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (4x uint64)</param>
+	template<typename ArrayU64x2, typename ArrayU64x4>
+	static void PemuteR72P256U(const ArrayU64x4 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x4 &State)
+	{
+		ulong C0;
+		ulong C1;
+		ulong C2;
+		ulong C3;
+		ulong K0;
+		ulong K1;
+		ulong K2;
+		ulong K3;
+		ulong K4;
+		ulong T0;
+		ulong T1;
+		ulong T2;
 
-#if defined(__AVX2__)
+		C0 = Counter[0];
+		C1 = Counter[1];
+		C2 = 0xFFFFFFFFFFFFFFFFULL;
+		C3 = 0xFFFFFFFFFFFFFFFFULL;
+		K0 = Key[0];
+		K1 = Key[1];
+		K2 = Key[2];
+		K3 = Key[3];
+		K4 = K0 ^ K1 ^ K2 ^ K3 ^ 0x1BD11BDAA9FC1A22ULL;
+		T0 = Tweak[0];
+		T1 = Tweak[1];
+		T2 = Tweak[0] ^ Tweak[1];
 
-	/// <summary>
-	/// The horizontally vectorized form of the Threefish-256 permutation function.
-	/// <para>This function processes 4*32 blocks of input in parallel using AVX2 instructions.
-	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
-	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
-	static void PemuteP4x256H(const std::array<ulong, 4> &Key, const std::array<ulong, 8> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 16> &State, size_t Rounds);
+		// rounds 0-7, inject k
+		C1 += K1 + T0;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		// mix
+		C3 += K3;
+		C2 += C3 + K2 + T1;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		// inject
+		C1 += K2 + T1;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		// mix
+		C3 += K4 + 1;
+		C2 += C3 + K3 + T2;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 8-15
+		C1 += K3 + T2;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K0 + 2;
+		C2 += C3 + K4 + T0;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K4 + T0;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K1 + 3;
+		C2 += C3 + K0 + T1;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 16-23
+		C1 += K0 + T1;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K2 + 4;
+		C2 += C3 + K1 + T2;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K1 + T2;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K3 + 5;
+		C2 += C3 + K2 + T0;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 24-31
+		C1 += K2 + T0;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K4 + 6;
+		C2 += C3 + K3 + T1;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K3 + T1;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K0 + 7;
+		C2 += C3 + K4 + T2;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 32-39
+		C1 += K4 + T2;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K1 + 8;
+		C2 += C3 + K0 + T0;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K0 + T0;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K2 + 9;
+		C2 += C3 + K1 + T1;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 40-47
+		C1 += K1 + T1;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K3 + 10;
+		C2 += C3 + K2 + T2;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K2 + T2;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K4 + 11;
+		C2 += C3 + K3 + T0;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 48-55
+		C1 += K3 + T0;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K0 + 12;
+		C2 += C3 + K4 + T1;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K4 + T1;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K1 + 13;
+		C2 += C3 + K0 + T2;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 56-63
+		C1 += K0 + T2;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K2 + 14;
+		C2 += C3 + K1 + T0;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K1 + T0;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K3 + 15;
+		C2 += C3 + K2 + T1;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
+		// rounds 64-71
+		C1 += K2 + T1;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 14) ^ C0;
+		C3 += K4 + 16;
+		C2 += C3 + K3 + T2;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 52) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 57) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 40) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 5) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 37) ^ C2;
+		C1 += K3 + T2;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C0;
+		C3 += K0 + 17;
+		C2 += C3 + K4 + T0;
+		C3 = IntegerTools::RotL64(C3, 33) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 46) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 12) ^ C2;
+		C0 += C1;
+		C1 = IntegerTools::RotL64(C1, 58) ^ C0;
+		C2 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C2;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 32) ^ C0;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 32) ^ C2;
 
-#endif
+		State[0] = C0 + K3;
+		State[1] = C1 + K4 + T0;
+		State[2] = C2 + K0 + T1;
+		State[3] = C3 + K1 + 18;
+	}
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 
 	/// <summary>
 	/// The horizontally vectorized form of the Threefish-256 permutation function.
@@ -217,12 +657,199 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
+	/// <param name="Key">The input cipher key array (4x uint64)</param>
+	/// <param name="Counter">The cipher counter array (4x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (32x uint64)</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
-	static void PemuteP8x256H(const std::array<ulong, 4> &Key, const std::array<ulong, 16> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 32> &State, size_t Rounds);
+	template<typename ArrayU64x2, typename ArrayU64x4, typename ArrayU64x16, typename ArrayU64x32>
+	static void PemuteP8x256H(const ArrayU64x4 &Key, const ArrayU64x16 &Counter, const ArrayU64x2 &Tweak, ArrayU64x32 &State, size_t Rounds)
+	{
+		std::array<ULong512, 4> C;
+		std::array<ULong512, 5> K;
+		std::array<ULong512, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		C[0].Load(Counter, 0);
+		C[1].Load(Counter, 8);
+		C[2].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[3].Load(0xFFFFFFFFFFFFFFFFULL);
+		K[0].Load(Key[0]);
+		K[1].Load(Key[1]);
+		K[2].Load(Key[2]);
+		K[3].Load(Key[3]);
+		K[8] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ ULong512(0x1BD11BDAA9FC1A22ULL);
+		T[0].Load(Tweak[0]);
+		T[1].Load(Tweak[1]);
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// 8 rounds, inject k
+			C[1] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 4;
+			C[0] += C[1] + K[x];
+			C[1] = ULong512::RotL64(C[1], 14) ^ C[0];
+			// mix
+			x > 1 ? x -= 2 : x += 3;
+			C[3] += K[x] + ULong512(i * 2);
+			x > 0 ? x -= 1 : x += 4;
+			y != 2 ? y += 1 : y -= 2;
+			C[2] += C[3] + K[x] + T[y];
+			C[3] = ULong512::RotL64(C[3], 16) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong512::RotL64(C[3], 52) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong512::RotL64(C[1], 57) ^ C[2];
+			C[0] += C[1];
+			C[1] = ULong512::RotL64(C[1], 23) ^ C[0];
+			C[2] += C[3];
+			C[3] = ULong512::RotL64(C[3], 40) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong512::RotL64(C[3], 5) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong512::RotL64(C[1], 37) ^ C[2];
+			// inject
+			C[1] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 4;
+			C[0] += C[1] + K[x];
+			C[1] = ULong512::RotL64(C[1], 25) ^ C[0];
+			// mix
+			x > 1 ? x -= 2 : x += 3;
+			C[3] += K[x] + ULong512((i * 2) + 1);
+			x != 0 ? x -= 1 : x += 4;
+			y != 2 ? y += 1 : y -= 2;
+			C[2] += C[3] + K[x] + T[y];
+			C[3] = ULong512::RotL64(C[3], 33) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong512::RotL64(C[3], 46) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong512::RotL64(C[1], 12) ^ C[2];
+			C[0] += C[1];
+			C[1] = ULong512::RotL64(C[1], 58) ^ C[0];
+			C[2] += C[3];
+			C[3] = ULong512::RotL64(C[3], 22) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong512::RotL64(C[3], 32) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong512::RotL64(C[1], 32) ^ C[2];
+		}
+
+		C[0] += K[3];
+		C[1] += K[4] + T[0];
+		C[2] += K[0] + T[1];
+		C[3] += K[1] + ULong512(Rounds / 4);
+
+		Store4xULL512(C, State);
+	}
+
+#elif defined(CEX_HAS_AVX2)
+
+	/// <summary>
+	/// The horizontally vectorized form of the Threefish-256 permutation function.
+	/// <para>This function processes 4*32 blocks of input in parallel using AVX2 instructions.
+	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
+	/// </summary>
+	/// 
+	/// <param name="Key">The input cipher key array (4x uint64)</param>
+	/// <param name="Counter">The cipher counter array (8x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (16x uint64)</param>
+	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
+	template<typename ArrayU64x2, typename ArrayU64x4, typename ArrayU64x8, typename ArrayU64x16>
+	static void PemuteP4x256H(const ArrayU64x4 &Key, const ArrayU64x8 &Counter, const ArrayU64x2 &Tweak, ArrayU64x16 &State, size_t Rounds) 
+	{
+		std::array<ULong256, 4> C;
+		std::array<ULong256, 5> K;
+		std::array<ULong256, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		C[0].Load(Counter, 0);
+		C[1].Load(Counter, 4);
+		C[2].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[3].Load(0xFFFFFFFFFFFFFFFFULL);
+		K[0].Load(Key[0]);
+		K[1].Load(Key[1]);
+		K[2].Load(Key[2]);
+		K[3].Load(Key[3]);
+		K[4] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ ULong256(0x1BD11BDAA9FC1A22ULL);
+		T[0].Load(Tweak[0]);
+		T[1].Load(Tweak[1]);
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 4;
+			C[0] += C[1] + K[x];
+			C[1] = ULong256::RotL64(C[1], 14) ^ C[0];
+			// mix
+			x > 1 ? x -= 2 : x += 3;
+			C[3] += K[x] + ULong256(static_cast<ulong>(i) * 2);
+			x > 0 ? x -= 1 : x += 4;
+			y != 2 ? y += 1 : y -= 2;
+			C[2] += C[3] + K[x] + T[y];
+			C[3] = ULong256::RotL64(C[3], 16) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong256::RotL64(C[3], 52) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong256::RotL64(C[1], 57) ^ C[2];
+			C[0] += C[1];
+			C[1] = ULong256::RotL64(C[1], 23) ^ C[0];
+			C[2] += C[3];
+			C[3] = ULong256::RotL64(C[3], 40) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong256::RotL64(C[3], 5) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong256::RotL64(C[1], 37) ^ C[2];
+			// inject
+			C[1] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 4;
+			C[0] += C[1] + K[x];
+			C[1] = ULong256::RotL64(C[1], 25) ^ C[0];
+			// mix
+			x > 1 ? x -= 2 : x += 3;
+			C[3] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
+			x != 0 ? x -= 1 : x += 4;
+			y != 2 ? y += 1 : y -= 2;
+			C[2] += C[3] + K[x] + T[y];
+			C[3] = ULong256::RotL64(C[3], 33) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong256::RotL64(C[3], 46) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong256::RotL64(C[1], 12) ^ C[2];
+			C[0] += C[1];
+			C[1] = ULong256::RotL64(C[1], 58) ^ C[0];
+			C[2] += C[3];
+			C[3] = ULong256::RotL64(C[3], 22) ^ C[2];
+			C[0] += C[3];
+			C[3] = ULong256::RotL64(C[3], 32) ^ C[0];
+			C[2] += C[1];
+			C[1] = ULong256::RotL64(C[1], 32) ^ C[2];
+		}
+
+		C[0] += K[3];
+		C[1] += K[4] + T[0];
+		C[2] += K[0] + T[1];
+		C[3] += K[1] + ULong256(Rounds / 4);
+
+		Store4xULL256(C, State);
+	}
 
 #endif
 
@@ -235,12 +862,140 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
+	/// <param name="Key">The input cipher key array (8x uint64)</param>
+	/// <param name="Counter">The cipher counter array (2x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (8x uint64)</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 96</param>
-	static void PemuteP512C(const std::array<ulong, 8> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 8> &State, size_t Rounds);
+	template<typename ArrayU64x2, typename ArrayU64x8>
+	static void PemuteP512C(const ArrayU64x8 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x8 &State, size_t Rounds)
+	{
+		std::array<ulong, 8> C;
+		std::array<ulong, 9> K;
+		std::array<ulong, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		MemoryTools::SetValue(C, 2, 6 * sizeof(ulong), 0xFF);
+		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(ulong));
+		MemoryTools::Copy(Key, 0, K, 0, 8 * sizeof(ulong));
+		K[8] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ 0x1BD11BDAA9FC1A22ULL;
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[0] += C[1] + K[x];
+			C[1] = IntegerTools::RotL64(C[1], 46) ^ C[0];
+			x < 6 ? x += 3 : x -= 6;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[2] += C[3] + K[x];
+			C[3] = IntegerTools::RotL64(C[3], 36) ^ C[2];
+			x < 6 ? x += 3 : x -= 6;
+			C[5] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 8;
+			C[4] += C[5] + K[x];
+			C[5] = IntegerTools::RotL64(C[5], 19) ^ C[4];
+			// mix
+			x < 6 ? x += 3 : x -= 6;
+			C[7] += K[x] + (static_cast<ulong>(i) * 2);
+			x != 0 ? x -= 1 : x += 8;
+			y != 2 ? y += 1 : y -= 2;
+			C[6] += C[7] + K[x] + T[y];
+			C[7] = IntegerTools::RotL64(C[7], 37) ^ C[6];
+			C[2] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 33) ^ C[2];
+			C[4] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 27) ^ C[4];
+			C[6] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 14) ^ C[6];
+			C[0] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 42) ^ C[0];
+			C[4] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 17) ^ C[4];
+			C[6] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 49) ^ C[6];
+			C[0] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 36) ^ C[0];
+			C[2] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 39) ^ C[2];
+			C[6] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 44) ^ C[6];
+			C[0] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 9) ^ C[0];
+			C[2] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 54) ^ C[2];
+			C[4] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 56) ^ C[4];
+			// inject
+			x > 3 ? x -= 4 : x += 5;
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[0] += C[1] + K[x];
+			C[1] = IntegerTools::RotL64(C[1], 39) ^ C[0];
+			x < 6 ? x += 3 : x -= 6;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[2] += C[3] + K[x];
+			C[3] = IntegerTools::RotL64(C[3], 30) ^ C[2];
+			x < 6 ? x += 3 : x -= 6;
+			C[5] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 8;
+			C[4] += C[5] + K[x];
+			C[5] = IntegerTools::RotL64(C[5], 34) ^ C[4];
+			// mix
+			x < 6 ? x += 3 : x -= 6;
+			C[7] += K[x] + (static_cast<ulong>(i) * 2) + 1;
+			x != 0 ? x -= 1 : x += 8;
+			y != 2 ? y += 1 : y -= 2;
+			C[6] += C[7] + K[x] + T[y];
+			C[7] = IntegerTools::RotL64(C[7], 24) ^ C[6];
+			C[2] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 13) ^ C[2];
+			C[4] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 50) ^ C[4];
+			C[6] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 10) ^ C[6];
+			C[0] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 17) ^ C[0];
+			C[4] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 25) ^ C[4];
+			C[6] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 29) ^ C[6];
+			C[0] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 39) ^ C[0];
+			C[2] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 43) ^ C[2];
+			C[6] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 8) ^ C[6];
+			C[0] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 35) ^ C[0];
+			C[2] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 56) ^ C[2];
+			C[4] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 22) ^ C[4];
+			x > 3 ? x -= 4 : x += 5;
+		}
+
+		State[0] = C[0] + K[0];
+		State[1] = C[1] + K[1];
+		State[2] = C[2] + K[2];
+		State[3] = C[3] + K[3];
+		State[4] = C[4] + K[4];
+		State[5] = C[5] + K[5] + T[0];
+		State[6] = C[6] + K[6] + T[1];
+		State[7] = C[7] + K[7] + (Rounds / 4);
+	}
 
 	/// <summary>
 	/// The unrolled form of the Threefish-512 permutation function processing 96 rounds.
@@ -248,30 +1003,946 @@ public:
 	/// To enable this function, remove the CEX_CIPHER_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
-	static void PemuteR96P512U(const std::array<ulong, 8> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 8> &State);
+	/// <param name="Key">The input cipher key array (8x uint64)</param>
+	/// <param name="Counter">The cipher counter array (2x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (8x uint64)</param>
+	template<typename ArrayU64x2, typename ArrayU64x8>
+	static void PemuteR96P512U(const ArrayU64x8 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x8 &State)
+	{
+		ulong C0;
+		ulong C1;
+		ulong C2;
+		ulong C3;
+		ulong C4;
+		ulong C5;
+		ulong C6;
+		ulong C7;
+		ulong K0;
+		ulong K1;
+		ulong K2;
+		ulong K3;
+		ulong K4;
+		ulong K5;
+		ulong K6;
+		ulong K7;
+		ulong K8;
+		ulong T0;
+		ulong T1;
+		ulong T2;
 
-#if defined(__AVX2__)
+		C0 = Counter[0];
+		C1 = Counter[1];
+		C2 = 0xFFFFFFFFFFFFFFFFULL;
+		C3 = 0xFFFFFFFFFFFFFFFFULL;
+		C4 = 0xFFFFFFFFFFFFFFFFULL;
+		C5 = 0xFFFFFFFFFFFFFFFFULL;
+		C6 = 0xFFFFFFFFFFFFFFFFULL;
+		C7 = 0xFFFFFFFFFFFFFFFFULL;
+		K0 = Key[0];
+		K1 = Key[1];
+		K2 = Key[2];
+		K3 = Key[3];
+		K4 = Key[4];
+		K5 = Key[5];
+		K6 = Key[6];
+		K7 = Key[7];
+		K8 = K0 ^ K1 ^ K2 ^ K3 ^ K4 ^ K5 ^ K6 ^ K7 ^ 0x1BD11BDAA9FC1A22ULL;
+		T0 = Tweak[0];
+		T1 = Tweak[1];
+		T2 = Tweak[0] ^ Tweak[1];
 
-	/// <summary>
-	/// The horizontally vectorized form of the Threefish-512 permutation function.
-	/// <para>This function processes 4*64 blocks of input in parallel using AVX2 instructions.
-	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
-	/// <param name="Rounds">The number of mixing rounds; the default is 96</param>
-	static void PemuteP4x512H(const std::array<ulong, 8> &Key, const std::array<ulong, 8> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 32> &State, size_t Rounds);
+		// rounds 0-7, inject k
+		C1 += K1;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K3;
+		C2 += C3 + K2;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K5 + T0;
+		C4 += C5 + K4;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		// mix 
+		C7 += K7;
+		C6 += C7 + K6 + T1;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		// inject
+		C1 += K2;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K4;
+		C2 += C3 + K3;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K6 + T1;
+		C4 += C5 + K5;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		// mix
+		C7 += K8 + 1;
+		C6 += C7 + K7 + T2;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 8-15
+		C1 += K3;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K5;
+		C2 += C3 + K4;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K7 + T2;
+		C4 += C5 + K6;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K0 + 2;
+		C6 += C7 + K8 + T0;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K4;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K6;
+		C2 += C3 + K5;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K8 + T0;
+		C4 += C5 + K7;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K1 + 3;
+		C6 += C7 + K0 + T1;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 16-23
+		C1 += K5;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K7;
+		C2 += C3 + K6;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K0 + T1;
+		C4 += C5 + K8;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K2 + 4;
+		C6 += C7 + K1 + T2;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K6;
+		C0 += C1 + K5;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K8;
+		C2 += C3 + K7;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K1 + T2;
+		C4 += C5 + K0;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K3 + 5;
+		C6 += C7 + K2 + T0;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 24-31
+		C1 += K7;
+		C0 += C1 + K6;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K0;
+		C2 += C3 + K8;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K2 + T0;
+		C4 += C5 + K1;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K4 + 6;
+		C6 += C7 + K3 + T1;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K8;
+		C0 += C1 + K7;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K1;
+		C2 += C3 + K0;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K3 + T1;
+		C4 += C5 + K2;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K5 + 7;
+		C6 += C7 + K4 + T2;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 32-39
+		C1 += K0;
+		C0 += C1 + K8;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K2;
+		C2 += C3 + K1;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K4 + T2;
+		C4 += C5 + K3;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K6 + 8;
+		C6 += C7 + K5 + T0;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K1;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K3;
+		C2 += C3 + K2;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K5 + T0;
+		C4 += C5 + K4;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K7 + 9;
+		C6 += C7 + K6 + T1;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 40-47
+		C1 += K2;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K4;
+		C2 += C3 + K3;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K6 + T1;
+		C4 += C5 + K5;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K8 + 10;
+		C6 += C7 + K7 + T2;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K3;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K5;
+		C2 += C3 + K4;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K7 + T2;
+		C4 += C5 + K6;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K0 + 11;
+		C6 += C7 + K8 + T0;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 48-55
+		C1 += K4;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K6;
+		C2 += C3 + K5;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K8 + T0;
+		C4 += C5 + K7;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K1 + 12;
+		C6 += C7 + K0 + T1;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K5;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K7;
+		C2 += C3 + K6;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K0 + T1;
+		C4 += C5 + K8;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K2 + 13;
+		C6 += C7 + K1 + T2;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 56-63
+		C1 += K6;
+		C0 += C1 + K5;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K8;
+		C2 += C3 + K7;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K1 + T2;
+		C4 += C5 + K0;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K3 + 14;
+		C6 += C7 + K2 + T0;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K7;
+		C0 += C1 + K6;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K0;
+		C2 += C3 + K8;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K2 + T0;
+		C4 += C5 + K1;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K4 + 15;
+		C6 += C7 + K3 + T1;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 64-71
+		C1 += K8;
+		C0 += C1 + K7;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K1;
+		C2 += C3 + K0;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K3 + T1;
+		C4 += C5 + K2;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K5 + 16;
+		C6 += C7 + K4 + T2;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K0;
+		C0 += C1 + K8;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K2;
+		C2 += C3 + K1;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K4 + T2;
+		C4 += C5 + K3;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K6 + 17;
+		C6 += C7 + K5 + T0;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 72-79
+		C1 += K1;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K3;
+		C2 += C3 + K2;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K5 + T0;
+		C4 += C5 + K4;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K7 + 18;
+		C6 += C7 + K6 + T1;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K2;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K4;
+		C2 += C3 + K3;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K6 + T1;
+		C4 += C5 + K5;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K8 + 19;
+		C6 += C7 + K7 + T2;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 80-87
+		C1 += K3;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K5;
+		C2 += C3 + K4;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K7 + T2;
+		C4 += C5 + K6;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K0 + 20;
+		C6 += C7 + K8 + T0;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K4;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K6;
+		C2 += C3 + K5;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K8 + T0;
+		C4 += C5 + K7;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K1 + 21;
+		C6 += C7 + K0 + T1;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
+		// rounds 88-95
+		C1 += K5;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C0;
+		C3 += K7;
+		C2 += C3 + K6;
+		C3 = IntegerTools::RotL64(C3, 36) ^ C2;
+		C5 += K0 + T1;
+		C4 += C5 + K8;
+		C5 = IntegerTools::RotL64(C5, 19) ^ C4;
+		C7 += K2 + 22;
+		C6 += C7 + K1 + T2;
+		C7 = IntegerTools::RotL64(C7, 37) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 33) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 27) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 14) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 42) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 17) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 49) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 36) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 39) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 44) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 9) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 54) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 56) ^ C4;
+		C1 += K6;
+		C0 += C1 + K5;
+		C1 = IntegerTools::RotL64(C1, 39) ^ C0;
+		C3 += K8;
+		C2 += C3 + K7;
+		C3 = IntegerTools::RotL64(C3, 30) ^ C2;
+		C5 += K1 + T2;
+		C4 += C5 + K0;
+		C5 = IntegerTools::RotL64(C5, 34) ^ C4;
+		C7 += K3 + 23;
+		C6 += C7 + K2 + T0;
+		C7 = IntegerTools::RotL64(C7, 24) ^ C6;
+		C2 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C2;
+		C4 += C7;
+		C7 = IntegerTools::RotL64(C7, 50) ^ C4;
+		C6 += C5;
+		C5 = IntegerTools::RotL64(C5, 10) ^ C6;
+		C0 += C3;
+		C3 = IntegerTools::RotL64(C3, 17) ^ C0;
+		C4 += C1;
+		C1 = IntegerTools::RotL64(C1, 25) ^ C4;
+		C6 += C3;
+		C3 = IntegerTools::RotL64(C3, 29) ^ C6;
+		C0 += C5;
+		C5 = IntegerTools::RotL64(C5, 39) ^ C0;
+		C2 += C7;
+		C7 = IntegerTools::RotL64(C7, 43) ^ C2;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 8) ^ C6;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 35) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 56) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 22) ^ C4;
 
-#endif
+		State[0] = C0 + K0;
+		State[1] = C1 + K1;
+		State[2] = C2 + K2;
+		State[3] = C3 + K3;
+		State[4] = C4 + K4;
+		State[5] = C5 + K5 + T0;
+		State[6] = C6 + K6 + T1;
+		State[7] = C7 + K7 + 24;
+	}
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 
 	/// <summary>
 	/// The horizontally vectorized form of the Threefish-512 permutation function.
@@ -279,12 +1950,315 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
+	/// <param name="Key">The input cipher key array (8x uint64)</param>
+	/// <param name="Counter">The cipher counter array (16x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (64x uint64)</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 96</param>
-	static void PemuteP8x512H(const std::array<ulong, 8> &Key, const std::array<ulong, 16> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 64> &State, size_t Rounds);
+	template<typename ArrayU64x2, typename ArrayU64x8, typename ArrayU64x16, typename ArrayU64x64>
+	static void PemuteP8x512H(const ArrayU64x8 &Key, const ArrayU64x16 &Counter, const ArrayU64x2 &Tweak, ArrayU64x64 &State, size_t Rounds)
+	{
+		std::array<ULong512, 8> C;
+		std::array<ULong512, 9> K;
+		std::array<ULong512, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		C[0].Load(Counter, 0);
+		C[1].Load(Counter, 8);
+		C[2].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[3].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[4].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[5].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[6].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[7].Load(0xFFFFFFFFFFFFFFFFULL);
+		K[0].Load(Key[0]);
+		K[1].Load(Key[1]);
+		K[2].Load(Key[2]);
+		K[3].Load(Key[3]);
+		K[4].Load(Key[4]);
+		K[5].Load(Key[5]);
+		K[6].Load(Key[6]);
+		K[7].Load(Key[7]);
+		K[8] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ ULong512(0x1BD11BDAA9FC1A22ULL);
+		T[0].Load(Tweak[0]);
+		T[1].Load(Tweak[1]);
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[0] += C[1] + K[x];
+			C[1] = ULong512::RotL64(C[1], 46) ^ C[0];
+			x < 6 ? x += 3 : x -= 6;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[2] += C[3] + K[x];
+			C[3] = ULong512::RotL64(C[3], 36) ^ C[2];
+			x < 6 ? x += 3 : x -= 6;
+			C[5] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 8;
+			C[4] += C[5] + K[x];
+			C[5] = ULong512::RotL64(C[5], 19) ^ C[4];
+			// mix
+			x < 6 ? x += 3 : x -= 6;
+			C[7] += K[x] + ULong512(i * 2);
+			x != 0 ? x -= 1 : x += 8;
+			y != 2 ? y += 1 : y -= 2;
+			C[6] += C[7] + K[x] + T[y];
+			C[7] = ULong512::RotL64(C[7], 37) ^ C[6];
+			C[2] += C[1];
+			C[1] = ULong512::RotL64(C[1], 33) ^ C[2];
+			C[4] += C[7];
+			C[7] = ULong512::RotL64(C[7], 27) ^ C[4];
+			C[6] += C[5];
+			C[5] = ULong512::RotL64(C[5], 14) ^ C[6];
+			C[0] += C[3];
+			C[3] = ULong512::RotL64(C[3], 42) ^ C[0];
+			C[4] += C[1];
+			C[1] = ULong512::RotL64(C[1], 17) ^ C[4];
+			C[6] += C[3];
+			C[3] = ULong512::RotL64(C[3], 49) ^ C[6];
+			C[0] += C[5];
+			C[5] = ULong512::RotL64(C[5], 36) ^ C[0];
+			C[2] += C[7];
+			C[7] = ULong512::RotL64(C[7], 39) ^ C[2];
+			C[6] += C[1];
+			C[1] = ULong512::RotL64(C[1], 44) ^ C[6];
+			C[0] += C[7];
+			C[7] = ULong512::RotL64(C[7], 9) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong512::RotL64(C[5], 54) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong512::RotL64(C[3], 56) ^ C[4];
+			// inject
+			x > 3 ? x -= 4 : x += 5;
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[0] += C[1] + K[x];
+			C[1] = ULong512::RotL64(C[1], 39) ^ C[0];
+			x < 6 ? x += 3 : x -= 6;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[2] += C[3] + K[x];
+			C[3] = ULong512::RotL64(C[3], 30) ^ C[2];
+			x < 6 ? x += 3 : x -= 6;
+			C[5] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 8;
+			C[4] += C[5] + K[x];
+			C[5] = ULong512::RotL64(C[5], 34) ^ C[4];
+			// mix
+			x < 6 ? x += 3 : x -= 6;
+			C[7] += K[x] + ULong512((i * 2) + 1);
+			x != 0 ? x -= 1 : x += 8;
+			y != 2 ? y += 1 : y -= 2;
+			C[6] += C[7] + K[x] + T[y];
+			C[7] = ULong512::RotL64(C[7], 24) ^ C[6];
+			C[2] += C[1];
+			C[1] = ULong512::RotL64(C[1], 13) ^ C[2];
+			C[4] += C[7];
+			C[7] = ULong512::RotL64(C[7], 50) ^ C[4];
+			C[6] += C[5];
+			C[5] = ULong512::RotL64(C[5], 10) ^ C[6];
+			C[0] += C[3];
+			C[3] = ULong512::RotL64(C[3], 17) ^ C[0];
+			C[4] += C[1];
+			C[1] = ULong512::RotL64(C[1], 25) ^ C[4];
+			C[6] += C[3];
+			C[3] = ULong512::RotL64(C[3], 29) ^ C[6];
+			C[0] += C[5];
+			C[5] = ULong512::RotL64(C[5], 39) ^ C[0];
+			C[2] += C[7];
+			C[7] = ULong512::RotL64(C[7], 43) ^ C[2];
+			C[6] += C[1];
+			C[1] = ULong512::RotL64(C[1], 8) ^ C[6];
+			C[0] += C[7];
+			C[7] = ULong512::RotL64(C[7], 35) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong512::RotL64(C[5], 56) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong512::RotL64(C[3], 22) ^ C[4];
+			x > 3 ? x -= 4 : x += 5;
+		}
+
+		C[0] += K[0];
+		C[1] += K[1];
+		C[2] += K[2];
+		C[3] += K[3];
+		C[4] += K[4];
+		C[5] += K[5] + T[0];
+		C[6] += K[6] + T[1];
+		C[7] += K[7] + ULong512(Rounds / 4);
+
+		Store8xULL512(C, State);
+	}
+
+#elif defined(CEX_HAS_AVX2)
+
+	/// <summary>
+	/// The horizontally vectorized form of the Threefish-512 permutation function.
+	/// <para>This function processes 4*64 blocks of input in parallel using AVX2 instructions.
+	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
+	/// </summary>
+	/// 
+	/// <param name="Key">The input cipher key array (8x uint64)</param>
+	/// <param name="Counter">The cipher counter array (8x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (32x uint64)</param>
+	/// <param name="Rounds">The number of mixing rounds; the default is 96</param>
+	template<typename ArrayU64x2, typename ArrayU64x8, typename ArrayU64x32>
+	static void PemuteP4x512H(const ArrayU64x8 &Key, const ArrayU64x8 &Counter, const ArrayU64x2 &Tweak, ArrayU64x32 &State, size_t Rounds)
+	{
+		std::array<ULong256, 8> C; // Note: time loading it here
+		std::array<ULong256, 9> K;
+		std::array<ULong256, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		C[0].Load(Counter, 0);
+		C[1].Load(Counter, 4);
+		C[2].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[3].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[4].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[5].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[6].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[7].Load(0xFFFFFFFFFFFFFFFFULL);
+		K[0].Load(Key[0]);
+		K[1].Load(Key[1]);
+		K[2].Load(Key[2]);
+		K[3].Load(Key[3]);
+		K[4].Load(Key[4]);
+		K[5].Load(Key[5]);
+		K[6].Load(Key[6]);
+		K[7].Load(Key[7]);
+		K[8] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ ULong256(0x1BD11BDAA9FC1A22ULL);
+		T[0].Load(Tweak[0]);
+		T[1].Load(Tweak[1]);
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[0] += C[1] + K[x];
+			C[1] = ULong256::RotL64(C[1], 46) ^ C[0];
+			x < 6 ? x += 3 : x -= 6;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[2] += C[3] + K[x];
+			C[3] = ULong256::RotL64(C[3], 36) ^ C[2];
+			x < 6 ? x += 3 : x -= 6;
+			C[5] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 8;
+			C[4] += C[5] + K[x];
+			C[5] = ULong256::RotL64(C[5], 19) ^ C[4];
+			// mix
+			x < 6 ? x += 3 : x -= 6;
+			C[7] += K[x] + ULong256(static_cast<ulong>(i) * 2);
+			x != 0 ? x -= 1 : x += 8;
+			y != 2 ? y += 1 : y -= 2;
+			C[6] += C[7] + K[x] + T[y];
+			C[7] = ULong256::RotL64(C[7], 37) ^ C[6];
+			C[2] += C[1];
+			C[1] = ULong256::RotL64(C[1], 33) ^ C[2];
+			C[4] += C[7];
+			C[7] = ULong256::RotL64(C[7], 27) ^ C[4];
+			C[6] += C[5];
+			C[5] = ULong256::RotL64(C[5], 14) ^ C[6];
+			C[0] += C[3];
+			C[3] = ULong256::RotL64(C[3], 42) ^ C[0];
+			C[4] += C[1];
+			C[1] = ULong256::RotL64(C[1], 17) ^ C[4];
+			C[6] += C[3];
+			C[3] = ULong256::RotL64(C[3], 49) ^ C[6];
+			C[0] += C[5];
+			C[5] = ULong256::RotL64(C[5], 36) ^ C[0];
+			C[2] += C[7];
+			C[7] = ULong256::RotL64(C[7], 39) ^ C[2];
+			C[6] += C[1];
+			C[1] = ULong256::RotL64(C[1], 44) ^ C[6];
+			C[0] += C[7];
+			C[7] = ULong256::RotL64(C[7], 9) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong256::RotL64(C[5], 54) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong256::RotL64(C[3], 56) ^ C[4];
+			// inject
+			x > 3 ? x -= 4 : x += 5;
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[0] += C[1] + K[x];
+			C[1] = ULong256::RotL64(C[1], 39) ^ C[0];
+			x < 6 ? x += 3 : x -= 6;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 8;
+			C[2] += C[3] + K[x];
+			C[3] = ULong256::RotL64(C[3], 30) ^ C[2];
+			x < 6 ? x += 3 : x -= 6;
+			C[5] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 8;
+			C[4] += C[5] + K[x];
+			C[5] = ULong256::RotL64(C[5], 34) ^ C[4];
+			// mix
+			x < 6 ? x += 3 : x -= 6;
+			C[7] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
+			x != 0 ? x -= 1 : x += 8;
+			y != 2 ? y += 1 : y -= 2;
+			C[6] += C[7] + K[x] + T[y];
+			C[7] = ULong256::RotL64(C[7], 24) ^ C[6];
+			C[2] += C[1];
+			C[1] = ULong256::RotL64(C[1], 13) ^ C[2];
+			C[4] += C[7];
+			C[7] = ULong256::RotL64(C[7], 50) ^ C[4];
+			C[6] += C[5];
+			C[5] = ULong256::RotL64(C[5], 10) ^ C[6];
+			C[0] += C[3];
+			C[3] = ULong256::RotL64(C[3], 17) ^ C[0];
+			C[4] += C[1];
+			C[1] = ULong256::RotL64(C[1], 25) ^ C[4];
+			C[6] += C[3];
+			C[3] = ULong256::RotL64(C[3], 29) ^ C[6];
+			C[0] += C[5];
+			C[5] = ULong256::RotL64(C[5], 39) ^ C[0];
+			C[2] += C[7];
+			C[7] = ULong256::RotL64(C[7], 43) ^ C[2];
+			C[6] += C[1];
+			C[1] = ULong256::RotL64(C[1], 8) ^ C[6];
+			C[0] += C[7];
+			C[7] = ULong256::RotL64(C[7], 35) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong256::RotL64(C[5], 56) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong256::RotL64(C[3], 22) ^ C[4];
+			x > 3 ? x -= 4 : x += 5;
+		}
+
+		C[0] += K[0];
+		C[1] += K[1];
+		C[2] += K[2];
+		C[3] += K[3];
+		C[4] += K[4];
+		C[5] += K[5] + T[0];
+		C[6] += K[6] + T[1];
+		C[7] += K[7] + ULong256(Rounds / 4);
+
+		Store8xULL256(C, State);
+	}
 
 #endif
 
@@ -297,12 +2271,236 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
+	/// <param name="Key">The input cipher key array (16x uint64)</param>
+	/// <param name="Counter">The cipher counter array (2x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (16x uint64)</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 128</param>
-	static void PemuteP1024C(const std::array<ulong, 16> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 16> &State, size_t Rounds);
+	template<typename ArrayU64x2, typename ArrayU64x16>
+	static void PemuteP1024C(const ArrayU64x16 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x16 &State, size_t Rounds)
+	{
+		std::array<ulong, 16> C;
+		std::array<ulong, 17> K;
+		std::array<ulong, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		MemoryTools::Copy(Counter, 0, C, 0, 2 * sizeof(ulong));
+		MemoryTools::SetValue(C, 2, 14 * sizeof(ulong), 0xFF);
+		MemoryTools::Copy(Key, 0, K, 0, 16 * sizeof(ulong));
+		K[16] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ K[8] ^ K[9] ^ K[10] ^ K[11] ^ K[12] ^ K[13] ^ K[14] ^ K[15] ^ 0x1BD11BDAA9FC1A22ULL;
+		MemoryTools::Copy(Tweak, 0, T, 0, 2 * sizeof(ulong));
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[0] += C[1] + K[x];
+			C[1] = IntegerTools::RotL64(C[1], 24) ^ C[0];
+			x < 14 ? x += 3 : x -= 14;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[2] += C[3] + K[x];
+			C[3] = IntegerTools::RotL64(C[3], 13) ^ C[2];
+			x < 14 ? x += 3 : x -= 14;
+			C[5] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[4] += C[5] + K[x];
+			C[5] = IntegerTools::RotL64(C[5], 8) ^ C[4];
+			x < 14 ? x += 3 : x -= 14;
+			C[7] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[6] += C[7] + K[x];
+			C[7] = IntegerTools::RotL64(C[7], 47) ^ C[6];
+			x < 14 ? x += 3 : x -= 14;
+			C[9] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[8] += C[9] + K[x];
+			C[9] = IntegerTools::RotL64(C[9], 8) ^ C[8];
+			x < 14 ? x += 3 : x -= 14;
+			C[11] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[10] += C[11] + K[x];
+			C[11] = IntegerTools::RotL64(C[11], 17) ^ C[10];
+			x < 14 ? x += 3 : x -= 14;
+			C[13] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 16;
+			C[12] += C[13] + K[x];
+			C[13] = IntegerTools::RotL64(C[13], 22) ^ C[12];
+			// mix
+			x < 14 ? x += 3 : x -= 14;
+			C[15] += K[x] + (static_cast<ulong>(i) * 2);
+			x != 0 ? x -= 1 : x += 16;
+			y != 2 ? y += 1 : y -= 2;
+			C[14] += C[15] + K[x] + T[y];
+			C[15] = IntegerTools::RotL64(C[15], 37) ^ C[14];
+			C[0] += C[9];
+			C[9] = IntegerTools::RotL64(C[9], 38) ^ C[0];
+			C[2] += C[13];
+			C[13] = IntegerTools::RotL64(C[13], 19) ^ C[2];
+			C[6] += C[11];
+			C[11] = IntegerTools::RotL64(C[11], 10) ^ C[6];
+			C[4] += C[15];
+			C[15] = IntegerTools::RotL64(C[15], 55) ^ C[4];
+			C[10] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 49) ^ C[10];
+			C[12] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 18) ^ C[12];
+			C[14] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 23) ^ C[14];
+			C[8] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 52) ^ C[8];
+			C[0] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 33) ^ C[0];
+			C[2] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 4) ^ C[2];
+			C[4] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 51) ^ C[4];
+			C[6] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 13) ^ C[6];
+			C[12] += C[15];
+			C[15] = IntegerTools::RotL64(C[15], 34) ^ C[12];
+			C[14] += C[13];
+			C[13] = IntegerTools::RotL64(C[13], 41) ^ C[14];
+			C[8] += C[11];
+			C[11] = IntegerTools::RotL64(C[11], 59) ^ C[8];
+			C[10] += C[9];
+			C[9] = IntegerTools::RotL64(C[9], 17) ^ C[10];
+			C[0] += C[15];
+			C[15] = IntegerTools::RotL64(C[15], 5) ^ C[0];
+			C[2] += C[11];
+			C[11] = IntegerTools::RotL64(C[11], 20) ^ C[2];
+			C[6] += C[13];
+			C[13] = IntegerTools::RotL64(C[13], 48) ^ C[6];
+			C[4] += C[9];
+			C[9] = IntegerTools::RotL64(C[9], 41) ^ C[4];
+			C[14] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 47) ^ C[14];
+			C[8] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 28) ^ C[8];
+			C[10] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 16) ^ C[10];
+			C[12] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 25) ^ C[12];
+			// inject
+			x > 11 ? x -= 12 : x += 5;
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[0] += C[1] + K[x];
+			C[1] = IntegerTools::RotL64(C[1], 41) ^ C[0];
+			x < 14 ? x += 3 : x -= 14;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[2] += C[3] + K[x];
+			C[3] = IntegerTools::RotL64(C[3], 9) ^ C[2];
+			x < 14 ? x += 3 : x -= 14;
+			C[5] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[4] += C[5] + K[x];
+			C[5] = IntegerTools::RotL64(C[5], 37) ^ C[4];
+			x < 14 ? x += 3 : x -= 14;
+			C[7] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[6] += C[7] + K[x];
+			C[7] = IntegerTools::RotL64(C[7], 31) ^ C[6];
+			x < 14 ? x += 3 : x -= 14;
+			C[9] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[8] += C[9] + K[x];
+			C[9] = IntegerTools::RotL64(C[9], 12) ^ C[8];
+			x < 14 ? x += 3 : x -= 14;
+			C[11] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[10] += C[11] + K[x];
+			C[11] = IntegerTools::RotL64(C[11], 47) ^ C[10];
+			x < 14 ? x += 3 : x -= 14;
+			C[13] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 16;
+			C[12] += C[13] + K[x];
+			C[13] = IntegerTools::RotL64(C[13], 44) ^ C[12];
+			// mix
+			x < 14 ? x += 3 : x -= 14;
+			C[15] += K[x] + (static_cast<ulong>(i) * 2) + 1;
+			x != 0 ? x -= 1 : x += 16;
+			y != 2 ? y += 1 : y -= 2;
+			C[14] += C[15] + K[x] + T[y];
+			C[15] = IntegerTools::RotL64(C[15], 30) ^ C[14];
+			C[0] += C[9];
+			C[9] = IntegerTools::RotL64(C[9], 16) ^ C[0];
+			C[2] += C[13];
+			C[13] = IntegerTools::RotL64(C[13], 34) ^ C[2];
+			C[6] += C[11];
+			C[11] = IntegerTools::RotL64(C[11], 56) ^ C[6];
+			C[4] += C[15];
+			C[15] = IntegerTools::RotL64(C[15], 51) ^ C[4];
+			C[10] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 4) ^ C[10];
+			C[12] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 53) ^ C[12];
+			C[14] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 42) ^ C[14];
+			C[8] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 41) ^ C[8];
+			C[0] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 31) ^ C[0];
+			C[2] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 44) ^ C[2];
+			C[4] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 47) ^ C[4];
+			C[6] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 46) ^ C[6];
+			C[12] += C[15];
+			C[15] = IntegerTools::RotL64(C[15], 19) ^ C[12];
+			C[14] += C[13];
+			C[13] = IntegerTools::RotL64(C[13], 42) ^ C[14];
+			C[8] += C[11];
+			C[11] = IntegerTools::RotL64(C[11], 44) ^ C[8];
+			C[10] += C[9];
+			C[9] = IntegerTools::RotL64(C[9], 25) ^ C[10];
+			C[0] += C[15];
+			C[15] = IntegerTools::RotL64(C[15], 9) ^ C[0];
+			C[2] += C[11];
+			C[11] = IntegerTools::RotL64(C[11], 48) ^ C[2];
+			C[6] += C[13];
+			C[13] = IntegerTools::RotL64(C[13], 35) ^ C[6];
+			C[4] += C[9];
+			C[9] = IntegerTools::RotL64(C[9], 52) ^ C[4];
+			C[14] += C[1];
+			C[1] = IntegerTools::RotL64(C[1], 23) ^ C[14];
+			C[8] += C[5];
+			C[5] = IntegerTools::RotL64(C[5], 31) ^ C[8];
+			C[10] += C[3];
+			C[3] = IntegerTools::RotL64(C[3], 37) ^ C[10];
+			C[12] += C[7];
+			C[7] = IntegerTools::RotL64(C[7], 20) ^ C[12];
+			x > 11 ? x -= 12 : x += 5;
+		}
+
+		State[0] = C[0] + K[3];
+		State[1] = C[1] + K[4];
+		State[2] = C[2] + K[5];
+		State[3] = C[3] + K[6];
+		State[4] = C[4] + K[7];
+		State[5] = C[5] + K[8];
+		State[6] = C[6] + K[9];
+		State[7] = C[7] + K[10];
+		State[8] = C[8] + K[11];
+		State[9] = C[9] + K[12];
+		State[10] = C[10] + K[13];
+		State[11] = C[11] + K[14];
+		State[12] = C[12] + K[15];
+		State[13] = C[13] + K[16] + T[2];
+		State[14] = C[14] + K[0] + T[0];
+		State[15] = C[15] + K[1] + (Rounds / 4);
+	}
 
 	/// <summary>
 	/// The unrolled form of the Threefish-1024 permutation function processing 128 rounds
@@ -310,30 +2508,2285 @@ public:
 	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
-	static void PemuteR120P1024U(const std::array<ulong, 16> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 16> &State);
+	/// <param name="Key">The input cipher key array (16x uint64)</param>
+	/// <param name="Counter">The cipher counter array (2x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (16x uint64)</param>
+	template<typename ArrayU64x2, typename ArrayU64x16>
+	static void PemuteR120P1024U(const ArrayU64x16 &Key, const ArrayU64x2 &Counter, const ArrayU64x2 &Tweak, ArrayU64x16 &State)
+	{
+		ulong C0;
+		ulong C1;
+		ulong C2;
+		ulong C3;
+		ulong C4;
+		ulong C5;
+		ulong C6;
+		ulong C7;
+		ulong C8;
+		ulong C9;
+		ulong C10;
+		ulong C11;
+		ulong C12;
+		ulong C13;
+		ulong C14;
+		ulong C15;
+		ulong K0;
+		ulong K1;
+		ulong K2;
+		ulong K3;
+		ulong K4;
+		ulong K5;
+		ulong K6;
+		ulong K7;
+		ulong K8;
+		ulong K9;
+		ulong K10;
+		ulong K11;
+		ulong K12;
+		ulong K13;
+		ulong K14;
+		ulong K15;
+		ulong K16;
+		ulong T0;
+		ulong T1;
+		ulong T2;
 
-#if defined(__AVX2__)
+		C0 = Counter[0];
+		C1 = Counter[1];
+		C2 = 0xFFFFFFFFFFFFFFFFULL;
+		C3 = 0xFFFFFFFFFFFFFFFFULL;
+		C4 = 0xFFFFFFFFFFFFFFFFULL;
+		C5 = 0xFFFFFFFFFFFFFFFFULL;
+		C6 = 0xFFFFFFFFFFFFFFFFULL;
+		C7 = 0xFFFFFFFFFFFFFFFFULL;
+		C8 = 0xFFFFFFFFFFFFFFFFULL;
+		C9 = 0xFFFFFFFFFFFFFFFFULL;
+		C10 = 0xFFFFFFFFFFFFFFFFULL;
+		C11 = 0xFFFFFFFFFFFFFFFFULL;
+		C12 = 0xFFFFFFFFFFFFFFFFULL;
+		C13 = 0xFFFFFFFFFFFFFFFFULL;
+		C14 = 0xFFFFFFFFFFFFFFFFULL;
+		C15 = 0xFFFFFFFFFFFFFFFFULL;
+		K0 = Key[0];
+		K1 = Key[1];
+		K2 = Key[2];
+		K3 = Key[3];
+		K4 = Key[4];
+		K5 = Key[5];
+		K6 = Key[6];
+		K7 = Key[7];
+		K8 = Key[8];
+		K9 = Key[9];
+		K10 = Key[10];
+		K11 = Key[11];
+		K12 = Key[12];
+		K13 = Key[13];
+		K14 = Key[14];
+		K15 = Key[15];
+		K16 = K0 ^ K1 ^ K2 ^ K3 ^ K4 ^ K5 ^ K6 ^ K7 ^ K8 ^ K9 ^ K10 ^ K11 ^ K12 ^ K13 ^ K14 ^ K15 ^ 0x1BD11BDAA9FC1A22ULL;
+		T0 = Tweak[0];
+		T1 = Tweak[1];
+		T2 = Tweak[0] ^ Tweak[1];
 
-	/// <summary>
-	/// The horizontally vectorized form of the Threefish-1024 permutation function.
-	/// <para>This function processes 4*128 blocks of input in parallel using AVX2 instructions.
-	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
-	/// <param name="Rounds">The number of mixing rounds; the default is 128</param>
-	static void PemuteP4x1024H(const std::array<ulong, 16> &Key, const std::array<ulong, 8> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 64> &State, size_t Rounds);
+		// rounds 0-7, inject k
+		C1 += K1;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K3;
+		C2 += C3 + K2;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K5;
+		C4 += C5 + K4;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K7;
+		C6 += C7 + K6;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K9;
+		C8 += C9 + K8;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K11;
+		C10 += C11 + K10;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K13 + T0;
+		C12 += C13 + K12;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		// mix
+		C15 += K15;
+		C14 += C15 + K14 + T1;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		// inject 
+		C1 += K2;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K4;
+		C2 += C3 + K3;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K6;
+		C4 += C5 + K5;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K8;
+		C6 += C7 + K7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K10;
+		C8 += C9 + K9;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K12;
+		C10 += C11 + K11;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K14 + T1;
+		C12 += C13 + K13;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		// mix
+		C15 += K16 + 1;
+		C14 += C15 + K15 + T2;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 8-15
+		C1 += K3;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K5;
+		C2 += C3 + K4;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K7;
+		C4 += C5 + K6;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K9;
+		C6 += C7 + K8;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K11;
+		C8 += C9 + K10;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K13;
+		C10 += C11 + K12;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K15 + T2;
+		C12 += C13 + K14;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K0 + 2;
+		C14 += C15 + K16 + T0;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K4;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K6;
+		C2 += C3 + K5;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K8;
+		C4 += C5 + K7;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K10;
+		C6 += C7 + K9;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K12;
+		C8 += C9 + K11;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K14;
+		C10 += C11 + K13;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K16 + T0;
+		C12 += C13 + K15;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K1 + 3;
+		C14 += C15 + K0 + T1;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 16-23
+		C1 += K5;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K7;
+		C2 += C3 + K6;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K9;
+		C4 += C5 + K8;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K11;
+		C6 += C7 + K10;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K13;
+		C8 += C9 + K12;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K15;
+		C10 += C11 + K14;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K0 + T1;
+		C12 += C13 + K16;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K2 + 4;
+		C14 += C15 + K1 + T2;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K6;
+		C0 += C1 + K5;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K8;
+		C2 += C3 + K7;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K10;
+		C4 += C5 + K9;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K12;
+		C6 += C7 + K11;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K14;
+		C8 += C9 + K13;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K16;
+		C10 += C11 + K15;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K1 + T2;
+		C12 += C13 + K0;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K3 + 5;
+		C14 += C15 + K2 + T0;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 24-31
+		C1 += K7;
+		C0 += C1 + K6;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K9;
+		C2 += C3 + K8;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K11;
+		C4 += C5 + K10;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K13;
+		C6 += C7 + K12;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K15;
+		C8 += C9 + K14;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K0;
+		C10 += C11 + K16;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K2 + T0;
+		C12 += C13 + K1;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K4 + 6;
+		C14 += C15 + K3 + T1;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K8;
+		C0 += C1 + K7;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K10;
+		C2 += C3 + K9;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K12;
+		C4 += C5 + K11;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K14;
+		C6 += C7 + K13;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K16;
+		C8 += C9 + K15;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K1;
+		C10 += C11 + K0;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K3 + T1;
+		C12 += C13 + K2;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K5 + 7;
+		C14 += C15 + K4 + T2;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 32-39
+		C1 += K9;
+		C0 += C1 + K8;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K11;
+		C2 += C3 + K10;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K13;
+		C4 += C5 + K12;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K15;
+		C6 += C7 + K14;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K0;
+		C8 += C9 + K16;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K2;
+		C10 += C11 + K1;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K4 + T2;
+		C12 += C13 + K3;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K6 + 8;
+		C14 += C15 + K5 + T0;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K10;
+		C0 += C1 + K9;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K12;
+		C2 += C3 + K11;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K14;
+		C4 += C5 + K13;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K16;
+		C6 += C7 + K15;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K1;
+		C8 += C9 + K0;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K3;
+		C10 += C11 + K2;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K5 + T0;
+		C12 += C13 + K4;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K7 + 9;
+		C14 += C15 + K6 + T1;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 40-47
+		C1 += K11;
+		C0 += C1 + K10;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K13;
+		C2 += C3 + K12;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K15;
+		C4 += C5 + K14;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K0;
+		C6 += C7 + K16;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K2;
+		C8 += C9 + K1;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K4;
+		C10 += C11 + K3;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K6 + T1;
+		C12 += C13 + K5;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K8 + 10;
+		C14 += C15 + K7 + T2;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K12;
+		C0 += C1 + K11;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K14;
+		C2 += C3 + K13;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K16;
+		C4 += C5 + K15;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K1;
+		C6 += C7 + K0;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K3;
+		C8 += C9 + K2;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K5;
+		C10 += C11 + K4;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K7 + T2;
+		C12 += C13 + K6;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K9 + 11;
+		C14 += C15 + K8 + T0;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 48-55
+		C1 += K13;
+		C0 += C1 + K12;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K15;
+		C2 += C3 + K14;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K0;
+		C4 += C5 + K16;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K2;
+		C6 += C7 + K1;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K4;
+		C8 += C9 + K3;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K6;
+		C10 += C11 + K5;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K8 + T0;
+		C12 += C13 + K7;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K10 + 12;
+		C14 += C15 + K9 + T1;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K14;
+		C0 += C1 + K13;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K16;
+		C2 += C3 + K15;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K1;
+		C4 += C5 + K0;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K3;
+		C6 += C7 + K2;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K5;
+		C8 += C9 + K4;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K7;
+		C10 += C11 + K6;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K9 + T1;
+		C12 += C13 + K8;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K11 + 13;
+		C14 += C15 + K10 + T2;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 56-63
+		C1 += K15;
+		C0 += C1 + K14;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K0;
+		C2 += C3 + K16;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K2;
+		C4 += C5 + K1;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K4;
+		C6 += C7 + K3;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K6;
+		C8 += C9 + K5;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K8;
+		C10 += C11 + K7;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K10 + T2;
+		C12 += C13 + K9;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K12 + 14;
+		C14 += C15 + K11 + T0;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K16;
+		C0 += C1 + K15;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K1;
+		C2 += C3 + K0;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K3;
+		C4 += C5 + K2;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K5;
+		C6 += C7 + K4;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K7;
+		C8 += C9 + K6;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K9;
+		C10 += C11 + K8;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K11 + T0;
+		C12 += C13 + K10;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K13 + 15;
+		C14 += C15 + K12 + T1;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 64-71
+		C1 += K0;
+		C0 += C1 + K16;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K2;
+		C2 += C3 + K1;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K4;
+		C4 += C5 + K3;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K6;
+		C6 += C7 + K5;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K8;
+		C8 += C9 + K7;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K10;
+		C10 += C11 + K9;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K12 + T1;
+		C12 += C13 + K11;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K14 + 16;
+		C14 += C15 + K13 + T2;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K1;
+		C0 += C1 + K0;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K3;
+		C2 += C3 + K2;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K5;
+		C4 += C5 + K4;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K7;
+		C6 += C7 + K6;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K9;
+		C8 += C9 + K8;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K11;
+		C10 += C11 + K10;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K13 + T2;
+		C12 += C13 + K12;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K15 + 17;
+		C14 += C15 + K14 + T0;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 72-79
+		C1 += K2;
+		C0 += C1 + K1;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K4;
+		C2 += C3 + K3;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K6;
+		C4 += C5 + K5;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K8;
+		C6 += C7 + K7;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K10;
+		C8 += C9 + K9;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K12;
+		C10 += C11 + K11;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K14 + T0;
+		C12 += C13 + K13;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K16 + 18;
+		C14 += C15 + K15 + T1;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K3;
+		C0 += C1 + K2;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K5;
+		C2 += C3 + K4;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K7;
+		C4 += C5 + K6;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K9;
+		C6 += C7 + K8;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K11;
+		C8 += C9 + K10;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K13;
+		C10 += C11 + K12;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K15 + T1;
+		C12 += C13 + K14;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K0 + 19;
+		C14 += C15 + K16 + T2;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 80-87
+		C1 += K4;
+		C0 += C1 + K3;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K6;
+		C2 += C3 + K5;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K8;
+		C4 += C5 + K7;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K10;
+		C6 += C7 + K9;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K12;
+		C8 += C9 + K11;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K14;
+		C10 += C11 + K13;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K16 + T2;
+		C12 += C13 + K15;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K1 + 20;
+		C14 += C15 + K0 + T0;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K5;
+		C0 += C1 + K4;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K7;
+		C2 += C3 + K6;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K9;
+		C4 += C5 + K8;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K11;
+		C6 += C7 + K10;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K13;
+		C8 += C9 + K12;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K15;
+		C10 += C11 + K14;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K0 + T0;
+		C12 += C13 + K16;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K2 + 21;
+		C14 += C15 + K1 + T1;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 88-95
+		C1 += K6;
+		C0 += C1 + K5;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K8;
+		C2 += C3 + K7;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K10;
+		C4 += C5 + K9;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K12;
+		C6 += C7 + K11;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K14;
+		C8 += C9 + K13;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K16;
+		C10 += C11 + K15;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K1 + T1;
+		C12 += C13 + K0;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K3 + 22;
+		C14 += C15 + K2 + T2;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K7;
+		C0 += C1 + K6;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K9;
+		C2 += C3 + K8;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K11;
+		C4 += C5 + K10;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K13;
+		C6 += C7 + K12;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K15;
+		C8 += C9 + K14;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K0;
+		C10 += C11 + K16;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K2 + T2;
+		C12 += C13 + K1;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K4 + 23;
+		C14 += C15 + K3 + T0;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 96-103
+		C1 += K8;
+		C0 += C1 + K7;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K10;
+		C2 += C3 + K9;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K12;
+		C4 += C5 + K11;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K14;
+		C6 += C7 + K13;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K16;
+		C8 += C9 + K15;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K1;
+		C10 += C11 + K0;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K3 + T0;
+		C12 += C13 + K2;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K5 + 24;
+		C14 += C15 + K4 + T1;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K9;
+		C0 += C1 + K8;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K11;
+		C2 += C3 + K10;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K13;
+		C4 += C5 + K12;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K15;
+		C6 += C7 + K14;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K0;
+		C8 += C9 + K16;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K2;
+		C10 += C11 + K1;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K4 + T1;
+		C12 += C13 + K3;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K6 + 25;
+		C14 += C15 + K5 + T2;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 103-111
+		C1 += K10;
+		C0 += C1 + K9;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K12;
+		C2 += C3 + K11;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K14;
+		C4 += C5 + K13;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K16;
+		C6 += C7 + K15;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K1;
+		C8 += C9 + K0;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K3;
+		C10 += C11 + K2;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K5 + T2;
+		C12 += C13 + K4;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K7 + 26;
+		C14 += C15 + K6 + T0;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K11;
+		C0 += C1 + K10;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K13;
+		C2 += C3 + K12;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K15;
+		C4 += C5 + K14;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K0;
+		C6 += C7 + K16;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K2;
+		C8 += C9 + K1;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K4;
+		C10 += C11 + K3;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K6 + T0;
+		C12 += C13 + K5;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K8 + 27;
+		C14 += C15 + K7 + T1;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
+		// rounds 112-119
+		C1 += K12;
+		C0 += C1 + K11;
+		C1 = IntegerTools::RotL64(C1, 24) ^ C0;
+		C3 += K14;
+		C2 += C3 + K13;
+		C3 = IntegerTools::RotL64(C3, 13) ^ C2;
+		C5 += K16;
+		C4 += C5 + K15;
+		C5 = IntegerTools::RotL64(C5, 8) ^ C4;
+		C7 += K1;
+		C6 += C7 + K0;
+		C7 = IntegerTools::RotL64(C7, 47) ^ C6;
+		C9 += K3;
+		C8 += C9 + K2;
+		C9 = IntegerTools::RotL64(C9, 8) ^ C8;
+		C11 += K5;
+		C10 += C11 + K4;
+		C11 = IntegerTools::RotL64(C11, 17) ^ C10;
+		C13 += K7 + T1;
+		C12 += C13 + K6;
+		C13 = IntegerTools::RotL64(C13, 22) ^ C12;
+		C15 += K9 + 28;
+		C14 += C15 + K8 + T2;
+		C15 = IntegerTools::RotL64(C15, 37) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 38) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 19) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 10) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 55) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 49) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 18) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 23) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 52) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 33) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 4) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 51) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 13) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 34) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 41) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 59) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 17) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 5) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 20) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 48) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 41) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 47) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 28) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 16) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 25) ^ C12;
+		C1 += K13;
+		C0 += C1 + K12;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C0;
+		C3 += K15;
+		C2 += C3 + K14;
+		C3 = IntegerTools::RotL64(C3, 9) ^ C2;
+		C5 += K0;
+		C4 += C5 + K16;
+		C5 = IntegerTools::RotL64(C5, 37) ^ C4;
+		C7 += K2;
+		C6 += C7 + K1;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C6;
+		C9 += K4;
+		C8 += C9 + K3;
+		C9 = IntegerTools::RotL64(C9, 12) ^ C8;
+		C11 += K6;
+		C10 += C11 + K5;
+		C11 = IntegerTools::RotL64(C11, 47) ^ C10;
+		C13 += K8 + T2;
+		C12 += C13 + K7;
+		C13 = IntegerTools::RotL64(C13, 44) ^ C12;
+		C15 += K10 + 29;
+		C14 += C15 + K9 + T0;
+		C15 = IntegerTools::RotL64(C15, 30) ^ C14;
+		C0 += C9;
+		C9 = IntegerTools::RotL64(C9, 16) ^ C0;
+		C2 += C13;
+		C13 = IntegerTools::RotL64(C13, 34) ^ C2;
+		C6 += C11;
+		C11 = IntegerTools::RotL64(C11, 56) ^ C6;
+		C4 += C15;
+		C15 = IntegerTools::RotL64(C15, 51) ^ C4;
+		C10 += C7;
+		C7 = IntegerTools::RotL64(C7, 4) ^ C10;
+		C12 += C3;
+		C3 = IntegerTools::RotL64(C3, 53) ^ C12;
+		C14 += C5;
+		C5 = IntegerTools::RotL64(C5, 42) ^ C14;
+		C8 += C1;
+		C1 = IntegerTools::RotL64(C1, 41) ^ C8;
+		C0 += C7;
+		C7 = IntegerTools::RotL64(C7, 31) ^ C0;
+		C2 += C5;
+		C5 = IntegerTools::RotL64(C5, 44) ^ C2;
+		C4 += C3;
+		C3 = IntegerTools::RotL64(C3, 47) ^ C4;
+		C6 += C1;
+		C1 = IntegerTools::RotL64(C1, 46) ^ C6;
+		C12 += C15;
+		C15 = IntegerTools::RotL64(C15, 19) ^ C12;
+		C14 += C13;
+		C13 = IntegerTools::RotL64(C13, 42) ^ C14;
+		C8 += C11;
+		C11 = IntegerTools::RotL64(C11, 44) ^ C8;
+		C10 += C9;
+		C9 = IntegerTools::RotL64(C9, 25) ^ C10;
+		C0 += C15;
+		C15 = IntegerTools::RotL64(C15, 9) ^ C0;
+		C2 += C11;
+		C11 = IntegerTools::RotL64(C11, 48) ^ C2;
+		C6 += C13;
+		C13 = IntegerTools::RotL64(C13, 35) ^ C6;
+		C4 += C9;
+		C9 = IntegerTools::RotL64(C9, 52) ^ C4;
+		C14 += C1;
+		C1 = IntegerTools::RotL64(C1, 23) ^ C14;
+		C8 += C5;
+		C5 = IntegerTools::RotL64(C5, 31) ^ C8;
+		C10 += C3;
+		C3 = IntegerTools::RotL64(C3, 37) ^ C10;
+		C12 += C7;
+		C7 = IntegerTools::RotL64(C7, 20) ^ C12;
 
-#endif
+		State[0] = C0 + K3;
+		State[1] = C1 + K4;
+		State[2] = C2 + K5;
+		State[3] = C3 + K6;
+		State[4] = C4 + K7;
+		State[5] = C5 + K8;
+		State[6] = C6 + K9;
+		State[7] = C7 + K10;
+		State[8] = C8 + K11;
+		State[9] = C9 + K12;
+		State[10] = C10 + K13;
+		State[11] = C11 + K14;
+		State[12] = C12 + K15;
+		State[13] = C13 + K16 + T2;
+		State[14] = C14 + K0 + T0;
+		State[15] = C15 + K1 + 30;
+	}
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 
 	/// <summary>
 	/// The horizontally vectorized form of the Threefish-1024 permutation function.
@@ -341,14 +4794,542 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Key">The input cipher key array</param>
-	/// <param name="Counter">The cipher counter array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
-	/// <param name="State">The permutations state array</param>
+	/// <param name="Key">The input cipher key array (16x uint64)</param>
+	/// <param name="Counter">The cipher counter array (16x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (128x uint64)</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 128</param>
-	static void PemuteP8x1024H(const std::array<ulong, 16> &Key, const std::array<ulong, 16> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 128> &State, size_t Rounds);
+	template<typename ArrayU64x2, typename ArrayU64x16, typename ArrayU64x128>
+	static void PemuteP8x1024H(const ArrayU64x16 &Key, const ArrayU64x16 &Counter, const ArrayU64x2 &Tweak, ArrayU64x128 &State, size_t Rounds)
+	{
+		std::array<ULong512, 16> C;
+		std::array<ULong512, 17> K;
+		std::array<ULong512, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		C[0].Load(Counter, 0);
+		C[1].Load(Counter, 8);
+		C[2].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[3].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[4].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[5].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[6].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[7].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[8].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[9].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[10].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[11].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[12].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[13].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[14].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[15].Load(0xFFFFFFFFFFFFFFFFULL);
+		K[0].Load(Key[0]);
+		K[1].Load(Key[1]);
+		K[2].Load(Key[2]);
+		K[3].Load(Key[3]);
+		K[4].Load(Key[4]);
+		K[5].Load(Key[5]);
+		K[6].Load(Key[6]);
+		K[7].Load(Key[7]);
+		K[8].Load(Key[8]);
+		K[9].Load(Key[9]);
+		K[10].Load(Key[10]);
+		K[11].Load(Key[11]);
+		K[12].Load(Key[12]);
+		K[13].Load(Key[13]);
+		K[14].Load(Key[14]);
+		K[15].Load(Key[15]);
+		K[16] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ K[8] ^ K[9] ^ K[10] ^ K[11] ^ K[12] ^ K[13] ^ K[14] ^ K[15] ^ ULong512(0x1BD11BDAA9FC1A22ULL);
+		T[0].Load(Tweak[0]);
+		T[1].Load(Tweak[1]);
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[0] += C[1] + K[x];
+			C[1] = ULong512::RotL64(C[1], 24) ^ C[0];
+			x < 14 ? x += 3 : x -= 14;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[2] += C[3] + K[x];
+			C[3] = ULong512::RotL64(C[3], 13) ^ C[2];
+			x < 14 ? x += 3 : x -= 14;
+			C[5] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[4] += C[5] + K[x];
+			C[5] = ULong512::RotL64(C[5], 8) ^ C[4];
+			x < 14 ? x += 3 : x -= 14;
+			C[7] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[6] += C[7] + K[x];
+			C[7] = ULong512::RotL64(C[7], 47) ^ C[6];
+			x < 14 ? x += 3 : x -= 14;
+			C[9] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[8] += C[9] + K[x];
+			C[9] = ULong512::RotL64(C[9], 8) ^ C[8];
+			x < 14 ? x += 3 : x -= 14;
+			C[11] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[10] += C[11] + K[x];
+			C[11] = ULong512::RotL64(C[11], 17) ^ C[10];
+			x < 14 ? x += 3 : x -= 14;
+			C[13] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 16;
+			C[12] += C[13] + K[x];
+			C[13] = ULong512::RotL64(C[13], 22) ^ C[12];
+			// mix
+			x < 14 ? x += 3 : x -= 14;
+			C[15] += K[x] + ULong512(i * 2);
+			x != 0 ? x -= 1 : x += 16;
+			y != 2 ? y += 1 : y -= 2;
+			C[14] += C[15] + K[x] + T[y];
+			C[15] = ULong512::RotL64(C[15], 37) ^ C[14];
+			C[0] += C[9];
+			C[9] = ULong512::RotL64(C[9], 38) ^ C[0];
+			C[2] += C[13];
+			C[13] = ULong512::RotL64(C[13], 19) ^ C[2];
+			C[6] += C[11];
+			C[11] = ULong512::RotL64(C[11], 10) ^ C[6];
+			C[4] += C[15];
+			C[15] = ULong512::RotL64(C[15], 55) ^ C[4];
+			C[10] += C[7];
+			C[7] = ULong512::RotL64(C[7], 49) ^ C[10];
+			C[12] += C[3];
+			C[3] = ULong512::RotL64(C[3], 18) ^ C[12];
+			C[14] += C[5];
+			C[5] = ULong512::RotL64(C[5], 23) ^ C[14];
+			C[8] += C[1];
+			C[1] = ULong512::RotL64(C[1], 52) ^ C[8];
+			C[0] += C[7];
+			C[7] = ULong512::RotL64(C[7], 33) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong512::RotL64(C[5], 4) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong512::RotL64(C[3], 51) ^ C[4];
+			C[6] += C[1];
+			C[1] = ULong512::RotL64(C[1], 13) ^ C[6];
+			C[12] += C[15];
+			C[15] = ULong512::RotL64(C[15], 34) ^ C[12];
+			C[14] += C[13];
+			C[13] = ULong512::RotL64(C[13], 41) ^ C[14];
+			C[8] += C[11];
+			C[11] = ULong512::RotL64(C[11], 59) ^ C[8];
+			C[10] += C[9];
+			C[9] = ULong512::RotL64(C[9], 17) ^ C[10];
+			C[0] += C[15];
+			C[15] = ULong512::RotL64(C[15], 5) ^ C[0];
+			C[2] += C[11];
+			C[11] = ULong512::RotL64(C[11], 20) ^ C[2];
+			C[6] += C[13];
+			C[13] = ULong512::RotL64(C[13], 48) ^ C[6];
+			C[4] += C[9];
+			C[9] = ULong512::RotL64(C[9], 41) ^ C[4];
+			C[14] += C[1];
+			C[1] = ULong512::RotL64(C[1], 47) ^ C[14];
+			C[8] += C[5];
+			C[5] = ULong512::RotL64(C[5], 28) ^ C[8];
+			C[10] += C[3];
+			C[3] = ULong512::RotL64(C[3], 16) ^ C[10];
+			C[12] += C[7];
+			C[7] = ULong512::RotL64(C[7], 25) ^ C[12];
+			// inject
+			x > 11 ? x -= 12 : x += 5;
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[0] += C[1] + K[x];
+			C[1] = ULong512::RotL64(C[1], 41) ^ C[0];
+			x < 14 ? x += 3 : x -= 14;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[2] += C[3] + K[x];
+			C[3] = ULong512::RotL64(C[3], 9) ^ C[2];
+			x < 14 ? x += 3 : x -= 14;
+			C[5] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[4] += C[5] + K[x];
+			C[5] = ULong512::RotL64(C[5], 37) ^ C[4];
+			x < 14 ? x += 3 : x -= 14;
+			C[7] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[6] += C[7] + K[x];
+			C[7] = ULong512::RotL64(C[7], 31) ^ C[6];
+			x < 14 ? x += 3 : x -= 14;
+			C[9] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[8] += C[9] + K[x];
+			C[9] = ULong512::RotL64(C[9], 12) ^ C[8];
+			x < 14 ? x += 3 : x -= 14;
+			C[11] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[10] += C[11] + K[x];
+			C[11] = ULong512::RotL64(C[11], 47) ^ C[10];
+			x < 14 ? x += 3 : x -= 14;
+			C[13] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 16;
+			C[12] += C[13] + K[x];
+			C[13] = ULong512::RotL64(C[13], 44) ^ C[12];
+			// mix
+			x < 14 ? x += 3 : x -= 14;
+			C[15] += K[x] + ULong512((i * 2) + 1);
+			x != 0 ? x -= 1 : x += 16;
+			y != 2 ? y += 1 : y -= 2;
+			C[14] += C[15] + K[x] + T[y];
+			C[15] = ULong512::RotL64(C[15], 30) ^ C[14];
+			C[0] += C[9];
+			C[9] = ULong512::RotL64(C[9], 16) ^ C[0];
+			C[2] += C[13];
+			C[13] = ULong512::RotL64(C[13], 34) ^ C[2];
+			C[6] += C[11];
+			C[11] = ULong512::RotL64(C[11], 56) ^ C[6];
+			C[4] += C[15];
+			C[15] = ULong512::RotL64(C[15], 51) ^ C[4];
+			C[10] += C[7];
+			C[7] = ULong512::RotL64(C[7], 4) ^ C[10];
+			C[12] += C[3];
+			C[3] = ULong512::RotL64(C[3], 53) ^ C[12];
+			C[14] += C[5];
+			C[5] = ULong512::RotL64(C[5], 42) ^ C[14];
+			C[8] += C[1];
+			C[1] = ULong512::RotL64(C[1], 41) ^ C[8];
+			C[0] += C[7];
+			C[7] = ULong512::RotL64(C[7], 31) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong512::RotL64(C[5], 44) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong512::RotL64(C[3], 47) ^ C[4];
+			C[6] += C[1];
+			C[1] = ULong512::RotL64(C[1], 46) ^ C[6];
+			C[12] += C[15];
+			C[15] = ULong512::RotL64(C[15], 19) ^ C[12];
+			C[14] += C[13];
+			C[13] = ULong512::RotL64(C[13], 42) ^ C[14];
+			C[8] += C[11];
+			C[11] = ULong512::RotL64(C[11], 44) ^ C[8];
+			C[10] += C[9];
+			C[9] = ULong512::RotL64(C[9], 25) ^ C[10];
+			C[0] += C[15];
+			C[15] = ULong512::RotL64(C[15], 9) ^ C[0];
+			C[2] += C[11];
+			C[11] = ULong512::RotL64(C[11], 48) ^ C[2];
+			C[6] += C[13];
+			C[13] = ULong512::RotL64(C[13], 35) ^ C[6];
+			C[4] += C[9];
+			C[9] = ULong512::RotL64(C[9], 52) ^ C[4];
+			C[14] += C[1];
+			C[1] = ULong512::RotL64(C[1], 23) ^ C[14];
+			C[8] += C[5];
+			C[5] = ULong512::RotL64(C[5], 31) ^ C[8];
+			C[10] += C[3];
+			C[3] = ULong512::RotL64(C[3], 37) ^ C[10];
+			C[12] += C[7];
+			C[7] = ULong512::RotL64(C[7], 20) ^ C[12];
+			x > 11 ? x -= 12 : x += 5;
+		}
+
+		C[0] += K[3];
+		C[1] += K[4];
+		C[2] += K[5];
+		C[3] += K[6];
+		C[4] += K[7];
+		C[5] += K[8];
+		C[6] += K[9];
+		C[7] += K[10];
+		C[8] += K[11];
+		C[9] += K[12];
+		C[10] += K[13];
+		C[11] += K[14];
+		C[12] += K[15];
+		C[13] += K[16] + T[2];
+		C[14] += K[0] + T[0];
+		C[15] += K[1] + ULong512(Rounds / 4);
+
+		Store16xULL512(C, State);
+	}
+
+#elif defined(CEX_HAS_AVX2)
+
+	/// <summary>
+	/// The horizontally vectorized form of the Threefish-1024 permutation function.
+	/// <para>This function processes 4*128 blocks of input in parallel using AVX2 instructions.
+	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
+	/// </summary>
+	/// 
+	/// <param name="Key">The input cipher key array (16x uint64)</param>
+	/// <param name="Counter">The cipher counter array (8x uint64)</param>
+	/// <param name="Tweak">The cipher tweak array (2x uint64)</param>
+	/// <param name="State">The permutations state array (64x uint64)</param>
+	/// <param name="Rounds">The number of mixing rounds; the default is 128</param>
+	template<typename ArrayU64x2, typename ArrayU64x8, typename ArrayU64x16, typename ArrayU64x64>
+	static void PemuteP4x1024H(const ArrayU64x16 &Key, const ArrayU64x8 &Counter, const ArrayU64x2 &Tweak, ArrayU64x64 &State, size_t Rounds)
+	{
+		std::array<ULong256, 16> C;
+		std::array<ULong256, 17> K;
+		std::array<ULong256, 3> T;
+		size_t i;
+		size_t r;
+		size_t x;
+		size_t y;
+
+		C[0].Load(Counter, 0);
+		C[1].Load(Counter, 4);
+		C[2].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[3].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[4].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[5].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[6].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[7].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[8].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[9].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[10].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[11].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[12].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[13].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[14].Load(0xFFFFFFFFFFFFFFFFULL);
+		C[15].Load(0xFFFFFFFFFFFFFFFFULL);
+		K[0].Load(Key[0]);
+		K[1].Load(Key[1]);
+		K[2].Load(Key[2]);
+		K[3].Load(Key[3]);
+		K[4].Load(Key[4]);
+		K[5].Load(Key[5]);
+		K[6].Load(Key[6]);
+		K[7].Load(Key[7]);
+		K[8].Load(Key[8]);
+		K[9].Load(Key[9]);
+		K[10].Load(Key[10]);
+		K[11].Load(Key[11]);
+		K[12].Load(Key[12]);
+		K[13].Load(Key[13]);
+		K[14].Load(Key[14]);
+		K[15].Load(Key[15]);
+		K[16] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ K[8] ^ K[9] ^ K[10] ^ K[11] ^ K[12] ^ K[13] ^ K[14] ^ K[15] ^ ULong256(0x1BD11BDAA9FC1A22ULL);
+		T[0].Load(Tweak[0]);
+		T[1].Load(Tweak[1]);
+		T[2] = T[0] ^ T[1];
+
+		r = Rounds / 8;
+		x = 1;
+		y = 0;
+
+		for (i = 0; i < r; ++i)
+		{
+			// round n+8, inject k
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[0] += C[1] + K[x];
+			C[1] = ULong256::RotL64(C[1], 24) ^ C[0];
+			x < 14 ? x += 3 : x -= 14;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[2] += C[3] + K[x];
+			C[3] = ULong256::RotL64(C[3], 13) ^ C[2];
+			x < 14 ? x += 3 : x -= 14;
+			C[5] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[4] += C[5] + K[x];
+			C[5] = ULong256::RotL64(C[5], 8) ^ C[4];
+			x < 14 ? x += 3 : x -= 14;
+			C[7] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[6] += C[7] + K[x];
+			C[7] = ULong256::RotL64(C[7], 47) ^ C[6];
+			x < 14 ? x += 3 : x -= 14;
+			C[9] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[8] += C[9] + K[x];
+			C[9] = ULong256::RotL64(C[9], 8) ^ C[8];
+			x < 14 ? x += 3 : x -= 14;
+			C[11] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[10] += C[11] + K[x];
+			C[11] = ULong256::RotL64(C[11], 17) ^ C[10];
+			x < 14 ? x += 3 : x -= 14;
+			C[13] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 16;
+			C[12] += C[13] + K[x];
+			C[13] = ULong256::RotL64(C[13], 22) ^ C[12];
+			// mix
+			x < 14 ? x += 3 : x -= 14;
+			C[15] += K[x] + ULong256(static_cast<ulong>(i) * 2);
+			x != 0 ? x -= 1 : x += 16;
+			y != 2 ? y += 1 : y -= 2;
+			C[14] += C[15] + K[x] + T[y];
+			C[15] = ULong256::RotL64(C[15], 37) ^ C[14];
+			C[0] += C[9];
+			C[9] = ULong256::RotL64(C[9], 38) ^ C[0];
+			C[2] += C[13];
+			C[13] = ULong256::RotL64(C[13], 19) ^ C[2];
+			C[6] += C[11];
+			C[11] = ULong256::RotL64(C[11], 10) ^ C[6];
+			C[4] += C[15];
+			C[15] = ULong256::RotL64(C[15], 55) ^ C[4];
+			C[10] += C[7];
+			C[7] = ULong256::RotL64(C[7], 49) ^ C[10];
+			C[12] += C[3];
+			C[3] = ULong256::RotL64(C[3], 18) ^ C[12];
+			C[14] += C[5];
+			C[5] = ULong256::RotL64(C[5], 23) ^ C[14];
+			C[8] += C[1];
+			C[1] = ULong256::RotL64(C[1], 52) ^ C[8];
+			C[0] += C[7];
+			C[7] = ULong256::RotL64(C[7], 33) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong256::RotL64(C[5], 4) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong256::RotL64(C[3], 51) ^ C[4];
+			C[6] += C[1];
+			C[1] = ULong256::RotL64(C[1], 13) ^ C[6];
+			C[12] += C[15];
+			C[15] = ULong256::RotL64(C[15], 34) ^ C[12];
+			C[14] += C[13];
+			C[13] = ULong256::RotL64(C[13], 41) ^ C[14];
+			C[8] += C[11];
+			C[11] = ULong256::RotL64(C[11], 59) ^ C[8];
+			C[10] += C[9];
+			C[9] = ULong256::RotL64(C[9], 17) ^ C[10];
+			C[0] += C[15];
+			C[15] = ULong256::RotL64(C[15], 5) ^ C[0];
+			C[2] += C[11];
+			C[11] = ULong256::RotL64(C[11], 20) ^ C[2];
+			C[6] += C[13];
+			C[13] = ULong256::RotL64(C[13], 48) ^ C[6];
+			C[4] += C[9];
+			C[9] = ULong256::RotL64(C[9], 41) ^ C[4];
+			C[14] += C[1];
+			C[1] = ULong256::RotL64(C[1], 47) ^ C[14];
+			C[8] += C[5];
+			C[5] = ULong256::RotL64(C[5], 28) ^ C[8];
+			C[10] += C[3];
+			C[3] = ULong256::RotL64(C[3], 16) ^ C[10];
+			C[12] += C[7];
+			C[7] = ULong256::RotL64(C[7], 25) ^ C[12];
+			// inject
+			x > 11 ? x -= 12 : x += 5;
+			C[1] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[0] += C[1] + K[x];
+			C[1] = ULong256::RotL64(C[1], 41) ^ C[0];
+			x < 14 ? x += 3 : x -= 14;
+			C[3] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[2] += C[3] + K[x];
+			C[3] = ULong256::RotL64(C[3], 9) ^ C[2];
+			x < 14 ? x += 3 : x -= 14;
+			C[5] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[4] += C[5] + K[x];
+			C[5] = ULong256::RotL64(C[5], 37) ^ C[4];
+			x < 14 ? x += 3 : x -= 14;
+			C[7] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[6] += C[7] + K[x];
+			C[7] = ULong256::RotL64(C[7], 31) ^ C[6];
+			x < 14 ? x += 3 : x -= 14;
+			C[9] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[8] += C[9] + K[x];
+			C[9] = ULong256::RotL64(C[9], 12) ^ C[8];
+			x < 14 ? x += 3 : x -= 14;
+			C[11] += K[x];
+			x != 0 ? x -= 1 : x += 16;
+			C[10] += C[11] + K[x];
+			C[11] = ULong256::RotL64(C[11], 47) ^ C[10];
+			x < 14 ? x += 3 : x -= 14;
+			C[13] += K[x] + T[y];
+			x != 0 ? x -= 1 : x += 16;
+			C[12] += C[13] + K[x];
+			C[13] = ULong256::RotL64(C[13], 44) ^ C[12];
+			// mix
+			x < 14 ? x += 3 : x -= 14;
+			C[15] += K[x] + ULong256((static_cast<ulong>(i) * 2) + 1);
+			x != 0 ? x -= 1 : x += 16;
+			y != 2 ? y += 1 : y -= 2;
+			C[14] += C[15] + K[x] + T[y];
+			C[15] = ULong256::RotL64(C[15], 30) ^ C[14];
+			C[0] += C[9];
+			C[9] = ULong256::RotL64(C[9], 16) ^ C[0];
+			C[2] += C[13];
+			C[13] = ULong256::RotL64(C[13], 34) ^ C[2];
+			C[6] += C[11];
+			C[11] = ULong256::RotL64(C[11], 56) ^ C[6];
+			C[4] += C[15];
+			C[15] = ULong256::RotL64(C[15], 51) ^ C[4];
+			C[10] += C[7];
+			C[7] = ULong256::RotL64(C[7], 4) ^ C[10];
+			C[12] += C[3];
+			C[3] = ULong256::RotL64(C[3], 53) ^ C[12];
+			C[14] += C[5];
+			C[5] = ULong256::RotL64(C[5], 42) ^ C[14];
+			C[8] += C[1];
+			C[1] = ULong256::RotL64(C[1], 41) ^ C[8];
+			C[0] += C[7];
+			C[7] = ULong256::RotL64(C[7], 31) ^ C[0];
+			C[2] += C[5];
+			C[5] = ULong256::RotL64(C[5], 44) ^ C[2];
+			C[4] += C[3];
+			C[3] = ULong256::RotL64(C[3], 47) ^ C[4];
+			C[6] += C[1];
+			C[1] = ULong256::RotL64(C[1], 46) ^ C[6];
+			C[12] += C[15];
+			C[15] = ULong256::RotL64(C[15], 19) ^ C[12];
+			C[14] += C[13];
+			C[13] = ULong256::RotL64(C[13], 42) ^ C[14];
+			C[8] += C[11];
+			C[11] = ULong256::RotL64(C[11], 44) ^ C[8];
+			C[10] += C[9];
+			C[9] = ULong256::RotL64(C[9], 25) ^ C[10];
+			C[0] += C[15];
+			C[15] = ULong256::RotL64(C[15], 9) ^ C[0];
+			C[2] += C[11];
+			C[11] = ULong256::RotL64(C[11], 48) ^ C[2];
+			C[6] += C[13];
+			C[13] = ULong256::RotL64(C[13], 35) ^ C[6];
+			C[4] += C[9];
+			C[9] = ULong256::RotL64(C[9], 52) ^ C[4];
+			C[14] += C[1];
+			C[1] = ULong256::RotL64(C[1], 23) ^ C[14];
+			C[8] += C[5];
+			C[5] = ULong256::RotL64(C[5], 31) ^ C[8];
+			C[10] += C[3];
+			C[3] = ULong256::RotL64(C[3], 37) ^ C[10];
+			C[12] += C[7];
+			C[7] = ULong256::RotL64(C[7], 20) ^ C[12];
+			x > 11 ? x -= 12 : x += 5;
+		}
+
+		C[0] += K[3];
+		C[1] += K[4];
+		C[2] += K[5];
+		C[3] += K[6];
+		C[4] += K[7];
+		C[5] += K[8];
+		C[6] += K[9];
+		C[7] += K[10];
+		C[8] += K[11];
+		C[9] += K[12];
+		C[10] += K[13];
+		C[11] += K[14];
+		C[12] += K[15];
+		C[13] += K[16] + T[2];
+		C[14] += K[0] + T[0];
+		C[15] += K[1] + ULong256(Rounds / 4);
+
+		Store16xULL256(C, State);
+	}
 
 #endif
+
 };
 
 NAMESPACE_STREAMEND

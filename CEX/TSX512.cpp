@@ -1,20 +1,21 @@
 #include "TSX512.h"
 #include "IntegerTools.h"
-#include "MacFromName.h"
+#include "KMAC.h"
 #include "MemoryTools.h"
 #include "ParallelTools.h"
 #include "SHAKE.h"
 #include "Threefish.h"
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 #	include "ULong256.h"
 #endif
 
 NAMESPACE_STREAM
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
-using Utility::ParallelTools;
+using Tools::IntegerTools;
+using Mac::KMAC;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 
 const std::string TSX512::CLASS_NAME("TSX512");
 const std::vector<byte> TSX512::OMEGA_INFO = { 0x54, 0x68, 0x72, 0x65, 0x65, 0x66, 0x69, 0x73, 0x68, 0x50, 0x35, 0x31, 0x32, 0x52, 0x39, 0x36 };
@@ -30,18 +31,26 @@ public:
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
 	ulong Counter;
-	bool Encryption;
-	bool Initialized;
+	bool IsAuthenticated;
+	bool IsEncryption;
+	bool IsInitialized;
 
-	TSX512State()
+	TSX512State(bool Authenticated)
 		:
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
 		Counter(0),
-		Encryption(false),
-		Initialized(false)
+		IsAuthenticated(Authenticated),
+		IsEncryption(false),
+		IsInitialized(false)
 	{
+	}
+
+	~TSX512State()
+	{
+		Reset();
+		IsAuthenticated = false;
 	}
 
 	void Reset()
@@ -53,19 +62,18 @@ public:
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
 		Counter = 0;
-		Encryption = false;
-		Initialized = false;
+		IsEncryption = false;
+		IsInitialized = false;
 	}
 };
 
 //~~~Constructor~~~//
 
-TSX512::TSX512(StreamAuthenticators AuthenticatorType)
+TSX512::TSX512(bool Authenticate)
 	:
-	m_tsx512State(new TSX512State),
+	m_tsx512State(new TSX512State(Authenticate)),
 	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(ulong), INFO_SIZE) },
-	m_macAuthenticator(AuthenticatorType == StreamAuthenticators::None ? nullptr :
-		Helper::MacFromName::GetInstance(AuthenticatorType)),
+	m_macAuthenticator(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 }
@@ -74,7 +82,6 @@ TSX512::~TSX512()
 {
 	if (m_tsx512State != nullptr)
 	{
-		m_tsx512State->Reset();
 		m_tsx512State.reset(nullptr);
 	}
 	if (m_macAuthenticator != nullptr)
@@ -92,7 +99,9 @@ const StreamCiphers TSX512::Enumeral()
 	StreamAuthenticators auth;
 	StreamCiphers tmpn;
 
-	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
+	auth = IsAuthenticator() ? 
+		StreamAuthenticators::KMAC512 : 
+		StreamAuthenticators::None;
 	tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::TSX256, auth);
 
 	return tmpn;
@@ -100,17 +109,17 @@ const StreamCiphers TSX512::Enumeral()
 
 const bool TSX512::IsAuthenticator()
 {
-	return static_cast<bool>(m_macAuthenticator != nullptr);
+	return m_tsx512State->IsAuthenticated;
 }
 
 const bool TSX512::IsEncryption()
 {
-	return m_tsx512State->Encryption;
+	return m_tsx512State->IsEncryption;
 }
 
 const bool TSX512::IsInitialized()
 {
-	return m_tsx512State->Initialized;
+	return m_tsx512State->IsInitialized;
 }
 
 const bool TSX512::IsParallel()
@@ -131,7 +140,7 @@ const std::string TSX512::Name()
 
 	if (IsAuthenticator())
 	{
-		name += std::string("-") + Enumeration::StreamAuthenticatorConvert::ToName(static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()));
+		name += std::string("-") + Enumeration::StreamAuthenticatorConvert::ToName(StreamAuthenticators::KMAC512);
 	}
 
 	return name;
@@ -169,7 +178,7 @@ const void TSX512::Tag(SecureVector<byte> &Output)
 
 const size_t TSX512::TagSize()
 {
-	return IsAuthenticator() ? m_macAuthenticator->TagSize() : 0;
+	return IsAuthenticator() ? TAG_SIZE : 0;
 }
 
 //~~~Public Functions~~~//
@@ -180,7 +189,7 @@ void TSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length!"), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.KeySizes().NonceSize() != (NONCE_SIZE * sizeof(ulong)))
+	if (Parameters.KeySizes().IVSize() != (NONCE_SIZE * sizeof(ulong)))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Nonce must be 16 bytes!"), ErrorCodes::InvalidNonce);
 	}
@@ -202,14 +211,14 @@ void TSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 
 	// reset the counter and mac
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
 
 	// copy nonce
-	m_tsx512State->Nonce[0] = IntegerTools::LeBytesTo64(Parameters.Nonce(), 0);
-	m_tsx512State->Nonce[1] = IntegerTools::LeBytesTo64(Parameters.Nonce(), 8);
+	m_tsx512State->Nonce[0] = IntegerTools::LeBytesTo64(Parameters.IV(), 0);
+	m_tsx512State->Nonce[1] = IntegerTools::LeBytesTo64(Parameters.IV(), 8);
 
 	if (Parameters.KeySizes().InfoSize() != 0)
 	{
@@ -224,7 +233,7 @@ void TSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_tsx512State->Tweak[1] = IntegerTools::LeBytesTo64(OMEGA_INFO, 8);
 	}
 
-	if (!IsAuthenticator())
+	if (IsAuthenticator() == false)
 	{
 		m_tsx512State->Key[0] = IntegerTools::LeBytesTo64(Parameters.Key(), 0);
 		m_tsx512State->Key[1] = IntegerTools::LeBytesTo64(Parameters.Key(), 8);
@@ -237,6 +246,8 @@ void TSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 	else
 	{
+		m_macAuthenticator.reset(new KMAC(Enumeration::KmacModes::KMAC512));
+
 		// set the initial counter value
 		m_tsx512State->Counter = 1;
 
@@ -273,12 +284,12 @@ void TSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_macAuthenticator->Initialize(kpm);
 		// store the key
 		m_tsx512State->MacKey.resize(mack.size());
-		SecureMove(mack, m_tsx512State->MacKey, 0);
+		SecureMove(mack, 0, m_tsx512State->MacKey, 0, mack.size());
 		m_tsx512State->MacTag.resize(TagSize());
 	}
 
-	m_tsx512State->Encryption = Encryption;
-	m_tsx512State->Initialized = true;
+	m_tsx512State->IsEncryption = Encryption;
+	m_tsx512State->IsInitialized = true;
 }
 
 void TSX512::ParallelMaxDegree(size_t Degree)
@@ -293,11 +304,11 @@ void TSX512::ParallelMaxDegree(size_t Degree)
 
 void TSX512::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
-	if (!IsAuthenticator())
+	if (IsAuthenticator() == false)
 	{
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
@@ -308,9 +319,9 @@ void TSX512::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, si
 
 void TSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (IsEncryption())
+	if (IsEncryption() == true)
 	{
-		if (IsAuthenticator())
+		if (IsAuthenticator() == true)
 		{
 			if (Output.size() < Length + OutOffset + m_macAuthenticator->TagSize())
 			{
@@ -368,7 +379,7 @@ void TSX512::Finalize(std::unique_ptr<TSX512State> &State, std::unique_ptr<IMac>
 	// generate the mac code
 	Authenticator->Finalize(State->MacTag, 0);
 
-	// customization string is: mac counter + algorithm name
+	// customization string is mac counter + algorithm name
 	IntegerTools::Le64ToBytes(State->Counter, State->Custom, 0);
 
 	// extract the new mac key
@@ -382,7 +393,7 @@ void TSX512::Finalize(std::unique_ptr<TSX512State> &State, std::unique_ptr<IMac>
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
-	SecureMove(mack, State->MacKey, 0);
+	SecureMove(mack, 0, State->MacKey, 0, mack.size());
 }
 
 void TSX512::Generate(std::unique_ptr<TSX512State> &State, std::array<ulong, 2> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -391,7 +402,7 @@ void TSX512::Generate(std::unique_ptr<TSX512State> &State, std::array<ulong, 2> 
 
 	ctr = 0;
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 
 	const size_t AVX512BLK = 8 * BLOCK_SIZE;
 
@@ -434,7 +445,7 @@ void TSX512::Generate(std::unique_ptr<TSX512State> &State, std::array<ulong, 2> 
 		}
 	}
 
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 
 	const size_t AVX2BLK = 4 * BLOCK_SIZE;
 

@@ -2,16 +2,16 @@
 #include "../CEX/KDF2.h"
 #include "../CEX/IntegerTools.h"
 #include "../CEX/SecureRandom.h"
-#include "../CEX/SHA256.h"
+#include "../CEX/SHA2256.h"
 #include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
 	using Exception::CryptoKdfException;
 	using Kdf::KDF2;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
-	using Digest::SHA256;
+	using Digest::SHA2256;
 	using Enumeration::SHA2Digests;
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
@@ -52,11 +52,11 @@ namespace Test
 			Exception();
 			OnProgress(std::string("KDF2Test: Passed KDF2 exception handling tests.."));
 
-			KDF2* gen1 = new KDF2(SHA2Digests::SHA256);
+			KDF2* gen1 = new KDF2(SHA2Digests::SHA2256);
 			Kat(gen1, m_key[0], m_expected[0]);
 			OnProgress(std::string("KDF2Test: Passed KDF2 SHA2-256 known answer tests.."));
 
-			KDF2* gen2 = new KDF2(SHA2Digests::SHA512);
+			KDF2* gen2 = new KDF2(SHA2Digests::SHA2512);
 			Kat(gen2, m_key[1], m_expected[1]);
 			OnProgress(std::string("KDF2Test: Passed KDF2 SHA2-512 known answer tests.."));
 
@@ -112,7 +112,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			KDF2 gen(SHA2Digests::SHA256);
+			KDF2 gen(SHA2Digests::SHA2256);
 			// invalid key size
 			std::vector<byte> key(1);
 			SymmetricKey kp(key);
@@ -131,7 +131,7 @@ namespace Test
 		// test generator state -1
 		try
 		{
-			KDF2 gen(SHA2Digests::SHA256);
+			KDF2 gen(SHA2Digests::SHA2256);
 			std::vector<byte> otp(32);
 			// generator was not initialized
 			gen.Generate(otp);
@@ -149,7 +149,7 @@ namespace Test
 		// test generator state -2
 		try
 		{
-			KDF2 gen(SHA2Digests::SHA256);
+			KDF2 gen(SHA2Digests::SHA2256);
 			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			std::vector<byte> otp(32);
@@ -172,7 +172,7 @@ namespace Test
 		// test generator state -3
 		try
 		{
-			KDF2 gen(SHA2Digests::SHA256);
+			KDF2 gen(SHA2Digests::SHA2256);
 			Cipher::SymmetricKeySize ks = gen.LegalKeySizes()[1];
 			std::vector<byte> key(ks.KeySize());
 			// output exceeds maximum
@@ -245,7 +245,7 @@ namespace Test
 			const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			otp1.resize(OTPLEN);
 			otp2.resize(OTPLEN);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
+			rnd.Generate(key, 0, key.size());
 
 			// generate with the kdf
 			SymmetricKey kp(key);
@@ -278,7 +278,7 @@ namespace Test
 			{
 				const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				otp.resize(OTPLEN);
-				IntegerTools::Fill(key, 0, key.size(), rnd);
+				rnd.Generate(key, 0, key.size());
 
 				// generate with the kdf
 				SymmetricKey kp(key);

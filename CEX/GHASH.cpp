@@ -1,15 +1,15 @@
 #include "GHASH.h"
 #include "CpuDetect.h"
 #include "IntegerTools.h"
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 #	include "Intrinsics.h"
 #	include <wmmintrin.h>
 #endif
 
 NAMESPACE_DIGEST
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 const bool GHASH::HAS_CMUL = HasGmul();
 

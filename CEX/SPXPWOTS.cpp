@@ -112,7 +112,7 @@ void SPXPWOTS::WotsGenLeaf(std::vector<byte> &Leaf, size_t LeafOffset, const std
 	const std::array<uint, 8> & TreeAddress, size_t N)
 {
 	const size_t WOTSLEN = ((8UL * N / SPX_WOTS_LOGW) + SPX_WOTS_LEN2);
-	const size_t WOTSBYTES = (WOTSLEN * static_cast<uint>(N));
+	const size_t WOTSBYTES = (WOTSLEN * N);
 	// computes the leaf at a given address. First generates the SPXPWOTS key pair, then computes leaf by hashing horizontally
 	std::vector<byte> buf(N + SPX_ADDR_BYTES + WOTSLEN * N);
 	std::vector<byte> mask(WOTSLEN * N);

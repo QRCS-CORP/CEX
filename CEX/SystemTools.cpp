@@ -1,26 +1,26 @@
 #include "SystemTools.h"
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 bool SystemTools::TMR_RDTSC = false;
 bool SystemTools::HAS_RDRAND = false;
 
 std::string SystemTools::ComputerName()
 {
-	std::string ret("");
+	std::string res("");
 
 #if defined(CEX_OS_WINDOWS)
 	try
 	{
-		TCHAR buffer[MAX_COMPUTERNAME_LENGTH + 1];
-		DWORD buffLen = sizeof(buffer) / sizeof(TCHAR);
-		GetComputerName(buffer, &buffLen);
+		TCHAR buf[MAX_COMPUTERNAME_LENGTH + 1];
+		DWORD buffLen = sizeof(buf) / sizeof(TCHAR);
+		GetComputerName(buf, &buffLen);
 
 #if defined(UNICODE)
-		std::wstring cpy((wchar_t*)buffer, buffLen);
-		ret.assign(cpy.begin(), cpy.end());
+		std::wstring cpy(reinterpret_cast<wchar_t*>(buf), buffLen);
+		res.assign(cpy.begin(), cpy.end());
 #else
-		ret.assign((char*)buffer, buffLen);
+		res.assign((char*)buf, buffLen);
 #endif
 	}
 	catch (std::exception&) 
@@ -31,14 +31,14 @@ std::string SystemTools::ComputerName()
 
 	try
 	{
-		char buffer[HOST_NAME_MAX];
-		gethostname(buffer, HOST_NAME_MAX);
+		char buf[HOST_NAME_MAX];
+		gethostname(buf, HOST_NAME_MAX);
 
 #if defined(UNICODE)
-		std::wstring cpy((wchar_t*)buffer, buffLen);
-		ret.assign(cpy.begin(), cpy.end());
+		std::wstring cpy((wchar_t*)buf, buffLen);
+		res.assign(cpy.begin(), cpy.end());
 #else
-		ret.assign((char*)buffer, buffLen);
+		res.assign((char*)buf, buffLen);
 #endif
 	}
 	catch (std::exception&) 
@@ -47,17 +47,17 @@ std::string SystemTools::ComputerName()
 
 #endif
 	
-	return ret;
+	return res;
 }
 
 std::vector<ulong> SystemTools::DriveSpace(const std::string &Drive)
 {
 #if defined(CEX_OS_WINDOWS)
 
-	std::vector<ulong> retSizes(0);
-	ULARGE_INTEGER freeBytes;
-	ULARGE_INTEGER totalBytes;
-	ULARGE_INTEGER availBytes;
+	std::vector<ulong> rlen(0);
+	ULARGE_INTEGER freebt;
+	ULARGE_INTEGER totalbt;
+	ULARGE_INTEGER availbt;
 	std::wstring ws;
 
 	try
@@ -67,11 +67,11 @@ std::vector<ulong> SystemTools::DriveSpace(const std::string &Drive)
 
 		if (drvType == 3 || drvType == 6)
 		{
-			if (GetDiskFreeSpaceEx(ws.c_str(), &freeBytes, &totalBytes, &availBytes))
+			if (GetDiskFreeSpaceEx(ws.c_str(), &freebt, &totalbt, &availbt))
 			{
-				retSizes.push_back(static_cast<ulong>(freeBytes.QuadPart));
-				retSizes.push_back(static_cast<ulong>(totalBytes.QuadPart));
-				retSizes.push_back(static_cast<ulong>(availBytes.QuadPart));
+				rlen.push_back(static_cast<ulong>(freebt.QuadPart));
+				rlen.push_back(static_cast<ulong>(totalbt.QuadPart));
+				rlen.push_back(static_cast<ulong>(availbt.QuadPart));
 			}
 		}
 	}
@@ -79,52 +79,50 @@ std::vector<ulong> SystemTools::DriveSpace(const std::string &Drive)
 	{
 	}
 
-	return retSizes;
-
 #elif defined(CEX_OS_POSIX)
-
-	std::vector<ulong> retSizes(0);
 
 	try
 	{
 		struct statvfs fsinfo;
 		statvfs("/", &fsinfo);
 
-		retSizes.push_back(static_cast<ulong>(fsinfo.f_frsize * fsinfo.f_blocks));
-		retSizes.push_back(static_cast<ulong>(fsinfo.f_bsize * fsinfo.f_bfree));
+		rlen.push_back(static_cast<ulong>(fsinfo.f_frsize * fsinfo.f_blocks));
+		rlen.push_back(static_cast<ulong>(fsinfo.f_bsize * fsinfo.f_bfree));
 	}
 	catch (std::exception&) 
 	{
 	}
 
-	return retSizes;
-
-#else
-	return 0;
 #endif
+
+	return rlen;
 }
 
 ulong SystemTools::GetRdtscFrequency()
 {
+	ulong res;
+
 	if (HasRdtsc())
 	{
 		ulong first = __rdtsc();
 		Sleep(10);
 		ulong second = __rdtsc();
 
-		return (second - first) * 100;
+		res = (second - first) * 100;
 	}
 	else
 	{
-		return 0;
+		res = 0;
 	}
+
+	return res;
 }
 
 bool SystemTools::HasRdRand()
 {
 	if (!HAS_RDRAND)
 	{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		CpuDetect dtc;
 		HAS_RDRAND = dtc.RDRAND();
 #else
@@ -139,7 +137,7 @@ bool SystemTools::HasRdtsc()
 {
 	if (!TMR_RDTSC)
 	{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		CpuDetect dtc;
 		TMR_RDTSC = dtc.RDTSCP();
 #else
@@ -152,6 +150,8 @@ bool SystemTools::HasRdtsc()
 
 ulong SystemTools::MemoryPhysicalTotal()
 {
+	ulong res(0);
+
 #if defined(CEX_OS_WINDOWS)
 
 	// http://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
@@ -166,7 +166,7 @@ ulong SystemTools::MemoryPhysicalTotal()
 	{
 	}
 
-	return static_cast<ulong>(memInfo.ullTotalPhys);
+	res = static_cast<ulong>(memInfo.ullTotalPhys);
 
 #elif defined(CEX_OS_POSIX)
 
@@ -179,20 +179,20 @@ ulong SystemTools::MemoryPhysicalTotal()
 		totalPhysMem = memInfo.totalram;
 		totalPhysMem *= memInfo.mem_unit;
 
-		return static_cast<ulong>(totalPhysMem);
+		res = static_cast<ulong>(totalPhysMem);
 	}
 	catch (std::exception&) 
 	{
-		return 0;
 	}
-
-#else
-	return 0;
 #endif
+
+	return res;
 }
 
 ulong SystemTools::MemoryPhysicalUsed()
 {
+	ulong res(0);
+
 #if defined(CEX_OS_WINDOWS)
 
 	MEMORYSTATUSEX memInfo;
@@ -202,11 +202,10 @@ ulong SystemTools::MemoryPhysicalUsed()
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
 
-		return static_cast<ulong>(memInfo.ullTotalPhys - memInfo.ullAvailPhys);
+		res = static_cast<ulong>(memInfo.ullTotalPhys - memInfo.ullAvailPhys);
 	}
 	catch (std::exception&) 
 	{
-		return 0;
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -224,15 +223,17 @@ ulong SystemTools::MemoryPhysicalUsed()
 	{
 	}
 
-	return static_cast<ulong>(physMemUsed);
+	res = static_cast<ulong>(physMemUsed);
 
-#else
-	return 0;
 #endif
+
+	return res;
 }
 
 ulong SystemTools::MemoryVirtualTotal()
 {
+	ulong res(0);
+
 #if defined(CEX_OS_WINDOWS)
 
 	MEMORYSTATUSEX memInfo;
@@ -242,11 +243,10 @@ ulong SystemTools::MemoryVirtualTotal()
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
 
-		return static_cast<ulong>(memInfo.ullTotalPageFile);
+		res = static_cast<ulong>(memInfo.ullTotalPageFile);
 	}
 	catch (std::exception&) 
 	{
-		return 0;
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -265,15 +265,17 @@ ulong SystemTools::MemoryVirtualTotal()
 	{
 	}
 
-	return static_cast<ulong>(totalVirtualMem);
+	res = static_cast<ulong>(totalVirtualMem);
 
-#else
-	return 0;
 #endif
+
+	return res;
 }
 
 ulong SystemTools::MemoryVirtualUsed()
 {
+	ulong res(0);
+
 #if defined(CEX_OS_WINDOWS)
 
 	MEMORYSTATUSEX memInfo;
@@ -283,76 +285,81 @@ ulong SystemTools::MemoryVirtualUsed()
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
 
-		return static_cast<ulong>(memInfo.ullTotalPageFile - memInfo.ullAvailPageFile);
+		res = static_cast<ulong>(memInfo.ullTotalPageFile - memInfo.ullAvailPageFile);
 	}
 	catch (std::exception&) 
 	{
-		return 0;
 	}
 
 #elif defined(CEX_OS_POSIX)
 
-	long long virtualMemUsed = 0;
+	long long vused(0);
 
 	try
 	{
 		struct sysinfo memInfo;
 		sysinfo(&memInfo);
-		virtualMemUsed = memInfo.totalram - memInfo.freeram;
-		virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
-		virtualMemUsed *= memInfo.mem_unit;
+		vused = memInfo.totalram - memInfo.freeram;
+		vused += memInfo.totalswap - memInfo.freeswap;
+		vused *= memInfo.mem_unit;
 	}
 	catch (std::exception&)
 	{
 	}
 
-	return static_cast<ulong>(virtualMemUsed);
+	res = static_cast<ulong>(vused);
 
-#else
-	return 0;
 #endif
+
+	return res;
 }
 
 std::string SystemTools::OsName()
 {
+	std::string res("");
+
 #ifdef _WIN32
-	return "Windows 32-bit";
+	res = "Windows 32-bit";
 #elif _WIN64
-	return "Windows 64-bit";
+	res = "Windows 64-bit";
 #elif __unix || __unix__
-	return "Unix";
+	res = "Unix";
 #elif __APPLE__ || __MACH__
-	return "Mac OSX";
+	res = "Mac OSX";
 #elif __linux__
-	return "Linux";
+	res = "Linux";
 #elif __FreeBSD__
-	return "FreeBSD";
+	res = "FreeBSD";
 #else
-	return "Other";
+	res = "Other";
 #endif
+
+	return res;
 }
 
 uint SystemTools::ProcessId()
 {
+	uint res(0);
+
 #if defined(CEX_OS_WINDOWS)
 	try 
 	{
-		return static_cast<uint>(GetCurrentProcessId());
+		res = static_cast<uint>(GetCurrentProcessId());
 	}
 	catch (std::exception&)
 	{
-		return 0;
 	}
 #else
 	try
 	{
-		return static_cast<uint>(::getpid());
+		res = static_cast<uint>(::getpid());
 	}
 	catch (std::exception&)
 	{
-		return 0;
 	}
 #endif
+
+	return res;
 }
 
 ulong SystemTools::TimeCurrentNS()
@@ -362,7 +369,7 @@ ulong SystemTools::TimeCurrentNS()
 
 ulong SystemTools::TimeStamp(bool HasRdtsc)
 {
-	ulong tmeStamp = 0;
+	ulong rtme(0);
 
 	// http://nadeausoftware.com/articles/2012/04/c_c_tip_how_measure_elapsed_real_time_benchmarking
 #if defined(CEX_OS_WINDOWS)
@@ -371,20 +378,20 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 		if (HasRdtsc)
 		{
 			// use tsc if available
-			tmeStamp = static_cast<ulong>(__rdtsc());
+			rtme = static_cast<ulong>(__rdtsc());
 		}
 		else
 		{
 			int64_t ctr1 = 0;
 			int64_t freq = 0;
 
-			if (QueryPerformanceCounter((LARGE_INTEGER *)&ctr1) != 0)
+			if (QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&ctr1)) != 0)
 			{
-				QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
+				QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&freq));
 				// return microseconds to milliseconds
 				if (freq > 0)
 				{
-					tmeStamp = static_cast<ulong>(ctr1 * 1000.0 / freq);
+					rtme = static_cast<ulong>(ctr1 * 1000ULL / freq);
 				}
 			}
 			else
@@ -395,11 +402,11 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 				GetSystemTimeAsFileTime(&ft);
 				li.LowPart = ft.dwLowDateTime;
 				li.HighPart = ft.dwHighDateTime;
-				tmeStamp = static_cast<ulong>(li.QuadPart);
+				rtme = static_cast<ulong>(li.QuadPart);
 				// Convert from file time to UNIX epoch time.
-				tmeStamp -= 116444736000000000LL; 
+				rtme -= 116444736000000000LL; 
 				// From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals
-				tmeStamp /= 10000;
+				rtme /= 10000;
 			}
 		}
 	}
@@ -408,7 +415,7 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
-		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		rtme = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #elif (defined(CEX_OS_HPUX) || defined(CEX_OS_SUNUX)) && (defined(__SVR4) || defined(__svr4__))
@@ -416,14 +423,14 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 	// HP-UX, Solaris
 	try
 	{
-		tmeStamp = static_cast<ulong>(gethrtime());
+		rtme = static_cast<ulong>(gethrtime());
 	}
 	catch (std::exception&)
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
-		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		rtme = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #elif defined(CEX_OS_APPLE)
@@ -434,14 +441,14 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 		mach_timebase_info_data_t timeBase;
 		(void)mach_timebase_info(&timeBase);
 		timeConvert = timeBase.numer / timeBase.denom;
-		tmeStamp = static_cast<ulong>(mach_absolute_time() * timeConvert);
+		rtme = static_cast<ulong>(mach_absolute_time() * timeConvert);
 	}
 	catch (std::exception&)
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
-		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		rtme = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -473,7 +480,7 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 		{
 			if (id != (clockid_t)-1 && clock_gettime(id, &ts) != -1)
 			{
-				tmeStamp = static_cast<ulong>(ts.tv_sec + ts.tv_nsec);
+				rtme = static_cast<ulong>(ts.tv_sec + ts.tv_nsec);
 			}
 		}
 		catch (std::exception&)
@@ -482,7 +489,7 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 			auto now = std::chrono::high_resolution_clock::now();
 			auto elapsed = now - epoch;
 
-			tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+			rtme = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 		}
 	}
 
@@ -494,7 +501,7 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 		struct timeval tm;
 		gettimeofday(&tm, NULL);
 
-		tmeStamp = static_cast<ulong>(tm.tv_sec + tm.tv_usec);
+		rtme = static_cast<ulong>(tm.tv_sec + tm.tv_usec);
 	}
 	catch (std::exception&)
 	{
@@ -502,7 +509,7 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
 
-		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		rtme = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #else
@@ -510,20 +517,22 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 	auto now = std::chrono::high_resolution_clock::now();
 	auto elapsed = now - epoch;
 
-	tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+	rtme = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 #endif
 
-	return tmeStamp;
+	return rtme;
 }
 
 ulong SystemTools::TimeSinceBoot()
 {
+	ulong res(0);
+
 	// http://stackoverflow.com/questions/30095439/how-do-i-get-system-up-time-in-milliseconds-in-c
 #if defined(CEX_OS_WINDOWS)
 
 	try
 	{
-		return std::chrono::milliseconds(GetTickCount64()).count();
+		res = std::chrono::milliseconds(GetTickCount64()).count();
 	}
 	catch (std::exception&)
 	{
@@ -531,7 +540,7 @@ ulong SystemTools::TimeSinceBoot()
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
 
-		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		res = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -543,14 +552,14 @@ ulong SystemTools::TimeSinceBoot()
 		if (clock_gettime(CLOCK_UPTIME_PRECISE, &ts) == 0)
 		{
 			uptime = std::chrono::milliseconds(static_cast<ulong>(ts.tv_sec) * 1000ULL + static_cast<ulong>(ts.tv_nsec) / 1000000ULL);
-			return return static_cast<ulong>(uptime);
+			res = return static_cast<ulong>(uptime);
 		}
 		else
 		{
 			std::chrono::high_resolution_clock::time_point epoch;
 			auto now = std::chrono::high_resolution_clock::now();
 			auto elapsed = now - epoch;
-			return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+			res = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 		}
 	}
 	catch (std::exception&)
@@ -558,30 +567,29 @@ ulong SystemTools::TimeSinceBoot()
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
-		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		res = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
-
-#else
-	return 0;
 #endif
+
+	return res;
 }
 
 std::string SystemTools::UserName()
 {
-	std::string ret("");
+	std::string res("");
 
 #if defined(CEX_OS_WINDOWS)
 
 	try
 	{
-		TCHAR buffer[UNLEN + 1];
-		DWORD buffLen = sizeof(buffer) / sizeof(TCHAR);
-		GetUserName(buffer, &buffLen);
+		TCHAR buf[UNLEN + 1];
+		DWORD buffLen = sizeof(buf) / sizeof(TCHAR);
+		GetUserName(buf, &buffLen);
 #if defined(UNICODE)
-		std::wstring cpy((wchar_t*)buffer, buffLen);
-		ret.assign(cpy.begin(), cpy.end());
+		std::wstring cpy(reinterpret_cast<wchar_t*>(buf), buffLen);
+		res.assign(cpy.begin(), cpy.end());
 #else
-		ret.assign((char*)buffer, buffLen);
+		res.assign((char*)buf, buffLen);
 #endif
 	}
 	catch (std::exception&)
@@ -592,14 +600,14 @@ std::string SystemTools::UserName()
 
 	try
 	{
-		char buffer[LOGIN_NAME_MAX];
-		getlogin_r(buffer, LOGIN_NAME_MAX);
-		size_t buffLen = sizeof(buffer) / sizeof(char);
+		char buf[LOGIN_NAME_MAX];
+		getlogin_r(buf, LOGIN_NAME_MAX);
+		size_t buffLen = sizeof(buf) / sizeof(char);
 #if defined(UNICODE)
-		std::wstring cpy((wchar_t*)buffer, buffLen);
-		ret.assign(cpy.begin(), cpy.end());
+		std::wstring cpy((wchar_t*)buf, buffLen);
+		res.assign(cpy.begin(), cpy.end());
 #else
-		ret.assign((char*)buffer, buffLen);
+		res.assign((char*)buf, buffLen);
 #endif
 	}
 	catch (std::exception&) 
@@ -608,7 +616,7 @@ std::string SystemTools::UserName()
 
 #endif
 
-	return ret;
+	return res;
 }
 
 std::string SystemTools::Version()
@@ -623,7 +631,7 @@ std::string SystemTools::Version()
 
 	std::vector<PIP_ADAPTER_INFO> SystemTools::AdaptersInfo()
 	{
-		std::vector<PIP_ADAPTER_INFO> serInf(0);
+		std::vector<PIP_ADAPTER_INFO> sinfo(0);
 
 		try
 		{
@@ -631,56 +639,56 @@ std::string SystemTools::Version()
 			PIP_ADAPTER_INFO pAdapter = NULL;
 			ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
-			pAdapterInfo = (IP_ADAPTER_INFO*)HeapAlloc(GetProcessHeap(), 0, sizeof(IP_ADAPTER_INFO));
+			pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(HeapAlloc(GetProcessHeap(), 0, sizeof(IP_ADAPTER_INFO)));
 
-			if (pAdapterInfo == NULL)
+			if (pAdapterInfo != NULL)
 			{
-				return serInf;
-			}
+				if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
+				{
+					HeapFree(GetProcessHeap(), 0, pAdapterInfo);
+					pAdapterInfo = reinterpret_cast<IP_ADAPTER_INFO*>(HeapAlloc(GetProcessHeap(), 0, ulOutBufLen));
+				}
 
-			if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
-			{
-				HeapFree(GetProcessHeap(), 0, pAdapterInfo);
-				pAdapterInfo = (IP_ADAPTER_INFO*)HeapAlloc(GetProcessHeap(), 0, ulOutBufLen);
 				if (pAdapterInfo == NULL)
 				{
-					return serInf;
+					if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == NO_ERROR)
+					{
+						pAdapter = pAdapterInfo;
+
+						while (pAdapter)
+						{
+							sinfo.push_back(pAdapter);
+							pAdapter = pAdapter->Next;
+						}
+					}
+
+					if (pAdapterInfo)
+					{
+						HeapFree(GetProcessHeap(), 0, pAdapterInfo);
+					}
 				}
-			}
-
-			if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == NO_ERROR)
-			{
-				pAdapter = pAdapterInfo;
-
-				while (pAdapter)
-				{
-					serInf.push_back(pAdapter);
-					pAdapter = pAdapter->Next;
-				}
-			}
-
-			if (pAdapterInfo)
-			{
-				HeapFree(GetProcessHeap(), 0, pAdapterInfo);
 			}
 		}
 		catch (std::exception&) 
 		{
 		}
 
-		return serInf;
+		return sinfo;
 	}
 
 	uint SystemTools::CurrentThreadId()
 	{
+		uint res(0);
+
 		try
 		{
-			return GetCurrentThreadId();
+			res = GetCurrentThreadId();
 		}
 		catch (std::exception&) 
 		{
-			return 0;
 		}
+
+		return res;
 	}
 
 	POINT SystemTools::CursorPosition()
@@ -700,7 +708,7 @@ std::string SystemTools::Version()
 
 	std::vector<HEAPENTRY32> SystemTools::HeapList()
 	{
-		std::vector<HEAPENTRY32> serInf(0);
+		std::vector<HEAPENTRY32> sinfo(0);
 
 		try
 		{
@@ -736,7 +744,7 @@ std::string SystemTools::Version()
 								break;
 							}
 
-							serInf.push_back(heapEntry);
+							sinfo.push_back(heapEntry);
 						} 
 						while (Heap32Next(&heapEntry));
 					}
@@ -748,7 +756,7 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return serInf;
+		return sinfo;
 	}
 
 	std::vector<std::string> SystemTools::LogicalDrives()
@@ -757,10 +765,10 @@ std::string SystemTools::Version()
 
 		try
 		{
-			TCHAR buffer[(4 * 26) + 1] = { 0 };
-			GetLogicalDriveStrings(sizeof(buffer) / sizeof(TCHAR), buffer);
+			TCHAR buf[(4 * 26) + 1] = { 0 };
+			GetLogicalDriveStrings(sizeof(buf) / sizeof(TCHAR), buf);
 
-			for (LPTSTR lpDrive = buffer; *lpDrive != 0; lpDrive += 4)
+			for (LPTSTR lpDrive = buf; *lpDrive != 0; lpDrive += 4)
 			{
 				std::wstring ws = lpDrive;
 				strBuf.push_back(std::string(ws.begin(), ws.end()));
@@ -791,7 +799,7 @@ std::string SystemTools::Version()
 
 	std::vector<MODULEENTRY32> SystemTools::ModuleEntries()
 	{
-		std::vector<MODULEENTRY32> serInf(0);
+		std::vector<MODULEENTRY32> sinfo(0);
 
 		try
 		{
@@ -803,7 +811,7 @@ std::string SystemTools::Version()
 			{
 				do
 				{
-					serInf.push_back(info);
+					sinfo.push_back(info);
 				} 
 				while (Module32Next(snapshot, &info));
 			}
@@ -812,19 +820,21 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return serInf;
+		return sinfo;
 	}
 
 	HMODULE SystemTools::GetCurrentModule()
 	{
 		HMODULE hMod = NULL;
-		::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (LPCTSTR)GetCurrentModule, &hMod);
+		::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, reinterpret_cast<LPCTSTR>(GetCurrentModule), &hMod);
 
 		return hMod;
 	}
 
 	std::string SystemTools::OsVersion()
 	{
+		std::string res("");
+
 		// note: application must have manifest in Win10, or will return Win8 or Server2012:
 		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms725492(v=vs.85).aspx
 	#if defined(CEX_COMPILER_MSC)
@@ -834,85 +844,87 @@ std::string SystemTools::Version()
 			{
 				if (IsWindowsVersionOrGreater(10, 0, 0))
 				{
-					return "Windows Server 2016";
+					res = "Windows Server 2016";
 				}
 				else if (IsWindowsVersionOrGreater(6, 3, 0))
 				{
-					return "Windows Server 2012 R2";
+					res = "Windows Server 2012 R2";
 				}
 				else if (IsWindowsVersionOrGreater(6, 2, 0))
 				{
-					return "Windows Server 2012";
+					res = "Windows Server 2012";
 				}
 				else if (IsWindowsVersionOrGreater(6, 1, 0))
 				{
-					return "Windows Server 2008 R2";
+					res = "Windows Server 2008 R2";
 				}
 				else if (IsWindowsVersionOrGreater(6, 0, 0))
 				{
-					return "Windows Server 2008";
+					res = "Windows Server 2008";
 				}
 				else if (IsWindowsVersionOrGreater(5, 2, 0))
 				{
-					return "Windows Server 2003";
+					res = "Windows Server 2003";
 				}
 				else if (IsWindowsVersionOrGreater(5, 0, 0))
 				{
-					return "Windows 2000";
+					res = "Windows 2000";
 				}
 				else
 				{
-					return "Unknown";
+					res = "Unknown";
 				}
 			}
 			else
 			{
 				if (IsWindowsVersionOrGreater(10, 0, 0))
 				{
-					return "Windows 10";
+					res = "Windows 10";
 				}
 				else if (IsWindowsVersionOrGreater(6, 3, 0))
 				{
-					return "Windows 8.1";
+					res = "Windows 8.1";
 				}
 				else if (IsWindowsVersionOrGreater(6, 2, 0))
 				{
-					return "Windows 8";
+					res = "Windows 8";
 				}
 				else if (IsWindowsVersionOrGreater(6, 1, 0))
 				{
-					return "Windows 7";
+					res = "Windows 7";
 				}
 				else if (IsWindowsVersionOrGreater(6, 0, 0))
 				{
-					return "Windows Vista";
+					res = "Windows Vista";
 				}
 				else if (IsWindowsVersionOrGreater(5, 2, 0))
 				{
-					return "Windows XP Professional x64 Edition";
+					res = "Windows XP Professional x64 Edition";
 				}
 				else if (IsWindowsVersionOrGreater(5, 1, 0))
 				{
-					return "Windows XP";
+					res = "Windows XP";
 				}
 				else
 				{
-					return "Unknown";
+					res = "Unknown";
 				}
 			}
 		}
 		catch (std::exception&) 
 		{
-			return "Windows Unknown";
+			res = "Windows Unknown";
 		}
 	#else
-		return "Windows Unknown"; // only msvc supports VersionHelpers.h?
+		res = "Windows Unknown"; // only msvc supports VersionHelpers.h?
 	#endif
+
+		return res;
 	}
 
 	std::vector<PROCESSENTRY32> SystemTools::ProcessEntries()
 	{
-		std::vector<PROCESSENTRY32> serInf(0);
+		std::vector<PROCESSENTRY32> sinfo(0);
 
 		try
 		{
@@ -924,7 +936,7 @@ std::string SystemTools::Version()
 			{
 				do
 				{
-					serInf.push_back(prcInf);
+					sinfo.push_back(prcInf);
 				} 
 				while (Process32Next(snapshot, &prcInf));
 			}
@@ -933,69 +945,77 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return serInf;
+		return sinfo;
 	}
 
 	bool SystemTools::ProtectPages(void* Pointer, size_t Length)
 	{
-		HANDLE hProcess = ::GetCurrentProcess();
+		HANDLE hproc;
 		MEMORY_BASIC_INFORMATION mbi;
-		BOOL ret;
+		SIZE_T res;
 		ULONG paold;
 
-		if (ret = (VirtualQueryEx(hProcess, Pointer, &mbi, sizeof(mbi)) == sizeof(mbi)))
+		hproc = ::GetCurrentProcess();
+		res = VirtualQueryEx(hproc, Pointer, &mbi, sizeof(mbi));
+
+		if (res == sizeof(mbi))
 		{
-			if (!(mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)))
+			if ((mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)) == 0)
 			{
-				ret = VirtualProtectEx(hProcess, Pointer, Length, PAGE_GUARD | mbi.Protect, &paold);
+				res = VirtualProtectEx(hproc, Pointer, Length, PAGE_GUARD | mbi.Protect, &paold);
 			}
 		}
 
-		return static_cast<bool>(ret);
+		return static_cast<bool>(res);
 	}
 
 	bool SystemTools::ReleaseProtectedPages(void* Pointer, size_t Length)
 	{
-		HANDLE hProcess = ::GetCurrentProcess();
+		HANDLE hproc;
 		MEMORY_BASIC_INFORMATION mbi;
-		BOOL ret;
+		SIZE_T res;
 		ULONG paold;
 
-		if (ret = (VirtualQueryEx(hProcess, Pointer, &mbi, sizeof(mbi)) == sizeof(mbi)))
+		hproc = ::GetCurrentProcess();
+		res = VirtualQueryEx(hproc, Pointer, &mbi, sizeof(mbi));
+
+		if (res == sizeof(mbi))
 		{
 			if ((mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)))
 			{
-				ret = VirtualProtectEx(hProcess, Pointer, Length, PAGE_EXECUTE_READWRITE, &paold);
+				res = VirtualProtectEx(hproc, Pointer, Length, PAGE_EXECUTE_READWRITE, &paold);
 			}
 		}
 
-		return static_cast<bool>(ret);
+		return static_cast<bool>(res);
 	}
 
 	std::vector<std::string> SystemTools::SystemIds()
 	{
-		std::vector<std::string> retArr(0);
+		std::vector<std::string> rids(0);
 
 		try
 		{
+			const size_t CLDLEN = 38;
 			HKEY hKey;
-			LSTATUS ret = 0;
+			LSTATUS res = 0;
 			DWORD lpcchName = 0;
 			TCHAR achKey[255];
-			const size_t CLDLEN = 38;
+			size_t i;
 
 			if (RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("CLSID"), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
 			{
 				DWORD dwIndex = 0;
 				const std::string FLT1 = "0";
 				const char FLT2[] = "{}-";
+				const size_t SLEN = 3;
 
 				do
 				{
 					lpcchName = 1024;
-					ret = RegEnumKeyEx(hKey, dwIndex, achKey, &lpcchName, NULL, NULL, NULL, NULL);
+					res = RegEnumKeyEx(hKey, dwIndex, achKey, &lpcchName, NULL, NULL, NULL, NULL);
 
-					if (ret == ERROR_SUCCESS)
+					if (res == ERROR_SUCCESS)
 					{
 						if (lpcchName == CLDLEN)
 						{
@@ -1006,19 +1026,19 @@ std::string SystemTools::Version()
 							// func is used only for entropy collection, rem this if you need the actual clsids
 							if (cid.find(FLT1) == std::string::npos)
 							{
-								for (unsigned int i = 0; i < strlen(FLT2); ++i)
+								for (i = 0; i < SLEN; ++i)
 								{
 									tmp.erase(std::remove(tmp.begin(), tmp.end(), FLT2[i]), tmp.end());
 								}
 
-								retArr.push_back(cid);
+								rids.push_back(cid);
 							}
 						}
 					}
 
 					++dwIndex;
 				} 
-				while (ret == 0);
+				while (res == 0);
 
 				if (hKey != NULL)
 				{
@@ -1030,68 +1050,68 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return retArr;
+		return rids;
 	}
 
 	SYSTEM_INFO SystemTools::SystemInfo()
 	{
-		SYSTEM_INFO sysInfo;
+		SYSTEM_INFO sinfo;
 
 		try
 		{
-			GetSystemInfo(&sysInfo);
+			GetSystemInfo(&sinfo);
 		}
 		catch (std::exception&) 
 		{
 		}
 
-		return sysInfo;
+		return sinfo;
 	}
 
 	MIB_TCPSTATS SystemTools::TcpStatistics()
 	{
-		MIB_TCPSTATS tcpStats;
+		MIB_TCPSTATS tcpstats;
 
 		try
 		{
-			GetTcpStatistics(&tcpStats);
+			GetTcpStatistics(&tcpstats);
 		}
 		catch (std::exception&) 
 		{
 		}
 
-		return tcpStats;
+		return tcpstats;
 	}
 
 	std::vector<THREADENTRY32> SystemTools::ThreadEntries()
 	{
-		std::vector<THREADENTRY32> serInf(0);
+		std::vector<THREADENTRY32> sinfo(0);
 
 		try
 		{
 			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-			THREADENTRY32 thdInf;
-			thdInf.dwSize = sizeof(THREADENTRY32);
+			THREADENTRY32 thdinf;
+			thdinf.dwSize = sizeof(THREADENTRY32);
 
-			if (Thread32First(snapshot, &thdInf))
+			if (Thread32First(snapshot, &thdinf))
 			{
 				do
 				{
-					serInf.push_back(thdInf);
+					sinfo.push_back(thdinf);
 				} 
-				while (Thread32Next(snapshot, &thdInf));
+				while (Thread32Next(snapshot, &thdinf));
 			}
 		}
 		catch (std::exception&) 
 		{
 		}
 
-		return serInf;
+		return sinfo;
 	}
 
 	std::string SystemTools::UserId()
 	{
-		std::string sidStr = "";
+		std::string sids("");
 
 		try
 		{
@@ -1099,14 +1119,14 @@ std::string SystemTools::Version()
 
 			if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
 			{
-				// Get the size of the memory buffer needed for the SID
+				// Get the size of the memory buf needed for the SID
 				DWORD dwBufferSize = 0;
 				if (!GetTokenInformation(hToken, TokenUser, NULL, 0, &dwBufferSize) && (GetLastError() == ERROR_INSUFFICIENT_BUFFER))
 				{
-					// Allocate buffer for user token data
-					std::vector<BYTE> buffer;
-					buffer.resize(dwBufferSize);
-					PTOKEN_USER pTokenUser = reinterpret_cast<PTOKEN_USER>(&buffer[0]);
+					// Allocate buf for user token data
+					std::vector<BYTE> buf;
+					buf.resize(dwBufferSize);
+					PTOKEN_USER pTokenUser = reinterpret_cast<PTOKEN_USER>(&buf[0]);
 
 					// Retrieve the token information in a TOKEN_USER structure
 					if (GetTokenInformation(hToken, TokenUser, pTokenUser, dwBufferSize, &dwBufferSize))
@@ -1116,8 +1136,8 @@ std::string SystemTools::Version()
 							LPTSTR pszSID = NULL;
 							if (ConvertSidToStringSid(pTokenUser->User.Sid, &pszSID))
 							{
-								std::wstring ws((wchar_t*)pszSID);
-								sidStr = std::string(ws.begin(), ws.end());
+								std::wstring ws(reinterpret_cast<wchar_t*>(pszSID));
+								sids = std::string(ws.begin(), ws.end());
 								LocalFree(pszSID);
 								pszSID = NULL;
 							}
@@ -1136,12 +1156,12 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return sidStr;
+		return sids;
 	}
 
 	std::vector<byte> SystemTools::UserToken()
 	{
-		std::vector<byte> buffer(0);
+		std::vector<byte> buf(0);
 
 		try
 		{
@@ -1149,14 +1169,14 @@ std::string SystemTools::Version()
 
 			if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
 			{
-				// get the size of the memory buffer needed for the SID
+				// get the size of the memory buf needed for the SID
 				DWORD dwBufferSize = 0;
 				if (GetTokenInformation(hToken, TokenUser, NULL, 0, &dwBufferSize) && (GetLastError() != ERROR_INSUFFICIENT_BUFFER))
 				{
-					// allocate buffer for user token data
-					buffer.resize(dwBufferSize);
+					// allocate buf for user token data
+					buf.resize(dwBufferSize);
 					// retrieve the token information in a TOKEN_USER structure
-					GetTokenInformation(hToken, TokenUser, reinterpret_cast<PTOKEN_USER>(&buffer[0]), dwBufferSize, &dwBufferSize);
+					GetTokenInformation(hToken, TokenUser, reinterpret_cast<PTOKEN_USER>(&buf[0]), dwBufferSize, &dwBufferSize);
 				}
 			}
 
@@ -1171,7 +1191,7 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return buffer;
+		return buf;
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -1179,9 +1199,7 @@ std::string SystemTools::Version()
 	ulong SystemTools::AvailableFreeSpace()
 	{
 		struct statvfs stat;
-		ulong ret;
-
-		ret = 0;
+		ulong res(0);
 
 		try
 		{
@@ -1189,22 +1207,20 @@ std::string SystemTools::Version()
 
 			if (NULL != pw && 0 == statvfs(pw->pw_dir, &stat))
 			{
-				ret = (uint64_t)stat.f_bavail * stat.f_frsize;
+				res = (uint64_t)stat.f_bavail * stat.f_frsize;
 			}
 		}
 		catch (std::exception&)
 		{
 		}
 
-		return ret;
+		return res;
 	}
 
 	std::string SystemTools::DeviceStatistics()
 	{
 		// TODO: refine this to specific statistics
-		std::string stats;
-
-		stats = std::string("");
+		std::string stats("");
 
 		try
 		{
@@ -1215,12 +1231,12 @@ std::string SystemTools::Version()
 				int length = is.tellg();
 				is.seekg(0, is.beg);
 
-				char* buffer = new char[length];
-				is.read(buffer, length);
+				char* buf = new char[length];
+				is.read(buf, length);
 				is.close();
 
-				stats = std::string(buffer);
-				delete[] buffer;
+				stats = std::string(buf);
+				delete[] buf;
 			}
 
 		}
@@ -1234,7 +1250,7 @@ std::string SystemTools::Version()
 	std::vector<std::string> SystemTools::GetDirectories(std::string &Path)
 	{
 		DIR * d = opendir(Path.c_str());
-		std::vector<std::string> ret(0);
+		std::vector<std::string> res(0);
 
 		try
 		{
@@ -1246,7 +1262,7 @@ std::string SystemTools::Version()
 				{
 					if (dir->d_type == DT_DIR && strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
 					{
-						ret.push_back(std::string(dir->d_name));
+						res.push_back(std::string(dir->d_name));
 						char dpath[255];
 						GetDirectories(dpath);
 					}
@@ -1258,12 +1274,12 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return ret;
+		return res;
 	}
 
 	std::vector<std::string> SystemTools::GetFiles(std::string &Path)
 	{
-		std::vector<std::string> ret(0);
+		std::vector<std::string> res(0);
 
 		try
 		{
@@ -1275,7 +1291,7 @@ std::string SystemTools::Version()
 
 				while ((entry = readdir(dir)) != NULL)
 				{
-					ret.push_back(std::string(entry->d_name));
+					res.push_back(std::string(entry->d_name));
 				}
 
 				closedir(dir);
@@ -1286,7 +1302,7 @@ std::string SystemTools::Version()
 		{
 		}
 
-		return ret;
+		return res;
 	}
 
 	std::string SystemTools::GetHomeDirectory()
@@ -1295,7 +1311,7 @@ std::string SystemTools::Version()
 		struct passwd* result;
 		const char* homedir;
 		char* buf;
-		size_t bufsize;
+		size_t buflen;
 		int s;
 
 		try
@@ -1305,16 +1321,16 @@ std::string SystemTools::Version()
 				homedir = getpwuid(getuid())->pw_dir;
 			}
 
-			bufsize = sysconf(_SC_GETPW_R_SIZE_MAX);
-			if (bufsize == -1)
+			buflen = sysconf(_SC_GETPW_R_SIZE_MAX);
+			if (buflen == -1)
 			{
-				bufsize = 0x4000;
+				buflen = 0x4000;
 			}
 
-			buf = malloc(bufsize);
+			buf = malloc(buflen);
 			if (buf != NULL)
 			{
-				s = getpwuid_r(getuid(), &pwd, buf, bufsize, &result);
+				s = getpwuid_r(getuid(), &pwd, buf, buflen, &result);
 			}
 
 			char *homedir = result.pw_dir;
@@ -1329,9 +1345,7 @@ std::string SystemTools::Version()
 	std::string SystemTools::MemoryStatistics()
 	{
 		// TODO: refine this to specific statistics
-		std::string stats;
-
-		stats = std::string("");
+		std::string stats("");
 
 		try
 		{
@@ -1343,12 +1357,12 @@ std::string SystemTools::Version()
 				int length = is.tellg();
 				is.seekg(0, is.beg);
 
-				char* buffer = new char[length];
-				is.read(buffer, length);
+				char* buf = new char[length];
+				is.read(buf, length);
 				is.close();
 
-				stats = std::string(buffer);
-				delete[] buffer;
+				stats = std::string(buf);
+				delete[] buf;
 			}
 
 		}
@@ -1362,9 +1376,7 @@ std::string SystemTools::Version()
 	std::string SystemTools::NetworkStatistics()
 	{
 		// TODO: refine this to specific statistics
-		std::string stats;
-
-		stats = std::string("");
+		std::string stats("");
 
 		try
 		{
@@ -1375,12 +1387,12 @@ std::string SystemTools::Version()
 				int length = is.tellg();
 				is.seekg(0, is.beg);
 
-				char* buffer = new char[length];
-				is.read(buffer, length);
+				char* buf = new char[length];
+				is.read(buf, length);
 				is.close();
 
-				stats = std::string(buffer);
-				delete[] buffer;
+				stats = std::string(buf);
+				delete[] buf;
 			}
 
 		}
@@ -1393,58 +1405,56 @@ std::string SystemTools::Version()
 
 	std::vector<uint> SystemTools::ProcessEntries()
 	{
-		std::vector<uint> ret(0);
+		std::vector<uint> res(0);
 
 		try
 		{
-			ret.push_back(static_cast<uint>(::getpid()));
-			ret.push_back(static_cast<uint>(::getppid()));
-			ret.push_back(static_cast<uint>(::getuid()));
-			ret.push_back(static_cast<uint>(::getgid()));
-			ret.push_back(static_cast<uint>(::getpgrp()));
+			res.push_back(static_cast<uint>(::getpid()));
+			res.push_back(static_cast<uint>(::getppid()));
+			res.push_back(static_cast<uint>(::getuid()));
+			res.push_back(static_cast<uint>(::getgid()));
+			res.push_back(static_cast<uint>(::getpgrp()));
 		}
 		catch (std::exception&)
 		{
 		}
 
-		return ret;
+		return res;
 	}
 
 	std::vector<byte> SystemTools::SystemInfo()
 	{
 		struct ::rusage suse;
-		std::vector<byte> ret;
+		std::vector<byte> res;
 
 		try
 		{
 			::getrusage(RUSAGE_SELF, &suse);
-			ret.resize(sizeof(suse));
-			std::memcpy(ret.data(), &suse, ret.size());
+			res.resize(sizeof(suse));
+			std::memcpy(res.data(), &suse, res.size());
 		}
 		catch (std::exception&)
 		{
 		}
 
-		return ret;
+		return res;
 	}
 
 	std::string SystemTools::UserId()
 	{
-		std::string ret;
-
-		ret = std::string("");
+		std::string res("");
 
 		try
 		{
-			ret = std::string(static_cast<uint>(::getuid()));
+			res = std::string(static_cast<uint>(::getuid()));
 		}
 		catch (std::exception&) 
 		{
 		}
 
-		return ret;
+		return res;
 	}
 
 #endif
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND

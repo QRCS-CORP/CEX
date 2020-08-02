@@ -34,7 +34,9 @@ namespace Test
 		void operator()(Params... Data) 
 		{
 			for (auto l : _listeners)
+			{
 				(*l)(Data...);
+			}
 		}
 	};
 

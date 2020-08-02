@@ -8,17 +8,17 @@
 NAMESPACE_DIGEST
 
 using Enumeration::DigestConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
-using Utility::ParallelTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 
 class Blake512::Blake2bState
 {
 public:
 
-	std::array<ulong, 2> F;
-	std::array<ulong, 8> H;
-	std::array<ulong, 2> T;
+	std::array<ulong, 2> F = { 0 };
+	std::array<ulong, 8> H = { 0 };
+	std::array<ulong, 2> T = { 0 };
 
 	Blake2bState()
 	{
@@ -41,11 +41,17 @@ public:
 
 Blake512::Blake512(bool Parallel)
 	:
-	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_msgBuffer(Parallel ? 2 * DEF_PRLDEGREE * Blake::BLAKE512_RATE_SIZE : Blake::BLAKE512_RATE_SIZE),
+	m_dgtState(Parallel ? 
+		DEF_PRLDEGREE : 
+		1),
+	m_msgBuffer(Parallel ? 
+		2UL * DEF_PRLDEGREE * Blake::BLAKE512_RATE_SIZE : 
+		Blake::BLAKE512_RATE_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(Blake::BLAKE512_RATE_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeParams(Parallel ? BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE), 0x02, static_cast<byte>(DEF_PRLDEGREE), 0x00, static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE)) : BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE), 0x01, 0x01, 0x00, 0x00))
+	m_treeParams(Parallel ? 
+		BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE), 0x02, static_cast<byte>(DEF_PRLDEGREE), 0x00, static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE)) : 
+		BlakeParams(static_cast<byte>(Blake::BLAKE512_DIGEST_SIZE), 0x01, 0x01, 0x00, 0x00))
 {
 	//m_parallelProfile.IsParallel() = (m_parallelProfile.IsParallel() == true) ? Parallel : false;
 
@@ -59,9 +65,12 @@ Blake512::Blake512(bool Parallel)
 
 Blake512::Blake512(BlakeParams &Params)
 	:
-	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? Params.FanOut() :
+	m_dgtState(Params.FanOut() != 0 && Params.FanOut() <= MAX_PRLDEGREE ? 
+		Params.FanOut() :
 		throw CryptoDigestException(DigestConvert::ToName(Digests::Blake512), std::string("Constructor"), std::string("The FanOut parameter can not be zero or exceed the maximum of 64!"), ErrorCodes::IllegalOperation)),
-	m_msgBuffer(Params.FanOut() > 0 ? 2 * Params.FanOut() * Blake::BLAKE512_RATE_SIZE : Blake::BLAKE512_RATE_SIZE),
+	m_msgBuffer(Params.FanOut() > 0 ? 
+		2UL * Params.FanOut() * Blake::BLAKE512_RATE_SIZE :
+		Blake::BLAKE512_RATE_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(Blake::BLAKE512_RATE_SIZE, false, STATE_PRECACHED, false, Params.FanOut()),
 	m_treeParams(Params)
@@ -221,6 +230,10 @@ void Blake512::Finalize(std::vector<byte> &Output, size_t OutOffset)
 				blen = m_msgLength;
 				MemoryTools::Clear(m_msgBuffer, (i * Blake::BLAKE512_RATE_SIZE) + blen, Blake::BLAKE512_RATE_SIZE - blen);
 			}
+			else
+			{
+				// misra
+			}
 
 			IntegerTools::LeIncreaseW(m_dgtState[i].T, m_dgtState[i].T, blen);
 			Permute(m_msgBuffer, i * Blake::BLAKE512_RATE_SIZE, m_dgtState[i]);
@@ -287,15 +300,15 @@ void Blake512::Initialize(Cipher::ISymmetricKey &MacKey)
 
 	std::vector<ulong> config(CONFIG_SIZE);
 
-	if (MacKey.Nonce().size() != 0)
+	if (MacKey.IV().size() != 0)
 	{
-		if (MacKey.Nonce().size() != 16)
+		if (MacKey.IV().size() != 16)
 		{
 			throw CryptoDigestException(Name(), std::string("Initialize"), std::string("Salt has invalid length!"), ErrorCodes::InvalidNonce);
 		}
 
-		config[4] = IntegerTools::LeBytesTo64(MacKey.Nonce(), 0);
-		config[5] = IntegerTools::LeBytesTo64(MacKey.Nonce(), 8);
+		config[4] = IntegerTools::LeBytesTo64(MacKey.IV(), 0);
+		config[5] = IntegerTools::LeBytesTo64(MacKey.IV(), 8);
 	}
 
 	if (MacKey.Info().size() != 0)
@@ -553,7 +566,7 @@ void Blake512::Permute(const std::vector<byte> &Input, size_t InOffset, Blake2bS
 		Blake::IV512[6] ^ State.F[0],
 		Blake::IV512[7] ^ State.F[1] };
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 	Blake::PermuteR12P1024V(Input, InOffset, State.H, iv);
 #else
 #	if defined(CEX_DIGEST_COMPACT)

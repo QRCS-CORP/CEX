@@ -1,0 +1,41 @@
+digraph "CEX"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=box];
+  rankdir=LR;
+  Node17 [label="Routing",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___event.html",tooltip="Library Events."];
+  Node12 [label="Mac",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___mac.html",tooltip="Message Authentication Code Generators."];
+  Node10 [label="KDF",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___k_d_f.html",tooltip="Key Derivation Functions."];
+  Node1 [label="CEX",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Root Namespace."];
+  Node9 [label="IO",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___i_o.html",tooltip="IO Processors."];
+  Node13 [label="Numeric",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___numeric.html",tooltip="SIMD and Big Integer Namespace."];
+  Node6 [label="Enumeration",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___enumeration.html",tooltip="Cryptographic Enumerations."];
+  Node11 [label="KMS",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___k_m_s.html",tooltip="Key Management Systems."];
+  Node7 [label="Exception",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___exception.html",tooltip="Cryptographic Exceptions."];
+  Node14 [label="Prng",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___prng.html",tooltip="Pseudo Random Number Generators."];
+  Node3 [label="Cipher",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___cipher.html",tooltip="Cryptographic Cipher Namespace."];
+  Node5 [label="Drbg",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___drbg.html",tooltip="Deterministic Random Byte Generators."];
+  Node18 [label="Utility",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___utility.html",tooltip="Library Utilities Classes."];
+  Node15 [label="Processing",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___processing.html",tooltip="Cryptographic Processing Namespace."];
+  Node8 [label="Helper",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___helper.html",tooltip="Cryptographic Helper Classes."];
+  Node2 [label="Asymmetric",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___asymmetric.html",tooltip="Asymmetric Ciphers Namespace."];
+  Node16 [label="Provider",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___provider.html",tooltip="Entropy source collectors and concentrators."];
+  Node4 [label="Digest",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___digest.html",tooltip="Cryptographic Hash Classes."];
+  Node1->Node2 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node3 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node4 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node5 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node6 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node7 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node8 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node9 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node10 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node11 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node12 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node13 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node14 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node15 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node16 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node17 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node18 [shape=plaintext, dir="back", style="solid"];
+}

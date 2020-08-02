@@ -64,6 +64,7 @@ IProvider* ProviderFromName::GetInstance(Providers ProviderType)
 			}
 			default:
 			{
+				// invalid parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The entropy provider type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}

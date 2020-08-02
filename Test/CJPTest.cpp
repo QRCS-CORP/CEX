@@ -8,7 +8,7 @@ namespace Test
 {
 	using Provider::CJP;
 	using Exception::CryptoRandomException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 
 	const std::string CJPTest::CLASSNAME = "CJPTest";

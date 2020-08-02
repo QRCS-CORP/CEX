@@ -464,7 +464,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI1"));
 		}
-		if (kp1.Nonce() != nonce)
+		if (kp1.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI2"));
 		}
@@ -479,7 +479,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI4"));
 		}
-		if (kp2.Nonce() != nonce)
+		if (kp2.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI5"));
 		}
@@ -497,7 +497,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI1"));
 		}
-		if (sp1.Nonce() != nonce)
+		if (sp1.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI2"));
 		}
@@ -512,7 +512,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI4"));
 		}
-		if (sp2.Nonce() != nonce)
+		if (sp2.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SI5"));
 		}
@@ -531,7 +531,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI7"));
 		}
-		if (sk1.Nonce() != nonce)
+		if (sk1.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI8"));
 		}
@@ -546,7 +546,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI10"));
 		}
-		if (sk2.Nonce() != nonce)
+		if (sk2.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI11"));
 		}
@@ -565,7 +565,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI7"));
 		}
-		if (ss1.Nonce() != nonce)
+		if (ss1.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI8"));
 		}
@@ -580,7 +580,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI10"));
 		}
-		if (ss2.Nonce() != nonce)
+		if (ss2.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI11"));
 		}
@@ -599,7 +599,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI13"));
 		}
-		if (sk4.Nonce() != nonce)
+		if (sk4.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI14"));
 		}
@@ -615,7 +615,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI13"));
 		}
-		if (ss4.Nonce() != nonce)
+		if (ss4.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI14"));
 		}
@@ -631,7 +631,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI16"));
 		}
-		if (sk5.Nonce() != nonce)
+		if (sk5.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI17"));
 		}
@@ -647,7 +647,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI16"));
 		}
-		if (ss5.Nonce() != nonce)
+		if (ss5.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI17"));
 		}
@@ -663,7 +663,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI19"));
 		}
-		if (sk6.Nonce() != nonce)
+		if (sk6.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI20"));
 		}
@@ -679,7 +679,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI19"));
 		}
-		if (ss6.Nonce() != nonce)
+		if (ss6.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI20"));
 		}
@@ -695,7 +695,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI22"));
 		}
-		if (sk7.Nonce() != nonce)
+		if (sk7.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI23"));
 		}
@@ -711,7 +711,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI22"));
 		}
-		if (ss7.Nonce() != nonce)
+		if (ss7.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI23"));
 		}
@@ -727,7 +727,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI25"));
 		}
-		if (sk8.Nonce() != nonce)
+		if (sk8.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI26"));
 		}
@@ -743,7 +743,7 @@ namespace Test
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI25"));
 		}
-		if (ss8.Nonce() != nonce)
+		if (ss8.IV() != nonce)
 		{
 			throw TestException(std::string("Initialization"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI26"));
 		}
@@ -763,7 +763,7 @@ namespace Test
 		SecureVector<byte> ks1 = SymmetricKey::Serialize(*kp1);
 		SymmetricKey* kp2 = SymmetricKey::DeSerialize(ks1);
 
-		if (kp1->Key() != kp2->Key() || kp1->Nonce() != kp2->Nonce() || kp1->Info() != kp2->Info())
+		if (kp1->Key() != kp2->Key() || kp1->IV() != kp2->IV() || kp1->Info() != kp2->Info())
 		{
 			throw TestException(std::string("Serialization"), std::string("SymmetricKey"), std::string("The symmetric key serialization has failed! -SS1"));
 		}
@@ -773,7 +773,7 @@ namespace Test
 		SecureVector<byte> ks2 = SymmetricSecureKey::Serialize(*sk1);
 		SymmetricKey* sk2 = SymmetricSecureKey::DeSerialize(ks2);
 
-		if (sk1->Key() != sk2->Key() || sk1->Nonce() != sk2->Nonce() || sk1->Info() != sk2->Info())
+		if (sk1->Key() != sk2->Key() || sk1->IV() != sk2->IV() || sk1->Info() != sk2->Info())
 		{
 			throw TestException(std::string("Serialization"), std::string("SymmetricSecureKey"), std::string("The symmetric key serialization has failed! -SS2"));
 		}
@@ -806,7 +806,7 @@ namespace Test
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS1"));
 			}
-			if (kp.Nonce() != nonce)
+			if (kp.IV() != nonce)
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS2"));
 			}
@@ -821,7 +821,7 @@ namespace Test
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI4"));
 			}
-			if (sk.Nonce() != nonce)
+			if (sk.IV() != nonce)
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI5"));
 			}
@@ -846,7 +846,7 @@ namespace Test
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS7"));
 			}
-			if (sp.Nonce() != SecureUnlock(secnonce))
+			if (sp.IV() != SecureUnlock(secnonce))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricKey"), std::string("The symmetric key is invalid! -SS8"));
 			}
@@ -861,7 +861,7 @@ namespace Test
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI10"));
 			}
-			if (ss.Nonce() != SecureUnlock(secnonce))
+			if (ss.IV() != SecureUnlock(secnonce))
 			{
 				throw TestException(std::string("Stress"), std::string("SymmetricSecureKey"), std::string("The secure key is invalid! -SI11"));
 			}

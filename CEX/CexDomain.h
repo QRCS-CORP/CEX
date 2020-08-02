@@ -84,7 +84,7 @@
 #define NAMESPACE_PROVIDEREND } } 
 #define NAMESPACE_ROUTING namespace CEX { namespace Routing {
 #define NAMESPACE_ROUTINGEND } }
-#define NAMESPACE_UTILITY namespace CEX { namespace Utility {
-#define NAMESPACE_UTILITYEND } } 
+#define NAMESPACE_TOOLS namespace CEX { namespace Tools {
+#define NAMESPACE_TOOLSEND } } 
 
 #endif

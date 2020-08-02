@@ -4,9 +4,9 @@
 
 NAMESPACE_KDF
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Enumeration::KdfConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 class HKDF::HkdfState
 {
@@ -14,11 +14,15 @@ public:
 
 	std::vector<byte> Info;
 	std::vector<byte> State;
+	bool IsDestroyed;
+	bool IsInitialized;
 
-	HkdfState(size_t StateSize, size_t InfoSize)
+	HkdfState(size_t StateSize, size_t InfoSize, bool Destroyed)
 		:
 		Info(InfoSize),
-		State(StateSize)
+		State(StateSize),
+		IsDestroyed(Destroyed),
+		IsInitialized(false)
 	{
 	}
 
@@ -31,6 +35,8 @@ public:
 	{
 		MemoryTools::Clear(Info, 0, Info.size());
 		MemoryTools::Clear(State, 0, State.size());
+		IsDestroyed = false;
+		IsInitialized = false;
 	}
 };
 
@@ -39,33 +45,30 @@ public:
 HKDF::HKDF(SHA2Digests DigestType)
 	:
 	KdfBase(
-		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
+		(DigestType != SHA2Digests::None ? (DigestType == SHA2Digests::SHA2256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
 #if defined(CEX_ENFORCE_LEGALKEY)
-		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
-		(DigestType == SHA2Digests::SHA256 ? 32 : DigestType == SHA2Digests::SHA512 ? 64 : 0),
+		(DigestType == SHA2Digests::SHA2256 ? 32 : DigestType == SHA2Digests::SHA2512 ? 64 : 0),
+		(DigestType == SHA2Digests::SHA2256 ? 32 : DigestType == SHA2Digests::SHA2512 ? 64 : 0),
 #else
 		MINKEY_LENGTH, 
 		MINSALT_LENGTH, 
 #endif
-		(DigestType == SHA2Digests::SHA256 ? KdfConvert::ToName(Kdfs::HKDF256) : DigestType == SHA2Digests::SHA512 ? KdfConvert::ToName(Kdfs::HKDF512) : std::string("")),
+		(DigestType == SHA2Digests::SHA2256 ? KdfConvert::ToName(Kdfs::HKDF256) : DigestType == SHA2Digests::SHA2512 ? KdfConvert::ToName(Kdfs::HKDF512) : std::string("")),
 		(DigestType != SHA2Digests::None ? std::vector<SymmetricKeySize> {
-			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 32 : 64), 0, 0),
-			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), 0, (DigestType == SHA2Digests::SHA256 ? 32 : 64)),
-			SymmetricKeySize((DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 64 : 128), (DigestType == SHA2Digests::SHA256 ? 32 : 64))} : 
+			SymmetricKeySize((DigestType == SHA2Digests::SHA2256 ? 32 : 64), 0, 0),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA2256 ? 64 : 128), 0, (DigestType == SHA2Digests::SHA2256 ? 32 : 64)),
+			SymmetricKeySize((DigestType == SHA2Digests::SHA2256 ? 64 : 128), (DigestType == SHA2Digests::SHA2256 ? 64 : 128), (DigestType == SHA2Digests::SHA2256 ? 32 : 64))} : 
 			std::vector<SymmetricKeySize>(0))),
-	m_isDestroyed(true),
-	m_isInitialized(false),
 	m_hkdfGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
 		throw CryptoKdfException(std::string("HKDF"), std::string("Constructor"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam)),
-	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(byte), 0))
+	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(byte), 0, true))
 {
-
 }
 
 HKDF::HKDF(IDigest* Digest)
 	:
 	KdfBase(
-		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
+		(Digest != nullptr ? (Digest->Enumeral() == Digests::SHA2256 ? Kdfs::HKDF256 : Kdfs::HKDF512) : Kdfs::None),
 #if defined(CEX_ENFORCE_LEGALKEY)
 		(Digest != nullptr ? Digest->DigestSize() : 0),
 		(Digest != nullptr ? Digest->DigestSize() : 0),
@@ -73,40 +76,35 @@ HKDF::HKDF(IDigest* Digest)
 		MINKEY_LENGTH,
 		MINSALT_LENGTH,
 #endif
-		(Digest != nullptr ? Digest->Enumeral() == Digests::SHA256 ? KdfConvert::ToName(Kdfs::HKDF256) : KdfConvert::ToName(Kdfs::HKDF512) : std::string("")),
+		(Digest != nullptr ? Digest->Enumeral() == Digests::SHA2256 ? KdfConvert::ToName(Kdfs::HKDF256) : KdfConvert::ToName(Kdfs::HKDF512) : std::string("")),
 		(Digest != nullptr ? std::vector<SymmetricKeySize> {
 			SymmetricKeySize(Digest->DigestSize(), 0, 0),
 			SymmetricKeySize(Digest->BlockSize(), 0, Digest->DigestSize()),
 			SymmetricKeySize(Digest->BlockSize(), Digest->BlockSize(), Digest->DigestSize())} :
 			std::vector<SymmetricKeySize>(0))),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_hkdfGenerator((Digest != nullptr && (Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512)) ? new HMAC(Digest) :
+	m_hkdfGenerator((Digest != nullptr && (Digest->Enumeral() == Digests::SHA2256 || Digest->Enumeral() == Digests::SHA2512)) ? new HMAC(Digest) :
 		throw CryptoKdfException(std::string("HKDF"), std::string("Constructor"), std::string("The digest instance is not supported!"), ErrorCodes::IllegalOperation)),
-	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(byte), 0))
+	m_hkdfState(new HkdfState(m_hkdfGenerator->TagSize() + sizeof(byte), 0, false))
 {
 }
 
 HKDF::~HKDF()
 {
-	m_isInitialized = false;
-
-	if (m_hkdfState != nullptr)
-	{
-		m_hkdfState.reset(nullptr);
-	}
-
 	if (m_hkdfGenerator != nullptr)
 	{
-		if (m_isDestroyed)
+		if (m_hkdfState->IsDestroyed)
 		{
 			m_hkdfGenerator.reset(nullptr);
-			m_isDestroyed = false;
 		}
 		else
 		{
 			m_hkdfGenerator.release();
 		}
+	}
+
+	if (m_hkdfState != nullptr)
+	{
+		m_hkdfState.reset(nullptr);
 	}
 }
 
@@ -119,7 +117,7 @@ std::vector<byte> &HKDF::Info()
 
 const bool HKDF::IsInitialized() 
 { 
-	return m_isInitialized; 
+	return m_hkdfState->IsInitialized; 
 }
 
 //~~~Public Functions~~~//
@@ -160,7 +158,7 @@ void HKDF::Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt
 
 void HKDF::Generate(std::vector<byte> &Output)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -174,7 +172,7 @@ void HKDF::Generate(std::vector<byte> &Output)
 
 void HKDF::Generate(SecureVector<byte> &Output)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -188,7 +186,7 @@ void HKDF::Generate(SecureVector<byte> &Output)
 
 void HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -206,7 +204,7 @@ void HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 void HKDF::Generate(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoKdfException(Name(), std::string("Generate"), std::string("The generator has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -229,7 +227,7 @@ void HKDF::Initialize(ISymmetricKey &Parameters)
 		throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Invalid key size, the key length must be at least MinimumKeySize in length!"), ErrorCodes::InvalidKey);
 	}
 
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
@@ -240,15 +238,15 @@ void HKDF::Initialize(ISymmetricKey &Parameters)
 		MemoryTools::Copy(Parameters.Info(), 0, m_hkdfState->Info, 0, m_hkdfState->Info.size());
 	}
 
-	if (Parameters.KeySizes().NonceSize() != 0)
+	if (Parameters.KeySizes().IVSize() != 0)
 	{
-		if (Parameters.KeySizes().NonceSize() + Parameters.KeySizes().InfoSize() < MinimumSaltSize())
+		if (Parameters.KeySizes().IVSize() + Parameters.KeySizes().InfoSize() < MinimumSaltSize())
 		{
 			throw CryptoKdfException(Name(), std::string("Initialize"), std::string("Salt value is too small, must be at least 4 bytes in length!"), ErrorCodes::InvalidSalt);
 		}
 
 		SecureVector<byte> prk(m_hkdfGenerator->TagSize());
-		Extract(Parameters.SecureKey(), Parameters.SecureNonce(), prk);
+		Extract(Parameters.SecureKey(), Parameters.SecureIV(), prk);
 		SymmetricKey kp(prk);
 		m_hkdfGenerator->Initialize(kp);
 		SecureClear(prk);
@@ -258,21 +256,23 @@ void HKDF::Initialize(ISymmetricKey &Parameters)
 		m_hkdfGenerator->Initialize(Parameters);
 	}
 
-	m_isInitialized = true;
+	m_hkdfState->IsInitialized = true;
 }
 
 void HKDF::Reset()
 {
 	m_hkdfState->Reset();
 	m_hkdfGenerator->Reset();
-	m_isInitialized = false;
+	m_hkdfState->IsInitialized = false;
 }
 
 //~~~Private Functions~~~//
 
 void HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<HkdfState> &State, std::unique_ptr<HMAC> &Generator)
 {
-	size_t plen = 0;
+	size_t plen;
+
+	plen = 0;
 
 	while (plen != Length)
 	{
@@ -305,7 +305,7 @@ void HKDF::Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, s
 {
 	std::vector<byte> tmps(Length);
 	Expand(tmps, OutOffset, Length, State, Generator);
-	SecureMove(tmps, Output, OutOffset);
+	SecureMove(tmps, 0, Output, OutOffset, Length);
 }
 
 NAMESPACE_KDFEND

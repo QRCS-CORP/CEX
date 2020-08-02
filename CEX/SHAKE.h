@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -91,7 +91,6 @@ private:
 	static const size_t MINSALT_LENGTH = 4;
 
 	class ShakeState;
-	bool m_isInitialized;
 	std::unique_ptr<ShakeState> m_shakeState;
 
 public:
@@ -279,9 +278,8 @@ public:
 
 private:
 
-	static void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<ShakeState> &State);
-	static void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Information, std::unique_ptr<ShakeState> &State);
-	static void Expand(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<ShakeState> &State);
+	static void Absorb(const SecureVector<byte> &Input, size_t InOffset, size_t Length, std::unique_ptr<ShakeState> &State);
+	static void Customize(const SecureVector<byte> &Customization, const SecureVector<byte> &Information, std::unique_ptr<ShakeState> &State);
 	static void Expand(SecureVector<byte> &Output, size_t OutOffset, size_t Length, std::unique_ptr<ShakeState> &State);
 	static void Permute(std::unique_ptr<ShakeState> &State);
 };

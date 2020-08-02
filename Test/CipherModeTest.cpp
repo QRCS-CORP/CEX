@@ -13,7 +13,7 @@ namespace Test
 	using namespace Cipher::Block::Mode;
 	using Enumeration::BlockCiphers;
 	using Enumeration::CipherModeConvert;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 	using Cipher::SymmetricKey;
 
@@ -359,7 +359,7 @@ namespace Test
 			CBC cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -379,7 +379,7 @@ namespace Test
 			CFB cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -399,7 +399,7 @@ namespace Test
 			CTR cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -419,7 +419,7 @@ namespace Test
 			ECB cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -439,7 +439,7 @@ namespace Test
 			ICM cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -459,7 +459,7 @@ namespace Test
 			OFB cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize() + 1);
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -481,7 +481,7 @@ namespace Test
 			CBC cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize() - 1);
+			std::vector<byte> nonce(ks.IVSize() - 1);
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -521,7 +521,7 @@ namespace Test
 			CTR cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize() - 1);
+			std::vector<byte> nonce(ks.IVSize() - 1);
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -541,7 +541,7 @@ namespace Test
 			ICM cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize() - 1);
+			std::vector<byte> nonce(ks.IVSize() - 1);
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -561,7 +561,7 @@ namespace Test
 			OFB cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize() - 1);
+			std::vector<byte> nonce(ks.IVSize() - 1);
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -583,7 +583,7 @@ namespace Test
 			CBC cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -604,7 +604,7 @@ namespace Test
 			CFB cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -625,7 +625,7 @@ namespace Test
 			ECB cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -646,7 +646,7 @@ namespace Test
 			ICM cpr(Enumeration::BlockCiphers::AES);
 			Cipher::SymmetricKeySize ks = cpr.LegalKeySizes()[0];
 			std::vector<byte> key(ks.KeySize());
-			std::vector<byte> nonce(ks.NonceSize());
+			std::vector<byte> nonce(ks.IVSize());
 			SymmetricKey kp(key, nonce);
 
 			cpr.Initialize(true, kp);
@@ -700,22 +700,28 @@ namespace Test
 
 		// test 1-byte feedback-register against the official vectors
 		CFB* mcfb = new CFB(BlockCiphers::AES, 1);
+		const std::string CPRNME = mcfb->Name();
 		SymmetricKey kp(m_keys[2], m_nonce[0]);
 
 		// encryption test
 		mcfb->Initialize(true, kp);
 		mcfb->Transform(inp, 0, enc, 0, enc.size());
 
-		if (!IntegerTools::Compare(enc, 0, otp, 0, otp.size()))
+		if (IntegerTools::Compare(enc, 0, otp, 0, otp.size()) == false)
 		{
-			throw TestException(std::string("CfbPartial"), mcfb->Name(), "Encrypted arrays are not equal! -CC1");
+			if (mcfb != nullptr)
+			{
+				delete mcfb;
+			}
+
+			throw TestException(std::string("CfbPartial"), CPRNME, "Encrypted arrays are not equal! -CC1");
 		}
 
 		// decryption
 		mcfb->Initialize(false, kp);
 		mcfb->Transform(enc, 0, msg, 0, msg.size());
 
-		if (!IntegerTools::Compare(inp, 0, msg, 0, otp.size()))
+		if (IntegerTools::Compare(inp, 0, msg, 0, otp.size()) == false)
 		{
 			throw TestException(std::string("CfbPartial"), mcfb->Name(), "Encrypted arrays are not equal! -CC2");
 		}
@@ -1231,7 +1237,7 @@ namespace Test
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
 		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> nonce(ks.NonceSize());
+		std::vector<byte> nonce(ks.IVSize());
 		std::vector<byte> otp;
 		SecureRandom rnd;
 		size_t i;
@@ -1244,14 +1250,13 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			const size_t ALNLEN = MSGLEN - (MSGLEN % Cipher->BlockSize());
-
 			cpt.resize(ALNLEN);
 			inp.resize(ALNLEN);
 			otp.resize(ALNLEN);
 
-			IntegerTools::Fill(inp, 0, ALNLEN, rnd);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(nonce, 0, nonce.size(), rnd);
+			rnd.Generate(inp, 0, ALNLEN);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(nonce, 0, nonce.size());
 			SymmetricKey kp(key, nonce);
 
 			// encrypt

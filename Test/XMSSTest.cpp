@@ -16,7 +16,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Test::NistRng;
 	using Prng::SecureRandom;
 	using Asymmetric::Sign::XMSS::XMSS;
@@ -99,8 +99,8 @@ namespace Test
 
 	void XMSSTest::Authentication()
 	{
-		XMSS sgn1(XmssParameters::XMSSSHA256H10);
-		XMSS sgn2(XmssParameters::XMSSSHA256H10);
+		XMSS sgn1(XmssParameters::XMSSSHA2256H10);
+		XMSS sgn2(XmssParameters::XMSSSHA2256H10);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -145,7 +145,7 @@ namespace Test
 		// invalid prng type
 		try
 		{
-			XMSS sgn(Enumeration::XmssParameters::XMSSSHA256H10, Enumeration::Prngs::None);
+			XMSS sgn(Enumeration::XmssParameters::XMSSSHA2256H10, Enumeration::Prngs::None);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE2"));
 		}
@@ -160,7 +160,7 @@ namespace Test
 		// null prng
 		try
 		{
-			XMSS sgn(Enumeration::XmssParameters::XMSSSHA256H10, nullptr);
+			XMSS sgn(Enumeration::XmssParameters::XMSSSHA2256H10, nullptr);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE3"));
 		}
@@ -177,7 +177,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			XMSS sgn(XmssParameters::XMSSSHA256H10);
+			XMSS sgn(XmssParameters::XMSSSHA2256H10);
 			sgn.Sign(msg, sig);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE4"));
@@ -195,7 +195,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			XMSS sgn(XmssParameters::XMSSSHA256H10);
+			XMSS sgn(XmssParameters::XMSSSHA2256H10);
 			sgn.Verify(sig, msg);
 
 			throw TestException(std::string("Exception"), sgn.Name(), std::string("Exception handling failure! -SE5"));
@@ -211,7 +211,7 @@ namespace Test
 		// test initialization with invalid key
 		try
 		{
-			XMSS sgn(XmssParameters::XMSSSHA256H10);
+			XMSS sgn(XmssParameters::XMSSSHA2256H10);
 			Asymmetric::Encrypt::MLWE::Kyber cprb;
 			// create an invalid key set
 			AsymmetricKeyPair* kp = cprb.Generate();
@@ -232,7 +232,7 @@ namespace Test
 		{
 			std::vector<byte> msg(32);
 			std::vector<byte> sig(0);
-			XMSS sgn(XmssParameters::XMSSSHA256H10);
+			XMSS sgn(XmssParameters::XMSSSHA2256H10);
 			AsymmetricKeyPair* kp = sgn.Generate();
 			sgn.Initialize(kp->PublicKey());
 			sgn.Sign(msg, sig);
@@ -250,16 +250,15 @@ namespace Test
 
 	void XMSSTest::Integrity()
 	{
-		std::vector<byte> cpt(0);
 		std::vector<byte> msg(0);
 		std::vector<byte> sig(0);
 		NistRng gen;
 
-		// XMSSSHA256H10
+		// XMSSSHA2256H10
 
 		gen.Initialize(m_rngseed);
 
-		XMSS sgn1(XmssParameters::XMSSSHA256H10, &gen);
+		XMSS sgn1(XmssParameters::XMSSSHA2256H10, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp1 = sgn1.Generate();
@@ -302,16 +301,15 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Messages do not match! -XI5"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp1;
 
-		// XMSSMTSHA256H20D2
+		// XMSSMTSHA2256H20D2
 
 		gen.Initialize(m_rngseed);
 
-		XMSS sgn2(XmssParameters::XMSSMTSHA256H20D2, &gen);
+		XMSS sgn2(XmssParameters::XMSSMTSHA2256H20D2, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp2 = sgn2.Generate();
@@ -348,7 +346,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Messages do not match! -SI10"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp2;
@@ -356,16 +353,15 @@ namespace Test
 
 	void XMSSTest::Kat()
 	{
-		std::vector<byte> cpt(0);
 		std::vector<byte> msg(0);
 		std::vector<byte> sig(0);
 		NistRng gen;
 
-		// XMSSSHA256H10
+		// XMSSSHA2256H10
 
 		gen.Initialize(m_rngseed);
 
-		XMSS sgn1(XmssParameters::XMSSSHA256H10, &gen);
+		XMSS sgn1(XmssParameters::XMSSSHA2256H10, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp1 = sgn1.Generate();
@@ -393,16 +389,15 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn1.Name(), std::string("Messages do not match! -XK3"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp1;
 
-		// XMSSSHA512H10
+		// XMSSSHA2512H10
 
 		gen.Initialize(m_rngseed);
 
-		XMSS sgn2(XmssParameters::XMSSSHA512H10, &gen);
+		XMSS sgn2(XmssParameters::XMSSSHA2512H10, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp2 = sgn2.Generate();
@@ -431,7 +426,6 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn2.Name(), std::string("Messages do not match! -XK6"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp2;
@@ -469,7 +463,6 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn3.Name(), std::string("Messages do not match! -XK9"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp3;
@@ -507,16 +500,15 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn4.Name(), std::string("Messages do not match! -XK12"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp4;
 
-		// XMSSMTSHA256H20D2
+		// XMSSMTSHA2256H20D2
 
 		gen.Initialize(m_rngseed);
 
-		XMSS sgn5(XmssParameters::XMSSMTSHA256H20D2, &gen);
+		XMSS sgn5(XmssParameters::XMSSMTSHA2256H20D2, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp5 = sgn5.Generate();
@@ -545,16 +537,15 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn5.Name(), std::string("Messages do not match! -XK15"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp5;
 
-		// XMSSMTSHA512H20D2
+		// XMSSMTSHA2512H20D2
 
 		gen.Initialize(m_rngseed);
 
-		XMSS sgn6(XmssParameters::XMSSMTSHA512H20D2, &gen);
+		XMSS sgn6(XmssParameters::XMSSMTSHA2512H20D2, &gen);
 
 		// generate the key pair
 		AsymmetricKeyPair* kp6 = sgn6.Generate();
@@ -583,7 +574,6 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn6.Name(), std::string("Messages do not match! -XK18"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp6;
@@ -621,7 +611,6 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn7.Name(), std::string("Messages do not match! -XK18"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp7;
@@ -659,7 +648,6 @@ namespace Test
 			throw TestException(std::string("KAT"), sgn8.Name(), std::string("Messages do not match! -XK21"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp8;
@@ -668,7 +656,7 @@ namespace Test
 	void XMSSTest::PrivateKey()
 	{
 		SecureRandom gen;
-		XMSS sgn(XmssParameters::XMSSSHA256H10);
+		XMSS sgn(XmssParameters::XMSSSHA2256H10);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -678,7 +666,7 @@ namespace Test
 		// alter private key
 		std::vector<byte> sk1 = kp->PrivateKey()->Polynomial();
 		gen.Generate(sk1, 0, 16);
-		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(XmssParameters::XMSSSHA256H10));
+		AsymmetricKey* sk2 = new AsymmetricKey(sk1, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePrivateKey, static_cast<AsymmetricParameters>(XmssParameters::XMSSSHA2256H10));
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -694,7 +682,7 @@ namespace Test
 	void XMSSTest::PublicKey()
 	{
 		SecureRandom gen;
-		XMSS sgn(XmssParameters::XMSSSHA256H10);
+		XMSS sgn(XmssParameters::XMSSSHA2256H10);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -704,7 +692,7 @@ namespace Test
 		// alter public key
 		std::vector<byte> pk1 = (kp->PublicKey()->Polynomial());
 		gen.Generate(pk1, 0, 16);
-		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(XmssParameters::XMSSSHA256H10));
+		AsymmetricKey* pk2 = new AsymmetricKey(pk1, AsymmetricPrimitives::XMSS, AsymmetricKeyTypes::SignaturePublicKey, static_cast<AsymmetricParameters>(XmssParameters::XMSSSHA2256H10));
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -719,7 +707,7 @@ namespace Test
 
 	void XMSSTest::Serialization()
 	{
-		XMSS sgn(XmssParameters::XMSSSHA256H10);
+		XMSS sgn(XmssParameters::XMSSSHA2256H10);
 		SecureVector<byte> skey(0);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
@@ -742,13 +730,15 @@ namespace Test
 			{
 				throw TestException(std::string("Serialization"), sgn.Name(), std::string("Public key serialization test has failed! -XR2"));
 			}
+
+			delete kp;
 		}
 	}
 
 	void XMSSTest::Signature()
 	{
 		SecureRandom gen;
-		XMSS sgn(XmssParameters::XMSSSHA256H10);
+		XMSS sgn(XmssParameters::XMSSSHA2256H10);
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
@@ -774,8 +764,8 @@ namespace Test
 		const size_t CYCLES = TEST_CYCLES == 1 ? 1 : TEST_CYCLES / 2;
 
 		SecureRandom gen;
-		XMSS sgn1(XmssParameters::XMSSSHA256H10);
-		XMSS sgn2(XmssParameters::XMSSSHA256H10);
+		XMSS sgn1(XmssParameters::XMSSSHA2256H10);
+		XMSS sgn2(XmssParameters::XMSSSHA2256H10);
 		std::vector<byte> msg1(0);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);

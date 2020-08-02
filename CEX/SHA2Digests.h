@@ -18,11 +18,11 @@ enum class SHA2Digests : byte
 	/// <summary>
 	/// The SHA2-256 digest
 	/// </summary>
-	SHA256 = static_cast<byte>(Digests::SHA256),
+	SHA2256 = static_cast<byte>(Digests::SHA2256),
 	/// <summary>
 	/// The SHA2-512 digest
 	/// </summary>
-	SHA512 = static_cast<byte>(Digests::SHA512)
+	SHA2512 = static_cast<byte>(Digests::SHA2512)
 };
 
 class SHA2DigestConvert

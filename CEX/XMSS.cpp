@@ -7,7 +7,7 @@
 NAMESPACE_XMSS
 
 using Enumeration::AsymmetricPrimitiveConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::XmssParameterConvert;
 
 class XMSS::XmssState
@@ -39,9 +39,55 @@ public:
 
 XMSS::XMSS(XmssParameters Parameters, Prngs PrngType)
 	:
-	m_xmssState(new XmssState(Parameters != XmssParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_xmssState(new XmssState(Parameters == XmssParameters::XMSSSHA2256H10 ||
+		Parameters == XmssParameters::XMSSSHA2256H16 ||
+		Parameters == XmssParameters::XMSSSHA2256H20 ||
+		Parameters == XmssParameters::XMSSSHA2512H10 ||
+		Parameters == XmssParameters::XMSSSHA2512H16 ||
+		Parameters == XmssParameters::XMSSSHA2512H20 ||
+		Parameters == XmssParameters::XMSSSHAKE256H10 ||
+		Parameters == XmssParameters::XMSSSHAKE256H16 ||
+		Parameters == XmssParameters::XMSSSHAKE256H20 ||
+		Parameters == XmssParameters::XMSSSHAKE512H10 ||
+		Parameters == XmssParameters::XMSSSHAKE512H16 ||
+		Parameters == XmssParameters::XMSSSHAKE512H20 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H60D12 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H60D12 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H60D12 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H60D12 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The XMSS parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
@@ -49,9 +95,55 @@ XMSS::XMSS(XmssParameters Parameters, Prngs PrngType)
 
 XMSS::XMSS(XmssParameters Parameters, IPrng* Rng)
 	:
-	m_xmssState(new XmssState(Parameters != XmssParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_xmssState(new XmssState(Parameters == XmssParameters::XMSSSHA2256H10 ||
+		Parameters == XmssParameters::XMSSSHA2256H16 ||
+		Parameters == XmssParameters::XMSSSHA2256H20 ||
+		Parameters == XmssParameters::XMSSSHA2512H10 ||
+		Parameters == XmssParameters::XMSSSHA2512H16 ||
+		Parameters == XmssParameters::XMSSSHA2512H20 ||
+		Parameters == XmssParameters::XMSSSHAKE256H10 ||
+		Parameters == XmssParameters::XMSSSHAKE256H16 ||
+		Parameters == XmssParameters::XMSSSHAKE256H20 ||
+		Parameters == XmssParameters::XMSSSHAKE512H10 ||
+		Parameters == XmssParameters::XMSSSHAKE512H16 ||
+		Parameters == XmssParameters::XMSSSHAKE512H20 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHA2256H60D12 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHA2512H60D12 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHAKE256H60D12 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H20D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H20D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H40D2 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H40D4 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H40D8 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H60D3 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H60D6 ||
+		Parameters == XmssParameters::XMSSMTSHAKE512H60D12 ?
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The XMSS parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Rng != nullptr ? Rng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::XMSS), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
@@ -59,16 +151,8 @@ XMSS::XMSS(XmssParameters Parameters, IPrng* Rng)
 
 XMSS::~XMSS()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_xmssState->Destroyed)
 	{
@@ -171,13 +255,13 @@ const void XMSS::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::SignaturePublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_xmssState->Parameters = static_cast<XmssParameters>(m_publicKey->Parameters());
 		m_xmssState->Signer = false;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_xmssState->Parameters = static_cast<XmssParameters>(m_privateKey->Parameters());
 		m_xmssState->Signer = true;
 	}
@@ -204,7 +288,7 @@ size_t XMSS::Sign(const std::vector<byte> &Message, std::vector<byte> &Signature
 
 	size_t slen;
 
-	slen = XMSSCore::Sign(Signature, Message, m_privateKey->Polynomial(), m_rndGenerator, m_xmssState->Parameters);
+	slen = XMSSCore::Sign(Signature, Message, m_privateKey->Polynomial(), m_xmssState->Parameters);
 
 	return slen;
 }
@@ -222,8 +306,6 @@ bool XMSS::Verify(const std::vector<byte> &Signature, std::vector<byte> &Message
 	}
 
 	bool res;
-
-	res = false;
 
 	res = XMSSCore::Verify(Message, Signature, m_publicKey->Polynomial(), m_xmssState->Parameters);
 

@@ -5,9 +5,9 @@
 
 NAMESPACE_RINGLWE
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 //~~~Constant Tables~~~//
 
@@ -591,7 +591,7 @@ void RLWEQ12289N1024::MulCoefficients(std::array<ushort, RLWE_N> &Poly, const st
 
 void RLWEQ12289N1024::Ntt(std::array<ushort, RLWE_N> &A, const std::vector<ushort> &Omega)
 {
-	uint distance;
+	size_t distance;
 	size_t start;
 	size_t i;
 	size_t j;
@@ -858,8 +858,8 @@ void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 	size_t j;
 	ushort val;
 
-	MemoryTools::Copy(Seed, 0, tmpk, 0, RLWE_SEED_SIZE);
 	ctr = 0;
+	MemoryTools::Copy(Seed, 0, tmpk, 0, RLWE_SEED_SIZE);
 
 	// generate a in blocks of 64 coefficients
 	for (i = 0; i < RLWE_N / 64; ++i)
@@ -875,7 +875,7 @@ void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 
 			for (j = 0; j < Keccak::KECCAK128_RATE_SIZE && ctr < 64; j += 2)
 			{
-				val = (buf[j] | ((ushort)buf[j + 1] << 8));
+				val = (buf[j] | (static_cast<ushort>(buf[j + 1]) << 8));
 				if (val < 5 * RLWE_Q)
 				{
 					A[(i * 64) + ctr] = val;

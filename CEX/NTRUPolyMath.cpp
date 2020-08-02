@@ -6,10 +6,6 @@ NAMESPACE_NTRUPRIME
 
 void NTRUPolyMath::Decode(std::vector<ushort> &Output, size_t OutOffset, const std::vector<byte> &S, size_t SOffset, const std::vector<ushort> &M, size_t Length)
 {
-	std::vector<ushort> tmpr(0);
-	std::vector<ushort> m2(0);
-	std::vector<ushort> bottomr(0);
-	std::vector<uint> bottomt(0);
 	size_t i;
 	uint m;
 	uint r;
@@ -34,10 +30,10 @@ void NTRUPolyMath::Decode(std::vector<ushort> &Output, size_t OutOffset, const s
 
 	if (Length > 1)
 	{
-		tmpr.resize((Length + 1) / 2);
-		m2.resize((Length + 1) / 2);
-		bottomr.resize(Length / 2);
-		bottomt.resize(Length / 2);
+		std::vector<ushort> tmpr((Length + 1) / 2);
+		std::vector<ushort> m2((Length + 1) / 2);
+		std::vector<ushort> bottomr(Length / 2);
+		std::vector<uint> bottomt(Length / 2);
 
 		for (i = 0; i < Length - 1; i += 2)
 		{
@@ -81,7 +77,7 @@ void NTRUPolyMath::Decode(std::vector<ushort> &Output, size_t OutOffset, const s
 			r1 = U32ModU14(r1, M[i + 1]);
 			Output[OutOffset] = r0;
 			++OutOffset;
-			Output[OutOffset] = r1;
+			Output[OutOffset] = static_cast<ushort>(r1);
 			++OutOffset;
 		}
 
@@ -126,9 +122,6 @@ void NTRUPolyMath::Decrypt(std::vector<int8_t> &R, const std::vector<int16_t> &C
 void NTRUPolyMath::Encode(std::vector<byte> &Output, size_t OutOffset, const std::vector<ushort> &R, const std::vector<ushort> &M, size_t Length)
 {
 	// 0 <= R[i] < M[i] < 16384
-
-	std::vector<ushort> tmpm(0);
-	std::vector<ushort> tmpr(0);
 	size_t i;
 	uint m;
 	uint m0;
@@ -153,8 +146,8 @@ void NTRUPolyMath::Encode(std::vector<byte> &Output, size_t OutOffset, const std
 
 	if (Length > 1)
 	{
-		tmpr.resize((Length + 1) / 2);
-		tmpm.resize((Length + 1) / 2);
+		std::vector<ushort> tmpm((Length + 1) / 2);
+		std::vector<ushort> tmpr((Length + 1) / 2);
 
 		for (i = 0; i < Length - 1; i += 2)
 		{
@@ -202,7 +195,7 @@ int16_t NTRUPolyMath::FqRecip(int16_t A1, int32_t Q)
 	i = 1;
 	ai = A1;
 
-	while (i < static_cast<size_t>(Q - 2))
+	while (i < static_cast<size_t>(Q - 2L))
 	{
 		ai = FqFreeze(A1 * ai, Q);
 		i += 1;

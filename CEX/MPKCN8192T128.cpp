@@ -6,7 +6,7 @@
 NAMESPACE_MCELIECE
 
 using Digest::Keccak;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 bool MPKCN8192T128::Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
@@ -134,7 +134,8 @@ void MPKCN8192T128::SupportGen(ushort* S, const byte* C)
 			--j;
 			S[i] <<= 1;
 			S[i] |= (L[j][i / 8] >> (i % 8)) & 1;
-		} while (j > 0);
+		} 
+		while (j > 0);
 	}
 }
 
@@ -159,10 +160,12 @@ void MPKCN8192T128::BerlekampMassey(ushort* Output, const ushort* S)
 
 	for (i = 0; i < SYS_T + 1; ++i)
 	{
-		C[i] = B[i] = 0;
+		B[i] = 0;
+		C[i] = 0;
 	}
 
-	B[1] = C[0] = 1;
+	B[1] = 1;
+	C[0] = 1;
 
 	for (N = 0; N < 2 * SYS_T; N++)
 	{
@@ -372,7 +375,7 @@ void MPKCN8192T128::GenE(byte* E, std::unique_ptr<IPrng> &Rng)
 	}
 }
 
-void MPKCN8192T128::Syndrome(byte* S, const byte* Pk, byte* E)
+void MPKCN8192T128::Syndrome(byte* S, const byte* Pk, const byte* E)
 {
 	byte row[SYS_N / 8];
 	size_t i;
@@ -440,132 +443,118 @@ int32_t MPKCN8192T128::PkGen(byte* Pk, const byte* Sk)
 	uint8_t b;
 	uint8_t mask;
 
-	ret = (mat == nullptr) ? -1 : 0;
+	g[SYS_T] = 1;
+	ret = 0;
 
-	if (ret == 0)
+	for (i = 0; i < SYS_T; i++)
 	{
-		g[SYS_T] = 1;
+		g[i] = MPKCUtils::Load16(Sk);
+		g[i] &= GFMASK;
+		Sk += 2;
+	}
 
-		for (i = 0; i < SYS_T; i++)
+	SupportGen(L, Sk);
+	Root(inv, g, L);
+
+	for (i = 0; i < SYS_N; i++)
+	{
+		inv[i] = GF::Inverse(inv[i]);
+	}
+
+	for (i = 0; i < GFBITS * SYS_T; ++i)
+	{
+		mat[i] = new byte[SYS_N / 8];
+		std::memset(mat[i], 0, SYS_N / 8);
+	}
+
+	for (i = 0; i < SYS_T; i++)
+	{
+		for (j = 0; j < SYS_N; j += 8)
 		{
-			g[i] = MPKCUtils::Load16(Sk);
-			g[i] &= GFMASK;
-			Sk += 2;
-		}
-
-		SupportGen(L, Sk);
-		Root(inv, g, L);
-
-		for (i = 0; i < SYS_N; i++)
-		{
-			inv[i] = GF::Inverse(inv[i]);
-		}
-
-		for (i = 0; i < GFBITS * SYS_T; ++i)
-		{
-			mat[i] = new byte[SYS_N / 8];
-
-			if (mat[i] == nullptr)
+			for (k = 0; k < GFBITS; k++)
 			{
-				ret = -1;
+				b = (inv[j + 7] >> k) & 1; b <<= 1;
+				b |= (inv[j + 6] >> k) & 1; b <<= 1;
+				b |= (inv[j + 5] >> k) & 1; b <<= 1;
+				b |= (inv[j + 4] >> k) & 1; b <<= 1;
+				b |= (inv[j + 3] >> k) & 1; b <<= 1;
+				b |= (inv[j + 2] >> k) & 1; b <<= 1;
+				b |= (inv[j + 1] >> k) & 1; b <<= 1;
+				b |= (inv[j + 0] >> k) & 1;
+
+				mat[i * GFBITS + k][j / 8] = b;
+			}
+		}
+
+		for (j = 0; j < SYS_N; j++)
+		{
+			inv[j] = GF::Multiply(inv[j], L[j]);
+		}
+	}
+
+	for (i = 0; i < (GFBITS * SYS_T + 7) / 8; i++)
+	{
+		for (j = 0; j < 8; j++)
+		{
+			row = i * 8 + j;
+
+			if (row >= (GFBITS * SYS_T))
+			{
 				break;
 			}
 
-			std::memset(mat[i], 0, SYS_N / 8);
-		}
+			for (k = row + 1; k < GFBITS * SYS_T; k++)
+			{
+				mask = mat[row][i] ^ mat[k][i];
+				mask >>= j;
+				mask &= 1;
+				mask = ~mask + 1;
 
-		if (ret == 0)
+				for (c = 0; c < SYS_N / 8; c++)
+				{
+					mat[row][c] ^= mat[k][c] & mask;
+				}
+			}
+
+			// return if not systematic
+			if (((mat[row][i] >> j) & 1) == 0)
+			{
+				return -1;
+			}
+
+			for (k = 0; k < GFBITS * SYS_T; k++)
+			{
+				if (k != row)
+				{
+					mask = mat[k][i] >> j;
+					mask &= 1;
+					mask = ~mask + 1;
+
+					for (c = 0; c < SYS_N / 8; c++)
+					{
+						mat[k][c] ^= mat[row][c] & mask;
+					}
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < PK_NROWS; i++)
+	{
+		std::memcpy(Pk + i * PK_ROW_BYTES, mat[i] + PK_NROWS / 8, PK_ROW_BYTES);
+	}
+
+	for (i = 0; i < GFBITS * SYS_T; ++i)
+	{
+		if (mat[i] != nullptr)
 		{
-			for (i = 0; i < SYS_T; i++)
-			{
-				for (j = 0; j < SYS_N; j += 8)
-				{
-					for (k = 0; k < GFBITS; k++)
-					{
-						b = (inv[j + 7] >> k) & 1; b <<= 1;
-						b |= (inv[j + 6] >> k) & 1; b <<= 1;
-						b |= (inv[j + 5] >> k) & 1; b <<= 1;
-						b |= (inv[j + 4] >> k) & 1; b <<= 1;
-						b |= (inv[j + 3] >> k) & 1; b <<= 1;
-						b |= (inv[j + 2] >> k) & 1; b <<= 1;
-						b |= (inv[j + 1] >> k) & 1; b <<= 1;
-						b |= (inv[j + 0] >> k) & 1;
-
-						mat[i * GFBITS + k][j / 8] = b;
-					}
-				}
-
-				for (j = 0; j < SYS_N; j++)
-				{
-					inv[j] = GF::Multiply(inv[j], L[j]);
-				}
-			}
-
-			for (i = 0; i < (GFBITS * SYS_T + 7) / 8; i++)
-			{
-				for (j = 0; j < 8; j++)
-				{
-					row = i * 8 + j;
-
-					if (row >= GFBITS * SYS_T)
-					{
-						break;
-					}
-
-					for (k = row + 1; k < GFBITS * SYS_T; k++)
-					{
-						mask = mat[row][i] ^ mat[k][i];
-						mask >>= j;
-						mask &= 1;
-						mask = ~mask + 1;
-
-						for (c = 0; c < SYS_N / 8; c++)
-						{
-							mat[row][c] ^= mat[k][c] & mask;
-						}
-					}
-
-					// return if not systematic
-					if (((mat[row][i] >> j) & 1) == 0)
-					{
-						return -1;
-					}
-
-					for (k = 0; k < GFBITS * SYS_T; k++)
-					{
-						if (k != row)
-						{
-							mask = mat[k][i] >> j;
-							mask &= 1;
-							mask = ~mask + 1;
-
-							for (c = 0; c < SYS_N / 8; c++)
-							{
-								mat[k][c] ^= mat[row][c] & mask;
-							}
-						}
-					}
-				}
-			}
-
-			for (i = 0; i < PK_NROWS; i++)
-			{
-				std::memcpy(Pk + i * PK_ROW_BYTES, mat[i] + PK_NROWS / 8, PK_ROW_BYTES);
-			}
-
-			for (i = 0; i < GFBITS * SYS_T; ++i)
-			{
-				if (mat[i] != nullptr)
-				{
-					delete[] mat[i];
-				}
-			}
+			delete[] mat[i];
 		}
+	}
 
-		if (mat != nullptr)
-		{
-			delete[] mat;
-		}
+	if (mat != nullptr)
+	{
+		delete[] mat;
 	}
 
 	return ret;
@@ -710,7 +699,7 @@ int32_t MPKCN8192T128::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
 			a[i] &= GFMASK;
 		}
 
-		if (IrrGen(g, (ushort*)a.data()) == 0)
+		if (IrrGen(g, reinterpret_cast<ushort*>(a.data())) == 0)
 		{
 			break;
 		}
@@ -720,7 +709,7 @@ int32_t MPKCN8192T128::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
 	{
 		Rng->Fill(perm, 0, perm.size());
 
-		if (PermConversion((uint*)perm.data()) == 0)
+		if (PermConversion(reinterpret_cast<uint*>(perm.data())) == 0)
 		{
 			break;
 		}
@@ -731,7 +720,7 @@ int32_t MPKCN8192T128::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
 		MPKCUtils::Store16(Sk + SYS_N / 8 + i * 2, g[i]);
 	}
 
-	ControlBits(Sk + SYS_N / 8 + IRR_BYTES, (uint*)perm.data());
+	ControlBits(Sk + SYS_N / 8 + IRR_BYTES, reinterpret_cast<uint*>(perm.data()));
 
 	return 0;
 }
@@ -751,7 +740,8 @@ ushort MPKCN8192T128::Evaluate(const ushort* F, ushort A)
 		--i;
 		r = GF::Multiply(r, A);
 		r = GF::Add(r, F[i]);
-	} while (i != 0);
+	} 
+	while (i != 0);
 
 	return r;
 }
@@ -831,7 +821,7 @@ ushort MPKCN8192T128::GF::Sq2(ushort Input)
 		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
 	}
 
-	return (ushort)(x & GFMASK);
+	return static_cast<ushort>(x & GFMASK);
 }
 
 ushort MPKCN8192T128::GF::SqMul(ushort Input, ushort M)
@@ -867,7 +857,7 @@ ushort MPKCN8192T128::GF::SqMul(ushort Input, ushort M)
 		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
 	}
 
-	return (ushort)(x & GFMASK);
+	return static_cast<ushort>(x & GFMASK);
 }
 
 ushort MPKCN8192T128::GF::Sq2Mul(ushort Input, ushort M)
@@ -906,7 +896,7 @@ ushort MPKCN8192T128::GF::Sq2Mul(ushort Input, ushort M)
 		x ^= (t >> 9) ^ (t >> 10) ^ (t >> 12) ^ (t >> 13);
 	}
 
-	return (ushort)(x & GFMASK);
+	return static_cast<ushort>(x & GFMASK);
 }
 
 ushort MPKCN8192T128::GF::Add(ushort A, ushort B)
@@ -975,7 +965,7 @@ ushort MPKCN8192T128::GF::Multiply(ushort A, ushort B)
 	return static_cast<ushort>(tmp & GFMASK);
 }
 
-void MPKCN8192T128::GF::Multiply(ushort* Output, ushort* X, const ushort* Y)
+void MPKCN8192T128::GF::Multiply(ushort* Output, const ushort* X, const ushort* Y)
 {
 	ushort prod[255];
 	size_t i;

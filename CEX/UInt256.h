@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -521,16 +521,16 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UInt256 operator / (const UInt256 &X) const
 	{
-		std::array<uint, 8> tmpA;
-		std::array<uint, 8> tmpB;
-		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
-		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		std::array<uint, 8> tmpa;
+		std::array<uint, 8> tmpb;
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpa.data()), ymm);
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpb.data()), X.ymm);
+		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0 && tmpb[4] != 0 && tmpb[5] != 0 && tmpb[6] != 0 && tmpb[7] != 0, "Division by zero");
 
-		return UInt256(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
-			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
+		return UInt256(tmpa[7] / tmpb[7], tmpa[6] / tmpb[6], tmpa[5] / tmpb[5], tmpa[4] / tmpb[4],
+			tmpa[3] / tmpb[3], tmpa[2] / tmpb[2], tmpa[1] / tmpb[1], tmpa[0] / tmpb[0]);
 
-		// TODO: finish this
+		// TODO: optimize this
 		//return UInt256(_mm256_cvtps_epi32(_mm256_div_ps(_mm256_cvtepi32_ps(ymm), _mm256_cvtepi32_ps(X.ymm))));
 	}
 
@@ -541,16 +541,16 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UInt256 &X)
 	{
-		std::array<uint, 8> tmpA;
-		std::array<uint, 8> tmpB;
-		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
-		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		std::array<uint, 8> tmpa;
+		std::array<uint, 8> tmpb;
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpa.data()), ymm);
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(tmpb.data()), X.ymm);
+		CEXASSERT(tmpb[0] != 0 && tmpb[1] != 0 && tmpb[2] != 0 && tmpb[3] != 0 && tmpb[4] != 0 && tmpb[5] != 0 && tmpb[6] != 0 && tmpb[7] != 0, "Division by zero");
 
-		ymm = _mm256_set_epi32(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
-			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
+		ymm = _mm256_set_epi32(tmpa[7] / tmpb[7], tmpa[6] / tmpb[6], tmpa[5] / tmpb[5], tmpa[4] / tmpb[4],
+			tmpa[3] / tmpb[3], tmpa[2] / tmpb[2], tmpa[1] / tmpb[1], tmpa[0] / tmpb[0]);
 
-		// TODO: finish this
+		// TODO: optimize this
 		//ymm = _mm256_cvtps_epi32(_mm256_div_ps(_mm256_cvtepi32_ps(ymm), _mm256_cvtepi32_ps(X.ymm)));
 	}
 
@@ -699,7 +699,7 @@ public:
 	/// </summary>
 	inline UInt256 operator ~ () const
 	{
-		return UInt256(_mm256_xor_si256(ymm, _mm256_set1_epi32(0xFFFFFFFF)));
+		return UInt256(_mm256_xor_si256(ymm, _mm256_set1_epi32(0xFFFFFFFFUL)));
 	}
 
 	/// <summary>

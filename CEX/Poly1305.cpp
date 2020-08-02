@@ -5,9 +5,9 @@
 NAMESPACE_MAC
 
 using Numeric::Donna128;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Enumeration::MacConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 class Poly1305::Poly1305State
 {
@@ -16,11 +16,13 @@ public:
 	std::array<ulong, 8> State = { 0x00 };
 	std::vector<byte> Buffer;
 	size_t Position;
+	bool IsInitialized;
 
 	Poly1305State(size_t BufferSize)
 		:
 		Buffer(BufferSize),
-		Position(0)
+		Position(0),
+		IsInitialized(false)
 	{
 	}
 
@@ -34,6 +36,7 @@ public:
 		Position = 0;
 		MemoryTools::Clear(Buffer, 0, Buffer.size());
 		MemoryTools::Clear(State, 0, State.size() * sizeof(ulong));
+		IsInitialized = false;
 	}
 };
 
@@ -52,15 +55,12 @@ Poly1305::Poly1305()
 		POLYKEY_SIZE,
 		MINSALT_LENGTH,
 		BLOCK_SIZE),
-	m_isInitialized(false),
 	m_poly1305State(new Poly1305State(BLOCK_SIZE))
 {
 }
 
 Poly1305::~Poly1305()
 {
-	m_isInitialized = false;
-
 	if (m_poly1305State != nullptr)
 	{
 		m_poly1305State.reset(nullptr);
@@ -71,14 +71,14 @@ Poly1305::~Poly1305()
 
 const bool Poly1305::IsInitialized()
 {
-	return m_isInitialized;
+	return m_poly1305State->IsInitialized;
 }
 
 //~~~Public Functions~~~//
 
 void Poly1305::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Compute"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -101,7 +101,7 @@ size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	ulong h1;
 	ulong h2;
 
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Finalize"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -189,7 +189,7 @@ size_t Poly1305::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	std::vector<byte> tag(TagSize());
 
 	Finalize(tag, 0);
-	SecureMove(tag, Output, OutOffset);
+	SecureMove(tag, 0, Output, OutOffset, tag.size());
 
 	return TagSize();
 }
@@ -204,7 +204,7 @@ void Poly1305::Initialize(ISymmetricKey &Parameters)
 	const ulong T0 = IntegerTools::LeBytesTo64(Parameters.Key(), 0);
 	const ulong T1 = IntegerTools::LeBytesTo64(Parameters.Key(), sizeof(ulong));
 
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
@@ -220,18 +220,18 @@ void Poly1305::Initialize(ISymmetricKey &Parameters)
 	m_poly1305State->State[6] = IntegerTools::LeBytesTo64(Parameters.Key(), 2 * sizeof(ulong));
 	m_poly1305State->State[7] = IntegerTools::LeBytesTo64(Parameters.Key(), 3 * sizeof(ulong));
 
-	m_isInitialized = true;
+	m_poly1305State->IsInitialized = true;
 }
 
 void Poly1305::Reset()
 {
 	m_poly1305State->Reset();
-	m_isInitialized = false;
+	m_poly1305State->IsInitialized = false;
 }
 
 void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoMacException(Name(), std::string("Update"), std::string("The MAC has not been initialized!"), ErrorCodes::NotInitialized);
 	}

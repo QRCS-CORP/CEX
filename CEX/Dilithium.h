@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -82,9 +82,9 @@ using Enumeration::DilithiumParameters;
 /// </para>
 /// <description>Scientific Background:</description>
 /// <para>The design of Dilithium is based on the "Fiat-Shamir with Aborts" technique of Lyubashevsky which uses rejection sampling to make lattice-based Fiat-Shamir schemes 
-/// compact and secure.The scheme with the smallest signature sizes using this approach is the one of Ducas, Durmus, Lepoint, and Lyubashevsky,
+/// compact and secure. The scheme with the smallest signature sizes using this approach is the one of Ducas, Durmus, Lepoint, and Lyubashevsky,
 /// which is based on the NTRU assumption and crucially uses Gaussian sampling for creating signatures.
-/// Because Gaussian sampling is hard to implement securely and efficiently, we opted to only use the uniform distribution.
+/// Because Gaussian sampling is hard to implement securely and efficiently, they opted to only use the uniform distribution.
 /// Dilithium improves on the most efficient scheme that only uses the uniform distribution, due to Bai and Galbraith, by using a new technique that shrinks the public key by more than a factor of 2.</para>
 /// <description>:</description>
 /// 
@@ -111,8 +111,8 @@ private:
 
 	class DilithiumState;
 	std::unique_ptr<DilithiumState> m_dilithiumState;
-	std::unique_ptr<AsymmetricKey> m_privateKey;
-	std::unique_ptr<AsymmetricKey> m_publicKey;
+	AsymmetricKey* m_privateKey;
+	AsymmetricKey* m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:

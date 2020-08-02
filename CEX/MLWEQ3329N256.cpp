@@ -5,9 +5,9 @@
 
 NAMESPACE_MODULELWE
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 //~~~Constants~~~//
 
@@ -162,11 +162,10 @@ void MLWEQ3329N256::UnpackCiphertext(std::vector<std::array<ushort, MLWE_N>> &B,
 uint MLWEQ3329N256::RejUniform(std::array<ushort, MLWE_N> &R, uint ROffset, uint RLength, const std::vector<byte> &Buffer, size_t BufLength)
 {
 	uint ctr;
-	size_t pos;
+	size_t pos(0);
 	ushort val;
 
 	ctr = ROffset;
-	pos = 0;
 
 	while (ctr < RLength && pos + 2 <= BufLength)
 	{
@@ -242,12 +241,10 @@ void MLWEQ3329N256::CpaGenerate(std::vector<byte> &PublicKey, std::vector<byte> 
 	std::vector<byte> nseed(MLWE_SEED_SIZE);
 	std::vector<byte> pseed(MLWE_SEED_SIZE);
 	size_t i;
-	byte nonce;
+	byte nonce(0);
 
 	MemoryTools::Copy(Seed, 0, pseed, 0, MLWE_SEED_SIZE);
 	MemoryTools::Copy(Seed, MLWE_SEED_SIZE, nseed, 0, MLWE_SEED_SIZE);
-
-	nonce = 0;
 	GenMatrix(a, pseed, 0);
 
 	for (i = 0; i < K; ++i)
@@ -291,9 +288,8 @@ void MLWEQ3329N256::CpaEncrypt(std::vector<byte> &CipherText, const std::vector<
 	std::array<ushort, MLWE_N> epp;
 	std::array<ushort, MLWE_N> v;
 	size_t i;
-	uint8_t nonce;
+	uint8_t nonce(0);
 
-	nonce = 0;
 	UnpackPk(pkpv, seed, Pk, K);
 	PolyFromMsg(k, Message);
 	GenMatrix(at, seed, 1);
@@ -362,10 +358,10 @@ ushort MLWEQ3329N256::FqMul(int16_t A, int16_t B)
 
 void MLWEQ3329N256::Ntt(std::array<ushort, MLWE_N> &R)
 {
-	uint j;
-	uint k;
-	uint len;
-	uint start;
+	size_t j;
+	size_t k;
+	size_t len;
+	size_t start;
 	ushort t;
 	int16_t zeta;
 
@@ -390,10 +386,10 @@ void MLWEQ3329N256::Ntt(std::array<ushort, MLWE_N> &R)
 
 void MLWEQ3329N256::InvNtt(std::array<ushort, MLWE_N> &R)
 {
-	uint j;
-	uint k;
-	uint len;
-	uint start;
+	size_t j;
+	size_t k;
+	size_t len;
+	size_t start;
 	ushort t;
 	int16_t zeta;
 
@@ -445,13 +441,13 @@ void MLWEQ3329N256::Cbd(std::array<ushort, MLWE_N> &R, const std::vector<byte> &
 	for (i = 0; i < MLWE_N / 8; ++i)
 	{
 		t = IntegerTools::LeBytesTo32(Buffer, 4 * i);
-		d = t &0x55555555UL;
-		d += (t >> 1) &0x55555555UL;
+		d = t & 0x55555555UL;
+		d += (t >> 1) & 0x55555555UL;
 
 		for (j = 0; j < 8; j++)
 		{
-			a = (d >> (4 * j)) &0x03;
-			b = (d >> ((4 * j) + 2)) &0x03;
+			a = (d >> (4 * j)) & 0x03;
+			b = (d >> ((4 * j) + 2)) & 0x03;
 			R[(8 * i) + j] = static_cast<ushort>(a - b);
 		}
 	}
@@ -473,7 +469,7 @@ void MLWEQ3329N256::PolyCompress(std::vector<byte> &R, std::array<ushort, MLWE_N
 		{
 			for (j = 0; j < 8; ++j)
 			{
-				t[j] = (((static_cast<uint>(A[i + j]) << 3) + MLWE_Q / 2) / MLWE_Q) &7;
+				t[j] = (((static_cast<uint>(A[i + j]) << 3) + MLWE_Q / 2) / MLWE_Q) & 7;
 			}
 
 			R[kctr] = t[0] | (t[1] << 3) | (t[2] << 6);
@@ -488,7 +484,7 @@ void MLWEQ3329N256::PolyCompress(std::vector<byte> &R, std::array<ushort, MLWE_N
 		{
 			for (j = 0; j < 8; ++j)
 			{
-				t[j] = (((static_cast<uint>(A[i + j]) << 4) + MLWE_Q / 2) / MLWE_Q) &15;
+				t[j] = (((static_cast<uint>(A[i + j]) << 4) + MLWE_Q / 2) / MLWE_Q) & 15;
 			}
 
 			R[kctr] = static_cast<byte>(t[0] | (t[1] << 4));
@@ -504,7 +500,7 @@ void MLWEQ3329N256::PolyCompress(std::vector<byte> &R, std::array<ushort, MLWE_N
 		{
 			for (j = 0; j < 8; ++j)
 			{
-				t[j] = (((static_cast<uint>(A[i + j]) << 5) + MLWE_Q / 2) / MLWE_Q) &31;
+				t[j] = (((static_cast<uint>(A[i + j]) << 5) + MLWE_Q / 2) / MLWE_Q) & 31;
 			}
 
 			R[kctr] = static_cast<byte>(t[0] | (t[1] << 5));
@@ -528,13 +524,13 @@ void MLWEQ3329N256::PolyDecompress(std::array<ushort, MLWE_N> &R, const std::vec
 	{
 		for (i = 0; i < MLWE_N; i += 8)
 		{
-			R[i] = (((A[actr] &7) * MLWE_Q) + 4) >> 3;
-			R[i + 1] = ((((A[actr] >> 3) &7) * MLWE_Q) + 4) >> 3;
-			R[i + 2] = ((((A[actr] >> 6) | ((A[actr + 1] << 2) &4)) * MLWE_Q) + 4) >> 3;
-			R[i + 3] = ((((A[actr + 1] >> 1) &7) * MLWE_Q) + 4) >> 3;
-			R[i + 4] = ((((A[actr + 1] >> 4) &7) * MLWE_Q) + 4) >> 3;
-			R[i + 5] = ((((A[actr + 1] >> 7) | ((A[actr + 2] << 1) &6)) * MLWE_Q) + 4) >> 3;
-			R[i + 6] = ((((A[actr + 2] >> 2) &7) * MLWE_Q) + 4) >> 3;
+			R[i] = (((A[actr] & 7) * MLWE_Q) + 4) >> 3;
+			R[i + 1] = ((((A[actr] >> 3) & 7) * MLWE_Q) + 4) >> 3;
+			R[i + 2] = ((((A[actr] >> 6) | ((A[actr + 1] << 2) & 4)) * MLWE_Q) + 4) >> 3;
+			R[i + 3] = ((((A[actr + 1] >> 1) & 7) * MLWE_Q) + 4) >> 3;
+			R[i + 4] = ((((A[actr + 1] >> 4) & 7) * MLWE_Q) + 4) >> 3;
+			R[i + 5] = ((((A[actr + 1] >> 7) | ((A[actr + 2] << 1) & 6)) * MLWE_Q) + 4) >> 3;
+			R[i + 6] = ((((A[actr + 2] >> 2) & 7) * MLWE_Q) + 4) >> 3;
 			R[i + 7] = ((((A[actr + 2] >> 5)) * MLWE_Q) + 4) >> 3;
 			actr += 3;
 		}
@@ -543,13 +539,13 @@ void MLWEQ3329N256::PolyDecompress(std::array<ushort, MLWE_N> &R, const std::vec
 	{
 		for (i = 0; i < MLWE_N; i += 8)
 		{
-			R[i] = (((A[actr] &15) * MLWE_Q) + 8) >> 4;
+			R[i] = (((A[actr] & 15) * MLWE_Q) + 8) >> 4;
 			R[i + 1] = (((A[actr] >> 4) * MLWE_Q) + 8) >> 4;
-			R[i + 2] = (((A[actr + 1] &15) * MLWE_Q) + 8) >> 4;
+			R[i + 2] = (((A[actr + 1] & 15) * MLWE_Q) + 8) >> 4;
 			R[i + 3] = (((A[actr + 1] >> 4) * MLWE_Q) + 8) >> 4;
-			R[i + 4] = (((A[actr + 2] &15) * MLWE_Q) + 8) >> 4;
+			R[i + 4] = (((A[actr + 2] & 15) * MLWE_Q) + 8) >> 4;
 			R[i + 5] = (((A[actr + 2] >> 4) * MLWE_Q) + 8) >> 4;
-			R[i + 6] = (((A[actr + 3] &15) * MLWE_Q) + 8) >> 4;
+			R[i + 6] = (((A[actr + 3] & 15) * MLWE_Q) + 8) >> 4;
 			R[i + 7] = (((A[actr + 3] >> 4) * MLWE_Q) + 8) >> 4;
 			actr += 4;
 		}
@@ -558,13 +554,13 @@ void MLWEQ3329N256::PolyDecompress(std::array<ushort, MLWE_N> &R, const std::vec
 	{
 		for (i = 0; i < MLWE_N; i += 8)
 		{
-			R[i] = (((A[actr] &31) * MLWE_Q) + 16) >> 5;
-			R[i + 1] = ((((A[actr] >> 5) | ((A[actr + 1] &3) << 3)) * MLWE_Q) + 16) >> 5;
-			R[i + 2] = ((((A[actr + 1] >> 2) &31) * MLWE_Q) + 16) >> 5;
-			R[i + 3] = ((((A[actr + 1] >> 7) | ((A[actr + 2] &15) << 1)) * MLWE_Q) + 16) >> 5;
-			R[i + 4] = ((((A[actr + 2] >> 4) | ((A[actr + 3] &1) << 4)) * MLWE_Q) + 16) >> 5;
-			R[i + 5] = ((((A[actr + 3] >> 1) &31) * MLWE_Q) + 16) >> 5;
-			R[i + 6] = ((((A[actr + 3] >> 6) | ((A[actr + 4] &7) << 2)) * MLWE_Q) + 16) >> 5;
+			R[i] = (((A[actr] & 31) * MLWE_Q) + 16) >> 5;
+			R[i + 1] = ((((A[actr] >> 5) | ((A[actr + 1] & 3) << 3)) * MLWE_Q) + 16) >> 5;
+			R[i + 2] = ((((A[actr + 1] >> 2) & 31) * MLWE_Q) + 16) >> 5;
+			R[i + 3] = ((((A[actr + 1] >> 7) | ((A[actr + 2] & 15) << 1)) * MLWE_Q) + 16) >> 5;
+			R[i + 4] = ((((A[actr + 2] >> 4) | ((A[actr + 3] & 1) << 4)) * MLWE_Q) + 16) >> 5;
+			R[i + 5] = ((((A[actr + 3] >> 1) & 31) * MLWE_Q) + 16) >> 5;
+			R[i + 6] = ((((A[actr + 3] >> 6) | ((A[actr + 4] & 7) << 2)) * MLWE_Q) + 16) >> 5;
 			R[i + 7] = (((A[actr + 4] >> 3) * MLWE_Q) + 16) >> 5;
 			actr += 5;
 		}
@@ -583,8 +579,8 @@ void MLWEQ3329N256::PolyToBytes(std::vector<byte> &R, size_t ROffset, std::array
 	{
 		t0 = A[2 * i];
 		t1 = A[(2 * i) + 1];
-		R[ROffset + (3 * i)] = t0 &0xFF;
-		R[ROffset + (3 * i) + 1] = (t0 >> 8) | ((t1 &0x0F) << 4);
+		R[ROffset + (3 * i)] = t0 & 0xFF;
+		R[ROffset + (3 * i) + 1] = (t0 >> 8) | ((t1 & 0x0F) << 4);
 		R[ROffset + (3 * i) + 2] = static_cast<byte>(t1 >> 4);
 	}
 }
@@ -595,8 +591,8 @@ void MLWEQ3329N256::PolyFromBytes(std::array<ushort, MLWE_N> &R, const std::vect
 
 	for (i = 0; i < MLWE_N / 2; ++i)
 	{
-		R[2 * i] = A[AOffset + (3 * i)] | (static_cast<ushort>(A[AOffset + (3 * i) + 1]) &0x0F) << 8;
-		R[(2 * i) + 1] = A[AOffset + (3 * i) + 1] >> 4 | (static_cast<ushort>(A[AOffset + (3 * i) + 2]) &0xFF) << 4;
+		R[2 * i] = A[AOffset + (3 * i)] | (static_cast<ushort>(A[AOffset + (3 * i) + 1]) & 0x0F) << 8;
+		R[(2 * i) + 1] = A[AOffset + (3 * i) + 1] >> 4 | (static_cast<ushort>(A[AOffset + (3 * i) + 2]) & 0xFF) << 4;
 	}
 }
 
@@ -696,8 +692,8 @@ void MLWEQ3329N256::PolyFromMsg(std::array<ushort, MLWE_N> &R, const std::vector
 	{
 		for (j = 0; j < 8; ++j)
 		{
-			mask = ~((Msg[i] >> j) &1) + 1;
-			R[(8 * i) + j] = mask &((MLWE_Q + 1) / 2);
+			mask = ~((Msg[i] >> j) & 1) + 1;
+			R[(8 * i) + j] = mask & ((MLWE_Q + 1) / 2);
 		}
 	}
 }
@@ -716,7 +712,7 @@ void MLWEQ3329N256::PolyToMsg(std::vector<byte> &Msg, std::array<ushort, MLWE_N>
 
 		for (j = 0; j < 8; ++j)
 		{
-			t = (((A[(8 * i) + j] << 1) + MLWE_Q / 2) / MLWE_Q) &1;
+			t = (((A[(8 * i) + j] << 1) + MLWE_Q / 2) / MLWE_Q) & 1;
 			Msg[i] |= static_cast<byte>(t << j);
 		}
 	}
@@ -744,19 +740,19 @@ void MLWEQ3329N256::PolyVecCompress(std::vector<byte> &R, std::vector<std::array
 			{
 				for (k = 0; k < 8; ++k)
 				{
-					t[k] = (((static_cast<uint>(A[i][(8 * j) + k]) << 11) + MLWE_Q / 2) / MLWE_Q) &0x7FF;
+					t[k] = (((static_cast<uint>(A[i][(8 * j) + k]) << 11) + MLWE_Q / 2) / MLWE_Q) & 0x7FF;
 				}
 
-				R[rctr + (11 * j)] = t[0] &0xFF;
-				R[rctr + (11 * j) + 1] = (t[0] >> 8) | ((t[1] &0x1F) << 3);
-				R[rctr + (11 * j) + 2] = (t[1] >> 5) | ((t[2] &0x03) << 6);
-				R[rctr + (11 * j) + 3] = (t[2] >> 2) &0xFF;
-				R[rctr + (11 * j) + 4] = (t[2] >> 10) | ((t[3] &0x7F) << 1);
-				R[rctr + (11 * j) + 5] = (t[3] >> 7) | ((t[4] &0x0F) << 4);
-				R[rctr + (11 * j) + 6] = (t[4] >> 4) | ((t[5] &0x01) << 7);
-				R[rctr + (11 * j) + 7] = (t[5] >> 1) &0xff;
-				R[rctr + (11 * j) + 8] = (t[5] >> 9) | ((t[6] &0x3F) << 2);
-				R[rctr + (11 * j) + 9] = (t[6] >> 6) | ((t[7] &0x07) << 5);
+				R[rctr + (11 * j)] = t[0] & 0xFF;
+				R[rctr + (11 * j) + 1] = (t[0] >> 8) | ((t[1] & 0x1F) << 3);
+				R[rctr + (11 * j) + 2] = (t[1] >> 5) | ((t[2] & 0x03) << 6);
+				R[rctr + (11 * j) + 3] = (t[2] >> 2) & 0xFF;
+				R[rctr + (11 * j) + 4] = (t[2] >> 10) | ((t[3] & 0x7F) << 1);
+				R[rctr + (11 * j) + 5] = (t[3] >> 7) | ((t[4] & 0x0F) << 4);
+				R[rctr + (11 * j) + 6] = (t[4] >> 4) | ((t[5] & 0x01) << 7);
+				R[rctr + (11 * j) + 7] = (t[5] >> 1) & 0xff;
+				R[rctr + (11 * j) + 8] = (t[5] >> 9) | ((t[6] & 0x3F) << 2);
+				R[rctr + (11 * j) + 9] = (t[6] >> 6) | ((t[7] & 0x07) << 5);
 				R[rctr + (11 * j) + 10] = (t[7] >> 3);
 			}
 
@@ -773,13 +769,13 @@ void MLWEQ3329N256::PolyVecCompress(std::vector<byte> &R, std::vector<std::array
 			{
 				for (k = 0; k < 4; ++k)
 				{
-					t[k] = (((static_cast<uint>(A[i][(4 * j) + k]) << 10) + MLWE_Q / 2) / MLWE_Q) &0x3FF;
+					t[k] = (((static_cast<uint>(A[i][(4 * j) + k]) << 10) + MLWE_Q / 2) / MLWE_Q) & 0x3FF;
 				}
 
-				R[rctr + (5 * j)] = static_cast<byte>(t[0] &0xFF);
-				R[rctr + (5 * j) + 1] = static_cast<byte>((t[0] >> 8) | ((t[1] &0x3F) << 2));
-				R[rctr + (5 * j) + 2] = static_cast<byte>((t[1] >> 6) | ((t[2] &0x0F) << 4));
-				R[rctr + (5 * j) + 3] = static_cast<byte>((t[2] >> 4) | ((t[3] &0x03) << 6));
+				R[rctr + (5 * j)] = static_cast<byte>(t[0] & 0xFF);
+				R[rctr + (5 * j) + 1] = static_cast<byte>((t[0] >> 8) | ((t[1] & 0x3F) << 2));
+				R[rctr + (5 * j) + 2] = static_cast<byte>((t[1] >> 6) | ((t[2] & 0x0F) << 4));
+				R[rctr + (5 * j) + 3] = static_cast<byte>((t[2] >> 4) | ((t[3] & 0x03) << 6));
 				R[rctr + (5 * j) + 4] = static_cast<byte>((t[3] >> 2));
 			}
 
@@ -803,14 +799,14 @@ void MLWEQ3329N256::PolyVecDecompress(std::vector<std::array<ushort, MLWE_N>> &R
 		{
 			for (j = 0; j < MLWE_N / 8; ++j)
 			{
-				R[i][(8 * j)] = (((A[actr + (11 * j)] | ((static_cast<uint>(A[actr + (11 * j) + 1]) &0x07) << 8)) * MLWE_Q) + 1024) >> 11;
-				R[i][(8 * j) + 1] = ((((A[actr + (11 * j) + 1] >> 3) | ((static_cast<uint>(A[actr + (11 * j) + 2]) &0x3F) << 5)) * MLWE_Q) + 1024) >> 11;
-				R[i][(8 * j) + 2] = ((((A[actr + (11 * j) + 2] >> 6) | ((static_cast<uint>(A[actr + (11 * j) + 3]) &0xFF) << 2) | ((static_cast<uint>(A[actr + (11 * j) + 4]) &0x01) << 10)) * MLWE_Q) + 1024) >> 11;
-				R[i][(8 * j) + 3] = ((((A[actr + (11 * j) + 4] >> 1) | ((static_cast<uint>(A[actr + (11 * j) + 5]) &0x0F) << 7)) * MLWE_Q) + 1024) >> 11;
-				R[i][(8 * j) + 4] = ((((A[actr + (11 * j) + 5] >> 4) | ((static_cast<uint>(A[actr + (11 * j) + 6]) &0x7F) << 4)) * MLWE_Q) + 1024) >> 11;
-				R[i][(8 * j) + 5] = ((((A[actr + (11 * j) + 6] >> 7) | ((static_cast<uint>(A[actr + (11 * j) + 7]) &0xFF) << 1) | ((static_cast<uint>(A[actr + (11 * j) + 8]) &0x03) << 9)) * MLWE_Q) + 1024) >> 11;
-				R[i][(8 * j) + 6] = ((((A[actr + (11 * j) + 8] >> 2) | ((static_cast<uint>(A[actr + (11 * j) + 9]) &0x1F) << 6)) * MLWE_Q) + 1024) >> 11;
-				R[i][(8 * j) + 7] = ((((A[actr + (11 * j) + 9] >> 5) | ((static_cast<uint>(A[actr + (11 * j) + 10]) &0xFF) << 3)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j)] = (((A[actr + (11 * j)] | ((static_cast<uint>(A[actr + (11 * j) + 1]) & 0x07) << 8)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j) + 1] = ((((A[actr + (11 * j) + 1] >> 3) | ((static_cast<uint>(A[actr + (11 * j) + 2]) & 0x3F) << 5)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j) + 2] = ((((A[actr + (11 * j) + 2] >> 6) | ((static_cast<uint>(A[actr + (11 * j) + 3]) & 0xFF) << 2) | ((static_cast<uint>(A[actr + (11 * j) + 4]) & 0x01) << 10)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j) + 3] = ((((A[actr + (11 * j) + 4] >> 1) | ((static_cast<uint>(A[actr + (11 * j) + 5]) & 0x0F) << 7)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j) + 4] = ((((A[actr + (11 * j) + 5] >> 4) | ((static_cast<uint>(A[actr + (11 * j) + 6]) & 0x7F) << 4)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j) + 5] = ((((A[actr + (11 * j) + 6] >> 7) | ((static_cast<uint>(A[actr + (11 * j) + 7]) & 0xFF) << 1) | ((static_cast<uint>(A[actr + (11 * j) + 8]) & 0x03) << 9)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j) + 6] = ((((A[actr + (11 * j) + 8] >> 2) | ((static_cast<uint>(A[actr + (11 * j) + 9]) & 0x1F) << 6)) * MLWE_Q) + 1024) >> 11;
+				R[i][(8 * j) + 7] = ((((A[actr + (11 * j) + 9] >> 5) | ((static_cast<uint>(A[actr + (11 * j) + 10]) & 0xFF) << 3)) * MLWE_Q) + 1024) >> 11;
 			}
 
 			actr += PLYBSE;
@@ -822,10 +818,10 @@ void MLWEQ3329N256::PolyVecDecompress(std::vector<std::array<ushort, MLWE_N>> &R
 		{
 			for (j = 0; j < MLWE_N / 4; ++j)
 			{
-				R[i][4 * j] = (((A[actr + (5 * j)] | ((static_cast<uint>(A[actr + (5 * j) + 1]) &0x03) << 8)) * MLWE_Q) + 512) >> 10;
-				R[i][(4 * j) + 1] = ((((A[actr + (5 * j) + 1] >> 2) | ((static_cast<uint>(A[actr + (5 * j) + 2]) &0x0F) << 6)) * MLWE_Q) + 512) >> 10;
-				R[i][(4 * j) + 2] = ((((A[actr + (5 * j) + 2] >> 4) | ((static_cast<uint>(A[actr + (5 * j) + 3]) &0x3F) << 4)) * MLWE_Q) + 512) >> 10;
-				R[i][(4 * j) + 3] = ((((A[actr + (5 * j) + 3] >> 6) | ((static_cast<uint>(A[actr + (5 * j) + 4]) &0xFF) << 2)) * MLWE_Q) + 512) >> 10;
+				R[i][4 * j] = (((A[actr + (5 * j)] | ((static_cast<uint>(A[actr + (5 * j) + 1]) & 0x03) << 8)) * MLWE_Q) + 512) >> 10;
+				R[i][(4 * j) + 1] = ((((A[actr + (5 * j) + 1] >> 2) | ((static_cast<uint>(A[actr + (5 * j) + 2]) & 0x0F) << 6)) * MLWE_Q) + 512) >> 10;
+				R[i][(4 * j) + 2] = ((((A[actr + (5 * j) + 2] >> 4) | ((static_cast<uint>(A[actr + (5 * j) + 3]) & 0x3F) << 4)) * MLWE_Q) + 512) >> 10;
+				R[i][(4 * j) + 3] = ((((A[actr + (5 * j) + 3] >> 6) | ((static_cast<uint>(A[actr + (5 * j) + 4]) & 0xFF) << 2)) * MLWE_Q) + 512) >> 10;
 			}
 
 			actr += PLYBSE;
@@ -949,7 +945,7 @@ ushort MLWEQ3329N256::BarrettReduce(int16_t A)
 ushort MLWEQ3329N256::CSubQ(int16_t A)
 {
 	A -= MLWE_Q;
-	A += (A >> 15) &MLWE_Q;
+	A += (A >> 15) & MLWE_Q;
 
 	return static_cast<ushort>(A);
 }

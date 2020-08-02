@@ -17,7 +17,7 @@ namespace Test
 	using Enumeration::AsymmetricPrimitives;
 	using Enumeration::AsymmetricParameters;
 	using Exception::CryptoAsymmetricException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Enumeration::KyberParameters;
 	using Asymmetric::Encrypt::MLWE::Kyber;
 	using Test::NistRng;
@@ -639,9 +639,7 @@ namespace Test
 			}
 
 			delete kp;
-			delete prik1;
 			delete prik2;
-			delete pubk1;
 			delete pubk2;
 		}
 
@@ -673,9 +671,7 @@ namespace Test
 			}
 
 			delete kp;
-			delete prik1;
 			delete prik2;
-			delete pubk1;
 			delete pubk2;
 		}
 
@@ -706,9 +702,7 @@ namespace Test
 			}
 
 			delete kp;
-			delete prik1;
 			delete prik2;
-			delete pubk1;
 			delete pubk2;
 		}
 	}

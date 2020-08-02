@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -24,7 +24,7 @@
 
 NAMESPACE_NTRUPRIME
 
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 /// 
 /// internal
@@ -156,35 +156,33 @@ public:
 		size_t qt;
 		size_t top;
 
-		if (N < 2)
+		if (N > 1)
 		{
-			return;
-		}
+			top = 1;
 
-		top = 1;
-
-		while (top < N - top)
-		{
-			top += top;
-		}
-
-		for (pt = top; pt > 0; pt >>= 1)
-		{
-			for (i = 0; i < N - pt; ++i)
+			while (top < N - top)
 			{
-				if (!(i & pt))
-				{
-					MinMax(X, i, X, i + pt);
-				}
+				top += top;
 			}
 
-			for (qt = top; qt > pt; qt >>= 1)
+			for (pt = top; pt > 0; pt >>= 1)
 			{
-				for (i = 0; i < N - qt; ++i)
+				for (i = 0; i < N - pt; ++i)
 				{
-					if (!(i & pt))
+					if ((i & pt) == 0)
 					{
-						MinMax(X, i + pt, X, i + qt);
+						MinMax(X, i, X, i + pt);
+					}
+				}
+
+				for (qt = top; qt > pt; qt >>= 1)
+				{
+					for (i = 0; i < N - qt; ++i)
+					{
+						if ((i & pt) == 0)
+						{
+							MinMax(X, i + pt, X, i + qt);
+						}
 					}
 				}
 			}

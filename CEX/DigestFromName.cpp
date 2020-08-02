@@ -2,11 +2,11 @@
 #include "Blake512.h"
 #include "Blake256.h"
 #include "CryptoDigestException.h"
-#include "Keccak256.h"
-#include "Keccak512.h"
-#include "Keccak1024.h"
-#include "SHA256.h"
-#include "SHA512.h"
+#include "SHA3256.h"
+#include "SHA3512.h"
+#include "SHA31024.h"
+#include "SHA2256.h"
+#include "SHA2512.h"
 #include "Skein256.h"
 #include "Skein512.h"
 #include "Skein1024.h"
@@ -40,29 +40,29 @@ IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 				dptr = new Blake512(Parallel);
 				break;
 			}
-			case Digests::Keccak256:
+			case Digests::SHA3256:
 			{
-				dptr = new Keccak256(Parallel);
+				dptr = new SHA3256(Parallel);
 				break;
 			}
-			case Digests::Keccak512:
+			case Digests::SHA3512:
 			{
-				dptr = new Keccak512(Parallel);
+				dptr = new SHA3512(Parallel);
 				break;
 			}
-			case Digests::Keccak1024:
+			case Digests::SHA31024:
 			{
-				dptr = new Keccak1024(Parallel);
+				dptr = new SHA31024(Parallel);
 				break;
 			}
-			case Digests::SHA256:
+			case Digests::SHA2256:
 			{
-				dptr = new SHA256(Parallel);
+				dptr = new SHA2256(Parallel);
 				break;
 			}
-			case Digests::SHA512:
+			case Digests::SHA2512:
 			{
-				dptr = new SHA512(Parallel);
+				dptr = new SHA2512(Parallel);
 				break;
 			}
 			case Digests::Skein256:
@@ -82,6 +82,7 @@ IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 			}
 			default:
 			{
+				// invalid parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
@@ -112,26 +113,26 @@ size_t DigestFromName::GetBlockSize(Digests DigestType)
 			break;
 		}
 		case Digests::Blake256:
-		case Digests::SHA256:
+		case Digests::SHA2256:
 		case Digests::Skein512:
 		{
 			blen = 64;
 			break;
 		}
 		case Digests::Blake512:
-		case Digests::SHA512:
+		case Digests::SHA2512:
 		case Digests::Skein1024:
 		{
 			blen = 128;
 			break;
 		}
-		case Digests::Keccak256:
+		case Digests::SHA3256:
 		{
 			blen = 136;
 			break;
 		}
-		case Digests::Keccak512:
-		case Digests::Keccak1024:
+		case Digests::SHA3512:
+		case Digests::SHA31024:
 		{
 			blen = 72;
 			break;
@@ -143,6 +144,7 @@ size_t DigestFromName::GetBlockSize(Digests DigestType)
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoException(CLASS_NAME, std::string("GetBlockSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -159,22 +161,22 @@ size_t DigestFromName::GetDigestSize(Digests DigestType)
 	switch (DigestType)
 	{
 		case Digests::Blake256:
-		case Digests::Keccak256:
-		case Digests::SHA256:
+		case Digests::SHA3256:
+		case Digests::SHA2256:
 		case Digests::Skein256:
 		{
 			dlen = 32;
 			break;
 		}
 		case Digests::Blake512:
-		case Digests::Keccak512:
-		case Digests::SHA512:
+		case Digests::SHA3512:
+		case Digests::SHA2512:
 		case Digests::Skein512:
 		{
 			dlen = 64;
 			break;
 		}
-		case Digests::Keccak1024:
+		case Digests::SHA31024:
 		case Digests::Skein1024:
 		{
 			dlen = 128;
@@ -187,6 +189,7 @@ size_t DigestFromName::GetDigestSize(Digests DigestType)
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoException(CLASS_NAME, std::string("GetDigestSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -204,9 +207,9 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 	{
 		case Digests::Blake256:
 		case Digests::Blake512:
-		case Digests::Keccak256:
-		case Digests::Keccak512:
-		case Digests::Keccak1024:
+		case Digests::SHA3256:
+		case Digests::SHA3512:
+		case Digests::SHA31024:
 		case Digests::Skein256:
 		case Digests::Skein512:
 		case Digests::Skein1024:
@@ -214,12 +217,12 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 			plen = 0;
 			break;
 		}
-		case Digests::SHA256:
+		case Digests::SHA2256:
 		{
 			plen = 9;
 			break;
 		}
-		case Digests::SHA512:
+		case Digests::SHA2512:
 		{
 			plen = 17;
 			break;
@@ -231,6 +234,7 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoException(CLASS_NAME, std::string("GetPaddingSize"), std::string("The digest type is not supported!"), ErrorCodes::InvalidParam);
 		}
 	}

@@ -1,0 +1,11 @@
+digraph "Helper"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=box];
+  rankdir=LR;
+  Node2 [label="CEX",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___c_e_x.html",tooltip="Root Namespace."];
+  Node3 [label="IO",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___i_o.html",tooltip="IO Processors."];
+  Node1 [label="Helper",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Cryptographic Helper Classes."];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node3 [shape=plaintext, label="SecureStream", color="orange", dir="none", style="dashed"];
+}

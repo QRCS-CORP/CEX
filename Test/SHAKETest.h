@@ -103,7 +103,6 @@ namespace Test
 
 	private:
 
-
 		void Initialize();
 		void OnProgress(const std::string &Data);
 	};

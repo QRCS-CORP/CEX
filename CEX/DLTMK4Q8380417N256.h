@@ -41,7 +41,6 @@ private:
 	static const size_t DILITHIUM_POLT1_SIZE_PACKED = ((DILITHIUM_N * (DILITHIUM_QBITS - DILITHIUM_D)) / 8);
 	static const size_t DILITHIUM_POLW1_SIZE_PACKED = ((DILITHIUM_N * 4) / 8);
 	static const size_t DILITHIUM_POLZ_SIZE_PACKED = ((DILITHIUM_N * (DILITHIUM_QBITS - 3)) / 8);
-
 	static void XOF(const std::vector<byte> &Input, size_t InOffset, size_t InLength, std::vector<byte> &Output, size_t OutOffset, size_t OutLength, size_t Rate);
 
 public:
@@ -49,11 +48,8 @@ public:
 	static const size_t DILITHIUM_PUBLICKEY_SIZE = (DILITHIUM_SEED_SIZE + DILITHIUM_K * DILITHIUM_POLT1_SIZE_PACKED);
 	static const size_t DILITHIUM_SECRETKEY_SIZE = (2 * DILITHIUM_SEED_SIZE + (DILITHIUM_L + DILITHIUM_K) * DILITHIUM_POLETA_SIZE_PACKED + DILITHIUM_CRH_SIZE + DILITHIUM_K * DILITHIUM_POLT0_SIZE_PACKED);
 	static const size_t DILITHIUM_SIGNATURE_SIZE = (DILITHIUM_L * DILITHIUM_POLZ_SIZE_PACKED + (DILITHIUM_OMEGA + DILITHIUM_K) + (DILITHIUM_N / 8 + 8));
-
 	static void Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
-
 	static void Sign(std::vector<byte> &Signature, const std::vector<byte> &Message, const std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
-
 	static bool Verify(std::vector<byte> &Message, const std::vector<byte> &Signature, const std::vector<byte> &PublicKey);
 };
 

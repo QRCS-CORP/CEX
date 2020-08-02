@@ -4,11 +4,11 @@ namespace Test
 {
 	void RandomUtils::Evaluate(const std::string &Name, std::vector<byte> &Sample)
 	{
-		double x;
-		std::string status;
 		const std::string TPASS = std::string(": PASS");
 		const std::string TWARN = std::string(": WARN");
 		const std::string TFAIL = std::string(": FAIL!");
+		std::string status;
+		double x;
 
 		// mean value test
 		x = TestUtils::MeanValue(Sample);
@@ -31,7 +31,7 @@ namespace Test
 		TestUtils::Print(std::string(status));
 
 		// ChiSquare
-		x = TestUtils::ChiSquare(Sample) * 100;
+		x = TestUtils::ChiSquare(Sample) * 100.0;
 		status = (std::string(Name + ": ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
 
 		if (x < 1.0 || x > 99.0)

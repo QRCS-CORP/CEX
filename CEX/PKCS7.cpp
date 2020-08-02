@@ -3,7 +3,7 @@
 
 NAMESPACE_PADDING
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 const std::string PKCS7::CLASS_NAME("PKCS7");
 

@@ -8,7 +8,7 @@
 #include "../CEX/MemoryStream.h"
 #include "../CEX/SecureRandom.h"
 #include "../CEX/RHX.h"
-#include "../CEX/SHA256.h"
+#include "../CEX/SHA2256.h"
 
 namespace Test
 {
@@ -112,7 +112,7 @@ namespace Test
 		SymmetricKey kp(key);
 
 		// digest instance for baseline
-		Mac::HMAC* gen = new Mac::HMAC(Enumeration::SHA2Digests::SHA256);
+		Mac::HMAC* gen = new Mac::HMAC(Enumeration::SHA2Digests::SHA2256);
 		size_t macSze = gen->TagSize();
 		std::vector<byte> hash1(macSze);
 		gen->Initialize(kp);

@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -76,7 +76,7 @@ private:
 	static const size_t RDR_SUCCESS = 1;
 
 #if defined(CEX_FIPS140_ENABLED)
-	ProviderSelfTest m_pvdSelfTest;
+	std::unique_ptr<ProviderSelfTest> m_pvdSelfTest;
 #endif
 	DrandEngines m_randType;
 
@@ -157,7 +157,7 @@ private:
 
 	static DrandEngines Capability();
 	bool FipsTest();
-	static void GetRandom(byte* Output, size_t Length, DrandEngines DrandType);
+	static void Generate(byte* Output, size_t Length, DrandEngines DrandType);
 };
 
 NAMESPACE_PROVIDEREND

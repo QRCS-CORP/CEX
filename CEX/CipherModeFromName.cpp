@@ -57,6 +57,7 @@ ICipherMode* CipherModeFromName::GetInstance(IBlockCipher* Cipher, CipherModes C
 			}
 			default:
 			{
+				// invalid option
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The cipher engine is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
@@ -117,6 +118,7 @@ ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, CipherMode
 			}
 			default:
 			{
+				// invalid option
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The cipher type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}

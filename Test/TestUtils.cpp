@@ -25,19 +25,25 @@ namespace Test
 	double TestUtils::ChiSquare(std::vector<byte> &Input)
 	{
 		std::vector<long> count(256, 0);
-		double chisq = 0.0;
-		long totalc = (long)Input.size();
+		double a;
+		double cexp;
+		double chisq(0.0);
+		long totalc;
+		size_t i;
 
-		for (size_t i = 0; i < Input.size(); ++i)
+		totalc = static_cast<long>(Input.size());
+
+		for (i = 0; i < Input.size(); ++i)
 		{
 			count[Input[i]]++;
 		}
 
 		// Expected count per bin
-		double cexp = totalc / 256.0;
-		for (size_t i = 0; i < 256; i++)
+		cexp = static_cast<double>(totalc) / 256.0;
+
+		for (i = 0; i < 256; i++)
 		{
-			double a = count[i] - cexp;;
+			a = static_cast<double>(count[i]) - cexp;
 			chisq += (a * a) / cexp;
 		}
 
@@ -52,39 +58,43 @@ namespace Test
 	bool TestUtils::IsEqual(std::vector<byte> &A, std::vector<byte> &B)
 	{
 		size_t i = A.size();
+		bool res(true);
 
 		if (i != B.size())
 		{
-			return false;
+			res = false;
 		}
 
 		while (i != 0)
 		{
 			--i;
+
 			if (A[i] != B[i])
 			{
-				return false;
+				res = false;
 			}
 		}
 
-		return true;
+		return res;
 	}
 
 	uint64_t TestUtils::GetTimeMs64()
 	{
 #if defined(_WIN32)
 		// Windows
-		int64_t ctr1 = 0;
-		int64_t freq = 0;
-		if (QueryPerformanceCounter((LARGE_INTEGER *)&ctr1) != 0)
+		int64_t ctr1(0);
+		int64_t freq(0);
+
+		if (QueryPerformanceCounter(reinterpret_cast<LARGE_INTEGER*>(&ctr1)) != 0)
 		{
-			QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
+			QueryPerformanceFrequency(reinterpret_cast<LARGE_INTEGER*>(&freq));
+
 			if (freq == 0)
 			{
 				throw;
 			}
 			// return microseconds to milliseconds
-			return (uint64_t)(ctr1 * 1000.0 / freq);
+			return ((ctr1 * 1000) / freq);
 		}
 		else
 		{
@@ -126,25 +136,29 @@ namespace Test
 	SymmetricKey* TestUtils::GetRandomKey(size_t KeySize, size_t IvSize)
 	{
 		CSP rng;
-
+		SymmetricKey* kp;
 		std::vector<byte> key(KeySize, 0);
+
 		rng.Generate(key);
 
 		if (IvSize > 0)
 		{
 			std::vector<byte> iv(IvSize, 0);
 			rng.Generate(iv);
-			return new SymmetricKey(key, iv);
+			kp = new SymmetricKey(key, iv);
 		}
 		else
 		{
-			return new SymmetricKey(key);
+			kp =  new SymmetricKey(key);
 		}
+
+		return kp;
 	}
 
 	std::string TestUtils::GetRandomString(size_t Length)
 	{
 		std::string res;
+
 		res = TestUtils::RandomReadableString(Length);
 
 		return res;
@@ -152,25 +166,24 @@ namespace Test
 
 	double TestUtils::MeanValue(std::vector<byte> &Input)
 	{
-		double ret = 0;
+		double ret(0);
+		size_t i;
 
-		for (size_t i = 0; i < Input.size(); ++i)
+		for (i = 0; i < Input.size(); ++i)
 		{
-			ret += Input[i];
+			ret += static_cast<double>(Input[i]);
 		}
 
-		return ret / Input.size();
+		return ret / static_cast<double>(Input.size());
 	}
 
 	bool TestUtils::OrderedRuns(const std::vector<byte> &Input, size_t Threshold)
 	{
-		size_t c;
+		size_t c(0);
 		size_t i;
 		byte val;
-		bool state;
+		bool state(false);
 
-		state = false;
-		c = 0;
 		val = Input[0];
 
 		// indicates zeroed output or bad run
@@ -179,6 +192,7 @@ namespace Test
 			if (Input[i] == val)
 			{
 				++c;
+
 				if (c >= Threshold)
 				{
 					state = true;
@@ -199,7 +213,9 @@ namespace Test
 	{
 		// borrowed from the ENT project: https://www.fourmilab.ch/random/
 		// returns cumulative probability from -oo to z 
-		double y, x, w;
+		double w;
+		double x;
+		double y;
 
 		if (Z == 0.0)
 		{
@@ -242,19 +258,22 @@ namespace Test
 	{
 		// obtained chi-square value
 		// degrees of freedom
-		double x = Ax;
+		double x;
 		double a; 
 		double s;
 		double e;
 		double c;
 		double z;
-		double y = 0;
+		double y(0);
+		double res;
 		// true if df is an even number
 		int even;
 
+		x = Ax;
+
 		if (x <= 0.0 || Df < 1)
 		{
-			return 1.0;
+			res = 1.0;
 		}
 
 		a = 0.5 * x;
@@ -266,39 +285,47 @@ namespace Test
 		}
 
 		s = (even ? y : (2.0 * Poz(-sqrt(x))));
+
 		if (Df > 2)
 		{
-			x = 0.5 * (Df - 1.0);
+			x = 0.5 * (static_cast<double>(Df) - 1.0);
 			z = (even ? 1.0 : 0.5);
+
 			if (a > BIGX)
 			{
 				e = (even ? 0.0 : LOG_SQRT_PI);
 				c = log(a);
+
 				while (z <= x)
 				{
 					e = log(z) + e;
 					s += ex(c * z - a - e);
 					z += 1.0;
 				}
-				return (s);
+
+				res =s;
 			}
 			else
 			{
 				e = (even ? 1.0 : (I_SQRT_PI / sqrt(a)));
 				c = 0.0;
+
 				while (z <= x)
 				{
 					e = e * (a / z);
 					c = c + e;
 					z += 1.0;
 				}
-				return (c * y + s);
+
+				res = (c * y + s);
 			}
 		}
 		else
 		{
-			return s;
+			res = s;
 		}
+
+		return res;
 	}
 
 	void TestUtils::Print(const std::string &Data)
@@ -315,14 +342,14 @@ namespace Test
 	{
 		std::vector<byte> fill(1);
 		CEX::Prng::SecureRandom rnd;
-		std::string rtxt = "";
+		std::string rtxt("");
 		size_t ctr = 0;
 
 		while (ctr < Length)
 		{
 			rnd.Generate(fill);
 
-			if (fill[0] > 31 && fill[0] < 123 && (fill[0] != 39 || fill[0] != 40 || fill[0] != 41))
+			if (fill[0] > 31 && fill[0] < 123 && (fill[0] != 39 && fill[0] != 40 && fill[0] != 41))
 			{
 
 				rtxt += static_cast<unsigned char>(fill[0]);
@@ -333,46 +360,60 @@ namespace Test
 		return rtxt;
 	}
 
-	bool TestUtils::Read(const std::string &FilePath, std::string &Contents)
+	bool TestUtils::Read(const std::string &FilePath, std::string &Contents) 
 	{
-		bool status = false;
+		bool status(false);
 		std::ifstream ifs(FilePath, std::ios::binary | std::ios::ate);
 
 		if (!ifs || !ifs.is_open())
 		{
-			throw TestException(std::string("RandomReadableString"), FilePath, std::string("Could not open the KAT file!"));
+			throw TestException(std::string("Read"), FilePath, std::string("Could not open the file!"));
 		}
 		else
 		{
 			ifs.seekg(0, std::ios::end);
-			const int bufsize = (int)ifs.tellg();
+			const int BUFLEN = static_cast<int>(ifs.tellg());
 			ifs.seekg(0, std::ios::beg);
 
-			if (bufsize > 0)
+			if (BUFLEN > 0)
 			{
 				status = true;
-				std::vector<char> bufv(bufsize, 0);
+				std::vector<char> bufv(BUFLEN, 0);
 				char *buf = &bufv[0];
-				ifs.read(buf, bufsize);
-				Contents.assign(buf, bufsize);
+				ifs.read(buf, BUFLEN);
+				Contents.assign(buf, BUFLEN);
 			}
 			else
 			{
-				throw TestException(std::string("RandomReadableString"), FilePath, std::string("The KAT file is empty!"));
+				throw TestException(std::string("Read"), FilePath, std::string("The file is empty!"));
 			}
 		}
 
 		return status;
 	}
 
+	std::ifstream TestUtils::OpenFile(std::string &FilePath)
+	{
+		std::ifstream ifs(FilePath, std::ios::binary | std::ios::ate);
+
+		if (!ifs || !ifs.is_open())
+		{
+			throw TestException(std::string("OpenFile"), FilePath, std::string("Could not open the file!"));
+		}
+		else
+		{
+			return ifs;
+		}
+	}
+
 	std::vector<byte> TestUtils::Reduce(std::vector<byte> Seed)
 	{
-		size_t len = Seed.size() / 2;
-		std::vector<byte> data(len);
+		const size_t SEEDLEN = Seed.size() / 2;
+		std::vector<byte> data(SEEDLEN);
 
-		for (size_t i = 0; i < len; i++)
+		for (size_t i = 0; i < SEEDLEN; i++)
 		{
-			data[i] = (byte)(Seed[i] ^ Seed[len + i]);
+			data[i] = static_cast<byte>(Seed[i] ^ Seed[SEEDLEN + i]);
 		}
 
 		return data;
@@ -385,12 +426,9 @@ namespace Test
 
 	bool TestUtils::SuccesiveZeros(const std::vector<byte> &Input, size_t Threshold)
 	{
-		size_t c;
+		size_t c(0);
 		size_t i;
-		bool state;
-
-		state = false;
-		c = 0;
+		bool state(false);
 
 		for (i = 0; i < Input.size(); ++i)
 		{

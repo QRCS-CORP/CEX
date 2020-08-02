@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -20,11 +20,11 @@
 #define CEX_MEMUTILS_H
 
 #include "CexDomain.h"
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 #	include "Intrinsics.h"
 #endif
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 /// <summary>
 /// Memory template functions class
@@ -46,7 +46,7 @@ class MemoryTools
 {
 public:
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 #define CEX_CACHE_SEGMENT 64
 
 #define PREFETCHT0(address, length)									\
@@ -92,7 +92,7 @@ public:
 	{
 		const size_t ELMLEN = sizeof(Array::value_type);
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		PREFETCHT1(Input.data() + (Offset * ELMLEN), Length);
 #else
 		volatile Array::value_type tmp;
@@ -125,7 +125,7 @@ public:
 	{
 		const size_t ELMLEN = sizeof(Array::value_type);
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		PREFETCHT2(Input.data() + (Offset * ELMLEN), Length);
 #else
 		volatile Array::value_type tmp;
@@ -163,13 +163,12 @@ public:
 		if (Length != 0)
 		{
 			const size_t ELMLEN = sizeof(Array::value_type);
-
 			pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64 / ELMLEN;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32 / ELMLEN;
 #	else
 			const size_t SMDBLK = 16 / ELMLEN;
@@ -181,11 +180,11 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					CLEAR512(Output, Offset + pctr);
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					CLEAR256(Output, Offset + pctr);
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					CLEAR128(Output, Offset + pctr);
 #endif
 					pctr += SMDBLK;
@@ -225,20 +224,18 @@ public:
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output size");
-		CEXASSERT(Length > 0, "Length can not be zero");
 		CEXASSERT(INPLEN <= Length, "Integer type is larger than length");
 		CEXASSERT(OTPLEN <= Length, "Integer type is larger than length");
-
 
 		if (Length != 0)
 		{
 			const size_t ELMLEN = sizeof(ArrayA::value_type);
 			pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32;
 #	else
 			const size_t SMDBLK = 16;
@@ -250,11 +247,11 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					AND512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					AND256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					AND128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #endif
 					pctr += SMDBLK;
@@ -285,7 +282,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output size");
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_and_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 #else
 		for (size_t i = 0; i < (16 / OTPLEN); ++i)
@@ -312,7 +309,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output size");
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_and_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 #else
 		AND128(Input, InOffset, Output, OutOffset);
@@ -337,7 +334,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output size");
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_and_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
 #else
 		AND256(Input, InOffset, Output, OutOffset);
@@ -355,7 +352,7 @@ public:
 	template <typename Array>
 	inline static void CLEAR128(Array &Output, size_t Offset)
 	{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[Offset]), _mm_setzero_si128());
 #else
 		std::memset(&Output[Offset], 0, 16);
@@ -372,7 +369,7 @@ public:
 	template <typename Array>
 	inline static void CLEAR256(Array &Output, size_t Offset)
 	{
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), _mm256_setzero_si256());
 #else
 		CLEAR128(Output, Offset);
@@ -390,7 +387,7 @@ public:
 	template <typename Array>
 	inline static void CLEAR512(Array &Output, size_t Offset)
 	{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[Offset]), _mm512_setzero_si512());
 #else
 		CLEAR256(Output, Offset);
@@ -446,10 +443,10 @@ public:
 		{
 			pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64 / ELMLEN;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32 / ELMLEN;
 #	else
 			const size_t SMDBLK = 16 / ELMLEN;
@@ -461,11 +458,11 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					COPY512FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					COPY256FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					COPY128FROMOBJECT(Input + pctr, Output, OutOffset + pctr);
 #endif
 					pctr += SMDBLK;
@@ -503,10 +500,10 @@ public:
 		{
 			pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64 / ELMLEN;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32 / ELMLEN;
 #	else
 			const size_t SMDBLK = 16 / ELMLEN;
@@ -518,11 +515,11 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					COPY512TOOBJECT(Input, InOffset + pctr, Output + pctr);
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					COPY256TOOBJECT(Input, InOffset + pctr, Output + pctr);
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					COPY128TOOBJECT(Input, InOffset + pctr, Output + pctr);
 #endif
 					pctr += SMDBLK;
@@ -598,10 +595,10 @@ public:
 		{
 			pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64 / ELMLEN;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32 / ELMLEN;
 #	else
 			const size_t SMDBLK = 16 / ELMLEN;
@@ -613,11 +610,11 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					COPY512(Input, InOffset + pctr, Output, OutOffset + pctr);
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					COPY256(Input, InOffset + pctr, Output, OutOffset + pctr);
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					COPY128(Input, InOffset + pctr, Output, OutOffset + pctr);
 #endif
 					pctr += SMDBLK;
@@ -656,28 +653,28 @@ public:
 
 		if (Length != 0)
 		{
-#if defined(__AVX512__)
+			pctr = 0;
+
+#if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64;
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32;
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 			const size_t SMDBLK = 16;
 #endif
 
-			pctr = 0;
-
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 			if (Length >= SMDBLK)
 			{
 				const size_t ALNLEN = Length - (Length % SMDBLK);
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					COPY512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					COPY256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					COPY128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #endif
 					pctr += SMDBLK;
@@ -705,7 +702,7 @@ public:
 	template <typename Object, typename Array>
 	inline static void COPY128FROMOBJECT(const Object* Input, Array &Output, size_t OutOffset)
 	{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_loadu_si128(reinterpret_cast<const __m128i*>(Input)));
 #else
 		std::memcpy(&Output[OutOffset], Input, 16);
@@ -725,7 +722,7 @@ public:
 	template <typename Object, typename Array>
 	inline static void COPY128TOOBJECT(Array &Input, size_t InOffset, Object* Output)
 	{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(Output), _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])));
 #else
 		std::memcpy(Output, &Input[InOffset], 16);
@@ -746,7 +743,7 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void COPY128(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])));
 #else
 		std::memcpy(&Output[OutOffset], &Input[InOffset], 16);
@@ -766,7 +763,7 @@ public:
 	template <typename Object, typename Array>
 	inline static void COPY256FROMOBJECT(const Object* Input, Array &Output, size_t OutOffset)
 	{
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(Input)));
 #else
 		COPY128(Input, Output, OutOffset);
@@ -787,7 +784,7 @@ public:
 	template <typename Object, typename Array>
 	inline static void COPY256TOOBJECT(const Array &Input, size_t InOffset, Object* Output)
 	{
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(Output), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
 #else
 		COPY128(Input, InOffset, Output);
@@ -809,7 +806,7 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void COPY256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
 #else
 		COPY128(Input, InOffset, Output, OutOffset);
@@ -830,7 +827,7 @@ public:
 	template <typename Object, typename Array>
 	inline static void COPY512FROMOBJECT(const Object* Input, Array &Output, size_t OutOffset)
 	{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(Input)));
 #else
 		COPY256(Input, Output, OutOffset);
@@ -851,7 +848,7 @@ public:
 	template <typename Object, typename Array>
 	inline static void COPY512TOOBJECT(const Array &Input, size_t InOffset, Object* Output)
 	{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(Output), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[OutOffset])));
 #else
 		COPY256(Input, InOffset, Output);
@@ -873,7 +870,7 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void COPY512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])));
 #else
 		COPY256(Input, InOffset, Output, OutOffset);
@@ -927,7 +924,6 @@ public:
 
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= Length, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= Length, "Length is larger than output size");
-		CEXASSERT(Length > 0, "Length can not be zero");
 		CEXASSERT(INPLEN <= Length, "Integer type is larger than length");
 		CEXASSERT(OTPLEN <= Length, "Integer type is larger than length");
 
@@ -935,10 +931,10 @@ public:
 		{
 			pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32;
 #	else
 			const size_t SMDBLK = 16;
@@ -950,11 +946,11 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					OR512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					OR256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					OR128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #endif
 					pctr += SMDBLK;
@@ -985,7 +981,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output size");
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_or_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 #else
 		for (size_t i = 0; i < (16 / OTPLEN); ++i)
@@ -1012,7 +1008,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output size");
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_or_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 #else
 		OR128(Input, InOffset, Output, OutOffset);
@@ -1037,7 +1033,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output size");
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_or_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
 #else
 		OR256(Input, InOffset, Output, OutOffset);
@@ -1068,10 +1064,10 @@ public:
 		{
 			pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 			const size_t SMDBLK = 64 / ELMLEN;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 			const size_t SMDBLK = 32 / ELMLEN;
 #	else
 			const size_t SMDBLK = 16 / ELMLEN;
@@ -1083,11 +1079,11 @@ public:
 
 				while (pctr != ALNLEN)
 				{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 					SETVAL512(Output, Offset + pctr, Value);
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 					SETVAL256(Output, Offset + pctr, Value);
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 					SETVAL128(Output, Offset + pctr, Value);
 #endif
 					pctr += SMDBLK;
@@ -1115,7 +1111,7 @@ public:
 	{
 		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 16, "Length is larger than output size");
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[Offset]), _mm_set1_epi8(Value));
 #else
 		std::memset(&Output[Offset], Value, 16);
@@ -1135,7 +1131,7 @@ public:
 	{
 		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 32, "Length is larger than output size");
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), _mm256_set1_epi8(Value));
 #else
 		SETVAL128(Output, Offset, Value);
@@ -1156,7 +1152,7 @@ public:
 	{
 		CEXASSERT((Output.size() - Offset) * sizeof(Array::value_type) >= 64, "Length is larger than output size");
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[Offset]), _mm512_set1_epi8(Value));
 #else
 		SETVAL256(Output, Offset, Value);
@@ -1191,10 +1187,10 @@ public:
 
 		pctr = 0;
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-#	if defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	if defined(CEX_HAS_AVX512)
 		const size_t SMDBLK = 64;
-#	elif defined(__AVX2__)
+#	elif defined(CEX_HAS_AVX2)
 		const size_t SMDBLK = 32;
 #	else
 		const size_t SMDBLK = 16;
@@ -1206,11 +1202,11 @@ public:
 
 			while (pctr != ALNLEN)
 			{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 				XOR512(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 				XOR256(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 				XOR128(Input, InOffset + (pctr / INPLEN), Output, OutOffset + (pctr / OTPLEN));
 #endif
 				pctr += SMDBLK;
@@ -1240,7 +1236,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 16, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 16, "Length is larger than output size");
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 #else
 		for (size_t i = 0; i < (16 / OTPLEN); ++i)
@@ -1267,7 +1263,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 32, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 32, "Length is larger than output size");
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 #else
 		XOR128(Input, InOffset, Output, OutOffset);
@@ -1292,7 +1288,7 @@ public:
 		CEXASSERT((Input.size() - InOffset) * INPLEN >= 64, "Length is larger than input size");
 		CEXASSERT((Output.size() - OutOffset) * OTPLEN >= 64, "Length is larger than output size");
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_xor_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
 #else
 		XOR256(Input, InOffset, Output, OutOffset);
@@ -1350,11 +1346,11 @@ public:
 	template <typename Array>
 	inline static void XorPad(Array &Output, byte N)
 	{
-		size_t i;
+		size_t pctr;
 
-		i = 0;
+		pctr = 0;
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 
 		const size_t SMDLEN = sizeof(__m512i);
 		const size_t ALNLEN = (Output.size() / SMDLEN) * SMDLEN;
@@ -1363,14 +1359,14 @@ public:
 		{
 			__m256i zmm = _mm512_set1_epi8(N);
 
-			while (i != ALNLEN)
+			while (pctr != ALNLEN)
 			{
-				_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[i]), _mm512_xor_si512(zmm, _mm512_loadu_si512(reinterpret_cast<__m512i*>(&Output[i]))));
-				i += SMDLEN;
+				_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[pctr]), _mm512_xor_si512(zmm, _mm512_loadu_si512(reinterpret_cast<__m512i*>(&Output[pctr]))));
+				pctr += SMDLEN;
 			}
 		}
 
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 
 		const size_t SMDLEN = sizeof(__m256i);
 		const size_t ALNLEN = (Output.size() / SMDLEN) * SMDLEN;
@@ -1379,14 +1375,14 @@ public:
 		{
 			__m256i ymm = _mm256_set1_epi8(N);
 
-			while (i != ALNLEN)
+			while (pctr != ALNLEN)
 			{
-				_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[i]), _mm256_xor_si256(ymm, _mm256_loadu_si256(reinterpret_cast<__m256i*>(&Output[i]))));
-				i += SMDLEN;
+				_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[pctr]), _mm256_xor_si256(ymm, _mm256_loadu_si256(reinterpret_cast<__m256i*>(&Output[pctr]))));
+				pctr += SMDLEN;
 			}
 		}
 
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 
 		const size_t SMDLEN = sizeof(__m128i);
 		const size_t ALNLEN = (Output.size() / SMDLEN) * SMDLEN;
@@ -1395,22 +1391,22 @@ public:
 		{
 			__m128i xmm = _mm_set1_epi8(N);
 
-			while (i != ALNLEN)
+			while (pctr != ALNLEN)
 			{
-				_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[i]), _mm_xor_si128(xmm, _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[i]))));
-				i += SMDLEN;
+				_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[pctr]), _mm_xor_si128(xmm, _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[pctr]))));
+				pctr += SMDLEN;
 			}
 		}
 
 #endif
 
-		while (i < Output.size())
+		while (pctr < Output.size())
 		{
-			Output[i] ^= N;
-			++i;
+			Output[pctr] ^= N;
+			++pctr;
 		}
 	}
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif

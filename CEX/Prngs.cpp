@@ -11,18 +11,6 @@ std::string PrngConvert::ToName(Prngs Enumeral)
 		case Prngs::BCR:
 			name = std::string("BCR");
 			break;
-		case Prngs::BCRAHXS256:
-			name = std::string("BCRAHXS256");
-			break;
-		case Prngs::BCRAHXS512:
-			name = std::string("BCRAHXS512");
-			break;
-		case Prngs::BCRSHXS256:
-			name = std::string("BCRSHXS256");
-			break;
-		case Prngs::BCRSHXS512:
-			name = std::string("BCRSHXS512");
-			break;
 		case Prngs::CSR:
 			name = std::string("CSR");
 			break;
@@ -53,22 +41,6 @@ Prngs PrngConvert::FromName(std::string &Name)
 	if (Name == std::string("BCR"))
 	{
 		tname = Prngs::BCR;
-	}
-	else if (Name == std::string("BCRAHXS256"))
-	{
-		tname = Prngs::BCRAHXS256;
-	}
-	else if (Name == std::string("BCRAHXS512"))
-	{
-		tname = Prngs::BCRAHXS512;
-	}
-	else if (Name == std::string("BCRSHXS256"))
-	{
-		tname = Prngs::BCRSHXS256;
-	}
-	else if (Name == std::string("BCRSHXS512"))
-	{
-		tname = Prngs::BCRSHXS512;
 	}
 	else if (Name == std::string("CSR"))
 	{

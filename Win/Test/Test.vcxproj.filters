@@ -70,14 +70,8 @@
     <Filter Include="Vectors">
       <UniqueIdentifier>{f7cc6bb9-5879-4e51-9a5b-9f2795523eba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Vectors\AESAVS">
-      <UniqueIdentifier>{6ac40e46-c403-426b-be31-dc3498a89f79}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Vectors\Blake2">
       <UniqueIdentifier>{d6c93546-7a24-4cd0-8521-63d131fcf466}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Vectors\Counterpane">
-      <UniqueIdentifier>{fff5c676-0d4d-4e64-a94c-66d1414be044}</UniqueIdentifier>
     </Filter>
     <Filter Include="Vectors\Nessie">
       <UniqueIdentifier>{323f7e15-acb7-4eac-9f7d-90345efb0252}</UniqueIdentifier>
@@ -114,6 +108,15 @@
     </Filter>
     <Filter Include="Header Files\Test\PrngTest\DiehardResults\100MB">
       <UniqueIdentifier>{3b74ae82-ab25-4665-a517-7d790ec73df6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\KmsTest">
+      <UniqueIdentifier>{f38a2fe3-814c-4109-a20c-424c1d23982b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\KmsTest">
+      <UniqueIdentifier>{62f9e2d6-2c6e-4695-bdc9-f218ce18b583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vectors\AESAVS">
+      <UniqueIdentifier>{7fc2e197-1b32-48a5-b194-851322f0b7f3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -159,101 +162,65 @@
     <Text Include="..\..\Test\Diehard Results\100mb\rdp100.txt">
       <Filter>Header Files\Test\PrngTest\DiehardResults\100MB</Filter>
     </Text>
-    <Content Include="Vectors\AESAVS\keyvect128.txt">
-      <Filter>Vectors\AESAVS</Filter>
-    </Content>
-    <Content Include="Vectors\AESAVS\keyvect192.txt">
-      <Filter>Vectors\AESAVS</Filter>
-    </Content>
-    <Content Include="Vectors\AESAVS\keyvect256.txt">
-      <Filter>Vectors\AESAVS</Filter>
-    </Content>
-    <Content Include="Vectors\AESAVS\plainvect128.txt">
-      <Filter>Vectors\AESAVS</Filter>
-    </Content>
-    <Content Include="Vectors\AESAVS\plainvect192.txt">
-      <Filter>Vectors\AESAVS</Filter>
-    </Content>
-    <Content Include="Vectors\AESAVS\plainvect256.txt">
-      <Filter>Vectors\AESAVS</Filter>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2b-kat.txt">
-      <Filter>Vectors\Blake2</Filter>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2bp-kat.txt">
-      <Filter>Vectors\Blake2</Filter>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2s-kat.txt">
-      <Filter>Vectors\Blake2</Filter>
-    </Content>
-    <Content Include="Vectors\Blake2\blake2sp-kat.txt">
-      <Filter>Vectors\Blake2</Filter>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishcipher128.txt">
-      <Filter>Vectors\Counterpane</Filter>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishcipher192.txt">
-      <Filter>Vectors\Counterpane</Filter>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishcipher256.txt">
-      <Filter>Vectors\Counterpane</Filter>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishkey128.txt">
-      <Filter>Vectors\Counterpane</Filter>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishkey192.txt">
-      <Filter>Vectors\Counterpane</Filter>
-    </Content>
-    <Content Include="Vectors\Counterpane\twofishkey256.txt">
-      <Filter>Vectors\Counterpane</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentcipher128.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentcipher192.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentcipher256.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentkey128.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentkey192.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentkey256.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte100-128.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte100-192.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte100-256.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte1000-128.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte1000-192.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentmonte1000-256.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentplain128.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentplain192.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
-    <Content Include="Vectors\Nessie\serpentplain256.txt">
-      <Filter>Vectors\Nessie</Filter>
-    </Content>
     <Text Include="..\..\Test\NistStsResults.txt">
       <Filter>Header Files\Test\PrngTest</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Blake2\blake2b-kat.txt">
+      <Filter>Vectors\Blake2</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Blake2\blake2bp-kat.txt">
+      <Filter>Vectors\Blake2</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Blake2\blake2s-kat.txt">
+      <Filter>Vectors\Blake2</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Blake2\blake2sp-kat.txt">
+      <Filter>Vectors\Blake2</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentcipher128.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentcipher192.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentcipher256.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentkey128.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentkey192.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentkey256.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte100-128.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte100-192.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte100-256.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte1000-128.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte1000-192.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentmonte1000-256.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentplain128.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentplain192.txt">
+      <Filter>Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\..\Test\Vectors\Nessie\serpentplain256.txt">
+      <Filter>Vectors\Nessie</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
@@ -271,9 +238,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\SerpentTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\KeccakTest.h">
-      <Filter>Header Files\Test\DigestTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\Sha2Test.h">
       <Filter>Header Files\Test\DigestTest</Filter>
@@ -352,9 +316,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\GMACTest.h">
       <Filter>Header Files\Test\MacTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\SCRYPTTest.h">
-      <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\MemUtilsTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
@@ -461,10 +422,22 @@
     <ClInclude Include="..\..\Test\NTRUPrimeTest.h">
       <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\NetworkTest.h">
-      <Filter>Header Files\Test\ProcessorTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\HKDFTest.h">
+      <Filter>Header Files\Test\KdfTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HKDSTest.h">
+      <Filter>Header Files\Test\KmsTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\DUKPTTest.h">
+      <Filter>Header Files\Test\KmsTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RWSTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SHA3Test.h">
+      <Filter>Header Files\Test\DigestTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SCBKDFTest.h">
       <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
   </ItemGroup>
@@ -498,9 +471,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\DigestStreamTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\KeccakTest.cpp">
-      <Filter>Source Files\Test\DigestTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\SerpentTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
@@ -540,9 +510,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\GMACTest.cpp">
       <Filter>Source Files\Test\MacTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\SCRYPTTest.cpp">
-      <Filter>Source Files\Test\KdfTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\HexConverter.cpp">
       <Filter>Source Files\Common</Filter>
@@ -661,8 +628,70 @@
     <ClCompile Include="..\..\Test\NTRUPrimeTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\NetworkTest.cpp">
-      <Filter>Source Files\Test\ProcessorTest</Filter>
+    <ClCompile Include="..\..\Test\HKDSTest.cpp">
+      <Filter>Source Files\Test\KmsTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Test\DUKPTTest.cpp">
+      <Filter>Source Files\Test\KmsTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RWSTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SHA3Test.cpp">
+      <Filter>Source Files\Test\DigestTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SCBKDFTest.cpp">
+      <Filter>Source Files\Test\KdfTest</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarKey128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarKey256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarTxt128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\KAT\CBCVarTxt256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MCT\CBCMCT128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MCT\CBCMCT256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MMT\CBCMMT128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\CBC\MMT\CBCMMT256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarKey128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarKey256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarTxt128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\KAT\ECBVarTxt256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MCT\ECBMCT128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MCT\ECBMCT256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MMT\ECBMMT128.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
+    <None Include="..\..\Test\Vectors\AESAVS\ECB\MMT\ECBMMT256.rsp">
+      <Filter>Vectors\AESAVS</Filter>
+    </None>
   </ItemGroup>
 </Project>

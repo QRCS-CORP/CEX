@@ -5,9 +5,9 @@
 NAMESPACE_ASYMMETRIC
 
 using Enumeration::ErrorCodes;
-using Utility::ArrayTools;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::ArrayTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 const std::string AsymmetricKey::CLASS_NAME = "AsymmetricKey";
 
@@ -92,7 +92,6 @@ AsymmetricKey::AsymmetricKey(const SecureVector<byte> &Polynomial, AsymmetricPri
 
 AsymmetricKey::~AsymmetricKey()
 {
-	Reset();
 }
 
 //~~~Accessors~~~//

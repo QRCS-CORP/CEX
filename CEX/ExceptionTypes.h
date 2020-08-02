@@ -43,25 +43,29 @@ enum class ExceptionTypes : byte
 	/// </summary>
 	CryptoKdfException = 7,
 	/// <summary>
+	/// Key derivation function exception
+	/// </summary>
+	CryptoKmsException = 8,
+	/// <summary>
 	/// Message authentication code generator exception
 	/// </summary>
-	CryptoMacException = 8,
+	CryptoMacException = 9,
 	/// <summary>
 	/// Symmetric block cipher padding exception
 	/// </summary>
-	CryptoPaddingException = 9,
+	CryptoPaddingException = 10,
 	/// <summary>
 	/// Cryptographic data processing exception
 	/// </summary>
-	CryptoProcessingException = 10,
+	CryptoProcessingException = 11,
 	/// <summary>
 	/// Cryptographic pseudo-random number generator exception
 	/// </summary>
-	CryptoRandomException = 11,
+	CryptoRandomException = 12,
 	/// <summary>
 	/// Symmetric cipher operationas exception
 	/// </summary>
-	CryptoSymmetricException = 12
+	CryptoSymmetricException = 13
 };
 
 class ExceptionTypeConvert

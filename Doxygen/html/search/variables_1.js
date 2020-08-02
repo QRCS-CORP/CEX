@@ -1,20 +1,7 @@
 var searchData=
 [
-  ['keccak1024_5fdigest_5fsize',['KECCAK1024_DIGEST_SIZE',['../class_keccak.html#adba7a6bb83e3659129c805f9730bac8e',1,'Keccak']]],
-  ['keccak1024_5frate_5fsize',['KECCAK1024_RATE_SIZE',['../class_keccak.html#a67900885e6ff36a3d6a67fe967e8dce5',1,'Keccak']]],
-  ['keccak128_5fdigest_5fsize',['KECCAK128_DIGEST_SIZE',['../class_keccak.html#a901e0344e54a2fbbfa883c6ee9554824',1,'Keccak']]],
-  ['keccak128_5frate_5fsize',['KECCAK128_RATE_SIZE',['../class_keccak.html#afdb930101e4a8c2c50db53517e126cb5',1,'Keccak']]],
-  ['keccak256_5fdigest_5fsize',['KECCAK256_DIGEST_SIZE',['../class_keccak.html#ab76d0dcecef2dff66a7f400132f813b1',1,'Keccak']]],
-  ['keccak256_5frate_5fsize',['KECCAK256_RATE_SIZE',['../class_keccak.html#aba8b92b3a23e5fcfb787efb744d6a288',1,'Keccak']]],
-  ['keccak512_5fdigest_5fsize',['KECCAK512_DIGEST_SIZE',['../class_keccak.html#a1a5b3c6f77d9016a8679cbf9d6b27c10',1,'Keccak']]],
-  ['keccak512_5frate_5fsize',['KECCAK512_RATE_SIZE',['../class_keccak.html#a9359f109ebc471b8047495f82ca5d679',1,'Keccak']]],
-  ['keccak_5fcshake_5fdomain',['KECCAK_CSHAKE_DOMAIN',['../class_keccak.html#a7738d1c5beba21e29a2507d92c83b6be',1,'Keccak']]],
-  ['keccak_5fcshakew4_5fdomain',['KECCAK_CSHAKEW4_DOMAIN',['../class_keccak.html#abb5531cea1696e9c57ec66039c183945',1,'Keccak']]],
-  ['keccak_5fcshakew8_5fdomain',['KECCAK_CSHAKEW8_DOMAIN',['../class_keccak.html#a18d2b039dda51d6e58d564eec57d5189',1,'Keccak']]],
-  ['keccak_5fkmac_5fdomain',['KECCAK_KMAC_DOMAIN',['../class_keccak.html#acb02216ed17248c6fddaff193811bdc4',1,'Keccak']]],
-  ['keccak_5frc24',['KECCAK_RC24',['../class_keccak.html#af09f33ca338c46d8de990d21ed87e7fa',1,'Keccak']]],
-  ['keccak_5frc48',['KECCAK_RC48',['../class_keccak.html#a4493a3ae96750765870f6f67994952ed',1,'Keccak']]],
-  ['keccak_5fsha3_5fdomain',['KECCAK_SHA3_DOMAIN',['../class_keccak.html#a5505f7c74c1ceae7a74de3dccb84cddc',1,'Keccak']]],
-  ['keccak_5fshake_5fdomain',['KECCAK_SHAKE_DOMAIN',['../class_keccak.html#acd81314685cb375acfeaa3838f34e99c',1,'Keccak']]],
-  ['keccak_5fstate_5fsize',['KECCAK_STATE_SIZE',['../class_keccak.html#afe6189a3216451de2deb617f3daa9630',1,'Keccak']]]
+  ['ciphertext_5fsize_2263',['CIPHERTEXT_SIZE',['../class_m_p_k_c_n6960_t119.html#afa90de6374e3d72877ed3f41acf24232',1,'MPKCN6960T119::CIPHERTEXT_SIZE()'],['../class_m_p_k_c_n8192_t128.html#aa9d0044b44b100d0915e5625c7614fe1',1,'MPKCN8192T128::CIPHERTEXT_SIZE()'],['../class_n_t_r_u_s_q4591_p761.html#a6744a67be9e4cc59223a108ca5ff2006',1,'NTRUSQ4591P761::CIPHERTEXT_SIZE()'],['../class_n_t_r_u_s_q4621_p653.html#a5eb6629916ea48b4496ee512c7918c9d',1,'NTRUSQ4621P653::CIPHERTEXT_SIZE()'],['../class_n_t_r_u_s_q5167_p857.html#acb9e287bf63b4cfd7e1c46a87f1114ac',1,'NTRUSQ5167P857::CIPHERTEXT_SIZE()'],['../class_r_l_w_e_q12289_n1024.html#af8e0fc216489d07ae676d835a8843d84',1,'RLWEQ12289N1024::CIPHERTEXT_SIZE()'],['../class_r_l_w_e_q12289_n2048.html#a49f0dcfea9c906bf7bf32d47ef3ffd43',1,'RLWEQ12289N2048::CIPHERTEXT_SIZE()']]],
+  ['ciphertextk2_5fsize_2264',['CIPHERTEXTK2_SIZE',['../class_m_l_w_e_q3329_n256.html#abc5cd009a717eb94f403b8205b012c07',1,'MLWEQ3329N256']]],
+  ['ciphertextk3_5fsize_2265',['CIPHERTEXTK3_SIZE',['../class_m_l_w_e_q3329_n256.html#aa3cf9f649cee6e1e5a94097b299a0688',1,'MLWEQ3329N256']]],
+  ['ciphertextk4_5fsize_2266',['CIPHERTEXTK4_SIZE',['../class_m_l_w_e_q3329_n256.html#ad9b8acb8dd75508d009df9b47e02ac97',1,'MLWEQ3329N256']]]
 ];

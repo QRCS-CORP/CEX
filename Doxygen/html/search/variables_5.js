@@ -1,8 +1,11 @@
 var searchData=
 [
-  ['secret_5fsize',['SECRET_SIZE',['../class_m_p_k_c_n4096_t62.html#a467c24f96f60a90fb53e1f3cd927a0f2',1,'MPKCN4096T62::SECRET_SIZE()'],['../class_m_p_k_c_n6960_t119.html#aa49ff021c8516d6b37a67041e01b922c',1,'MPKCN6960T119::SECRET_SIZE()'],['../class_m_p_k_c_n8192_t128.html#a2f54c7d8fac062954910e1c3a751c398',1,'MPKCN8192T128::SECRET_SIZE()']]],
-  ['seed_5fsize',['SEED_SIZE',['../class_n_t_r_u_s_q4591_p761.html#a4a70b4bc9e6e723be8a6fc0e7a0d42ce',1,'NTRUSQ4591P761::SEED_SIZE()'],['../class_n_t_r_u_s_q4621_p653.html#a78ed8d056af339bf6eee912e822b4ab7',1,'NTRUSQ4621P653::SEED_SIZE()'],['../class_n_t_r_u_s_q5167_p857.html#abd71fdffc3d497474d194a9a780a48fa',1,'NTRUSQ5167P857::SEED_SIZE()'],['../class_r_l_w_e_q12289_n1024.html#a8cfe22ab0dabb1fa95236cebb46a219d',1,'RLWEQ12289N1024::SEED_SIZE()'],['../class_r_l_w_e_q12289_n2048.html#ada7d69c336fc70a7b03239e884b601e1',1,'RLWEQ12289N2048::SEED_SIZE()']]],
-  ['sphincs_5fpublickey_5fsize',['SPHINCS_PUBLICKEY_SIZE',['../class_s_p_x_p_s128_s_h_a_k_e.html#a804f0ac99f42f24f3aa9f5507a83f401',1,'SPXPS128SHAKE::SPHINCS_PUBLICKEY_SIZE()'],['../class_s_p_x_p_s192_s_h_a_k_e.html#ab907d7f6555edfbda509c9ce87a34519',1,'SPXPS192SHAKE::SPHINCS_PUBLICKEY_SIZE()'],['../class_s_p_x_p_s256_s_h_a_k_e.html#a635432b49cbad4fe12e15e225edf3120',1,'SPXPS256SHAKE::SPHINCS_PUBLICKEY_SIZE()']]],
-  ['sphincs_5fsecretkey_5fsize',['SPHINCS_SECRETKEY_SIZE',['../class_s_p_x_p_s128_s_h_a_k_e.html#a55e2c0da893c9f74cf4420db21a2a682',1,'SPXPS128SHAKE::SPHINCS_SECRETKEY_SIZE()'],['../class_s_p_x_p_s192_s_h_a_k_e.html#a1c8c7a1c3b096c953cd68f56f4e9032b',1,'SPXPS192SHAKE::SPHINCS_SECRETKEY_SIZE()'],['../class_s_p_x_p_s256_s_h_a_k_e.html#a271ce9cae6702ca445ed9a24a1a20119',1,'SPXPS256SHAKE::SPHINCS_SECRETKEY_SIZE()']]],
-  ['sphincs_5fsignature_5fsize',['SPHINCS_SIGNATURE_SIZE',['../class_s_p_x_p_s128_s_h_a_k_e.html#a1378cc4a6907418e973d2ee3d7ec8334',1,'SPXPS128SHAKE::SPHINCS_SIGNATURE_SIZE()'],['../class_s_p_x_p_s192_s_h_a_k_e.html#a9960b46d56e65166dcffa889dfc6b055',1,'SPXPS192SHAKE::SPHINCS_SIGNATURE_SIZE()'],['../class_s_p_x_p_s256_s_h_a_k_e.html#a29a9daaf77172b78185577ea2d4a0ef4',1,'SPXPS256SHAKE::SPHINCS_SIGNATURE_SIZE()']]]
+  ['onasyncsocketaccepted_2293',['OnAsyncSocketAccepted',['../class_socket_server.html#aa693b5d5ee1fb593ee2ab226c0ab1b83',1,'SocketServer']]],
+  ['onsocketaccepted_2294',['OnSocketAccepted',['../class_socket_server.html#a7086fb96584a61911d25739bf8639d92',1,'SocketServer']]],
+  ['onsocketclosed_2295',['OnSocketClosed',['../class_socket_server.html#a22974a0f27c6320b672c2e854ed3d071',1,'SocketServer']]],
+  ['onsocketconnected_2296',['OnSocketConnected',['../class_socket_client.html#a35572e9cebdc839ecc6419430d94f7e7',1,'SocketClient']]],
+  ['onsocketdisconnected_2297',['OnSocketDisconnected',['../class_socket_client.html#a39e9cf59b7c1e7e42f98363c62c6fad3',1,'SocketClient']]],
+  ['onsocketerror_2298',['OnSocketError',['../class_socket_client.html#afd9cdf293298dec639008cb77e3806b0',1,'SocketClient::OnSocketError()'],['../class_socket_server.html#a96c2d93e4bafb67f8ebf786040d7dbea',1,'SocketServer::OnSocketError()']]],
+  ['onsocketreceived_2299',['OnSocketReceived',['../class_socket_client.html#a4a6a0ecd3c167523dfb67e40c0ed2528',1,'SocketClient']]],
+  ['onsocketsent_2300',['OnSocketSent',['../class_socket_client.html#a7b34d3d3800f00d38664171df6622884',1,'SocketClient']]]
 ];

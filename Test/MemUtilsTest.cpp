@@ -4,7 +4,7 @@
 
 namespace Test
 {
-	using Utility::MemoryTools;
+	using Tools::MemoryTools;
 
 	const std::string MemUtilsTest::CLASSNAME = "MemUtilsTest";
 	const std::string MemUtilsTest::DESCRIPTION = "MemoryTools test; tests output and speed of parallelized memory functions.";
@@ -55,74 +55,88 @@ namespace Test
 
 	void MemUtilsTest::Evaluate()
 	{
+		std::vector<byte> inp;
+		std::vector<byte> otp;
+		ulong cmpval;
+		ulong inpval;
+		size_t i;
+		uint inplen;
+		byte val;
+
 		Prng::SecureRandom rng;
+
 		//~~~COPY~~~//
 		// block copy
-		for (size_t i = 0; i < 100; ++i)
-		{
-			uint inpSze = rng.NextUInt32(10000, 100);
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::Copy(input, 0, output, 0, inpSze);
+		inplen = rng.NextUInt32(10000, 100);
+		inp = rng.Generate(inplen);
+		otp.resize(inp.size());
 
-			if (input != output)
+		for (i = 0; i < 100; ++i)
+		{
+			MemoryTools::Copy(inp, 0, otp, 0, inplen);
+
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("Copy"), std::string("Byte comparison failed! -ME1"));
 			}
 		}
 
 		// 128 block
-		for (size_t i = 0; i < 100; ++i)
-		{
-			uint inpSze = 16;
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::COPY128(input, 0, output, 0);
+		inplen = 16;
+		inp = rng.Generate(inplen);
+		otp.resize(inp.size());
 
-			if (input != output)
+		for (i = 0; i < 100; ++i)
+		{
+			MemoryTools::COPY128(inp, 0, otp, 0);
+
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("COPY128"), std::string("Byte comparison failed! -ME2"));
 			}
 		}
 
 		// 256 block
-		for (size_t i = 0; i < 100; ++i)
-		{
-			uint inpSze = 32;
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::COPY256(input, 0, output, 0);
+		inplen = 32;
+		inp = rng.Generate(inplen);
+		otp.resize(inp.size());
 
-			if (input != output)
+		for (i = 0; i < 100; ++i)
+		{
+			MemoryTools::COPY256(inp, 0, otp, 0);
+
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("COPY256"), std::string("Byte comparison failed! -ME3"));
 			}
 		}
 
 		// 512 block
-		for (size_t i = 0; i < 100; ++i)
-		{
-			uint inpSze = 64;
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::COPY512(input, 0, output, 0);
+		inplen = 64;
+		inp = rng.Generate(inplen);
+		otp.resize(inp.size());
 
-			if (input != output)
+		for (i = 0; i < 100; ++i)
+		{
+			MemoryTools::COPY512(inp, 0, otp, 0);
+
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("COPY512"), std::string("Byte comparison failed! -ME4"));
 			}
 		}
 
 		// byte to ulong
-		for (size_t i = 0; i < 100; ++i)
-		{
-			ulong inpVal = rng.NextUInt64(1000000, 100);
-			std::vector<byte> output(8);
-			MemoryTools::CopyFromValue(inpVal, output, 0, 8);
-			ulong cmpVal = 0;
-			MemoryTools::CopyToValue(output, 0, cmpVal, 8);
 
-			if (cmpVal != inpVal)
+		for (i = 0; i < 100; ++i)
+		{
+			inpval = rng.NextUInt64(1000000, 100);
+			otp.resize(8);
+			MemoryTools::CopyFromValue(inpval, otp, 0, 8);
+			cmpval = 0;
+			MemoryTools::CopyToValue(otp, 0, cmpval, 8);
+
+			if (cmpval != inpval)
 			{
 				throw TestException(std::string("Evaluate"), std::string("CopyToValue"), std::string("Byte comparison failed! -ME5"));
 			}
@@ -130,14 +144,15 @@ namespace Test
 
 		//~~~CLEAR~~~//
 		// block clear
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = rng.NextUInt32(10000, 100);
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::Clear(input, 0, inpSze);
+			inplen = rng.NextUInt32(10000, 100);
+			inp = rng.Generate(inplen);
+			otp.clear();
+			otp.resize(inp.size());
+			MemoryTools::Clear(inp, 0, inplen);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("Clear"), std::string("Evaluate: Byte comparison failed! -ME6"));
 			}
@@ -145,42 +160,45 @@ namespace Test
 
 
 		// clear 128
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = 16;
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::CLEAR128(input, 0);
+			inplen = 16;
+			inp = rng.Generate(inplen);
+			otp.clear();
+			otp.resize(inp.size());
+			MemoryTools::CLEAR128(inp, 0);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("CLEAR128"), std::string("Byte comparison failed! -ME7"));
 			}
 		}
 
 		// clear 256
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = 32;
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::CLEAR256(input, 0);
+			inplen = 32;
+			inp = rng.Generate(inplen);
+			otp.clear();
+			otp.resize(inp.size());
+			MemoryTools::CLEAR256(inp, 0);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("CLEAR256"), std::string("Byte comparison failed! -ME8"));
 			}
 		}
 
 		// clear 512
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = 64;
-			std::vector<byte> input = rng.Generate(inpSze);
-			std::vector<byte> output(input.size());
-			MemoryTools::CLEAR512(input, 0);
+			inplen = 64;
+			inp = rng.Generate(inplen);
+			otp.clear();
+			otp.resize(inp.size());
+			MemoryTools::CLEAR512(inp, 0);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("CLEAR512"), std::string("Byte comparison failed! -ME9"));
 			}
@@ -188,60 +206,64 @@ namespace Test
 
 		//~~~SET~~~//
 		// block set
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = rng.NextUInt32(10000, 100);
-			std::vector<byte> input(inpSze);
-			std::vector<byte> output(inpSze);
-			std::memset(&input[0], (byte)0xff, inpSze);
-			MemoryTools::SetValue(output, 0, inpSze, (byte)0xff);
+			inplen = rng.NextUInt32(10000, 100);
+			inp.clear();
+			inp.resize(inplen);
+			otp.resize(inplen);
+			std::memset(&inp[0], 0xFF, inplen);
+			MemoryTools::SetValue(otp, 0, inplen, 0xFF);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("SetValue"), std::string("Byte comparison failed! -ME10"));
 			}
 		}
-
+		
 		// memset 128
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = 16;
-			byte val = (byte)rng.NextInt16(255, 1);
-			std::vector<byte> input(inpSze, val);
-			std::vector<byte> output(input.size());
-			MemoryTools::SETVAL128(output, 0, val);
+			inplen = 16;
+			val = static_cast<byte>(rng.NextInt16(255, 1));
+			inp.clear();
+			inp.resize(inplen, val);
+			otp.resize(inp.size());
+			MemoryTools::SETVAL128(otp, 0, val);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("SETVAL128"), std::string("Byte comparison failed! -ME11"));
 			}
 		}
 
 		// memset 256
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = 32;
-			byte val = (byte)rng.NextInt16(255, 1);
-			std::vector<byte> input(inpSze, val);
-			std::vector<byte> output(input.size());
-			MemoryTools::SETVAL256(output, 0, val);
+			inplen = 32;
+			val = static_cast<byte>(rng.NextInt16(255, 1));
+			inp.clear();
+			inp.resize(inplen, val);
+			otp.resize(inp.size());
+			MemoryTools::SETVAL256(otp, 0, val);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("SETVAL256"), std::string("Byte comparison failed! -ME12"));
 			}
 		}
 
 		// memset 512
-		for (size_t i = 0; i < 100; ++i)
+		for (i = 0; i < 100; ++i)
 		{
-			uint inpSze = 64;
-			byte val = (byte)rng.NextInt16(255, 1);
-			std::vector<byte> input(inpSze, val);
-			std::vector<byte> output(input.size());
-			MemoryTools::SETVAL512(output, 0, val);
+			inplen = 64;
+			val = static_cast<byte>(rng.NextInt16(255, 1));
+			inp.clear();
+			inp.resize(inplen, val);
+			otp.resize(inp.size());
+			MemoryTools::SETVAL512(otp, 0, val);
 
-			if (input != output)
+			if (inp != otp)
 			{
 				throw TestException(std::string("Evaluate"), std::string("SETVAL512"), std::string("Byte comparison failed! -ME13"));
 			}

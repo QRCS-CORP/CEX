@@ -6,6 +6,7 @@
 NAMESPACE_CIPHER
 
 using Enumeration::ErrorCodes;
+using Tools::ArrayTools;
 
 const std::string SymmetricKeyGenerator::CLASS_NAME = "SymmetricKeyGenerator";
 
@@ -42,12 +43,12 @@ SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 
 	SymmetricKey* pkey;
 
-	if (KeySize.NonceSize() != 0)
+	if (KeySize.IVSize() != 0)
 	{
 		if (KeySize.InfoSize() != 0)
 		{
 			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.NonceSize());
+			SecureVector<byte> tmpn(KeySize.IVSize());
 			SecureVector<byte> tmpi(KeySize.InfoSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
@@ -60,7 +61,7 @@ SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 		else
 		{
 			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.NonceSize());
+			SecureVector<byte> tmpn(KeySize.IVSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 			Generate(m_providerType, m_securityPolicy, tmpn, 0, tmpn.size());
@@ -89,12 +90,12 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 
 	SymmetricSecureKey* pkey = nullptr;
 
-	if (KeySize.NonceSize() != 0)
+	if (KeySize.IVSize() != 0)
 	{
 		if (KeySize.InfoSize() != 0)
 		{
 			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.NonceSize());
+			SecureVector<byte> tmpn(KeySize.IVSize());
 			SecureVector<byte> tmpi(KeySize.InfoSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
@@ -106,7 +107,7 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 		else
 		{
 			SecureVector<byte> tmpk(KeySize.KeySize());
-			SecureVector<byte> tmpn(KeySize.NonceSize());
+			SecureVector<byte> tmpn(KeySize.IVSize());
 
 			Generate(m_providerType, m_securityPolicy, tmpk, 0, tmpk.size());
 			Generate(m_providerType, m_securityPolicy, tmpn, 0, tmpn.size());
@@ -182,6 +183,7 @@ void SymmetricKeyGenerator::Generate(Providers Provider, SecurityPolicy Policy, 
 		{
 			klen = 128;
 			mode = Enumeration::ShakeModes::SHAKE1024;
+			break;
 		}
 	}
 
@@ -194,9 +196,9 @@ void SymmetricKeyGenerator::Generate(Providers Provider, SecurityPolicy Policy, 
 	Kdf::SHAKE gen(mode);
 
 	// customization string is name + provider-name + shake-name
-	Utility::ArrayTools::AppendString(CLASS_NAME, tmpc);
-	Utility::ArrayTools::AppendString(pvd->Name(), tmpc);
-	Utility::ArrayTools::AppendString(gen.Name(), tmpc);
+	ArrayTools::AppendString(CLASS_NAME, tmpc);
+	ArrayTools::AppendString(pvd->Name(), tmpc);
+	ArrayTools::AppendString(gen.Name(), tmpc);
 
 	gen.Initialize(tmpk, tmpc);
 	gen.Generate(Output, Offset, Length);

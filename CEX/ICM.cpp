@@ -7,8 +7,9 @@ NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
 using Enumeration::CipherModeConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 
 class ICM::IcmState
 {
@@ -47,7 +48,8 @@ public:
 ICM::ICM(BlockCiphers CipherType)
 	:
 	m_icmState(new IcmState(true)),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? 
+		Helper::BlockCipherFromName::GetInstance(CipherType) :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::ICM), std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
@@ -56,7 +58,8 @@ ICM::ICM(BlockCiphers CipherType)
 ICM::ICM(IBlockCipher* Cipher)
 	:
 	m_icmState(new IcmState(false)),
-	m_blockCipher(Cipher != nullptr ? Cipher : 
+	m_blockCipher(Cipher != nullptr ? 
+		Cipher : 
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::ICM), std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
@@ -177,7 +180,7 @@ void ICM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.KeySizes().NonceSize() != BLOCK_SIZE)
+	if (Parameters.KeySizes().IVSize() != BLOCK_SIZE)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Invalid nonce size; nonce must be one of the LegalKeySizes members in length!"), ErrorCodes::InvalidNonce);
 	}
@@ -195,7 +198,7 @@ void ICM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 
 	m_blockCipher->Initialize(true, Parameters);
-	MemoryTools::COPY128(Parameters.Nonce(), 0, m_icmState->Nonce, 0);
+	MemoryTools::COPY128(Parameters.IV(), 0, m_icmState->Nonce, 0);
 	m_icmState->Encryption = Encryption;
 	m_icmState->Initialized = true;
 }
@@ -262,7 +265,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 	bctr = 0;
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 	const size_t AVX512BLK = 16 * BLOCK_SIZE;
 	if (Length >= AVX512BLK)
 	{
@@ -309,7 +312,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 			bctr += AVX512BLK;
 		}
 	}
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 	const size_t AVX2BLK = 8 * BLOCK_SIZE;
 	if (Length >= AVX2BLK)
 	{
@@ -339,7 +342,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 			bctr += AVX2BLK;
 		}
 	}
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 	const size_t AVXBLK = 4 * BLOCK_SIZE;
 	if (Length >= AVXBLK)
 	{
@@ -392,7 +395,7 @@ void ICM::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 	std::vector<ulong> tmpc(m_icmState->Nonce.size());
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
+	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
 		std::vector<ulong> thdc(2, 0);

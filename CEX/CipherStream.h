@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -26,7 +26,6 @@
 #define CEX_CIPHERSTREAM_H
 
 #include "CexDomain.h"
-#include "BlockCipherExtensions.h"
 #include "CryptoProcessingException.h"
 #include "Event.h"
 #include "IBlockCipher.h"
@@ -40,7 +39,6 @@
 NAMESPACE_PROCESSING
 
 using Enumeration::BlockCiphers;
-using Enumeration::BlockCipherExtensions;
 using Exception::CryptoProcessingException;
 using Enumeration::CipherModes;
 using Routing::Event;
@@ -162,12 +160,11 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The block cipher enumeration name</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// <param name="CipherModeType">The cipher mode enumeration name</param>
 	/// <param name="PaddingType">The padding mode enumeration name</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if invalid parameters are passed</exception>
-	CipherStream(BlockCiphers CipherType = BlockCiphers::AES, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, CipherModes CipherModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
+	CipherStream(BlockCiphers CipherType = BlockCiphers::AES, CipherModes CipherModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
 
 	/// <summary>
 	/// Initialize the class with a block cipher mode and (optional) padding instances.
@@ -272,7 +269,7 @@ private:
 	void BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void BlockTransform(IByteStream* InStream, IByteStream* OutStream);
 	void CalculateProgress(size_t Length, size_t Processed);
-	static ICipherMode* GetCipherMode(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType);
+	static ICipherMode* GetCipherMode(BlockCiphers CipherType, CipherModes CipherModeType);
 	static IPadding* GetPaddingMode(PaddingModes PaddingType);
 };
 

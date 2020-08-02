@@ -9,7 +9,7 @@ namespace Test
 	using Cipher::Stream::IStreamCipher;
 
 	/// <summary>
-	/// The ChaCha implementation KAT, monte carlo, stress, permutation, parallelization, authentication, and exception handling tests
+	/// The ChaCha and CSX-512 implementations KAT, monte carlo, stress, permutation, parallelization, authentication, and exception handling tests
 	/// </summary>
 	/// 
 	/// <remarks>
@@ -86,9 +86,9 @@ namespace Test
 		void CompareP256();
 
 		/// <summary>
-		/// Compare ChaCha-512 vectorized, compact, and unrolled, permutation functions for equivalence
+		/// Compare CSX-1024 vectorized and compact permutation functions for equivalence
 		/// </summary>
-		void CompareP512();
+		void CompareP1024();
 
 		/// <summary>
 		/// Test exception handlers for correct execution

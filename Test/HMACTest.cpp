@@ -9,7 +9,7 @@ namespace Test
 {
 	using Exception::CryptoMacException;
 	using Mac::HMAC;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 	using Digest::SHA2;
 	using Enumeration::SHA2Digests;
@@ -17,7 +17,7 @@ namespace Test
 	using Cipher::SymmetricKeySize;
 
 	const std::string HMACTest::CLASSNAME = "HMACTest";
-	const std::string HMACTest::DESCRIPTION = "RFC 4321 test vectors for HMAC SHA256, and SHA512.";
+	const std::string HMACTest::DESCRIPTION = "RFC 4321 test vectors for HMAC SHA2256, and SHA2512.";
 	const std::string HMACTest::SUCCESS = "SUCCESS! All HMAC tests have executed succesfully.";
 
 	HMACTest::HMACTest()
@@ -57,31 +57,31 @@ namespace Test
 			Exception();
 			OnProgress(std::string("HMACTest: Passed HMAC exception handling tests.."));
 
-			HMAC* gen1 = new HMAC(SHA2Digests::SHA256);
+			HMAC* gen1 = new HMAC(SHA2Digests::SHA2256);
 			Kat(gen1, m_key[0], m_message[0], m_expected[0]);
 			Kat(gen1, m_key[1], m_message[1], m_expected[1]);
 			Kat(gen1, m_key[2], m_message[2], m_expected[2]);
 			Kat(gen1, m_key[3], m_message[3], m_expected[3]);
 			Kat(gen1, m_key[4], m_message[4], m_expected[4]);
 			Kat(gen1, m_key[5], m_message[5], m_expected[5]);
-			OnProgress(std::string("HMACTest: Passed HMAC SHA256 bit known answer vector tests.."));
+			OnProgress(std::string("HMACTest: Passed HMAC SHA2256 bit known answer vector tests.."));
 
-			HMAC* gen2 = new HMAC(SHA2Digests::SHA512);
+			HMAC* gen2 = new HMAC(SHA2Digests::SHA2512);
 			Kat(gen2, m_key[0], m_message[0], m_expected[6]);
 			Kat(gen2, m_key[1], m_message[1], m_expected[7]);
 			Kat(gen2, m_key[2], m_message[2], m_expected[8]);
 			Kat(gen2, m_key[3], m_message[3], m_expected[9]);
 			Kat(gen2, m_key[4], m_message[4], m_expected[10]);
 			Kat(gen2, m_key[5], m_message[5], m_expected[11]);
-			OnProgress(std::string("HMACTest: Passed HMAC SHA512 bit known answer vector tests.."));
+			OnProgress(std::string("HMACTest: Passed HMAC SHA2512 bit known answer vector tests.."));
 
 			Params(gen1);
 			Params(gen2);
-			OnProgress(std::string("HMACTest: Passed HMAC SHA256/SHA512 initialization parameters tests.."));
+			OnProgress(std::string("HMACTest: Passed HMAC SHA2256/SHA2512 initialization parameters tests.."));
 
 			Stress(gen1);
 			Stress(gen2);
-			OnProgress(std::string("HMACTest: Passed HMAC SHA256/SHA512 stress tests.."));
+			OnProgress(std::string("HMACTest: Passed HMAC SHA2256/SHA2512 stress tests.."));
 
 			delete gen1;
 			delete gen2;
@@ -200,7 +200,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			HMAC gen(SHA2Digests::SHA256);
+			HMAC gen(SHA2Digests::SHA2256);
 			// invalid key size
 			std::vector<byte> k(1);
 			SymmetricKey kp(k);
@@ -219,7 +219,7 @@ namespace Test
 		// test finalize state -1
 		try
 		{
-			HMAC gen(SHA2Digests::SHA256);
+			HMAC gen(SHA2Digests::SHA2256);
 			std::vector<byte> code(gen.TagSize());
 			// generator was not initialized
 			gen.Finalize(code, 0);
@@ -318,8 +318,8 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(msg, 0, msg.size());
 			SymmetricKey kp(key);
 
 			// generate the mac
@@ -353,8 +353,8 @@ namespace Test
 			{
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
-				IntegerTools::Fill(key, 0, key.size(), rnd);
-				IntegerTools::Fill(msg, 0, msg.size(), rnd);
+				rnd.Generate(key, 0, key.size());
+				rnd.Generate(msg, 0, msg.size());
 				SymmetricKey kp(key);
 
 				// generate with the kdf

@@ -7,7 +7,8 @@ NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
 using Enumeration::CipherModeConvert;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
+using Tools::ParallelTools;
 
 class ECB::EcbState
 {
@@ -44,7 +45,8 @@ public:
 ECB::ECB(BlockCiphers CipherType)
 	:
 	m_ecbState(new EcbState(true)),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? 
+		Helper::BlockCipherFromName::GetInstance(CipherType) :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::ECB), std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
@@ -53,7 +55,8 @@ ECB::ECB(BlockCiphers CipherType)
 ECB::ECB(IBlockCipher* Cipher)
 	:
 	m_ecbState(new EcbState(false)),
-	m_blockCipher(Cipher != nullptr ? Cipher :
+	m_blockCipher(Cipher != nullptr ? 
+		Cipher :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::ECB), std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
 {
@@ -144,14 +147,14 @@ void ECB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
-	Encrypt128(Input, 0, Output, 0);
+	Decrypt128(Input, 0, Output, 0);
 }
 
 void ECB::DecryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
 
-	Encrypt128(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void ECB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -205,7 +208,7 @@ void ECB::ParallelMaxDegree(size_t Degree)
 void ECB::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized");
-	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length");
 	CEXASSERT(Length % BlockSize() == 0, "The length must be evenly divisible by the block size");
 
 	const size_t PRLBLK = m_parallelProfile.ParallelBlockSize();
@@ -217,7 +220,7 @@ void ECB::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 		for (i = 0; i < BLKCNT; ++i)
 		{
-			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK), PRLBLK);
+			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK));
 		}
 
 		const size_t RMDLEN = Length - (PRLBLK * BLKCNT);
@@ -236,10 +239,18 @@ void ECB::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 //~~~Private Functions~~~//
 
+void ECB::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the block-size!");
+
+	m_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
+}
+
 void ECB::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	CEXASSERT(IsInitialized(), "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the block-size!");
+	CEXASSERT(IntegerTools::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the block-size!");
 
 	m_blockCipher->EncryptBlock(Input, InOffset, Output, OutOffset);
 }
@@ -251,7 +262,7 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 
 	bctr = BlockCount;
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 	if (bctr > 15)
 	{
 		// 512bit avx
@@ -268,7 +279,7 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 			--rctr;
 		}
 	}
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 	if (bctr > 7)
 	{
 		// 256bit avx
@@ -285,7 +296,7 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 			--rctr;
 		}
 	}
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 	if (bctr > 3)
 	{
 		// 128bit sse3
@@ -313,12 +324,12 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 	}
 }
 
-void ECB::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void ECB::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t SEGLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t BLKCNT = (SEGLEN / BLOCK_SIZE);
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, SEGLEN, BLKCNT](size_t i)
+	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, SEGLEN, BLKCNT](size_t i)
 	{
 		this->Generate(Input, InOffset + (i * SEGLEN), Output, OutOffset + (i * SEGLEN), BLKCNT);
 	});

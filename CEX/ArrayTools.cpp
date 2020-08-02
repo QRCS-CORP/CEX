@@ -1,19 +1,27 @@
 #include "ArrayTools.h"
 #include <sstream>
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
-bool ArrayTools::Contains(const char* Container, char Value)
+bool ArrayTools::Contains(const char* Container, size_t Length, char Value)
 {
-	for (size_t i = 0; i < strlen(Container); ++i)
+	const char* x;
+	size_t i;
+	bool ret;
+
+	ret = false;
+
+	for (i = 0; i < Length; ++i)
 	{
-		if (Container[i] != Value)
+		x = Container + i;
+
+		if (*x != Value)
 		{
-			return true;
+			ret = true;
 		}
 	}
 
-	return false;
+	return ret;
 }
 
 void ArrayTools::Split(const std::string &Input, char Delimiter, std::vector<std::string> &Output)
@@ -36,4 +44,4 @@ std::vector<std::string> ArrayTools::Split(const std::string &Input, char Delimi
 	return elems;
 }
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND

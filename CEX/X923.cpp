@@ -5,7 +5,7 @@
 
 NAMESPACE_PADDING
 
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 const std::string X923::CLASS_NAME("X923");
 

@@ -81,14 +81,14 @@ IMac* MacFromName::GetInstance(Macs MacType)
 				mptr = new GMAC(BlockCiphers::RHXS512);
 				break;
 			}
-			case Macs::HMACSHA256:
+			case Macs::HMACSHA2256:
 			{
-				mptr = new HMAC(SHA2Digests::SHA256);
+				mptr = new HMAC(SHA2Digests::SHA2256);
 				break;
 			}
-			case Macs::HMACSHA512:
+			case Macs::HMACSHA2512:
 			{
-				mptr = new HMAC(SHA2Digests::SHA512);
+				mptr = new HMAC(SHA2Digests::SHA2512);
 				break;
 			}
 			case Macs::KMAC256:
@@ -113,6 +113,7 @@ IMac* MacFromName::GetInstance(Macs MacType)
 			}
 			default:
 			{
+				// invaild parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}
@@ -141,14 +142,14 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 	{
 		switch (AuthenticatorType)
 		{
-			case StreamAuthenticators::HMACSHA256:
+			case StreamAuthenticators::HMACSHA2256:
 			{
-				mptr = new HMAC(SHA2Digests::SHA256);
+				mptr = new HMAC(SHA2Digests::SHA2256);
 				break;
 			}
-			case StreamAuthenticators::HMACSHA512:
+			case StreamAuthenticators::HMACSHA2512:
 			{
-				mptr = new HMAC(SHA2Digests::SHA512);
+				mptr = new HMAC(SHA2Digests::SHA2512);
 				break;
 			}
 			case StreamAuthenticators::KMAC256:
@@ -173,6 +174,7 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 			}
 			default:
 			{
+				// invaild parameter
 				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The mac generator type is not supported!"), ErrorCodes::InvalidParam);
 			}
 		}

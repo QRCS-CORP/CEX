@@ -33,11 +33,11 @@
 //////////////////////////////////////////////////////
 
 // the libraries formal name 'C,E,X'
-static const std::vector<char> CEX_LIBRARY_NAME = { 0x43, 0x45, 0x58 };
+#define CEX_LIBRARY_NAME ((const uint8_t*) "CEX");
 // the libraries prefix 'C,E,X,-'
-static const std::vector<char> CEX_LIBRARY_PREFIX = { 0x43, 0x45, 0x58, 0x2D };
+#define CEX_LIBRARY_PREFIX = ((const uint8_t*) "CEX-");
 // the libraries version number: Major, Minor, Patch, and Release
-static const std::vector<char> CEX_LIBRARY_VERSION = { 0x01, 0x00, 0x00, 0x07 };
+#define CEX_LIBRARY_VERSION = ((const uint8_t*) "1.0.0.9");
 
 // compiler types; not all will be supported (targets are msvc, mingw, gcc, intel, and clang)
 #if defined(_MSC_VER)
@@ -383,6 +383,49 @@ typedef unsigned char byte;
 #	define CEX_APPLE_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
 
+/// <summary>
+/// AVX512 Capabilities Check
+/// TODO: future expansion (if you can test it, I'll add it)
+/// links: 
+/// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
+/// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
+/// https://colfaxresearch.com/knl-avx512/
+/// 
+/// #include <immintrin.h>
+/// supported is 1: ex. __AVX512CD__ 1
+/// F		__AVX512F__					Foundation
+/// CD	__AVX512CD__				Conflict Detection Instructions(CDI)
+/// ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
+/// PF	__AVX512PF__				Prefetch Instructions(PFI)
+/// DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
+/// BW	__AVX512BW__				Byte and Word Instructions(BW)
+/// VL	__AVX512VL__				Vector Length Extensions(VL)
+/// IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
+/// VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
+/// VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
+/// FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
+/// VPOPCNT	__AVX512VPOPCNTDQ__		?
+/// 
+/// Note: AVX512 is currently untested, this flag enables support on a compliant system
+/// </summary>
+//#define CEX_AVX512_SUPPORTED
+
+#if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
+#	include <immintrin.h>
+#	if (!defined(CEX_HAS_AVX512))
+#		define __AVX512__
+#	endif
+#endif
+
+// avx
+
+/// <summary>
+/// AVX minimum version support
+/// </summary>
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	define CEX_AVX_SUPPORTED
+#endif
+
 // intrinsics support level
 #if defined(__SSE2__)
 #	define CEX_HAS_SSE2
@@ -405,6 +448,10 @@ typedef unsigned char byte;
 #if defined(__AVX2__)
 #	define CEX_HAS_AVX2
 #endif
+#if defined(__AVX512__)
+#	define CEX_HAS_AVX512
+#endif
+
 #if defined(CEX_HAS_AVX2)
 #if (!defined(CEX_HAS_AVX))
 #		define CEX_HAS_AVX
@@ -446,7 +493,7 @@ typedef unsigned char byte;
 #	endif
 #endif
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 #	define CEX_AVX_INTRINSICS
 #endif
 
@@ -537,7 +584,7 @@ typedef unsigned char byte;
 
 
 /// <summary>
-/// 
+/// Use the table based Rijndael implementation; faster, but not timing neutral
 /// </summary>
 //#define CEX_RIJNDAEL_TABLES
 
@@ -562,7 +609,7 @@ typedef unsigned char byte;
 /// <summary>
 /// Toggles CSX512 from 40 to 80 rounds of mixing
 /// </summary>
-#define CEX_CHACHA512_STRONG
+//#define CEX_CSX512_STRONG
 
 /// <summary>
 /// Toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3
@@ -597,55 +644,12 @@ typedef unsigned char byte;
 /// <summary>
 /// Pre-loads tables in rhx and thx into L1 for performance and as a timing attack counter measure
 /// </summary>
-#define CEX_PREFETCH_RHX_TABLES
+#define CEX_PREFETCH_RIJNDAEL_TABLES
 
 /// <summary>
 /// Enabling this value will add cpu jitter to the ACP entropy collector (slightly stronger, but much slower)
 /// </summary>
 #define CEX_ACP_JITTER
-
-/// <summary>
-/// AVX512 Capabilities Check
-/// TODO: future expansion (if you can test it, I'll add it)
-/// links: 
-/// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
-/// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
-/// https://colfaxresearch.com/knl-avx512/
-/// 
-/// #include <immintrin.h>
-/// supported is 1: ex. __AVX512CD__ 1
-/// F		__AVX512F__					Foundation
-/// CD	__AVX512CD__				Conflict Detection Instructions(CDI)
-/// ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
-/// PF	__AVX512PF__				Prefetch Instructions(PFI)
-/// DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
-/// BW	__AVX512BW__				Byte and Word Instructions(BW)
-/// VL	__AVX512VL__				Vector Length Extensions(VL)
-/// IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
-/// VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
-/// VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
-/// FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
-/// VPOPCNT	__AVX512VPOPCNTDQ__		?
-/// 
-/// Note: AVX512 is currently untested, this flag enables support on a compliant system
-/// </summary>
-//#define CEX_AVX512_SUPPORTED
-
-#if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
-#	include <immintrin.h>
-#	if (!defined(__AVX512__))
-#		define __AVX512__
-#	endif
-#endif
-
-// avx
-
-/// <summary>
-/// AVX minimum version support
-/// </summary>
-#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
-#	define CEX_AVX_SUPPORTED
-#endif
 
 // EOF
 #endif

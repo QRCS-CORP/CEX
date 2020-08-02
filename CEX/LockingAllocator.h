@@ -5,10 +5,13 @@
 #include "CryptoException.h"
 #include "MemoryPool.h"
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 /// cond private
 
+/// <summary>
+/// Internal class locking allocator for secure vector implementation
+/// </summary>
 class LockingAllocator final
 {
 private:
@@ -38,5 +41,5 @@ public:
 	bool deallocate(void* Pointer, size_t Elements, size_t ElementSize);
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif

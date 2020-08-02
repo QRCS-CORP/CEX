@@ -16,9 +16,12 @@ namespace Test
 		{
 			// converges slowly, needs 1mb or more
 			std::vector<byte> rnd(SampleSize);
+			std::string status;
+			double x;
+
 			Rng->Generate(rnd);
-			double x = TestUtils::ChiSquare(rnd) * 100;
-			std::string status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
+			x = TestUtils::ChiSquare(rnd) * 100.0;
+			status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
 
 			if (x < 1.0 || x > 99.0)
 			{
@@ -41,10 +44,13 @@ namespace Test
 		{
 			// converges slowly, needs 1mb or more
 			std::vector<byte> rnd(SampleSize);
+			std::string status;
+			double x;
+
 			Generator->Initialize(Seed);
 			Generator->Generate(rnd);
-			double x = TestUtils::ChiSquare(rnd) * 100;
-			std::string status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
+			x = TestUtils::ChiSquare(rnd) * 100.0;
+			status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
 
 			if (x < 1.0 || x > 99.0)
 			{
@@ -67,9 +73,12 @@ namespace Test
 		{
 			// 100kb sample
 			std::vector<byte> rnd(SampleSize);
+			std::string status;
+			double x;
+
 			Rng->Generate(rnd);
-			double x = TestUtils::MeanValue(rnd);
-			std::string status = (std::string("Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
+			x = TestUtils::MeanValue(rnd);
+			status = (std::string("Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
 
 			if (x < 122.5 || x > 132.5)
 			{
@@ -92,10 +101,13 @@ namespace Test
 		{
 			// 100kb sample
 			std::vector<byte> rnd(SampleSize);
+			std::string status;
+			double x;
+
 			Generator->Initialize(Seed);
 			Generator->Generate(rnd);
-			double x = TestUtils::MeanValue(rnd);
-			std::string status = (std::string("Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
+			x = TestUtils::MeanValue(rnd);
+			status = (std::string("Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
 
 			if (x < 122.5 || x > 132.5)
 			{

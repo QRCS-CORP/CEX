@@ -17,7 +17,7 @@ using Cipher::Block::IBlockCipher;
 using Cipher::Block::Mode::IAeadMode;
 
 /// <summary>
-/// Get a Cipher Mode instance from it's enumeration name.
+/// Get an AEAD Cipher Mode instance from it's enumeration name.
 /// <para>The Cipher modes Initialize function must be called before it can be used.</para>
 /// </summary>
 class AeadModeFromName

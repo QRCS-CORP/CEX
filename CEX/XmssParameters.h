@@ -16,29 +16,29 @@ enum class XmssParameters : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The XMSS SHA256H10 parameter; (Medium Security) SHA2-256 with a tree height of 10
+	/// The XMSS SHA2256H10 parameter; (Medium Security) SHA2-256 with a tree height of 10
 	/// </summary>
-	XMSSSHA256H10 = static_cast<byte>(AsymmetricParameters::XMSSSHA256H10),
+	XMSSSHA2256H10 = static_cast<byte>(AsymmetricParameters::XMSSSHA2256H10),
 	/// <summary>
-	/// The XMSS SHA256H16 parameter; (Medium Security) SHA2-256 with a tree height of 16
+	/// The XMSS SHA2256H16 parameter; (Medium Security) SHA2-256 with a tree height of 16
 	/// </summary>
-	XMSSSHA256H16 = static_cast<byte>(AsymmetricParameters::XMSSSHA256H16),
+	XMSSSHA2256H16 = static_cast<byte>(AsymmetricParameters::XMSSSHA2256H16),
 	/// <summary>
-	/// The XMSS SHA256H20 parameter; (Medium Security) The SHA2-256 with a tree height of 20
+	/// The XMSS SHA2256H20 parameter; (Medium Security) The SHA2-256 with a tree height of 20
 	/// </summary>
-	XMSSSHA256H20 = static_cast<byte>(AsymmetricParameters::XMSSSHA256H20),
+	XMSSSHA2256H20 = static_cast<byte>(AsymmetricParameters::XMSSSHA2256H20),
 	/// <summary>
-	/// The XMSS SHA512H10 parameter; (High Security) SHA2-512 with a tree height of 10
+	/// The XMSS SHA2512H10 parameter; (High Security) SHA2-512 with a tree height of 10
 	/// </summary>
-	XMSSSHA512H10 = static_cast<byte>(AsymmetricParameters::XMSSSHA512H10),
+	XMSSSHA2512H10 = static_cast<byte>(AsymmetricParameters::XMSSSHA2512H10),
 	/// <summary>
-	/// The XMSS SHA512H10 parameter; (High Security) SHA2-512 with a tree height of 16
+	/// The XMSS SHA2512H10 parameter; (High Security) SHA2-512 with a tree height of 16
 	/// </summary>
-	XMSSSHA512H16 = static_cast<byte>(AsymmetricParameters::XMSSSHA512H16),
+	XMSSSHA2512H16 = static_cast<byte>(AsymmetricParameters::XMSSSHA2512H16),
 	/// <summary>
-	/// The XMSS SHA512H20 parameter; (Highest Security) SHA2-512 with a tree height of 20
+	/// The XMSS SHA2512H20 parameter; (Highest Security) SHA2-512 with a tree height of 20
 	/// </summary>
-	XMSSSHA512H20 = static_cast<byte>(AsymmetricParameters::XMSSSHA512H20),
+	XMSSSHA2512H20 = static_cast<byte>(AsymmetricParameters::XMSSSHA2512H20),
 	/// <summary>
 	/// The XMSS SHAKE256H10 parameter; (Medium Security) SHAKE-256 with a tree height of 10
 	/// </summary>
@@ -64,69 +64,69 @@ enum class XmssParameters : byte
 	/// </summary>
 	XMSSSHAKE512H20 = static_cast<byte>(AsymmetricParameters::XMSSSHAKE512H20),
 	/// <summary>
-	/// The XMSS-MT SHA256H20D2 parameter; (Medium Security) SHA2-256 with a tree height of 20, and 2 subtree layers
+	/// The XMSS-MT SHA2256H20D2 parameter; (Medium Security) SHA2-256 with a tree height of 20, and 2 subtree layers
 	/// </summary>
-	XMSSMTSHA256H20D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H20D2),
+	XMSSMTSHA2256H20D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H20D2),
 	/// <summary>
-	/// The XMSS-MT SHA256H20D4 parameter; (Medium Security) SHA2-256 with a tree height of 20, and 4 subtree layers
+	/// The XMSS-MT SHA2256H20D4 parameter; (Medium Security) SHA2-256 with a tree height of 20, and 4 subtree layers
 	/// </summary>
-	XMSSMTSHA256H20D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H20D4),
+	XMSSMTSHA2256H20D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H20D4),
 	/// <summary>
-	/// The XMSS-MT SHA256H40D2 parameter; (Medium Security) SHA2-256 with a tree height of 40, and 2 subtree layers
+	/// The XMSS-MT SHA2256H40D2 parameter; (Medium Security) SHA2-256 with a tree height of 40, and 2 subtree layers
 	/// </summary>
-	XMSSMTSHA256H40D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H40D2),
+	XMSSMTSHA2256H40D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H40D2),
 	/// <summary>
-	/// The XMSS-MT SHA256H40D4 parameter; (Medium Security) SHA2-256 with a tree height of 40, and 4 subtree layers
+	/// The XMSS-MT SHA2256H40D4 parameter; (Medium Security) SHA2-256 with a tree height of 40, and 4 subtree layers
 	/// </summary>
-	XMSSMTSHA256H40D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H40D4),
+	XMSSMTSHA2256H40D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H40D4),
 	/// <summary>
-	/// The XMSS-MT SHA256H40D8 parameter; (Medium Security) SHA2-256 with a tree height of 40, and 8 subtree layers
+	/// The XMSS-MT SHA2256H40D8 parameter; (Medium Security) SHA2-256 with a tree height of 40, and 8 subtree layers
 	/// </summary>
-	XMSSMTSHA256H40D8 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H40D8),
+	XMSSMTSHA2256H40D8 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H40D8),
 	/// <summary>
-	/// The XMSS-MT SHA256H60D3 parameter; (Medium Security) SHA2-256 with a tree height of 60, and 3 subtree layers
+	/// The XMSS-MT SHA2256H60D3 parameter; (Medium Security) SHA2-256 with a tree height of 60, and 3 subtree layers
 	/// </summary>
-	XMSSMTSHA256H60D3 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H60D3),
+	XMSSMTSHA2256H60D3 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H60D3),
 	/// <summary>
-	/// The XMSS-MT SHA256H60D6 parameter; (Medium Security) SHA2-256 with a tree height of 60, and 6 subtree layers
+	/// The XMSS-MT SHA2256H60D6 parameter; (Medium Security) SHA2-256 with a tree height of 60, and 6 subtree layers
 	/// </summary>
-	XMSSMTSHA256H60D6 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H60D6),
+	XMSSMTSHA2256H60D6 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H60D6),
 	/// <summary>
-	/// The XMSS-MT SHA256H60D12 parameter; (Medium Security) SHA2-256 with a tree height of 60, and 12 subtree layers
+	/// The XMSS-MT SHA2256H60D12 parameter; (Medium Security) SHA2-256 with a tree height of 60, and 12 subtree layers
 	/// </summary>
-	XMSSMTSHA256H60D12 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA256H60D12),
+	XMSSMTSHA2256H60D12 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2256H60D12),
 	/// <summary>
-	/// The XMSS-MT SHA512H20D2 parameter; (High Security) SHA2-512 with a tree height of 20, and 2 subtree layers
+	/// The XMSS-MT SHA2512H20D2 parameter; (High Security) SHA2-512 with a tree height of 20, and 2 subtree layers
 	/// </summary>
-	XMSSMTSHA512H20D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H20D2),
+	XMSSMTSHA2512H20D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H20D2),
 	/// <summary>
-	/// The XMSS-MT SHA512H20D4 parameter; (High Security) SHA2-512 with a tree height of 20, and 4 subtree layers
+	/// The XMSS-MT SHA2512H20D4 parameter; (High Security) SHA2-512 with a tree height of 20, and 4 subtree layers
 	/// </summary>
-	XMSSMTSHA512H20D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H20D4),
+	XMSSMTSHA2512H20D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H20D4),
 	/// <summary>
-	/// The XMSS-MT SHA512H40D2 parameter; (High Security) SHA2-512 with a tree height of 40, and 2 subtree layers
+	/// The XMSS-MT SHA2512H40D2 parameter; (High Security) SHA2-512 with a tree height of 40, and 2 subtree layers
 	/// </summary>
-	XMSSMTSHA512H40D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H40D2),
+	XMSSMTSHA2512H40D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H40D2),
 	/// <summary>
-	/// The XMSS-MT SHA512H40D4 parameter; (High Security) SHA2-512 with a tree height of 40, and 4 subtree layers
+	/// The XMSS-MT SHA2512H40D4 parameter; (High Security) SHA2-512 with a tree height of 40, and 4 subtree layers
 	/// </summary>
-	XMSSMTSHA512H40D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H40D4),
+	XMSSMTSHA2512H40D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H40D4),
 	/// <summary>
-	/// The XMSS-MT SHA512H40D8 parameter; (High Security) SHA2-512 with a tree height of 40, and 8 subtree layers
+	/// The XMSS-MT SHA2512H40D8 parameter; (High Security) SHA2-512 with a tree height of 40, and 8 subtree layers
 	/// </summary>
-	XMSSMTSHA512H40D8 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H40D8),
+	XMSSMTSHA2512H40D8 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H40D8),
 	/// <summary>
-	/// The XMSS-MT SHA512H60D3 parameter; (Highest Security) SHA2-512 with a tree height of 60, and 3 subtree layers
+	/// The XMSS-MT SHA2512H60D3 parameter; (Highest Security) SHA2-512 with a tree height of 60, and 3 subtree layers
 	/// </summary>
-	XMSSMTSHA512H60D3 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H60D3),
+	XMSSMTSHA2512H60D3 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H60D3),
 	/// <summary>
-	/// The XMSS-MT SHA512H60D6 parameter; (Highest Security) SHA2-512 with a tree height of 60, and 6 subtree layers
+	/// The XMSS-MT SHA2512H60D6 parameter; (Highest Security) SHA2-512 with a tree height of 60, and 6 subtree layers
 	/// </summary>
-	XMSSMTSHA512H60D6 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H60D6),
+	XMSSMTSHA2512H60D6 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H60D6),
 	/// <summary>
-	/// The XMSS-MT SHA512H60D12 parameter; (Highest Security) SHA2-512 with a tree height of 60, and 12 subtree layers
+	/// The XMSS-MT SHA2512H60D12 parameter; (Highest Security) SHA2-512 with a tree height of 60, and 12 subtree layers
 	/// </summary>
-	XMSSMTSHA512H60D12 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA512H60D12),
+	XMSSMTSHA2512H60D12 = static_cast<byte>(AsymmetricParameters::XMSSMTSHA2512H60D12),
 	/// <summary>
 	/// The XMSS-MT SHAKE256H20D2 parameter; (Medium Security) SHAKE-256 with a tree height of 20, and 2 subtree layers
 	/// </summary>
@@ -172,11 +172,11 @@ enum class XmssParameters : byte
 	/// </summary>
 	XMSSMTSHAKE512H40D2 = static_cast<byte>(AsymmetricParameters::XMSSMTSHAKE512H40D2),
 	/// <summary>
-	/// The XMSS-MT SHA512H40D4 parameter; (High Security) SHAKE-512 with a tree height of 40, and 4 subtree layers
+	/// The XMSS-MT SHA2512H40D4 parameter; (High Security) SHAKE-512 with a tree height of 40, and 4 subtree layers
 	/// </summary>
 	XMSSMTSHAKE512H40D4 = static_cast<byte>(AsymmetricParameters::XMSSMTSHAKE512H40D4),
 	/// <summary>
-	/// The XMSS-MT SHA512H40D8 parameter; (High Security) SHAKE-512 with a tree height of 40, and 8 subtree layers
+	/// The XMSS-MT SHA2512H40D8 parameter; (High Security) SHAKE-512 with a tree height of 40, and 8 subtree layers
 	/// </summary>
 	XMSSMTSHAKE512H40D8 = static_cast<byte>(AsymmetricParameters::XMSSMTSHAKE512H40D8),
 	/// <summary>

@@ -199,9 +199,6 @@
     <Filter Include="Source Files\Cipher\Stream">
       <UniqueIdentifier>{6a668064-fa08-4db8-b393-764235c874d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Cipher\Stream\Support">
-      <UniqueIdentifier>{e653f4b9-3335-4ff1-82dd-1c74a54e1248}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Cipher\Key">
       <UniqueIdentifier>{0f8bcbe4-ea74-4a45-910b-7132e12c7b61}</UniqueIdentifier>
     </Filter>
@@ -336,6 +333,18 @@
     </Filter>
     <Filter Include="Source Files\Asymmetric\Cipher\NewHope\Support">
       <UniqueIdentifier>{2b081e58-9b0d-4b2a-9efc-a35b79f5ab15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Kms">
+      <UniqueIdentifier>{503852e2-cf79-4af9-82fd-da65b7828a46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Kms">
+      <UniqueIdentifier>{a6d3bebc-d756-4fb1-b9ed-92f62276c74b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Network\Base">
+      <UniqueIdentifier>{0516aa73-bcde-44a2-9465-8424df3fda58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network\Base">
+      <UniqueIdentifier>{b94cf9ca-969a-4bfe-ab16-97b06a664ab9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -612,12 +621,6 @@
     <ClInclude Include="..\..\CEX\Skein1024.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\BlakeParams.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
@@ -632,12 +635,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\KeccakParams.h">
       <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Keccak512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Keccak256.h">
-      <Filter>Header Files\Digest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoAsymmetricException.h">
       <Filter>Header Files\Exception</Filter>
@@ -672,9 +669,6 @@
     <ClInclude Include="..\..\CEX\TimeStamp.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Keccak1024.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\AeadModeFromName.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
@@ -698,9 +692,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2.h">
       <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SCRYPT.h">
-      <Filter>Header Files\Kdf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\IAsymmetricParameters.h">
       <Filter>Header Files\Asymmetric\Common</Filter>
@@ -767,9 +758,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\ZeroOne.h">
       <Filter>Header Files\Cipher\Block\Padding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Mutex.h">
-      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SecureVector.h">
       <Filter>Header Files\Common</Filter>
@@ -855,9 +843,6 @@
     <ClInclude Include="..\..\CEX\KdfBase.h">
       <Filter>Header Files\Kdf\Base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Salsa.h">
-      <Filter>Header Files\Cipher\Stream\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\MacBase.h">
       <Filter>Header Files\Mac\Base</Filter>
     </ClInclude>
@@ -910,9 +895,6 @@
       <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MPKCN6960T119.h">
-      <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MPKCN4096T62.h">
       <Filter>Header Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MLWEQ3329N256.h">
@@ -1035,12 +1017,6 @@
     <ClInclude Include="..\..\CEX\CryptoSocketException.h">
       <Filter>Header Files\Exception</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Socket.h">
-      <Filter>Header Files\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Wait.h">
-      <Filter>Header Files\Network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Timer.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
@@ -1053,17 +1029,131 @@
     <ClInclude Include="..\..\CEX\NetworkTools.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\WindowsHandle.h">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\QOT.h">
-      <Filter>Header Files\Cipher\Stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\GCM.h">
       <Filter>Header Files\Cipher\Block\AEAD</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Kms.h">
       <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\HkdsMessages.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\HKDSServer.h">
+      <Filter>Header Files\Kms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\HKDSClient.h">
+      <Filter>Header Files\Kms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\HKDSMasterKey.h">
+      <Filter>Header Files\Kms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CryptoKmsException.h">
+      <Filter>Source Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketServer.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketAddressFamilies.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketOptions.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketProtocols.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketReceiveFlags.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketSendFlags.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketShutdownFlags.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketClient.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\EventHandler.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ParallelCallback.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\InternetAddress.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketBase.h">
+      <Filter>Header Files\Network\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketStates.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketTransports.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketExceptions.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketEvents.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ThreadPool.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAsyncResult.h">
+      <Filter>Header Files\Network\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AsyncThread.h">
+      <Filter>Header Files\Network\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SocketContainer.h">
+      <Filter>Header Files\Network\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Socket.h">
+      <Filter>Header Files\Network\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DukptDerivationPurpose.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DukptKeyType.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DukptKeyUsage.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DUKPTClient.h">
+      <Filter>Header Files\Kms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DUKPTServer.h">
+      <Filter>Header Files\Kms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\BlockCipherExtensions.h">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KdfDigests.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RWS.h">
+      <Filter>Header Files\Cipher\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SCBKDF.h">
+      <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA3256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA3512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA31024.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA2256.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA2512.h">
+      <Filter>Header Files\Digest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1199,26 +1289,11 @@
     <ClCompile Include="..\..\CEX\Skein1024.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\SHA256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SHA512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Blake256.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Blake512.cpp">
       <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Keccak256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Keccak512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SCRYPT.cpp">
-      <Filter>Source Files\Kdf</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CryptoAsymmetricException.cpp">
       <Filter>Source Files\Exception</Filter>
@@ -1265,9 +1340,6 @@
     <ClCompile Include="..\..\CEX\McEliece.cpp">
       <Filter>Source Files\Asymmetric\Cipher\McEliece</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Keccak1024.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
@@ -1313,17 +1385,8 @@
     <ClCompile Include="..\..\CEX\SHA2.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Skein.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\ChaCha.cpp">
-      <Filter>Source Files\Cipher\Stream\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\RLWEQ12289N2048.cpp">
       <Filter>Source Files\Asymmetric\Cipher\NewHope\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Threefish.cpp">
-      <Filter>Source Files\Cipher\Stream\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MacFromName.cpp">
       <Filter>Source Files\Helper</Filter>
@@ -1390,9 +1453,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\KdfBase.cpp">
       <Filter>Source Files\Kdf\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Salsa.cpp">
-      <Filter>Source Files\Cipher\Stream\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\AeadModes.cpp">
       <Filter>Source Files\Enumeration</Filter>
@@ -1499,16 +1559,10 @@
     <ClCompile Include="..\..\CEX\ACS.cpp">
       <Filter>Source Files\Cipher\Stream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Blake.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\MPKCN6960T119.cpp">
       <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MPKCN8192T128.cpp">
-      <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\MPKCN4096T62.cpp">
       <Filter>Source Files\Asymmetric\Cipher\McEliece\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MLWEQ3329N256.cpp">
@@ -1628,12 +1682,6 @@
     <ClCompile Include="..\..\CEX\CryptoSocketException.cpp">
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Socket.cpp">
-      <Filter>Source Files\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Wait.cpp">
-      <Filter>Source Files\Network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Timer.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -1646,17 +1694,68 @@
     <ClCompile Include="..\..\CEX\NetworkTools.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\WindowsHandle.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\QOT.cpp">
-      <Filter>Source Files\Cipher\Stream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\GCM.cpp">
       <Filter>Source Files\Cipher\Block\AEAD</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Kms.cpp">
       <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\HKDSClient.cpp">
+      <Filter>Source Files\Kms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\HKDSMasterKey.cpp">
+      <Filter>Source Files\Kms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\HKDSServer.cpp">
+      <Filter>Source Files\Kms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoKmsException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SocketBase.cpp">
+      <Filter>Source Files\Network\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SocketServer.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SocketClient.cpp">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ParallelCallback.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Socket.cpp">
+      <Filter>Source Files\Network\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DUKPTClient.cpp">
+      <Filter>Source Files\Kms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DUKPTServer.cpp">
+      <Filter>Source Files\Kms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RWS.cpp">
+      <Filter>Source Files\Cipher\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SCBKDF.cpp">
+      <Filter>Source Files\Kdf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Blake.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA3256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA3512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA31024.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA2256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA2512.cpp">
+      <Filter>Source Files\Digest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

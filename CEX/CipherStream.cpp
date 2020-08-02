@@ -9,7 +9,8 @@ NAMESPACE_PROCESSING
 
 using Exception::CryptoCipherModeException;
 using Exception::ErrorCodes;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 class CipherStream::CipherState
 {
@@ -46,10 +47,10 @@ const std::string CipherStream::CLASS_NAME("CipherStream");
 
 //~~~Constructor~~~//
 
-CipherStream::CipherStream(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType, PaddingModes PaddingType)
+CipherStream::CipherStream(BlockCiphers CipherType, CipherModes CipherModeType, PaddingModes PaddingType)
 	:
 	m_cipherState(new CipherState((CipherModeType == CipherModes::CTR || CipherModeType == CipherModes::ICM), true)),
-	m_cipherEngine(CipherModeType != CipherModes::None && CipherType != BlockCiphers::None ? GetCipherMode(CipherType, CipherExtensionType, CipherModeType) :
+	m_cipherEngine(CipherModeType != CipherModes::None && CipherType != BlockCiphers::None ? GetCipherMode(CipherType, CipherModeType) :
 		throw CryptoProcessingException(CLASS_NAME, std::string("Constructor"), std::string("Digest type can not be none!"), ErrorCodes::IllegalOperation)),
 	m_cipherPadding(CipherModeType == CipherModes::CBC || CipherModeType == CipherModes::CFB || CipherModeType == CipherModes::OFB ? GetPaddingMode(PaddingType) : nullptr),
 	m_legalKeySizes(m_cipherEngine->LegalKeySizes())
@@ -79,19 +80,8 @@ CipherStream::~CipherStream()
 			m_cipherPadding.reset(nullptr);
 		}
 	}
-	else
-	{
-		if (m_cipherEngine != nullptr)
-		{
-			m_cipherEngine.release();
-		}
-		if (m_cipherPadding != nullptr)
-		{
-			m_cipherPadding.release();
-		}
-	}
 
-	Utility::IntegerTools::Clear(m_legalKeySizes);
+	IntegerTools::Clear(m_legalKeySizes);
 }
 
 //~~~Accessors~~~//
@@ -356,7 +346,11 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 {
 	if (Length >= Processed)
 	{
-		double progress = 100.0 * (static_cast<double>(Processed) / Length);
+		double prc;
+		double progress;
+
+		prc = static_cast<double>(Processed);
+		progress = 100.0 * (prc / static_cast<double>(Length));
 
 		if (progress > 100.0)
 		{
@@ -378,11 +372,15 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 			{
 				ProgressPercent(static_cast<int>(progress));
 			}
+			else
+			{
+				// misra
+			}
 		}
 	}
 }
 
-ICipherMode* CipherStream::GetCipherMode(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType)
+ICipherMode* CipherStream::GetCipherMode(BlockCiphers CipherType, CipherModes CipherModeType)
 {
 	return Helper::CipherModeFromName::GetInstance(CipherType, CipherModeType);
 }

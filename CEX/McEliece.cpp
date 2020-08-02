@@ -1,5 +1,4 @@
 #include "McEliece.h"
-#include "MPKCN4096T62.h"
 #include "MPKCN6960T119.h"
 #include "MPKCN8192T128.h"
 #include "IntegerTools.h"
@@ -10,7 +9,7 @@
 NAMESPACE_MCELIECE
 
 using Enumeration::AsymmetricPrimitiveConvert;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
 using Enumeration::McElieceParameterConvert;
 
@@ -48,9 +47,13 @@ public:
 
 McEliece::McEliece(McElieceParameters Parameters, Prngs PrngType)
 	:
-	m_mpkcState(new MpkcState(Parameters != McElieceParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_mpkcState(new MpkcState(Parameters == McElieceParameters::MPKCS2N6960T119 || 
+		Parameters == McElieceParameters::MPKCS3N8192T128 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) : 
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
@@ -58,9 +61,13 @@ McEliece::McEliece(McElieceParameters Parameters, Prngs PrngType)
 
 McEliece::McEliece(McElieceParameters Parameters, IPrng* Prng)
 	:
-	m_mpkcState(new MpkcState(Parameters != McElieceParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_mpkcState(new MpkcState(Parameters == McElieceParameters::MPKCS2N6960T119 ||
+		Parameters == McElieceParameters::MPKCS3N8192T128 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Prng != nullptr ? Prng : 
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::McEliece), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::IllegalOperation))
 {
@@ -68,16 +75,8 @@ McEliece::McEliece(McElieceParameters Parameters, IPrng* Prng)
 
 McEliece::~McEliece()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_mpkcState->Destroyed)
 	{
@@ -105,23 +104,19 @@ const size_t McEliece::CipherTextSize()
 
 	switch (m_mpkcState->Parameters)
 	{
-		case (McElieceParameters::MPKCS1N4096T62):
-		{
-			clen = MPKCN4096T62::CIPHERTEXT_SIZE;
-			break;
-		}
-		case (McElieceParameters::MPKCS1N6960T119):
+		case (McElieceParameters::MPKCS2N6960T119):
 		{
 			clen = MPKCN6960T119::CIPHERTEXT_SIZE;
 			break;
 		}
-		case (McElieceParameters::MPKCS1N8192T128):
+		case (McElieceParameters::MPKCS3N8192T128):
 		{
 			clen = MPKCN8192T128::CIPHERTEXT_SIZE;
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -171,23 +166,19 @@ const size_t McEliece::PrivateKeySize()
 
 	switch (m_mpkcState->Parameters)
 	{
-		case (McElieceParameters::MPKCS1N4096T62):
-		{
-			klen = MPKCN4096T62::PRIVATEKEY_SIZE;
-			break;
-		}
-		case (McElieceParameters::MPKCS1N6960T119):
+		case (McElieceParameters::MPKCS2N6960T119):
 		{
 			klen = MPKCN6960T119::PRIVATEKEY_SIZE;
 			break;
 		}
-		case (McElieceParameters::MPKCS1N8192T128):
+		case (McElieceParameters::MPKCS3N8192T128):
 		{
 			klen = MPKCN8192T128::PRIVATEKEY_SIZE;
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -201,23 +192,19 @@ const size_t McEliece::PublicKeySize()
 
 	switch (m_mpkcState->Parameters)
 	{
-		case (McElieceParameters::MPKCS1N4096T62):
-		{
-			klen = MPKCN4096T62::PUBLICKEY_SIZE;
-			break;
-		}
-		case (McElieceParameters::MPKCS1N6960T119):
+		case (McElieceParameters::MPKCS2N6960T119):
 		{
 			klen = MPKCN6960T119::PUBLICKEY_SIZE;
 			break;
 		}
-		case (McElieceParameters::MPKCS1N8192T128):
+		case (McElieceParameters::MPKCS3N8192T128):
 		{
 			klen = MPKCN8192T128::PUBLICKEY_SIZE;
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -236,43 +223,42 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 {
 	CEXASSERT(m_mpkcState->Initialized, "The cipher has not been initialized");
 
-	std::vector<byte> sec(SECRET_SIZE);
-	bool status;
+	std::vector<byte> sec(SECRET_SIZE, 0x00);
+	bool res;
 
 	switch (m_mpkcState->Parameters)
 	{
-		case McElieceParameters::MPKCS1N4096T62:
+		case McElieceParameters::MPKCS2N6960T119:
 		{
-			status = MPKCN4096T62::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
+			res = MPKCN6960T119::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
 			break;
 		}
-		case McElieceParameters::MPKCS1N6960T119:
+		case McElieceParameters::MPKCS3N8192T128:
 		{
-			status = MPKCN6960T119::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
-			break;
-		}
-		case McElieceParameters::MPKCS1N8192T128:
-		{
-			status = MPKCN8192T128::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
+			res = MPKCN8192T128::Decapsulate(m_privateKey->Polynomial(), CipherText, sec);
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
 
-	if (m_mpkcState->DomainKey.size() != 0)
+	if (res == true)
 	{
-		CXOF(m_mpkcState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
-	}
-	else
-	{
-		SharedSecret.resize(sec.size());
-		MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
+		if (m_mpkcState->DomainKey.size() != 0)
+		{
+			CXOF(m_mpkcState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
+		}
+		else
+		{
+			SharedSecret.resize(sec.size());
+			MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
+		}
 	}
 
-	return status;
+	return res;
 }
 
 void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
@@ -284,19 +270,13 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 
 	switch (m_mpkcState->Parameters)
 	{
-		case McElieceParameters::MPKCS1N4096T62:
-		{
-			CipherText.resize(MPKCN4096T62::CIPHERTEXT_SIZE);
-			MPKCN4096T62::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
-			break;
-		}
-		case McElieceParameters::MPKCS1N6960T119:
+		case McElieceParameters::MPKCS2N6960T119:
 		{
 			CipherText.resize(MPKCN6960T119::CIPHERTEXT_SIZE);
 			MPKCN6960T119::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
 			break;
 		}
-		case McElieceParameters::MPKCS1N8192T128:
+		case McElieceParameters::MPKCS3N8192T128:
 		{
 			CipherText.resize(MPKCN8192T128::CIPHERTEXT_SIZE);
 			MPKCN8192T128::Encapsulate(m_publicKey->Polynomial(), CipherText, sec, m_rndGenerator);
@@ -304,6 +284,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 		}
 		default:
 		{
+			// invalid parameters
 			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -326,44 +307,33 @@ AsymmetricKeyPair* McEliece::Generate()
 
 	switch (m_mpkcState->Parameters)
 	{
-		case McElieceParameters::MPKCS1N4096T62:
-		{
-			pk.resize(MPKCN4096T62::PUBLICKEY_SIZE);
-			sk.resize(MPKCN4096T62::PRIVATEKEY_SIZE);
-
-			if (!MPKCN4096T62::Generate(pk, sk, m_rndGenerator))
-			{
-				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N4096T62"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
-			}
-
-			break;
-		}
-		case McElieceParameters::MPKCS1N6960T119:
+		case McElieceParameters::MPKCS2N6960T119:
 		{
 			pk.resize(MPKCN6960T119::PUBLICKEY_SIZE);
 			sk.resize(MPKCN6960T119::PRIVATEKEY_SIZE);
 
 			if (!MPKCN6960T119::Generate(pk, sk, m_rndGenerator))
 			{
-				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N6960T119"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS2N6960T119"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
 			}
 
 			break;
 		}
-		case McElieceParameters::MPKCS1N8192T128:
+		case McElieceParameters::MPKCS3N8192T128:
 		{
 			pk.resize(MPKCN8192T128::PUBLICKEY_SIZE);
 			sk.resize(MPKCN8192T128::PRIVATEKEY_SIZE);
 
 			if (!MPKCN8192T128::Generate(pk, sk, m_rndGenerator))
 			{
-				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS1N8192T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
+				throw CryptoAsymmetricException(std::string("McEliece"), std::string("Generate-MPKCS3N8192T128"), std::string("Key generation max retries failure!"), ErrorCodes::MaxExceeded);
 			}
 
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The McEliece parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -388,13 +358,13 @@ void McEliece::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_mpkcState->Parameters = static_cast<McElieceParameters>(m_publicKey->Parameters());
 		m_mpkcState->Encryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_mpkcState->Parameters = static_cast<McElieceParameters>(m_privateKey->Parameters());
 		m_mpkcState->Encryption = false;
 	}

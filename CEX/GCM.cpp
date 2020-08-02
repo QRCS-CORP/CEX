@@ -6,8 +6,8 @@ NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
 using Enumeration::AeadModeConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 
 class GCM::GcmState
 {
@@ -16,7 +16,6 @@ public:
 	std::vector<byte> AAD;
 	SecureVector<byte> Buffer;
 	SecureVector<byte> Key;
-
 	std::vector<byte> Nonce;
 	std::vector<byte> Tag;
 	size_t Counter;
@@ -65,8 +64,9 @@ public:
 GCM::GCM(BlockCiphers CipherType)
 	:
 	m_gcmState(new GcmState(true)),
-	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
-		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::GCM), std::string("Constructor"), std::string("The block cipher type can nor be None!"), ErrorCodes::InvalidParam)),
+	m_cipherMode(CipherType != BlockCiphers::None ? 
+		new CTR(CipherType) : 
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::GCM), std::string("Constructor"), std::string("The block cipher type can nor be None!"), ErrorCodes::InvalidParam)), //-V2571
 	m_macAuthenticator(new Digest::GHASH()),
 	m_legalKeySizes((CipherType == BlockCiphers::AES || CipherType == BlockCiphers::Serpent) ?
 		std::vector<SymmetricKeySize> { 
@@ -86,7 +86,7 @@ GCM::GCM(IBlockCipher* Cipher)
 	:
 	m_gcmState(new GcmState(false)),
 	m_cipherMode(Cipher != nullptr ? new CTR(Cipher) :
-		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::GCM), std::string("Constructor"), std::string("The block cipher can nor be null!"), ErrorCodes::IllegalOperation)),
+		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::GCM), std::string("Constructor"), std::string("The block cipher can nor be null!"), ErrorCodes::IllegalOperation)), //-V2571
 	m_macAuthenticator(new Digest::GHASH()),
 	m_legalKeySizes((Cipher == nullptr || Cipher->Enumeral() == BlockCiphers::AES || Cipher->Enumeral() == BlockCiphers::Serpent) ?
 		std::vector<SymmetricKeySize> { 
@@ -115,13 +115,6 @@ GCM::~GCM()
 		if (m_cipherMode != nullptr)
 		{
 			m_cipherMode.reset(nullptr);
-		}
-	}
-	else
-	{
-		if (m_cipherMode != nullptr)
-		{
-			m_cipherMode.release();
 		}
 	}
 }
@@ -198,7 +191,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	MemoryTools::Clear(m_gcmState->Tag, 0, m_gcmState->Tag.size());
 
-	if (Parameters.KeySizes().NonceSize() < MIN_NONCESIZE)
+	if (Parameters.KeySizes().IVSize() < MIN_NONCESIZE)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a nonce of minimum 10 bytes in length!"), ErrorCodes::InvalidNonce);
 	}
@@ -217,7 +210,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	if (Parameters.KeySizes().KeySize() == 0)
 	{
-		if (Parameters.SecureNonce() == m_gcmState->Buffer)
+		if (Parameters.SecureIV() == m_gcmState->Buffer)
 		{
 			throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("The nonce can not be zeroised or repeating!"), ErrorCodes::InvalidNonce);
 		}
@@ -254,8 +247,8 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 	// load the state
 	m_gcmState->Encryption = Encryption;
-	m_gcmState->Buffer.resize(Parameters.KeySizes().NonceSize());
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_gcmState->Buffer, 0, m_gcmState->Buffer.size());
+	m_gcmState->Buffer.resize(Parameters.KeySizes().IVSize());
+	MemoryTools::Copy(Parameters.IV(), 0, m_gcmState->Buffer, 0, m_gcmState->Buffer.size());
 
 	// create the CTR mode nonce
 	if (m_gcmState->Buffer.size() == MIN_TAGSIZE)
@@ -297,7 +290,7 @@ void GCM::ParallelMaxDegree(size_t Degree)
 
 void GCM::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -313,7 +306,7 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 
 void GCM::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher mode has not been initialized!"), ErrorCodes::NotInitialized);
 	}
@@ -334,7 +327,7 @@ void GCM::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 	m_gcmState->Counter += Length;
 
-	if (IsEncryption())
+	if (IsEncryption() == true)
 	{
 		// encrypt plain-text
 		m_cipherMode->Transform(Input, InOffset, Output, OutOffset, Length);
@@ -366,7 +359,7 @@ void GCM::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Finalize"), std::string("The length must be minimum of 12 and maximum of MAC code size!"), ErrorCodes::InvalidSize);
 	}
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Finalize"), std::string("The cipher mode has not been finalized!"), ErrorCodes::NotInitialized);
 	}

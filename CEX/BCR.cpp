@@ -8,36 +8,62 @@ NAMESPACE_PRNG
 
 using Drbg::BCG;
 using Enumeration::BlockCipherConvert;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 using Enumeration::PrngConvert;
 using Enumeration::ProviderConvert;
 
+class BCR::BcrState
+{
+public:
+
+	SecureVector<byte> Buffer;
+	size_t Position;
+	Providers ProviderType;
+
+	BcrState(Providers ProviderType)
+		:
+		Buffer(BUFFER_SIZE),
+		Position(0),
+		ProviderType(ProviderType)
+	{
+	}
+
+	~BcrState()
+	{
+		Reset();
+	}
+
+	void Reset()
+	{
+		MemoryTools::Clear(Buffer, 0, Buffer.size());
+		Position = 0;
+		ProviderType = Providers::None;
+	}
+};
+
 //~~~Constructor~~~//
 
-BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
+BCR::BCR(Providers ProviderType)
 	:
-	PrngBase(Prngs::BCR, PrngConvert::ToName(Prngs::BCR) + std::string("-") + BlockCipherConvert::ToName(CipherType) + std::string("-") + ProviderConvert::ToName(ProviderType)),
-	m_isParallel(Parallel),
-	m_pvdType(ProviderType != Providers::None ? ProviderType :
+	PrngBase(Prngs::BCR, PrngConvert::ToName(Prngs::BCR) + std::string("-") + std::string("-") + ProviderConvert::ToName(ProviderType)),
+	m_bcrState(ProviderType != Providers::None ? 
+		new BcrState(ProviderType) :
 		throw CryptoRandomException(PrngConvert::ToName(Prngs::BCR), std::string("Constructor"), std::string("Provider type can not be none!"), ErrorCodes::InvalidParam)),
-	m_rndBuffer(BUFFER_SIZE),
-	m_rndIndex(BUFFER_SIZE),
-	m_rngGenerator(CipherType != BlockCiphers::None ? new BCG(CipherType, ProviderType) :
-		throw CryptoRandomException(PrngConvert::ToName(Prngs::BCR), std::string("Constructor"), std::string("Cipher type can not be none!"), ErrorCodes::IllegalOperation))
+	m_rngGenerator(new BCG(ProviderType))
 {
 	Reset();
 }
 
 BCR::~BCR()
 {
-	m_isParallel = false;
-	m_pvdType = Providers::None;
-	m_rndIndex = 0;
-	SecureClear(m_rndBuffer);
-
 	if (m_rngGenerator != nullptr)
 	{
 		m_rngGenerator.reset(nullptr);
+	}
+
+	if (m_bcrState != nullptr)
+	{
+		m_bcrState.reset(nullptr);
 	}
 }
 
@@ -47,7 +73,10 @@ BCR::~BCR()
 
 void BCR::Generate(std::vector<byte> &Output)
 {
-	GetRandom(Output, 0, Output.size(), m_rngGenerator);
+	SecureVector<byte> tmp(Output.size());
+
+	Generate(tmp, 0, Output.size(), m_rngGenerator);
+	SecureMove(tmp, 0, Output, 0, Output.size());
 }
 
 void BCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -57,13 +86,15 @@ void BCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
-	GetRandom(Output, Offset, Length, m_rngGenerator);
+	SecureVector<byte> tmp(Length);
+
+	Generate(tmp, 0, Length, m_rngGenerator);
+	SecureMove(tmp, 0, Output, Offset, Length);
 }
 
 void BCR::Generate(SecureVector<byte> &Output)
 {
-
-	GetRandom(Output, 0, Output.size(), m_rngGenerator);
+	Generate(Output, 0, Output.size(), m_rngGenerator);
 }
 
 void BCR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
@@ -73,44 +104,43 @@ void BCR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
 
-	GetRandom(Output, Offset, Length, m_rngGenerator);
+	Generate(Output, Offset, Length, m_rngGenerator);
 }
 
 void BCR::Reset()
 {
-	if (m_isParallel)
-	{
-		static_cast<BCG*>(m_rngGenerator.get())->IsParallel();
-	}
-
-	static_cast<BCG*>(m_rngGenerator.get())->ParallelProfile().IsParallel() = m_isParallel;
-
 	Cipher::SymmetricKeySize ks = m_rngGenerator->LegalKeySizes()[1];
 	std::vector<byte> key(ks.KeySize());
-	std::vector<byte> nonce(ks.NonceSize());
+	std::vector<byte> nonce(ks.IVSize());
 
-	Provider::IProvider* pvd = Helper::ProviderFromName::GetInstance(m_pvdType);
+	// initialize the random provider
+	Provider::IProvider* pvd = Helper::ProviderFromName::GetInstance(m_bcrState->ProviderType);
 
 	if (!pvd->IsAvailable())
 	{
 		throw CryptoRandomException(Name(), std::string("Reset"), std::string("The random provider can not be instantiated!"), ErrorCodes::NoAccess);
 	}
 
+	// use the provider to generate the key
 	pvd->Generate(key);
 	pvd->Generate(nonce);
 	delete pvd;
 
+	// initialize the drbg
 	Cipher::SymmetricKey kp(key, nonce);
 	m_rngGenerator->Initialize(kp);
 	MemoryTools::Clear(key, 0, key.size());
 	MemoryTools::Clear(nonce, 0, nonce.size());
+
+	// fill the buffer
+	m_rngGenerator->Generate(m_bcrState->Buffer, 0, m_bcrState->Buffer.size());
 }
 
 //~~~Private Functions~~~//
 
-void BCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
+void BCR::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
 {
-	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
+	const size_t BUFLEN = m_bcrState->Buffer.size() - m_bcrState->Position;
 
 	if (Length != 0)
 	{
@@ -118,60 +148,25 @@ void BCR::GetRandom(std::vector<byte> &Output, size_t Offset, size_t Length, std
 		{
 			if (BUFLEN > 0)
 			{
-				SecureExtract(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
+				SecureMove(m_bcrState->Buffer, m_bcrState->Position, Output, Offset, BUFLEN);
 			}
 
-			while (Length > m_rndBuffer.size())
+			while (Length >= m_bcrState->Buffer.size())
 			{
-				Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-				SecureExtract(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
-				Length -= m_rndBuffer.size();
-				Offset += m_rndBuffer.size();
+				Generator->Generate(m_bcrState->Buffer, 0, m_bcrState->Buffer.size());
+				SecureMove(m_bcrState->Buffer, 0, Output, Offset, m_bcrState->Buffer.size());
+				Length -= m_bcrState->Buffer.size();
+				Offset += m_bcrState->Buffer.size();
 			}
 
-			Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-			SecureExtract(m_rndBuffer, 0, Output, Offset, Length);
-			m_rndIndex = Length;
+			Generator->Generate(m_bcrState->Buffer, 0, m_bcrState->Buffer.size());
+			SecureMove(m_bcrState->Buffer, 0, Output, Offset, Length);
+			m_bcrState->Position = Length;
 		}
 		else
 		{
-			SecureExtract(m_rndBuffer, m_rndIndex, Output, Offset, Length);
-			m_rndIndex += Length;
-		}
-	}
-
-	Generator->Generate(Output, Offset, Length);
-}
-
-void BCR::GetRandom(SecureVector<byte> &Output, size_t Offset, size_t Length, std::unique_ptr<IDrbg> &Generator)
-{
-	const size_t BUFLEN = m_rndBuffer.size() - m_rndIndex;
-
-	if (Length != 0)
-	{
-		if (Length > BUFLEN)
-		{
-			if (BUFLEN > 0)
-			{
-				SecureCopy(m_rndBuffer, m_rndIndex, Output, Offset, BUFLEN);
-			}
-
-			while (Length >= m_rndBuffer.size())
-			{
-				Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-				SecureCopy(m_rndBuffer, 0, Output, Offset, m_rndBuffer.size());
-				Length -= m_rndBuffer.size();
-				Offset += m_rndBuffer.size();
-			}
-
-			Generator->Generate(m_rndBuffer, 0, m_rndBuffer.size());
-			SecureCopy(m_rndBuffer, 0, Output, Offset, Length);
-			m_rndIndex = Length;
-		}
-		else
-		{
-			SecureCopy(m_rndBuffer, m_rndIndex, Output, Offset, Length);
-			m_rndIndex += Length;
+			SecureMove(m_bcrState->Buffer, m_bcrState->Position, Output, Offset, Length);
+			m_bcrState->Position += Length;
 		}
 	}
 }

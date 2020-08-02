@@ -5,15 +5,17 @@
 
 NAMESPACE_PROVIDER
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
 using Enumeration::ProviderConvert;
-using Utility::SystemTools;
+using Tools::SystemTools;
 
-const bool CJP::HAS_TSC = SystemTools::HasRdtsc();
+const bool CJP::OS_HAS_TSC = SystemTools::HasRdtsc();
 
-struct CJP::JitterState
+class CJP::JitterState
 {
+public:
+
 	std::vector<byte> MemoryState;
 	ulong LastDelta;
 	ulong LastDelta2;
@@ -26,6 +28,28 @@ struct CJP::JitterState
 	size_t MemoryTotalSize;
 	size_t OverSampleRate;
 	bool SecureCache;
+
+	JitterState()
+		:
+		MemoryState(0),
+		LastDelta(0),
+		LastDelta2(0),
+		PreviousTime(0),
+		RandomState(0),
+		MemoryBlocks(0),
+		MemoryBlockSize(0),
+		MemoryIterations(0),
+		MemoryPosition(0),
+		MemoryTotalSize(0),
+		OverSampleRate(0),
+		SecureCache(false)
+	{
+	}
+
+	~JitterState()
+	{
+		Reset();
+	}
 
 	void Reset()
 	{
@@ -52,21 +76,21 @@ struct CJP::JitterState
 
 CJP::CJP()
 	:
-
 #if defined(CEX_FIPS140_ENABLED)
-	m_pvdSelfTest(),
+	m_pvdSelfTest(new ProviderSelfTest),
 #endif
-	ProviderBase(HAS_TSC, Providers::CJP, ProviderConvert::ToName(Providers::CJP)),
+	ProviderBase(OS_HAS_TSC, Providers::CJP, ProviderConvert::ToName(Providers::CJP)),
 	m_pvdState(Prime())
 {
-	if (!TimerCheck(m_pvdState))
-	{
-		throw CryptoRandomException(Name(), std::string("Constructor"), std::string("The timer evaluation check has failed!"), ErrorCodes::NotSupported);
-	}
 }
 
 CJP::~CJP()
 {
+	if (m_pvdSelfTest != nullptr)
+	{
+		m_pvdSelfTest.reset(nullptr);
+	}
+
 	if (m_pvdState != nullptr)
 	{
 		m_pvdState->Reset();
@@ -90,21 +114,21 @@ bool &CJP::SecureCache()
 
 void CJP::Generate(std::vector<byte> &Output)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(m_pvdState, Output.data(), Output.size());
+	Generate(m_pvdState, Output.data(), Output.size());
 }
 
 void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
@@ -112,31 +136,31 @@ void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(m_pvdState, Output.data() + Offset, Length);
+	Generate(m_pvdState, &Output[Offset], Length);
 }
 
 void CJP::Generate(SecureVector<byte> &Output)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(m_pvdState, Output.data(), Output.size());
+	Generate(m_pvdState, Output.data(), Output.size());
 }
 
 void CJP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (!IsAvailable())
+	if (IsAvailable() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider is not available!"), ErrorCodes::NotFound);
 	}
@@ -144,12 +168,12 @@ void CJP::Generate(SecureVector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The output buffer is too small!"), ErrorCodes::InvalidSize);
 	}
-	if (!FipsTest())
+	if (FipsTest() == false)
 	{
 		throw CryptoRandomException(Name(), std::string("Generate"), std::string("The random provider has failed the self test!"), ErrorCodes::InvalidState);
 	}
 
-	GetRandom(m_pvdState, Output.data() + Offset, Length);
+	Generate(m_pvdState, &Output[Offset], Length);
 }
 
 void CJP::Reset()
@@ -172,11 +196,11 @@ bool CJP::FipsTest()
 
 #if defined(CEX_FIPS140_ENABLED)
 
-	SecureVector<byte> smp(m_pvdSelfTest.SELFTEST_LENGTH);
+	SecureVector<byte> smp(m_pvdSelfTest->SELFTEST_LENGTH);
 
-	GetRandom(m_pvdState, smp.data(), smp.size());
+	Generate(m_pvdState, smp.data(), smp.size());
 
-	if (!m_pvdSelfTest.SelfTest(smp))
+	if (!m_pvdSelfTest->SelfTest(smp))
 	{
 		fail = true;
 	}
@@ -222,7 +246,7 @@ void CJP::FoldTime(std::unique_ptr<JitterState> &State, ulong TimeStamp)
 }
 CEX_OPTIMIZE_RESUME
 
-void CJP::GetRandom(std::unique_ptr<JitterState> &State)
+void CJP::Generate(std::unique_ptr<JitterState> &State)
 {
 	size_t k;
 
@@ -247,8 +271,13 @@ void CJP::GetRandom(std::unique_ptr<JitterState> &State)
 	}
 }
 
-void CJP::GetRandom(std::unique_ptr<JitterState> &State, byte* Output, size_t Length)
+void CJP::Generate(std::unique_ptr<JitterState> &State, byte* Output, size_t Length)
 {
+	if (!TimerCheck(State))
+	{
+		throw CryptoRandomException(std::string("CJP"), std::string("Generate"), std::string("The timer evaluation check has failed!"), ErrorCodes::NotSupported);
+	}
+
 	size_t i;
 	size_t poff;
 
@@ -258,7 +287,7 @@ void CJP::GetRandom(std::unique_ptr<JitterState> &State, byte* Output, size_t Le
 
 		do
 		{
-			GetRandom(State);
+			Generate(State);
 
 			const size_t RMDLEN = (Length > sizeof(ulong)) ? sizeof(ulong) : Length;
 
@@ -269,18 +298,19 @@ void CJP::GetRandom(std::unique_ptr<JitterState> &State, byte* Output, size_t Le
 
 			Length -= RMDLEN;
 			poff += RMDLEN;
-		} while (Length != 0);
+		} 
+		while (Length != 0);
 
 		if (State->SecureCache)
 		{
-			GetRandom(State);
+			Generate(State);
 		}
 	}
 }
 
 ulong CJP::GetTime()
 {
-	return SystemTools::TimeStamp(HAS_TSC);
+	return SystemTools::TimeStamp(OS_HAS_TSC);
 }
 
 bool CJP::MeasureJitter(std::unique_ptr<JitterState> &State)
@@ -369,7 +399,7 @@ std::unique_ptr<CJP::JitterState> CJP::Prime()
 	}
 
 	// fill the state with non-zero values
-	GetRandom(state);
+	Generate(state);
 
 	return state;
 }
@@ -438,9 +468,9 @@ bool CJP::TimerCheck(std::unique_ptr<JitterState> &State)
 	for (size_t i = 0; (LOOP_TEST_COUNT + CLEARCACHE) > i; i++)
 	{
 		delta = 0;
-		time = SystemTools::TimeStamp(HAS_TSC);
+		time = SystemTools::TimeStamp(OS_HAS_TSC);
 		FoldTime(State, time);
-		time2 = SystemTools::TimeStamp(HAS_TSC);
+		time2 = SystemTools::TimeStamp(OS_HAS_TSC);
 
 		// test whether timer works
 		if (time == 0 || time2 == 0)
@@ -474,20 +504,17 @@ bool CJP::TimerCheck(std::unique_ptr<JitterState> &State)
 
 		// ensure that we have a varying delta timer which is necessary for the calculation of entropy
 		// perform this check only after the first loop is executed as we need to prime the oldDelta value
-		if (i != 0)
+		if (delta != olddelta)
 		{
-			if (delta != olddelta)
-			{
-				varctr++;
-			}
-			if (delta > olddelta)
-			{
-				sumdelta += (delta - olddelta);
-			}
-			else
-			{
-				sumdelta += (olddelta - delta);
-			}
+			varctr++;
+		}
+		if (delta > olddelta)
+		{
+			sumdelta += (delta - olddelta);
+		}
+		else
+		{
+			sumdelta += (olddelta - delta);
 		}
 
 		olddelta = delta;

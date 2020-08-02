@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -189,23 +189,16 @@ private:
 	private:
 
 		static ushort Sq2(ushort Input);
-
 		static ushort SqMul(ushort Input, ushort M);
-
 		static ushort Sq2Mul(ushort Input, ushort M);
 
 	public:
 
 		static ushort Add(ushort A, ushort B);
-
 		static ushort GfFrac(ushort Den, ushort Num);
-
 		static ushort Inverse(ushort Den);
-
 		static ushort IsZero(ushort A);
-
 		static ushort Multiply(ushort A, ushort B);
-
 		static void Multiply(ushort* Output, const ushort* X, const ushort* Y);
 	};
 };

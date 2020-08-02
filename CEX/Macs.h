@@ -55,13 +55,13 @@ enum class Macs : byte
 	/// </summary>
 	GMACRHXS512 = 10,
 	/// <summary>
-	/// A Hash based Message Authentication Code generator using SHA256
+	/// A Hash based Message Authentication Code generator using SHA2256
 	/// </summary>
-	HMACSHA256 = 11,
+	HMACSHA2256 = 11,
 	/// <summary>
-	/// A Hash based Message Authentication Code generator using SHA512
+	/// A Hash based Message Authentication Code generator using SHA2512
 	/// </summary>
-	HMACSHA512 = 12,
+	HMACSHA2512 = 12,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator using Keccak-256
 	/// </summary>

@@ -8,8 +8,8 @@
 NAMESPACE_BLOCK
 
 using Enumeration::BlockCipherConvert;
-using Utility::MemoryTools;
-using Utility::IntegerTools;
+using Tools::MemoryTools;
+using Tools::IntegerTools;
 using Enumeration::Kdfs;
 
 class AHX::AhxState
@@ -61,7 +61,8 @@ public:
 AHX::AHX(BlockCipherExtensions CipherExtension)
 	:
 	m_ahxState(new AhxState(CipherExtension, true)),
-	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
+	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ?
+		nullptr :
 		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_legalKeySizes(CalculateKeySizes(CipherExtension))
 {
@@ -146,6 +147,7 @@ const BlockCiphers AHX::Enumeral()
 		default:
 		{
 			tmpn = BlockCiphers::AES;
+			break;
 		}
 	}
 
@@ -372,8 +374,8 @@ void AHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<AhxState
 
 	if (KWORDS == 8)
 	{
-		State->RoundKeys[0] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data()));
-		State->RoundKeys[1] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 16));
+		State->RoundKeys[0] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Key[0]));
+		State->RoundKeys[1] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Key[16]));
 		State->RoundKeys[2] = _mm_aeskeygenassist_si128(State->RoundKeys[1], 0x01);
 		ExpandRotBlock(State->RoundKeys, 2, 2);
 		ExpandSubBlock(State->RoundKeys, 3, 2);
@@ -397,8 +399,8 @@ void AHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<AhxState
 	}
 	else if (KWORDS == 6)
 	{
-		__m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data()));
-		__m128i K1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 8));
+		__m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Key[0]));
+		__m128i K1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Key[8]));
 
 		K1 = _mm_srli_si128(K1, 8);
 		State->RoundKeys[0] = K0;
@@ -441,8 +443,7 @@ void AHX::StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<AhxState
 void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset)
 {
 	// 192 bit key expansion method, -requires additional processing
-	__m128i key1 = *K1; 
-	__m128i key2 = *K2;
+	__m128i key1 = *K1;
 
 	KR = _mm_shuffle_epi32(KR, _MM_SHUFFLE(1, 1, 1, 1));
 	key1 = _mm_xor_si128(key1, _mm_slli_si128(key1, 4));
@@ -451,22 +452,23 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 	key1 = _mm_xor_si128(key1, KR);
 	*K1 = key1;
 
-	std::memcpy(((byte*)Key.data() + Offset), &key1, 16);
+	std::memcpy(reinterpret_cast<byte*>(Key.data()) + Offset, &key1, sizeof(__m128i));
 
 	if (!(Offset == 192 && Key.size() == 13))
 	{
+		__m128i key2 = *K2;
 		key2 = _mm_xor_si128(key2, _mm_slli_si128(key2, 4));
 		key2 = _mm_xor_si128(key2, _mm_shuffle_epi32(key1, _MM_SHUFFLE(3, 3, 3, 3)));
 		*K2 = key2;
 
 		Offset += 16;
 		std::vector<byte> tmpB(4);
-		Utility::IntegerTools::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
-		std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
+		IntegerTools::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
+		std::memcpy(reinterpret_cast<byte*>(Key.data()) + Offset, &tmpB[0], sizeof(uint));
 
 		Offset += 4;
-		Utility::IntegerTools::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
-		std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
+		IntegerTools::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, sizeof(uint))), tmpB, 0);
+		std::memcpy(reinterpret_cast<byte*>(Key.data()) + Offset, &tmpB[0], sizeof(uint));
 	}
 }
 
@@ -639,55 +641,55 @@ std::vector<SymmetricKeySize> AHX::CalculateKeySizes(BlockCipherExtensions Exten
 
 	switch (Extension)
 	{
-		case BlockCipherExtensions::None:
-		{
-			keys.push_back(SymmetricKeySize(16, BLOCK_SIZE, 0));
-			keys.push_back(SymmetricKeySize(24, BLOCK_SIZE, 0));
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 0));
-			break;
-		}
-		case BlockCipherExtensions::HKDF256:
-		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 13));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 13));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 13));
-			break;
-		}
-		case BlockCipherExtensions::HKDF512:
-		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 37));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 37));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 37));
-			break;
-		}
-		case BlockCipherExtensions::SHAKE256:
-		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 127));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 127));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 127));
-			break;
-		}
-		case BlockCipherExtensions::SHAKE128:
-		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 159));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 159));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 159));
-			break;
-		}
-		case BlockCipherExtensions::SHAKE512:
-		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 63));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 63));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 63));
-			break;
-		}
-		case BlockCipherExtensions::SHAKE1024:
-		{
-			keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 62));
-			keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 62));
-			keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 62));
-			break;
-		}
+	case BlockCipherExtensions::None:
+	{
+		keys.push_back(SymmetricKeySize(16, BLOCK_SIZE, 0));
+		keys.push_back(SymmetricKeySize(24, BLOCK_SIZE, 0));
+		keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 0));
+		break;
+	}
+	case BlockCipherExtensions::HKDF256:
+	{
+		keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 13));
+		keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 13));
+		keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 13));
+		break;
+	}
+	case BlockCipherExtensions::HKDF512:
+	{
+		keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 37));
+		keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 37));
+		keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 37));
+		break;
+	}
+	case BlockCipherExtensions::SHAKE256:
+	{
+		keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 127));
+		keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 127));
+		keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 127));
+		break;
+	}
+	case BlockCipherExtensions::SHAKE128:
+	{
+		keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 159));
+		keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 159));
+		keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 159));
+		break;
+	}
+	case BlockCipherExtensions::SHAKE512:
+	{
+		keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 63));
+		keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 63));
+		keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 63));
+		break;
+	}
+	case BlockCipherExtensions::SHAKE1024:
+	{
+		keys.push_back(SymmetricKeySize(32, BLOCK_SIZE, 62));
+		keys.push_back(SymmetricKeySize(64, BLOCK_SIZE, 62));
+		keys.push_back(SymmetricKeySize(128, BLOCK_SIZE, 62));
+		break;
+	}
 	}
 
 	return keys;

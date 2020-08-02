@@ -1,22 +1,24 @@
 #include "CSX256.h"
 #include "ChaCha.h"
 #include "IntegerTools.h"
-#include "MacFromName.h"
+#include "KMAC.h"
 #include "MemoryTools.h"
 #include "ParallelTools.h"
 #include "SHAKE.h"
 
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 #	include "UInt256.h"
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 #	include "UInt128.h"
 #endif
 
 NAMESPACE_STREAM
 
-using Utility::IntegerTools;
-using Utility::MemoryTools;
-using Utility::ParallelTools;
+using Tools::IntegerTools;
+using Mac::KMAC;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
+using Kdf::SHAKE;
 
 const std::string CSX256::CLASS_NAME("CSX256");
 const std::vector<byte> CSX256::SIGMA_INFO = { 0x65, 0x78, 0x70, 0x61, 0x6E, 0x64, 0x20, 0x33, 0x32, 0x2D, 0x62, 0x79, 0x74, 0x65, 0x20, 0x6B };
@@ -31,23 +33,26 @@ public:
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
 	ulong Counter;
-	bool Encryption;
-	bool Initialized;
+	bool IsAuthenticated;
+	bool IsEncryption;
+	bool IsInitialized;
 
-	CSX256State()
+	CSX256State(bool Authenticate)
 		:
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
 		Counter(0),
-		Encryption(false),
-		Initialized(false)
+		IsAuthenticated(Authenticate),
+		IsEncryption(false),
+		IsInitialized(false)
 	{
 	}
 
 	~CSX256State()
 	{
 		Reset();
+		IsAuthenticated = false;
 	}
 
 	void Reset()
@@ -58,19 +63,18 @@ public:
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
 		Counter = 0;
-		Encryption = false;
-		Initialized = false;
+		IsEncryption = false;
+		IsInitialized = false;
 	}
 };
 
 //~~~Constructor~~~//
 
-CSX256::CSX256(StreamAuthenticators AuthenticatorType)
+CSX256::CSX256(bool Authenticate)
 	:
-	m_csx256State(new CSX256State),
+	m_csx256State(new CSX256State(Authenticate)),
 	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, NONCE_SIZE * sizeof(uint), INFO_SIZE) },
-	m_macAuthenticator(AuthenticatorType == StreamAuthenticators::None ? nullptr :
-		Helper::MacFromName::GetInstance(AuthenticatorType)),
+	m_macAuthenticator(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
 }
@@ -79,9 +83,9 @@ CSX256::~CSX256()
 {
 	if (m_csx256State != nullptr)
 	{
-		m_csx256State->Reset();
 		m_csx256State.reset(nullptr);
 	}
+
 	if (m_macAuthenticator != nullptr)
 	{
 		m_macAuthenticator.reset(nullptr);
@@ -97,7 +101,7 @@ const StreamCiphers CSX256::Enumeral()
 	StreamAuthenticators auth;
 	StreamCiphers tmpn;
 
-	auth = IsAuthenticator() ? static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()) : StreamAuthenticators::None;
+	auth = IsAuthenticator() ? StreamAuthenticators::KMAC256 : StreamAuthenticators::None;
 	tmpn = Enumeration::StreamCipherConvert::FromDescription(StreamCiphers::CSX256, auth);
 
 	return tmpn;
@@ -105,17 +109,17 @@ const StreamCiphers CSX256::Enumeral()
 
 const bool CSX256::IsAuthenticator()
 {
-	return static_cast<bool>(m_macAuthenticator != nullptr);
+	return m_csx256State->IsAuthenticated;
 }
 
 const bool CSX256::IsEncryption()
 {
-	return m_csx256State->Encryption;
+	return m_csx256State->IsEncryption;
 }
 
 const bool CSX256::IsInitialized() 
 { 
-	return m_csx256State->Initialized;
+	return m_csx256State->IsInitialized;
 }
 
 const bool CSX256::IsParallel() 
@@ -136,7 +140,7 @@ const std::string CSX256::Name()
 
 	if (IsAuthenticator())
 	{
-		name += std::string("-") + Enumeration::StreamAuthenticatorConvert::ToName(static_cast<StreamAuthenticators>(m_macAuthenticator->Enumeral()));
+		name += std::string("-") + Enumeration::StreamAuthenticatorConvert::ToName(StreamAuthenticators::KMAC256);
 	}
 
 	return name;
@@ -164,17 +168,27 @@ ParallelOptions &CSX256::ParallelProfile()
 
 const std::vector<byte> CSX256::Tag()
 {
+	if (m_csx256State->MacTag.size() == 0 || IsAuthenticator() == false)
+	{
+		throw CryptoSymmetricException(std::string("CSX256"), std::string("Tag"), std::string("The cipher is not initialized for authentication or has not run!"), ErrorCodes::NotInitialized);
+	}
+
 	return SecureUnlock(m_csx256State->MacTag);
 }
 
 const void CSX256::Tag(SecureVector<byte> &Output)
 {
+	if (m_csx256State->MacTag.size() == 0 || IsAuthenticator() == false)
+	{
+		throw CryptoSymmetricException(std::string("CSX256"), std::string("Tag"), std::string("The cipher is not initialized for authentication or has not run!"), ErrorCodes::NotInitialized);
+	}
+
 	SecureCopy(m_csx256State->MacTag, 0, Output, 0, m_csx256State->MacTag.size());
 }
 
 const size_t CSX256::TagSize()
 {
-	return IsAuthenticator() ? m_macAuthenticator->TagSize() : 0;
+	return IsAuthenticator() ? TAG_SIZE : 0;
 }
 
 //~~~Public Functions~~~//
@@ -185,7 +199,7 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid key size; key must be one of the LegalKeySizes in length."), ErrorCodes::InvalidKey);
 	}
-	if (Parameters.KeySizes().NonceSize() != NONCE_SIZE * sizeof(uint))
+	if (Parameters.KeySizes().IVSize() != NONCE_SIZE * sizeof(uint))
 	{
 		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Nonce must be 8 bytes!"), ErrorCodes::InvalidNonce);
 	}
@@ -206,7 +220,7 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 
 	// reset the counter and mac
-	if (IsInitialized())
+	if (IsInitialized() == true)
 	{
 		Reset();
 	}
@@ -216,7 +230,7 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	if (Parameters.KeySizes().InfoSize() != 0)
 	{
 		// custom code
-		MemoryTools::Copy(Parameters.Info(), 0, code, 0, Parameters.KeySizes().InfoSize());
+		MemoryTools::Copy(Parameters.Info(), 0, code, 0, IntegerTools::Min(Parameters.KeySizes().InfoSize(), code.size()));
 	}
 	else
 	{
@@ -224,13 +238,15 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		MemoryTools::Copy(SIGMA_INFO, 0, code, 0, SIGMA_INFO.size());
 	}
 
-	if (!IsAuthenticator())
+	if (IsAuthenticator() == false)
 	{
 		// add key and nonce to state
-		Load(Parameters.Key(), Parameters.Nonce(), code);
+		Load(Parameters.Key(), Parameters.IV(), code);
 	}
 	else
 	{
+		m_macAuthenticator.reset(new KMAC(Enumeration::KmacModes::KMAC256));
+
 		// set the initial counter value
 		m_csx256State->Counter = 1;
 
@@ -242,15 +258,15 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		MemoryTools::CopyFromObject(tmpn.data(), m_csx256State->Custom, sizeof(ulong), tmpn.size());
 
 		// initialize cSHAKE
-		Kdf::SHAKE gen(ShakeModes::SHAKE256);
+		SHAKE gen(ShakeModes::SHAKE256);
 		gen.Initialize(Parameters.SecureKey(), m_csx256State->Custom);
 
 		// generate the new cipher key
-		std::vector<byte> ck(KEY_SIZE);
-		gen.Generate(ck);
+		std::vector<byte> cprk(KEY_SIZE);
+		gen.Generate(cprk);
 
 		// load the ciphers state
-		Load(ck, Parameters.Nonce(), code);
+		Load(cprk, Parameters.IV(), code);
 
 		// generate the mac key
 		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[1];
@@ -261,12 +277,12 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		m_macAuthenticator->Initialize(kpm);
 		// store the key
 		m_csx256State->MacKey.resize(mack.size());
-		SecureMove(mack, m_csx256State->MacKey, 0);
+		SecureMove(mack, 0, m_csx256State->MacKey, 0, mack.size());
 		m_csx256State->MacTag.resize(TagSize());
 	}
 
-	m_csx256State->Encryption = Encryption;
-	m_csx256State->Initialized = true;
+	m_csx256State->IsEncryption = Encryption;
+	m_csx256State->IsInitialized = true;
 }
 
 void CSX256::ParallelMaxDegree(size_t Degree)
@@ -281,11 +297,11 @@ void CSX256::ParallelMaxDegree(size_t Degree)
 
 void CSX256::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (!IsInitialized())
+	if (IsInitialized() == false)
 	{
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
-	if (!IsAuthenticator())
+	if (IsAuthenticator() == false)
 	{
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
@@ -296,9 +312,9 @@ void CSX256::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, si
 
 void CSX256::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (IsEncryption())
+	if (IsEncryption() == true)
 	{
-		if (IsAuthenticator())
+		if (IsAuthenticator() == true)
 		{
 			if (Output.size() < Length + OutOffset + m_macAuthenticator->TagSize())
 			{
@@ -356,11 +372,11 @@ void CSX256::Finalize(std::unique_ptr<CSX256State> &State, std::unique_ptr<IMac>
 	// generate the mac code
 	Authenticator->Finalize(State->MacTag, 0);
 
-	// customization string is: mac counter + algorithm name
+	// customization string is mac counter + algorithm name
 	IntegerTools::Le64ToBytes(State->Counter, State->Custom, 0);
 
 	// extract the new mac key
-	Kdf::SHAKE gen(ShakeModes::SHAKE256);
+	SHAKE gen(ShakeModes::SHAKE256);
 	gen.Initialize(State->MacKey, State->Custom);
 	SymmetricKeySize ks = Authenticator->LegalKeySizes()[1];
 	SecureVector<byte> mack(ks.KeySize());
@@ -370,7 +386,7 @@ void CSX256::Finalize(std::unique_ptr<CSX256State> &State, std::unique_ptr<IMac>
 	SymmetricKey kpm(mack);
 	Authenticator->Initialize(kpm);
 	// store the new key and erase the temporary key
-	SecureMove(mack, State->MacKey, 0);
+	SecureMove(mack, 0, State->MacKey, 0, mack.size());
 }
 
 void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -379,7 +395,7 @@ void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &
 
 	ctr = 0;
 
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 
 	const size_t AVX512BLK = 16 * BLOCK_SIZE;
 
@@ -443,7 +459,7 @@ void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &
 			ctr += AVX512BLK;
 		}
 	}
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 	const size_t AVX2BLK = 8 * BLOCK_SIZE;
 
 	if (Length >= AVX2BLK)
@@ -482,7 +498,7 @@ void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &
 			ctr += AVX2BLK;
 		}
 	}
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 	const size_t AVXBLK = 4 * BLOCK_SIZE;
 
 	if (Length >= AVXBLK)
@@ -532,9 +548,9 @@ void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &
 #else
 		ChaCha::PermuteR20P512U(otp, 0, Counter, State->State);
 #endif
+		IntegerTools::LeIncrementW(Counter);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
 		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
-		IntegerTools::LeIncrementW(Counter);
 	}
 }
 

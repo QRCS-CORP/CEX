@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -20,6 +20,7 @@
 #define CEX_SERPENT_H
 
 #include "CexDomain.h"
+#include "IntegerTools.h"
 
 NAMESPACE_SERPENTBASE
 
@@ -27,10 +28,12 @@ NAMESPACE_SERPENTBASE
 /// internal
 /// 
 
+using Tools::IntegerTools;
+
 template<typename T, typename ArrayA, typename ArrayB>
 static void DecryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, ArrayB &Key)
 {
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 
 	const size_t RNDCNT = 4;
 	const size_t INPOFF = T::size();
@@ -172,7 +175,7 @@ static void DecryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Ou
 template<typename T, typename ArrayA, typename ArrayB>
 static void EncryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, ArrayB &Key)
 {
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 
 	const size_t RNDCNT = Key.size() - 5;
 	const size_t INPOFF = T::size();
@@ -305,16 +308,16 @@ static void EncryptW(const ArrayA &Input, size_t InOffset, std::vector<byte> &Ou
 template<typename T>
 static void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R0 = Utility::IntegerTools::RotL32(R0, 13);
-	R2 = Utility::IntegerTools::RotL32(R2, 3);
+	R0 = IntegerTools::RotL32(R0, 13);
+	R2 = IntegerTools::RotL32(R2, 3);
 	R1 ^= R0 ^ R2;
 	R3 ^= R2 ^ (R0 << 3);
-	R1 = Utility::IntegerTools::RotL32(R1, 1);
-	R3 = Utility::IntegerTools::RotL32(R3, 7);
+	R1 = IntegerTools::RotL32(R1, 1);
+	R3 = IntegerTools::RotL32(R3, 7);
 	R0 ^= R1 ^ R3;
 	R2 ^= R3 ^ (R1 << 7);
-	R0 = Utility::IntegerTools::RotL32(R0, 5);
-	R2 = Utility::IntegerTools::RotL32(R2, 22);
+	R0 = IntegerTools::RotL32(R0, 5);
+	R2 = IntegerTools::RotL32(R2, 22);
 }
 
 template<typename T>
@@ -335,16 +338,16 @@ static void LinearTransformW(T &R0, T &R1, T &R2, T &R3)
 template<typename T>
 static void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R2 = Utility::IntegerTools::RotR32(R2, 22);
-	R0 = Utility::IntegerTools::RotR32(R0, 5);
+	R2 = IntegerTools::RotR32(R2, 22);
+	R0 = IntegerTools::RotR32(R0, 5);
 	R2 ^= R3 ^ (R1 << 7);
 	R0 ^= R1 ^ R3;
-	R3 = Utility::IntegerTools::RotR32(R3, 7);
-	R1 = Utility::IntegerTools::RotR32(R1, 1);
+	R3 = IntegerTools::RotR32(R3, 7);
+	R1 = IntegerTools::RotR32(R1, 1);
 	R3 ^= R2 ^ (R0 << 3);
 	R1 ^= R0 ^ R2;
-	R2 = Utility::IntegerTools::RotR32(R2, 3);
-	R0 = Utility::IntegerTools::RotR32(R0, 13);
+	R2 = IntegerTools::RotR32(R2, 3);
+	R0 = IntegerTools::RotR32(R0, 13);
 }
 
 template<typename T>

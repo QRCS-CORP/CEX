@@ -1,10 +1,21 @@
 var searchData=
 [
-  ['mac_5fsize',['MAC_SIZE',['../class_m_p_k_c_n4096_t62.html#a847c72ee53f33385f68f789a2d7b04b0',1,'MPKCN4096T62::MAC_SIZE()'],['../class_m_p_k_c_n6960_t119.html#a12c083ae5f0c607b5150fe7f540389bf',1,'MPKCN6960T119::MAC_SIZE()'],['../class_m_p_k_c_n8192_t128.html#ad2be6551e84d8d0f0be4ce34987fc7b0',1,'MPKCN8192T128::MAC_SIZE()']]],
-  ['mlwe_5fn',['MLWE_N',['../class_m_l_w_e_q3329_n256.html#ac032b9f6863faeadc121dc151405620d',1,'MLWEQ3329N256::MLWE_N()'],['../class_m_l_w_e_q7681_n256.html#a30349abe4fdaf295788913306cbd0976',1,'MLWEQ7681N256::MLWE_N()']]],
-  ['mlwe_5fq',['MLWE_Q',['../class_m_l_w_e_q3329_n256.html#aca829c619769ee1dc5ded65a80ec4560',1,'MLWEQ3329N256::MLWE_Q()'],['../class_m_l_w_e_q7681_n256.html#a757783695a416631a01685e3f3d0e3bc',1,'MLWEQ7681N256::MLWE_Q()']]],
-  ['mlwe_5fseed_5fsize',['MLWE_SEED_SIZE',['../class_m_l_w_e_q3329_n256.html#a5695be0ff25aedba4c12936f60ed8742',1,'MLWEQ3329N256']]],
-  ['mpkc_5fm',['MPKC_M',['../class_m_p_k_c_n4096_t62.html#ada52e9c6a835f5c15b4b2df650b3c23b',1,'MPKCN4096T62::MPKC_M()'],['../class_m_p_k_c_n6960_t119.html#aebd3cc4c341eec8e03728280b8932cec',1,'MPKCN6960T119::MPKC_M()'],['../class_m_p_k_c_n8192_t128.html#a56f130f8e20d010aeec21b6489150328',1,'MPKCN8192T128::MPKC_M()']]],
-  ['mpkc_5fn',['MPKC_N',['../class_m_p_k_c_n4096_t62.html#ae3f59e03a7d80ca00d2a6774e0a49f83',1,'MPKCN4096T62::MPKC_N()'],['../class_m_p_k_c_n6960_t119.html#adb808a0ce881e94d787ce2bd5ce5ed33',1,'MPKCN6960T119::MPKC_N()'],['../class_m_p_k_c_n8192_t128.html#a64ca15dfb16f0f6fce8a94a3a881dc40',1,'MPKCN8192T128::MPKC_N()']]],
-  ['mpkc_5ft',['MPKC_T',['../class_m_p_k_c_n4096_t62.html#aa48eb03aa004eaff29aa3917f4bdddc0',1,'MPKCN4096T62::MPKC_T()'],['../class_m_p_k_c_n6960_t119.html#a8ea1817b506040dcbe7505cded317fc3',1,'MPKCN6960T119::MPKC_T()'],['../class_m_p_k_c_n8192_t128.html#a6bc02838441f4732a53c531c8d013ffa',1,'MPKCN8192T128::MPKC_T()']]]
+  ['keccak1024_5fdigest_5fsize_2267',['KECCAK1024_DIGEST_SIZE',['../class_keccak.html#adba7a6bb83e3659129c805f9730bac8e',1,'Keccak']]],
+  ['keccak1024_5frate_5fsize_2268',['KECCAK1024_RATE_SIZE',['../class_keccak.html#a67900885e6ff36a3d6a67fe967e8dce5',1,'Keccak']]],
+  ['keccak128_5fdigest_5fsize_2269',['KECCAK128_DIGEST_SIZE',['../class_keccak.html#a901e0344e54a2fbbfa883c6ee9554824',1,'Keccak']]],
+  ['keccak128_5frate_5fsize_2270',['KECCAK128_RATE_SIZE',['../class_keccak.html#afdb930101e4a8c2c50db53517e126cb5',1,'Keccak']]],
+  ['keccak256_5fdigest_5fsize_2271',['KECCAK256_DIGEST_SIZE',['../class_keccak.html#ab76d0dcecef2dff66a7f400132f813b1',1,'Keccak']]],
+  ['keccak256_5frate_5fsize_2272',['KECCAK256_RATE_SIZE',['../class_keccak.html#aba8b92b3a23e5fcfb787efb744d6a288',1,'Keccak']]],
+  ['keccak512_5fdigest_5fsize_2273',['KECCAK512_DIGEST_SIZE',['../class_keccak.html#a1a5b3c6f77d9016a8679cbf9d6b27c10',1,'Keccak']]],
+  ['keccak512_5frate_5fsize_2274',['KECCAK512_RATE_SIZE',['../class_keccak.html#a9359f109ebc471b8047495f82ca5d679',1,'Keccak']]],
+  ['keccak_5fcshake_5fdomain_2275',['KECCAK_CSHAKE_DOMAIN',['../class_keccak.html#a7738d1c5beba21e29a2507d92c83b6be',1,'Keccak']]],
+  ['keccak_5fcshakew4_5fdomain_2276',['KECCAK_CSHAKEW4_DOMAIN',['../class_keccak.html#abb5531cea1696e9c57ec66039c183945',1,'Keccak']]],
+  ['keccak_5fcshakew8_5fdomain_2277',['KECCAK_CSHAKEW8_DOMAIN',['../class_keccak.html#a18d2b039dda51d6e58d564eec57d5189',1,'Keccak']]],
+  ['keccak_5fkmac_5fdomain_2278',['KECCAK_KMAC_DOMAIN',['../class_keccak.html#acb02216ed17248c6fddaff193811bdc4',1,'Keccak']]],
+  ['keccak_5frc24_2279',['KECCAK_RC24',['../class_keccak.html#afc45b3a56bff7b2d9607f7c537077ac6',1,'Keccak']]],
+  ['keccak_5frc48_2280',['KECCAK_RC48',['../class_keccak.html#a4493a3ae96750765870f6f67994952ed',1,'Keccak']]],
+  ['keccak_5fsha3_5fdomain_2281',['KECCAK_SHA3_DOMAIN',['../class_keccak.html#a5505f7c74c1ceae7a74de3dccb84cddc',1,'Keccak']]],
+  ['keccak_5fshake_5fdomain_2282',['KECCAK_SHAKE_DOMAIN',['../class_keccak.html#acd81314685cb375acfeaa3838f34e99c',1,'Keccak']]],
+  ['keccak_5fstate_5fsize_2283',['KECCAK_STATE_SIZE',['../class_keccak.html#afe6189a3216451de2deb617f3daa9630',1,'Keccak']]],
+  ['kid_2284',['KID',['../class_h_k_d_s_master_key.html#a2495766c1afc92dac44afec300866221',1,'HKDSMasterKey']]]
 ];

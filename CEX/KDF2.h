@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -41,7 +41,7 @@ using Enumeration::SHA2Digests;
 /// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
 /// // set to 10,000 rounds (default: 4000)
-/// KDF2 kdf(Enumeration::Digests::SHA256);
+/// KDF2 kdf(Enumeration::Digests::SHA2256);
 /// // initialize
 /// kdf.Initialize(Key, [Salt], [Info]);
 /// // generate bytes
@@ -97,8 +97,6 @@ private:
 	static const size_t MINSALT_LENGTH = 4;
 
 	class Kdf2State;
-	bool m_isDestroyed;
-	bool m_isInitialized;
 	std::unique_ptr<IDigest> m_kdf2Generator;
 	std::unique_ptr<Kdf2State> m_kdf2State;
 

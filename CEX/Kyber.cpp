@@ -9,7 +9,7 @@ NAMESPACE_MODULELWE
 
 using Enumeration::AsymmetricPrimitiveConvert;
 using Enumeration::ErrorCodes;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
 using Enumeration::KyberParameterConvert;
 
@@ -47,9 +47,14 @@ public:
 
 Kyber::Kyber(KyberParameters Parameters, Prngs PrngType)
 	:
-	m_mlweState(new MlweState(Parameters != KyberParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_mlweState(new MlweState(Parameters == KyberParameters::MLWES1Q3329N256 || 
+		Parameters == KyberParameters::MLWES2Q3329N256 || 
+		Parameters == KyberParameters::MLWES3Q3329N256 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
@@ -57,9 +62,14 @@ Kyber::Kyber(KyberParameters Parameters, Prngs PrngType)
 
 Kyber::Kyber(KyberParameters Parameters, IPrng* Prng)
 	:
-	m_mlweState(new MlweState(Parameters != KyberParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_mlweState(new MlweState(Parameters == KyberParameters::MLWES1Q3329N256 ||
+		Parameters == KyberParameters::MLWES2Q3329N256 ||
+		Parameters == KyberParameters::MLWES3Q3329N256 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::Kyber), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
@@ -67,16 +77,8 @@ Kyber::Kyber(KyberParameters Parameters, IPrng* Prng)
 
 Kyber::~Kyber()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_mlweState->Destroyed)
 	{
@@ -121,6 +123,7 @@ const size_t Kyber::CipherTextSize()
 		}
 		default:
 		{
+			// invalid param
 			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -187,6 +190,7 @@ const size_t Kyber::PrivateKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -217,6 +221,7 @@ const size_t Kyber::PublicKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -233,36 +238,25 @@ const size_t Kyber::SharedSecretSize()
 
 bool Kyber::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	std::vector<byte> sec(SECRET_SIZE);
-	bool result;
+	std::vector<byte> sec(SECRET_SIZE, 0x00);
+	bool res;
 
-	switch (m_mlweState->Parameters)
+	res = MLWEQ3329N256::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
+
+	if (res == true)
 	{
-		case KyberParameters::MLWES1Q3329N256:
-		case KyberParameters::MLWES2Q3329N256:
-		case KyberParameters::MLWES3Q3329N256:
+		if (m_mlweState->DomainKey.size() != 0)
 		{
-			break;
+			CXOF(m_mlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
 		}
-		default:
+		else
 		{
-			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
+			SharedSecret.resize(sec.size());
+			MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
 		}
 	}
 
-	result = MLWEQ3329N256::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
-
-	if (m_mlweState->DomainKey.size() != 0)
-	{
-		CXOF(m_mlweState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
-	}
-	else
-	{
-		SharedSecret.resize(sec.size());
-		MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
-	}
-
-	return result;
+	return res;
 }
 
 void Kyber::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
@@ -291,6 +285,7 @@ void Kyber::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shared
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -319,25 +314,23 @@ AsymmetricKeyPair* Kyber::Generate()
 		{
 			pk.resize(MLWEQ3329N256::PUBLICKEYK2_SIZE);
 			sk.resize(MLWEQ3329N256::PRIVATEKEYK2_SIZE);
-
 			break;
 		}
 		case KyberParameters::MLWES2Q3329N256:
 		{
 			pk.resize(MLWEQ3329N256::PUBLICKEYK3_SIZE);
 			sk.resize(MLWEQ3329N256::PRIVATEKEYK3_SIZE);
-
 			break;
 		}
 		case KyberParameters::MLWES3Q3329N256:
 		{
 			pk.resize(MLWEQ3329N256::PUBLICKEYK4_SIZE);
 			sk.resize(MLWEQ3329N256::PRIVATEKEYK4_SIZE);
-
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -363,13 +356,13 @@ void Kyber::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_mlweState->Parameters = static_cast<KyberParameters>(m_publicKey->Parameters());
 		m_mlweState->Encryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_mlweState->Parameters = static_cast<KyberParameters>(m_privateKey->Parameters());
 		m_mlweState->Encryption = false;
 	}

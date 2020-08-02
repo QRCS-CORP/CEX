@@ -8,7 +8,7 @@ namespace Test
 {
 	using Prng::BCR;
 	using Exception::CryptoRandomException;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 
 	const std::string BCRTest::CLASSNAME = "BCRTest";

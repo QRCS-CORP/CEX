@@ -49,7 +49,7 @@ CpuDetect::~CpuDetect()
 	m_hyperThread = false;
 	m_l1CacheLineSize = 0;
 	m_l1CacheSize = 0;
-	CacheAssociations m_l2Associative = CacheAssociations::Disabled;
+	m_l2Associative = CacheAssociations::Disabled;
 	m_l2CacheSize = 0;
 	m_logicalPerCore = 0;
 	m_physCores = 0;
@@ -134,74 +134,98 @@ const bool CpuDetect::IsX64()
 
 const size_t CpuDetect::L1CacheSize()
 {
+	size_t res;
+
 	if (m_l1CacheSize == 0 || m_physCores == 0)
 	{
-		return KB32;
+		res = KB32;
 	}
 	else
 	{
-		return m_l1CacheSize * KB1;
+		res = m_l1CacheSize * KB1;
 	}
+
+	return res;
 }
 
 const size_t CpuDetect::L1CacheLineSize()
 {
+	size_t res;
+
 	if (m_l1CacheLineSize == 0)
 	{
-		return 64;
+		res = 64;
 	}
 	else
 	{
-		return m_l1CacheLineSize;
+		res = m_l1CacheLineSize;
 	}
+
+	return res;
 }
 
 const size_t CpuDetect::L1CacheTotal()
 {
+	size_t res;
+
 	if (m_l1CacheSize == 0 || m_physCores == 0)
 	{
-		return KB256;
+		res = KB256;
 	}
 	else
 	{
-		return m_l1CacheSize * m_physCores * KB1;
+		res = m_l1CacheSize * m_physCores * KB1;
 	}
+
+	return res;
 }
 
 const size_t CpuDetect::L1DataCacheTotal()
 {
+	size_t res;
+
 	if (m_l1CacheSize == 0 || m_physCores == 0)
 	{
-		return KB256;
+		res = KB256;
 	}
 	else
 	{
-		return (m_l1CacheSize / 2) * m_physCores * KB1;
+		res = (m_l1CacheSize / 2) * m_physCores * KB1;
 	}
+
+	return res;
 }
 
 const size_t CpuDetect::L2CacheSize()
 {
+	size_t res;
+
 	if (m_l2CacheSize == 0 || m_physCores == 0)
 	{
-		return KB128;
+		res = KB128;
 	}
 	else
 	{
-		return m_l2CacheSize * KB1;
+		res = m_l2CacheSize * KB1;
 	}
+
+	return res;
 }
 
 const size_t CpuDetect::L2CacheTotal()
 {
+	size_t res;
+
 	if (m_l2CacheSize == 0 || m_physCores == 0)
 	{
-		return KB256;
+		res = KB256;
 	}
 	else
 	{
-		return m_l2CacheSize * m_physCores * KB1;
+		res = m_l2CacheSize * m_physCores * KB1;
 	}
+
+	return res;
 }
 
 const CpuDetect::CacheAssociations CpuDetect::L2Associative()
@@ -324,8 +348,6 @@ const bool CpuDetect::XOP()
 	return HasFeature(CpuidFlags::CPUID_XOP);
 }
 
-//~~~Private Functions~~~//
-
 bool CpuDetect::AvxEnabled()
 {
 	std::array<uint, 4> cpuInfo;
@@ -333,9 +355,9 @@ bool CpuDetect::AvxEnabled()
 	bool status = false;
 
 	// check if os saves the ymm registers
-	if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
+	if (((cpuInfo[2] & (1UL << 27)) != 0) && ((cpuInfo[2] & (1UL << 28)) != 0))
 	{
-		status = (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0x6) != 0;
+		status = (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0x06) != 0;
 	}
 
 	return status;
@@ -347,13 +369,15 @@ bool CpuDetect::Avx2Enabled()
 	Cpuid(1, cpuInfo);
 	bool status = false;
 
-	if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
+	if (((cpuInfo[2] & (1UL << 27)) != 0) && (cpuInfo[2] & (1UL << 28)) != 0)
 	{
 		status = (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0xE6) != 0;
 	}
 
 	return status;
 }
+
+//~~~Private Functions~~~//
 
 void CpuDetect::BusInfo()
 {
@@ -374,7 +398,7 @@ void CpuDetect::Cpuid(int Flag, std::array<uint, 4> &Output)
 {
 #if defined(CEX_ARCH_X86_X64)
 #	if defined(CEX_COMPILER_MSC)
-	__cpuid((int*)Output.data(), Flag);
+	__cpuid(reinterpret_cast<int*>(Output.data()), Flag);
 #	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
 	__get_cpuid(Flag, Output[0], Output[1], Output[2], Output[3]);
 #	endif
@@ -385,7 +409,7 @@ void CpuDetect::CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output)
 {
 #if defined(CEX_ARCH_X86_X64)
 #	if defined(CEX_COMPILER_MSC)
-	__cpuidex((int*)Output.data(), Flag, Level);
+	__cpuidex(reinterpret_cast<int*>(Output.data()), Flag, Level);
 #	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
 	__cpuid_count(Flag, Level, Output[0], Output[1], Output[2], Output[3]);
 #	endif
@@ -394,7 +418,8 @@ void CpuDetect::CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output)
 
 bool CpuDetect::HasFeature(CpuidFlags Flag)
 {
-	return static_cast<bool>(ReadBits(m_x86CpuFlags[(Flag / 32)], (Flag % 32), 1));
+	uint f = static_cast<uint>(Flag);
+	return static_cast<bool>(ReadBits(m_x86CpuFlags[(f / 32)], (f % 32), 1));
 }
 
 void CpuDetect::Initialize()
@@ -422,7 +447,7 @@ void CpuDetect::Initialize()
 
 		if (m_cpuVendor == CpuVendors::INTEL)
 		{
-			m_cacheLineSize = 8 * ReadBits(cpuInfo[1], 16, 8);
+			m_cacheLineSize = static_cast<size_t>(ReadBits(cpuInfo[1], 16, 8)) * 8UL;
 		}
 
 		if (SUBLVL >= 7)
@@ -600,6 +625,10 @@ const CpuDetect::CpuVendors CpuDetect::VendorName(std::string &Name)
 		else if (data.find("amd", 0) != std::string::npos)
 		{
 			vendor = CpuVendors::AMD;
+		}
+		else
+		{
+			vendor = CpuVendors::UNKNOWN;
 		}
 	}
 

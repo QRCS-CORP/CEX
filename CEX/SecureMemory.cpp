@@ -80,10 +80,10 @@ void* SecureMemory::Allocate(size_t Length)
 
 	if (ptr != nullptr)
 	{
-		if (::VirtualLock((LPVOID)ptr, Length) == 0)
+		if (::VirtualLock(reinterpret_cast<LPVOID>(ptr), Length) == 0)
 		{
 			::memset(ptr, 0, Length);
-			::VirtualFree((LPVOID)ptr, 0, MEM_RELEASE);
+			::VirtualFree(reinterpret_cast<LPVOID>(ptr), 0, MEM_RELEASE);
 
 			// failed to lock
 			ptr = nullptr;
@@ -116,7 +116,7 @@ void SecureMemory::Erase(void* Pointer, size_t Length)
 {
 #if defined(CEX_HAS_RTLSECUREMEMORY)
 
-	::RtlSecureZeroMemory((PVOID)Pointer, Length);
+	::RtlSecureZeroMemory(reinterpret_cast<PVOID>(Pointer), Length);
 
 #elif defined(CEX_OS_OPENBSD)
 
@@ -161,8 +161,8 @@ void SecureMemory::Free(void* Pointer, size_t Length)
 
 		if (Pointer != nullptr)
 		{
-			::VirtualUnlock((LPVOID)Pointer, Length);
-			::VirtualFree((LPVOID)Pointer, 0, MEM_RELEASE);
+			::VirtualUnlock(reinterpret_cast<LPVOID>(Pointer), Length);
+			::VirtualFree(reinterpret_cast<LPVOID>(Pointer), 0, MEM_RELEASE);
 		}
 
 #else

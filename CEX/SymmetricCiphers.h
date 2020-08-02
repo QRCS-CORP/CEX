@@ -86,61 +86,20 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	CSX256 = 96,
 	/// <summary>
-	/// The ChaChaPoly20 stream cipher authenticated with HMAC-SHA2-256
-	/// <para>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</para>
-	/// </summary>
-	CSXR20H256 = 97,
-	/// <summary>
-	/// The ChaChaPoly20 stream cipher authenticated with HMAC-SHA2-512
-	/// <para>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</para>
-	/// </summary>
-	CSXR20H512 = 98,
-	/// <summary>
 	/// The ChaChaPoly20 stream cipher authenticated with KMAC-256
 	/// <para>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</para>
 	/// </summary>
-	CSXR20K256 = 99,
-	/// <summary>
-	/// The ChaChaPoly20 stream cipher authenticated with KMAC-512
-	/// <para>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</para>
-	/// </summary>
-	CSXR20K512 = 100,
-	/// <summary>
-	/// The ChaChaPoly20 stream cipher authenticated with Poly1305
-	/// <para>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</para>
-	/// </summary>
-	CSXR20P256 = 101,
-
+	CSXR20K256 = 97,
 	/// <summary>
 	/// A extended implementation of the ChaCha stream-cipher, this variant uses 80 rounds and has no athentication.
 	/// <para>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</para>
 	/// </summary>
-	CSX512 = 102,
-	/// <summary>
-	/// The extended ChaChaP80 stream cipher authenticated with HMAC-SHA2-256
-	/// <para>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</para>
-	/// </summary>
-	CSXR80H256 = 103,
-	/// <summary>
-	/// The extended ChaChaP80 stream cipher authenticated with HMAC-SHA2-512
-	/// <para>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</para>
-	/// </summary>
-	CSXR80H512 = 104,
-	/// <summary>
-	/// The extended ChaChaP80 stream cipher authenticated with KMAC-256
-	/// <para>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</para>
-	/// </summary>
-	CSXR80K256 = 105,
+	CSX512 = 98,
 	/// <summary>
 	/// The extended ChaChaP80 stream cipher authenticated with KMAC-512
 	/// <para>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</para>
 	/// </summary>
-	CSXR80K512 = 106,
-	/// <summary>
-	/// The extended ChaChaP80 stream cipher authenticated with Poly1305
-	/// <para>An extended ChaCha stream-cipher implementation: uses a 512-bit input-block, a 512-bit key, and 80 rounds</para>
-	/// </summary>
-	CSXR80P256 = 107,
+	CSXR80K512 = 99,
 
 	//~~~ Rijndael-256 Extended Cipher Stream Variants~~//
 
@@ -150,45 +109,43 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	RCS = 160,
 	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-256 for authentication.
-	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	RCSG256 = 161,
-	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using GMAC-RHX-512 for authentication.
-	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	RCSG512 = 162,
-	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-256 for authentication.
-	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	RCSH256 = 163,
-	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using HMAC-SHA2-512 for authentication.
-	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
-	/// </summary>
-	RCSH512 = 164,
-	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-256 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSK256 = 165,
+	RCSK256 = 161,
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-512 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSK512 = 166,
+	RCSK512 = 162,
 	/// <summary>
 	/// The authenticated Rijndael-256 Stream Cipher; using KMAC-1024 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSK1024 = 167,
+	RCSK1024 = 163,
+
+	//~~~ Rijndael-512 Extended Cipher Stream Variants~~//
+
 	/// <summary>
-	/// The authenticated Rijndael-256 Stream Cipher; using Poly1305 for authentication.
+	/// The Rijndael-512 wide-block based authenticated stream cipher, this variant has no athentication.
+	/// <para>A Rijndael Extended cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes</para>
+	/// </summary>
+	RWS = 170,
+	/// <summary>
+	/// The authenticated Rijndael-512 Stream Cipher; using KMAC-256 for authentication.
 	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
 	/// </summary>
-	RCSP256 = 168,
+	RWSK256 = 171,
+	/// <summary>
+	/// The authenticated Rijndael-512 Stream Cipher; using KMAC-512 for authentication.
+	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
+	/// </summary>
+	RWSK512 = 172,
+	/// <summary>
+	/// The authenticated Rijndael-512 Stream Cipher; using KMAC1024 for authentication.
+	/// <para>Extended Rijndael cipher implementation: uses a 256-bit nonce and 256/512/1024-bit key sizes.</para>
+	/// </summary>
+	RWSK1024 = 173,
 
 	//~~~ Threefish Stream-cipher Extended Variants~~//
 
@@ -198,97 +155,30 @@ enum class SymmetricCiphers : byte
 	/// </summary>
 	TSX256 = 128,
 	/// <summary>
-	/// The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-256
-	/// <para>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</para>
-	/// </summary>
-	TSXR72H256 = 129,
-	/// <summary>
-	/// The Threefish 256-bit stream cipher authenticated with HMAC-SHA2-512
-	/// <para>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</para>
-	/// </summary>
-	TSXR72H512 = 130,
-	/// <summary>
 	/// The Threefish 256-bit stream cipher authenticated with KMAC-256.
 	/// <para>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</para>
 	/// </summary>
-	TSXR72K256 = 131,
-	/// <summary>
-	/// The Threefish 256-bit stream cipher authenticated with KMAC-512.
-	/// <para>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</para>
-	/// </summary>
-	TSXR72K512 = 132,
-	/// <summary>
-	/// The Threefish 256-bit stream cipher authenticated with Poly1305.
-	/// <para>An extended Threefish-256 stream-cipher implementation: uses a 256-bit block, 72 rounds, and a 256-bit key size</para>
-	/// </summary>
-	TSXR72P256 = 133,
-
+	TSXR72K256 = 129,
 	/// <summary>
 	/// The Threefish 512-bit stream cipher, this variant uses 96 rounds and has no athentication.
 	/// <para>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</para>
 	/// </summary>
-	TSX512 = 134,
-	/// <summary>
-	/// The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-256.
-	/// <para>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</para>
-	/// </summary>
-	TSXR96H256 = 135,
-	/// <summary>
-	/// The Threefish 512-bit stream cipher authenticated with HMAC-SHA2-512.
-	/// <para>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</para>
-	/// </summary>
-	TSXR96H512 = 136,
-	/// <summary>
-	/// The Threefish 512-bit stream cipher authenticated with KMAC-256.
-	/// <para>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</para>
-	/// </summary>
-	TSXR96K256 = 137,
+	TSX512 = 130,
 	/// <summary>
 	/// The Threefish 512-bit stream cipher authenticated with KMAC-512.
 	/// <para>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</para>
 	/// </summary>
-	TSXR96K512 = 138,
-	/// <summary>
-	/// The Threefish 512-bit stream cipher authenticated with Poly1305.
-	/// <para>An extended Threefish-512 stream-cipher implementation: uses a 512-bit block, 96 rounds, and a 512-bit key size</para>
-	/// </summary>
-	TSXR96P256 = 139,
-
+	TSXR96K512 = 131,
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher, this variant uses 120 rounds and has no athentication.
 	/// <para>Extended cipher implementation: uses a 1024-bit block and a 1024-bit key size</para>
 	/// </summary>
-	TSX1024 = 140,
-	/// <summary>
-	/// The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-256.
-	/// <para>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</para>
-	/// </summary>
-	TSXR120H256 = 141,
-	/// <summary>
-	/// The Threefish 1024-bit stream cipher authenticated with HMAC-SHA2-512.
-	/// <para>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</para>
-	/// </summary>
-	TSXR120H512 = 142,
-	/// <summary>
-	/// The Threefish 1024-bit stream cipher authenticated with KMAC-256.
-	/// <para>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</para>
-	/// </summary>
-	TSXR120K256 = 143,
-	/// <summary>
-	/// The Threefish 1024-bit stream cipher authenticated with KMAC-512.
-	/// <para>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</para>
-	/// </summary>
-	TSXR120K512 = 144,
+	TSX1024 = 132,
 	/// <summary>
 	/// The Threefish 1024-bit stream cipher authenticated with KMAC-1024.
 	/// <para>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</para>
 	/// </summary>
-	TSXR120K1024 = 145,
-	/// <summary>
-	/// The Threefish 1024-bit stream cipher authenticated with Poly1305.
-	/// <para>An extended Threefish-1024 stream-cipher implementation: uses a 1024-bit block, 120 rounds, and a 1024-bit key size</para>
-	/// </summary>
-	TSXR120P256 = 146
+	TSXR120K1024 = 133,
 };
 
 class SymmetricCipherConvert

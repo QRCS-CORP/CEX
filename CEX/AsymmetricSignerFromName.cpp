@@ -17,36 +17,35 @@ IAsymmetricSigner* AsymmetricSignerFromName::GetInstance(AsymmetricSigners Signe
 
 	IAsymmetricSigner* mptr;
 
-	mptr = nullptr;
-
 	try
 	{
 		switch (SignerType)
 		{
-		case AsymmetricSigners::Dilithium:
-		{
-			mptr = new DLTM::Dilithium(static_cast<Enumeration::DilithiumParameters>(Parameters));
-			break;
-		}
-		case AsymmetricSigners::Rainbow:
-		{
-			mptr = new RNBW::Rainbow(static_cast<Enumeration::RainbowParameters>(Parameters));
-			break;
-		}
-		case AsymmetricSigners::SphincsPlus:
-		{
-			mptr = new SPXP::SphincsPlus(static_cast<Enumeration::SphincsPlusParameters>(Parameters));
-			break;
-		}
-		case AsymmetricSigners::XMSS:
-		{
-			mptr = new XMSS::XMSS(static_cast<Enumeration::XmssParameters>(Parameters));
-			break;
-		}
-		default:
-		{
-			throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The asymmetric signature scheme is not recognized!"), ErrorCodes::InvalidParam);
-		}
+			case AsymmetricSigners::Dilithium:
+			{
+				mptr = new DLTM::Dilithium(static_cast<Enumeration::DilithiumParameters>(Parameters)); 
+				break;
+			}
+			case AsymmetricSigners::Rainbow:
+			{
+				mptr = new RNBW::Rainbow(static_cast<Enumeration::RainbowParameters>(Parameters)); 
+				break;
+			}
+			case AsymmetricSigners::SphincsPlus:
+			{
+				mptr = new SPXP::SphincsPlus(static_cast<Enumeration::SphincsPlusParameters>(Parameters)); 
+				break;
+			}
+			case AsymmetricSigners::XMSS:
+			{
+				mptr = new XMSS::XMSS(static_cast<Enumeration::XmssParameters>(Parameters)); 
+				break;
+			}
+			default:
+			{
+				mptr = nullptr;
+				throw CryptoException(CLASS_NAME, std::string("GetInstance"), std::string("The asymmetric signature scheme is not recognized!"), ErrorCodes::InvalidParam);
+			}
 		}
 	}
 	catch (CryptoAsymmetricException &ex)

@@ -5,7 +5,7 @@
 NAMESPACE_DILITHIUM
 
 using Digest::Keccak;
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 const uint DLTMPolyMath::Zetas[DILITHIUM_N] =
 {
@@ -340,19 +340,21 @@ int32_t DLTMPolyMath::UnpackSig(std::vector<std::array<uint, 256>> &Z, std::vect
 		if (Sig[soff + Omega + i] < k || Sig[soff + Omega + i] > Omega)
 		{
 			ret = 1;
-			break;
 		}
 
-		for (j = k; j < Sig[soff + Omega + i]; ++j)
+		if (ret == 0)
 		{
-			// coefficients are ordered for strong unforgeability 
-			if (j > k && Sig[soff + j] <= Sig[soff + j - 1])
+			for (j = k; j < Sig[soff + Omega + i]; ++j)
 			{
-				ret = 1;
-				break;
-			}
+				// coefficients are ordered for strong unforgeability 
+				if (j > k && Sig[soff + j] <= Sig[soff + j - 1])
+				{
+					ret = 1;
+					break;
+				}
 
-			H[i][Sig[soff + j]] = 1;
+				H[i][Sig[soff + j]] = 1;
+			}
 		}
 
 		if (ret != 0)
@@ -519,14 +521,14 @@ void DLTMPolyMath::PolyEtaUnpack(std::array<uint, 256> &R, const std::vector<byt
 	{
 		for (i = 0; i < R.size() / 8; ++i)
 		{
-			R[(8 * i)] = A[AOffset + (3 * i)] &0x07;
-			R[(8 * i) + 1] = (A[AOffset + (3 * i)] >> 3) &0x07;
-			R[(8 * i) + 2] = ((A[AOffset + (3 * i)] >> 6) | (A[AOffset + (3 * i) + 1] << 2)) &0x07;
-			R[(8 * i) + 3] = (A[AOffset + (3 * i) + 1] >> 1) &0x07;
-			R[(8 * i) + 4] = (A[AOffset + (3 * i) + 1] >> 4) &0x07;
-			R[(8 * i) + 5] = ((A[AOffset + (3 * i) + 1] >> 7) | (A[AOffset + (3 * i) + 2] << 1)) &0x07;
-			R[(8 * i) + 6] = (A[AOffset + (3 * i) + 2] >> 2) &0x07;
-			R[(8 * i) + 7] = (A[AOffset + (3 * i) + 2] >> 5) &0x07;
+			R[(8 * i)] = A[AOffset + (3 * i)] & 0x07;
+			R[(8 * i) + 1] = (A[AOffset + (3 * i)] >> 3) & 0x07;
+			R[(8 * i) + 2] = ((A[AOffset + (3 * i)] >> 6) | (A[AOffset + (3 * i) + 1] << 2)) & 0x07;
+			R[(8 * i) + 3] = (A[AOffset + (3 * i) + 1] >> 1) & 0x07;
+			R[(8 * i) + 4] = (A[AOffset + (3 * i) + 1] >> 4) & 0x07;
+			R[(8 * i) + 5] = ((A[AOffset + (3 * i) + 1] >> 7) | (A[AOffset + (3 * i) + 2] << 1)) & 0x07;
+			R[(8 * i) + 6] = (A[AOffset + (3 * i) + 2] >> 2) & 0x07;
+			R[(8 * i) + 7] = (A[AOffset + (3 * i) + 2] >> 5) & 0x07;
 
 			R[(8 * i)] = DILITHIUM_Q + Eta - R[(8 * i)];
 			R[(8 * i) + 1] = DILITHIUM_Q + Eta - R[(8 * i) + 1];
@@ -542,7 +544,7 @@ void DLTMPolyMath::PolyEtaUnpack(std::array<uint, 256> &R, const std::vector<byt
 	{
 		for (i = 0; i < R.size() / 2; ++i)
 		{
-			R[(2 * i)] = A[AOffset + i] &0x0F;
+			R[(2 * i)] = A[AOffset + i] & 0x0F;
 			R[(2 * i) + 1] = A[AOffset + i] >> 4;
 			R[(2 * i)] = DILITHIUM_Q + Eta - R[2 * i];
 			R[(2 * i) + 1] = DILITHIUM_Q + Eta - R[(2 * i) + 1];
@@ -668,15 +670,15 @@ void DLTMPolyMath::PolyT0Unpack(std::array<uint, 256> &R, const std::vector<byte
 	for (i = 0; i < R.size() / 4; ++i)
 	{
 		R[(4 * i)] = A[AOffset + (7 * i)];
-		R[(4 * i)] |= static_cast<uint>(A[AOffset + (7 * i) + 1] &0x3F) << 8;
+		R[(4 * i)] |= static_cast<uint>(A[AOffset + (7 * i) + 1] & 0x3F) << 8;
 
 		R[(4 * i) + 1] = A[AOffset + (7 * i) + 1] >> 6;
 		R[(4 * i) + 1] |= static_cast<uint>(A[AOffset + (7 * i) + 2]) << 2;
-		R[(4 * i) + 1] |= static_cast<uint>(A[AOffset + (7 * i) + 3] &0x0F) << 10;
+		R[(4 * i) + 1] |= static_cast<uint>(A[AOffset + (7 * i) + 3] & 0x0F) << 10;
 
 		R[(4 * i) + 2] = A[AOffset + (7 * i) + 3] >> 4;
 		R[(4 * i) + 2] |= static_cast<uint>(A[AOffset + (7 * i) + 4]) << 4;
-		R[(4 * i) + 2] |= static_cast<uint>(A[AOffset + (7 * i) + 5] &0x03) << 12;
+		R[(4 * i) + 2] |= static_cast<uint>(A[AOffset + (7 * i) + 5] & 0x03) << 12;
 
 		R[(4 * i) + 3] = A[AOffset + (7 * i) + 5] >> 2;
 		R[(4 * i) + 3] |= static_cast<uint>(A[AOffset + (7 * i) + 6]) << 6;
@@ -712,14 +714,14 @@ void DLTMPolyMath::PolyT1Unpack(std::array<uint, 256> &R, const std::vector<byte
 
 	for (i = 0; i < R.size() / 8; ++i)
 	{
-		R[(8 * i)] = ((A[AOffset + (9 * i)] >> 0) | (static_cast<uint>(A[AOffset + (9 * i) + 1]) << 8)) &0x000001FFUL;
-		R[(8 * i) + 1] = ((A[AOffset + (9 * i) + 1] >> 1) | (static_cast<uint>(A[AOffset + (9 * i) + 2]) << 7)) &0x000001FFUL;
-		R[(8 * i) + 2] = ((A[AOffset + (9 * i) + 2] >> 2) | (static_cast<uint>(A[AOffset + (9 * i) + 3]) << 6)) &0x000001FFUL;
-		R[(8 * i) + 3] = ((A[AOffset + (9 * i) + 3] >> 3) | (static_cast<uint>(A[AOffset + (9 * i) + 4]) << 5)) &0x000001FFUL;
-		R[(8 * i) + 4] = ((A[AOffset + (9 * i) + 4] >> 4) | (static_cast<uint>(A[AOffset + (9 * i) + 5]) << 4)) &0x000001FFUL;
-		R[(8 * i) + 5] = ((A[AOffset + (9 * i) + 5] >> 5) | (static_cast<uint>(A[AOffset + (9 * i) + 6]) << 3)) &0x000001FFUL;
-		R[(8 * i) + 6] = ((A[AOffset + (9 * i) + 6] >> 6) | (static_cast<uint>(A[AOffset + (9 * i) + 7]) << 2)) &0x000001FFUL;
-		R[(8 * i) + 7] = ((A[AOffset + (9 * i) + 7] >> 7) | (static_cast<uint>(A[AOffset + (9 * i) + 8]) << 1)) &0x000001FFUL;
+		R[(8 * i)] = ((A[AOffset + (9 * i)] >> 0) | (static_cast<uint>(A[AOffset + (9 * i) + 1]) << 8)) & 0x000001FFUL;
+		R[(8 * i) + 1] = ((A[AOffset + (9 * i) + 1] >> 1) | (static_cast<uint>(A[AOffset + (9 * i) + 2]) << 7)) & 0x000001FFUL;
+		R[(8 * i) + 2] = ((A[AOffset + (9 * i) + 2] >> 2) | (static_cast<uint>(A[AOffset + (9 * i) + 3]) << 6)) & 0x000001FFUL;
+		R[(8 * i) + 3] = ((A[AOffset + (9 * i) + 3] >> 3) | (static_cast<uint>(A[AOffset + (9 * i) + 4]) << 5)) & 0x000001FFUL;
+		R[(8 * i) + 4] = ((A[AOffset + (9 * i) + 4] >> 4) | (static_cast<uint>(A[AOffset + (9 * i) + 5]) << 4)) & 0x000001FFUL;
+		R[(8 * i) + 5] = ((A[AOffset + (9 * i) + 5] >> 5) | (static_cast<uint>(A[AOffset + (9 * i) + 6]) << 3)) & 0x000001FFUL;
+		R[(8 * i) + 6] = ((A[AOffset + (9 * i) + 6] >> 6) | (static_cast<uint>(A[AOffset + (9 * i) + 7]) << 2)) & 0x000001FFUL;
+		R[(8 * i) + 7] = ((A[AOffset + (9 * i) + 7] >> 7) | (static_cast<uint>(A[AOffset + (9 * i) + 8]) << 1)) & 0x000001FFUL;
 	}
 }
 
@@ -851,9 +853,9 @@ void DLTMPolyMath::PolyZPack(std::vector<byte> &R, size_t ROffset, const std::ar
 	{
 		// map to {0,...,2*GAMMA1 - 2} 
 		t[0] = DILITHIUM_GAMMA1 - 1 - A[(2 * i)];
-		t[0] += (static_cast<int32_t>(t[0]) >> 31) &DILITHIUM_Q;
+		t[0] += (static_cast<int32_t>(t[0]) >> 31) & DILITHIUM_Q;
 		t[1] = DILITHIUM_GAMMA1 - 1 - A[(2 * i) + 1];
-		t[1] += (static_cast<int32_t>(t[1]) >> 31) &DILITHIUM_Q;
+		t[1] += (static_cast<int32_t>(t[1]) >> 31) & DILITHIUM_Q;
 
 		R[ROffset + (5 * i)] = t[0];
 		R[ROffset + (5 * i) + 1] = t[0] >> 8;
@@ -872,16 +874,16 @@ void DLTMPolyMath::PolyZUnpack(std::array<uint, 256> &R, const std::vector<byte>
 	{
 		R[(2 * i)] = A[AOffset + (5 * i)];
 		R[(2 * i)] |= static_cast<uint>(A[AOffset + (5 * i) + 1]) << 8;
-		R[(2 * i)] |= static_cast<uint>(A[AOffset + (5 * i) + 2] &0x0F) << 16;
+		R[(2 * i)] |= static_cast<uint>(A[AOffset + (5 * i) + 2] & 0x0F) << 16;
 
 		R[(2 * i) + 1] = A[AOffset + (5 * i) + 2] >> 4;
 		R[(2 * i) + 1] |= static_cast<uint>(A[AOffset + (5 * i) + 3]) << 4;
 		R[(2 * i) + 1] |= static_cast<uint>(A[AOffset + (5 * i) + 4]) << 12;
 
 		R[(2 * i)] = DILITHIUM_GAMMA1 - 1 - R[(2 * i)];
-		R[(2 * i)] += (static_cast<int32_t>(R[(2 * i)]) >> 31) &DILITHIUM_Q;
+		R[(2 * i)] += (static_cast<int32_t>(R[(2 * i)]) >> 31) & DILITHIUM_Q;
 		R[(2 * i) + 1] = DILITHIUM_GAMMA1 - 1 - R[(2 * i) + 1];
-		R[(2 * i) + 1] += (static_cast<int32_t>(R[(2 * i) + 1]) >> 31) &DILITHIUM_Q;
+		R[(2 * i) + 1] += (static_cast<int32_t>(R[(2 * i) + 1]) >> 31) & DILITHIUM_Q;
 	}
 }
 
@@ -895,17 +897,17 @@ size_t DLTMPolyMath::RejEta(std::array<uint, 256> &A, size_t AOffset, size_t ALe
 	ctr = 0;
 	pos = 0;
 
-	while (ctr < ALength &&pos < BufLength)
+	while (ctr < ALength && pos < BufLength)
 	{
 		if (Eta <= 3)
 		{
-			t0 = Buffer[pos] &0x07;
+			t0 = Buffer[pos] & 0x07;
 			t1 = Buffer[pos] >> 5;
 			++pos;
 		}
 		else
 		{
-			t0 = Buffer[pos] &0x0F;
+			t0 = Buffer[pos] & 0x0F;
 			t1 = Buffer[pos] >> 4;
 			++pos;
 		}
@@ -916,7 +918,7 @@ size_t DLTMPolyMath::RejEta(std::array<uint, 256> &A, size_t AOffset, size_t ALe
 			++ctr;
 		}
 
-		if (t1 <= 2 * Eta &&ctr < ALength)
+		if (t1 <= 2 * Eta && ctr < ALength)
 		{
 			A[AOffset + ctr] = DILITHIUM_Q + Eta - t1;
 			++ctr;
@@ -936,7 +938,7 @@ size_t DLTMPolyMath::RejGamma1M1(std::array<uint, 256> &A, size_t AOffset, size_
 	ctr = 0;
 	pos = 0;
 
-	while (ctr < ALength &&pos + 5 <= BufLength)
+	while (ctr < ALength && pos + 5 <= BufLength)
 	{
 		t0 = Buffer[pos];
 		t0 |= static_cast<uint>(Buffer[pos + 1]) << 8;
@@ -955,7 +957,7 @@ size_t DLTMPolyMath::RejGamma1M1(std::array<uint, 256> &A, size_t AOffset, size_
 			++ctr;
 		}
 
-		if (t1 <= (2 * DILITHIUM_GAMMA1) - 2 &&ctr < ALength)
+		if (t1 <= (2 * DILITHIUM_GAMMA1) - 2 && ctr < ALength)
 		{
 			A[AOffset + ctr] = DILITHIUM_Q + DILITHIUM_GAMMA1 - 1 - t1;
 			++ctr;
@@ -974,7 +976,7 @@ size_t DLTMPolyMath::RejUniform(std::array<uint, 256> &A, size_t AOffset, size_t
 	ctr = 0;
 	pos = 0;
 
-	while (ctr < ALength &&pos + 3 <= BufLength)
+	while (ctr < ALength && pos + 3 <= BufLength)
 	{
 		t = Buffer[pos];
 		++pos;
@@ -1159,7 +1161,7 @@ void DLTMPolyMath::PolyVecUseHint(std::vector<std::array<uint, 256>> &W, const s
 uint DLTMPolyMath::CSubQ(uint A)
 {
 	A -= DILITHIUM_Q;
-	A += (static_cast<int32_t>(A) >> 31) &DILITHIUM_Q;
+	A += (static_cast<int32_t>(A) >> 31) & DILITHIUM_Q;
 
 	return A;
 }
@@ -1190,7 +1192,7 @@ uint DLTMPolyMath::Reduce32(uint A)
 {
 	uint t;
 
-	t = A &0x007FFFFFUL;
+	t = A & 0x007FFFFFUL;
 	A >>= 23;
 	t += (A << 13) - A;
 
@@ -1205,10 +1207,10 @@ uint DLTMPolyMath::Decompose(uint A, uint&A0)
 	int32_t u;
 
 	// centralized remainder mod ALPHA 
-	t = A &0x0007FFFFL;
+	t = A & 0x0007FFFFL;
 	t += (A >> 19) << 9;
 	t -= (DILITHIUM_ALPHA / 2) + 1;
-	t += (t >> 31) &DILITHIUM_ALPHA;
+	t += (t >> 31) & DILITHIUM_ALPHA;
 	t -= (DILITHIUM_ALPHA / 2) - 1;
 	A -= t;
 
@@ -1216,7 +1218,7 @@ uint DLTMPolyMath::Decompose(uint A, uint&A0)
 	u = A - 1;
 	u >>= 31;
 	A = (A >> 19) + 1;
-	A -= u &1;
+	A -= u & 1;
 
 	// border case 
 	A0 = DILITHIUM_Q + t - (A >> 4);
@@ -1231,7 +1233,7 @@ uint DLTMPolyMath::MakeHint(const uint A0, const uint A1)
 
 	r = 1;
 
-	if (A0 <= DILITHIUM_GAMMA2 || A0 > DILITHIUM_Q - DILITHIUM_GAMMA2 || (A0 == DILITHIUM_Q - DILITHIUM_GAMMA2 &&A1 == 0))
+	if (A0 <= DILITHIUM_GAMMA2 || A0 > DILITHIUM_Q - DILITHIUM_GAMMA2 || (A0 == DILITHIUM_Q - DILITHIUM_GAMMA2 && A1 == 0))
 	{
 		r = 0;
 	}
@@ -1244,9 +1246,9 @@ uint DLTMPolyMath::Power2Round(uint A, uint&A0)
 	int32_t t;
 
 	// Centralized remainder mod 2^DILITHIUM_D 
-	t = A &((1U << DILITHIUM_D) - 1);
+	t = A & ((1U << DILITHIUM_D) - 1);
 	t -= (1U << (DILITHIUM_D - 1)) + 1;
-	t += (t >> 31) &(1U << DILITHIUM_D);
+	t += (t >> 31) & (1U << DILITHIUM_D);
 	t -= (1U << (DILITHIUM_D - 1)) - 1;
 	A0 = DILITHIUM_Q + t;
 	A = (A - t) >> DILITHIUM_D;
@@ -1258,21 +1260,24 @@ uint DLTMPolyMath::UseHint(const uint A, const uint Hint)
 {
 	uint a0;
 	uint a1;
+	uint ret;
 
 	a1 = Decompose(A, a0);
 
 	if (Hint == 0)
 	{
-		return a1;
+		ret = a1;
 	}
 	else if (a0 > DILITHIUM_Q)
 	{
-		return (a1 + 1) &0x0F;
+		ret = (a1 + 1) & 0x0F;
 	}
 	else
 	{
-		return (a1 - 1) &0x0F;
+		ret = (a1 - 1) & 0x0F;
 	}
+
+	return ret;
 }
 
 // sign.c //
@@ -1316,13 +1321,14 @@ void DLTMPolyMath::Challenge(std::array<uint, 256> &C, const std::vector<byte> &
 				pos = 0;
 			}
 
-			b = (size_t)outbuf[pos];
+			b = static_cast<size_t>(outbuf[pos]);
 			++pos;
-		} while (b > i);
+		} 
+		while (b > i);
 
 		C[i] = C[b];
 		C[b] = 1;
-		C[b] ^= static_cast<uint>(~(signs &1) + 1) &(1 ^ (DILITHIUM_Q - 1));
+		C[b] ^= static_cast<uint>(~(signs & 1) + 1) & (1 ^ (DILITHIUM_Q - 1));
 		signs >>= 1;
 	}
 }

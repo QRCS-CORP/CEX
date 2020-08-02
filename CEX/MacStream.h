@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -51,7 +51,7 @@ using Cipher::SymmetricKeySize;
 /// <description>Example of hashing a Stream:</description>
 /// <code>
 /// // instantiate the mac function
-/// MacStream ms(Macs::HMACSHA256);
+/// MacStream ms(Macs::HMACSHA2256);
 /// // initialize with a key
 /// ms.Initialize(Key);
 /// // wrap the input buyes in a memory stream

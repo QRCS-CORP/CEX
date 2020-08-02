@@ -49,21 +49,21 @@ public:
 	/// </summary>
 	///
 	/// <param name="Key">The primary cryptographic key</param>
-	/// <param name="Nonce">The nonce or counter array</param>
+	/// <param name="IV">The salt, iv, or nonce array</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce);
+	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &IV);
 
 	/// <summary>
 	/// Constructor: instantiate this class with an cryptographic key, nonce, and info parameters
 	/// </summary>
 	///
 	/// <param name="Key">The primary cryptographic key</param>
-	/// <param name="Nonce">The nonce or counter array</param>
+	/// <param name="IV">The salt, iv, or nonce array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
+	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &IV, const std::vector<byte> &Info);
 
 	/// <summary>
 	/// Constructor: instantiate this class with a secure-vector cryptographic key
@@ -79,21 +79,21 @@ public:
 	/// </summary>
 	///
 	/// <param name="Key">The primary cryptographic key</param>
-	/// <param name="Nonce">The nonce or salt array</param>
+	/// <param name="IV">The salt, iv, or nonce array</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce);
+	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV);
 
 	/// <summary>
 	/// Constructor: instantiate this class with a secure-vector cryptographic key, nonce, and info parameters
 	/// </summary>
 	///
 	/// <param name="Key">The primary cryptographic key</param>
-	/// <param name="Nonce">The nonce or counter array</param>
+	/// <param name="IV">The salt, iv, or nonce array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// 
 	/// <exception cref="CryptoSymmetricException">Thrown if an input array size is zero length</exception>
-	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Info);
+	SymmetricKey(const SecureVector<byte> &Key, const SecureVector<byte> &IV, const SecureVector<byte> &Info);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -118,9 +118,9 @@ public:
 	SymmetricKeySize &KeySizes() const override;
 
 	/// <summary>
-	/// Read Only: Return a standard-vector copy of the nonce; can also be used as the salt or iv
+	/// Read Only: Return a standard-vector copy of the initialization vector; can also be used as the nonce, salt, or iv
 	/// </summary>
-	const std::vector<byte> Nonce() override;
+	const std::vector<byte> IV() override;
 
 	/// <summary>
 	/// Read Only: Return a secure-vector copy of the personalization string; can used as an optional source of entropy
@@ -133,9 +133,9 @@ public:
 	const SecureVector<byte> SecureKey() override;
 
 	/// <summary>
-	/// Read Only: Return a secure-vector copy of the nonce or salt value
+	/// Read Only: Return a secure-vector copy of the initialization vector; can also be used as the nonce, salt, or iv
 	/// </summary>
-	const SecureVector<byte> SecureNonce() override;
+	const SecureVector<byte> SecureIV() override;
 
 	//~~~Public Functions~~~//
 

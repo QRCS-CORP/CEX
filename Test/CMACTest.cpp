@@ -10,7 +10,7 @@ namespace Test
 	using Enumeration::BlockCipherExtensions;
 	using Exception::CryptoMacException;
 	using Mac::CMAC;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Prng::SecureRandom;
 	using Cipher::SymmetricKey;
 	using Cipher::SymmetricKeySize;
@@ -279,8 +279,8 @@ namespace Test
 		{
 			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 			msg.resize(MSGLEN);
-			IntegerTools::Fill(key, 0, key.size(), rnd);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
+			rnd.Generate(key, 0, key.size());
+			rnd.Generate(msg, 0, msg.size());
 			SymmetricKey kp(key);
 
 			// generate the mac
@@ -314,8 +314,8 @@ namespace Test
 			{
 				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
 				msg.resize(MSGLEN);
-				IntegerTools::Fill(key, 0, key.size(), rnd);
-				IntegerTools::Fill(msg, 0, msg.size(), rnd);
+				rnd.Generate(key, 0, key.size());
+				rnd.Generate(msg, 0, msg.size());
 				SymmetricKey kp(key);
 
 				// generate with the kdf

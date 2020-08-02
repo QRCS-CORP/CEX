@@ -113,7 +113,7 @@ void SPXPFORS::ForsPkFromSig(std::vector<byte> &PublicKey, size_t PubKeyOffset, 
 	// hash horizontally across all tree roots to derive the public key
 	std::vector<byte> buf(N + SPX_ADDR_BYTES + ForsTrees * N);
 	std::vector<byte> mask(ForsTrees * N);
-	SPXPUtils::THash(PublicKey, 0, roots, 0, ForsTrees, PublicSeed, forspkaddr, buf, mask, N);
+	SPXPUtils::THash(PublicKey, PubKeyOffset, roots, 0, ForsTrees, PublicSeed, forspkaddr, buf, mask, N);
 }
 
 void SPXPFORS::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vector<byte> &PublicKey, const std::vector<byte> &Message,
@@ -129,7 +129,7 @@ void SPXPFORS::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vec
 	size_t idx;
 	size_t idxoff;
 
-	idxsm = static_cast<uint>(SigOffset);
+	idxsm = SigOffset;
 
 	SPXPUtils::CopyKeypairAddress(ForsAddress, forstreeaddr);
 	SPXPUtils::CopyKeypairAddress(ForsAddress, forspkaddr);
@@ -152,7 +152,7 @@ void SPXPFORS::ForsSign(std::vector<byte> &Signature, size_t SigOffset, std::vec
 		SPXPUtils::SetTreeIndex(forstreeaddr, indices[idx] + static_cast<uint>(idxoff));
 		// include the secret key part that produces the selected leaf node
 		ForsGenSk(Signature, idxsm, SecretSeed, forstreeaddr, N);
-		idxsm += static_cast<uint>(N);
+		idxsm += N;
 		// compute the authentication path for this leaf node
 		SPXPUtils::TreeHash(roots, N * idx, Signature, idxsm, SecretSeed, PublicSeed, indices[idx], static_cast<uint>(idxoff), static_cast<uint>(ForsHeight), forstreeaddr, stack, heights, N, forsgen);
 		idxsm += N * ForsHeight;

@@ -14,20 +14,20 @@ std::string DigestConvert::ToName(Digests Enumeral)
 		case CEX::Enumeration::Digests::Blake512:
 			name = std::string("Blake512");
 			break;
-		case CEX::Enumeration::Digests::Keccak256:
-			name = std::string("Keccak256");
+		case CEX::Enumeration::Digests::SHA3256:
+			name = std::string("SHA3256");
 			break;
-		case CEX::Enumeration::Digests::Keccak512:
-			name = std::string("Keccak512");
+		case CEX::Enumeration::Digests::SHA3512:
+			name = std::string("SHA3512");
 			break;
-		case CEX::Enumeration::Digests::Keccak1024:
-			name = std::string("Keccak1024");
+		case CEX::Enumeration::Digests::SHA31024:
+			name = std::string("SHA31024");
 			break;
-		case CEX::Enumeration::Digests::SHA256:
-			name = std::string("SHA256");
+		case CEX::Enumeration::Digests::SHA2256:
+			name = std::string("SHA2256");
 			break;
-		case CEX::Enumeration::Digests::SHA512:
-			name = std::string("SHA512");
+		case CEX::Enumeration::Digests::SHA2512:
+			name = std::string("SHA2512");
 			break;
 		case CEX::Enumeration::Digests::SHAKE128:
 			name = std::string("SHAKE128");
@@ -70,25 +70,25 @@ Digests DigestConvert::FromName(std::string &Name)
 	{
 		tname = Digests::Blake512;
 	}
-	else if (Name == std::string("Keccak256"))
+	else if (Name == std::string("SHA3256"))
 	{
-		tname = Digests::Keccak256;
+		tname = Digests::SHA3256;
 	}
-	else if (Name == std::string("Keccak512"))
+	else if (Name == std::string("SHA3512"))
 	{
-		tname = Digests::Keccak512;
+		tname = Digests::SHA3512;
 	}
-	else if (Name == std::string("Keccak1024"))
+	else if (Name == std::string("SHA31024"))
 	{
-		tname = Digests::Keccak1024;
+		tname = Digests::SHA31024;
 	}
-	else if (Name == std::string("SHA256"))
+	else if (Name == std::string("SHA2256"))
 	{
-		tname = Digests::SHA256;
+		tname = Digests::SHA2256;
 	}
-	else if (Name == std::string("SHA512"))
+	else if (Name == std::string("SHA2512"))
 	{
-		tname = Digests::SHA512;
+		tname = Digests::SHA2512;
 	}
 	else if (Name == std::string("SHAKE128"))
 	{

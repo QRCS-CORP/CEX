@@ -6,8 +6,15 @@
 NAMESPACE_MCELIECE
 
 using Digest::Keccak;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
+/// <summary>
+/// Decrypts the cipher-text and returns the shared secret
+/// </summary>
+/// 
+/// <param name="PrivateKey">The private-key vector</param>
+/// <param name="CipherText">The input cipher-text vector</param>
+/// <param name="SharedSecret">The output shared-secret (an array of MCELIECE_SECRET_SIZE bytes)</param>
 bool MPKCN6960T119::Decapsulate(const std::vector<byte> &PrivateKey, const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	std::vector<byte> conf(32);
@@ -21,7 +28,7 @@ bool MPKCN6960T119::Decapsulate(const std::vector<byte> &PrivateKey, const std::
 
 	pctr = 0;
 	confirm = 0;
-	derr = DecryptE(e2.data() + 1, PrivateKey.data() + (MPKC_N / 8), CipherText.data());
+	derr = DecryptE(&e2[1], &PrivateKey[MPKC_N / 8], CipherText.data());
 	XOF(e2, 0, e2.size(), conf, 0, conf.size(), Keccak::KECCAK256_RATE_SIZE);
 
 	for (i = 0; i < MAC_SIZE; i++)
@@ -65,11 +72,11 @@ void MPKCN6960T119::Encapsulate(const std::vector<byte> &PublicKey, std::vector<
 	std::vector<byte> e2(1 + (MPKC_N / 8), 0x02);
 	std::vector<byte> ec1(1 + (MPKC_N / 8) + (SYND_BYTES + MAC_SIZE), 0x01);
 
-	EncryptE(CipherText.data(), PublicKey.data(), e2.data() + 1, Rng);
+	EncryptE(&CipherText[0], &PublicKey[0], &e2[1], Rng);
 	XOF(e2, 0, e2.size(), CipherText, SYND_BYTES, MAC_SIZE, Keccak::KECCAK256_RATE_SIZE);
 
-	std::memcpy(ec1.data() + 1, e2.data() + 1, MPKC_N / 8);
-	std::memcpy(ec1.data() + 1 + (MPKC_N / 8), CipherText.data(), SYND_BYTES + MAC_SIZE);
+	std::memcpy(&ec1[1], &e2[1], MPKC_N / 8);
+	std::memcpy(&ec1[1 + (MPKC_N / 8)], CipherText.data(), SYND_BYTES + MAC_SIZE);
 	XOF(ec1, 0, ec1.size(), SharedSecret, 0, SharedSecret.size(), Keccak::KECCAK256_RATE_SIZE);
 }
 
@@ -90,7 +97,7 @@ bool MPKCN6960T119::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 	{
 		SkPartGen(PrivateKey.data(), Rng);
 
-		if (PkGen(PublicKey.data(), PrivateKey.data() + MPKC_N / 8) == 0)
+		if (PkGen(PublicKey.data(), &PrivateKey[MPKC_N / 8]) == 0)
 		{
 			break;
 		}
@@ -154,7 +161,8 @@ void MPKCN6960T119::SupportGen(ushort* S, const byte* C)
 			--j;
 			S[i] <<= 1;
 			S[i] |= (L[j][i / 8] >> (i % 8)) & 1;
-		} while (j > 0);
+		}
+		while (j > 0);
 	}
 }
 
@@ -183,10 +191,12 @@ void MPKCN6960T119::BerlekampMassey(ushort* Output, const ushort* S)
 
 	for (i = 0; i < MPKC_T + 1; ++i)
 	{
-		C[i] = B[i] = 0;
+		B[i] = 0;
+		C[i] = 0;
 	}
 
-	B[1] = C[0] = 1;
+	B[1] = 1;
+	C[0] = 1;
 
 	for (N = 0; N < 2 * MPKC_T; ++N)
 	{
@@ -234,7 +244,8 @@ void MPKCN6960T119::BerlekampMassey(ushort* Output, const ushort* S)
 
 			B[i] = B[i - 1];
 			--i;
-		} while (i > 0);
+		} 
+		while (i > 0);
 
 		B[0] = 0;
 	}
@@ -362,7 +373,7 @@ void MPKCN6960T119::GenE(byte* E, std::unique_ptr<IPrng> &Rng)
 			ind[i] &= GFMASK;
 		}
 
-		if (MovForward((ushort*)ind.data()) == 0)
+		if (MovForward(reinterpret_cast<ushort*>(ind.data())) == 0)
 		{
 			continue;
 		}
@@ -522,151 +533,137 @@ int32_t MPKCN6960T119::PkGen(byte* Pk, const byte* Sk)
 	byte b;
 	byte mask;
 
-	ret = (mat == nullptr) ? -1 : 0;
-
-	if (ret == 0)
+	g[SYS_T] = 1;
+	ret = 0;
+	
+	for (i = 0; i < SYS_T; i++)
 	{
-		g[SYS_T] = 1;
+		g[i] = MPKCUtils::Load16(Sk);
+		g[i] &= GFMASK;
+		Sk += 2;
+	}
 
-		for (i = 0; i < SYS_T; i++)
+	SupportGen(L, Sk);
+	Root(inv, g, L);
+
+	for (i = 0; i < SYS_N; i++)
+	{
+		inv[i] = GF::Inverse(inv[i]);
+	}
+
+	for (i = 0; i < GFBITS * SYS_T; ++i)
+	{
+		mat[i] = new byte[SYS_N / 8];
+		std::memset(mat[i], 0, SYS_N / 8);
+	}
+
+	for (i = 0; i < SYS_T; i++)
+	{
+		for (j = 0; j < SYS_N; j += 8)
 		{
-			g[i] = MPKCUtils::Load16(Sk);
-			g[i] &= GFMASK;
-			Sk += 2;
+			for (k = 0; k < GFBITS; k++)
+			{
+				/* jgu: checked */
+				/*lint -save -e661, -e662 */
+				b = (inv[j + 7] >> k) & 1;
+				b <<= 1;
+				b |= (inv[j + 6] >> k) & 1;
+				b <<= 1;
+				b |= (inv[j + 5] >> k) & 1;
+				b <<= 1;
+				b |= (inv[j + 4] >> k) & 1;
+				b <<= 1;
+				b |= (inv[j + 3] >> k) & 1;
+				b <<= 1;
+				b |= (inv[j + 2] >> k) & 1;
+				b <<= 1;
+				b |= (inv[j + 1] >> k) & 1;
+				b <<= 1;
+				b |= (inv[j] >> k) & 1;
+				/*lint -restore */
+				mat[i * GFBITS + k][j / 8] = b;
+			}
 		}
 
-		SupportGen(L, Sk);
-		Root(inv, g, L);
-
-		for (i = 0; i < SYS_N; i++)
+		for (j = 0; j < SYS_N; j++)
 		{
-			inv[i] = GF::Inverse(inv[i]);
+			inv[j] = GF::Multiply(inv[j], L[j]);
 		}
+	}
 
-		for (i = 0; i < GFBITS * SYS_T; ++i)
+	for (i = 0; i < (GFBITS * SYS_T + 7) / 8; i++)
+	{
+		for (j = 0; j < 8; j++)
 		{
-			mat[i] = new byte[SYS_N / 8];
+			row = (i * 8) + j;
 
-			if (mat[i] == nullptr)
+			if (row >= GFBITS * SYS_T)
+			{
+				break;
+			}
+
+			for (k = row + 1; k < GFBITS * SYS_T; k++)
+			{
+				mask = mat[row][i] ^ mat[k][i];
+				mask >>= j;
+				mask &= 1;
+				mask = ~mask + 1;
+
+				for (c = 0; c < SYS_N / 8; c++)
+				{
+					mat[row][c] ^= mat[k][c] & mask;
+				}
+			}
+
+			// return if not systematic
+			if (((mat[row][i] >> j) & 1) == 0)
 			{
 				ret = -1;
 				break;
 			}
 
-			std::memset(mat[i], 0, SYS_N / 8);
-		}
-
-		if (ret == 0)
-		{
-			for (i = 0; i < SYS_T; i++)
+			for (k = 0; k < GFBITS * SYS_T; k++)
 			{
-				for (j = 0; j < SYS_N; j += 8)
+				if (k != row)
 				{
-					for (k = 0; k < GFBITS; k++)
+					mask = mat[k][i] >> j;
+					mask &= 1;
+					mask = ~mask + 1;
+
+					for (c = 0; c < SYS_N / 8; c++)
 					{
-						/* jgu: checked */
-						/*lint -save -e661, -e662 */
-						b = (inv[j + 7] >> k) & 1;
-						b <<= 1;
-						b |= (inv[j + 6] >> k) & 1;
-						b <<= 1;
-						b |= (inv[j + 5] >> k) & 1;
-						b <<= 1;
-						b |= (inv[j + 4] >> k) & 1;
-						b <<= 1;
-						b |= (inv[j + 3] >> k) & 1;
-						b <<= 1;
-						b |= (inv[j + 2] >> k) & 1;
-						b <<= 1;
-						b |= (inv[j + 1] >> k) & 1;
-						b <<= 1;
-						b |= (inv[j] >> k) & 1;
-						/*lint -restore */
-						mat[i * GFBITS + k][j / 8] = b;
+						mat[k][c] ^= mat[row][c] & mask;
 					}
 				}
-
-				for (j = 0; j < SYS_N; j++)
-				{
-					inv[j] = GF::Multiply(inv[j], L[j]);
-				}
-			}
-
-			for (i = 0; i < (GFBITS * SYS_T + 7) / 8; i++)
-			{
-				for (j = 0; j < 8; j++)
-				{
-					row = (i * 8) + j;
-
-					if (row >= GFBITS * SYS_T)
-					{
-						break;
-					}
-
-					for (k = row + 1; k < GFBITS * SYS_T; k++)
-					{
-						mask = mat[row][i] ^ mat[k][i];
-						mask >>= j;
-						mask &= 1;
-						mask = ~mask + 1;
-
-						for (c = 0; c < SYS_N / 8; c++)
-						{
-							mat[row][c] ^= mat[k][c] & mask;
-						}
-					}
-
-					// return if not systematic
-					if (((mat[row][i] >> j) & 1) == 0)
-					{
-						ret = -1;
-						break;
-					}
-
-					for (k = 0; k < GFBITS * SYS_T; k++)
-					{
-						if (k != row)
-						{
-							mask = mat[k][i] >> j;
-							mask &= 1;
-							mask = ~mask + 1;
-
-							for (c = 0; c < SYS_N / 8; c++)
-							{
-								mat[k][c] ^= mat[row][c] & mask;
-							}
-						}
-					}
-				}
-
-				if (ret != 0)
-				{
-					break;
-				}
-			}
-
-			tail = (GFBITS * SYS_T) % 8;
-			k = 0;
-
-			for (i = 0; i < GFBITS * SYS_T; i++)
-			{
-				for (j = ((GFBITS * SYS_T) - 1) / 8; j < (SYS_N / 8) - 1; j++)
-				{
-					Pk[k] = (mat[i][j] >> tail) | (mat[i][j + 1UL] << (8UL - tail));
-					++k;
-				}
-
-				Pk[k] = (mat[i][j] >> tail);
-				++k;
 			}
 		}
 
-		for (i = 0; i < GFBITS * SYS_T; ++i)
+		if (ret != 0)
 		{
-			if (mat[i] != nullptr)
-			{
-				delete[] mat[i];
-			}
+			break;
+		}
+	}
+
+	tail = (GFBITS * SYS_T) % 8;
+	k = 0;
+
+	for (i = 0; i < GFBITS * SYS_T; i++)
+	{
+		for (j = ((GFBITS * SYS_T) - 1) / 8; j < (SYS_N / 8) - 1; j++)
+		{
+			Pk[k] = (mat[i][j] >> tail) | (mat[i][j + 1UL] << (8UL - tail));
+			++k;
+		}
+
+		Pk[k] = (mat[i][j] >> tail);
+		++k;
+	}
+
+	for (i = 0; i < GFBITS * SYS_T; ++i)
+	{
+		if (mat[i] != nullptr)
+		{
+			delete[] mat[i];
 		}
 	}
 
@@ -693,7 +690,8 @@ ushort MPKCN6960T119::Evaluate(const ushort* F, ushort A)
 		--i;
 		r = GF::Multiply(r, A);
 		r = GF::Add(r, F[i]);
-	} while (i != 0);
+	}
+	while (i != 0);
 
 	return r;
 }
@@ -858,7 +856,7 @@ int32_t MPKCN6960T119::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
 			a[i] &= GFMASK;
 		}
 
-		if (IrrGen(g, (ushort*)a.data()) == 0)
+		if (IrrGen(g, reinterpret_cast<ushort*>(a.data())) == 0)
 		{
 			break;
 		}
@@ -868,7 +866,7 @@ int32_t MPKCN6960T119::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
 	{
 		Rng->Fill(perm, 0, perm.size());
 
-		if (PermConversion((uint*)perm.data()) == 0)
+		if (PermConversion(reinterpret_cast<uint*>(perm.data())) == 0)
 		{
 			break;
 		}
@@ -879,7 +877,7 @@ int32_t MPKCN6960T119::SkPartGen(byte* Sk, std::unique_ptr<IPrng> &Rng)
 		MPKCUtils::Store16(Sk + MPKC_N / 8 + i * 2, g[i]);
 	}
 
-	ControlBits(Sk + MPKC_N / 8 + IRR_BYTES, (uint*)perm.data());
+	ControlBits(Sk + MPKC_N / 8 + IRR_BYTES, reinterpret_cast<uint*>(perm.data()));
 
 	return 0;
 }

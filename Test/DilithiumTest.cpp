@@ -18,7 +18,7 @@ namespace Test
 	using Exception::CryptoAsymmetricException;
 	using Asymmetric::Sign::DLTM::Dilithium;
 	using Enumeration::DilithiumParameters;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 	using Test::NistRng;
 	using Prng::SecureRandom;
 
@@ -250,7 +250,6 @@ namespace Test
 
 	void DilithiumTest::Integrity()
 	{
-		std::vector<byte> cpt(0);
 		std::vector<byte> msg(0);
 		std::vector<byte> sig(0);
 		NistRng gen;
@@ -299,7 +298,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn1.Name(), std::string("Messages do not match! -DI5"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp1;
@@ -345,7 +343,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn2.Name(), std::string("Messages do not match! -DI10"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp2;
@@ -391,7 +388,6 @@ namespace Test
 			throw TestException(std::string("Integrity"), sgn3.Name(), std::string("Messages do not match! -DI15"));
 		}
 
-		cpt.clear();
 		msg.clear();
 		sig.clear();
 		delete kp3;

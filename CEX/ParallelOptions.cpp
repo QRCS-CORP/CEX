@@ -214,11 +214,11 @@ void ParallelOptions::Calculate()
 
 	if (m_simdMultiply)
 	{
-#if defined(__AVX512__)
+#if defined(CEX_HAS_AVX512)
 		m_parallelMinimumSize *= 16;
-#elif defined(__AVX2__)
+#elif defined(CEX_HAS_AVX2)
 		m_parallelMinimumSize *= 8;
-#elif defined(__AVX__)
+#elif defined(CEX_HAS_AVX)
 		m_parallelMinimumSize *= 4;
 #endif
 	}
@@ -251,6 +251,10 @@ void ParallelOptions::Calculate()
 		{
 			m_parallelBlockSize = m_parallelMinimumSize;
 		}
+	}
+	else
+	{
+		// misra
 	}
 
 	// round it off

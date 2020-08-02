@@ -10,13 +10,19 @@ namespace Test
 {
 	const byte HexConverter::ENCODING_TABLE[16] = 
 	{
-		(byte)'0', (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5', (byte)'6', (byte)'7',
-		(byte)'8', (byte)'9', (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f'
+		0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66
 	};
 
 	void HexConverter::Decode(const std::string &Input, std::vector<byte> &Output)
 	{
-		size_t end = Input.size();
+		size_t end;
+		size_t i(0);
+		size_t j(0);
+		size_t len(0);
+		byte b1;
+		byte b2;
+
+		end = Input.size();
 		Output.resize(end / 2, 0);
 
 		while (end > 0)
@@ -26,85 +32,104 @@ namespace Test
 				break;
 			}
 
-			end--;
+			--end;
 		}
 
-		size_t i = 0;
-		size_t j = 0;
-		size_t length = 0;
+
 		std::vector<byte> decTable = GetDecodingTable();
 
 		while (i < end)
 		{
 			while (i < end && Ignore(Input[i]))
 			{
-				i++;
+				++i;
 			}
 
-			byte b1 = decTable[Input[i++]];
+			b1 = decTable[Input[i]];
+			++i;
 
 			while (i < end && Ignore(Input[i]))
 			{
-				i++;
+				++i;
 			}
 
-			byte b2 = decTable[Input[i++]];
-			Output[j++] = (byte)((b1 << 4) | b2);
-			length++;
+			b2 = decTable[Input[i]];
+			++i;
+			Output[j] = static_cast<byte>((b1 << 4) | b2);
+			++j;
+			++len;
 		}
 	}
 
 	void HexConverter::Decode(const std::vector<std::string> &Input, std::vector<std::vector<byte>> &Output)
 	{
+		std::vector<byte> temp;
+		size_t i;
+
 		Output.clear();
 
-		for (size_t i = 0; i < Input.size(); ++i)
+		for (i = 0; i < Input.size(); ++i)
 		{
-			const std::string str = Input[i];
-			std::vector<byte> temp;
-			Decode(str, temp);
+			const std::string TMPSTR = Input[i];
+			Decode(TMPSTR, temp);
 			Output.push_back(temp);
 		}
 	}
 
 	void HexConverter::Decode(const char* Input[], size_t Length, std::vector<std::vector<byte>> &Output)
 	{
+		std::vector<byte> dec;
+		std::string enc;
+		size_t i;
+
 		Output.reserve(Length);
 
-		for (size_t i = 0; i < Length; ++i)
+		for (i = 0; i < Length; ++i)
 		{
-			std::string encoded = Input[i];
-			std::vector<byte> decoded;
-			Decode(encoded, decoded);
-			Output.push_back(decoded);
+			enc = Input[i];
+			Decode(enc, dec);
+			Output.push_back(dec);
 		}
 	}
 
 	void HexConverter::Decode(const std::vector<std::string> &Input, size_t Length, std::vector<std::vector<byte>> &Output)
 	{
+		std::vector<byte> dec;
+		std::string enc;
+		size_t i;
+
 		Output.reserve(Length);
 
-		for (size_t i = 0; i < Length; ++i)
+		for (i = 0; i < Length; ++i)
 		{
-			std::string encoded = Input[i];
-			std::vector<byte> decoded;
-			Decode(encoded, decoded);
-			Output.push_back(decoded);
+			enc = Input[i];
+			Decode(enc, dec);
+			Output.push_back(dec);
 		}
 	}
 
 	void HexConverter::Encode(const std::vector<byte> &Input, size_t Offset, size_t Length, std::vector<byte> &Output)
 	{
-		Output.resize(Length * 2, 0);
-		size_t counter = 0;
-		std::vector<byte> encTable = GetEncodingTable();
+		const std::vector<byte> ENCTBL = GetEncodingTable();
+		size_t ctr(0);
+		size_t i;
+		int vct;
 
-		for (size_t i = Offset; i < (Offset + Length); i++)
+		Output.resize(Length * 2, 0);
+
+		for (i = Offset; i < (Offset + Length); ++i)
 		{
-			int vct = Input[i];
-			Output[counter++] = encTable[vct >> 4];
-			Output[counter++] = encTable[vct & 0xF];
+			vct = Input[i];
+			Output[ctr] = ENCTBL[vct >> 4];
+			++ctr;
+			Output[ctr] = ENCTBL[vct & 0x0F];
+			++ctr;
 		}
+	}
+
+	void HexConverter::Encode(const std::vector<byte> &Input, std::string &Output)
+	{
+		Output = ToString(Input);
 	}
 
 	bool HexConverter::Ignore(char Value)
@@ -115,12 +140,12 @@ namespace Test
 	void HexConverter::Print(const std::string &Input, size_t Length)
 	{
 		std::string tmp;
-		size_t pos;
+		size_t pos(0);
+		size_t i;
 
-		pos = 0;
 		tmp.resize(128);
 
-		for (size_t i = 0; i < Input.size(); ++i)
+		for (i = 0; i < Input.size(); ++i)
 		{
 			if (i != 0 && i % Length == 0)
 			{
@@ -148,13 +173,13 @@ namespace Test
 	{
 		std::string inp;
 		std::string tmp;
-		size_t pos;
+		size_t i;
+		size_t pos(0);
 
-		pos = 0;
 		inp = ToString(Input);
 		tmp.resize(128);
 
-		for (size_t i = 0; i < inp.size(); ++i)
+		for (i = 0; i < inp.size(); ++i)
 		{
 			if (i != 0 && i % Length == 0)
 			{
@@ -181,10 +206,10 @@ namespace Test
 	std::string HexConverter::ToString(const std::vector<byte> &Input)
 	{
 		std::vector<byte> enc;
-		std::string otp = "";
+		std::string otp("");
 
 		Encode(Input, 0, Input.size(), enc);
-		otp.assign((char*)&enc[0], enc.size());
+		otp.assign(reinterpret_cast<char*>(&enc[0]), enc.size());
 
 		return otp;
 	}
@@ -194,14 +219,17 @@ namespace Test
 		std::vector<byte> enc;
 
 		Encode(Input, 0, Input.size(), enc);
-		Output.assign((char*)&enc[0], enc.size());
+		Output.assign(reinterpret_cast<char*>(&enc[0]), enc.size());
 	}
 
 	std::vector<byte> HexConverter::GetEncodingTable()
 	{
 		std::vector<byte> encTable;
+		size_t i;
+
 		encTable.reserve(sizeof(ENCODING_TABLE));
-		for (size_t i = 0; i < sizeof(ENCODING_TABLE); ++i)
+
+		for (i = 0; i < sizeof(ENCODING_TABLE); ++i)
 		{
 			encTable.push_back(ENCODING_TABLE[i]);
 		}
@@ -211,12 +239,13 @@ namespace Test
 
 	std::vector<byte> HexConverter::GetDecodingTable()
 	{
-		std::vector<byte> encTable = GetEncodingTable();
+		std::vector<byte> ENCTBL = GetEncodingTable();
 		std::vector<byte> decTable(128, 0);
+		size_t i;
 
-		for (size_t i = 0; i < encTable.size(); i++)
+		for (i = 0; i < ENCTBL.size(); i++)
 		{
-			decTable[encTable[i]] = (byte)i;
+			decTable[ENCTBL[i]] = static_cast<byte>(i);
 		}
 
 		decTable['A'] = decTable['a'];

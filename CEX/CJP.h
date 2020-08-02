@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -71,12 +71,12 @@ private:
 	static const size_t MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
 	static const size_t OVRSMP_RATE_MAX = 128;
 	static const size_t OVRSMP_RATE_MIN = 1;
-	static const bool HAS_TSC;
+	static const bool OS_HAS_TSC;
 
-	struct JitterState;
+	class JitterState;
 
 #if defined(CEX_FIPS140_ENABLED)
-	ProviderSelfTest m_pvdSelfTest;
+	std::unique_ptr<ProviderSelfTest> m_pvdSelfTest;
 #endif
 	std::unique_ptr<JitterState> m_pvdState;
 
@@ -173,8 +173,8 @@ private:
 
 	bool FipsTest();
 	static void FoldTime(std::unique_ptr<JitterState> &State, ulong TimeStamp);
-	static void GetRandom(std::unique_ptr<JitterState> &State);
-	static void GetRandom(std::unique_ptr<JitterState> &State, byte* Output, size_t Length);
+	static void Generate(std::unique_ptr<JitterState> &State);
+	static void Generate(std::unique_ptr<JitterState> &State, byte* Output, size_t Length);
 	static ulong GetTime();
 	static bool MeasureJitter(std::unique_ptr<JitterState> &State);
 	static void MemoryJitter(std::unique_ptr<JitterState> &State);

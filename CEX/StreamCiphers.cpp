@@ -11,29 +11,15 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 {
 	StreamCiphers name;
 
+	name = StreamCiphers::None;
+
 	switch (Enumeral)
 	{
 		case StreamCiphers::CSX256:
 		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
-			{
-				name = StreamCiphers::CSXR20H256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::CSXR20H512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
+			if (Authenticator == StreamAuthenticators::KMAC256)
 			{
 				name = StreamCiphers::CSXR20K256;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC512)
-			{
-				name = StreamCiphers::CSXR20K512;
-			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
-			{
-				name = StreamCiphers::CSXR20P256;
 			}
 			else
 			{
@@ -43,25 +29,9 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 		}
 		case StreamCiphers::CSX512:
 		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
-			{
-				name = StreamCiphers::CSXR80H256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::CSXR80H512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
-			{
-				name = StreamCiphers::CSXR80K256;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC512)
+			if (Authenticator == StreamAuthenticators::KMAC512)
 			{
 				name = StreamCiphers::CSXR80K512;
-			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
-			{
-				name = StreamCiphers::CSXR80P256;
 			}
 			else
 			{
@@ -71,15 +41,7 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 		}
 		case StreamCiphers::RCS:
 		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
-			{
-				name = StreamCiphers::RCSH256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::RCSH512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
+			if (Authenticator == StreamAuthenticators::KMAC256)
 			{
 				name = StreamCiphers::RCSK256;
 			}
@@ -87,9 +49,9 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 			{
 				name = StreamCiphers::RCSK512;
 			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
+			else if (Authenticator == StreamAuthenticators::KMAC1024)
 			{
-				name = StreamCiphers::RCSP256;
+				name = StreamCiphers::RCSK1024;
 			}
 			else
 			{
@@ -97,27 +59,31 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 			}
 			break;
 		}
-		case StreamCiphers::TSX256:
+		case StreamCiphers::RWS:
 		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
+			if (Authenticator == StreamAuthenticators::KMAC256)
 			{
-				name = StreamCiphers::TSXR72H256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::TSXR72H512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
-			{
-				name = StreamCiphers::TSXR72K256;
+				name = StreamCiphers::RWSK256;
 			}
 			else if (Authenticator == StreamAuthenticators::KMAC512)
 			{
-				name = StreamCiphers::TSXR72K512;
+				name = StreamCiphers::RWSK512;
 			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
+			else if (Authenticator == StreamAuthenticators::KMAC1024)
 			{
-				name = StreamCiphers::TSXR72P256;
+				name = StreamCiphers::RWSK1024;
+			}
+			else
+			{
+				name = StreamCiphers::RWS;
+			}
+			break;
+		}
+		case StreamCiphers::TSX256:
+		{
+			if (Authenticator == StreamAuthenticators::KMAC256)
+			{
+				name = StreamCiphers::TSXR72K256;
 			}
 			else
 			{
@@ -127,25 +93,9 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 		}
 		case StreamCiphers::TSX512:
 		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
-			{
-				name = StreamCiphers::TSXR96H256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::TSXR96H512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
-			{
-				name = StreamCiphers::TSXR96K256;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC512)
+			if (Authenticator == StreamAuthenticators::KMAC512)
 			{
 				name = StreamCiphers::TSXR96K512;
-			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
-			{
-				name = StreamCiphers::TSXR96P256;
 			}
 			else
 			{
@@ -155,25 +105,9 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 		}
 		case StreamCiphers::TSX1024:
 		{
-			if (Authenticator == StreamAuthenticators::HMACSHA256)
+			if (Authenticator == StreamAuthenticators::KMAC1024)
 			{
-				name = StreamCiphers::TSXR120H256;
-			}
-			else if (Authenticator == StreamAuthenticators::HMACSHA512)
-			{
-				name = StreamCiphers::TSXR120H512;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC256)
-			{
-				name = StreamCiphers::TSXR120K256;
-			}
-			else if (Authenticator == StreamAuthenticators::KMAC512)
-			{
-				name = StreamCiphers::TSXR120K512;
-			}
-			else if (Authenticator == StreamAuthenticators::Poly1305)
-			{
-				name = StreamCiphers::TSXR120P256;
+				name = StreamCiphers::TSXR120K1024;
 			}
 			else
 			{

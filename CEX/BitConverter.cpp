@@ -3,7 +3,7 @@
 
 NAMESPACE_IO
 
-using Utility::MemoryTools;
+using Tools::MemoryTools;
 
 char BitConverter::ToChar(const std::vector<byte> &Input, size_t InOffset)
 {

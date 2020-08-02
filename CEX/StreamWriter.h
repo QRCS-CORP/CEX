@@ -7,6 +7,9 @@
 
 NAMESPACE_IO
 
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+
 /// <summary>
 /// Write integer values to a byte array
 /// </summary>
@@ -97,12 +100,13 @@ public:
 	void Write(const std::vector<T> &Input)
 	{
 		const size_t INPLEN = Input.size() * sizeof(T);
+
 		if (m_streamPosition + INPLEN > m_streamState.size())
 		{
 			m_streamState.resize(m_streamPosition + INPLEN);
 		}
 
-		Utility::IntegerTools::LeToBlock(Input, 0, m_streamState, m_streamPosition, INPLEN);
+		IntegerTools::LeToBlock(Input, 0, m_streamState, m_streamPosition, INPLEN);
 		m_streamPosition += INPLEN;
 	}
 
@@ -124,10 +128,10 @@ public:
 
 		if (sizeof(Array::value_type) > 1)
 		{
-			Utility::IntegerTools::LeToBlock(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
+			IntegerTools::LeToBlock(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
 		}
 		{
-			Utility::MemoryTools::Copy(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
+			MemoryTools::Copy(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
 		}
 
 
@@ -152,22 +156,23 @@ public:
 		{
 			case 8:
 			{
-				Utility::IntegerTools::Le64ToBytes(Value, m_streamState, m_streamPosition);
+				IntegerTools::Le64ToBytes(Value, m_streamState, m_streamPosition);
 				break;
 			}
 			case 4:
 			{
-				Utility::IntegerTools::Le32ToBytes(Value, m_streamState, m_streamPosition);
+				IntegerTools::Le32ToBytes(Value, m_streamState, m_streamPosition);
 				break;
 			}
 			case 2:
 			{
-				Utility::IntegerTools::Le16ToBytes(Value, m_streamState, m_streamPosition);
+				IntegerTools::Le16ToBytes(Value, m_streamState, m_streamPosition);
 				break;
 			}
 			default:
 			{
-				Utility::MemoryTools::CopyFromValue(Value, m_streamState, m_streamPosition, 1);
+				MemoryTools::CopyFromValue(Value, m_streamState, m_streamPosition, 1);
+				break;
 			}
 		}
 

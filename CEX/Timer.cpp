@@ -13,23 +13,24 @@
 #	include <unistd.h>
 #endif
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 using Exception::CryptoProcessingException;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 
 double TimerBase::ConvertTo(TimerWord t, Unit unit)
 {
 	static ulong unitsPerSecondTable[] = { 1, 1000, 1000 * 1000, 1000 * 1000 * 1000 };
 
-	assert(unit < sizeof(unitsPerSecondTable) / sizeof(unitsPerSecondTable[0]));
+	assert(static_cast<size_t>(unit) < sizeof(unitsPerSecondTable) / sizeof(unitsPerSecondTable[0]));
 
-	return static_cast<double>(static_cast<long>(t) * unitsPerSecondTable[unit] / static_cast<long>(TicksPerSecond()));
+	return static_cast<double>(static_cast<long>(t) * unitsPerSecondTable[static_cast<size_t>(unit)] / static_cast<long>(TicksPerSecond()));
 }
 
 void TimerBase::StartTimer()
 {
-	m_last = m_start = GetCurrentTimerValue();
+	m_last = GetCurrentTimerValue();
+	m_start = m_last;
 	m_started = true;
 }
 
@@ -37,7 +38,7 @@ double TimerBase::ElapsedTimeAsDouble()
 {
 	double ret;
 
-	ret = 0;
+	ret = 0.0;
 
 	if (!m_stuckAtZero)
 	{
@@ -182,4 +183,4 @@ TimerWord ThreadUserTimer::TicksPerSecond()
 #endif
 }
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND

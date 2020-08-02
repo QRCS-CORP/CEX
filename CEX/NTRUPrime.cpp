@@ -11,7 +11,7 @@ NAMESPACE_NTRUPRIME
 
 using Enumeration::AsymmetricPrimitiveConvert;
 using Enumeration::ErrorCodes;
-using Utility::IntegerTools;
+using Tools::IntegerTools;
 using Digest::Keccak;
 using Enumeration::NTRUPrimeParameterConvert;
 
@@ -49,9 +49,14 @@ public:
 
 NTRUPrime::NTRUPrime(NTRUPrimeParameters Parameters, Prngs PrngType)
 	:
-	m_ntruState(new NtruState(Parameters != NTRUPrimeParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_ntruState(new NtruState(Parameters == NTRUPrimeParameters::NTRUS1SQ4621N653 || 
+		Parameters == NTRUPrimeParameters::NTRUS2SQ4591N761 || 
+		Parameters == NTRUPrimeParameters::NTRUS3SQ5167N857 ? 
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam),
 		true)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The prng type can not be none!"), ErrorCodes::InvalidParam))
 {
@@ -59,9 +64,14 @@ NTRUPrime::NTRUPrime(NTRUPrimeParameters Parameters, Prngs PrngType)
 
 NTRUPrime::NTRUPrime(NTRUPrimeParameters Parameters, IPrng* Prng)
 	:
-	m_ntruState(new NtruState(Parameters != NTRUPrimeParameters::None ? Parameters :
-		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The Kyber parameter set is invalid!"), ErrorCodes::InvalidParam),
+	m_ntruState(new NtruState(Parameters == NTRUPrimeParameters::NTRUS1SQ4621N653 ||
+		Parameters == NTRUPrimeParameters::NTRUS2SQ4591N761 ||
+		Parameters == NTRUPrimeParameters::NTRUS3SQ5167N857 ?
+			Parameters :
+			throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam),
 		false)),
+	m_privateKey(nullptr),
+	m_publicKey(nullptr),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException(AsymmetricPrimitiveConvert::ToName(AsymmetricPrimitives::NTRUPrime), std::string("Constructor"), std::string("The prng can not be null!"), ErrorCodes::InvalidParam))
 {
@@ -69,16 +79,8 @@ NTRUPrime::NTRUPrime(NTRUPrimeParameters Parameters, IPrng* Prng)
 
 NTRUPrime::~NTRUPrime()
 {
-	// release keys
-	if (m_privateKey != nullptr)
-	{
-		m_privateKey.release();
-	}
-
-	if (m_publicKey != nullptr)
-	{
-		m_publicKey.release();
-	}
+	m_privateKey = nullptr;
+	m_publicKey = nullptr;
 
 	if (m_ntruState->Destroyed)
 	{
@@ -123,6 +125,7 @@ const size_t NTRUPrime::CipherTextSize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("CipherTextSize"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -189,6 +192,7 @@ const size_t NTRUPrime::PrivateKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PrivateKeySize"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -219,6 +223,7 @@ const size_t NTRUPrime::PublicKeySize()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("PublicKeySize"), std::string("The NTRUPrime parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -238,43 +243,47 @@ bool NTRUPrime::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	CEXASSERT(m_ntruState->Initialized, "The cipher has not been initialized");
 	CEXASSERT(SharedSecret.size() <= 256, "The shared secret size is too large");
 
-	std::vector<byte> sec(SECRET_SIZE);
-	bool result;
+	std::vector<byte> sec(SECRET_SIZE, 0x00);
+	bool res;
 
 	switch (m_ntruState->Parameters)
 	{
 		case NTRUPrimeParameters::NTRUS1SQ4621N653:
 		{
-			result = NTRUSQ4621P653::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
+			res = NTRUSQ4621P653::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
 		}
 		case NTRUPrimeParameters::NTRUS2SQ4591N761:
 		{
-			result = NTRUSQ4591P761::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
+			res = NTRUSQ4591P761::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
 		}
 		case NTRUPrimeParameters::NTRUS3SQ5167N857:
 		{
-			result = NTRUSQ5167P857::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
+			res = NTRUSQ5167P857::Decapsulate(sec, CipherText, m_privateKey->Polynomial());
 			break;
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Decapsulate"), std::string("The NTRU-Prime parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
 
-	if (m_ntruState->DomainKey.size() != 0)
+	if (res == true)
 	{
-		CXOF(m_ntruState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
-	}
-	else
-	{
-		SharedSecret.resize(sec.size());
-		MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
+		if (m_ntruState->DomainKey.size() != 0)
+		{
+			CXOF(m_ntruState->DomainKey, sec, SharedSecret, Keccak::KECCAK512_RATE_SIZE);
+		}
+		else
+		{
+			SharedSecret.resize(sec.size());
+			MemoryTools::Copy(sec, 0, SharedSecret, 0, sec.size());
+		}
 	}
 
-	return result;
+	return res;
 }
 
 void NTRUPrime::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
@@ -306,6 +315,7 @@ void NTRUPrime::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Encapsulate"), std::string("The NTRU-Prime parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -353,6 +363,7 @@ AsymmetricKeyPair* NTRUPrime::Generate()
 		}
 		default:
 		{
+			// invalid parameter
 			throw CryptoAsymmetricException(Name(), std::string("Generate"), std::string("The NTRU-Prime parameter set is invalid!"), ErrorCodes::InvalidParam);
 		}
 	}
@@ -377,13 +388,13 @@ void NTRUPrime::Initialize(AsymmetricKey* Key)
 
 	if (Key->KeyClass() == AsymmetricKeyTypes::CipherPublicKey)
 	{
-		m_publicKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_publicKey = Key;
 		m_ntruState->Parameters = static_cast<NTRUPrimeParameters>(m_publicKey->Parameters());
 		m_ntruState->Encryption = true;
 	}
 	else
 	{
-		m_privateKey = std::unique_ptr<AsymmetricKey>(Key);
+		m_privateKey = Key;
 		m_ntruState->Parameters = static_cast<NTRUPrimeParameters>(m_privateKey->Parameters());
 		m_ntruState->Encryption = false;
 	}

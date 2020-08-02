@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -19,8 +19,10 @@
 //
 // Implementation Details:
 // An implementation of an AES-NI Rijndael-256 authenticated Counter Mode (ACS).
+// Version 1.0d
 // Written by John G. Underhill, March 8, 2019
 // Updated January 09, 2020
+// Updated July 18, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_ACS_H
@@ -29,12 +31,12 @@
 #include "IStreamCipher.h"
 #include "IMac.h"
 #include "Intrinsics.h"
-#include "StreamAuthenticators.h"
+#include "KmacModes.h"
 
 NAMESPACE_STREAM
 
 using Mac::IMac;
-using Enumeration::StreamAuthenticators;
+using Enumeration::KmacModes;
 
 /// <summary>
 /// An AES-NI implementation of the Rijndael symmetric 256-bit block-cipher, operating in a Little-Endian counter-mode, as an Authenticate, Encrypt, and Additional Data (AEAD) stream cipher implementation  (AESNI-256 Cipher Stream).
@@ -130,9 +132,18 @@ class ACS final : public IStreamCipher
 private:
 
 	static const size_t BLOCK_SIZE = 32;
+	static const size_t IK256_SIZE = 32;
+	static const size_t IK512_SIZE = 64;
+	static const size_t IK1024_SIZE = 128;
 	static const size_t INFO_SIZE = 16;
 	static const size_t MAX_PRLALLOC = 100000000;
-	static const std::vector<byte> RCS_INFO;
+	// Transformation round counts per input key size:
+	// modifying these values will increase the rounds processed by the cipher.
+	// These are the minimum sizes, changes will cause test failures,
+	// and incompatibility with standard the version.
+	static const size_t RK256_COUNT = 22;
+	static const size_t RK512_COUNT = 30;
+	static const size_t RK1024_COUNT = 38;
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_THRESHOLD = 838;
 	static const byte UPDATE_PREFIX = 0x80;
@@ -141,7 +152,6 @@ private:
 
 	class AcsState;
 	std::unique_ptr<AcsState> m_acsState;
-	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::unique_ptr<IMac> m_macAuthenticator;
 	ParallelOptions m_parallelProfile;
 
@@ -164,10 +174,10 @@ public:
 	/// <para>The cipher instance is created and destroyed automatically.</para>
 	/// </summary>
 	///
-	/// <param name="AuthenticatorType">The authentication engine, the default is KMAC256</param>
+	/// <param name="Authenticate">Activate the authentication option</param>
 	///
-	/// <exception cref="CryptoSymmetricException">Thrown if an invalid block cipher type is used</exception>
-	ACS(StreamAuthenticators AuthenticatorType = StreamAuthenticators::KMAC256);
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid authentication type is chosen</exception>
+	ACS(bool Authenticate);
 
 	/// <summary>
 	/// Initialize the stream cipher using a secure-vector serialized state.
@@ -178,7 +188,7 @@ public:
 	///
 	/// <param name="State">The serialized state, created by the Serialize() function</param>
 	///
-	/// <exception cref="CryptoSymmetricException">Thrown if an invalid block cipher type is used</exception>
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid state array is used</exception>
 	ACS(SecureVector<byte> &State);
 
 	/// <summary>

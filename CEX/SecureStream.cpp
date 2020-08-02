@@ -1,13 +1,15 @@
 #include "SecureStream.h"
 #include "ArrayTools.h"
 #include "CTR.h"
-#include "SHA512.h"
+#include "SHA2512.h"
 #include "SymmetricKey.h"
 #include "SystemTools.h"
 
 NAMESPACE_IO
 
-using Utility::MemoryTools;
+using Tools::ArrayTools;
+using Tools::MemoryTools;
+using Tools::SystemTools;
 
 const std::string SecureStream::CLASS_NAME("SecureStream");
 
@@ -204,14 +206,18 @@ void SecureStream::SetLength(ulong Length)
 
 std::vector<byte> SecureStream::ToArray()
 {
-	if (m_streamData.size() == 0)
-	{
-		return std::vector<byte>(0);
-	}
+	std::vector<byte> tmp;
 
-	Transform();
-	std::vector<byte> tmp = m_streamData;
-	Transform();
+	if (m_streamData.size() != 0)
+	{
+		Transform();
+		tmp = m_streamData;
+		Transform();
+	}
+	else
+	{
+		tmp = std::vector<byte>(0);
+	}
 
 	return tmp;
 }
@@ -220,7 +226,10 @@ void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 {
 	CEXASSERT(Offset + Length <= Input.size(), "Length is longer than the array size");
 
-	size_t len = m_streamPosition + Length;
+	size_t len;
+
+	len = m_streamPosition + Length;
+
 	if (m_streamData.capacity() - m_streamPosition < Length)
 	{
 		m_streamData.reserve(len);
@@ -254,18 +263,18 @@ void SecureStream::WriteByte(byte Value)
 std::vector<byte> SecureStream::GetSystemKey()
 {
 	std::vector<byte> state(0);
-	Utility::ArrayTools::AppendString(Utility::SystemTools::ComputerName(), state);
-	Utility::ArrayTools::AppendString(Utility::SystemTools::OsName(), state);
-	Utility::ArrayTools::AppendValue(Utility::SystemTools::ProcessId(), state);
-	Utility::ArrayTools::AppendString(Utility::SystemTools::UserId(), state);
-	Utility::ArrayTools::AppendString(Utility::SystemTools::UserName(), state);
+	ArrayTools::AppendString(SystemTools::ComputerName(), state);
+	ArrayTools::AppendString(SystemTools::OsName(), state);
+	ArrayTools::AppendValue(SystemTools::ProcessId(), state);
+	ArrayTools::AppendString(SystemTools::UserId(), state);
+	ArrayTools::AppendString(SystemTools::UserName(), state);
 
 	if (m_keySalt.size() != 0)
 	{
-		Utility::ArrayTools::AppendVector(m_keySalt, state);
+		ArrayTools::AppendVector(m_keySalt, state);
 	}
 
-	Digest::SHA512 dgt;
+	Digest::SHA2512 dgt;
 	std::vector<byte> hash(dgt.DigestSize());
 	dgt.Compute(state, hash);
 

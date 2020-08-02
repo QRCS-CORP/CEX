@@ -9,8 +9,8 @@ namespace Test
 	using Cipher::Block::IBlockCipher;
 
     /// <summary>
-    /// Tests the Rijndael implementation using the NIST AESAVS vectors.
-    /// <para>Using vector sets from: AESAVS certification package: <see href="http://csrc.nist.gov/groups/STM/cavp/documents/aes/AESAVS.pdf"/></para>
+    /// Tests the Rijndael implementation using the NIST AESAVS KAT, Monte Carlo, and Multi-block Message tests.
+    /// <para>Using vector sets from: AESAVS certification package: <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/aes/AESAVS.pdf"/></para>
     /// </summary>
     class AesAvsTest final : public ITest
     {
@@ -19,8 +19,12 @@ namespace Test
 		static const std::string CLASSNAME;
 		static const std::string DESCRIPTION;
 		static const std::string SUCCESS;
+		static const std::string COUNT_TOKEN;
+		static const std::string IV_TOKEN;
+		static const std::string KEY_TOKEN;
+		static const std::string PLAINTEXT_TOKEN;
+		static const std::string CIPHERTEXT_TOKEN;
 		static const bool HAS_AESNI;
-
 		TestEventHandler m_progressEvent;
 		bool m_aesniTest;
 
@@ -57,8 +61,13 @@ namespace Test
         
     private:
 
+		void CbcKat(IBlockCipher* Cipher, const std::string &FilePath);
+		void CbcMct(IBlockCipher* Cipher, const std::string &FilePath);
+		void CbcMmt(IBlockCipher* Cipher, const std::string &FilePath);
+		void EbcKat(IBlockCipher* Cipher, const std::string &FilePath);
+		void EcbMct(IBlockCipher* Cipher, const std::string &FilePath);
+		void EcbMmt(IBlockCipher* Cipher, const std::string &FilePath);
 		static bool HasAESNI();
-		void Kat(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void OnProgress(const std::string &Data);
     };
 }

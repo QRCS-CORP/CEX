@@ -25,6 +25,7 @@ namespace Test
 	using namespace Cipher::Block;
 	using namespace Cipher::Block::Mode;
 	using namespace Cipher::Stream;
+	using Enumeration::KmacModes;
 	using Enumeration::StreamAuthenticators;
 
 	const std::string CipherSpeedTest::CLASSNAME = "CipherSpeedTest";
@@ -112,7 +113,7 @@ namespace Test
 
 			OnProgress(std::string("***CSX256: Monte Carlo test (K=256; R=20)***"));
 			CSX256SpeedTest();
-#if defined(CEX_CHACHA512_STRONG)
+#if defined(CEX_CSX512_STRONG)
 			OnProgress(std::string("***CSX512: Monte Carlo test (K=512; R=80)***"));
 #else
 			OnProgress(std::string("***CSX512: Monte Carlo test (K=512; R=40)***"));
@@ -294,7 +295,7 @@ namespace Test
 		if (HAS_AESNI)
 		{
 			AHX* eng = new AHX();
-			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA256);
+			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA2256);
 			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
 			delete cpr;
 			delete eng;
@@ -303,7 +304,7 @@ namespace Test
 #endif
 		{
 			RHX* eng = new RHX();
-			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA256);
+			HBA* cpr = new HBA(eng, StreamAuthenticators::HMACSHA2256);
 			ParallelBlockLoop(cpr, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
 			delete cpr;
 			delete eng;
@@ -314,14 +315,14 @@ namespace Test
 
 	void CipherSpeedTest::CSX256SpeedTest()
 	{
-		CSX256* cpr = new CSX256(StreamAuthenticators::None);
+		CSX256* cpr = new CSX256(false);
 		ParallelStreamLoop(cpr, 32, 8, 10, m_progressEvent);
 		delete cpr;
 	}
 
 	void CipherSpeedTest::CSX512SpeedTest()
 	{
-		CSX512* cpr = new CSX512(StreamAuthenticators::None);
+		CSX512* cpr = new CSX512(false);
 		ParallelStreamLoop(cpr, 64, 0, 10, m_progressEvent);
 		delete cpr;
 	}
@@ -330,13 +331,13 @@ namespace Test
 	{
 		if (HAS_AESNI)
 		{
-			ACS* cpr = new ACS(StreamAuthenticators::None);
+			ACS* cpr = new ACS(false);
 			ParallelStreamLoop(cpr, 32, 32, 10, m_progressEvent);
 			delete cpr;
 		}
 		else
 		{
-			RCS* cpr = new RCS(StreamAuthenticators::None);
+			RCS* cpr = new RCS(false);
 			ParallelStreamLoop(cpr, 32, 32, 10, m_progressEvent);
 			delete cpr;
 		}
@@ -344,21 +345,21 @@ namespace Test
 
 	void CipherSpeedTest::TSX256SpeedTest()
 	{
-		TSX256* cpr = new TSX256(StreamAuthenticators::None);
+		TSX256* cpr = new TSX256(false);
 		ParallelStreamLoop(cpr, 32, 16, 10, m_progressEvent);
 		delete cpr;
 	}
 
 	void CipherSpeedTest::TSX512SpeedTest()
 	{
-		TSX512* cpr = new TSX512(StreamAuthenticators::None);
+		TSX512* cpr = new TSX512(false);
 		ParallelStreamLoop(cpr, 64, 16, 10, m_progressEvent);
 		delete cpr;
 	}
 
 	void CipherSpeedTest::TSX1024SpeedTest()
 	{
-		TSX1024* cpr = new TSX1024(StreamAuthenticators::None);
+		TSX1024* cpr = new TSX1024(false);
 		ParallelStreamLoop(cpr, 128, 16, 10, m_progressEvent);
 		delete cpr;
 	}
@@ -367,10 +368,13 @@ namespace Test
 
 	uint64_t CipherSpeedTest::GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize)
 	{
-		double sec = (double)DurationTicks / 1000.0;
-		double sze = (double)DataSize;
+		double sec;
+		double sze;
 
-		return (uint64_t)(sze / sec);
+		sec = static_cast<double>(DurationTicks) / 1000.0;
+		sze = static_cast<double>(DataSize);
+
+		return static_cast<uint64_t>(sze / sec);
 	}
 
 	bool CipherSpeedTest::HasAESNI()
@@ -393,15 +397,17 @@ namespace Test
 	void CipherSpeedTest::CounterSpeedTest()
 	{
 		const size_t LOOPS = 1000 * 1000 * 100;
-		size_t itr = 0;
-		size_t i = 0;
-		uint64_t start = 0;
 		std::vector<byte> ctr1(16, 0);
 		std::vector<byte> ctr2(16, 0);
 		std::vector<uint64_t> ctr3(2, 0);
 		std::vector<byte> ctr4(16, 0);
 		std::vector<byte> ctr5(16, 0);
+		size_t itr(0);
+		size_t i(0);
+		uint64_t start(0);
+
 		TestUtils::GetRandom(ctr1);
+
 		std::memcpy(&ctr2[0], &ctr1[0], 16);
 		std::memcpy(&ctr3[0], &ctr1[0], 16);
 		std::memcpy(&ctr4[0], &ctr1[0], 16);
@@ -418,9 +424,10 @@ namespace Test
 			{
 			}
 
-		} while (--itr != 0);
+		} 
+		while (--itr != 0);
 
-		std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000);
 		OnProgress(calc);
 
 
@@ -444,7 +451,7 @@ namespace Test
 		} 
 		while (--itr != 0);
 
-		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000);
 		OnProgress(calc);
 
 
@@ -461,7 +468,7 @@ namespace Test
 		} 
 		while (--itr != 0);
 
-		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000);
 		OnProgress(calc);
 
 
@@ -487,7 +494,7 @@ namespace Test
 		} 
 		while (--itr != 0);
 
-		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000);
 		OnProgress(calc);
 
 
@@ -504,7 +511,7 @@ namespace Test
 		}
 		while (--itr != 0);
 
-		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000);
 		OnProgress(calc);
 	}
 }

@@ -1,0 +1,17 @@
+digraph "Encrypt"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=box];
+  rankdir=LR;
+  Node5 [label="NTRUPrime",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___n_t_r_u_prime.html",tooltip="The NTRUPrime Cipher Namespace."];
+  Node4 [label="Kyber",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___kyber.html",tooltip="The McEliece Cipher Namespace."];
+  Node3 [label="McEliece",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___mc_eliece.html",tooltip="The McEliece Cipher Namespace."];
+  Node2 [label="Asymmetric",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___asymmetric.html",tooltip="Asymmetric Ciphers Namespace."];
+  Node1 [label="Encrypt",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Asymmetric Ciphers Namespace."];
+  Node6 [label="NewHope",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$group___new_hope.html",tooltip="The NewHope Cipher Namespace."];
+  Node2->Node1 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node3 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node4 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node5 [shape=plaintext, dir="back", style="solid"];
+  Node1->Node6 [shape=plaintext, dir="back", style="solid"];
+}

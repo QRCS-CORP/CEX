@@ -117,6 +117,10 @@ namespace Test
 			{
 				throw TestException(std::string("Kat"), Padding->Name(), std::string("Failed the padding value return check! -PC2"));
 			}
+			else
+			{
+				// misra
+			}
 
 			// test offset method
 			if (i > 0 && i < MSGBLK - 1)
@@ -136,6 +140,10 @@ namespace Test
 				else if (i != 0 && len != i)
 				{
 					throw TestException(std::string("Kat"), Padding->Name(), std::string("Failed the offset padding value return check! -PC4"));
+				}
+				else
+				{
+					// misra
 				}
 			}
 		}

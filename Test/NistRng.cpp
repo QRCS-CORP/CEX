@@ -5,8 +5,8 @@
 
 namespace Test
 {
-	using Utility::IntegerTools;
-	using Utility::MemoryTools;
+	using Tools::IntegerTools;
+	using Tools::MemoryTools;
 	using Cipher::SymmetricKey;
 
 	std::string NistRng::CLASSNAME = "NistRng";

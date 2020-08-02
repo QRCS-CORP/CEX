@@ -8,8 +8,9 @@ NAMESPACE_MODE
 
 using Enumeration::BlockCipherConvert;
 using Enumeration::CipherModeConvert;
-using Utility::IntegerTools;
-using Utility::MemoryTools;
+using Tools::IntegerTools;
+using Tools::MemoryTools;
+using Tools::ParallelTools;
 
 class CFB::CfbState
 {
@@ -51,7 +52,8 @@ public:
 CFB::CFB(BlockCiphers CipherType, size_t RegisterSize)
 	:
 	m_cfbState(new CfbState(true, RegisterSize)),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? 
+		Helper::BlockCipherFromName::GetInstance(CipherType) :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::CFB), std::string("Constructor"), std::string("The cipher type can not be none!"), ErrorCodes::InvalidParam)),
 	m_parallelProfile(m_blockCipher->BlockSize(), false, m_blockCipher->StateCacheSize(), true)
 {
@@ -60,7 +62,8 @@ CFB::CFB(BlockCiphers CipherType, size_t RegisterSize)
 CFB::CFB(IBlockCipher* Cipher, size_t RegisterSize)
 	:
 	m_cfbState(new CfbState(false, RegisterSize)),
-	m_blockCipher(Cipher != nullptr ? Cipher :
+	m_blockCipher(Cipher != nullptr ? 
+		Cipher :
 		throw CryptoCipherModeException(CipherModeConvert::ToName(CipherModes::CFB), std::string("Constructor"), std::string("The cipher type can not be null!"), ErrorCodes::IllegalOperation)),
 	m_parallelProfile(m_blockCipher->BlockSize(), false, m_blockCipher->StateCacheSize(), true)
 {
@@ -181,7 +184,7 @@ void CFB::EncryptBlock(const std::vector<byte> &Input, size_t InOffset, std::vec
 
 void CFB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 {
-	if (Parameters.KeySizes().NonceSize() < 1)
+	if (Parameters.KeySizes().IVSize() < 1)
 	{
 		throw CryptoCipherModeException(Name(), std::string("Initialize"), std::string("Requires a minimum 1 byte of Nonce!"), ErrorCodes::InvalidNonce);
 	}
@@ -202,8 +205,8 @@ void CFB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		}
 	}
 
-	const size_t BLKDIF = BLOCK_SIZE - Parameters.KeySizes().NonceSize();
-	MemoryTools::Copy(Parameters.Nonce(), 0, m_cfbState->IV, BLKDIF, Parameters.KeySizes().NonceSize());
+	const size_t BLKDIF = BLOCK_SIZE - Parameters.KeySizes().IVSize();
+	MemoryTools::Copy(Parameters.IV(), 0, m_cfbState->IV, BLKDIF, Parameters.KeySizes().IVSize());
 	MemoryTools::Clear(m_cfbState->IV, 0, BLKDIF);
 
 	m_blockCipher->Initialize(true, Parameters);
@@ -260,7 +263,7 @@ void CFB::DecryptParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t BLKCNT = (SEGLEN / BLOCK_SIZE);
 	std::vector<byte> tmpv(BLOCK_SIZE);
 
-	Utility::ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpv, SEGLEN, BLKCNT](size_t i)
+	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpv, SEGLEN, BLKCNT](size_t i)
 	{
 		std::vector<byte> thdv(BLOCK_SIZE);
 
@@ -347,7 +350,7 @@ void CFB::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<b
 
 	bctr = Length / m_cfbState->RegisterSize;
 
-	if (IsEncryption())
+	if (IsEncryption() == true)
 	{
 		for (i = 0; i < bctr; ++i)
 		{

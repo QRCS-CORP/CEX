@@ -3,7 +3,7 @@
 // Copyright (c) 2020 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// This program is free software : you can redistribute it and / or modify
+// This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -43,7 +43,7 @@ using Enumeration::SHA2Digests;
 /// <description>Generate an array of pseudo-random bytes:</description>
 /// <code>
 /// // use the enumeration constructor
-/// HKDF kdf(Enumeration::Digests::SHA256);
+/// HKDF kdf(Enumeration::Digests::SHA2256);
 /// // initialize
 /// kdf.Initialize(Key, [Salt], [Info]);
 /// // generate bytes
@@ -111,8 +111,6 @@ private:
 	static const size_t MINSALT_LENGTH = 4;
 
 	class HkdfState;
-	bool m_isDestroyed;
-	bool m_isInitialized;
 	std::unique_ptr<HMAC> m_hkdfGenerator;
 	std::unique_ptr<HkdfState> m_hkdfState;
 
@@ -183,6 +181,14 @@ public:
 	/// The array size is the underlying digests output size (32 bytes with SHA2-256, and 64 bytes when using SHA2-512)</param>
 	void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output);
 
+	/// <summary>
+	/// HKDF-Extract function; generate a new secure-vector key using combined key and salt arrays as input.
+	/// </summary>
+	/// 
+	/// <param name="Key">The key used to initialize the generator</param>
+	/// <param name="Salt">The salt value, added to the key</param>
+	/// <param name="Output">Receives the newly generated secure-vector key. 
+	/// The array size is the underlying digests output size (32 bytes with SHA2-256, and 64 bytes when using SHA2-512)</param>
 	void Extract(const SecureVector<byte> &Key, const SecureVector<byte> &Salt, SecureVector<byte> &Output);
 
 	/// <summary>

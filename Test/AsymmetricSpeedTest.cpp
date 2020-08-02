@@ -15,7 +15,7 @@ namespace Test
 	using Helper::AsymmetricSignerFromName;
 	using Asymmetric::Encrypt::IAsymmetricCipher;
 	using Asymmetric::Sign::IAsymmetricSigner;
-	using Utility::IntegerTools;
+	using Tools::IntegerTools;
 
 	const std::string AsymmetricSpeedTest::CLASSNAME = "AsymmetricSpeedTest";
 	const std::string AsymmetricSpeedTest::DESCRIPTION = "Asymmetric Cipher and Signature Scheme Speed Tests.";
@@ -45,95 +45,96 @@ namespace Test
 	{
 		try
 		{
-			const std::string TSTITR = IntegerTools::ToString(TEST_ITERATIONS);
+			const std::string TSTITRF = IntegerTools::ToString(TEST_ITERATIONSF);
+			const std::string TSTITRL = IntegerTools::ToString(TEST_ITERATIONSL);
 
 			// Test the asymmetric ciphers
 			OnProgress(std::string("### Asymmetric Cipher Speed Tests:"));
 			OnProgress(std::string(""));
 
 			// NewHope
-			OnProgress(std::string("***NewHope Generating " + TSTITR + " Keypairs using parameter RLWES1Q12289N1024***"));
-			CipherGenerateLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024);
+			OnProgress(std::string("***NewHope Generating " + TSTITRF + " Keypairs using parameter RLWES1Q12289N1024***"));
+			CipherGenerateLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***NewHope Encrypting " + TSTITR + " messages using parameter RLWES1Q12289N1024***"));
-			CipherEncryptLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024);
+			OnProgress(std::string("***NewHope Encrypting " + TSTITRF + " messages using parameter RLWES1Q12289N1024***"));
+			CipherEncryptLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***NewHope Decrypting " + TSTITR + " messages using parameter RLWES1Q12289N1024***"));
-			CipherDecryptLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024);
-
-			// McEliece
-			OnProgress(std::string("***McEliece Generating " + TSTITR + " Keypairs using parameter MPKCS1N4096T62***"));
-			CipherGenerateLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS1N4096T62);
-
-			OnProgress(std::string("***McEliece Encrypting " + TSTITR + " messages using parameter MPKCS1N4096T62***"));
-			CipherEncryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS1N4096T62);
-
-			OnProgress(std::string("***McEliece Decrypting " + TSTITR + " messages using parameter MPKCS1N4096T62***"));
-			CipherDecryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS1N4096T62);
+			OnProgress(std::string("***NewHope Decrypting " + TSTITRF + " messages using parameter RLWES1Q12289N1024***"));
+			CipherDecryptLoop(AsymmetricCiphers::NewHope, AsymmetricParameters::RLWES1Q12289N1024, TEST_ITERATIONSF);
 
 			// Kyber
-			OnProgress(std::string("***Kyber Generating " + TSTITR + " Keypairs using parameter MLWES2Q3329N256***"));
-			CipherGenerateLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256);
+			OnProgress(std::string("***Kyber Generating " + TSTITRF + " Keypairs using parameter MLWES2Q3329N256***"));
+			CipherGenerateLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Kyber Encrypting " + TSTITR + " messages using parameter MLWES2Q3329N256***"));
-			CipherEncryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256);
+			OnProgress(std::string("***Kyber Encrypting " + TSTITRF + " messages using parameter MLWES2Q3329N256***"));
+			CipherEncryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Kyber Decrypting " + TSTITR + " messages using parameter MLWES2Q3329N256***"));
-			CipherDecryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256);
+			OnProgress(std::string("***Kyber Decrypting " + TSTITRF + " messages using parameter MLWES2Q3329N256***"));
+			CipherDecryptLoop(AsymmetricCiphers::Kyber, AsymmetricParameters::MLWES2Q3329N256, TEST_ITERATIONSF);
 
 			// NTRU-Prime
-			OnProgress(std::string("***NTRU-SPrime Generating " + TSTITR + " Keypairs using parameter NTRUS2SQ4591N761***"));
-			CipherGenerateLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653);
+			OnProgress(std::string("***NTRU-SPrime Generating " + TSTITRL +" Keypairs using parameter NTRUS2SQ4591N761***"));
+			CipherGenerateLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***NTRU-SPrime Encrypting " + TSTITR + " messages using parameter NTRUS2SQ4591N761***"));
-			CipherEncryptLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653);
+			OnProgress(std::string("***NTRU-SPrime Encrypting " + TSTITRL + " messages using parameter NTRUS2SQ4591N761***"));
+			CipherEncryptLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***NTRU-SPrime Decrypting " + TSTITR + " messages using parameter NTRUS2SQ4591N761***"));
-			CipherDecryptLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653);
+			OnProgress(std::string("***NTRU-SPrime Decrypting " + TSTITRL + " messages using parameter NTRUS2SQ4591N761***"));
+			CipherDecryptLoop(AsymmetricCiphers::NTRUPrime, AsymmetricParameters::NTRUS1SQ4621N653, TEST_ITERATIONSF);
 
-			// Signature schemes
+			// McEliece
+			OnProgress(std::string("***McEliece Generating " + TSTITRL + " Keypairs using parameter MPKCS2N6960T119***"));
+			CipherGenerateLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS2N6960T119, TEST_ITERATIONSL);
+
+			OnProgress(std::string("***McEliece Encrypting " + TSTITRL + " messages using parameter MPKCS2N6960T119***"));
+			CipherEncryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS2N6960T119, TEST_ITERATIONSL);
+
+			OnProgress(std::string("***McEliece Decrypting " + TSTITRL + " messages using parameter MPKCS2N6960T119***"));
+			CipherDecryptLoop(AsymmetricCiphers::McEliece, AsymmetricParameters::MPKCS2N6960T119, TEST_ITERATIONSL);
+
+			// Signature schemes //
 			OnProgress(std::string("### Asymmetric Signature Scheme Speed Tests:"));
 			OnProgress(std::string(""));
 
 			// Dilithium
-			OnProgress(std::string("***Dilithium Generating " + TSTITR + " Keypairs using parameter DLTMS2N256Q8380417***"));
-			SignerGenerateLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417);
+			OnProgress(std::string("***Dilithium Generating " + TSTITRL + " Keypairs using parameter DLTMS2N256Q8380417***"));
+			SignerGenerateLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Dilithium Signing " + TSTITR + " messages using parameter DLTMS2N256Q8380417***"));
-			SignerSignLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417);
+			OnProgress(std::string("***Dilithium Signing " + TSTITRL + " messages using parameter DLTMS2N256Q8380417***"));
+			SignerSignLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Dilithium Verifying " + TSTITR + " messages using parameter DLTMS2N256Q8380417***"));
-			SignerVerifyLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417);
+			OnProgress(std::string("***Dilithium Verifying " + TSTITRL + " messages using parameter DLTMS2N256Q8380417***"));
+			SignerVerifyLoop(AsymmetricSigners::Dilithium, AsymmetricParameters::DLTMS2N256Q8380417, TEST_ITERATIONSF);
 
 			// Rainbow
-			OnProgress(std::string("***Rainbow Generating " + TSTITR + " Keypairs using parameter RNBWS1S128SHAKE256***"));
-			SignerGenerateLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256);
+			OnProgress(std::string("***Rainbow Generating " + TSTITRF + " Keypairs using parameter RNBWS1S128SHAKE256***"));
+			SignerGenerateLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Rainbow Signing " + TSTITR + " messages using parameter RNBWS1S128SHAKE256***"));
-			SignerSignLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256);
+			OnProgress(std::string("***Rainbow Signing " + TSTITRF + " messages using parameter RNBWS1S128SHAKE256***"));
+			SignerSignLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256, TEST_ITERATIONSF);
 
-			OnProgress(std::string("***Rainbow Verifying " + TSTITR + " messages using parameter RNBWS1S128SHAKE256***"));
-			SignerVerifyLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256);
+			OnProgress(std::string("***Rainbow Verifying " + TSTITRF + " messages using parameter RNBWS1S128SHAKE256***"));
+			SignerVerifyLoop(AsymmetricSigners::Rainbow, AsymmetricParameters::RNBWS1S128SHAKE256, TEST_ITERATIONSF);
 
 			// SPHINCS+
-			OnProgress(std::string("***SPHINCS+ Generating " + TSTITR + " Keypairs using parameter SPXPS1S128SHAKE***"));
-			SignerGenerateLoop(AsymmetricSigners::SphincsPlus, AsymmetricParameters::SPXPS1S128SHAKE);
+			OnProgress(std::string("***SPHINCS+ Generating " + TSTITRL + " Keypairs using parameter SPXPS1S128SHAKE***"));
+			SignerGenerateLoop(AsymmetricSigners::SphincsPlus, AsymmetricParameters::SPXPS1S128SHAKE, TEST_ITERATIONSL);
 
-			OnProgress(std::string("***SPHINCS+ Signing " + TSTITR + " messages using parameter SPXPS1S128SHAKE***"));
-			SignerSignLoop(AsymmetricSigners::SphincsPlus, AsymmetricParameters::SPXPS1S128SHAKE);
+			OnProgress(std::string("***SPHINCS+ Signing " + TSTITRL + " messages using parameter SPXPS1S128SHAKE***"));
+			SignerSignLoop(AsymmetricSigners::SphincsPlus, AsymmetricParameters::SPXPS1S128SHAKE, TEST_ITERATIONSL);
 
-			OnProgress(std::string("***SPHINCS+ Verifying " + TSTITR + " messages using parameter SPXPS1S128SHAKE***"));
-			SignerVerifyLoop(AsymmetricSigners::SphincsPlus, AsymmetricParameters::SPXPS1S128SHAKE);
+			OnProgress(std::string("***SPHINCS+ Verifying " + TSTITRL + " messages using parameter SPXPS1S128SHAKE***"));
+			SignerVerifyLoop(AsymmetricSigners::SphincsPlus, AsymmetricParameters::SPXPS1S128SHAKE, TEST_ITERATIONSL);
 
 			// XMSS
-			OnProgress(std::string("***XMSS Generating " + TSTITR + " Keypairs using parameter XMSSSHA256H10***"));
-			SignerGenerateLoop(AsymmetricSigners::XMSS, AsymmetricParameters::XMSSSHA256H10);
+			OnProgress(std::string("***XMSS Generating " + TSTITRL + " Keypairs using parameter XMSSSHA2256H10***"));
+			SignerGenerateLoop(AsymmetricSigners::XMSS, AsymmetricParameters::XMSSSHA2256H10, TEST_ITERATIONSL);
 
-			OnProgress(std::string("***XMSS Signing " + TSTITR + " messages using parameter XMSSSHA256H10***"));
-			SignerSignLoop(AsymmetricSigners::XMSS, AsymmetricParameters::XMSSSHA256H10);
+			OnProgress(std::string("***XMSS Signing " + TSTITRL + " messages using parameter XMSSSHA2256H10***"));
+			SignerSignLoop(AsymmetricSigners::XMSS, AsymmetricParameters::XMSSSHA2256H10, TEST_ITERATIONSL);
 
-			OnProgress(std::string("***XMSS Verifying " + TSTITR + " messages using parameter XMSSSHA256H10***"));
-			SignerVerifyLoop(AsymmetricSigners::XMSS, AsymmetricParameters::XMSSSHA256H10);
+			OnProgress(std::string("***XMSS Verifying " + TSTITRL + " messages using parameter XMSSSHA2256H10***"));
+			SignerVerifyLoop(AsymmetricSigners::XMSS, AsymmetricParameters::XMSSSHA2256H10, TEST_ITERATIONSL);
 
 			return MESSAGE;
 		}
@@ -149,13 +150,20 @@ namespace Test
 
 	//~~~Ciphers~~~//
 
-	void AsymmetricSpeedTest::CipherDecryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters)
+	void AsymmetricSpeedTest::CipherDecryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 		AsymmetricKeyPair* kp;
 		IAsymmetricCipher* pcpr;
+		std::string nlen;
+		std::string secs;
+		std::string ksec;
+		std::string resp;
+		uint64_t dur;
+		uint64_t start;
+		size_t i;
 
 		pcpr = AsymmetricCipherFromName::GetInstance(CipherType, Parameters);
 		kp = pcpr->Generate();
@@ -163,76 +171,85 @@ namespace Test
 		pcpr->Encapsulate(cpt, sec1);
 		pcpr->Initialize(kp->PrivateKey());
 
-		uint64_t start = TestUtils::GetTimeMs64();
+		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < TEST_ITERATIONS; ++i)
+		for (i = 0; i < Iterations; ++i)
 		{
 			pcpr->Decapsulate(cpt, sec2);
 		}
 
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-
+		dur = TestUtils::GetTimeMs64() - start;
 		delete kp;
-
-		std::string nlen = TestUtils::ToString(TEST_ITERATIONS);
-		std::string secs = TestUtils::ToString((double)dur / 1000.0);
-		std::string ksec = TestUtils::ToString(GetUnitsPerSecond(dur, TEST_ITERATIONS));
-		std::string resp = std::string("Decrypted " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " derypted per second");
+		nlen = TestUtils::ToString(Iterations);
+		secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
+		ksec = TestUtils::ToString(GetUnitsPerSecond(dur, Iterations));
+		resp = std::string("Decrypted " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " derypted per second");
 
 		OnProgress(resp);
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::CipherEncryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters)
+	void AsymmetricSpeedTest::CipherEncryptLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
 		AsymmetricKeyPair* kp;
 		IAsymmetricCipher* pcpr;
+		std::string nlen;
+		std::string secs;
+		std::string ksec;
+		std::string resp;
+		uint64_t dur;
+		uint64_t start;
+		size_t i;
 
 		pcpr = AsymmetricCipherFromName::GetInstance(CipherType, Parameters);
 		kp = pcpr->Generate();
 		pcpr->Initialize(kp->PublicKey());
+		start = TestUtils::GetTimeMs64();
 
-		uint64_t start = TestUtils::GetTimeMs64();
-
-		for (size_t i = 0; i < TEST_ITERATIONS; ++i)
+		for (i = 0; i < Iterations; ++i)
 		{
 			pcpr->Encapsulate(cpt, sec);
 		}
 
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-
+		dur = TestUtils::GetTimeMs64() - start;
 		delete kp;
-
-		std::string nlen = TestUtils::ToString(TEST_ITERATIONS);
-		std::string secs = TestUtils::ToString((double)dur / 1000.0);
-		std::string ksec = TestUtils::ToString(GetUnitsPerSecond(dur, TEST_ITERATIONS));
-		std::string resp = std::string("Encrypted " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " encrypted per second");
+		nlen = TestUtils::ToString(Iterations);
+		secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
+		ksec = TestUtils::ToString(GetUnitsPerSecond(dur, Iterations));
+		resp = std::string("Encrypted " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " encrypted per second");
 
 		OnProgress(resp);
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::CipherGenerateLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters)
+	void AsymmetricSpeedTest::CipherGenerateLoop(AsymmetricCiphers CipherType, AsymmetricParameters Parameters, size_t Iterations)
 	{
-		uint64_t start = TestUtils::GetTimeMs64();
 		IAsymmetricCipher* pcpr;
+		AsymmetricKeyPair* kp;
+		std::string nlen;
+		std::string secs;
+		std::string ksec;
+		std::string resp;
+		uint64_t dur;
+		uint64_t start;
+		size_t i;
 
 		pcpr = AsymmetricCipherFromName::GetInstance(CipherType, Parameters);
+		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < TEST_ITERATIONS; ++i)
+		for (i = 0; i < Iterations; ++i)
 		{
-			AsymmetricKeyPair* kp = pcpr->Generate();
+			kp = pcpr->Generate();
 			delete kp;
 		}
 
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-
-		std::string nlen = TestUtils::ToString(TEST_ITERATIONS);
-		std::string secs = TestUtils::ToString((double)dur / 1000.0);
-		std::string ksec = TestUtils::ToString(GetUnitsPerSecond(dur, TEST_ITERATIONS));
-		std::string resp = std::string("Generated " + nlen + " keypairs in " + secs + " seconds, avg. " + ksec + " generated per second");
+		dur = TestUtils::GetTimeMs64() - start;
+		nlen = TestUtils::ToString(Iterations);
+		secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
+		ksec = TestUtils::ToString(GetUnitsPerSecond(dur, Iterations));
+		resp = std::string("Generated " + nlen + " keypairs in " + secs + " seconds, avg. " + ksec + " generated per second");
 
 		OnProgress(resp);
 		OnProgress(std::string(""));
@@ -240,84 +257,107 @@ namespace Test
 
 	//~~~Signature Schemes~~~//
 
-	void AsymmetricSpeedTest::SignerGenerateLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters)
+	void AsymmetricSpeedTest::SignerGenerateLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations)
 	{
-		uint64_t start = TestUtils::GetTimeMs64();
 		IAsymmetricSigner* psnr;
+		AsymmetricKeyPair* kp;
+		std::string nlen;
+		std::string secs;
+		std::string ksec;
+		std::string resp;
+		uint64_t dur;
+		uint64_t start;
+		size_t i;
 
 		psnr = AsymmetricSignerFromName::GetInstance(SignerType, Parameters);
+		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < TEST_ITERATIONS; ++i)
+		for (i = 0; i < Iterations; ++i)
 		{
-			AsymmetricKeyPair* kp = psnr->Generate();
+			kp = psnr->Generate();
 			delete kp;
 		}
 
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-
-		std::string nlen = TestUtils::ToString(TEST_ITERATIONS);
-		std::string secs = TestUtils::ToString((double)dur / 1000.0);
-		std::string ksec = TestUtils::ToString(GetUnitsPerSecond(dur, TEST_ITERATIONS));
-		std::string resp = std::string("Generated " + nlen + " keypairs in " + secs + " seconds, avg. " + ksec + " generated per second");
+		dur = TestUtils::GetTimeMs64() - start;
+		nlen = TestUtils::ToString(Iterations);
+		secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
+		ksec = TestUtils::ToString(GetUnitsPerSecond(dur, Iterations));
+		resp = std::string("Generated " + nlen + " keypairs in " + secs + " seconds, avg. " + ksec + " generated per second");
 
 		OnProgress(resp);
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::SignerSignLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters)
+	void AsymmetricSpeedTest::SignerSignLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations)
 	{
 		std::vector<byte> msg(32);
 		std::vector<byte> sig(0);
 		IAsymmetricSigner* psnr;
+		AsymmetricKeyPair* kp;
+		std::string nlen;
+		std::string secs;
+		std::string ksec;
+		std::string resp;
+		uint64_t dur;
+		uint64_t start;
+		size_t i;
 
 		psnr = AsymmetricSignerFromName::GetInstance(SignerType, Parameters);
-		AsymmetricKeyPair* kp = psnr->Generate();
+		kp = psnr->Generate();
 		psnr->Initialize(kp->PrivateKey());
 
-		uint64_t start = TestUtils::GetTimeMs64();
+		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < TEST_ITERATIONS; ++i)
+		for (i = 0; i < Iterations; ++i)
 		{
 			psnr->Sign(msg, sig);
 		}
 
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
+		dur = TestUtils::GetTimeMs64() - start;
 		delete kp;
-		std::string nlen = TestUtils::ToString(TEST_ITERATIONS);
-		std::string secs = TestUtils::ToString((double)dur / 1000.0);
-		std::string ksec = TestUtils::ToString(GetUnitsPerSecond(dur, TEST_ITERATIONS));
-		std::string resp = std::string("Signed " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " signed per second");
+		nlen = TestUtils::ToString(Iterations);
+		secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
+		ksec = TestUtils::ToString(GetUnitsPerSecond(dur, Iterations));
+		resp = std::string("Signed " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " signed per second");
 
 		OnProgress(resp);
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::SignerVerifyLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters)
+	void AsymmetricSpeedTest::SignerVerifyLoop(AsymmetricSigners SignerType, AsymmetricParameters Parameters, size_t Iterations)
 	{
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 		IAsymmetricSigner* psnr;
+		AsymmetricKeyPair* kp;
+		std::string nlen;
+		std::string secs;
+		std::string ksec;
+		std::string resp;
+		uint64_t dur;
+		uint64_t start;
+		size_t i;
 
 		psnr = AsymmetricSignerFromName::GetInstance(SignerType, Parameters);
-		AsymmetricKeyPair* kp = psnr->Generate();
+		kp = psnr->Generate();
 		psnr->Initialize(kp->PrivateKey());
 		psnr->Sign(msg1, sig);
 		psnr->Initialize(kp->PublicKey());
 
-		uint64_t start = TestUtils::GetTimeMs64();
+		start = TestUtils::GetTimeMs64();
 
-		for (size_t i = 0; i < TEST_ITERATIONS; ++i)
+		for (i = 0; i < Iterations; ++i)
 		{
 			psnr->Verify(sig, msg2);
 		}
 
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
+		dur = TestUtils::GetTimeMs64() - start;
 		delete kp;
-		std::string nlen = TestUtils::ToString(TEST_ITERATIONS);
-		std::string secs = TestUtils::ToString((double)dur / 1000.0);
-		std::string ksec = TestUtils::ToString(GetUnitsPerSecond(dur, TEST_ITERATIONS));
-		std::string resp = std::string("Verified " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " verified per second");
+		nlen = TestUtils::ToString(Iterations);
+		secs = TestUtils::ToString(static_cast<double>(dur) / 1000.0);
+		ksec = TestUtils::ToString(GetUnitsPerSecond(dur, Iterations));
+		resp = std::string("Verified " + nlen + " messages in " + secs + " seconds, avg. " + ksec + " verified per second");
 
 		OnProgress(resp);
 		OnProgress(std::string(""));
@@ -325,10 +365,13 @@ namespace Test
 
 	uint64_t AsymmetricSpeedTest::GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count)
 	{
-		double sec = (double)DurationTicks / 1000.0;
-		double sze = (double)Count;
+		double sec;
+		double sze;
 
-		return (uint64_t)(sze / sec);
+		sec = static_cast<double>(DurationTicks) / 1000.0;
+		sze = static_cast<double>(Count);
+
+		return static_cast<uint64_t>(sze / sec);
 	}
 
 	void AsymmetricSpeedTest::OnProgress(const std::string &Data)

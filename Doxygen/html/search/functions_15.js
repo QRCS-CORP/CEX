@@ -1,14 +1,7 @@
 var searchData=
 [
-  ['x923',['X923',['../class_x923.html#ac930e0b075939c20930bfd624c3b219d',1,'X923::X923(const X923 &amp;)=delete'],['../class_x923.html#ac474cf8909a3678ce9f87071f5757ff4',1,'X923::X923()']]],
-  ['xmss',['XMSS',['../class_x_m_s_s.html#aa230f414b9ff58e7e325788c2d711018',1,'XMSS::XMSS(const XMSS &amp;)=delete'],['../class_x_m_s_s.html#a5eec419036c49916cc13e3d80e7c2f75',1,'XMSS::XMSS(XmssParameters Parameters=XmssParameters::XMSSSHA256H16, Prngs PrngType=Prngs::BCR)'],['../class_x_m_s_s.html#a9c062838cab44b6c64283865131caaff',1,'XMSS::XMSS(XmssParameters Parameters, IPrng *Rng)']]],
-  ['xofr24p1600',['XOFR24P1600',['../class_keccak.html#a68cf32cf2c6ced7b0fe9be81681f7a3b',1,'Keccak']]],
-  ['xofr48p1600',['XOFR48P1600',['../class_keccak.html#af5907066432ac7a6f0b494365c10a82d',1,'Keccak']]],
-  ['xop',['XOP',['../class_cpu_detect.html#a75f14b6fb41a0b280d175b76f1d8de19',1,'CpuDetect']]],
-  ['xor',['XOR',['../class_a_e_s128.html#ab9e6f6ec211dfb56d4599c45508ba93f',1,'AES128::XOR()'],['../class_memory_tools.html#a679d645ef3cabecc4da03291f4c714dc',1,'MemoryTools::XOR()']]],
-  ['xor1024',['XOR1024',['../class_memory_tools.html#aab492cf56272534ed0d6766267a61ed6',1,'MemoryTools']]],
-  ['xor128',['XOR128',['../class_memory_tools.html#a43bce380c627bc46c255b661f843d34e',1,'MemoryTools']]],
-  ['xor256',['XOR256',['../class_memory_tools.html#a7db0d0af409e8f19a0d38887783e55a2',1,'MemoryTools']]],
-  ['xor512',['XOR512',['../class_memory_tools.html#af83d227dcad0db3bb56b9051c799ecf7',1,'MemoryTools']]],
-  ['xorpartial',['XorPartial',['../class_memory_tools.html#a82044efba0a7b7ef0ac503b8d6629452',1,'MemoryTools']]]
+  ['waitall_2129',['WaitAll',['../class_thread_pool.html#a8a7f68837cd8b060a9ca1a3a0c9517ab',1,'ThreadPool']]],
+  ['wideblock_2130',['WideBlock',['../class_parallel_options.html#acbcdeba81aea6027f4ceb5f641d14b49',1,'ParallelOptions']]],
+  ['write_2131',['Write',['../class_cipher_stream.html#a7ed2599026c305482975353375e8e587',1,'CipherStream::Write(IByteStream *InStream, IByteStream *OutStream)'],['../class_cipher_stream.html#ac43ca901d8c28e29fa094fe31db180b1',1,'CipherStream::Write(const std::vector&lt; byte &gt; &amp;Input, size_t InOffset, std::vector&lt; byte &gt; &amp;Output, size_t OutOffset)'],['../class_file_stream.html#a658ed227b31c5724f2cf110f4fa87fff',1,'FileStream::Write()'],['../class_i_byte_stream.html#a3edb0711c7c7b1bf68afcbe56f6b24c4',1,'IByteStream::Write()'],['../class_memory_stream.html#af31bccd09f46c34a3e1253ebdfcaa65d',1,'MemoryStream::Write()'],['../class_secure_stream.html#aab7f76c430a77af05cad933b219e5222',1,'SecureStream::Write()'],['../class_stream_writer.html#a37b7eb21468faf3ead2cb54d276a3684',1,'StreamWriter::Write(const std::vector&lt; T &gt; &amp;Input)'],['../class_stream_writer.html#a58e8a684ebe95502e421e6ae267b6968',1,'StreamWriter::Write(const Array &amp;Input, size_t InOffset, size_t Elements)'],['../class_stream_writer.html#afeaa2585d8522101ee1af5644879e733',1,'StreamWriter::Write(T Value)']]],
+  ['writebyte_2132',['WriteByte',['../class_file_stream.html#aa4f10cebd26b195bf9d6440bcc4b0c02',1,'FileStream::WriteByte()'],['../class_i_byte_stream.html#a6488cc80668577af9953bb00079ff749',1,'IByteStream::WriteByte()'],['../class_memory_stream.html#a47978ed42baba1c6f9871955bda4a45c',1,'MemoryStream::WriteByte()'],['../class_secure_stream.html#ae2765b107e1fc3e0ee254d0e6b303749',1,'SecureStream::WriteByte()']]]
 ];

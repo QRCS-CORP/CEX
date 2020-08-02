@@ -1,0 +1,8 @@
+digraph "Graphical Class Hierarchy"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node0 [label="AsymmetricCipherFromName",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_asymmetric_cipher_from_name.html",tooltip="Get an asymmetric cipher instance from it's enumeration name."];
+}

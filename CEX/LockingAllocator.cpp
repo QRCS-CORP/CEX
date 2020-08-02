@@ -3,11 +3,11 @@
 #include <cstdlib>
 #include <memory>
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 using Exception::CryptoException;
 using Enumeration::ErrorCodes;
-using Utility::MemoryPool;
+using Tools::MemoryPool;
 
 //~~~LockingAllocator~~~//
 
@@ -126,4 +126,4 @@ void LockingAllocator::Deallocate(void* Pointer, size_t Elements, size_t Element
 	}
 }
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND

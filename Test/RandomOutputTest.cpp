@@ -79,9 +79,9 @@ namespace Test
 			OnProgress(std::string("RDSeed Provider (RDP) generated sample file succesfully...."));
 
 			// drbg's
-			BCGGenerateFile(m_outputFolder + std::string("bcg_10mb.txt"), SAMPLE_SIZE, false);
+			BCGGenerateFile(m_outputFolder + std::string("bcg_10mb.txt"), SAMPLE_SIZE);
 			OnProgress(std::string("Block cipher Counter Generator (BCG) generated sample file succesfully.."));
-			BCGGenerateFile(m_outputFolder + std::string("bcgp_10mb.txt"), SAMPLE_SIZE, true);
+			BCGGenerateFile(m_outputFolder + std::string("bcgp_10mb.txt"), SAMPLE_SIZE);
 			OnProgress(std::string("Block cipher parallel Counter Generator (BCGP) generated sample file succesfully.."));
 			CSGGenerateFile(m_outputFolder + std::string("csg_10mb.txt"), SAMPLE_SIZE, false);
 			OnProgress(std::string("Custom SHAKE Generator (CSG) generated sample file succesfully.."));
@@ -132,7 +132,7 @@ namespace Test
 		do
 		{
 			pvd.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		}
@@ -152,7 +152,7 @@ namespace Test
 		do
 		{
 			pvd.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -172,7 +172,7 @@ namespace Test
 		do
 		{
 			pvd.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -192,7 +192,7 @@ namespace Test
 		do
 		{
 			pvd.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -212,7 +212,7 @@ namespace Test
 		do
 		{
 			pvd.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -224,15 +224,15 @@ namespace Test
 
 	// drbgs
 
-	void RandomOutputTest::BCGGenerateFile(std::string FilePath, size_t FileSize, bool Parallel)
+	void RandomOutputTest::BCGGenerateFile(std::string FilePath, size_t FileSize)
 	{
-		BCG gen(BlockCiphers::RHXS256, Providers::CSP, Parallel);
+		BCG gen(Providers::CSP);
 		CSP pvd;
 		SymmetricKeySize ks = gen.LegalKeySizes()[1];
 		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpn(ks.IVSize());
 		std::vector<byte> tmpi(ks.InfoSize());
-		const size_t PRCLEN = Parallel ? gen.ParallelBlockSize() : 1024;
+		const size_t PRCLEN = 1024;
 		std::vector<byte> tmpr(PRCLEN);
 		size_t plen;
 
@@ -249,7 +249,7 @@ namespace Test
 		do
 		{
 			gen.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -265,7 +265,7 @@ namespace Test
 		CSP pvd;
 		SymmetricKeySize ks = gen.LegalKeySizes()[1];
 		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpn(ks.IVSize());
 		std::vector<byte> tmpi(ks.InfoSize());
 		const size_t PRCLEN = Parallel ? 4096 : 1024;
 		std::vector<byte> tmpr(PRCLEN);
@@ -283,7 +283,7 @@ namespace Test
 		do
 		{
 			gen.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -295,11 +295,11 @@ namespace Test
 
 	void RandomOutputTest::HCGGenerateFile(std::string FilePath, size_t FileSize)
 	{
-		HCG gen(SHA2Digests::SHA256, Providers::CSP);
+		HCG gen(SHA2Digests::SHA2256, Providers::CSP);
 		CSP pvd;
 		SymmetricKeySize ks = gen.LegalKeySizes()[1];
 		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpn(ks.IVSize());
 		std::vector<byte> tmpi(ks.InfoSize());
 		std::vector<byte> tmpr(1024);
 		size_t plen;
@@ -316,7 +316,7 @@ namespace Test
 		do
 		{
 			gen.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -330,7 +330,7 @@ namespace Test
 
 	void RandomOutputTest::BCRGenerateFile(std::string FilePath, size_t FileSize)
 	{
-		BCR gen(BlockCiphers::RHXS256, Providers::CSP, true);
+		BCR gen(Providers::CSP);
 		std::vector<byte> tmpr(1024);
 		size_t plen;
 
@@ -340,7 +340,7 @@ namespace Test
 		do
 		{
 			gen.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -362,7 +362,7 @@ namespace Test
 		do
 		{
 			gen.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -374,7 +374,7 @@ namespace Test
 
 	void RandomOutputTest::HCRGenerateFile(std::string FilePath, size_t FileSize)
 	{
-		HCR gen(SHA2Digests::SHA256, Providers::CSP);
+		HCR gen(SHA2Digests::SHA2256, Providers::CSP);
 		std::vector<byte> tmpr(1024);
 		size_t plen;
 
@@ -384,7 +384,7 @@ namespace Test
 		do
 		{
 			gen.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 
@@ -400,7 +400,7 @@ namespace Test
 		CSP pvd;
 		SymmetricKeySize ks = gen.LegalKeySizes()[1];
 		std::vector<byte> tmpk(ks.KeySize());
-		std::vector<byte> tmpn(ks.NonceSize());
+		std::vector<byte> tmpn(ks.IVSize());
 		std::vector<byte> tmpi(ks.InfoSize());
 		std::vector<byte> tmpr(1024);
 		size_t plen;
@@ -418,7 +418,7 @@ namespace Test
 		do
 		{
 			gen.Generate(tmpr);
-			size_t rmd = Utility::IntegerTools::Min(tmpr.size(), plen);
+			size_t rmd = Tools::IntegerTools::Min(tmpr.size(), plen);
 			fs.Write(tmpr, 0, rmd);
 			plen -= rmd;
 		} 

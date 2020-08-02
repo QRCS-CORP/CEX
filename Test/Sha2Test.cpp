@@ -3,8 +3,8 @@
 #include "../CEX/IntegerTools.h"
 #include "../CEX/MemoryTools.h"
 #include "../CEX/SHA2.h"
-#include "../CEX/SHA256.h"
-#include "../CEX/SHA512.h"
+#include "../CEX/SHA2256.h"
+#include "../CEX/SHA2512.h"
 
 #if defined(__AVX2__)
 #	include "../CEX/UInt256.h"
@@ -19,8 +19,8 @@
 namespace Test
 {
 	using Exception::CryptoDigestException;
-	using Utility::IntegerTools;
-	using Utility::MemoryTools;
+	using Tools::IntegerTools;
+	using Tools::MemoryTools;
 	using Prng::SecureRandom;
 #if defined(__AVX2__)
 	using Numeric::UInt256;
@@ -31,8 +31,8 @@ namespace Test
 	using Numeric::ULong512;
 #endif
 	using Digest::SHA2;
-	using Digest::SHA256;
-	using Digest::SHA512; 
+	using Digest::SHA2256;
+	using Digest::SHA2512; 
 	using Digest::SHA2Params;
 
 	const std::string SHA2Test::CLASSNAME = "SHA2Test";
@@ -80,8 +80,8 @@ namespace Test
 			Exception();
 			OnProgress(std::string("SHA2Test: Passed SHA2-256/512 exception handling tests.."));
 
-			SHA256* dgt256s = new SHA256(false);
-			SHA512* dgt512s = new SHA512(false);
+			SHA2256* dgt256s = new SHA2256(false);
+			SHA2512* dgt512s = new SHA2512(false);
 
 			Kat(dgt256s, m_message[0], m_expected[0]);
 			Kat(dgt256s, m_message[1], m_expected[1]);
@@ -104,8 +104,8 @@ namespace Test
 			delete dgt256s;
 			delete dgt512s;
 
-			SHA256* dgt256p = new SHA256(true);
-			SHA512* dgt512p = new SHA512(true);
+			SHA2256* dgt256p = new SHA2256(true);
+			SHA2512* dgt512p = new SHA2512(true);
 
 			Parallel(dgt256p);
 			OnProgress(std::string("SHA2Test: Passed SHA-256 parallel integrity tests.."));
@@ -249,12 +249,12 @@ namespace Test
 
 	void SHA2Test::Exception()
 	{
-		// test params constructor SHA256
+		// test params constructor SHA2256
 		try
 		{
 			// invalid fan out -99
 			SHA2Params params(32, 32, 99);
-			SHA256 dgt(params);
+			SHA2256 dgt(params);
 
 			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE1"));
 		}
@@ -266,12 +266,12 @@ namespace Test
 			throw;
 		}
 
-		// test params constructor SHA512
+		// test params constructor SHA2512
 		try
 		{
 			// invalid fan out -99
 			SHA2Params params(64, 64, 99);
-			SHA512 dgt(params);
+			SHA2512 dgt(params);
 
 			throw TestException(std::string("Exception"), dgt.Name(), std::string("Exception handling failure! -SE2"));
 		}
@@ -283,10 +283,10 @@ namespace Test
 			throw;
 		}
 
-		// test parallel max-degree SHA256
+		// test parallel max-degree SHA2256
 		try
 		{
-			SHA256 dgt;
+			SHA2256 dgt;
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
@@ -300,10 +300,10 @@ namespace Test
 			throw;
 		}
 
-		// test parallel max-degree SHA512
+		// test parallel max-degree SHA2512
 		try
 		{
-			SHA512 dgt;
+			SHA2512 dgt;
 			// set max degree to invalid -99
 			dgt.ParallelMaxDegree(99);
 
@@ -357,7 +357,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
 			msg.resize(INPLEN);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
+			rnd.Generate(msg, 0, msg.size());
 
 			try
 			{
@@ -518,7 +518,7 @@ namespace Test
 		{
 			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
 			msg.resize(INPLEN);
-			IntegerTools::Fill(msg, 0, msg.size(), rnd);
+			rnd.Generate(msg, 0, msg.size());
 
 			try
 			{

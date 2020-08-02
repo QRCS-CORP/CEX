@@ -1,0 +1,36 @@
+digraph "CryptoException"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="CryptoException",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="Base cryptographic exception container."];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="CryptoAsymmetricException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_asymmetric_exception.html",tooltip="Asymmetric cipher and signature scheme exception container"];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="CryptoAuthenticationFailure",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_authentication_failure.html",tooltip="Asymmetric cipher/signature, and AEAD mode authentication failure exception container"];
+  Node1 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="CryptoCipherModeException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_cipher_mode_exception.html",tooltip="Symmetric cipher-mode operations exception"];
+  Node1 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="CryptoDigestException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_digest_exception.html",tooltip="Cryptographic digest exception"];
+  Node1 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="CryptoGeneratorException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_generator_exception.html",tooltip="Cryptographic pseudo-random generator exception"];
+  Node1 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="CryptoKdfException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_kdf_exception.html",tooltip="Key derivation function exception"];
+  Node1 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="CryptoKmsException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_kms_exception.html",tooltip="Key management system exception"];
+  Node1 -> Node9 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="CryptoMacException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_mac_exception.html",tooltip="Message authentication code generator exception"];
+  Node1 -> Node10 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="CryptoNetworkingException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_networking_exception.html",tooltip="Network operations exception"];
+  Node1 -> Node11 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node11 [label="CryptoPaddingException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_padding_exception.html",tooltip="Symmetric block cipher padding exception"];
+  Node1 -> Node12 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node12 [label="CryptoProcessingException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_processing_exception.html",tooltip="Cryptographic data processing exception"];
+  Node1 -> Node13 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node13 [label="CryptoRandomException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_random_exception.html",tooltip="Cryptographic pseudo-random number generator exception"];
+  Node1 -> Node14 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node14 [label="CryptoSocketException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_socket_exception.html",tooltip="The network sockets exception container"];
+  Node1 -> Node15 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node15 [label="CryptoSymmetricException",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$class_crypto_symmetric_exception.html",tooltip="Symmetric cipher operationas exception"];
+}

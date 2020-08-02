@@ -4,10 +4,10 @@
 #include "CexDomain.h"
 #include "SystemTools.h"
 
-NAMESPACE_UTILITY
+NAMESPACE_TOOLS
 
 /// <summary>
-/// Wraps the highest available system time stamp
+/// Internal class, wraps the highest available system time stamp
 /// </summary>
 class TimeStamp
 {
@@ -47,5 +47,5 @@ public:
 	void Start();
 };
 
-NAMESPACE_UTILITYEND
+NAMESPACE_TOOLSEND
 #endif
