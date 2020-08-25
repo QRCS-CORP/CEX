@@ -34,7 +34,7 @@
 #include "../Test/BCGTest.h"
 #include "../Test/BCRTest.h"
 #include "../Test/Blake2Test.h"
-#include "../Test/ChaChaTest.h"
+#include "../Test/CSXTest.h"
 #include "../Test/CipherModeTest.h"
 #include "../Test/CipherSpeedTest.h"
 #include "../Test/CipherStreamTest.h"
@@ -95,6 +95,7 @@ using namespace Test;
 void CpuCheck()
 {
 	CpuDetect detect;
+
 	ConsoleUtils::WriteLine("L1 cache size: " + std::to_string(detect.L1CacheSize()));
 	ConsoleUtils::WriteLine("Total L1 cache size: " + std::to_string(detect.L1CacheTotal()));
 	ConsoleUtils::WriteLine("L1 cache line size: " + std::to_string(detect.L1CacheLineSize()));
@@ -165,9 +166,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.8i (A8)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.8g (A8)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      August 01, 2020                   *");
+	ConsoleUtils::WriteLine("* Date:      August 21, 2020                   *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -392,7 +393,7 @@ int main()
 			PrintHeader("TESTING CIPHER PADDING MODES");
 			TestRun(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
-			TestRun(new ChaChaTest());
+			TestRun(new CSXTest());
 			TestRun(new RCSTest());
 			TestRun(new RWSTest());
 			TestRun(new ThreefishTest());

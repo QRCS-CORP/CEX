@@ -392,24 +392,14 @@ void TSX1024::Transform(const std::vector<byte> &Input, size_t InOffset, std::ve
 
 void TSX1024::Finalize(std::unique_ptr<TSX1024State> &State, std::unique_ptr<IMac> &Authenticator)
 {
-	// generate the mac code
-	Authenticator->Finalize(State->MacTag, 0);
-
 	// customization string is mac counter + algorithm name
 	IntegerTools::Le64ToBytes(State->Counter, State->Custom, 0);
 
-	// extract the new mac key
-	Kdf::SHAKE gen(ShakeModes::SHAKE1024);
-	gen.Initialize(State->MacKey, State->Custom);
-	SymmetricKeySize ks = Authenticator->LegalKeySizes()[1];
-	SecureVector<byte> mack(ks.KeySize());
-	gen.Generate(mack);
+	// update the authenticator
+	Authenticator->Update(SecureUnlock(State->Custom), 0, State->Custom.size());
 
-	// reset the generator with the new key
-	SymmetricKey kpm(mack);
-	Authenticator->Initialize(kpm);
-	// store the new key and erase the temporary key
-	SecureMove(mack, 0, State->MacKey, 0, mack.size());
+	// generate the mac code
+	Authenticator->Finalize(State->MacTag, 0);
 }
 
 void TSX1024::Generate(std::unique_ptr<TSX1024State> &State, std::array<ulong, 2> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length)

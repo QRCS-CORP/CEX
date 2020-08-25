@@ -1,0 +1,8 @@
+﻿  ConsoleTools.cpp
+  FileTools.cpp
+  QSC.cpp
+  QSClient.cpp
+  Generating code
+  Not all modules are compiled with -Gy (function comdat), build without incremental LTCG.
+  Finished generating code
+  QSheildClient.vcxproj -> C:\Users\John\Documents\Visual Studio 2019\Projects\Cryptography\C++ Projects\CEX++ Auxillary\Win\x64\Release\QSheildClient.exe

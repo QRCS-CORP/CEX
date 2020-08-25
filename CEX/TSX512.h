@@ -20,6 +20,7 @@
 // Updated December 20, 2018
 // Updated December 26, 2018
 // Updated July 31, 2020
+// Updated August 19, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_TSX512_H

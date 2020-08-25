@@ -18,12 +18,13 @@
 //
 // 
 // Implementation Details:
-// CSX512: An implementation of the ChaCha stream cipher
+// CSX512: An implementation of the CSX-512 stream cipher
 // Written by John G. Underhill, September 20, 2018
 // Updated December 20, 2018
 // Updated December 26, 2018
 // Updated February 24, 2019
 // Updated July 31, 2020
+// Updated August 19, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CSX512_H
@@ -136,6 +137,7 @@ private:
 #endif
 	static const std::vector<byte> SIGMA_INFO;
 	static const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_THRESHOLD = 243;
 	static const size_t STATE_SIZE = 14;
 	static const size_t TAG_SIZE = 64;
 
@@ -171,6 +173,18 @@ public:
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid authentication type is chosen</exception>
 	explicit CSX512(bool Authenticate);
+
+	/// <summary>
+	/// Initialize the stream cipher using a secure-vector serialized state.
+	/// <para>The Serialize function stores the internal state of the cipher, so that it can be reinitialized,
+	/// without the need to call the Initialize function and key-schedule. 
+	/// If this constructor is used, the cipher is fully initialized to the values it had when the Serialize function was called.</para>
+	/// </summary>
+	///
+	/// <param name="State">The serialized state, created by the Serialize() function</param>
+	///
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid state array is used</exception>
+	explicit CSX512(SecureVector<byte> &State);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -277,6 +291,16 @@ public:
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if the degree parameter is invalid</exception>
 	void ParallelMaxDegree(size_t Degree) override;
+
+	/// <summary>
+	/// Saves the internal state of the cipher to a secure vector.
+	/// <para>The Serialize function can store the internal state of the cipher at the time it is invoked.
+	/// The cipher instance can be reinitialized through a constructor option, without the need to re-call the Initialize function and associated key-schedule functions.
+	/// This is useful in situations where the cipher is required intermitantly, and the entire state can be stored rather than just the key and nonce.</para>
+	/// </summary>
+	///
+	/// <returns>The serialized cipher state</returns>
+	SecureVector<byte> Serialize();
 
 	/// <summary>
 	/// Add additional data to the message authentication code generator.  

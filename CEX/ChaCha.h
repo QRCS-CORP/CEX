@@ -187,99 +187,98 @@ public:
 	template<typename ArrayU8, typename Array2xU32, typename Array14xU32>
 	static void PermuteP512C(ArrayU8 &Output, size_t OutOffset, Array2xU32 &Counter, Array14xU32 &State, size_t Rounds)
 	{
-		std::array<uint, 16> S;
-
-		MemoryTools::Copy(State, 0, S, 0, 12 * sizeof(uint));
-		MemoryTools::Copy(Counter, 0, S, 12, 2 * sizeof(uint));
-		MemoryTools::Copy(State, 12, S, 14, 2 * sizeof(uint));
+		std::array<ulong, 16> X{ State[0], State[1], State[2], State[3], 
+			State[4], State[5], State[6], State[7], 
+			State[8], State[9], State[10], State[11], 
+			Counter[0], Counter[1], State[12], State[13] };
 
 		while (Rounds != 0)
 		{
 			// round n
-			S[0] += S[4];
-			S[12] = IntegerTools::RotFL32(S[12] ^ S[0], 16);
-			S[8] += S[12];
-			S[4] = IntegerTools::RotFL32(S[4] ^ S[8], 12);
-			S[0] += S[4];
-			S[12] = IntegerTools::RotFL32(S[12] ^ S[0], 8);
-			S[8] += S[12];
-			S[4] = IntegerTools::RotFL32(S[4] ^ S[8], 7);
-			S[1] += S[5];
-			S[13] = IntegerTools::RotFL32(S[13] ^ S[1], 16);
-			S[9] += S[13];
-			S[5] = IntegerTools::RotFL32(S[5] ^ S[9], 12);
-			S[1] += S[5];
-			S[13] = IntegerTools::RotFL32(S[13] ^ S[1], 8);
-			S[9] += S[13];
-			S[5] = IntegerTools::RotFL32(S[5] ^ S[9], 7);
-			S[2] += S[6];
-			S[14] = IntegerTools::RotFL32(S[14] ^ S[2], 16);
-			S[10] += S[14];
-			S[6] = IntegerTools::RotFL32(S[6] ^ S[10], 12);
-			S[2] += S[6];
-			S[14] = IntegerTools::RotFL32(S[14] ^ S[2], 8);
-			S[10] += S[14];
-			S[6] = IntegerTools::RotFL32(S[6] ^ S[10], 7);
-			S[3] += S[7];
-			S[15] = IntegerTools::RotFL32(S[15] ^ S[3], 16);
-			S[11] += S[15];
-			S[7] = IntegerTools::RotFL32(S[7] ^ S[11], 12);
-			S[3] += S[7];
-			S[15] = IntegerTools::RotFL32(S[15] ^ S[3], 8);
-			S[11] += S[15];
-			S[7] = IntegerTools::RotFL32(S[7] ^ S[11], 7);
+			X[0] += X[4];
+			X[12] = IntegerTools::RotFL32(X[12] ^ X[0], 16);
+			X[8] += X[12];
+			X[4] = IntegerTools::RotFL32(X[4] ^ X[8], 12);
+			X[0] += X[4];
+			X[12] = IntegerTools::RotFL32(X[12] ^ X[0], 8);
+			X[8] += X[12];
+			X[4] = IntegerTools::RotFL32(X[4] ^ X[8], 7);
+			X[1] += X[5];
+			X[13] = IntegerTools::RotFL32(X[13] ^ X[1], 16);
+			X[9] += X[13];
+			X[5] = IntegerTools::RotFL32(X[5] ^ X[9], 12);
+			X[1] += X[5];
+			X[13] = IntegerTools::RotFL32(X[13] ^ X[1], 8);
+			X[9] += X[13];
+			X[5] = IntegerTools::RotFL32(X[5] ^ X[9], 7);
+			X[2] += X[6];
+			X[14] = IntegerTools::RotFL32(X[14] ^ X[2], 16);
+			X[10] += X[14];
+			X[6] = IntegerTools::RotFL32(X[6] ^ X[10], 12);
+			X[2] += X[6];
+			X[14] = IntegerTools::RotFL32(X[14] ^ X[2], 8);
+			X[10] += X[14];
+			X[6] = IntegerTools::RotFL32(X[6] ^ X[10], 7);
+			X[3] += X[7];
+			X[15] = IntegerTools::RotFL32(X[15] ^ X[3], 16);
+			X[11] += X[15];
+			X[7] = IntegerTools::RotFL32(X[7] ^ X[11], 12);
+			X[3] += X[7];
+			X[15] = IntegerTools::RotFL32(X[15] ^ X[3], 8);
+			X[11] += X[15];
+			X[7] = IntegerTools::RotFL32(X[7] ^ X[11], 7);
 			// round n+1
-			S[0] += S[5];
-			S[15] = IntegerTools::RotFL32(S[15] ^ S[0], 16);
-			S[10] += S[15];
-			S[5] = IntegerTools::RotFL32(S[5] ^ S[10], 12);
-			S[0] += S[5];
-			S[15] = IntegerTools::RotFL32(S[15] ^ S[0], 8);
-			S[10] += S[15];
-			S[5] = IntegerTools::RotFL32(S[5] ^ S[10], 7);
-			S[1] += S[6];
-			S[12] = IntegerTools::RotFL32(S[12] ^ S[1], 16);
-			S[11] += S[12];
-			S[6] = IntegerTools::RotFL32(S[6] ^ S[11], 12);
-			S[1] += S[6];
-			S[12] = IntegerTools::RotFL32(S[12] ^ S[1], 8);
-			S[11] += S[12];
-			S[6] = IntegerTools::RotFL32(S[6] ^ S[11], 7);
-			S[2] += S[7];
-			S[13] = IntegerTools::RotFL32(S[13] ^ S[2], 16);
-			S[8] += S[13];
-			S[7] = IntegerTools::RotFL32(S[7] ^ S[8], 12);
-			S[2] += S[7];
-			S[13] = IntegerTools::RotFL32(S[13] ^ S[2], 8);
-			S[8] += S[13];
-			S[7] = IntegerTools::RotFL32(S[7] ^ S[8], 7);
-			S[3] += S[4];
-			S[14] = IntegerTools::RotFL32(S[14] ^ S[3], 16);
-			S[9] += S[14];
-			S[4] = IntegerTools::RotFL32(S[4] ^ S[9], 12);
-			S[3] += S[4];
-			S[14] = IntegerTools::RotFL32(S[14] ^ S[3], 8);
-			S[9] += S[14];
-			S[4] = IntegerTools::RotFL32(S[4] ^ S[9], 7);
+			X[0] += X[5];
+			X[15] = IntegerTools::RotFL32(X[15] ^ X[0], 16);
+			X[10] += X[15];
+			X[5] = IntegerTools::RotFL32(X[5] ^ X[10], 12);
+			X[0] += X[5];
+			X[15] = IntegerTools::RotFL32(X[15] ^ X[0], 8);
+			X[10] += X[15];
+			X[5] = IntegerTools::RotFL32(X[5] ^ X[10], 7);
+			X[1] += X[6];
+			X[12] = IntegerTools::RotFL32(X[12] ^ X[1], 16);
+			X[11] += X[12];
+			X[6] = IntegerTools::RotFL32(X[6] ^ X[11], 12);
+			X[1] += X[6];
+			X[12] = IntegerTools::RotFL32(X[12] ^ X[1], 8);
+			X[11] += X[12];
+			X[6] = IntegerTools::RotFL32(X[6] ^ X[11], 7);
+			X[2] += X[7];
+			X[13] = IntegerTools::RotFL32(X[13] ^ X[2], 16);
+			X[8] += X[13];
+			X[7] = IntegerTools::RotFL32(X[7] ^ X[8], 12);
+			X[2] += X[7];
+			X[13] = IntegerTools::RotFL32(X[13] ^ X[2], 8);
+			X[8] += X[13];
+			X[7] = IntegerTools::RotFL32(X[7] ^ X[8], 7);
+			X[3] += X[4];
+			X[14] = IntegerTools::RotFL32(X[14] ^ X[3], 16);
+			X[9] += X[14];
+			X[4] = IntegerTools::RotFL32(X[4] ^ X[9], 12);
+			X[3] += X[4];
+			X[14] = IntegerTools::RotFL32(X[14] ^ X[3], 8);
+			X[9] += X[14];
+			X[4] = IntegerTools::RotFL32(X[4] ^ X[9], 7);
 			Rounds -= 2;
 		}
 
-		IntegerTools::Le32ToBytes(S[0] + State[0], Output, OutOffset);
-		IntegerTools::Le32ToBytes(S[1] + State[1], Output, OutOffset + 4);
-		IntegerTools::Le32ToBytes(S[2] + State[2], Output, OutOffset + 8);
-		IntegerTools::Le32ToBytes(S[3] + State[3], Output, OutOffset + 12);
-		IntegerTools::Le32ToBytes(S[4] + State[4], Output, OutOffset + 16);
-		IntegerTools::Le32ToBytes(S[5] + State[5], Output, OutOffset + 20);
-		IntegerTools::Le32ToBytes(S[6] + State[6], Output, OutOffset + 24);
-		IntegerTools::Le32ToBytes(S[7] + State[7], Output, OutOffset + 28);
-		IntegerTools::Le32ToBytes(S[8] + State[8], Output, OutOffset + 32);
-		IntegerTools::Le32ToBytes(S[9] + State[9], Output, OutOffset + 36);
-		IntegerTools::Le32ToBytes(S[10] + State[10], Output, OutOffset + 40);
-		IntegerTools::Le32ToBytes(S[11] + State[11], Output, OutOffset + 44);
-		IntegerTools::Le32ToBytes(S[12] + Counter[0], Output, OutOffset + 48);
-		IntegerTools::Le32ToBytes(S[13] + Counter[1], Output, OutOffset + 52);
-		IntegerTools::Le32ToBytes(S[14] + State[12], Output, OutOffset + 56);
-		IntegerTools::Le32ToBytes(S[15] + State[13], Output, OutOffset + 60);
+		IntegerTools::Le32ToBytes(X[0] + State[0], Output, OutOffset);
+		IntegerTools::Le32ToBytes(X[1] + State[1], Output, OutOffset + 4);
+		IntegerTools::Le32ToBytes(X[2] + State[2], Output, OutOffset + 8);
+		IntegerTools::Le32ToBytes(X[3] + State[3], Output, OutOffset + 12);
+		IntegerTools::Le32ToBytes(X[4] + State[4], Output, OutOffset + 16);
+		IntegerTools::Le32ToBytes(X[5] + State[5], Output, OutOffset + 20);
+		IntegerTools::Le32ToBytes(X[6] + State[6], Output, OutOffset + 24);
+		IntegerTools::Le32ToBytes(X[7] + State[7], Output, OutOffset + 28);
+		IntegerTools::Le32ToBytes(X[8] + State[8], Output, OutOffset + 32);
+		IntegerTools::Le32ToBytes(X[9] + State[9], Output, OutOffset + 36);
+		IntegerTools::Le32ToBytes(X[10] + State[10], Output, OutOffset + 40);
+		IntegerTools::Le32ToBytes(X[11] + State[11], Output, OutOffset + 44);
+		IntegerTools::Le32ToBytes(X[12] + Counter[0], Output, OutOffset + 48);
+		IntegerTools::Le32ToBytes(X[13] + Counter[1], Output, OutOffset + 52);
+		IntegerTools::Le32ToBytes(X[14] + State[12], Output, OutOffset + 56);
+		IntegerTools::Le32ToBytes(X[15] + State[13], Output, OutOffset + 60);
 	}
 
 	/// <summary>
@@ -983,7 +982,7 @@ public:
 
 	/// <summary>
 	/// An experimental form of the CSX-512 (based on ChaCha) permutation function using 64-bit integers.
-	/// <para>This function has been optimized for a small memory consumption.</para>
+	/// <para>This function has been optimized for small memory consumption.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The output message array</param>
@@ -994,100 +993,108 @@ public:
 	template<typename ArrayU8, typename Array2xU64, typename Array14xU64>
 	static void PermuteP1024C(ArrayU8 &Output, size_t OutOffset, Array2xU64 &Counter, Array14xU64 &State, size_t Rounds)
 	{
-		std::array<ulong, 16> S;
+		std::array<ulong, 16> X{ State[0], State[1], State[2], State[3], 
+			State[4], State[5], State[6], State[7], 
+			State[8], State[9], State[10], State[11], 
+			Counter[0], Counter[1], State[12], State[13] };
 
-		MemoryTools::Copy(State, 0, S, 0, 8 * sizeof(ulong));
-		MemoryTools::Copy(Counter, 0, S, 8, 2 * sizeof(ulong));
-		MemoryTools::Copy(State, 8, S, 10, 6 * sizeof(ulong));
+		// new rotational constants = 
+		// 38,19,10,55 
+		// 33,4,51,13 
+		// 16,34,56,51 
+		// 4,53,42,41 
+		// 34,41,59,17 
+		// 23,31,37,20 
+		// 31,44,47,46 
+		// 12,47,44,30 
 
-		// new rotational constants=38,19,10,55 33,4,51,13 16,34,56,51 4,53,42,41 34,41,59,17 23,31,37,20 31,44,47,46 12,47,44,30 
 		while (Rounds != 0)
 		{
 			// round n
-			S[0] += S[4];
-			S[12] = IntegerTools::RotFL64(S[12] ^ S[0], 38);
-			S[8] += S[12];
-			S[4] = IntegerTools::RotFL64(S[4] ^ S[8], 19);
-			S[0] += S[4];
-			S[12] = IntegerTools::RotFL64(S[12] ^ S[0], 10);
-			S[8] += S[12];
-			S[4] = IntegerTools::RotFL64(S[4] ^ S[8], 55);
-			S[1] += S[5];
-			S[13] = IntegerTools::RotFL64(S[13] ^ S[1], 33);
-			S[9] += S[13];
-			S[5] = IntegerTools::RotFL64(S[5] ^ S[9], 4);
-			S[1] += S[5];
-			S[13] = IntegerTools::RotFL64(S[13] ^ S[1], 51);
-			S[9] += S[13];
-			S[5] = IntegerTools::RotFL64(S[5] ^ S[9], 13);
-			S[2] += S[6];
-			S[14] = IntegerTools::RotFL64(S[14] ^ S[2], 16);
-			S[10] += S[14];
-			S[6] = IntegerTools::RotFL64(S[6] ^ S[10], 34);
-			S[2] += S[6];
-			S[14] = IntegerTools::RotFL64(S[14] ^ S[2], 56);
-			S[10] += S[14];
-			S[6] = IntegerTools::RotFL64(S[6] ^ S[10], 51);
-			S[3] += S[7];
-			S[15] = IntegerTools::RotFL64(S[15] ^ S[3], 4);
-			S[11] += S[15];
-			S[7] = IntegerTools::RotFL64(S[7] ^ S[11], 53);
-			S[3] += S[7];
-			S[15] = IntegerTools::RotFL64(S[15] ^ S[3], 42);
-			S[11] += S[15];
-			S[7] = IntegerTools::RotFL64(S[7] ^ S[11], 41);
+			X[0] += X[4];
+			X[12] = IntegerTools::RotFL64(X[12] ^ X[0], 38);
+			X[8] += X[12];
+			X[4] = IntegerTools::RotFL64(X[4] ^ X[8], 19);
+			X[0] += X[4];
+			X[12] = IntegerTools::RotFL64(X[12] ^ X[0], 10);
+			X[8] += X[12];
+			X[4] = IntegerTools::RotFL64(X[4] ^ X[8], 55);
+			X[1] += X[5];
+			X[13] = IntegerTools::RotFL64(X[13] ^ X[1], 33);
+			X[9] += X[13];
+			X[5] = IntegerTools::RotFL64(X[5] ^ X[9], 4);
+			X[1] += X[5];
+			X[13] = IntegerTools::RotFL64(X[13] ^ X[1], 51);
+			X[9] += X[13];
+			X[5] = IntegerTools::RotFL64(X[5] ^ X[9], 13);
+			X[2] += X[6];
+			X[14] = IntegerTools::RotFL64(X[14] ^ X[2], 16);
+			X[10] += X[14];
+			X[6] = IntegerTools::RotFL64(X[6] ^ X[10], 34);
+			X[2] += X[6];
+			X[14] = IntegerTools::RotFL64(X[14] ^ X[2], 56);
+			X[10] += X[14];
+			X[6] = IntegerTools::RotFL64(X[6] ^ X[10], 51);
+			X[3] += X[7];
+			X[15] = IntegerTools::RotFL64(X[15] ^ X[3], 4);
+			X[11] += X[15];
+			X[7] = IntegerTools::RotFL64(X[7] ^ X[11], 53);
+			X[3] += X[7];
+			X[15] = IntegerTools::RotFL64(X[15] ^ X[3], 42);
+			X[11] += X[15];
+			X[7] = IntegerTools::RotFL64(X[7] ^ X[11], 41);
 			// round n+1
-			S[0] += S[5];
-			S[15] = IntegerTools::RotFL64(S[15] ^ S[0], 34);
-			S[10] += S[15];
-			S[5] = IntegerTools::RotFL64(S[5] ^ S[10], 41);
-			S[0] += S[5];
-			S[15] = IntegerTools::RotFL64(S[15] ^ S[0], 59);
-			S[10] += S[15];
-			S[5] = IntegerTools::RotFL64(S[5] ^ S[10], 17);
-			S[1] += S[6];
-			S[12] = IntegerTools::RotFL64(S[12] ^ S[1], 23);
-			S[11] += S[12];
-			S[6] = IntegerTools::RotFL64(S[6] ^ S[11], 31);
-			S[1] += S[6];
-			S[12] = IntegerTools::RotFL64(S[12] ^ S[1], 37);
-			S[11] += S[12];
-			S[6] = IntegerTools::RotFL64(S[6] ^ S[11], 20);
-			S[2] += S[7];
-			S[13] = IntegerTools::RotFL64(S[13] ^ S[2], 31);
-			S[8] += S[13];
-			S[7] = IntegerTools::RotFL64(S[7] ^ S[8], 44);
-			S[2] += S[7];
-			S[13] = IntegerTools::RotFL64(S[13] ^ S[2], 47);
-			S[8] += S[13];
-			S[7] = IntegerTools::RotFL64(S[7] ^ S[8], 46);
-			S[3] += S[4];
-			S[14] = IntegerTools::RotFL64(S[14] ^ S[3], 12);
-			S[9] += S[14];
-			S[4] = IntegerTools::RotFL64(S[4] ^ S[9], 47);
-			S[3] += S[4];
-			S[14] = IntegerTools::RotFL64(S[14] ^ S[3], 44);
-			S[9] += S[14];
-			S[4] = IntegerTools::RotFL64(S[4] ^ S[9], 30);
+			X[0] += X[5];
+			X[15] = IntegerTools::RotFL64(X[15] ^ X[0], 34);
+			X[10] += X[15];
+			X[5] = IntegerTools::RotFL64(X[5] ^ X[10], 41);
+			X[0] += X[5];
+			X[15] = IntegerTools::RotFL64(X[15] ^ X[0], 59);
+			X[10] += X[15];
+			X[5] = IntegerTools::RotFL64(X[5] ^ X[10], 17);
+			X[1] += X[6];
+			X[12] = IntegerTools::RotFL64(X[12] ^ X[1], 23);
+			X[11] += X[12];
+			X[6] = IntegerTools::RotFL64(X[6] ^ X[11], 31);
+			X[1] += X[6];
+			X[12] = IntegerTools::RotFL64(X[12] ^ X[1], 37);
+			X[11] += X[12];
+			X[6] = IntegerTools::RotFL64(X[6] ^ X[11], 20);
+			X[2] += X[7];
+			X[13] = IntegerTools::RotFL64(X[13] ^ X[2], 31);
+			X[8] += X[13];
+			X[7] = IntegerTools::RotFL64(X[7] ^ X[8], 44);
+			X[2] += X[7];
+			X[13] = IntegerTools::RotFL64(X[13] ^ X[2], 47);
+			X[8] += X[13];
+			X[7] = IntegerTools::RotFL64(X[7] ^ X[8], 46);
+			X[3] += X[4];
+			X[14] = IntegerTools::RotFL64(X[14] ^ X[3], 12);
+			X[9] += X[14];
+			X[4] = IntegerTools::RotFL64(X[4] ^ X[9], 47);
+			X[3] += X[4];
+			X[14] = IntegerTools::RotFL64(X[14] ^ X[3], 44);
+			X[9] += X[14];
+			X[4] = IntegerTools::RotFL64(X[4] ^ X[9], 30);
 			Rounds -= 2;
 		}
 
-		IntegerTools::Le64ToBytes(S[0] + State[0], Output, OutOffset);
-		IntegerTools::Le64ToBytes(S[1] + State[1], Output, OutOffset + 8);
-		IntegerTools::Le64ToBytes(S[2] + State[2], Output, OutOffset + 16);
-		IntegerTools::Le64ToBytes(S[3] + State[3], Output, OutOffset + 24);
-		IntegerTools::Le64ToBytes(S[4] + State[4], Output, OutOffset + 32);
-		IntegerTools::Le64ToBytes(S[5] + State[5], Output, OutOffset + 40);
-		IntegerTools::Le64ToBytes(S[6] + State[6], Output, OutOffset + 48);
-		IntegerTools::Le64ToBytes(S[7] + State[7], Output, OutOffset + 56);
-		IntegerTools::Le64ToBytes(S[8] + State[8], Output, OutOffset + 64);
-		IntegerTools::Le64ToBytes(S[9] + State[9], Output, OutOffset + 72);
-		IntegerTools::Le64ToBytes(S[10] + State[10], Output, OutOffset + 80);
-		IntegerTools::Le64ToBytes(S[11] + State[11], Output, OutOffset + 88);
-		IntegerTools::Le64ToBytes(S[12] + Counter[0], Output, OutOffset + 96);
-		IntegerTools::Le64ToBytes(S[13] + Counter[1], Output, OutOffset + 104);
-		IntegerTools::Le64ToBytes(S[14] + State[12], Output, OutOffset + 112);
-		IntegerTools::Le64ToBytes(S[15] + State[13], Output, OutOffset + 120);
+		IntegerTools::Le64ToBytes(X[0] + State[0], Output, OutOffset);
+		IntegerTools::Le64ToBytes(X[1] + State[1], Output, OutOffset + 8);
+		IntegerTools::Le64ToBytes(X[2] + State[2], Output, OutOffset + 16);
+		IntegerTools::Le64ToBytes(X[3] + State[3], Output, OutOffset + 24);
+		IntegerTools::Le64ToBytes(X[4] + State[4], Output, OutOffset + 32);
+		IntegerTools::Le64ToBytes(X[5] + State[5], Output, OutOffset + 40);
+		IntegerTools::Le64ToBytes(X[6] + State[6], Output, OutOffset + 48);
+		IntegerTools::Le64ToBytes(X[7] + State[7], Output, OutOffset + 56);
+		IntegerTools::Le64ToBytes(X[8] + State[8], Output, OutOffset + 64);
+		IntegerTools::Le64ToBytes(X[9] + State[9], Output, OutOffset + 72);
+		IntegerTools::Le64ToBytes(X[10] + State[10], Output, OutOffset + 80);
+		IntegerTools::Le64ToBytes(X[11] + State[11], Output, OutOffset + 88);
+		IntegerTools::Le64ToBytes(X[12] + Counter[0], Output, OutOffset + 96);
+		IntegerTools::Le64ToBytes(X[13] + Counter[1], Output, OutOffset + 104);
+		IntegerTools::Le64ToBytes(X[14] + State[12], Output, OutOffset + 112);
+		IntegerTools::Le64ToBytes(X[15] + State[13], Output, OutOffset + 120);
 	}
 
 #if defined(CEX_HAS_AVX512)
@@ -1214,10 +1221,20 @@ public:
 	static void PermuteP8x1024H(ArrayU8 &Output, size_t OutOffset, Array16xU64 &Counter, Array14xU64 &State, size_t Rounds)
 	{
 		std::array<ULong512, 16> X{ ULong512(State[0]), ULong512(State[1]), ULong512(State[2]), ULong512(State[3]),
-			ULong512(State[4]), ULong512(State[5]), ULong512(State[6]), ULong512(State[7]), ULong512(Counter, 0), ULong512(Counter, 8),
-			ULong512(State[8]), ULong512(State[9]), ULong512(State[10]), ULong512(State[11]), ULong512(State[12]), ULong512(State[13]) };
+			ULong512(State[4]), ULong512(State[5]), ULong512(State[6]), ULong512(State[7]), 
+			ULong512(State[8]), ULong512(State[9]), ULong512(State[10]), ULong512(State[11]), 
+			UInt512(Counter, 0), UInt512(Counter, 8), ULong512(State[12]), ULong512(State[13]) };
 
-		// new rotational constants=38,19,10,55 33,4,51,13 16,34,56,51 4,53,42,41 34,41,59,17 23,31,37,20 31,44,47,46 12,47,44,30 
+		// new rotational constants = 
+		// 38,19,10,55 
+		// 33,4,51,13 
+		// 16,34,56,51 
+		// 4,53,42,41 
+		// 34,41,59,17 
+		// 23,31,37,20 
+		// 31,44,47,46 
+		// 12,47,44,30 
+
 		while (Rounds != 0)
 		{
 			// round n
@@ -1428,14 +1445,24 @@ public:
 	/// <param name="Counter">The cipher counter array</param>
 	/// <param name="State">The permutations state array</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 20</param>
-	template<typename ArrayU8, typename Array4xU64, typename Array14xU64>
-	static void PermuteP4x1024H(ArrayU8 &Output, size_t OutOffset, Array4xU64 &Counter, Array14xU64 &State, size_t Rounds)
+	template<typename ArrayU8, typename Array8xU64, typename Array14xU64>
+	static void PermuteP4x1024H(ArrayU8 &Output, size_t OutOffset, Array8xU64 &Counter, Array14xU64 &State, size_t Rounds)
 	{
 		std::array<ULong256, 16> X{ ULong256(State[0]), ULong256(State[1]), ULong256(State[2]), ULong256(State[3]),
-			ULong256(State[4]), ULong256(State[5]), ULong256(State[6]), ULong256(State[7]), ULong256(Counter, 0), ULong256(Counter, 4), 
-			ULong256(State[8]), ULong256(State[9]), ULong256(State[10]), ULong256(State[11]), ULong256(State[12]), ULong256(State[13]) };
+			ULong256(State[4]), ULong256(State[5]), ULong256(State[6]), ULong256(State[7]), 
+			ULong256(State[8]), ULong256(State[9]), ULong256(State[10]), ULong256(State[11]), 
+			ULong256(Counter, 0), ULong256(Counter, 4), ULong256(State[12]), ULong256(State[13]) };
 
-		// new rotational constants=38,19,10,55 33,4,51,13 16,34,56,51 4,53,42,41 34,41,59,17 23,31,37,20 31,44,47,46 12,47,44,30 
+		// new rotational constants = 
+		// 38,19,10,55 
+		// 33,4,51,13 
+		// 16,34,56,51 
+		// 4,53,42,41 
+		// 34,41,59,17 
+		// 23,31,37,20 
+		// 31,44,47,46 
+		// 12,47,44,30 
+
 		while (Rounds != 0)
 		{
 			// round n

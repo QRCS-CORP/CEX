@@ -157,7 +157,7 @@ public:
 	///
 	/// <param name="Source">The source socket instance</param>
 	/// <param name="Address">The remote hosts IPv6 address</param>
-	/// <param name="Service">The remote hosts service port number</param>
+	/// <param name="Port">The remote hosts service port number</param>
 	///
 	/// <returns>Returns true if the connection was successful</returns>
 	static bool Connect(Socket &Source, const ipv6_address &Address, ushort Port);

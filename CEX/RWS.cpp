@@ -112,6 +112,7 @@ public:
 		ushort vlen;
 
 		soff = 0;
+		vlen = 0;
 
 		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
 		RoundKeys.resize(vlen / sizeof(uint));
@@ -189,12 +190,12 @@ public:
 
 	SecureVector<byte> Serialize()
 	{
-		const size_t STASZE = (RoundKeys.size() * sizeof(uint)) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
+		const size_t STALEN = (RoundKeys.size() * sizeof(uint)) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
 			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(uint) + sizeof(KmacModes) + sizeof(ShakeModes) + (3 * sizeof(bool)) + (7 * sizeof(ushort));
 
 		size_t soff;
 		ushort vlen;
-		SecureVector<byte> state(STASZE);
+		SecureVector<byte> state(STALEN);
 
 		soff = 0;
 		vlen = static_cast<ushort>(RoundKeys.size() * sizeof(uint));
@@ -617,27 +618,8 @@ void RWS::Finalize(std::unique_ptr<RwsState> &State, std::unique_ptr<IMac> &Auth
 	// add the termination string to the mac
 	Authenticator->Update(mctr, 0, mctr.size());
 
-	// finalize the mac code to state
+	// 1.0b: finalize the mac code to state
 	Authenticator->Finalize(State->MacTag, 0);
-
-	// re-initialize the mac function
-	// name string is an unsigned 64-bit bytes counter + key-size + cipher-name
-	// the state counter is the total number of bytes processed by the cipher
-	IntegerTools::Le64ToBytes(State->Counter, State->Name, 0);
-
-	// extract the new mac key: cSHAKE(k,c,n)
-	Kdf::SHAKE gen(State->Mode);
-	gen.Initialize(State->MacKey, State->Custom, State->Name);
-	SymmetricKeySize ks = Authenticator->LegalKeySizes()[1];
-	SecureVector<byte> mack(ks.KeySize());
-	// generate the new key
-	gen.Generate(mack);
-
-	// re-initialize the mac generator with the new key
-	SymmetricKey kpm(mack);
-	Authenticator->Initialize(kpm);
-	// store the new key and erase the temporary key
-	SecureMove(mack, 0, State->MacKey, 0, mack.size());
 }
 
 void RWS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)

@@ -18,10 +18,12 @@
 //
 //
 // Implementation Details:
-// An implementation of an Rijndael-256 authenticated Counter Mode (RWS).
+// An implementation of an Rijndael-512 authenticated Counter Mode (RWS).
+// Version 1.0b
 // Written by John G. Underhill, March 8, 2019
 // Updated January 09, 2020
 // Updated July 31, 2020
+// Updated August 17, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_RWS_H
@@ -169,7 +171,7 @@ public:
 	/// <param name="Authenticate">Activate the authentication option</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid authentication type is chosen</exception>
-	RWS(bool Authenticate);
+	explicit RWS(bool Authenticate);
 
 	/// <summary>
 	/// Initialize the stream cipher using a secure-vector serialized state.
@@ -181,7 +183,7 @@ public:
 	/// <param name="State">The serialized state, created by the Serialize() function</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid state array is used</exception>
-	RWS(SecureVector<byte> &State);
+	explicit RWS(SecureVector<byte> &State);
 
 	/// <summary>
 	/// Destructor: finalize this class

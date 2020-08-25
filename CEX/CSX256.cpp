@@ -16,6 +16,7 @@ NAMESPACE_STREAM
 
 using Tools::IntegerTools;
 using Mac::KMAC;
+using Enumeration::KmacModes;
 using Tools::MemoryTools;
 using Tools::ParallelTools;
 using Kdf::SHAKE;
@@ -49,22 +50,124 @@ public:
 	{
 	}
 
+	CSX256State(SecureVector<byte> &State)
+		:
+		Custom(0),
+		MacKey(0),
+		MacTag(0),
+		Counter(0),
+		IsAuthenticated(false),
+		IsEncryption(false),
+		IsInitialized(false)
+	{
+		DeSerialize(State);
+	}
+
 	~CSX256State()
 	{
 		Reset();
 		IsAuthenticated = false;
 	}
 
+	void DeSerialize(SecureVector<byte> &SecureState)
+	{
+		size_t soff;
+		ushort vlen;
+
+		soff = 0;
+		vlen = 0;
+
+		vlen = static_cast<ushort>(State.size()) * sizeof(uint);
+		MemoryTools::Copy(SecureState, soff, State, 0, vlen);
+		soff = vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		Custom.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, Custom, 0, Custom.size());
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MacKey.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, MacKey, 0, MacKey.size());
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
+		MacTag.resize(vlen);
+		soff += sizeof(ushort);
+		MemoryTools::Copy(SecureState, soff, MacTag, 0, MacTag.size());
+		soff += vlen;
+
+		vlen = static_cast<ushort>(Nonce.size() * sizeof(uint));
+		MemoryTools::Copy(SecureState, soff, Nonce, 0, vlen);
+		soff += vlen;
+
+		MemoryTools::CopyToObject(SecureState, soff, &Counter, sizeof(ulong));
+		soff += sizeof(ulong);
+		MemoryTools::CopyToObject(SecureState, soff, &IsAuthenticated, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyToObject(SecureState, soff, &IsEncryption, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyToObject(SecureState, soff, &IsInitialized, sizeof(bool));
+	}
+
 	void Reset()
 	{
-		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(uint));
-		MemoryTools::Clear(State, 0, State.size() * sizeof(uint));
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
+		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(uint));
+		MemoryTools::Clear(State, 0, State.size() * sizeof(uint));
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
 		Counter = 0;
 		IsEncryption = false;
 		IsInitialized = false;
+	}
+
+	SecureVector<byte> Serialize()
+	{
+		const size_t STALEN = ((State.size() * sizeof(uint)) + Custom.size() + MacKey.size() + MacTag.size() + (Nonce.size() * sizeof(uint)) + sizeof(ulong) + (3 * sizeof(ushort)) + (3 * sizeof(bool)));
+
+		size_t soff;
+		ushort vlen;
+		SecureVector<byte> state(STALEN);
+
+		soff = 0;
+		vlen = static_cast<ushort>(State.size() * sizeof(uint));
+		MemoryTools::Copy(State, 0, state, soff, vlen);
+		soff += vlen;
+
+		vlen = static_cast<ushort>(Custom.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(Custom, 0, state, soff, Custom.size());
+		soff += Custom.size();
+
+		vlen = static_cast<ushort>(MacKey.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(MacKey, 0, state, soff, MacKey.size());
+		soff += MacKey.size();
+
+		vlen = static_cast<ushort>(MacTag.size());
+		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
+		soff += sizeof(ushort);
+		MemoryTools::Copy(MacTag, 0, state, soff, MacTag.size());
+		soff += MacTag.size();
+
+		vlen = static_cast<ushort>(Nonce.size() * sizeof(uint));
+		MemoryTools::Copy(Nonce, 0, state, soff, vlen);
+		soff += vlen;
+
+		MemoryTools::CopyFromObject(&Counter, state, soff, sizeof(ulong));
+		soff += sizeof(ulong);
+		MemoryTools::CopyFromObject(&IsAuthenticated, state, soff, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyFromObject(&IsEncryption, state, soff, sizeof(bool));
+		soff += sizeof(bool);
+		MemoryTools::CopyFromObject(&IsInitialized, state, soff, sizeof(bool));
+
+		return state;
 	}
 };
 
@@ -77,6 +180,23 @@ CSX256::CSX256(bool Authenticate)
 	m_macAuthenticator(nullptr),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
+}
+
+CSX256::CSX256(SecureVector<byte> &State)
+	:
+	m_csx256State(State.size() >= STATE_THRESHOLD ? new CSX256State(State) :
+		throw CryptoSymmetricException(std::string("CSX256"), std::string("Constructor"), std::string("The State array is invalid!"), ErrorCodes::InvalidKey)),
+	m_macAuthenticator(m_csx256State->IsAuthenticated == false ?
+		nullptr :
+		new KMAC(KmacModes::KMAC256)),
+	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
+{
+	if (m_csx256State->IsAuthenticated == true)
+	{
+		// initialize the mac
+		SymmetricKey kpm(m_csx256State->MacKey);
+		m_macAuthenticator->Initialize(kpm);
+	}
 }
 
 CSX256::~CSX256()
@@ -225,60 +345,59 @@ void CSX256::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		Reset();
 	}
 
-	std::vector<byte> code(INFO_SIZE);
+	m_csx256State->Custom.resize(INFO_SIZE);
 
 	if (Parameters.KeySizes().InfoSize() != 0)
 	{
 		// custom code
-		MemoryTools::Copy(Parameters.Info(), 0, code, 0, IntegerTools::Min(Parameters.KeySizes().InfoSize(), code.size()));
+		MemoryTools::Copy(Parameters.Info(), 0, m_csx256State->Custom, 0, IntegerTools::Min(Parameters.KeySizes().InfoSize(), m_csx256State->Custom.size()));
 	}
 	else
 	{
 		// standard
-		MemoryTools::Copy(SIGMA_INFO, 0, code, 0, SIGMA_INFO.size());
+		MemoryTools::Copy(SIGMA_INFO, 0, m_csx256State->Custom, 0, SIGMA_INFO.size());
 	}
 
 	if (IsAuthenticator() == false)
 	{
 		// add key and nonce to state
-		Load(Parameters.Key(), Parameters.IV(), code);
+		Load(Parameters.SecureKey(), Parameters.SecureIV(), m_csx256State->Custom);
 	}
 	else
 	{
 		m_macAuthenticator.reset(new KMAC(Enumeration::KmacModes::KMAC256));
 
-		// set the initial counter value
-		m_csx256State->Counter = 1;
-
-		// create the cSHAKE customization string
+		// store algorithm name
 		std::string tmpn = Name();
-		m_csx256State->Custom.resize(sizeof(ulong) + tmpn.size());
-		// add mac counter and algorithm name to customization string
-		IntegerTools::Le64ToBytes(m_csx256State->Counter, m_csx256State->Custom, 0);
-		MemoryTools::CopyFromObject(tmpn.data(), m_csx256State->Custom, sizeof(ulong), tmpn.size());
+		SecureVector<byte> name(tmpn.size());
+		MemoryTools::CopyFromObject(Name().data(), name, 0, name.size());
 
 		// initialize cSHAKE
 		SHAKE gen(ShakeModes::SHAKE256);
-		gen.Initialize(Parameters.SecureKey(), m_csx256State->Custom);
+		// not using customization parameter
+		SecureVector<byte> zero(0);
+		gen.Initialize(Parameters.SecureKey(), zero, name);
 
 		// generate the new cipher key
-		std::vector<byte> cprk(KEY_SIZE);
+		SecureVector<byte> cprk(KEY_SIZE);
 		gen.Generate(cprk);
 
 		// load the ciphers state
-		Load(cprk, Parameters.IV(), code);
+		Load(cprk, Parameters.SecureIV(), m_csx256State->Custom);
 
 		// generate the mac key
 		SymmetricKeySize ks = m_macAuthenticator->LegalKeySizes()[1];
 		SecureVector<byte> mack(ks.KeySize());
 		gen.Generate(mack);
+
 		// initialize the mac
 		SymmetricKey kpm(mack);
 		m_macAuthenticator->Initialize(kpm);
-		// store the key
-		m_csx256State->MacKey.resize(mack.size());
-		SecureMove(mack, 0, m_csx256State->MacKey, 0, mack.size());
 		m_csx256State->MacTag.resize(TagSize());
+
+		// store mac key for serializaztion
+		m_csx256State->MacKey.resize(mack.size());
+		SecureMove(mack, m_csx256State->MacKey, 0);
 	}
 
 	m_csx256State->IsEncryption = Encryption;
@@ -293,6 +412,13 @@ void CSX256::ParallelMaxDegree(size_t Degree)
 	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
+}
+
+SecureVector<byte> CSX256::Serialize()
+{
+	SecureVector<byte> tmps = m_csx256State->Serialize();
+
+	return tmps;
 }
 
 void CSX256::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_t Length)
@@ -369,24 +495,16 @@ void CSX256::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 
 void CSX256::Finalize(std::unique_ptr<CSX256State> &State, std::unique_ptr<IMac> &Authenticator)
 {
+	std::vector<byte> cust(sizeof(ulong));
+
+	// cap input with mac bytes counter
+	IntegerTools::Le64ToBytes(State->Counter, cust, 0);
+
+	// update the authenticator
+	Authenticator->Update(cust, 0, cust.size());
+
 	// generate the mac code
 	Authenticator->Finalize(State->MacTag, 0);
-
-	// customization string is mac counter + algorithm name
-	IntegerTools::Le64ToBytes(State->Counter, State->Custom, 0);
-
-	// extract the new mac key
-	SHAKE gen(ShakeModes::SHAKE256);
-	gen.Initialize(State->MacKey, State->Custom);
-	SymmetricKeySize ks = Authenticator->LegalKeySizes()[1];
-	SecureVector<byte> mack(ks.KeySize());
-	gen.Generate(mack);
-
-	// reset the generator with the new key
-	SymmetricKey kpm(mack);
-	Authenticator->Initialize(kpm);
-	// store the new key and erase the temporary key
-	SecureMove(mack, 0, State->MacKey, 0, mack.size());
 }
 
 void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -554,7 +672,7 @@ void CSX256::Generate(std::unique_ptr<CSX256State> &State, std::array<uint, 2> &
 	}
 }
 
-void CSX256::Load(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Code)
+void CSX256::Load(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Code)
 {
 	m_csx256State->State[0] = IntegerTools::LeBytesTo32(Code, 0);
 	m_csx256State->State[1] = IntegerTools::LeBytesTo32(Code, 4);

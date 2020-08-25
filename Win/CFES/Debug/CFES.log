@@ -1,0 +1,7 @@
+﻿  ConsoleTools.cpp
+  CFESMain.cpp
+  CFES.cpp
+C:\Users\stepp\Documents\Visual Studio 2019\Projects\C++\CEX++ Auxillary\CEX++ Auxillary\Win\CFES\CFES.cpp(228,15): warning C4566: character represented by universal-character-name '\u200B' cannot be represented in the current code page (1252)
+  FileTools.cpp
+  Generating Code...
+  CFES.vcxproj -> C:\Users\stepp\Documents\Visual Studio 2019\Projects\C++\CEX++ Auxillary\CEX++ Auxillary\Win\Debug\CFES.exe

@@ -35,7 +35,7 @@ Note: This is still an early stage in the development of this library (pre-alpha
 ### New in Current Release 1.0.0.8 (version A8):
 * The Rainbow signature scheme
 * The 512-bit block Rijndael authenticated stream cipher RWS (end of the world cipher)
-* The ChaCha derivitive CSX-512 authenticated styream cipher using 64-bit integers and a 1024-bit block
+* The ChaCha derivitive CSX-512 authenticated stream cipher using 64-bit integers and a 1024-bit block, and a 512-bit key
 * Changes to extended 1024-bit versions of KMAC, SHA3, and SHAKE
 * The integration of SecureVector (memory locked arrays) throughout
 * The addition of an IPv4/IPv6  networking stack

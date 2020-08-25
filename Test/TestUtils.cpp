@@ -10,6 +10,7 @@
 #endif
 #include <fstream>
 #include <iostream>
+#include <math.h>
 
 namespace Test
 {

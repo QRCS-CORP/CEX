@@ -95,7 +95,7 @@ namespace Test
 			Kat(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[3]);
 			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer cipher tests.."));
 
-			Sequential(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[4], m_expected[5], m_expected[6]);
+			//Sequential(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[4], m_expected[5], m_expected[6]);
 			Sequential(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[7], m_expected[8], m_expected[9]);
 			Sequential(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[10], m_expected[11], m_expected[12]);
 			OnProgress(std::string("RCSTest: Passed RCS sequential transformation calls test.."));
@@ -526,6 +526,89 @@ namespace Test
 		}
 	}
 
+	void RCSTest::Sequential(IStreamCipher* Cipher, const std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce,
+		const std::vector<byte> &Output1, const std::vector<byte> &Output2, const std::vector<byte> &Output3)
+	{
+		std::vector<byte> ad(20, 0x01);
+		std::vector<byte> dec1(Message.size());
+		std::vector<byte> dec2(Message.size());
+		std::vector<byte> dec3(Message.size());
+		std::vector<byte> otp1(Output1.size());
+		std::vector<byte> otp2(Output2.size());
+		std::vector<byte> otp3(Output3.size());
+
+		SymmetricKey kp(Key, Nonce);
+
+		Cipher->Initialize(true, kp);
+		Cipher->SetAssociatedData(ad, 0, ad.size());
+		Cipher->Transform(Message, 0, otp1, 0, Message.size());
+
+		if (otp1 != Output1)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS1"));
+		}
+
+		Cipher->Transform(Message, 0, otp2, 0, Message.size());
+
+		if (otp2 != Output2)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS2"));
+		}
+
+		Cipher->Transform(Message, 0, otp3, 0, Message.size());
+
+		if (otp3 != Output3)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS3"));
+		}
+
+		// test inverse operation -decryption mode
+		Cipher->Initialize(false, kp);
+		Cipher->SetAssociatedData(ad, 0, ad.size());
+
+		try
+		{
+			Cipher->Transform(otp1, 0, dec1, 0, dec1.size());
+		}
+		catch (CryptoAuthenticationFailure const&)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS4"));
+		}
+
+		if (dec1 != Message)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS5"));
+		}
+
+		try
+		{
+			Cipher->Transform(otp2, 0, dec2, 0, dec2.size());
+		}
+		catch (CryptoAuthenticationFailure const&)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS6"));
+		}
+
+		if (dec2 != Message)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS7"));
+		}
+
+		try
+		{
+			Cipher->Transform(otp3, 0, dec3, 0, dec3.size());
+		}
+		catch (CryptoAuthenticationFailure const&)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS8"));
+		}
+
+		if (dec3 != Message)
+		{
+			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS9"));
+		}
+	}
+
 	void RCSTest::Serialization()
 	{
 		const size_t TAGLEN = 32;
@@ -617,89 +700,6 @@ namespace Test
 		}
 	}
 
-	void RCSTest::Sequential(IStreamCipher* Cipher, const std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce,
-		const std::vector<byte> &Output1, const std::vector<byte> &Output2, const std::vector<byte> &Output3)
-	{
-		std::vector<byte> ad(20, 0x01);
-		std::vector<byte> dec1(Message.size());
-		std::vector<byte> dec2(Message.size());
-		std::vector<byte> dec3(Message.size());
-		std::vector<byte> otp1(Output1.size());
-		std::vector<byte> otp2(Output2.size());
-		std::vector<byte> otp3(Output3.size());
-
-		SymmetricKey kp(Key, Nonce);
-
-		Cipher->Initialize(true, kp);
-		Cipher->SetAssociatedData(ad, 0, ad.size());
-		Cipher->Transform(Message, 0, otp1, 0, Message.size());
-
-		if (otp1 != Output1)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS1"));
-		}
-
-		Cipher->Transform(Message, 0, otp2, 0, Message.size());
-
-		if (otp2 != Output2)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS2"));
-		}
-
-		Cipher->Transform(Message, 0, otp3, 0, Message.size());
-
-		if (otp3 != Output3)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Encrypted output is not equal! -AS3"));
-		}
-
-		// test inverse operation -decryption mode
-		Cipher->Initialize(false, kp);
-		Cipher->SetAssociatedData(ad, 0, ad.size());
-
-		try
-		{
-			Cipher->Transform(otp1, 0, dec1, 0, dec1.size());
-		}
-		catch (CryptoAuthenticationFailure const&)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS4"));
-		}
-
-		if (dec1 != Message)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS5"));
-		}
-
-		try
-		{
-			Cipher->Transform(otp2, 0, dec2, 0, dec2.size());
-		}
-		catch (CryptoAuthenticationFailure const&)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS6"));
-		}
-
-		if (dec2 != Message)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS7"));
-		}
-
-		try
-		{
-			Cipher->Transform(otp3, 0, dec3, 0, dec3.size());
-		}
-		catch (CryptoAuthenticationFailure const&)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Authentication failure! -AS8"));
-		}
-
-		if (dec3 != Message)
-		{
-			throw TestException(std::string("Sequential"), Cipher->Name(), std::string("AeadTest: Decrypted output is not equal! -AS9"));
-		}
-	}
-
 	void RCSTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
 	{
 		const size_t MSGLEN = Message.size();
@@ -761,38 +761,42 @@ namespace Test
 		{
 			// rcsc256k256
 			std::string("CE628327C50E0893EF608FA819E46E2521CFD604B26326261A40030B88271914"),
-			std::string("BE41BFB37765365D91C156691175F9DF042C82282EE3A399884F6C6E58150F60"),
+			std::string("423E6860E3EA2039EDB2CCA151FE653CED118E4C1A64B511484748795982D512"),
 			// rcsc512k512
 			std::string("9A15E3108957135AA660986C8DABE15BAA480A4A7360D68E78F5A9C5A7749C0B244C6F740B7492B57F7C57DF95B013E5682A10F3B76D3FBB99A35BB378BFBAC0"),
-			std::string("87E1B538137880D7BC6A255223BFAFEDC5C5081CBC3E743274B99B6217B8682793634D3AD9E09103B79203F4029801DBDF757A0AA047DCDAC368563BA0002897"),
+			std::string("9F6F9ED64DDCC235E798955274B951F016BB5128B2C5092AACC06B2917ECE530E729D350C8E4E437D117FF1CB8107DCBD8747FACEFCE2B2EB175839A2991EC8A"),
 			// rcs1024k1024
 			std::string("A915546833FEC271D1480F2814EDF992A56AF60A8A87CA130B35FE89AD15DC3FA142BD32135661135F72F4742556CF4D1AB8D5221384F6FDE77D2D7CCD6D555C"
 				"D4C42C101BF744D47551410D9ABF604224B23F6773A888203749CDBDD10840FEF246BF45FB92E2CB35B7A57420C8F971E146CEFCEBC4CD821FAE2A5972E8A419"),
-			std::string("1BA0271061960B0C325A65F15A333775C3D1EB8E17630EA07A6FBC2B8746A6E521EEFFF7E56E4D9452AB41C277D6A29C3342F238DE72B9F7C37C2CDD531E8EBC"
-				"610DBBAB0A2E4315E2464C0EC79D0FDD9BAD5B2E3F6A647119064337D8B7A1557CA4216785F29FBD6FD4E4BED53D19F0FF4B3FBDA481384E9D648A9C5B2D4D49")
+			std::string("EDA807B4E2FBC5172CD03B5DAF05F6AF4AF8AB96D50EA2C4DCA6D31901EEA63850C0D353F964352E025AA605F405F83009B1043EA89D9DFFD5833196C3C918A8"
+				"8CF074D0F3BE1A59CF996464FAC9180539BA0D662ACBC07C19D91E68B07065CE0DCC6D280653CD5041FA113F6F2AC3F78FCB7923DE248CEFC72D75EA68252D47")
 		};
 		HexConverter::Decode(code, 6, m_code);
 
 		const std::vector<std::string> expected =
 		{
 			// kat tests
-			std::string("9EF7D04279C5277366D2DDD3FBB47F0DFCB3994D6F43D7F3A782778838C56DB3"),	// rcs256s
-			std::string("7940917E9219A31248946F71647B15421535941574F84F79F6110C1F2F776D03"),	// rcsc256k256
-			std::string("21E97A126E35BE731EF204E48248A2EEB01B692992F73786602F21031FBFB7C8A1CF250F2EC948D5985B92667349B72EFA751048AF0B919AE9E16F177F5C97F2"),	// rcsc512k512
+			// rcs256s
+			std::string("9EF7D04279C5277366D2DDD3FBB47F0DFCB3994D6F43D7F3A782778838C56DB3"),
+			// rcsc256k256
+			std::string("7940917E9219A31248946F71647B15421535941574F84F79F6110C1F2F776D03"),
+			// rcsc512k512
+			std::string("21E97A126E35BE731EF204E48248A2EEB01B692992F73786602F21031FBFB7C8A1CF250F2EC948D5985B92667349B72EFA751048AF0B919AE9E16F177F5C97F2"),
+			// rcsc1024k1024
 			std::string("469D7D1F5B83E17BF5D11C806A87BC060C5820C1566AA9CD89BC9606EE7964D3DDE8D819B1489325C2D8A84AB0209FC7A447164D0BD62403A1633D9E6CE1AB9C"
-				"42326455C3CF4879708FA3DB260C3075E898CE052F7F39F8428332B2B5CF8B388F8AC64050C74C9947E79AB5661D953A15DEA04F9E86D3F148ABC3467F27DAB3"),			// rcsc1024k1024
+				"42326455C3CF4879708FA3DB260C3075E898CE052F7F39F8428332B2B5CF8B388F8AC64050C74C9947E79AB5661D953A15DEA04F9E86D3F148ABC3467F27DAB3"),
 			// sequential tests
 			// hbar256k256
 			std::string("7940917E9219A31248946F71647B15421535941574F84F79F6110C1F2F776D03EBC24989F5DC4F8598BF155E24944745E52B7DC27161CA3D9DB7951647F41DB8"),
-			std::string("ABF3574126DAA563B423B0EEEE9970FD0C8F060F65CB00CDC05BB0DC047DB2ADBE41BFB37765365D91C156691175F9DF042C82282EE3A399884F6C6E58150F60"),
-			std::string("A4F915090E2BE9BB71C93B2847935751E3D9B2A746365462CA26116B661FC0BCF83ED2C74EBCC739B13BD358EBEC79421415622C1A80D88A4B53370D691CF02B"),
+			std::string("ABF3574126DAA563B423B0EEEE9970FD0C8F060F65CB00CDC05BB0DC047DB2ADA45F363A919EE677C9C1C7478A63E78E0C66AB17078AEC4E30C6B9063BB20B68"),
+			std::string("A4F915090E2BE9BB71C93B2847935751E3D9B2A746365462CA26116B661FC0BC4E95F3F17683BD9F9D854AD252B419ACB270E11890924AE8A9CC54CF8A2FD582"),
 			// hbar512k512
 			std::string("21E97A126E35BE731EF204E48248A2EEB01B692992F73786602F21031FBFB7C8A1CF250F2EC948D5985B92667349B72EFA751048AF0B919AE9E16F177F5C97F2"
 				"CA4C3AF6D1BF2FA8694483FC1F429A7ECC7C9B5F6FCB8504265DE0385B4D012A8E11035F172C98090549B38FA4B0525ED747EE9670B240C1EC3C2E03070E3E11"),
 			std::string("388270BF8DF03483BB287FFA527D81403F0362210FD525657C8541250DFFE3BAD1285FAB37A6821DA524F3F7FF7EFCB39C5B59E3897B177E45D6AA7F4BB5BE77"
-				"87E1B538137880D7BC6A255223BFAFEDC5C5081CBC3E743274B99B6217B8682793634D3AD9E09103B79203F4029801DBDF757A0AA047DCDAC368563BA0002897"),
+				"F8A3206DD873100E1CC7AD430EDB01A4D464EAE2DB23BF310E53C65A1AABDC92D0F1F64D9A427447296475CA9429F715967863ED209715453FA48030E43C7C35"),
 			std::string("80DE0F8E40DB5DCDBE6F844F523C4FDE4AB9681DF7721382AF98A219BC78688A97C0CCCD359F4A21EE875B5D6842CE58AE30512847650223934666175F3F62E4"
-				"AA49AF730E7275B045BF59993D4D97E9851512B4A9575248E44A1A57A7262E6B252BA2BE186B500B92AFB0B67FF1F690879102B027367D8E11280179832BD59D"),
+				"EECFA967C23272F66EC25C4A7764FEB4E81055350BEEFA40140E2C9001A74E7BE42750B6B9D6D1575D849EACAAD8E21A9049E1A9F1FDFB7375AF1D09ED0B5AC8"),
 			// hbar1024k1024
 			std::string("469D7D1F5B83E17BF5D11C806A87BC060C5820C1566AA9CD89BC9606EE7964D3DDE8D819B1489325C2D8A84AB0209FC7A447164D0BD62403A1633D9E6CE1AB9C"
 				"42326455C3CF4879708FA3DB260C3075E898CE052F7F39F8428332B2B5CF8B388F8AC64050C74C9947E79AB5661D953A15DEA04F9E86D3F148ABC3467F27DAB3"
@@ -800,12 +804,12 @@ namespace Test
 				"9E75DD9754A335D154E7D6F08F46D977D4D924A6D640A5748208DF5B125747C37AD1E54E64C6D5CBE692B8C209B7F8C7CC815BD4ED4E7A43FE5C2BB034BC2118"),
 			std::string("CEDC009FC7F4B2B7625857F38655AA32DCBB5701FCCFEF2CDA5366952BAE54DB9C1B0FD2C172C49A0692FD9821951C92BB19AEAEA260972C1B5F550EFACD7D93"
 				"6D7A2BB73791523FCC44CFC48223C4B552766C9F2E391E6C52FC79C1BE7416AE9CC7408F95CE7DBC177D58E503A637CC8C34CA352872CB04ED49E5A19FA15C74"
-				"1BA0271061960B0C325A65F15A333775C3D1EB8E17630EA07A6FBC2B8746A6E521EEFFF7E56E4D9452AB41C277D6A29C3342F238DE72B9F7C37C2CDD531E8EBC"
-				"610DBBAB0A2E4315E2464C0EC79D0FDD9BAD5B2E3F6A647119064337D8B7A1557CA4216785F29FBD6FD4E4BED53D19F0FF4B3FBDA481384E9D648A9C5B2D4D49"),
+				"6B76D66584208807DCA5CB28F7A5C32BB2B5E237CA38FCA1D2800F71F9A250EB7EF241E4304E1F8207BDCB53D063A406DB33C29ED149C9C3BDB6CB83D85BC05B"
+				"96F5EC1FB76C06E75CC9CD338494B404E980017DD005CE35161570A3E4EA869D65B9634ECD0604FF32D2E720CAA1AB297B2529C2BB1C93868818BA7A071DB32D"),
 			std::string("150DF56DAC5E16F149FC12B2BA84DB85AA5E179454FB45DB906AE541F48618F91401405C1C870549118ED5837374FAF46F811CA9FA5E3307DB73F1256315ABEB"
 				"F38CD2910FA820EE514D5CCA2E2DFBD7301CC1A9CBE2C2685372D14979ECCC960098F41358EAD8DD79742A496102E4A6CDAD286DCB42809656AE3377C4F88BC8"
-				"F12F1E0304DE2DA4AB2E221BAB894B4677ABD467ED2D405649F1FF937B3D18570854DACC89BFBF21813B04A9F0BB25BBA93EC6129806D167B6F246731B7224E8"
-				"049992E0CC88CA535A6E66C70AAA8CBDA82FF8D692AE6D86030776B9E07249B99D7ECBEE2AB4B695ACE2667756819D1D2C57A9CB01F4A5565109C89EA230B807")
+				"4823A98B485F759D8DAC8347F15438A9F7926134DF90B25EC7B4D669CAA98DAC7D4C968093623CA8E56ADE0033CB49038DC9FF324B946BBBE5C852D942A24AF0"
+				"BA007D1507161331DB8CEE2859FF672C34F9DFFD7E52FC22E00DCE52CE93963A77537215F9BB3889183924790EE23AC4FF1A2B9AAAAC6771FB7F611112BC035A")
 		};
 		HexConverter::Decode(expected, 13, m_expected);
 

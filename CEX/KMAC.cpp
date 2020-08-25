@@ -199,8 +199,13 @@ size_t KMAC::Finalize(SecureVector<byte> &Output, size_t OutOffset)
 	m_kmacState->Buffer[m_kmacState->Position] = Keccak::KECCAK_KMAC_DOMAIN;
 	m_kmacState->Buffer[m_kmacState->Rate - 1] |= 128;
 
+	// generate the hash code
 	Keccak::FastAbsorb(m_kmacState->Buffer, 0, m_kmacState->Rate, m_kmacState->State);
 	Squeeze(Output, OutOffset, olen, m_kmacState);
+
+	// reset the buffer
+	MemoryTools::Clear(m_kmacState->Buffer, 0, m_kmacState->Buffer.size());
+	m_kmacState->Position = 0;
 
 	return olen;
 }

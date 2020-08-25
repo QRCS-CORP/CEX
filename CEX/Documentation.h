@@ -9,24 +9,49 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.8i (A8).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.8g (A8).
 \brief
 CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.8i</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.8g</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John G. Underhill
-\version   v1.0.0.8i
-\date      August 01, 2020
+\version   v1.0.0.8g
+\date      August 21, 2020
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.8i (A8 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.8g (A8 version), which are the major, minor, patch, and release codes. \n \n
 
+<B>Current Release v1.0.0.8g (version A8):</B> \n
+
+The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
+The Rainbow asymmetric signature scheme \n
+The XMSS/MT asymmetric signature scheme \n
+The Dilithium asymmetric signature scheme \n
+The SPHINCS+ asymmetric signature scheme \n
+The NTRU-Prime asymmetric cipher \n
+Authenticated Threefish-256/512/1024 stream ciphers \n
+Authenticated ChaCha-256/512 stream ciphers \n
+The cSHAKE option (RHX/SHX) integrated into HX symmetric ciphers \n
+Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
+
+<B>Planned Release 1.1.0.1</B> \n
+NewHope \n
+McEliece \n
+Kyber \n
+NTRUPrime \n
+Dilithium \n
+SPHINCS+ \n \n
+
+<B>Planned Release 1.2.0.1</B> \n
+TLS-1.3 \n
+Android/iOS/Linux Compatability \n
+DLL API \n \n
 
 \section intro_link Links
 The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html  \n

@@ -27,6 +27,7 @@
 // Updated December 26, 2018
 // Updated February 24, 2019
 // Updated July 31, 2020
+// Updated August 19, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CSX256_H
@@ -134,6 +135,7 @@ private:
 	static const size_t NONCE_SIZE = 2;
 	static const size_t ROUND_COUNT = 20;
 	static const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_THRESHOLD = 155;
 	static const std::vector<byte> SIGMA_INFO;
 	static const size_t STATE_SIZE = 14;
 	static const size_t TAG_SIZE = 32;
@@ -168,6 +170,18 @@ public:
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid authentication type is chosen</exception>
 	explicit CSX256(bool Authenticate);
+
+	/// <summary>
+	/// Initialize the stream cipher using a secure-vector serialized state.
+	/// <para>The Serialize function stores the internal state of the cipher, so that it can be reinitialized,
+	/// without the need to call the Initialize function and key-schedule. 
+	/// If this constructor is used, the cipher is fully initialized to the values it had when the Serialize function was called.</para>
+	/// </summary>
+	///
+	/// <param name="State">The serialized state, created by the Serialize() function</param>
+	///
+	/// <exception cref="CryptoSymmetricException">Thrown if an invalid state array is used</exception>
+	explicit CSX256(SecureVector<byte> &State);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -276,6 +290,16 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
+	/// Saves the internal state of the cipher to a secure vector.
+	/// <para>The Serialize function can store the internal state of the cipher at the time it is invoked.
+	/// The cipher instance can be reinitialized through a constructor option, without the need to re-call the Initialize function and associated key-schedule functions.
+	/// This is useful in situations where the cipher is required intermitantly, and the entire state can be stored rather than just the key and nonce.</para>
+	/// </summary>
+	///
+	/// <returns>The serialized cipher state</returns>
+	SecureVector<byte> Serialize();
+
+	/// <summary>
 	/// Add additional data to the message authentication code generator.  
 	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can then be called before or after a stream segment has been processed.</para>
 	/// </summary>
@@ -307,7 +331,7 @@ private:
 
 	static void Finalize(std::unique_ptr<CSX256State> &State, std::unique_ptr<IMac> &Authenticator);
 	static void Generate(std::unique_ptr<CSX256State> &State, std::array<uint, NONCE_SIZE> &Counter, std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	void Load(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Code);
+	void Load(const SecureVector<byte> &Key, const SecureVector<byte> &Nonce, const SecureVector<byte> &Code);
 	void Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Reset();
 };

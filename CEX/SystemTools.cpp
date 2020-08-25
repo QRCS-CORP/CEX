@@ -150,7 +150,9 @@ bool SystemTools::HasRdtsc()
 
 ulong SystemTools::MemoryPhysicalTotal()
 {
-	ulong res(0);
+	ulong res;
+
+	res = 0;
 
 #if defined(CEX_OS_WINDOWS)
 
@@ -191,7 +193,9 @@ ulong SystemTools::MemoryPhysicalTotal()
 
 ulong SystemTools::MemoryPhysicalUsed()
 {
-	ulong res(0);
+	ulong res;
+
+	res = 0;
 
 #if defined(CEX_OS_WINDOWS)
 
@@ -232,7 +236,9 @@ ulong SystemTools::MemoryPhysicalUsed()
 
 ulong SystemTools::MemoryVirtualTotal()
 {
-	ulong res(0);
+	ulong res;
+
+	res = 0;
 
 #if defined(CEX_OS_WINDOWS)
 
@@ -274,7 +280,9 @@ ulong SystemTools::MemoryVirtualTotal()
 
 ulong SystemTools::MemoryVirtualUsed()
 {
-	ulong res(0);
+	ulong res;
+
+	res = 0;
 
 #if defined(CEX_OS_WINDOWS)
 
@@ -293,7 +301,9 @@ ulong SystemTools::MemoryVirtualUsed()
 
 #elif defined(CEX_OS_POSIX)
 
-	long long vused(0);
+	long long vused;
+
+	vused = 0;
 
 	try
 	{
@@ -339,7 +349,9 @@ std::string SystemTools::OsName()
 
 uint SystemTools::ProcessId()
 {
-	uint res(0);
+	uint res;
+
+	res = 0;
 
 #if defined(CEX_OS_WINDOWS)
 	try 
@@ -369,7 +381,9 @@ ulong SystemTools::TimeCurrentNS()
 
 ulong SystemTools::TimeStamp(bool HasRdtsc)
 {
-	ulong rtme(0);
+	ulong rtme;
+
+	rtme = 0;
 
 	// http://nadeausoftware.com/articles/2012/04/c_c_tip_how_measure_elapsed_real_time_benchmarking
 #if defined(CEX_OS_WINDOWS)
@@ -525,7 +539,9 @@ ulong SystemTools::TimeStamp(bool HasRdtsc)
 
 ulong SystemTools::TimeSinceBoot()
 {
-	ulong res(0);
+	ulong res;
+
+	res = 0;
 
 	// http://stackoverflow.com/questions/30095439/how-do-i-get-system-up-time-in-milliseconds-in-c
 #if defined(CEX_OS_WINDOWS)
@@ -678,7 +694,9 @@ std::string SystemTools::Version()
 
 	uint SystemTools::CurrentThreadId()
 	{
-		uint res(0);
+		uint res;
+
+		res = 0;
 
 		try
 		{
@@ -1199,7 +1217,9 @@ std::string SystemTools::Version()
 	ulong SystemTools::AvailableFreeSpace()
 	{
 		struct statvfs stat;
-		ulong res(0);
+		ulong res;
+
+		res = 0;
 
 		try
 		{

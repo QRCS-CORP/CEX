@@ -177,7 +177,7 @@ public:
 	/// <param name="Authenticate">Activate the authentication option</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid authentication type is chosen</exception>
-	ACS(bool Authenticate);
+	explicit ACS(bool Authenticate);
 
 	/// <summary>
 	/// Initialize the stream cipher using a secure-vector serialized state.
@@ -189,7 +189,7 @@ public:
 	/// <param name="State">The serialized state, created by the Serialize() function</param>
 	///
 	/// <exception cref="CryptoSymmetricException">Thrown if an invalid state array is used</exception>
-	ACS(SecureVector<byte> &State);
+	explicit ACS(SecureVector<byte> &State);
 
 	/// <summary>
 	/// Destructor: finalize this class
