@@ -270,7 +270,7 @@ void HCG::Initialize(ISymmetricKey &Parameters)
 	ArrayTools::AppendString(Name(), m_hcgState->Code);
 	ArrayTools::AppendValue(static_cast<ushort>(SecurityStrength()), m_hcgState->Code);
 	// add the optional custom distribution code
-	ArrayTools::AppendVector(Parameters.Info(), m_hcgState->Code);
+	ArrayTools::AppendVector(Parameters.Info(), m_hcgState->Code); 
 
 	if (Parameters.KeySizes().IVSize() != 0)
 	{

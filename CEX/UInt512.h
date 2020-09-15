@@ -79,7 +79,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Z">The 256bit register</param>
-	explicit UInt128(__m512i const &Z)
+	UInt512(__m512i const &Z)
 	{
 		zmm = Z;
 	}
@@ -119,7 +119,8 @@ public:
 	explicit UInt512(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7,
 		uint X8, uint X9, uint X10, uint X11, uint X12, uint X13, uint X14, uint X15)
 	{
-		zmm = _mm512_set_epi32(X0, X1, X2, X3, X4, X5, X6, X7);
+		zmm = _mm512_set_epi32(X0, X1, X2, X3, X4, X5, X6, X7,
+			X8, X9, X10, X11, X12, X13, X14, X15);
 	}
 
 	/// <summary>
@@ -289,7 +290,7 @@ public:
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	const size_t size() { return sizeof(__m512i); }
+	static const size_t size() { return sizeof(__m512i); }
 
 	/// <summary>
 	/// Computes the 32 bit left rotation of four unsigned integers
@@ -492,7 +493,7 @@ public:
 	/// </summary>
 	inline UInt512 operator -- ()
 	{
-		return UInt512(zmm) - ZMM1();
+		return UInt512(zmm) - UInt512::ONE();
 	}
 
 	/// <summary>
@@ -782,7 +783,7 @@ public:
 	/// </summary>
 	inline UInt512 operator ! () const
 	{
-		return UInt512(_mm512_cmpeq_epi32(zmm, _mm512_setzero_si512()));
+		return UInt512(_mm512_cmpneq_epi32_mask(zmm, _mm512_setzero_si512()));
 	}
 
 	/// <summary>

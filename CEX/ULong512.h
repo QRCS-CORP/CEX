@@ -79,7 +79,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Z">The 512bit register</param>
-	explicit UInt128(__m512i const &Z)
+	ULong512(__m512i const &Z)
 	{
 		zmm = Z;
 	}
@@ -263,7 +263,10 @@ public:
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	const size_t size() { return sizeof(__m512i); }
+	static const size_t size() 
+	{ 
+		return sizeof(__m512i);
+	}
 
 	/// <summary>
 	/// Computes the 64 bit left rotation of eight unsigned integers
@@ -326,7 +329,7 @@ public:
 	inline static ULong512 ShiftRA(const ULong512 &Value, const int Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
-		return ULong512(_mm512_sra_epi64(Value, _mm_set1_epi64(Shift)));
+		return ULong512(_mm512_sra_epi64(Value, _mm_set1_epi64x(Shift)));
 	}
 
 	/// <summary>
@@ -340,7 +343,7 @@ public:
 	inline static ULong512 ShiftRL(const ULong512 &Value, const int Shift)
 	{
 		CEXASSERT(Shift <= 64, "Shift size is too large");
-		return ULong512(_mm512_srl_epi64(Value, _mm_set1_epi64(Shift)));
+		return ULong512(_mm512_srl_epi64(Value, _mm_set1_epi64x(Shift)));
 	}
 
 	/// <summary>
@@ -446,7 +449,7 @@ public:
 	/// </summary>
 	inline ULong512 operator -- ()
 	{
-		return ULong512(zmm) - ZMM1();
+		return ULong512(zmm) - ULong512::ONE();
 	}
 
 	/// <summary>
@@ -734,7 +737,7 @@ public:
 	/// </summary>
 	inline ULong512 operator ! () const
 	{
-		return ULong512(_mm512_cmpeq_epi64(zmm, _mm512_setzero_si512()));
+		return ULong512(_mm512_cmpeq_epi64_mask(zmm, _mm512_setzero_si512()));
 	}
 
 	/// <summary>

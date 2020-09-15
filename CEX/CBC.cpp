@@ -303,7 +303,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			m_blockCipher->Transform2048(Input, InOffset, Output, OutOffset);
 			// xor the set
 			MemoryTools::XOR1024(tmpv, 0, Output, OutOffset);
-			MemoryTools::XOR1024(tmpv + 128, 0, Output, OutOffset + 128);
+			MemoryTools::XOR1024(tmpv, 128, Output, OutOffset + 128);
 			// swap iv
 			MemoryTools::Copy(tmpn, 0, tmpv, 0, AVX512BLK);
 			InOffset += AVX512BLK;

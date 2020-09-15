@@ -23,6 +23,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include "../CEX/CexConfig.h"
 #include "../CEX/CpuDetect.h"
 #include "../Test/TestFiles.h"
 #include "../Test/TestUtils.h"
@@ -34,7 +35,7 @@
 #include "../Test/BCGTest.h"
 #include "../Test/BCRTest.h"
 #include "../Test/Blake2Test.h"
-#include "../Test/CSXTest.h"
+#include "../Test/ChaChaTest.h"
 #include "../Test/CipherModeTest.h"
 #include "../Test/CipherSpeedTest.h"
 #include "../Test/CipherStreamTest.h"
@@ -166,7 +167,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.8g (A8)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.1.8g (A8)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
 	ConsoleUtils::WriteLine("* Date:      August 21, 2020                   *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
@@ -328,7 +329,7 @@ int main()
 
 	if (hasAvx2)
 	{
-#if !defined(__AVX2__)
+#if !defined(CEX_HAS_AVX2)
 		PrintHeader("Warning! AVX2 support was detected! Set the enhanced instruction set to arch:AVX2 for best performance.");
 #else
 		PrintHeader("AVX2 intrinsics support has been enabled.");
@@ -336,9 +337,9 @@ int main()
 	}
 	else if (hasAvx)
 	{
-#if defined(__AVX2__)
+#if defined(CEX_HAS_AVX2)
 		PrintHeader("AVX2 is not supported on this system! AVX intrinsics support is available, set enable enhanced instruction set to arch:AVX");
-#elif !defined(__AVX__)
+#elif !defined(CEX_HAS_AVX)
 		PrintHeader("AVX intrinsics support has been detected, set enhanced instruction set to arch:AVX for best performance.");
 #else
 		PrintHeader("AVX intrinsics support has been enabled.");
@@ -361,7 +362,7 @@ int main()
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 			if (hasAesni)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
@@ -372,7 +373,7 @@ int main()
 			PrintHeader("Testing the AES software implementation (AES)");
 			TestRun(new AesAvsTest(false));
 
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 			if (hasAesni)
 			{
 				PrintHeader("Testing the AES-NI implementation (AES-NI)");
@@ -393,7 +394,7 @@ int main()
 			PrintHeader("TESTING CIPHER PADDING MODES");
 			TestRun(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
-			TestRun(new CSXTest());
+			TestRun(new ChaChaTest());
 			TestRun(new RCSTest());
 			TestRun(new RWSTest());
 			TestRun(new ThreefishTest());

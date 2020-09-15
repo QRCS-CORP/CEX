@@ -59,7 +59,7 @@ namespace Test
 	void SecureStreamTest::Evaluate()
 	{
 		Prng::SecureRandom gen;
-		uint32_t cnt;
+		uint cnt;
 		std::vector<byte> data;
 
 		for (size_t i = 0; i < 10; ++i)

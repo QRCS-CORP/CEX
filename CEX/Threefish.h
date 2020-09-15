@@ -74,7 +74,7 @@ private:
 			State[i + 16] = tmp[4];
 			State[i + 20] = tmp[5];
 			State[i + 24] = tmp[6];
-			State[i + 30] = tmp[7];
+			State[i + 28] = tmp[7];
 		}
 	}
 
@@ -681,7 +681,7 @@ public:
 		K[1].Load(Key[1]);
 		K[2].Load(Key[2]);
 		K[3].Load(Key[3]);
-		K[8] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ K[4] ^ K[5] ^ K[6] ^ K[7] ^ ULong512(0x1BD11BDAA9FC1A22ULL);
+		K[4] = K[0] ^ K[1] ^ K[2] ^ K[3] ^ ULong512(0x1BD11BDAA9FC1A22ULL);
 		T[0].Load(Tweak[0]);
 		T[1].Load(Tweak[1]);
 		T[2] = T[0] ^ T[1];

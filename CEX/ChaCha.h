@@ -25,6 +25,7 @@
 
 #if defined(CEX_HAS_AVX512)
 #	include "UInt512.h"
+#	include "ULong512.h"
 #elif defined(CEX_HAS_AVX2)
 #	include "UInt256.h"
 #	include "ULong256.h"
@@ -1223,7 +1224,7 @@ public:
 		std::array<ULong512, 16> X{ ULong512(State[0]), ULong512(State[1]), ULong512(State[2]), ULong512(State[3]),
 			ULong512(State[4]), ULong512(State[5]), ULong512(State[6]), ULong512(State[7]), 
 			ULong512(State[8]), ULong512(State[9]), ULong512(State[10]), ULong512(State[11]), 
-			UInt512(Counter, 0), UInt512(Counter, 8), ULong512(State[12]), ULong512(State[13]) };
+			ULong512(Counter, 0), ULong512(Counter, 8), ULong512(State[12]), ULong512(State[13]) };
 
 		// new rotational constants = 
 		// 38,19,10,55 
@@ -1319,7 +1320,7 @@ public:
 		X[10] += ULong512(State[10]);
 		X[11] += ULong512(State[11]);
 		X[12] += ULong512(Counter, 0);
-		X[13] += ULong512(Counter, 4);
+		X[13] += ULong512(Counter, 8);
 		X[14] += ULong512(State[12]);
 		X[15] += ULong512(State[13]);
 

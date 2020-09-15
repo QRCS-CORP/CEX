@@ -568,7 +568,7 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			m_macAuthenticator->Update(Output, OutOffset, Length);
 			// update the processed bytes counter
 			m_acsState->Counter += Length;
-			// finalize the mac and add the tag to the stream
+			// finalize the mac and copy the tag to the end of the output stream
 			Finalize(m_acsState, m_macAuthenticator);
 			MemoryTools::Copy(m_acsState->MacTag, 0, Output, OutOffset + Length, m_acsState->MacTag.size());
 		}
@@ -821,12 +821,15 @@ void ACS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 	if (ALNLEN < OUTLEN)
 	{
-		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, FNLLEN, m_acsState->Nonce);
+		const size_t FNLLEN = OUTLEN - ALNLEN;
+		InOffset += ALNLEN;
+		OutOffset += ALNLEN;
 
-		for (size_t i = ALNLEN; i < OUTLEN; i++)
+		Generate(Output, OutOffset, FNLLEN, m_acsState->Nonce);
+
+		for (size_t i = 0; i < FNLLEN; ++i)
 		{
-			Output[i] ^= Input[i];
+			Output[OutOffset + i] ^= Input[InOffset + i];
 		}
 	}
 }

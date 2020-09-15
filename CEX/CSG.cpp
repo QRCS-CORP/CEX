@@ -716,7 +716,10 @@ void CSG::PermuteW(std::unique_ptr<CsgState> &State)
 {
 	size_t i;
 
+/* TODO: load and store in order to match 512 to 256 intrinsics
 #if defined(CEX_HAS_AVX512)
+
+	std::vector<ULong512> tmpW(Keccak::KECCAK_STATE_SIZE);
 
 	for (i = 0; i < Keccak::KECCAK_STATE_SIZE; ++i)
 	{
@@ -737,7 +740,7 @@ void CSG::PermuteW(std::unique_ptr<CsgState> &State)
 		tmpW[i].Store(State->State[7][i], State->State[6][i], State->State[5][i], State->State[4][i], State->State[3][i], State->State[2][i], State->State[1][i], State->State[0][i]);
 	}
 
-#elif defined(CEX_HAS_AVX2)
+#if defined(CEX_HAS_AVX2)
 
 	std::vector<ULong256> tmpW(Keccak::KECCAK_STATE_SIZE);
 
@@ -761,7 +764,7 @@ void CSG::PermuteW(std::unique_ptr<CsgState> &State)
 	}
 
 #else
-
+*/
 	// sequential fallback -not used, internal testing only
 	for (i = 0; i < State->State.size(); ++i)
 	{
@@ -771,7 +774,7 @@ void CSG::PermuteW(std::unique_ptr<CsgState> &State)
 
 	State->Index = 0;
 
-#endif
+//#endif
 }
 
 NAMESPACE_DRBGEND

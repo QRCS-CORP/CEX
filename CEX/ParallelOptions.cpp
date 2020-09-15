@@ -141,6 +141,11 @@ const bool ParallelOptions::HasSimd256()
 	return m_hasSimd256; 
 }
 
+const bool ParallelOptions::HasSimd512()
+{
+	return m_hasSimd512;
+}
+
 const size_t ParallelOptions::L1DataCacheTotalSize()
 { 
 	return m_l1DataCacheTotal;
@@ -344,7 +349,12 @@ void ParallelOptions::Detect()
 	m_hasSimd256 = dtc.AVX2();
 	m_hasSimd512 = dtc.AVX512F();
 	m_physicalCores = dtc.PhysicalCores();
-	m_simdDetected = (m_hasSimd256) ? SimdProfiles::Simd256 : (m_hasSimd128) ? SimdProfiles::Simd128 : SimdProfiles::None;
+
+	m_simdDetected = m_hasSimd512 ? SimdProfiles::Simd512 : 
+		m_hasSimd256 ? SimdProfiles::Simd256 : 
+		m_hasSimd128 ? SimdProfiles::Simd128 :
+		SimdProfiles::None;
+
 	m_virtualCores = dtc.VirtualCores();
 	m_processorCount = (m_virtualCores > m_physicalCores) ? m_virtualCores : m_physicalCores;
 

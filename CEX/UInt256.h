@@ -145,7 +145,6 @@ public:
 	/// </summary>
 	///
 	/// <param name="X">Set all uint32 integers to this value</param>
-
 	inline void Load(uint X)
 	{
 		ymm = _mm256_set1_epi32(X);
@@ -277,7 +276,7 @@ public:
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	inline static const size_t size() 
+	static const size_t size() 
 	{ 
 		return sizeof(__m256i); 
 	}

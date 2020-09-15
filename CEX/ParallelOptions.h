@@ -179,6 +179,11 @@ public:
 	const bool HasSimd256();
 
 	/// <summary>
+	/// Read Only: Returns True if the system supports 256bit AVX2 intrinsics
+	/// </summary>
+	const bool HasSimd512();
+
+	/// <summary>
 	/// Read Only: The total size in bytes of the L1 Data cache available on the system
 	/// </summary>
 	const size_t L1DataCacheTotalSize();

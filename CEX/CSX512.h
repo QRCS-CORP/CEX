@@ -18,7 +18,7 @@
 //
 // 
 // Implementation Details:
-// CSX512: An implementation of the CSX-512 stream cipher
+// CSX512: An implementation of the ChaCha stream cipher
 // Written by John G. Underhill, September 20, 2018
 // Updated December 20, 2018
 // Updated December 26, 2018

@@ -241,7 +241,7 @@ public:
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	inline static const size_t size()
+	static const size_t size()
 	{
 		return sizeof(__m256i);
 	}

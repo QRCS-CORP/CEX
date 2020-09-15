@@ -28,6 +28,9 @@
     <Filter Include="Header Files\Prng">
       <UniqueIdentifier>{44ef2270-c023-414a-a2a2-571e02a515c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{287ad61e-232f-4914-8dbb-b0bcafb821c5}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\Cipher">
       <UniqueIdentifier>{b086c7ae-ed26-4ebf-ace7-0a00d747a2ec}</UniqueIdentifier>
     </Filter>
@@ -39,6 +42,9 @@
     </Filter>
     <Filter Include="Source Files\Mac">
       <UniqueIdentifier>{d6dc62eb-fec3-4420-9309-5be05315faa6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{e4a8b128-ede7-47bd-8df0-91bf89e23c00}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Prng">
       <UniqueIdentifier>{c15bfdc9-684d-4444-8795-91df89388aed}</UniqueIdentifier>
@@ -339,12 +345,6 @@
     </Filter>
     <Filter Include="Source Files\Network\Base">
       <UniqueIdentifier>{b94cf9ca-969a-4bfe-ab16-97b06a664ab9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Tools">
-      <UniqueIdentifier>{287ad61e-232f-4914-8dbb-b0bcafb821c5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Tools">
-      <UniqueIdentifier>{e4a8b128-ede7-47bd-8df0-91bf89e23c00}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -667,7 +667,7 @@
       <Filter>Header Files\Asymmetric\Cipher\McEliece</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\TimeStamp.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\AeadModeFromName.h">
       <Filter>Header Files\Helper</Filter>
@@ -763,7 +763,7 @@
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MemoryPool.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SecureMemory.h">
       <Filter>Header Files\Common</Filter>
@@ -784,19 +784,19 @@
       <Filter>Header Files\Cipher\Key</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ArrayTools.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\IntegerTools.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MemoryTools.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ParallelTools.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SystemTools.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\AsymmetricKey.h">
       <Filter>Header Files\Asymmetric\Key</Filter>
@@ -835,7 +835,7 @@
       <Filter>Header Files\Provider\Base</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\LockingAllocator.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\PrngBase.h">
       <Filter>Header Files\Prng\Base</Filter>
@@ -1018,7 +1018,7 @@
       <Filter>Header Files\Exception</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Timer.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\HBA.h">
       <Filter>Header Files\Cipher\Block\AEAD</Filter>
@@ -1027,7 +1027,7 @@
       <Filter>Header Files\Exception</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\NetworkTools.h">
-      <Filter>Header Files\Tools</Filter>
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\GCM.h">
       <Filter>Header Files\Cipher\Block\AEAD</Filter>
@@ -1377,7 +1377,7 @@
       <Filter>Source Files\Asymmetric\Cipher\NewHope\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\TimeStamp.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak.cpp">
       <Filter>Source Files\Digest\Support</Filter>
@@ -1404,7 +1404,7 @@
       <Filter>Source Files\Cipher\Block\Padding</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\MemoryPool.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\SymmetricSecureKey.cpp">
       <Filter>Source Files\Cipher\Key</Filter>
@@ -1425,13 +1425,13 @@
       <Filter>Source Files\Asymmetric\Key</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ArrayTools.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ParallelTools.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\SystemTools.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\AsymmetricSecureKey.cpp">
       <Filter>Source Files\Asymmetric\Key</Filter>
@@ -1446,7 +1446,7 @@
       <Filter>Source Files\Provider\Base</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\LockingAllocator.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\PrngBase.cpp">
       <Filter>Source Files\Prng\Base</Filter>
@@ -1683,7 +1683,7 @@
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Timer.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\HBA.cpp">
       <Filter>Source Files\Cipher\Block\AEAD</Filter>
@@ -1692,7 +1692,7 @@
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\NetworkTools.cpp">
-      <Filter>Source Files\Tools</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\GCM.cpp">
       <Filter>Source Files\Cipher\Block\AEAD</Filter>

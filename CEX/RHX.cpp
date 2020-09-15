@@ -235,51 +235,6 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		StandardExpand(Parameters.SecureKey(), m_rhxState);
 	}
 
-#if defined(CEX_RIJNDAEL_TABLES)
-
-	size_t bwords;
-	size_t i;
-	size_t j;
-	size_t k;
-
-	// inverse cipher
-	if (!m_rhxState->Encryption)
-	{
-		bwords = BLOCK_SIZE / 4;
-
-		// reverse key
-		for (i = 0, k = m_rhxState->RoundKeys.size() - bwords; i < k; i += bwords, k -= bwords)
-		{
-			for (j = 0; j < bwords; j++)
-			{
-				uint tmpk = m_rhxState->RoundKeys[i + j];
-				m_rhxState->RoundKeys[i + j] = m_rhxState->RoundKeys[k + j];
-				m_rhxState->RoundKeys[k + j] = tmpk;
-			}
-		}
-
-		// pre-load the s-box into l1 cache as a timing defense
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-		PrefetchSbox();
-#endif
-
-		// pre-load the inverse multiplication tables
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchITables();
-#endif
-
-		// sbox inversion
-		for (i = bwords; i < m_rhxState->RoundKeys.size() - bwords; i++)
-		{
-			m_rhxState->RoundKeys[i] = IT0[SBox[(m_rhxState->RoundKeys[i] >> 24)]] ^
-				IT1[SBox[static_cast<byte>(m_rhxState->RoundKeys[i] >> 16)]] ^
-				IT2[SBox[static_cast<byte>(m_rhxState->RoundKeys[i] >> 8)]] ^
-				IT3[SBox[static_cast<byte>(m_rhxState->RoundKeys[i])]];
-		}
-	}
-
-#endif
-
 	// ready to transform data
 	m_rhxState->Initialized = true;
 }
@@ -512,95 +467,6 @@ void RHX::ExpandSubBlock(SecureVector<uint> &RoundKeys, size_t KeyIndex, size_t 
 
 //~~~Rounds Processing~~~//
 
-#if defined(CEX_RIJNDAEL_TABLES)
-
-void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t RNDCNT = m_rhxState->RoundKeys.size() - 4;
-	size_t kctr;
-	uint X0;
-	uint X1;
-	uint X2;
-	uint X3;
-	uint Y0;
-	uint Y1;
-	uint Y2;
-	uint Y3;
-
-	// pre-load the round key array into l1 as a timing defence
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchRoundKey(m_rhxState->RoundKeys);
-#endif
-
-	// round 0
-	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rhxState->RoundKeys[0];
-	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rhxState->RoundKeys[1];
-	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rhxState->RoundKeys[2];
-	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rhxState->RoundKeys[3];
-
-	std::vector<byte> tmps(16);
-	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[0], tmps, 0); // 122,213..159
-	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[1], tmps, 4); // 19,17..197
-	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[2], tmps, 8);
-	IntegerTools::Be32ToBytes(m_rhxState->RoundKeys[3], tmps, 12);
-
-	// pre-load the inverse multiplication tables
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchITables();
-#endif
-
-	// round 1
-	Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[4];
-	Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[5];
-	Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[6];
-	Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[7];
-
-	kctr = 8;
-
-	// rounds loop
-	while (kctr != RNDCNT)
-	{
-		X0 = IT0[(Y0 >> 24)] ^ IT1[static_cast<byte>(Y3 >> 16)] ^ IT2[static_cast<byte>(Y2 >> 8)] ^ IT3[static_cast<byte>(Y1)] ^ m_rhxState->RoundKeys[kctr];
-		X1 = IT0[(Y1 >> 24)] ^ IT1[static_cast<byte>(Y0 >> 16)] ^ IT2[static_cast<byte>(Y3 >> 8)] ^ IT3[static_cast<byte>(Y2)] ^ m_rhxState->RoundKeys[kctr + 1];
-		X2 = IT0[(Y2 >> 24)] ^ IT1[static_cast<byte>(Y1 >> 16)] ^ IT2[static_cast<byte>(Y0 >> 8)] ^ IT3[static_cast<byte>(Y3)] ^ m_rhxState->RoundKeys[kctr + 2];
-		X3 = IT0[(Y3 >> 24)] ^ IT1[static_cast<byte>(Y2 >> 16)] ^ IT2[static_cast<byte>(Y1 >> 8)] ^ IT3[static_cast<byte>(Y0)] ^ m_rhxState->RoundKeys[kctr + 3];
-
-		Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[kctr + 4];
-		Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[kctr + 5];
-		Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[kctr + 6];
-		Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[kctr + 7];
-		kctr += 8;
-	}
-
-	// pre-load the inverse s-box
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchISbox();
-#endif
-
-	// final round
-	Output[OutOffset] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 1] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 2] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 3] = static_cast<byte>(ISBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 4] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 5] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 6] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 7] = static_cast<byte>(ISBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 8] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 9] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 10] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 11] = static_cast<byte>(ISBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 12] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 13] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 14] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 15] = static_cast<byte>(ISBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-}
-
-#else
-
 void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	SecureVector<byte> state(BLOCK_SIZE, 0x00);
@@ -629,8 +495,6 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
 
-#endif
-
 void RHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
@@ -650,94 +514,6 @@ void RHX::Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vect
 	Decrypt1024(Input, InOffset, Output, OutOffset);
 	Decrypt1024(Input, InOffset + 128, Output, OutOffset + 128);
 }
-
-#if defined(CEX_RIJNDAEL_TABLES)
-
-void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t RNDCNT = m_rhxState->RoundKeys.size() - 4;
-	size_t kctr;
-	uint X0;
-	uint X1;
-	uint X2;
-	uint X3;
-	uint Y0;
-	uint Y1;
-	uint Y2;
-	uint Y3;
-
-	// pre-load the round key array into l1 as a timing defence
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchRoundKey(m_rhxState->RoundKeys);
-#endif
-
-	// round 0
-	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rhxState->RoundKeys[0];
-	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rhxState->RoundKeys[1];
-	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rhxState->RoundKeys[2];
-	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rhxState->RoundKeys[3];
-
-	// pre-load the multiplication tables
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchTables();
-#endif
-
-	// round 1
-	Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[4];
-	Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[5];
-	Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[6];
-	Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[7];
-
-	kctr = 8;
-
-	while (kctr != RNDCNT)
-	{
-		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rhxState->RoundKeys[kctr];
-		++kctr;
-	}
-
-	// pre-load the s-box
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchSbox();
-#endif
-
-	// final round
-	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 1] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 2] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 3] = static_cast<byte>(SBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 4] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 5] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 6] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 7] = static_cast<byte>(SBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 8] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 9] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 10] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 11] = static_cast<byte>(SBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 12] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 13] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 14] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rhxState->RoundKeys[kctr]));
-}
-
-#else
 
 void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
@@ -765,8 +541,6 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	KeyAddition(state, m_rhxState->RoundKeys, (m_rhxState->Rounds << 2));
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
-
-#endif
 
 void RHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
@@ -869,40 +643,5 @@ void RHX::PrefetchSbox()
 	MemoryTools::PrefetchL1(SBox, 0, SBox.size());
 }
 CEX_OPTIMIZE_RESUME
-
-#if defined(CEX_RIJNDAEL_TABLES)
-
-CEX_OPTIMIZE_IGNORE
-void RHX::PrefetchITables()
-{
-	// timing defence: pre-load inverse multiplication tables into l1 cache
-	MemoryTools::PrefetchL1(IT0, 0, IT0.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(IT1, 0, IT1.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(IT2, 0, IT2.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(IT3, 0, IT3.size() * sizeof(uint));
-}
-CEX_OPTIMIZE_RESUME
-
-CEX_OPTIMIZE_IGNORE
-void RHX::PrefetchRoundKey(const SecureVector<uint> &Rkey)
-{
-	// timing defence: load the round-key array into l1 cache
-	MemoryTools::PrefetchL1(Rkey, 0, Rkey.size() * sizeof(uint));
-}
-CEX_OPTIMIZE_RESUME
-
-CEX_OPTIMIZE_IGNORE
-void RHX::PrefetchTables()
-{
-	// timing defence: pre-load multiplication tables into l1 cache
-	MemoryTools::PrefetchL1(T0, 0, T0.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(T1, 0, T1.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(T2, 0, T2.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(T3, 0, T3.size() * sizeof(uint));
-
-}
-CEX_OPTIMIZE_RESUME
-
-#endif
 
 NAMESPACE_BLOCKEND

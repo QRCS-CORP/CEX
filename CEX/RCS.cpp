@@ -760,34 +760,12 @@ void RCS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 }
 
 CEX_OPTIMIZE_IGNORE
-void RCS::PrefetchRoundKey(const SecureVector<uint> &Rkey)
-{
-	// timing defence: pre-load the round-key array into l1 cache
-	MemoryTools::PrefetchL1(Rkey, 0, Rkey.size() * sizeof(uint));
-}
-CEX_OPTIMIZE_RESUME
-
-CEX_OPTIMIZE_IGNORE
 void RCS::PrefetchSbox()
 {
 	// timing defence: pre-load sbox into l1 cache
 	MemoryTools::PrefetchL1(SBox, 0, SBox.size());
 }
 CEX_OPTIMIZE_RESUME
-
-#if defined(CEX_RIJNDAEL_TABLES)
-CEX_OPTIMIZE_IGNORE
-void RCS::PrefetchTables()
-{
-	// timing defence: pre-load multiplication tables into l1 cache
-	MemoryTools::PrefetchL1(T0, 0, T0.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(T1, 0, T1.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(T2, 0, T2.size() * sizeof(uint));
-	MemoryTools::PrefetchL1(T3, 0, T3.size() * sizeof(uint));
-
-}
-CEX_OPTIMIZE_RESUME
-#endif
 
 void RCS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
@@ -851,12 +829,15 @@ void RCS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 	if (ALNLEN < OUTLEN)
 	{
-		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, FNLLEN, m_rcsState->Nonce);
+		const size_t FNLLEN = OUTLEN - ALNLEN;
+		InOffset += ALNLEN;
+		OutOffset += ALNLEN;
 
-		for (size_t i = ALNLEN; i < OUTLEN; i++)
+		Generate(Output, OutOffset, FNLLEN, m_rcsState->Nonce);
+
+		for (size_t i = 0; i < FNLLEN; ++i)
 		{
-			Output[i] ^= Input[i];
+			Output[OutOffset + i] ^= Input[InOffset + i];
 		}
 	}
 }
@@ -904,146 +885,6 @@ SecureVector<byte> RCS::Serialize()
 	return tmps;
 }
 
-#if defined(CEX_RIJNDAEL_TABLES)
-
-void RCS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t RNDCNT = m_rcsState->RoundKeys.size() - 8;
-	size_t kctr;
-	uint X0;
-	uint X1;
-	uint X2;
-	uint X3;
-	uint X4;
-	uint X5;
-	uint X6;
-	uint X7;
-	uint Y0;
-	uint Y1;
-	uint Y2;
-	uint Y3;
-	uint Y4;
-	uint Y5;
-	uint Y6;
-	uint Y7;
-
-	// pre-load the round key array into l1 as a timing defence
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchRoundKey(m_rcsState->RoundKeys);
-#endif
-
-	// round 0
-	X0 = IntegerTools::BeBytesTo32(Input, InOffset) ^ m_rcsState->RoundKeys[0];
-	X1 = IntegerTools::BeBytesTo32(Input, InOffset + 4) ^ m_rcsState->RoundKeys[1];
-	X2 = IntegerTools::BeBytesTo32(Input, InOffset + 8) ^ m_rcsState->RoundKeys[2];
-	X3 = IntegerTools::BeBytesTo32(Input, InOffset + 12) ^ m_rcsState->RoundKeys[3];
-	X4 = IntegerTools::BeBytesTo32(Input, InOffset + 16) ^ m_rcsState->RoundKeys[4];
-	X5 = IntegerTools::BeBytesTo32(Input, InOffset + 20) ^ m_rcsState->RoundKeys[5];
-	X6 = IntegerTools::BeBytesTo32(Input, InOffset + 24) ^ m_rcsState->RoundKeys[6];
-	X7 = IntegerTools::BeBytesTo32(Input, InOffset + 28) ^ m_rcsState->RoundKeys[7];
-
-	// pre-load the multiplication tables
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchTables();
-#endif
-
-	// round 1
-	Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X4)] ^ m_rcsState->RoundKeys[8];
-	Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X4 >> 8)] ^ T3[static_cast<byte>(X5)] ^ m_rcsState->RoundKeys[9];
-	Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X5 >> 8)] ^ T3[static_cast<byte>(X6)] ^ m_rcsState->RoundKeys[10];
-	Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X4 >> 16)] ^ T2[static_cast<byte>(X6 >> 8)] ^ T3[static_cast<byte>(X7)] ^ m_rcsState->RoundKeys[11];
-	Y4 = T0[static_cast<byte>(X4 >> 24)] ^ T1[static_cast<byte>(X5 >> 16)] ^ T2[static_cast<byte>(X7 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rcsState->RoundKeys[12];
-	Y5 = T0[static_cast<byte>(X5 >> 24)] ^ T1[static_cast<byte>(X6 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rcsState->RoundKeys[13];
-	Y6 = T0[static_cast<byte>(X6 >> 24)] ^ T1[static_cast<byte>(X7 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rcsState->RoundKeys[14];
-	Y7 = T0[static_cast<byte>(X7 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rcsState->RoundKeys[15];
-
-	kctr = 16;
-
-	while (kctr != RNDCNT)
-	{
-		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y4)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y4 >> 8)] ^ T3[static_cast<byte>(Y5)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y5 >> 8)] ^ T3[static_cast<byte>(Y6)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y4 >> 16)] ^ T2[static_cast<byte>(Y6 >> 8)] ^ T3[static_cast<byte>(Y7)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		X4 = T0[static_cast<byte>(Y4 >> 24)] ^ T1[static_cast<byte>(Y5 >> 16)] ^ T2[static_cast<byte>(Y7 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		X5 = T0[static_cast<byte>(Y5 >> 24)] ^ T1[static_cast<byte>(Y6 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		X6 = T0[static_cast<byte>(Y6 >> 24)] ^ T1[static_cast<byte>(Y7 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		X7 = T0[static_cast<byte>(Y7 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X4)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X4 >> 8)] ^ T3[static_cast<byte>(X5)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X5 >> 8)] ^ T3[static_cast<byte>(X6)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X4 >> 16)] ^ T2[static_cast<byte>(X6 >> 8)] ^ T3[static_cast<byte>(X7)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y4 = T0[static_cast<byte>(X4 >> 24)] ^ T1[static_cast<byte>(X5 >> 16)] ^ T2[static_cast<byte>(X7 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y5 = T0[static_cast<byte>(X5 >> 24)] ^ T1[static_cast<byte>(X6 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y6 = T0[static_cast<byte>(X6 >> 24)] ^ T1[static_cast<byte>(X7 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-		Y7 = T0[static_cast<byte>(X7 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_rcsState->RoundKeys[kctr];
-		++kctr;
-	}
-
-	// pre-load the s-box
-#if defined(CEX_PREFETCH_RIJNDAEL_TABLES)
-	PrefetchSbox();
-#endif
-
-	// final round
-	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 1] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 2] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 3] = static_cast<byte>(SBox[static_cast<byte>(Y4)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 4] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 5] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 6] = static_cast<byte>(SBox[static_cast<byte>(Y4 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 7] = static_cast<byte>(SBox[static_cast<byte>(Y5)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 8] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 9] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 10] = static_cast<byte>(SBox[static_cast<byte>(Y5 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 11] = static_cast<byte>(SBox[static_cast<byte>(Y6)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 12] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 13] = static_cast<byte>(SBox[static_cast<byte>(Y4 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 14] = static_cast<byte>(SBox[static_cast<byte>(Y6 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y7)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 16] = static_cast<byte>(SBox[static_cast<byte>(Y4 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 17] = static_cast<byte>(SBox[static_cast<byte>(Y5 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 18] = static_cast<byte>(SBox[static_cast<byte>(Y7 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 19] = static_cast<byte>(SBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 20] = static_cast<byte>(SBox[static_cast<byte>(Y5 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 21] = static_cast<byte>(SBox[static_cast<byte>(Y6 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 22] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 23] = static_cast<byte>(SBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 24] = static_cast<byte>(SBox[static_cast<byte>(Y6 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 25] = static_cast<byte>(SBox[static_cast<byte>(Y7 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 26] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 27] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-	++kctr;
-	Output[OutOffset + 28] = static_cast<byte>(SBox[static_cast<byte>(Y7 >> 24)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 24));
-	Output[OutOffset + 29] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 16));
-	Output[OutOffset + 30] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr] >> 8));
-	Output[OutOffset + 31] = static_cast<byte>(SBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_rcsState->RoundKeys[kctr]));
-}
-
-#else
-
 void RCS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	SecureVector<byte> state(BLOCK_SIZE, 0x00);
@@ -1071,8 +912,6 @@ void RCS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
-
-#endif
 
 void RCS::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {

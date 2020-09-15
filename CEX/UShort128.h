@@ -302,7 +302,10 @@ public:
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	inline static const size_t size() { return sizeof(__m128i); }
+	static const size_t size() 
+	{ 
+		return sizeof(__m128i); 
+	}
 
 	/// <summary>
 	/// Shuffles the registers in 8 * UShort128 structures

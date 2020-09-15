@@ -400,11 +400,13 @@ void SHA2256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length
 
 void SHA2256::Permute(const std::vector<byte> &Input, size_t InOffset, SHA2256State &State)
 {
+#if defined(CEX_HAS_AVX2)
 	if (m_parallelProfile.HasSHA2())
 	{
 		SHA2::PermuteR64P512V(Input, InOffset, State.H);
 	}
 	else
+#endif
 	{
 #if defined(CEX_DIGEST_COMPACT)
 		SHA2::PermuteR64P512C(Input, InOffset, State.H);

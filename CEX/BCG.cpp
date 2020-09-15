@@ -423,7 +423,7 @@ void BCG::Transform(SecureVector<byte> &Output, size_t OutOffset, size_t Length,
 	if (Length >= AVX512BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX512BLK);
-		std::vector<byte> tmpc(AVX512BLK);
+		SecureVector<byte> tmpc(AVX512BLK);
 
 		// stagger counters and process 8 blocks with avx512
 		while (bctr != PBKALN)
@@ -505,7 +505,7 @@ void BCG::Transform(SecureVector<byte> &Output, size_t OutOffset, size_t Length,
 	if (Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
-		std::vector<byte> tmpc(AVXBLK);
+		SecureVector<byte> tmpc(AVXBLK);
 
 		// 4 blocks with avx
 		while (bctr != PBKALN)
@@ -553,7 +553,6 @@ void BCG::Process(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 	else
 	{
-		const size_t OUTLEN = Length;
 		const size_t CNKLEN = ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 		const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 		std::vector<byte> tmpc(BLOCK_SIZE);
@@ -578,10 +577,11 @@ void BCG::Process(SecureVector<byte> &Output, size_t OutOffset, size_t Length)
 		// last block processing
 		const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 
-		if (ALNLEN < OUTLEN)
+		if (ALNLEN < Length)
 		{
-			const size_t FNLLEN = Length % ALNLEN;
-			Transform(Output, ALNLEN, FNLLEN, m_bcgState->Nonce);
+			const size_t FNLLEN = Length - ALNLEN;
+			OutOffset += ALNLEN;
+			Transform(Output, OutOffset, FNLLEN, m_bcgState->Nonce);
 		}
 	}
 }

@@ -446,7 +446,7 @@ void TSX1024::Generate(std::unique_ptr<TSX1024State> &State, std::array<ulong, 2
 			MemoryTools::Copy(Counter, 1, ctr16, 15, 8);
 			IntegerTools::LeIncrementW(Counter);
 			Threefish::PemuteP8x1024H(State->Key, ctr16, State->Tweak, tmp128, ROUND_COUNT);
-			MemoryTools::Copy(tmp128, 0, Output, OutOffset + ctr, AVX2BLK);
+			MemoryTools::Copy(tmp128, 0, Output, OutOffset + ctr, AVX512BLK);
 			ctr += AVX512BLK;
 		}
 	}
@@ -541,7 +541,7 @@ void TSX1024::Process(const std::vector<byte> &Input, size_t InOffset, std::vect
 	{
 		// parallel CTR processing
 		const size_t CNKLEN = (PRCLEN / BLOCK_SIZE / m_parallelProfile.ParallelMaxDegree()) * BLOCK_SIZE;
-		const size_t RNDLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
+		const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 		const size_t CTROFT = (CNKLEN / BLOCK_SIZE);
 		std::vector<ulong> tmpCtr(NONCE_SIZE);
 
@@ -567,14 +567,17 @@ void TSX1024::Process(const std::vector<byte> &Input, size_t InOffset, std::vect
 		MemoryTools::Copy(tmpCtr, 0, m_tsx1024State->Nonce, 0, NONCE_SIZE * sizeof(ulong));
 
 		// last block processing
-		if (RNDLEN < PRCLEN)
+		if (ALNLEN < PRCLEN)
 		{
-			const size_t FNLLEN = PRCLEN % RNDLEN;
-			Generate(m_tsx1024State, m_tsx1024State->Nonce, Output, RNDLEN, FNLLEN);
+			const size_t FNLLEN = PRCLEN - ALNLEN;
+			InOffset += ALNLEN;
+			OutOffset += ALNLEN;
+
+			Generate(m_tsx1024State, m_tsx1024State->Nonce, Output, OutOffset, FNLLEN);
 
 			for (size_t i = 0; i < FNLLEN; ++i)
 			{
-				Output[i + OutOffset + RNDLEN] ^= Input[i + InOffset + RNDLEN];
+				Output[OutOffset + i] ^= Input[InOffset + i];
 			}
 		}
 	}

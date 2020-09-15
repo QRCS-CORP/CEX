@@ -849,7 +849,7 @@ public:
 	inline static void COPY512TOOBJECT(const Array &Input, size_t InOffset, Object* Output)
 	{
 #if defined(CEX_HAS_AVX512)
-		_mm512_storeu_si512(reinterpret_cast<__m512i*>(Output), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[OutOffset])));
+		_mm512_storeu_si512(reinterpret_cast<__m512i*>(Output), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])));
 #else
 		COPY256(Input, InOffset, Output);
 		COPY256(Input, InOffset + (32 / sizeof(Array::value_type)), Output + 32);
@@ -1357,7 +1357,7 @@ public:
 
 		if (ALNLEN != 0)
 		{
-			__m256i zmm = _mm512_set1_epi8(N);
+			__m512i zmm = _mm512_set1_epi8(N);
 
 			while (pctr != ALNLEN)
 			{

@@ -73,7 +73,7 @@ public:
 		vlen = 0;
 		soff = 0;
 
-		vlen = static_cast<ushort>(State.size()) * sizeof(ulong);
+		vlen = State.size() * sizeof(ulong);
 		MemoryTools::Copy(SecureState, soff, State, 0, vlen);
 		soff = vlen;
 
@@ -95,7 +95,7 @@ public:
 		MemoryTools::Copy(SecureState, soff, MacTag, 0, MacTag.size());
 		soff += vlen;
 
-		vlen = static_cast<ushort>(Nonce.size() * sizeof(ulong));
+		vlen = Nonce.size() * sizeof(ulong);
 		MemoryTools::Copy(SecureState, soff, Nonce, 0, vlen);
 		soff += vlen;
 
@@ -127,7 +127,7 @@ public:
 		SecureVector<byte> state(STALEN);
 
 		soff = 0;
-		vlen = static_cast<ushort>(State.size()) * sizeof(ulong);
+		vlen = State.size() * sizeof(ulong);
 		MemoryTools::Copy(State, 0, state, soff, vlen);
 		soff += vlen;
 
@@ -149,7 +149,7 @@ public:
 		MemoryTools::Copy(MacTag, 0, state, soff, MacTag.size());
 		soff += MacTag.size();
 
-		vlen = static_cast<ushort>(Nonce.size() * sizeof(ulong));
+		vlen = Nonce.size() * sizeof(ulong);
 		MemoryTools::Copy(Nonce, 0, state, soff, vlen);
 		soff += vlen;
 
@@ -440,7 +440,7 @@ void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 				throw CryptoSymmetricException(Name(), std::string("Transform"), std::string("The vector is not long enough to add the MAC code!"), ErrorCodes::InvalidSize);
 			}
 
-			// add the starting position of the nonce
+			// add the starting position of the nonce//506097522914230528 1084818905618843912
 			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_csx512State->Nonce[0]), 0, sizeof(ulong));
 			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_csx512State->Nonce[1]), 0, sizeof(ulong));
 			// encrypt the stream

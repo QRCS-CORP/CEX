@@ -221,7 +221,7 @@ public:
 		low = 0;
 		high = 0;
 
-		Donna128::Mul64x64To128(Low(), Y, &low, &high);
+		Mul64x64To128(Low(), Y, &low, &high);
 
 		return Donna128(low, high);
 	}
@@ -314,6 +314,7 @@ public:
 	{
 		return static_cast<ulong>((X >> S1) | (Y << S2));
 	}
+
 #endif
 
 	/// <summary>

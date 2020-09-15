@@ -20,7 +20,9 @@
 
 #include <array>
 #include <iostream>
+#include <limits.h>
 #include <memory>
+#include <stddef.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -149,6 +151,43 @@
 #	endif
 #endif
 
+#if defined(CEX_STATIC)
+#	define CEX_EXPORT
+#	define CEX_EXPORT_WEAK
+#else
+#	if defined(_MSC_VER)
+#		if defined(CEX_DLL_EXPORT)
+#			define CEX_EXPORT __declspec(dllexport)
+#		else
+#			define CEX_EXPORT __declspec(dllimport)
+#		endif
+#	else
+#		if defined(__SUNPRO_C)
+#			if defined(__GNU_C__)
+#				define CEX_EXPORT __attribute__ (visibility(__global))
+#			else
+#				define CEX_EXPORT __attribute__ __global
+#			endif
+#		elif defined(_MSG_VER)
+#			define CEX_EXPORT extern __declspec(dllexport)
+#		else
+#			define CEX_EXPORT __attribute__ ((visibility ("default")))
+#		endif
+#	endif
+#	if defined(__ELF__) && !defined(CEX_DISABLE_WEAK_FUNCTIONS)
+#		define CEX_EXPORT_WEAK CEX_EXPORT __attribute__((weak))
+#	else
+#		define CEX_EXPORT_WEAK CEX_EXPORT
+#	endif
+#endif
+
+#if !defined(CEX_ALIGN)
+#	if defined(__INTEL_COMPILER) || defined(_MSC_VER)
+#		define CEX_ALIGN(x) __declspec(align(x))
+#	else
+#		define CEX_ALIGN(x) __attribute__ ((aligned(x)))
+#	endif
+#endif
 
 #if defined(CEX_HIGHRES_TIMER) && (defined(CEX_BERKELY_SOCKETS) || defined(CEX_WINDOWS_SOCKETS))
 #	define CEX_SOCKETS_AVAILABLE
@@ -410,7 +449,7 @@ typedef unsigned char byte;
 /// </summary>
 //#define CEX_AVX512_SUPPORTED
 
-#if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
+#if defined(__AVX512F__) && (__AVX512F__ == 1)
 #	include <immintrin.h>
 #	if (!defined(CEX_HAS_AVX512))
 #		define __AVX512__
@@ -516,8 +555,8 @@ typedef unsigned char byte;
 #endif
 
 // stringify helper TODO: verify changes on GCC
-//#define CEX_STRHELPER(x) #x
-//#define CEX_TO_STRING(x) CEX_STRHELPER(x)
+#define CEX_STRHELPER(x) #x
+#define CEX_TO_STRING(x) CEX_STRHELPER(x)
 
 // instructs the compiler to skip optimizations on the contained function; closed with CEX_OPTIMIZE_RESUME 
 #if defined(CEX_COMPILER_MSC)
@@ -582,12 +621,6 @@ typedef unsigned char byte;
 /// Settings in this section can be modified	///
 ///////////////////////////////////////////////////
 
-
-/// <summary>
-/// Use the table based Rijndael implementation; faster, but not timing neutral
-/// </summary>
-//#define CEX_RIJNDAEL_TABLES
-
 /// <summary>
 /// The default internal buffer size applied to all PRNGs
 /// </summary>
@@ -609,7 +642,7 @@ typedef unsigned char byte;
 /// <summary>
 /// Toggles CSX512 from 40 to 80 rounds of mixing
 /// </summary>
-//#define CEX_CSX512_STRONG
+#define CEX_CSX512_STRONG
 
 /// <summary>
 /// Toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3

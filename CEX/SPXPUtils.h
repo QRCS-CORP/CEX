@@ -73,7 +73,7 @@ public:
 		Address[7] = Hash;
 	}
 
-	inline static void SetKeypairAddress(std::array<uint, 8> &Address, uint32_t Keypair)
+	inline static void SetKeypairAddress(std::array<uint, 8> &Address, uint Keypair)
 	{
 		Address[5] = Keypair;
 	}

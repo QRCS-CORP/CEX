@@ -831,12 +831,15 @@ void RWS::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 
 	if (ALNLEN < OUTLEN)
 	{
-		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, FNLLEN, m_rwsState->Nonce);
+		const size_t FNLLEN = OUTLEN - ALNLEN;
+		InOffset += ALNLEN;
+		OutOffset += ALNLEN;
 
-		for (size_t i = ALNLEN; i < OUTLEN; i++)
+		Generate(Output, OutOffset, FNLLEN, m_rwsState->Nonce);
+
+		for (size_t i = 0; i < FNLLEN; ++i)
 		{
-			Output[i] ^= Input[i];
+			Output[OutOffset + i] ^= Input[InOffset + i];
 		}
 	}
 }

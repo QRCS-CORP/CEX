@@ -388,6 +388,7 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 {
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
+	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 	std::vector<byte> tmpc(m_ctrState->Nonce.size());
 
@@ -414,15 +415,18 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	MemoryTools::COPY128(tmpc, 0, m_ctrState->Nonce, 0);
 
 	// last block processing
-	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
+
 	if (ALNLEN < OUTLEN)
 	{
-		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
-		Generate(Output, ALNLEN, FNLLEN, m_ctrState->Nonce);
+		const size_t FNLLEN = OUTLEN - ALNLEN;
+		InOffset += ALNLEN;
+		OutOffset += ALNLEN;
 
-		for (size_t i = ALNLEN; i < OUTLEN; i++)
+		Generate(Output, OutOffset, FNLLEN, m_ctrState->Nonce);
+
+		for (size_t i = 0; i < FNLLEN; ++i)
 		{
-			Output[i] ^= Input[i];
+			Output[OutOffset + i] ^= Input[InOffset + i];
 		}
 	}
 }

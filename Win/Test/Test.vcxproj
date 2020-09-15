@@ -251,7 +251,7 @@
     <ClInclude Include="..\..\Test\RijndaelTest.h" />
     <ClInclude Include="..\..\Test\AsymmetricSpeedTest.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
-    <ClInclude Include="..\..\Test\CSXTest.h" />
+    <ClInclude Include="..\..\Test\ChaChaTest.h" />
     <ClInclude Include="..\..\Test\CipherModeTest.h" />
     <ClInclude Include="..\..\Test\CMACTest.h" />
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
@@ -324,7 +324,7 @@
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
     <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
-    <ClCompile Include="..\..\Test\CSXTest.cpp" />
+    <ClCompile Include="..\..\Test\ChaChaTest.cpp" />
     <ClCompile Include="..\..\Test\CipherModeTest.cpp" />
     <ClCompile Include="..\..\Test\CipherStreamTest.cpp" />
     <ClCompile Include="..\..\Test\CMACTest.cpp" />

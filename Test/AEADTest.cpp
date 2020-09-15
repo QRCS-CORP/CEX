@@ -391,7 +391,7 @@ namespace Test
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			const uint32_t BLKLEN = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelBlockSize()));
+			const uint BLKLEN = rng.NextUInt32(static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4), static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize()));
 
 			data.resize(BLKLEN);
 			rng.Generate(data);

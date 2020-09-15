@@ -95,7 +95,7 @@ namespace Test
 			EcbMmt(cprr, AESECB256_MMT);
 			OnProgress(std::string("AESAVSTest: Passed standard ECB AES-128/256 AESAVS Multi-block Message tests.."));
 
-			if (HAS_AESNI)
+			if (m_aesniTest)
 			{
 				AHX* cpra = new AHX();
 
