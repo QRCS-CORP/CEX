@@ -73,7 +73,7 @@ public:
 		vlen = 0;
 		soff = 0;
 
-		vlen = State.size() * sizeof(ulong);
+		vlen = static_cast<ushort>(State.size()) * sizeof(ulong);
 		MemoryTools::Copy(SecureState, soff, State, 0, vlen);
 		soff = vlen;
 
@@ -95,7 +95,7 @@ public:
 		MemoryTools::Copy(SecureState, soff, MacTag, 0, MacTag.size());
 		soff += vlen;
 
-		vlen = Nonce.size() * sizeof(ulong);
+		vlen = static_cast<ushort>(Nonce.size()) * sizeof(ulong);
 		MemoryTools::Copy(SecureState, soff, Nonce, 0, vlen);
 		soff += vlen;
 
@@ -127,7 +127,7 @@ public:
 		SecureVector<byte> state(STALEN);
 
 		soff = 0;
-		vlen = State.size() * sizeof(ulong);
+		vlen = static_cast<ushort>(State.size()) * sizeof(ulong);
 		MemoryTools::Copy(State, 0, state, soff, vlen);
 		soff += vlen;
 
@@ -149,7 +149,7 @@ public:
 		MemoryTools::Copy(MacTag, 0, state, soff, MacTag.size());
 		soff += MacTag.size();
 
-		vlen = Nonce.size() * sizeof(ulong);
+		vlen = static_cast<ushort>(Nonce.size()) * sizeof(ulong);
 		MemoryTools::Copy(Nonce, 0, state, soff, vlen);
 		soff += vlen;
 
@@ -317,7 +317,7 @@ void CSX512::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	}
 	if (Parameters.KeySizes().IVSize() != NONCE_SIZE * sizeof(ulong))
 	{
-		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid nonce size; a 16-byte nonce is required with CSX512!"), ErrorCodes::InvalidNonce);
+		throw CryptoSymmetricException(Name(), std::string("Initialize"), std::string("Invalid nonce size; an 16-byte nonce is required with CSX512!"), ErrorCodes::InvalidNonce);
 	}
 
 	if (m_parallelProfile.IsParallel())

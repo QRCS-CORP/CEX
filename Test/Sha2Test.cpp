@@ -402,26 +402,6 @@ namespace Test
 			throw TestException(std::string("PermutationR64"), std::string("PermuteR64P512"), std::string("Permutation output is not equal!"));
 		}
 
-#if defined(__AVX2__)
-
-		std::vector<byte> input256(512, 128U);
-		std::vector<UInt256> state256(8, UInt256(0));
-
-		SHA2::PermuteR64P8x512H(input256, 0, state256);
-
-		std::vector<uint> state256ul(32);
-		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			if (state256ul[i] != state1[i / 8])
-			{
-				throw TestException(std::string("PermutationR64"), std::string("PermuteR64P8x512H"), std::string("Permutation output is not equal!"));
-			}
-		}
-
-#endif
-
 #if defined(__AVX512__)
 
 		std::vector<byte> input512(1024, 128U);
@@ -437,6 +417,24 @@ namespace Test
 			if (state512ul[i] != state1[i / 16])
 			{
 				throw TestException(std::string("PermutationR64"), std::string("PermuteR64P16x512H"), std::string("Permutation output is not equal!"));
+			}
+		}
+
+#elif defined(__AVX2__)
+
+		std::vector<byte> input256(512, 128U);
+		std::vector<UInt256> state256(8, UInt256(0));
+
+		SHA2::PermuteR64P8x512H(input256, 0, state256);
+
+		std::vector<uint> state256ul(32);
+		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
+
+		for (size_t i = 0; i < 32; ++i)
+		{
+			if (state256ul[i] != state1[i / 8])
+			{
+				throw TestException(std::string("PermutationR64"), std::string("PermuteR64P8x512H"), std::string("Permutation output is not equal!"));
 			}
 		}
 
@@ -460,26 +458,6 @@ namespace Test
 			throw TestException(std::string("PermutationR80"), std::string("PermuteR80P1024"), std::string("Permutation output is not equal! -SP1"));
 		}
 
-#if defined(__AVX2__)
-
-		std::vector<byte> input256(512, 128U);
-		std::vector<ULong256> state256(8, ULong256(0));
-
-		SHA2::PermuteR80P4x1024H(input256, 0, state256);
-
-		std::vector<ulong> state256ull(32);
-		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			if (state256ull[i] != state1[i / 4])
-			{
-				throw TestException(std::string("PermutationR80"), std::string("PermuteR80P4x1024H"), std::string("Permutation output is not equal! -SP2"));
-			}
-		}
-
-#endif
-
 #if defined(__AVX512__)
 
 		std::vector<byte> input512(1024, 128U);
@@ -495,6 +473,24 @@ namespace Test
 			if (state512ull[i] != state1[i / 8])
 			{
 				throw TestException(std::string("PermutationR80"), std::string("PermuteR80P8x1024H"), std::string("Permutation output is not equal! -SP3"));
+			}
+		}
+
+#elif defined(__AVX2__)
+
+		std::vector<byte> input256(512, 128U);
+		std::vector<ULong256> state256(8, ULong256(0));
+
+		SHA2::PermuteR80P4x1024H(input256, 0, state256);
+
+		std::vector<ulong> state256ull(32);
+		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
+
+		for (size_t i = 0; i < 32; ++i)
+		{
+			if (state256ull[i] != state1[i / 4])
+			{
+				throw TestException(std::string("PermutationR80"), std::string("PermuteR80P4x1024H"), std::string("Permutation output is not equal! -SP2"));
 			}
 		}
 

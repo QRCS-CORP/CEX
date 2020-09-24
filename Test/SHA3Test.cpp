@@ -374,7 +374,24 @@ namespace Test
 			throw TestException(std::string("PermutationR24"), std::string("PermuteR24P1600"), std::string("Permutation output is not equal!"));
 		}
 
-#if defined(__AVX2__)
+#if defined(__AVX512__)
+
+		std::vector<ULong512> state512(25, ULong512(0));
+
+		Keccak::PermuteR24P8x1600H(state512);
+
+		std::vector<ulong> state512ull(200);
+		std::memcpy(state512ull.data(), state512.data(), 200 * sizeof(ulong));
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			if (state512ull[i] != state1[i / 8])
+			{
+				throw TestException(std::string("PermutationR24"), std::string("PermuteR24P8x1600H"), std::string("Permutation output is not equal!"));
+			}
+		}
+
+#elif defined(__AVX2__)
 
 		std::vector<ULong256> state256(25, ULong256(0));
 
@@ -388,25 +405,6 @@ namespace Test
 			if (state256ull[i] != state1[i / 4])
 			{
 				throw TestException(std::string("PermutationR24"), std::string("PermuteR24P4x1600H"), std::string("Permutation output is not equal!"));
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::vector<ULong512> state512(25, ULong512(0));
-
-		Keccak::PermuteR24P8x1600H(state512);
-
-		std::vector<ulong> state512ull(100);
-		std::memcpy(state512ull.data(), state512.data(), 200 * sizeof(ulong));
-
-		for (size_t i = 0; i < 25; ++i)
-		{
-			if (state512ull[i] != state1[i / 8])
-			{
-				throw TestException(std::string("PermutationR24"), std::string("PermuteR24P8x1600H"), std::string("Permutation output is not equal!"));
 			}
 		}
 
@@ -429,7 +427,24 @@ namespace Test
 			throw TestException(std::string("PermutationR48"), std::string("PermuteR48P1600"), std::string("Permutation output is not equal!"));
 		}
 
-#if defined(__AVX2__)
+#if defined(__AVX512__)
+
+		std::vector<ULong512> state512(25, ULong512(0));
+
+		Keccak::PermuteR48P8x1600H(state512);
+
+		std::vector<ulong> state512ull(200);
+		MemoryTools::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			if (state512ull[i] != state1[i / 8])
+			{
+				throw TestException(std::string("PermutationR48"), std::string("PermuteR48P8x1600H"), std::string("Permutation output is not equal!"));
+			}
+		}
+
+#elif defined(__AVX2__)
 
 		std::vector<ULong256> state256(25, ULong256(0));
 
@@ -443,25 +458,6 @@ namespace Test
 			if (state256ull[i] != state1[i / 4])
 			{
 				throw TestException(std::string("PermutationR48"), std::string("PermuteR48P4x1600H"), std::string("Permutation output is not equal!"));
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::vector<ULong512> state512(25, ULong512(0));
-
-		Keccak::PermuteR48P8x1600H(state512);
-
-		std::vector<ulong> state512ull(100);
-		MemoryTools::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));
-
-		for (size_t i = 0; i < 25; ++i)
-		{
-			if (state512ull[i] != state1[i / 8])
-			{
-				throw TestException(std::string("PermutationR48"), std::string("PermuteR48P8x1600H"), std::string("Permutation output is not equal!"));
 			}
 		}
 

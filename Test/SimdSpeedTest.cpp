@@ -5,10 +5,12 @@
 #include "../CEX/TimeStamp.h"
 #if defined(__AVX512__)
 #	include "../CEX/UInt512.h"
-#elif defined(__AVX2__)
+#endif
+#if defined(__AVX2__)
 #	include "../CEX/UInt256.h"
 #	include "../CEX/ULong256.h"
-#elif defined(__AVX__)
+#endif
+#if defined(__AVX__)
 #	include "../CEX/UInt128.h"
 #endif
 
@@ -19,9 +21,11 @@ namespace Test
 
 #if defined(__AVX512__)
 	using Numeric::UInt512;
-#elif defined(__AVX2__)
+#endif
+#if defined(__AVX2__)
 	using Numeric::UInt256;
-#elif defined(__AVX__)
+#endif
+#if defined(__AVX__)
 	using Numeric::UInt128;
 #endif
 
@@ -195,7 +199,7 @@ namespace Test
 
 		// sequential memset: 64 byte buffers
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
-		OnProgress(glen + std::string(" using 64 byte buffers with sequential clear "))
+		OnProgress(glen + std::string(" using 64 byte buffers with sequential clear "));
 		buffer1.resize(64, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -320,7 +324,8 @@ namespace Test
 		size_t i;
 
 		// Large Block Copy
-#if defined(__AVX__)
+#if defined(CEX_AVX_INTRINSICS)
+
 		// sequential copy: 1KB byte buffers
 		OnProgress(glen + std::string(" using 512 byte buffers with sequential memcpy: "));
 		start = TestUtils::GetTimeMs64();
@@ -1204,7 +1209,7 @@ namespace Test
 		// Vector Aligned Memset
 #if defined(__AVX512__)
 		// sequential memset: 64 byte buffers
-		OnProgress(glen + std::string(" using 64 byte buffers with sequential memset "))
+		OnProgress(glen + std::string(" using 64 byte buffers with sequential memset "));
 		buffer1.resize(64);
 		start = TestUtils::GetTimeMs64();
 
@@ -1386,7 +1391,7 @@ namespace Test
 #if defined(__AVX512__)
 
 		// sequential xor: 64 byte buffers
-		OnProgress(glen + std::string(" using 64 byte buffers with sequential XOR "))
+		OnProgress(glen + std::string(" using 64 byte buffers with sequential XOR "));
 		buffer1.resize(64, (byte)0x7);
 		buffer2.resize(64, (byte)0x11);
 		start = TestUtils::GetTimeMs64();

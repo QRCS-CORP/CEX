@@ -131,7 +131,7 @@ namespace Test
 			delete csx256a;
 			delete csx256s;
 
-			// ChaChaPoly80 is the default if CEX_CSX512_STRONG is defined in CexConfig, or ChaChaPoly40 as alternate
+			// CSXP80 is the default if CEX_CSX512_STRONG is defined in CexConfig, or CSXP40 as alternate
 			CSX512* csx512a = new CSX512(true);
 			CSX512* csx512s = new CSX512(false);
 

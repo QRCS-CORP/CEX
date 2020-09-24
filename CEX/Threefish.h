@@ -23,10 +23,10 @@
 #include "IntegerTools.h"
 #include "MemoryTools.h"
 
-#if defined(CEX_HAS_AVX2)
-#	include "ULong256.h"
-#elif defined(CEX_HAS_AVX512)
+#if defined(CEX_HAS_AVX512)
 #	include "ULong512.h"
+#elif defined(CEX_HAS_AVX2)
+#	include "ULong256.h"
 #endif
 
 NAMESPACE_STREAM

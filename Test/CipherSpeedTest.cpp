@@ -323,7 +323,7 @@ namespace Test
 	void CipherSpeedTest::CSX512SpeedTest()
 	{
 		CSX512* cpr = new CSX512(false);
-		ParallelStreamLoop(cpr, 64, 0, 10, m_progressEvent);
+		ParallelStreamLoop(cpr, 64, 16, 10, m_progressEvent);
 		delete cpr;
 	}
 

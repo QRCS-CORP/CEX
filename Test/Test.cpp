@@ -107,6 +107,7 @@ void CpuCheck()
 	ConsoleUtils::WriteLine("AES-NI: " + std::to_string(detect.AESNI()));
 	ConsoleUtils::WriteLine("AVX: " + std::to_string(detect.AVX()));
 	ConsoleUtils::WriteLine("AVX2: " + std::to_string(detect.AVX2()));
+	ConsoleUtils::WriteLine("AVX512: " + std::to_string(detect.AVX512F()));
 	ConsoleUtils::WriteLine("CMUL: " + std::to_string(detect.CMUL()));
 	ConsoleUtils::WriteLine("RDRAND: " + std::to_string(detect.RDRAND()));
 	ConsoleUtils::WriteLine("RDTSCP: " + std::to_string(detect.RDTSCP()));

@@ -642,7 +642,7 @@ typedef unsigned char byte;
 /// <summary>
 /// Toggles CSX512 from 40 to 80 rounds of mixing
 /// </summary>
-#define CEX_CSX512_STRONG
+//#define CEX_CSX512_STRONG
 
 /// <summary>
 /// Toggles the input block-size from 72 to 36 bytes on the 1024-bit variant (48 round) of the extended SHAKE or SHA3

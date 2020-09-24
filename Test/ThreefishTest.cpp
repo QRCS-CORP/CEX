@@ -287,7 +287,27 @@ namespace Test
 			throw TestException(std::string("CompareP256"), std::string("PemuteP256"), std::string("Permutation output is not equal! -TP1"));
 		}
 
-#if defined(__AVX2__)
+#if defined(__AVX512__)
+
+		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<ulong, 32> state4;
+
+		MemoryTools::Clear(state4, 0, 32 * sizeof(ulong));
+
+		Threefish::PemuteP8x256H(key, counter16, tweak, state4, 72);
+
+		for (size_t i = 0; i < 32; i += 4)
+		{
+			for (size_t j = 0; j < 4; ++j)
+			{
+				if (state4[i + j] != state1[j])
+				{
+					throw TestException(std::string("CompareP256"), std::string("PemuteP8x256H"), std::string("Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#elif defined(__AVX2__)
 
 		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
 		std::array<ulong, 16> state3;
@@ -303,28 +323,6 @@ namespace Test
 				if (state3[i + j] != state1[j])
 				{
 					throw TestException(std::string("CompareP256"), std::string("PemuteP4x256H"), std::string("Permutation output is not equal! -TP2"));
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 32> state4;
-
-		MemoryTools::Clear(state4, 0, 32 * sizeof(ulong));
-
-		Threefish::PemuteP8x256H(key, counter16, tweak, state4, 72);
-
-		for (size_t i = 0; i < 32; i += 8)
-		{
-			for (size_t j = 0; j < 8; ++j)
-			{
-				if (state3[i + j] != state1[j])
-				{
-					throw TestException(std::string("CompareP256"), std::string("PemuteP8x256H"), std::string("Permutation output is not equal! -TP3"));
 				}
 			}
 		}
@@ -354,7 +352,27 @@ namespace Test
 			throw TestException(std::string("CompareP512"), std::string("PemuteP512"), std::string("Permutation output is not equal! -TP1"));
 		}
 
-#if defined(__AVX2__)
+#if defined(__AVX512__)
+
+		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<ulong, 64> state4;
+
+		MemoryTools::Clear(state4, 0, 64 * sizeof(ulong));
+
+		Threefish::PemuteP8x512H(key, counter16, tweak, state4, 96);
+
+		for (size_t i = 0; i < 64; i += 8)
+		{
+			for (size_t j = 0; j < 8; ++j)
+			{
+				if (state4[i + j] != state1[j])
+				{
+					throw TestException(std::string("CompareP512"), std::string("PemuteP8x512H"), std::string("Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#elif defined(__AVX2__)
 
 		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
 		std::array<ulong, 32> state3;
@@ -370,28 +388,6 @@ namespace Test
 				if (state3[i + j] != state1[j])
 				{
 					throw TestException(std::string("CompareP512"), std::string("PemuteP4x512H"), std::string("Permutation output is not equal! -TP2"));
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 64> state4;
-
-		MemoryTools::Clear(state4, 0, 64 * sizeof(ulong));
-
-		Threefish::PemuteP8x512H(key, counter16, tweak, state4, 96);
-
-		for (size_t i = 0; i < 64; i += 16)
-		{
-			for (size_t j = 0; j < 16; ++j)
-			{
-				if (state3[i + j] != state1[j])
-				{
-					throw TestException(std::string("CompareP512"), std::string("PemuteP8x512H"), std::string("Permutation output is not equal! -TP3"));
 				}
 			}
 		}
@@ -422,7 +418,27 @@ namespace Test
 			throw TestException(std::string("CompareP1024"), std::string("PemuteP1024"), std::string("Permutation output is not equal! -TP1"));
 		}
 
-#if defined(__AVX2__)
+#if defined(__AVX512__)
+
+		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<ulong, 128> state4;
+
+		MemoryTools::Clear(state4, 0, 128 * sizeof(ulong));
+
+		Threefish::PemuteP8x1024H(key, counter16, tweak, state4, 120);
+
+		for (size_t i = 0; i < 128; i += 16)
+		{
+			for (size_t j = 0; j < 16; ++j)
+			{
+				if (state4[i + j] != state1[j])
+				{
+					throw TestException(std::string("CompareP1024"), std::string("PemuteP8x1024H"), std::string("Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#elif defined(__AVX2__)
 		
 		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
 		std::array<ulong, 64> state3;
@@ -438,28 +454,6 @@ namespace Test
 				if (state3[i + j] != state1[j])
 				{
 					throw TestException(std::string("CompareP1024"), std::string("PemuteP4x1024H"), std::string("Permutation output is not equal! -TP2"));
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<ulong, 16> counter16{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 128> state4;
-
-		MemoryTools::Clear(state4, 0, 128 * sizeof(ulong));
-
-		Threefish::PemuteP8x1024H(key, counter16, tweak, state4, 120);
-
-		for (size_t i = 0; i < 128; ++i)
-		{
-			for (size_t j = 0; j < 16; ++j)
-			{
-				if (state4[i + j] != state1[j])
-				{
-					throw TestException(std::string("CompareP1024"), std::string("PemuteP8x1024H"), std::string("Permutation output is not equal! -TP3"));
 				}
 			}
 		}

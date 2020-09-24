@@ -75,7 +75,7 @@ namespace Test
 			bool res = false;
 
 #if defined(__AVX512__)
-			res = 65535 == _mm512_movemask_ps(_mm512_cvtepi32_ps(_mm512_cmpeq_epi32(A.zmm, B.zmm)));
+			res = 65535 == _mm512_cmpeq_epi32_mask(A.zmm, B.zmm);
 #elif defined(__AVX2__)
 			res = 255 == _mm256_movemask_ps(_mm256_cvtepi32_ps(_mm256_cmpeq_epi32(A.ymm, B.ymm)));
 #elif defined(__AVX__)

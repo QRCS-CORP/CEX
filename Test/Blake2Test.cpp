@@ -272,43 +272,6 @@ namespace Test
 		Blake::PermuteR10P512C(input, 0, state1, iv);
 		Blake::PermuteR10P512U(input, 0, state2, iv);
 
-#if defined(__AVX2__)
-
-		Blake::PermuteR10P512V(input, 0, state3, iv);
-
-		if (state1 != state3)
-		{
-			throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P512"), std::string("Permutation output is not equal! -BCS1"));
-		}
-
-#endif
-
-		if (state1 != state2)
-		{
-			throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P512"), std::string("Permutation output is not equal! -BCS2"));
-		}
-
-#if defined(__AVX2__)
-
-		std::vector<byte> input256(512, 128UL);
-		std::vector<UInt256> iv256{ UInt256(0), UInt256(1), UInt256(2), UInt256(3), UInt256(4), UInt256(5), UInt256(6), UInt256(7) };
-		std::vector<UInt256> state256(8, UInt256(0));
-
-		Blake::PermuteR10P8x512H(input256, 0, state256, iv256);
-
-		std::vector<uint> state256ul(32);
-		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			if (state256ul[i] != state1[i / 8])
-			{
-				throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P8x512H"), std::string("Permutation output is not equal! -BCS3"));
-			}
-		}
-
-#endif
-
 #if defined(__AVX512__)
 
 		std::vector<byte> input512(1024, 128U);
@@ -325,6 +288,37 @@ namespace Test
 			if (state512ul[i] != state1[i / 16])
 			{
 				throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P16x512H"), std::string("Permutation output is not equal! -BCS4"));
+			}
+		}
+
+#elif defined(__AVX2__)
+
+		Blake::PermuteR10P512V(input, 0, state3, iv);
+
+		if (state1 != state3)
+		{
+			throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P512"), std::string("Permutation output is not equal! -BCS1"));
+		}
+
+		if (state1 != state2)
+		{
+			throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P512"), std::string("Permutation output is not equal! -BCS2"));
+		}
+
+		std::vector<byte> input256(512, 128UL);
+		std::vector<UInt256> iv256{ UInt256(0), UInt256(1), UInt256(2), UInt256(3), UInt256(4), UInt256(5), UInt256(6), UInt256(7) };
+		std::vector<UInt256> state256(8, UInt256(0));
+
+		Blake::PermuteR10P8x512H(input256, 0, state256, iv256);
+
+		std::vector<uint> state256ul(32);
+		std::memcpy(state256ul.data(), state256.data(), 32 * sizeof(uint));
+
+		for (size_t i = 0; i < 32; ++i)
+		{
+			if (state256ul[i] != state1[i / 8])
+			{
+				throw TestException(std::string("PermutationR10P512"), std::string("PermuteR10P8x512H"), std::string("Permutation output is not equal! -BCS3"));
 			}
 		}
 
@@ -346,43 +340,6 @@ namespace Test
 		Blake::PermuteR12P1024C(input, 0, state1, iv);
 		Blake::PermuteR12P1024U(input, 0, state2, iv);
 
-#if defined(__AVX2__)
-
-		Blake::PermuteR12P1024V(input, 0, state3, iv);
-
-		if (state1 != state3)
-		{
-			throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P1024"), std::string("Permutation output is not equal! -BCL1"));
-		}
-
-#endif
-
-		if (state1 != state2)
-		{
-			throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P1024"), std::string("Permutation output is not equal! -BCL2"));
-		}
-
-#if defined(__AVX2__)
-
-		std::vector<byte> input256(512, 128U);
-		std::vector<ULong256> iv256{ ULong256(0), ULong256(1), ULong256(2), ULong256(3), ULong256(4), ULong256(5), ULong256(6), ULong256(7) };
-		std::vector<ULong256> state256(8, ULong256(0));
-
-		Blake::PermuteR12P4x1024H(input256, 0, state256, iv256);
-
-		std::vector<ulong> state256ull(32);
-		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			if (state256ull[i] != state1[i / 4])
-			{
-				throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P4x1024H"), std::string("Permutation output is not equal! -BCL3"));
-			}
-		}
-
-#endif
-
 #if defined(__AVX512__)
 
 		std::vector<byte> input512(1024, 128U);
@@ -399,6 +356,37 @@ namespace Test
 			if (state512ull[i] != state1[i / 8])
 			{
 				throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P8x1024H"), std::string("Permutation output is not equal! -BCL4"));
+			}
+		}
+
+#elif defined(__AVX2__)
+
+		Blake::PermuteR12P1024V(input, 0, state3, iv);
+
+		if (state1 != state3)
+		{
+			throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P1024"), std::string("Permutation output is not equal! -BCL1"));
+		}
+
+		if (state1 != state2)
+		{
+			throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P1024"), std::string("Permutation output is not equal! -BCL2"));
+		}
+
+		std::vector<byte> input256(512, 128U);
+		std::vector<ULong256> iv256{ ULong256(0), ULong256(1), ULong256(2), ULong256(3), ULong256(4), ULong256(5), ULong256(6), ULong256(7) };
+		std::vector<ULong256> state256(8, ULong256(0));
+
+		Blake::PermuteR12P4x1024H(input256, 0, state256, iv256);
+
+		std::vector<ulong> state256ull(32);
+		MemoryTools::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
+
+		for (size_t i = 0; i < 32; ++i)
+		{
+			if (state256ull[i] != state1[i / 4])
+			{
+				throw TestException(std::string("PermutationR12P1024"), std::string("PermuteR12P4x1024H"), std::string("Permutation output is not equal! -BCL3"));
 			}
 		}
 
