@@ -1,5 +1,5 @@
-#ifndef CEXTEST_MODULELWETEST_H
-#define CEXTEST_MODULELWETEST_H
+#ifndef CEXTEST_KYBERTEST_H
+#define CEXTEST_KYBERTEST_H
 
 #include "ITest.h"
 

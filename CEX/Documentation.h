@@ -9,36 +9,31 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.8g (A8).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.8h (A8).
 \brief
 CEX is a library built for safety, speed, and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>v1.0.0.8g</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>v1.0.0.8h</B> (A8 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John G. Underhill
-\version   v1.0.0.8g
-\date      August 21, 2020
+\version   v1.0.0.8h
+\date      October 06, 2020
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is v1.0.0.8g (A8 version), which are the major, minor, patch, and release codes. \n \n
+The current version is v1.0.0.8h (A8 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release v1.0.0.8g (version A8):</B> \n
+<B>Added tourrent Release v1.0.0.8h (version A8):</B> \n
 
-The wide-block Rijndael-256 based authenticated stream cipher RCS, and the AES-NI version ACS \n
-The Rainbow asymmetric signature scheme \n
-The XMSS/MT asymmetric signature scheme \n
-The Dilithium asymmetric signature scheme \n
-The SPHINCS+ asymmetric signature scheme \n
-The NTRU-Prime asymmetric cipher \n
-Authenticated Threefish-256/512/1024 stream ciphers \n
-Authenticated ChaCha-256/512 stream ciphers \n
-The cSHAKE option (RHX/SHX) integrated into HX symmetric ciphers \n
-Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
+Elliptic Curve Diffie Hellman (ED25519) Key Exchange \n
+Elliptic Curve Digital Signature Algorithm ECDSA \n
+AES-NI wide block 256/512 added to RHX and RCS implementations \n
+The RWS cipher \n
+The SCBKDF KDF \n
 
 <B>Planned Release 1.1.0.1</B> \n
 NewHope \n

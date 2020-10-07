@@ -285,6 +285,18 @@ public:
 	void Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
+	/// Transform two blocks of bytes with offset parameters.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
+	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
+	void Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset) override;
+
+	/// <summary>
 	/// Transform 4 blocks of bytes.
 	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
@@ -299,7 +311,7 @@ public:
 	/// <summary>
 	/// Transform 8 blocks of bytes.
 	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
-	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
+	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
@@ -311,7 +323,7 @@ public:
 	/// <summary>
 	/// Transform 16 blocks of bytes.
 	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
-	/// Input and Output array lengths must be at least 16 * <see cref="BlockSize"/> in length.</para>
+	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
@@ -322,6 +334,12 @@ public:
 
 private:
 
+#if defined(CEX_EXTENDED_AESNI)
+	static __m256i Load128To256(__m128i &A, __m128i &B);
+#	if defined(CEX_HAS_AVX512)
+		static __m512i Load128To512(__m128i &A, __m128i &B, __m128i &C, __m128i &D);
+#	endif
+#endif
 	static std::vector<SymmetricKeySize> CalculateKeySizes(BlockCipherExtensions Extension);
 	static void ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset);
 	static void ExpandRotBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset);
@@ -330,10 +348,12 @@ private:
 	static void StandardExpand(const SecureVector<byte> &Key, std::unique_ptr<AhxState> &State);
 
 	void Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void Decrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Decrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void Encrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void Encrypt2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);

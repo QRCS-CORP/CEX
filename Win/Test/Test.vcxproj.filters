@@ -440,6 +440,12 @@
     <ClInclude Include="..\..\Test\SCBKDFTest.h">
       <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\ECDHTest.h">
+      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ECDSATest.h">
+      <Filter>Header Files\Test\Asymmetric\Sign</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -642,6 +648,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\SCBKDFTest.cpp">
       <Filter>Source Files\Test\KdfTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ECDHTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ECDSATest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Sign</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

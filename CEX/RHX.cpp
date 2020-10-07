@@ -263,6 +263,18 @@ void RHX::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 	}
 }
 
+void RHX::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	if (m_rhxState->Encryption)
+	{
+		Encrypt256(Input, InOffset, Output, OutOffset);
+	}
+	else
+	{
+		Decrypt256(Input, InOffset, Output, OutOffset);
+	}
+}
+
 void RHX::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	if (m_rhxState->Encryption)
@@ -495,12 +507,16 @@ void RHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
 
-void RHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RHX::Decrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
-	Decrypt128(Input, InOffset + 32, Output, OutOffset + 32);
-	Decrypt128(Input, InOffset + 48, Output, OutOffset + 48);
+}
+
+void RHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	Decrypt256(Input, InOffset, Output, OutOffset);
+	Decrypt256(Input, InOffset + 32, Output, OutOffset + 32);
 }
 
 void RHX::Decrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
@@ -542,12 +558,16 @@ void RHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	MemoryTools::Copy(state, 0, Output, OutOffset, BLOCK_SIZE);
 }
 
-void RHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void RHX::Encrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
-	Encrypt128(Input, InOffset + 32, Output, OutOffset + 32);
-	Encrypt128(Input, InOffset + 48, Output, OutOffset + 48);
+}
+
+void RHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	Encrypt256(Input, InOffset, Output, OutOffset);
+	Encrypt256(Input, InOffset + 32, Output, OutOffset + 32);
 }
 
 void RHX::Encrypt1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)

@@ -32,7 +32,10 @@ For more information on the current capabilities of the library, refer to the li
 Note: This is still an early stage in the development of this library (pre-alpha), and much of the work is formative and evolving, so stay tuned, be patient.. writing a new library is a big job! (eta is the summer of 2021).
 
 
-### New in Current Release 1.0.0.8 (version A8):
+### New in Current Release 1.0.0.8 (version A8)
+* The Elliptic Curve Diffie Hellman Key exchange (EC25519)
+* The Elliptic Curve Digital Signature Algorithm (ED25519)
+* Integration of AES-NI 256 and 512-bit instructions
 * The Rainbow signature scheme
 * The 512-bit block Rijndael authenticated stream cipher RWS (end of the world cipher)
 * The ChaCha derivitive CSX-512 authenticated stream cipher using 64-bit integers and a 1024-bit block, and a 512-bit key

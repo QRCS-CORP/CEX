@@ -340,14 +340,12 @@ typedef unsigned char byte;
 
 // 128 bit unsigned integer support
 #if defined(__SIZEOF_INT128__) && defined(CEX_IS_X64) && !defined(__xlc__)
-#define CEX_NATIVE_UINT128
-
-	// Prefer TI mode over __int128 as GCC rejects the latter in pedantic mode
-#if defined(__GNUG__)
-	typedef unsigned int uint128_t __attribute__((mode(TI)));
-#else
-	typedef unsigned __int128 uint128_t;
-#endif
+#	define CEX_SYSTEM_NATIVE_UINT128
+#	if defined(__GNUG__)
+		typedef unsigned int uint128_t __attribute__((mode(TI)));
+#	else
+		typedef unsigned __int128 uint128_t;
+#	endif
 #endif
 
 #if defined(CEX_NATIVE_UINT128)
@@ -422,38 +420,8 @@ typedef unsigned char byte;
 #	define CEX_APPLE_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
 
-/// <summary>
-/// AVX512 Capabilities Check
-/// TODO: future expansion (if you can test it, I'll add it)
-/// links: 
-/// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
-/// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
-/// https://colfaxresearch.com/knl-avx512/
-/// 
-/// #include <immintrin.h>
-/// supported is 1: ex. __AVX512CD__ 1
-/// F		__AVX512F__					Foundation
-/// CD	__AVX512CD__				Conflict Detection Instructions(CDI)
-/// ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
-/// PF	__AVX512PF__				Prefetch Instructions(PFI)
-/// DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
-/// BW	__AVX512BW__				Byte and Word Instructions(BW)
-/// VL	__AVX512VL__				Vector Length Extensions(VL)
-/// IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
-/// VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
-/// VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
-/// FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
-/// VPOPCNT	__AVX512VPOPCNTDQ__		?
-/// 
-/// Note: AVX512 is currently untested, this flag enables support on a compliant system
-/// </summary>
-//#define CEX_AVX512_SUPPORTED
-
 #if defined(__AVX512F__) && (__AVX512F__ == 1)
-#	include <immintrin.h>
-#	if (!defined(CEX_HAS_AVX512))
-#		define __AVX512__
-#	endif
+#	define __AVX512__
 #endif
 
 // avx
@@ -534,6 +502,10 @@ typedef unsigned char byte;
 
 #if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
 #	define CEX_AVX_INTRINSICS
+#endif
+
+#if defined(CEX_HAS_AVX512)
+#	define CEX_EXTENDED_AESNI
 #endif
 
 // native openmp support
@@ -630,6 +602,15 @@ typedef unsigned char byte;
 /// Enable the legal-key-size exception set on all primitives
 /// </summary>
 //#define CEX_ENFORCE_LEGALKEY
+
+/// <summary>
+/// Enables large-block AES-NI instructions (256/512).
+/// Not available on all processors, even ones with AVX2 support.
+/// Enabled manually on systems that have the extended instructions, but are not using AVX512.
+/// </summary>
+#if !defined(CEX_EXTENDED_AESNI)
+//#	define CEX_EXTENDED_AESNI
+#endif
 
 /// <summary>
 /// Enable FIPS 140.2 entropy provider wellness test

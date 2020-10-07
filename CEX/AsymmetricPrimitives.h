@@ -15,41 +15,49 @@ enum class AsymmetricPrimitives : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// A McEliece cipher implementation
+	/// A Elliptic ACurve Diffie Hellman cipher implementation
 	/// </summary>
-	McEliece = 1,
+	ECDH = 1,
 	/// <summary>
 	/// A Module-LWE cipher implementation
 	/// </summary>
 	Kyber = 2,
 	/// <summary>
+	/// A McEliece cipher implementation
+	/// </summary>
+	McEliece = 3,
+	/// <summary>
 	/// An NTRUPrime cipher implementation
 	/// </summary>
-	NTRUPrime = 3,
+	NTRUPrime = 4,
 	/// <summary>
 	/// The Dilithium asymmetric signature scheme
 	/// </summary>
-	Dilithium = 4,
+	Dilithium = 5,
+	/// <summary>
+	/// An Elliptic Curve Digital Signature Algorithm signature scheme
+	/// </summary>
+	ECDSA = 6,
 	/// <summary>
 	/// A Rainbow multivariate asymmetric signature scheme
 	/// </summary>
-	Rainbow = 5,
+	Rainbow = 7,
 	/// <summary>
 	/// A Ring-LWE cipher implementation
 	/// </summary>
-	NewHope = 6,
+	NewHope = 8,
 	/// <summary>
 	/// The SphincsPlus asymmetric signature scheme
 	/// </summary>
-	SphincsPlus = 7,
+	SphincsPlus = 9,
 	/// <summary>
 	/// The eXtended Merkle Signature Scheme
 	/// </summary>
-	XMSS = 8,
+	XMSS = 10,
 	/// <summary>
 	/// The eXtended Merkle Signature Scheme Multi-Tree
 	/// </summary>
-	XMSSMT = 9
+	XMSSMT = 11
 };
 
 class AsymmetricPrimitiveConvert

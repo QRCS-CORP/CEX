@@ -55,6 +55,7 @@ namespace Test
 
 	std::string CipherSpeedTest::Run()
 	{
+		RCSSpeedTest();
 		try
 		{
 			OnProgress(std::string("### BLOCK CIPHER TESTS ###"));

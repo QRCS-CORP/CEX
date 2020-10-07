@@ -10,6 +10,8 @@
 #define NAMESPACE_ASYMMETRICEND } }
 #define NAMESPACE_ASYMMETRICENCRYPT namespace CEX { namespace Asymmetric { namespace Encrypt {
 #define NAMESPACE_ASYMMETRICENCRYPTEND } } }
+#define NAMESPACE_ECDH namespace CEX { namespace Asymmetric { namespace Encrypt { namespace ECDH {
+#define NAMESPACE_ECDHEND } } } }
 #define NAMESPACE_MCELIECE namespace CEX { namespace Asymmetric { namespace Encrypt { namespace MPKC {
 #define NAMESPACE_MCELIECEEND } } } }
 #define NAMESPACE_MODULELWE namespace CEX { namespace Asymmetric { namespace Encrypt { namespace MLWE {
@@ -30,6 +32,8 @@
 #define NAMESPACE_ASYMMETRICSIGNEND } } }
 #define NAMESPACE_DILITHIUM namespace CEX { namespace Asymmetric { namespace Sign { namespace DLTM {
 #define NAMESPACE_DILITHIUMEND } } } }
+#define NAMESPACE_ECDSA namespace CEX { namespace Asymmetric { namespace Sign { namespace ECDSA {
+#define NAMESPACE_ECDSAEND } } } }
 #define NAMESPACE_RAINBOW namespace CEX { namespace Asymmetric { namespace Sign { namespace RNBW {
 #define NAMESPACE_RAINBOWEND } } } }
 #define NAMESPACE_SPHINCSPLUS namespace CEX { namespace Asymmetric { namespace Sign { namespace SPXP {

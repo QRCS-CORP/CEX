@@ -77,7 +77,7 @@ public:
 		soff = 0;
 		vlen = 0;
 
-		vlen = State.size() * sizeof(uint);
+		vlen = static_cast<ushort>(State.size()) * sizeof(uint);
 		MemoryTools::Copy(SecureState, soff, State, 0, vlen);
 		soff = vlen;
 
@@ -99,7 +99,7 @@ public:
 		MemoryTools::Copy(SecureState, soff, MacTag, 0, MacTag.size());
 		soff += vlen;
 
-		vlen = Nonce.size() * sizeof(uint);
+		vlen = static_cast<ushort>(Nonce.size()) * sizeof(uint);
 		MemoryTools::Copy(SecureState, soff, Nonce, 0, vlen);
 		soff += vlen;
 
@@ -133,7 +133,7 @@ public:
 		SecureVector<byte> state(STALEN);
 
 		soff = 0;
-		vlen = State.size() * sizeof(uint);
+		vlen = static_cast<ushort>(State.size()) * sizeof(uint);
 		MemoryTools::Copy(State, 0, state, soff, vlen);
 		soff += vlen;
 
@@ -155,7 +155,7 @@ public:
 		MemoryTools::Copy(MacTag, 0, state, soff, MacTag.size());
 		soff += MacTag.size();
 
-		vlen = Nonce.size() * sizeof(uint);
+		vlen = static_cast<ushort>(Nonce.size()) * sizeof(uint);
 		MemoryTools::Copy(Nonce, 0, state, soff, vlen);
 		soff += vlen;
 

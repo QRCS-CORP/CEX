@@ -220,6 +220,13 @@
     <ClInclude Include="..\..\CEX\DukptDerivationPurpose.h" />
     <ClInclude Include="..\..\CEX\DukptKeyType.h" />
     <ClInclude Include="..\..\CEX\DukptKeyUsage.h" />
+    <ClInclude Include="..\..\CEX\EC25519.h" />
+    <ClInclude Include="..\..\CEX\ECDH.h" />
+    <ClInclude Include="..\..\CEX\ECDHBase.h" />
+    <ClInclude Include="..\..\CEX\ECDHParameters.h" />
+    <ClInclude Include="..\..\CEX\ECDSA.h" />
+    <ClInclude Include="..\..\CEX\ECDSABase.h" />
+    <ClInclude Include="..\..\CEX\ECDSAParameters.h" />
     <ClInclude Include="..\..\CEX\EventHandler.h" />
     <ClInclude Include="..\..\CEX\GCM.h" />
     <ClInclude Include="..\..\CEX\HBA.h" />
@@ -227,6 +234,7 @@
     <ClInclude Include="..\..\CEX\HKDSMasterKey.h" />
     <ClInclude Include="..\..\CEX\HkdsMessages.h" />
     <ClInclude Include="..\..\CEX\HKDSServer.h" />
+    <ClInclude Include="..\..\CEX\IAsymmetricKeyExchange.h" />
     <ClInclude Include="..\..\CEX\IAsyncResult.h" />
     <ClInclude Include="..\..\CEX\InternetAddress.h" />
     <ClInclude Include="..\..\CEX\KdfDigests.h" />
@@ -487,6 +495,13 @@
     <ClCompile Include="..\..\CEX\DLTMK6Q8380417N256.cpp" />
     <ClCompile Include="..\..\CEX\DUKPTServer.cpp" />
     <ClCompile Include="..\..\CEX\DUKPTClient.cpp" />
+    <ClCompile Include="..\..\CEX\EC25519.cpp" />
+    <ClCompile Include="..\..\CEX\ECDH.cpp" />
+    <ClCompile Include="..\..\CEX\ECDHBase.cpp" />
+    <ClCompile Include="..\..\CEX\ECDHParameters.cpp" />
+    <ClCompile Include="..\..\CEX\ECDSA.cpp" />
+    <ClCompile Include="..\..\CEX\ECDSABase.cpp" />
+    <ClCompile Include="..\..\CEX\ECDSAParameters.cpp" />
     <ClCompile Include="..\..\CEX\GCM.cpp" />
     <ClCompile Include="..\..\CEX\HBA.cpp" />
     <ClCompile Include="..\..\CEX\HKDSClient.cpp" />

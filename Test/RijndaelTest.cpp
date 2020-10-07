@@ -55,6 +55,7 @@ namespace Test
 
 	std::string RijndaelTest::Run()
 	{
+
 		try
 		{
 			Exception();

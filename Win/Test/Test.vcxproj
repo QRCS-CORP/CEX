@@ -238,6 +238,8 @@
     <ClInclude Include="..\..\Test\CSRTest.h" />
     <ClInclude Include="..\..\Test\DilithiumTest.h" />
     <ClInclude Include="..\..\Test\DUKPTTest.h" />
+    <ClInclude Include="..\..\Test\ECDHTest.h" />
+    <ClInclude Include="..\..\Test\ECDSATest.h" />
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\HCRTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
@@ -312,6 +314,8 @@
     <ClCompile Include="..\..\Test\CSRTest.cpp" />
     <ClCompile Include="..\..\Test\DilithiumTest.cpp" />
     <ClCompile Include="..\..\Test\DUKPTTest.cpp" />
+    <ClCompile Include="..\..\Test\ECDHTest.cpp" />
+    <ClCompile Include="..\..\Test\ECDSATest.cpp" />
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
     <ClCompile Include="..\..\Test\HCRTest.cpp" />
     <ClCompile Include="..\..\Test\HKDSTest.cpp" />

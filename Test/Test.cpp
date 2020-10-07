@@ -1,13 +1,5 @@
 // Development Map
-// 1.0.0.8f
-// re-work asymmetric keys -done
-// change key naming nonce to iv -done
-// complete documentation review -done
-// complete code review -done
-// changes to RCS/HBA key schedule -done
-// network tests -
-// aes KATS to NIST file format -done
-
+//
 // 1.0.0.9a
 // internal migration to secure vectors
 // 
@@ -49,6 +41,8 @@
 #include "../Test/DigestStreamTest.h"
 #include "../Test/DilithiumTest.h"
 #include "../Test/DUKPTTest.h"
+#include "../Test/ECDHTest.h"
+#include "../Test/ECDSATest.h"
 #include "../Test/ECPTest.h"
 #include "../Test/GMACTest.h"
 #include "../Test/HCRTest.h"
@@ -168,9 +162,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.8: CEX Library in C++    *");
 	ConsoleUtils::WriteLine("*                                              *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.1.8g (A8)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.1.8h (A8)                    *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                             *");
-	ConsoleUtils::WriteLine("* Date:      August 21, 2020                   *");
+	ConsoleUtils::WriteLine("* Date:      October 06, 2020                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                 *");
 	ConsoleUtils::WriteLine("************************************************");
 	ConsoleUtils::WriteLine("");
@@ -241,11 +235,12 @@ void TestRun(ITest* Test)
 	}
 }
 
-int main()
+int32_t main()
 {
 	bool hasAesni;
 	bool hasAvx;
 	bool hasAvx2;
+	bool hasAvx512;
 	bool isx86emu;
 	bool is64bit;
 
@@ -285,6 +280,7 @@ int main()
 	hasAesni = false;
 	hasAvx = false;
 	hasAvx2 = false;
+	hasAvx512 = false;
 	isx86emu = false;
 	is64bit = false;
 
@@ -295,6 +291,7 @@ int main()
 		hasAesni = detect.AESNI();
 		hasAvx = detect.AVX();
 		hasAvx2 = detect.AVX2();
+		hasAvx512 - detect.AVX512F();
 		isx86emu = detect.IsX86Emulation();
 		is64bit = detect.IsX64();
 	}
@@ -328,7 +325,15 @@ int main()
 	}
 	PrintHeader("", "");
 
-	if (hasAvx2)
+	if (hasAvx512)
+	{
+#if !defined(CEX_HAS_AVX512)
+		PrintHeader("Warning! AVX512 support was detected! Set the enhanced instruction set to arch:AVX512 for best performance.");
+#else
+		PrintHeader("AVX512 intrinsics support has been enabled.");
+#endif
+	}
+	else if (hasAvx2)
 	{
 #if !defined(CEX_HAS_AVX2)
 		PrintHeader("Warning! AVX2 support was detected! Set the enhanced instruction set to arch:AVX2 for best performance.");
@@ -452,12 +457,14 @@ int main()
 			PrintHeader("TESTING UTILITY CLASS FUNCTIONS");
 			TestRun(new UtilityTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
+			TestRun(new ECDHTest());
 			TestRun(new KyberTest());
 			TestRun(new McElieceTest());
 			TestRun(new NewHopeTest());
 			TestRun(new NTRUPrimeTest());
 			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
 			TestRun(new DilithiumTest());
+			TestRun(new ECDSATest());
 			TestRun(new RainbowTest());
 			TestRun(new SphincsPlusTest());
 			TestRun(new XMSSTest());

@@ -651,7 +651,7 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			// test random-variable sized messages 16..128
+			// test random-variable sized messages
 			msglen = gen.NextUInt32(128, 16);
 			msg1.resize(msglen);
 

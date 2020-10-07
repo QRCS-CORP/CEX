@@ -265,6 +265,18 @@ void SHX::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 	}
 }
 
+void SHX::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	if (m_shxState->Encryption)
+	{
+		Encrypt256(Input, InOffset, Output, OutOffset);
+	}
+	else
+	{
+		Decrypt256(Input, InOffset, Output, OutOffset);
+	}
+}
+
 void SHX::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	if (m_shxState->Encryption)
@@ -529,6 +541,12 @@ void SHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	IntegerTools::Le32ToBytes(R0 ^ m_shxState->RoundKeys[kctr - 4], Output, OutOffset);
 }
 
+void SHX::Decrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	Decrypt128(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
+}
+
 void SHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 #if (!defined(CEX_HAS_AVX512)) && (!defined(CEX_HAS_AVX2)) && defined(CEX_HAS_AVX)
@@ -680,6 +698,12 @@ void SHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr + 1] ^ R1, Output, OutOffset + 4);
 	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr + 2] ^ R2, Output, OutOffset + 8);
 	IntegerTools::Le32ToBytes(m_shxState->RoundKeys[kctr + 3] ^ R3, Output, OutOffset + 12);
+}
+
+void SHX::Encrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	Encrypt128(Input, InOffset, Output, OutOffset);
+	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
 }
 
 void SHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)

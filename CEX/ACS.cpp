@@ -5,7 +5,7 @@
 #include "MemoryTools.h"
 #include "SHAKE.h"
 #include "StreamAuthenticators.h"
-#include <wmmintrin.h>
+#include <immintrin.h>
 
 NAMESPACE_STREAM
 
@@ -17,14 +17,29 @@ using Enumeration::ShakeModes;
 using Enumeration::StreamAuthenticators;
 using Enumeration::StreamCipherConvert;
 
-const __m128i ACS::BLEND_MASK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
-const __m128i ACS::SHIFT_MASK = { 0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3 };
+#if defined(CEX_HAS_AVX512)
+	const __m512i ACS::NI512K0 = _mm512_set_epi64(17361641481138401520, 17361641481138401520, 8102099357864587376, 8102099357864587376,
+		17361641481138401520, 17361641481138401520, 8102099357864587376, 8102099357864587376);
+	const __m512i ACS::NI512K1 = _mm512_set_epi64(8102099357864587376, 8102099357864587376, 17361641481138401520, 17361641481138401520,
+		8102099357864587376, 8102099357864587376, 17361641481138401520, 17361641481138401520);
+#endif
+#if defined(CEX_EXTENDED_AESNI)
+	const __m256i ACS::NI256K0 = _mm256_set_epi64x(17361641481138401520, 17361641481138401520, 8102099357864587376, 8102099357864587376);
+	const __m256i ACS::NI256K1 = _mm256_set_epi64x(8102099357864587376, 8102099357864587376, 17361641481138401520, 17361641481138401520);
+#else
+	const __m128i ACS::NIBMASK = _mm_set_epi32(0x80000000UL, 0x80800000UL, 0x80800000UL, 0x80808000UL);
+	const __m128i ACS::NISMASK = _mm_setr_epi8(0, 1, 6, 7, 4, 5, 10, 11, 8, 9, 14, 15, 12, 13, 2, 3);
+#endif
 
 class ACS::AcsState
 {
 public:
 
+#if defined(CEX_EXTENDED_AESNI)
+	std::vector<__m256i> RoundKeys;
+#else
 	std::vector<__m128i> RoundKeys;
+#endif
 	SecureVector<byte> Associated;
 	SecureVector<byte> Custom;
 	SecureVector<byte> MacKey;
@@ -175,7 +190,7 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(__m128i));
+		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(RoundKeys[0]));
 		MemoryTools::Clear(Associated, 0, Associated.size());
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
@@ -190,7 +205,7 @@ public:
 
 	SecureVector<byte> Serialize()
 	{
-		const size_t STALEN = (RoundKeys.size() * sizeof(__m128i)) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
+		const size_t STALEN = (RoundKeys.size() * sizeof(RoundKeys[0])) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
 			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(KmacModes) + sizeof(ShakeModes) + (3 * sizeof(bool)) + (7 * sizeof(ushort));
 
 		size_t soff;
@@ -198,7 +213,7 @@ public:
 		SecureVector<byte> state(STALEN);
 
 		soff = 0;
-		vlen = static_cast<ushort>(RoundKeys.size() * sizeof(__m128i));
+		vlen = static_cast<ushort>(RoundKeys.size() * sizeof(RoundKeys[0]));
 		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
 		soff += sizeof(ushort);
 		MemoryTools::Copy(RoundKeys, 0, state, soff, static_cast<size_t>(vlen));
@@ -487,16 +502,20 @@ void ACS::Initialize(bool Encryption, ISymmetricKey &Parameters)
 	gen.Initialize(Parameters.SecureKey(), m_acsState->Custom, m_acsState->Name);
 
 	// calculate the size of the round-key array
-	const size_t RNKLEN = static_cast<size_t>(BLOCK_SIZE / sizeof(__m128i)) * static_cast<size_t>(m_acsState->Rounds + 1UL);
+	const size_t RNKLEN = static_cast<size_t>(BLOCK_SIZE / sizeof(m_acsState->RoundKeys[0])) * static_cast<size_t>(m_acsState->Rounds + 1UL);
 	m_acsState->RoundKeys.resize(RNKLEN);
-	SecureVector<byte> tmpr(RNKLEN * sizeof(__m128i));
+	SecureVector<byte> tmpr(RNKLEN * sizeof(m_acsState->RoundKeys[0]));
 	// generate the cipher round-keys
 	gen.Generate(tmpr);
 
 	// copy p-rand bytes to round keys
 	for (i = 0; i < RNKLEN; ++i)
 	{
+#if defined(CEX_EXTENDED_AESNI) && defined(CEX_HAS_AVX2)
+		m_acsState->RoundKeys[i] = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&tmpr[i * sizeof(__m256i)]));
+#else
 		m_acsState->RoundKeys[i] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&tmpr[i * sizeof(__m128i)]));
+#endif
 	}
 
 	MemoryTools::Clear(tmpr, 0, tmpr.size());
@@ -637,105 +656,21 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 
 #if defined(CEX_HAS_AVX512)
 
-	const size_t AVX512BLK = 16 * BLOCK_SIZE;
+	const size_t AVX512BLK = 2 * BLOCK_SIZE;
 	if (Length >= AVX512BLK)
 	{
 		const size_t PBKALN = Length - (Length % AVX512BLK);
 		std::vector<byte> tmpc(AVX512BLK);
 
-		// stagger counters and process 8 blocks with avx512
+		// stagger counters and process 2 blocks with avx512
 		while (bctr != PBKALN)
 		{
 			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
 			IntegerTools::LeIncrement(Counter, 16);
 			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
 			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 256, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 288, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 320, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 352, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 384, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 416, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 448, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 480, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			Transform4096(tmpc, 0, Output, OutOffset + bctr);
+			Transform512(tmpc, 0, Output, OutOffset + bctr);
 			bctr += AVX512BLK;
-		}
-	}
-
-#elif defined(CEX_HAS_AVX2)
-
-	const size_t AVX2BLK = 8 * BLOCK_SIZE;
-	if (Length >= AVX2BLK)
-	{
-		const size_t PBKALN = Length - (Length % AVX2BLK);
-		std::vector<byte> tmpc(AVX2BLK);
-
-		// stagger counters and process 8 blocks with avx2
-		while (bctr != PBKALN)
-		{
-			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 128, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 160, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 192, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 224, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			Transform2048(tmpc, 0, Output, OutOffset + bctr);
-			bctr += AVX2BLK;
-		}
-	}
-
-#elif defined(CEX_HAS_AVX)
-
-	const size_t AVXBLK = 4 * BLOCK_SIZE;
-	if (Length >= AVXBLK)
-	{
-		const size_t PBKALN = Length - (Length % AVXBLK);
-		std::vector<byte> tmpc(AVXBLK);
-
-		// 4 blocks with avx
-		while (bctr != PBKALN)
-		{
-			MemoryTools::Copy(Counter, 0, tmpc, 0, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 32, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 64, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			MemoryTools::Copy(Counter, 0, tmpc, 96, BLOCK_SIZE);
-			IntegerTools::LeIncrement(Counter, 16);
-			Transform1024(tmpc, 0, Output, OutOffset + bctr);
-			bctr += AVXBLK;
 		}
 	}
 
@@ -758,6 +693,33 @@ void ACS::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		MemoryTools::Copy(otp, 0, Output, OutOffset + (Length - RMDLEN), RMDLEN);
 	}
 }
+
+#if defined(CEX_HAS_AVX512)
+__m512i ACS::Load256To512(__m256i &A, __m256i &B)
+{
+	__m512i x;
+
+	x = _mm512_setzero_si512();
+	x = _mm512_inserti32x8(x, A, 0);
+	x = _mm512_inserti32x8(x, B, 1);
+
+	return x;
+}
+
+__m512i ACS::Shuffle512(const __m512i &Value, const __m512i &Mask)
+{
+	return _mm512_or_si512(_mm512_shuffle_epi8(Value, _mm512_add_epi8(Mask, NI512K0)),
+		_mm512_shuffle_epi8(_mm512_permutex_epi64(Value, 0x4E), _mm512_add_epi8(Mask, NI512K1)));
+}
+#endif
+
+#if defined(CEX_EXTENDED_AESNI)
+__m256i ACS::Shuffle256(const __m256i &Value, const __m256i &Mask)
+{
+	return _mm256_or_si256(_mm256_shuffle_epi8(Value, _mm256_add_epi8(Mask, NI256K0)),
+		_mm256_shuffle_epi8(_mm256_permute4x64_epi64(Value, 0x4E), _mm256_add_epi8(Mask, NI256K1)));
+}
+#endif
 
 void ACS::Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
@@ -877,8 +839,34 @@ SecureVector<byte> ACS::Serialize()
 	return tmps;
 }
 
-void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)// 0, 255..208
 {
+#if defined(CEX_EXTENDED_AESNI)
+
+	static const __m256i SWMASK = _mm256_setr_epi8(0, 17, 22, 23, 4, 5, 26, 27, 8, 9, 14, 31, 12, 13, 18, 19, 
+		16, 1, 6, 7, 20, 21, 10, 11, 24, 25, 30, 15, 28, 29, 2, 3);
+	const size_t RNDCNT = m_acsState->RoundKeys.size() - 2;
+	size_t kctr;
+	__m256i x;
+
+	kctr = 0; 
+
+	x = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset]));
+	x = _mm256_xor_si256(x, m_acsState->RoundKeys[kctr]);
+
+	while (kctr < RNDCNT)
+	{
+		++kctr;
+		x = Shuffle256(x, SWMASK);
+		x = _mm256_aesenc_epi128(x, m_acsState->RoundKeys[kctr]);
+	}
+
+	++kctr;
+	x = Shuffle256(x, SWMASK);
+	_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_aesenclast_epi128(x, m_acsState->RoundKeys[kctr]));
+
+#else
+
 	const size_t HLFBLK = 16;
 	const size_t RNDCNT = m_acsState->RoundKeys.size() - 3;
 	size_t kctr;
@@ -896,11 +884,11 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	while (kctr != RNDCNT)
 	{
 		// mix the blocks
-		tmp1 = _mm_blendv_epi8(blk1, blk2, BLEND_MASK);
-		tmp2 = _mm_blendv_epi8(blk2, blk1, BLEND_MASK);
+		tmp1 = _mm_blendv_epi8(blk1, blk2, NIBMASK);
+		tmp2 = _mm_blendv_epi8(blk2, blk1, NIBMASK);
 		// shuffle
-		tmp1 = _mm_shuffle_epi8(tmp1, SHIFT_MASK);
-		tmp2 = _mm_shuffle_epi8(tmp2, SHIFT_MASK);
+		tmp1 = _mm_shuffle_epi8(tmp1, NISMASK);
+		tmp2 = _mm_shuffle_epi8(tmp2, NISMASK);
 		++kctr;
 		// encrypt the first half-block
 		blk1 = _mm_aesenc_si128(tmp1, m_acsState->RoundKeys[kctr]);
@@ -910,10 +898,10 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	}
 
 	// final block
-	tmp1 = _mm_blendv_epi8(blk1, blk2, BLEND_MASK);
-	tmp2 = _mm_blendv_epi8(blk2, blk1, BLEND_MASK);
-	tmp1 = _mm_shuffle_epi8(tmp1, SHIFT_MASK);
-	tmp2 = _mm_shuffle_epi8(tmp2, SHIFT_MASK);
+	tmp1 = _mm_blendv_epi8(blk1, blk2, NIBMASK);
+	tmp2 = _mm_blendv_epi8(blk2, blk1, NIBMASK);
+	tmp1 = _mm_shuffle_epi8(tmp1, NISMASK);
+	tmp2 = _mm_shuffle_epi8(tmp2, NISMASK);
 	++kctr;
 	blk1 = _mm_aesenclast_si128(tmp1, m_acsState->RoundKeys[kctr]);
 	++kctr;
@@ -922,26 +910,43 @@ void ACS::Transform256(const std::vector<byte> &Input, size_t InOffset, std::vec
 	// store in output
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), blk1);
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + HLFBLK]), blk2);
+
+#endif
 }
 
-void ACS::Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void ACS::Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)//255..208 0..208
 {
+#if defined(CEX_HAS_AVX512)
+
+	const __m512i SWMASKL = _mm512_setr_epi8(
+		0, 17, 22, 23, 4, 5, 26, 27, 8, 9, 14, 31, 12, 13, 18, 19, 16, 1, 6, 7, 20, 21, 10, 11, 24, 25, 30, 15, 28, 29, 2, 3,
+		0, 17, 22, 23, 4, 5, 26, 27, 8, 9, 14, 31, 12, 13, 18, 19, 16, 1, 6, 7, 20, 21, 10, 11, 24, 25, 30, 15, 28, 29, 2, 3);
+
+	const size_t RNDCNT = m_acsState->RoundKeys.size() - 2;
+	size_t kctr;
+	__m512i x;
+
+	kctr = 0;
+	x = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset]));
+	x = _mm512_xor_si512(x, Load256To512(m_acsState->RoundKeys[kctr], m_acsState->RoundKeys[kctr]));
+
+	while (kctr < RNDCNT)
+	{
+		++kctr;
+		x = Shuffle512(x, SWMASKL);
+		x = _mm512_aesenc_epi128(x, Load256To512(m_acsState->RoundKeys[kctr], m_acsState->RoundKeys[kctr]));
+	}
+
+	++kctr;
+	x = Shuffle512(x, SWMASKL);
+	_mm512_storeu_si512(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm512_aesenclast_epi128(x, Load256To512(m_acsState->RoundKeys[kctr], m_acsState->RoundKeys[kctr])));
+
+#else
+
 	Transform256(Input, InOffset, Output, OutOffset);
 	Transform256(Input, InOffset + 32, Output, OutOffset + 32);
-	Transform256(Input, InOffset + 64, Output, OutOffset + 64);
-	Transform256(Input, InOffset + 96, Output, OutOffset + 96);
-}
 
-void ACS::Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	Transform1024(Input, InOffset, Output, OutOffset);
-	Transform1024(Input, InOffset + 128, Output, OutOffset + 128);
-}
-
-void ACS::Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	Transform2048(Input, InOffset, Output, OutOffset);
-	Transform2048(Input, InOffset + 256, Output, OutOffset + 256);
+#endif
 }
 
 NAMESPACE_STREAMEND

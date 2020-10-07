@@ -17,6 +17,18 @@ std::string AsymmetricTransformConvert::ToName(AsymmetricParameters Enumeral)
 	case AsymmetricParameters::DLTMS3N256Q8380417:
 		name = std::string("DLTMS3N256Q8380417");
 		break;
+	case AsymmetricParameters::ECDHS1EC25519K:
+		name = std::string("ECDHS1EC25519K");
+		break;
+	case AsymmetricParameters::ECDHS2EC25519S:
+		name = std::string("ECDHS2EC25519S");
+		break;
+	case AsymmetricParameters::ECDSAS1ED25519K:
+		name = std::string("ECDSAS1ED25519K");
+		break;
+	case AsymmetricParameters::ECDSAS2ED25519S:
+		name = std::string("ECDSAS2ED25519S");
+		break;
 	case AsymmetricParameters::MLWES1Q3329N256:
 		name = std::string("MLWES1Q3329N256");
 		break;
@@ -220,6 +232,22 @@ AsymmetricParameters AsymmetricTransformConvert::FromName(std::string &Name)
 	else if (Name == std::string("DLTMS3N256Q8380417"))
 	{
 		tname = AsymmetricParameters::DLTMS3N256Q8380417;
+	}
+	else if (Name == std::string("ECDHS1EC25519K"))
+	{
+		tname = AsymmetricParameters::ECDHS1EC25519K;
+	}
+	else if (Name == std::string("ECDHS2EC25519S"))
+	{
+		tname = AsymmetricParameters::ECDHS2EC25519S;
+	}
+	else if (Name == std::string("ECDSAS1ED25519K"))
+	{
+		tname = AsymmetricParameters::ECDSAS1ED25519K;
+	}
+	else if (Name == std::string("ECDSAS2ED25519S"))
+	{
+		tname = AsymmetricParameters::ECDSAS2ED25519S;
 	}
 	else if (Name == std::string("MLWES1Q3329N256"))
 	{

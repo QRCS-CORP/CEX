@@ -62,8 +62,8 @@ namespace Test
 		try
 		{
 			// test all exception handlers for correct operation
-			Exception();
-			OnProgress(std::string("CipherModeTest: Passed CBC/CFB/CTR/ECB/ICM/OFB exception handling tests.."));
+			//Exception();
+			//OnProgress(std::string("CipherModeTest: Passed CBC/CFB/CTR/ECB/ICM/OFB exception handling tests.."));
 
 			CBC* cbcm = new CBC(BlockCiphers::AES);
 			CFB* cfbm = new CFB(BlockCiphers::AES);
@@ -72,73 +72,73 @@ namespace Test
 			ICM* icmm = new ICM(BlockCiphers::AES);
 			OFB* ofbm = new OFB(BlockCiphers::AES);
 
-			// CBC 128bit key
-			Kat(cbcm, m_keys[0], m_nonce[0], m_message[0], m_expected[0], true);
-			Kat(cbcm, m_keys[0], m_nonce[0], m_message[1], m_expected[1], false);
-			// 192bit
-			Kat(cbcm, m_keys[1], m_nonce[0], m_message[2], m_expected[2], true);
-			Kat(cbcm, m_keys[1], m_nonce[0], m_message[3], m_expected[3], false);
-			// 256bit
-			Kat(cbcm, m_keys[2], m_nonce[0], m_message[4], m_expected[4], true);
-			Kat(cbcm, m_keys[2], m_nonce[0], m_message[5], m_expected[5], false);
-			OnProgress(std::string("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests.."));
+			//// CBC 128bit key
+			//Kat(cbcm, m_keys[0], m_nonce[0], m_message[0], m_expected[0], true);
+			//Kat(cbcm, m_keys[0], m_nonce[0], m_message[1], m_expected[1], false);
+			//// 192bit
+			//Kat(cbcm, m_keys[1], m_nonce[0], m_message[2], m_expected[2], true);
+			//Kat(cbcm, m_keys[1], m_nonce[0], m_message[3], m_expected[3], false);
+			//// 256bit
+			//Kat(cbcm, m_keys[2], m_nonce[0], m_message[4], m_expected[4], true);
+			//Kat(cbcm, m_keys[2], m_nonce[0], m_message[5], m_expected[5], false);
+			//OnProgress(std::string("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests.."));
 
-			// CFB 128bit key
-			Register();
-			OnProgress(std::string("CipherModeTest: Passed CFB-256 8-bit feedback register tests.."));
-			Kat(cfbm, m_keys[0], m_nonce[0], m_message[6], m_expected[6], true);
-			Kat(cfbm, m_keys[0], m_nonce[0], m_message[7], m_expected[7], false);
-			// 192bit
-			Kat(cfbm, m_keys[1], m_nonce[0], m_message[8], m_expected[8], true);
-			Kat(cfbm, m_keys[1], m_nonce[0], m_message[9], m_expected[9], false);
-			// 256bit
-			Kat(cfbm, m_keys[2], m_nonce[0], m_message[10], m_expected[10], true);
-			Kat(cfbm, m_keys[2], m_nonce[0], m_message[11], m_expected[11], false);
-			OnProgress(std::string("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests.."));
+			//// CFB 128bit key
+			//Register();
+			//OnProgress(std::string("CipherModeTest: Passed CFB-256 8-bit feedback register tests.."));
+			//Kat(cfbm, m_keys[0], m_nonce[0], m_message[6], m_expected[6], true);
+			//Kat(cfbm, m_keys[0], m_nonce[0], m_message[7], m_expected[7], false);
+			//// 192bit
+			//Kat(cfbm, m_keys[1], m_nonce[0], m_message[8], m_expected[8], true);
+			//Kat(cfbm, m_keys[1], m_nonce[0], m_message[9], m_expected[9], false);
+			//// 256bit
+			//Kat(cfbm, m_keys[2], m_nonce[0], m_message[10], m_expected[10], true);
+			//Kat(cfbm, m_keys[2], m_nonce[0], m_message[11], m_expected[11], false);
+			//OnProgress(std::string("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests.."));
 
-			// CTR 128bit key
-			Kat(ctrm, m_keys[0], m_nonce[1], m_message[12], m_expected[12], true);
-			Kat(ctrm, m_keys[0], m_nonce[1], m_message[13], m_expected[13], false);
-			// 192bit
-			Kat(ctrm, m_keys[1], m_nonce[1], m_message[14], m_expected[14], true);
-			Kat(ctrm, m_keys[1], m_nonce[1], m_message[15], m_expected[15], false);
-			// 256bit
-			Kat(ctrm, m_keys[2], m_nonce[1], m_message[16], m_expected[16], true);
-			Kat(ctrm, m_keys[2], m_nonce[1], m_message[17], m_expected[17], false);
-			OnProgress(std::string("CipherModeTest: Passed CTR 128/192/256 bit key encryption/decryption tests.."));
+			//// CTR 128bit key
+			//Kat(ctrm, m_keys[0], m_nonce[1], m_message[12], m_expected[12], true);
+			//Kat(ctrm, m_keys[0], m_nonce[1], m_message[13], m_expected[13], false);
+			//// 192bit
+			//Kat(ctrm, m_keys[1], m_nonce[1], m_message[14], m_expected[14], true);
+			//Kat(ctrm, m_keys[1], m_nonce[1], m_message[15], m_expected[15], false);
+			//// 256bit
+			//Kat(ctrm, m_keys[2], m_nonce[1], m_message[16], m_expected[16], true);
+			//Kat(ctrm, m_keys[2], m_nonce[1], m_message[17], m_expected[17], false);
+			//OnProgress(std::string("CipherModeTest: Passed CTR 128/192/256 bit key encryption/decryption tests.."));
 
-			// ECB 128bit key
-			Kat(ecbm, m_keys[0], m_nonce[2], m_message[18], m_expected[18], true);
-			Kat(ecbm, m_keys[0], m_nonce[2], m_message[19], m_expected[19], false);
-			// 192bit
-			Kat(ecbm, m_keys[1], m_nonce[2], m_message[20], m_expected[20], true);
-			Kat(ecbm, m_keys[1], m_nonce[2], m_message[21], m_expected[21], false);
-			// 256bit
-			Kat(ecbm, m_keys[2], m_nonce[2], m_message[22], m_expected[22], true);
-			Kat(ecbm, m_keys[2], m_nonce[2], m_message[23], m_expected[23], false);
-			OnProgress(std::string("CipherModeTest: Passed ECB 128/192/256 bit key encryption/decryption tests.."));
+			//// ECB 128bit key
+			//Kat(ecbm, m_keys[0], m_nonce[2], m_message[18], m_expected[18], true);
+			//Kat(ecbm, m_keys[0], m_nonce[2], m_message[19], m_expected[19], false);
+			//// 192bit
+			//Kat(ecbm, m_keys[1], m_nonce[2], m_message[20], m_expected[20], true);
+			//Kat(ecbm, m_keys[1], m_nonce[2], m_message[21], m_expected[21], false);
+			//// 256bit
+			//Kat(ecbm, m_keys[2], m_nonce[2], m_message[22], m_expected[22], true);
+			//Kat(ecbm, m_keys[2], m_nonce[2], m_message[23], m_expected[23], false);
+			//OnProgress(std::string("CipherModeTest: Passed ECB 128/192/256 bit key encryption/decryption tests.."));
 
-			// ICM 128bit key
-			Kat(icmm, m_keys[0], m_nonce[1], m_message[24], m_expected[24], true);
-			Kat(icmm, m_keys[0], m_nonce[1], m_message[25], m_expected[25], false);
-			// 192bit
-			Kat(icmm, m_keys[1], m_nonce[1], m_message[26], m_expected[26], true);
-			Kat(icmm, m_keys[1], m_nonce[1], m_message[27], m_expected[27], false);
-			// 256bit
-			Kat(icmm, m_keys[2], m_nonce[1], m_message[28], m_expected[28], true);
-			Kat(icmm, m_keys[2], m_nonce[1], m_message[29], m_expected[29], false);
-			OnProgress(std::string("CipherModeTest: Passed ICM 128/192/256 bit key encryption/decryption tests.."));
+			//// ICM 128bit key
+			//Kat(icmm, m_keys[0], m_nonce[1], m_message[24], m_expected[24], true);
+			//Kat(icmm, m_keys[0], m_nonce[1], m_message[25], m_expected[25], false);
+			//// 192bit
+			//Kat(icmm, m_keys[1], m_nonce[1], m_message[26], m_expected[26], true);
+			//Kat(icmm, m_keys[1], m_nonce[1], m_message[27], m_expected[27], false);
+			//// 256bit
+			//Kat(icmm, m_keys[2], m_nonce[1], m_message[28], m_expected[28], true);
+			//Kat(icmm, m_keys[2], m_nonce[1], m_message[29], m_expected[29], false);
+			//OnProgress(std::string("CipherModeTest: Passed ICM 128/192/256 bit key encryption/decryption tests.."));
 
-			// OFB 128bit key
-			Kat(ofbm, m_keys[0], m_nonce[0], m_message[30], m_expected[30], true);
-			Kat(ofbm, m_keys[0], m_nonce[0], m_message[31], m_expected[31], false);
-			// 192bit
-			Kat(ofbm, m_keys[1], m_nonce[0], m_message[32], m_expected[32], true);
-			Kat(ofbm, m_keys[1], m_nonce[0], m_message[33], m_expected[33], false);
-			// 256bit
-			Kat(ofbm, m_keys[2], m_nonce[0], m_message[34], m_expected[34], true);
-			Kat(ofbm, m_keys[2], m_nonce[0], m_message[35], m_expected[35], false);
-			OnProgress(std::string("CipherModeTest: Passed OFB 128/192/256 bit key encryption/decryption tests.."));
+			//// OFB 128bit key
+			//Kat(ofbm, m_keys[0], m_nonce[0], m_message[30], m_expected[30], true);
+			//Kat(ofbm, m_keys[0], m_nonce[0], m_message[31], m_expected[31], false);
+			//// 192bit
+			//Kat(ofbm, m_keys[1], m_nonce[0], m_message[32], m_expected[32], true);
+			//Kat(ofbm, m_keys[1], m_nonce[0], m_message[33], m_expected[33], false);
+			//// 256bit
+			//Kat(ofbm, m_keys[2], m_nonce[0], m_message[34], m_expected[34], true);
+			//Kat(ofbm, m_keys[2], m_nonce[0], m_message[35], m_expected[35], false);
+			//OnProgress(std::string("CipherModeTest: Passed OFB 128/192/256 bit key encryption/decryption tests.."));
 
 			Stress(cbcm);
 			OnProgress(std::string("Passed CBC stress tests.."));

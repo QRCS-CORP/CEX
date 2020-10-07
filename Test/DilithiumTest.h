@@ -6,7 +6,7 @@
 namespace Test
 {
 	/// <summary>
-	/// The Spincs asymmetric cipher test suite.
+	/// The Dilithium asymmetric cipher test suite.
 	///  <para>Tests public-key, private-key and signature integrity, exception handling, cipher authentication, and a looping stress-test</para>
 	/// </summary>
 	class DilithiumTest final : public ITest

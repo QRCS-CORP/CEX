@@ -4,6 +4,11 @@
 #include "ITest.h"
 #include "../CEX/IStreamCipher.h"
 
+#include <wmmintrin.h>
+#if defined(CEX_HAS_AVX512) || defined(CEX_HAS_AVX2)
+#	include <zmmintrin.h>
+#endif
+
 namespace Test
 {
 	using Cipher::Stream::IStreamCipher;

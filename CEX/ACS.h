@@ -147,8 +147,19 @@ private:
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_THRESHOLD = 838;
 	static const byte UPDATE_PREFIX = 0x80;
-	static const __m128i BLEND_MASK;
-	static const __m128i SHIFT_MASK;
+
+
+#if defined(CEX_HAS_AVX512)
+	static const __m512i NI512K0;
+	static const __m512i NI512K1;
+#endif
+#if defined(CEX_EXTENDED_AESNI)
+	static const __m256i NI256K0;
+	static const __m256i NI256K1;
+#else
+	static const __m128i NIBMASK;
+	static const __m128i NISMASK;
+#endif
 
 	class AcsState;
 	std::unique_ptr<AcsState> m_acsState;
@@ -339,14 +350,21 @@ private:
 
 	static void Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Authenticator);
 	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter);
+#if defined(CEX_HAS_AVX512)
+	__m512i Load256To512(__m256i &A, __m256i &B);
+#endif
 	void Process(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Reset();
+#if defined(CEX_HAS_AVX512)
+	__m512i Shuffle512(const __m512i &Value, const __m512i &Mask);
+#endif
+#if defined(CEX_EXTENDED_AESNI)
+	__m256i Shuffle256(const __m256i &Value, const __m256i &Mask);
+#endif
 	void Transform256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Transform1024(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Transform2048(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Transform4096(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void Transform512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 };
 
 NAMESPACE_STREAMEND

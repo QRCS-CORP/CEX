@@ -346,6 +346,30 @@
     <Filter Include="Source Files\Network\Base">
       <UniqueIdentifier>{b94cf9ca-969a-4bfe-ab16-97b06a664ab9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\ECDH">
+      <UniqueIdentifier>{2065eca2-5f3a-48e9-8b9e-71983b2c6bcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\ECDSA">
+      <UniqueIdentifier>{43b900fc-e757-4c80-a42f-59ac0da84f36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\ECDH">
+      <UniqueIdentifier>{c23b2efe-5fd3-4141-8f20-fac91b23e473}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Sign\ECDSA">
+      <UniqueIdentifier>{c9166e40-8f0b-4246-a7de-af2eaa85da95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Cipher\ECDH\Support">
+      <UniqueIdentifier>{3c49f696-210d-420a-8c58-cc2da3a48d47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Cipher\ECDH\Support">
+      <UniqueIdentifier>{5a060d65-a77b-4d81-9ddb-e055afa26ab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asymmetric\Sign\ECDSA\Support">
+      <UniqueIdentifier>{ad5a2a3a-5cc3-4c9e-90be-cf5c967c99f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asymmetric\Sign\ECDSA\Support">
+      <UniqueIdentifier>{fe110152-b48c-4238-9dc0-0167cdd3e636}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -1128,9 +1152,6 @@
     <ClInclude Include="..\..\CEX\DUKPTServer.h">
       <Filter>Header Files\Kms</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\BlockCipherExtensions.h">
-      <Filter>Source Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\KdfDigests.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -1154,6 +1175,33 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2512.h">
       <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ECDH.h">
+      <Filter>Header Files\Asymmetric\Cipher\ECDH</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ECDHParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\BlockCipherExtensions.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\EC25519.h">
+      <Filter>Header Files\Asymmetric\Cipher\ECDH\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAsymmetricKeyExchange.h">
+      <Filter>Header Files\Asymmetric\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ECDSA.h">
+      <Filter>Header Files\Asymmetric\Sign\ECDSA</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ECDSAParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ECDHBase.h">
+      <Filter>Header Files\Asymmetric\Cipher\ECDH\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ECDSABase.h">
+      <Filter>Header Files\Asymmetric\Sign\ECDSA\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1756,6 +1804,27 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\SHA2512.cpp">
       <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECDHParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECDH.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\ECDH</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\EC25519.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\ECDH\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECDSA.cpp">
+      <Filter>Source Files\Asymmetric\Sign\ECDSA</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECDSAParameters.cpp">
+      <Filter>Source Files\Enumeration</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECDHBase.cpp">
+      <Filter>Source Files\Asymmetric\Cipher\ECDH\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECDSABase.cpp">
+      <Filter>Source Files\Asymmetric\Sign\ECDSA\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
