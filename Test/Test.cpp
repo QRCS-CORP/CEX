@@ -245,8 +245,6 @@ int32_t main()
 	bool isx86emu;
 	bool is64bit;
 
-	//TestRun(new HKDSTest());
-
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
 

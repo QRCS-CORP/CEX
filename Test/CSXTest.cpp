@@ -98,14 +98,14 @@ namespace Test
 			Kat(csx512s, m_message[0], m_key[1], m_nonce[0], m_expected[3]);
 			OnProgress(std::string("CSXTest: Passed CSX-512 known answer cipher tests.."));
 
-			Sequential(csx512a, m_message[1], m_key[0], m_nonce[0], m_expected[4], m_expected[5], m_expected[6]);
+			Sequential(csx512a, m_message[0], m_key[0], m_nonce[0], m_expected[4], m_expected[5], m_expected[6]);
 			OnProgress(std::string("CSXTest: Passed CSX-512 sequential transformation and authentication calls test.."));
 
 			// tests the cipher state serialization feature
 			Serialization();
 			OnProgress(std::string("CSXTest: Passed CSX-512 state serialization test.."));
 
-			MonteCarlo(csx512s, m_message[1], m_key[1], m_nonce[0], m_monte[0]);
+			MonteCarlo(csx512s, m_message[0], m_key[1], m_nonce[0], m_monte[0]);
 			OnProgress(std::string("CSXTest: Passed CSX-512 monte carlo tests.."));
 
 			Parallel(csx512s);
