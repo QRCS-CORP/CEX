@@ -246,7 +246,7 @@ NAMESPACE_ROOT
 		*  @brief Symmetric Stream Cipher Namespace
 		*/
 		NAMESPACE_STREAM
-			class CSX256 {};
+			class ChaChaP20 {};
 			class CSX512 {};
 			class IStreamCipher {};
 			class TSX256 {};

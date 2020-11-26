@@ -28,6 +28,7 @@
 #include "../Test/BCRTest.h"
 #include "../Test/Blake2Test.h"
 #include "../Test/ChaChaTest.h"
+#include "../Test/CSXTest.h"
 #include "../Test/CipherModeTest.h"
 #include "../Test/CipherSpeedTest.h"
 #include "../Test/CipherStreamTest.h"
@@ -46,14 +47,14 @@
 #include "../Test/ECPTest.h"
 #include "../Test/GMACTest.h"
 #include "../Test/HCRTest.h"
-#include "../Test/KDF2Test.h"
-#include "../Test/SHA3Test.h"
-#include "../Test/KMACTest.h"
 #include "../Test/HKDFTest.h"
 #include "../Test/HKDSTest.h"
 #include "../Test/HMACTest.h"
 #include "../Test/HCGTest.h"
 #include "../Test/ITest.h"
+#include "../Test/KDF2Test.h"
+#include "../Test/KMACTest.h"
+#include "../Test/KPATest.h"
 #include "../Test/MacStreamTest.h"
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
@@ -74,6 +75,7 @@
 #include "../Test/SecureStreamTest.h"
 #include "../Test/SerpentTest.h"
 #include "../Test/Sha2Test.h"
+#include "../Test/SHA3Test.h"
 #include "../Test/SimdSpeedTest.h"
 #include "../Test/SimdWrapperTest.h"
 #include "../Test/SHAKETest.h"
@@ -240,9 +242,10 @@ int32_t main()
 	bool hasAesni;
 	bool hasAvx;
 	bool hasAvx2;
-	bool hasAvx512;
 	bool isx86emu;
 	bool is64bit;
+
+	//TestRun(new HKDSTest());
 
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
@@ -280,7 +283,6 @@ int32_t main()
 	hasAesni = false;
 	hasAvx = false;
 	hasAvx2 = false;
-	hasAvx512 = false;
 	isx86emu = false;
 	is64bit = false;
 
@@ -291,7 +293,6 @@ int32_t main()
 		hasAesni = detect.AESNI();
 		hasAvx = detect.AVX();
 		hasAvx2 = detect.AVX2();
-		hasAvx512 - detect.AVX512F();
 		isx86emu = detect.IsX86Emulation();
 		is64bit = detect.IsX64();
 	}
@@ -325,15 +326,7 @@ int32_t main()
 	}
 	PrintHeader("", "");
 
-	if (hasAvx512)
-	{
-#if !defined(CEX_HAS_AVX512)
-		PrintHeader("Warning! AVX512 support was detected! Set the enhanced instruction set to arch:AVX512 for best performance.");
-#else
-		PrintHeader("AVX512 intrinsics support has been enabled.");
-#endif
-	}
-	else if (hasAvx2)
+	if (hasAvx2)
 	{
 #if !defined(CEX_HAS_AVX2)
 		PrintHeader("Warning! AVX2 support was detected! Set the enhanced instruction set to arch:AVX2 for best performance.");
@@ -401,6 +394,7 @@ int32_t main()
 			TestRun(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
 			TestRun(new ChaChaTest());
+			TestRun(new CSXTest());
 			TestRun(new RCSTest());
 			TestRun(new RWSTest());
 			TestRun(new ThreefishTest());

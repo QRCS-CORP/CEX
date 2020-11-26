@@ -25,7 +25,7 @@
 #ifndef CEX_CHA_H
 #define CEX_CHA_H
 
-#include "CTR.h"
+#include "ICM.h"
 #include "IAeadMode.h"
 #include "IMac.h"
 #include "StreamAuthenticators.h"
@@ -153,7 +153,7 @@ private:
 
 	class HbaState;
 	std::unique_ptr<HbaState> m_hbaState;
-	std::unique_ptr<CTR> m_cipherMode;
+	std::unique_ptr<ICM> m_cipherMode;
 	std::unique_ptr<IMac> m_macAuthenticator;
 
 public:

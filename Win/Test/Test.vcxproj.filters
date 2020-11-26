@@ -446,6 +446,12 @@
     <ClInclude Include="..\..\Test\ECDSATest.h">
       <Filter>Header Files\Test\Asymmetric\Sign</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\CSXTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\KPATest.h">
+      <Filter>Header Files\Test\MacTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -654,6 +660,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\ECDSATest.cpp">
       <Filter>Source Files\Test\Asymmetric\Sign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CSXTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\KPATest.cpp">
+      <Filter>Source Files\Test\MacTest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

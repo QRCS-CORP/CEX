@@ -44,6 +44,15 @@ std::string MacConvert::ToName(Macs Enumeral)
 		case Macs::HMACSHA2512:
 			name = std::string("HMACSHA2512");
 			break;
+		case Macs::KPA128:
+			name = std::string("KPA128");
+			break;
+		case Macs::KPA256:
+			name = std::string("KPA256");
+			break;
+		case Macs::KPA512:
+			name = std::string("KPA512");
+			break;
 		case Macs::KMAC128:
 			name = std::string("KMAC128");
 			break;
@@ -118,6 +127,18 @@ Macs MacConvert::FromName(std::string &Name)
 	else if (Name == std::string("HMACSHA2512"))
 	{
 		tname = Macs::HMACSHA2512;
+	}
+	else if (Name == std::string("KPA128"))
+	{
+		tname = Macs::KPA128;
+	}
+	else if (Name == std::string("KPA256"))
+	{
+		tname = Macs::KPA256;
+	}
+	else if (Name == std::string("KPA512"))
+	{
+		tname = Macs::KPA512;
 	}
 	else if (Name == std::string("KMAC128"))
 	{

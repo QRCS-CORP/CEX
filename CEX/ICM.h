@@ -205,6 +205,11 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
+	/// Read Only: The ICM initialization vector
+	/// </summary>
+	const std::vector<byte> &Nonce();
+
+	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
@@ -300,7 +305,7 @@ public:
 private:
 
 	void Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<ulong> &Counter);
+	void Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter);
 	void ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 };

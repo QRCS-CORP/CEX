@@ -16,6 +16,14 @@ enum class StreamAuthenticators : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
+	/// The Keccak-based Parallel Authentication code generator
+	/// </summary>
+	KPA = 1,
+	/// <summary>
+	/// The KMAC-256 message authentication code generator
+	/// </summary>
+	KMAC = 2,
+	/// <summary>
 	/// A HMAC(SHA2256) message authentication code generator
 	/// </summary>
 	HMACSHA2256 = static_cast<byte>(Macs::HMACSHA2256), 

@@ -44,8 +44,8 @@ std::string SymmetricCipherConvert::ToName(SymmetricCiphers Enumeral)
 		case SymmetricCiphers::SHXS1024:
 			name = std::string("SHXS1024");
 			break;
-		case SymmetricCiphers::CSX256:
-			name = std::string("CSX256");
+		case SymmetricCiphers::ChaChaP20:
+			name = std::string("ChaChaP20");
 			break;
 		case SymmetricCiphers::CSXR20K256:
 			name = std::string("CSXR20K256");
@@ -167,9 +167,9 @@ SymmetricCiphers SymmetricCipherConvert::FromName(std::string &Name)
 	{
 		tname = SymmetricCiphers::SHXS1024;
 	}
-	else if (Name == std::string("CSX256"))
+	else if (Name == std::string("ChaChaP20"))
 	{
-		tname = SymmetricCiphers::CSX256;
+		tname = SymmetricCiphers::ChaChaP20;
 	}
 	else if (Name == std::string("CSXR20K256"))
 	{

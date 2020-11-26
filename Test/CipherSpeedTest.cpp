@@ -11,7 +11,7 @@
 #include "../CEX/ICM.h"
 #include "../CEX/OFB.h"
 #include "../CEX/ACS.h"
-#include "../CEX/CSX256.h"
+#include "../CEX/ChaChaP20.h"
 #include "../CEX/CSX512.h"
 #include "../CEX/RCS.h"
 #include "../CEX/TSX256.h"
@@ -55,7 +55,6 @@ namespace Test
 
 	std::string CipherSpeedTest::Run()
 	{
-		RCSSpeedTest();
 		try
 		{
 			OnProgress(std::string("### BLOCK CIPHER TESTS ###"));
@@ -112,7 +111,7 @@ namespace Test
 			OnProgress(std::string("### Uses default of 20 rounds, 256 bit key"));
 			OnProgress(std::string(""));
 
-			OnProgress(std::string("***CSX256: Monte Carlo test (K=256; R=20)***"));
+			OnProgress(std::string("***ChaChaP20: Monte Carlo test (K=256; R=20)***"));
 			CSX256SpeedTest();
 #if defined(CEX_CSX512_STRONG)
 			OnProgress(std::string("***CSX512: Monte Carlo test (K=512; R=80)***"));
@@ -316,7 +315,7 @@ namespace Test
 
 	void CipherSpeedTest::CSX256SpeedTest()
 	{
-		CSX256* cpr = new CSX256(false);
+		ChaChaP20* cpr = new ChaChaP20(false);
 		ParallelStreamLoop(cpr, 32, 8, 10, m_progressEvent);
 		delete cpr;
 	}

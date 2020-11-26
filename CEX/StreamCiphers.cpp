@@ -15,7 +15,7 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 
 	switch (Enumeral)
 	{
-		case StreamCiphers::CSX256:
+		case StreamCiphers::ChaChaP20:
 		{
 			if (Authenticator == StreamAuthenticators::KMAC256)
 			{
@@ -23,7 +23,7 @@ StreamCiphers StreamCipherConvert::FromDescription(StreamCiphers Enumeral, Strea
 			}
 			else
 			{
-				name = StreamCiphers::CSX256;
+				name = StreamCiphers::ChaChaP20;
 			}
 			break;
 		}

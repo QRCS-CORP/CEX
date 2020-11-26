@@ -17,6 +17,9 @@ public:
 
 	SecureVector<byte> Custom;
 	std::vector<__m128i> RoundKeys;
+#if defined(CEX_HAS_AVX512)
+	std::vector<__m512i> RoundKeysW;
+#endif
 	size_t Rounds;
 	BlockCipherExtensions Extension;
 	bool Destroyed;
@@ -39,6 +42,9 @@ public:
 	{
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+#if defined(CEX_HAS_AVX512)
+		MemoryTools::Clear(RoundKeysW, 0, RoundKeysW.size() * sizeof(__m512i));
+#endif
 		Rounds = 0;
 		Extension = BlockCipherExtensions::None;
 		Destroyed = false;
@@ -50,6 +56,9 @@ public:
 	{
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(uint));
+#if defined(CEX_HAS_AVX512)
+		MemoryTools::Clear(RoundKeysW, 0, RoundKeysW.size() * sizeof(__m512i));
+#endif
 		Encryption = false;
 		Initialized = false;
 	}
@@ -254,6 +263,17 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &Parameters)
 
 		m_ahxState->RoundKeys[i] = _mm_aesimc_si128(m_ahxState->RoundKeys[i]);
 	}
+
+#if defined(CEX_HAS_AVX512)
+	size_t i;
+
+	m_ahxState->RoundKeysW.resize(m_ahxState->RoundKeys.size());
+
+	for (i = 0; i < m_ahxState->RoundKeys.size(); ++i)
+	{
+		m_ahxState->RoundKeysW[i] = Load128To512(m_ahxState->RoundKeys[i]);
+	}
+#endif
 
 	// ready to transform data
 	m_ahxState->Encryption = Encryption;
@@ -528,31 +548,8 @@ void AHX::Decrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 void AHX::Decrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(CEX_EXTENDED_AESNI)
-
-	const size_t RNDCNT = m_ahxState->RoundKeys.size() - 2;
-	size_t kctr;
-	__m256i x;
-
-	kctr = 0;
-	x = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset]));
-	x = _mm256_xor_si256(x, Load128To256(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
-
-	while (kctr != RNDCNT)
-	{
-		++kctr;
-		x = _mm256_aesdec_epi128(x, Load128To256(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
-	}
-
-	++kctr;
-	_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_aesdeclast_epi128(x, Load128To256(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr])));
-
-#else
-
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
-
-#endif
 }
 
 void AHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
@@ -565,16 +562,16 @@ void AHX::Decrypt512(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 	kctr = 0;
 	x = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset]));
-	x = _mm512_xor_si512(x, Load128To512(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
+	x = _mm512_xor_si512(x, m_ahxState->RoundKeysW[kctr]);
 
 	while (kctr != RNDCNT)
 	{
 		++kctr;
-		x = _mm512_aesdec_epi128(x, Load128To512(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
+		x = _mm512_aesdec_epi128(x, m_ahxState->RoundKeysW[kctr]);
 	}
 
 	++kctr;
-	_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_aesdeclast_epi128(x, Load128To512(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr])));
+	_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_aesdeclast_epi128(x, m_ahxState->RoundKeysW[kctr]));
 
 #else
 
@@ -617,31 +614,8 @@ void AHX::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 void AHX::Encrypt256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(CEX_EXTENDED_AESNI)
-
-	const size_t RNDCNT = m_ahxState->RoundKeys.size() - 2;
-	size_t kctr;
-	__m256i x;
-
-	kctr = 0;
-	x = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset]));
-	x = _mm256_xor_si256(x, Load128To256(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
-
-	while (kctr != RNDCNT)
-	{
-		++kctr;
-		x = _mm256_aesenc_epi128(x, Load128To256(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
-	}
-
-	++kctr;
-	_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_aesenclast_epi128(x, Load128To256(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr])));
-
-#else
-
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
-
-#endif
 }
 
 void AHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
@@ -654,16 +628,16 @@ void AHX::Encrypt512(const std::vector<byte> &Input, size_t InOffset, std::vecto
 
 	kctr = 0;
 	x = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset]));
-	x = _mm512_xor_si512(x, Load128To512(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
+	x = _mm512_xor_si512(x, m_ahxState->RoundKeysW[kctr]);
 
 	while (kctr != RNDCNT)
 	{
 		++kctr;
-		x = _mm512_aesenc_epi128(x, Load128To512(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr]));
+		x = _mm512_aesenc_epi128(x, m_ahxState->RoundKeysW[kctr]);
 	}
 
 	++kctr;
-	_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_aesenclast_epi128(x, Load128To512(m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr], m_ahxState->RoundKeys[kctr])));
+	_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_aesenclast_epi128(x, m_ahxState->RoundKeysW[kctr]));
 
 #else
 
@@ -751,29 +725,16 @@ std::vector<SymmetricKeySize> AHX::CalculateKeySizes(BlockCipherExtensions Exten
 	return keys;
 }
 
-#if defined(CEX_EXTENDED_AESNI)
-__m256i AHX::Load128To256(__m128i &A, __m128i &B)
-{
-	__m256i x;
-
-	x = _mm256_setzero_si256();
-	x = _mm256_inserti32x4(x, A, 0);
-	x = _mm256_inserti32x4(x, B, 1);
-
-	return x;
-}
-#endif
-
 #if defined(CEX_HAS_AVX512)
-__m512i AHX::Load128To512(__m128i &A, __m128i &B, __m128i &C, __m128i &D)
+__m512i AHX::Load128To512(__m128i &V)
 {
 	__m512i x;
 
 	x = _mm512_setzero_si512();
-	x = _mm512_inserti32x4(x, A, 0);
-	x = _mm512_inserti32x4(x, B, 1);
-	x = _mm512_inserti32x4(x, C, 2);
-	x = _mm512_inserti32x4(x, D, 3);
+	x = _mm512_inserti32x4(x, V, 0);
+	x = _mm512_inserti32x4(x, V, 1);
+	x = _mm512_inserti32x4(x, V, 2);
+	x = _mm512_inserti32x4(x, V, 3);
 
 	return x;
 }

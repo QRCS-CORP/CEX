@@ -17,12 +17,14 @@ public:
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
+	bool IsRijndael;
 
 	EcbState(bool IsDestroyed)
 		:
 		Destroyed(IsDestroyed),
 		Encryption(false),
-		Initialized(false)
+		Initialized(false),
+		IsRijndael(false)
 	{
 	}
 
@@ -36,6 +38,7 @@ public:
 		Destroyed = false;
 		Encryption = false;
 		Initialized = false;
+		IsRijndael = false;
 	}
 };
 
@@ -190,6 +193,8 @@ void ECB::Initialize(bool Encryption, ISymmetricKey &Parameters)
 		}
 	}
 
+
+	m_ecbState->IsRijndael = IsRijndael();
 	m_blockCipher->Initialize(Encryption, Parameters);
 	m_ecbState->Encryption = Encryption;
 	m_ecbState->Initialized = true;
@@ -263,20 +268,42 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 	bctr = BlockCount;
 
 #if defined(CEX_HAS_AVX512)
-	if (bctr > 15)
+	if (m_ecbState->IsRijndael)
 	{
-		// 512bit avx
-		const size_t AVX512BLK = 256;
-		rctr = (bctr / 16);
-
-		while (rctr != 0)
+		if (bctr > 4)
 		{
-			// transform 16 blocks
-			m_blockCipher->Transform2048(Input, InOffset, Output, OutOffset);
-			InOffset += AVX512BLK;
-			OutOffset += AVX512BLK;
-			bctr -= 16;
-			--rctr;
+			// 512bit avx
+			const size_t AVX512BLK = 64;
+			rctr = (bctr / 4);
+
+			while (rctr != 0)
+			{
+				// transform 16 blocks
+				m_blockCipher->Transform512(Input, InOffset, Output, OutOffset);
+				InOffset += AVX512BLK;
+				OutOffset += AVX512BLK;
+				bctr -= 4;
+				--rctr;
+			}
+		}
+	}
+	else
+	{
+		if (bctr > 15)
+		{
+			// serpent: uses a larger block
+			const size_t AVX512BLK = 256;
+			rctr = (bctr / 16);
+
+			while (rctr != 0)
+			{
+				// transform 16 blocks
+				m_blockCipher->Transform2048(Input, InOffset, Output, OutOffset);
+				InOffset += AVX512BLK;
+				OutOffset += AVX512BLK;
+				bctr -= 16;
+				--rctr;
+			}
 		}
 	}
 #elif defined(CEX_HAS_AVX2)
@@ -322,6 +349,31 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 		OutOffset += BLOCK_SIZE;
 		--bctr;
 	}
+}
+
+bool ECB::IsRijndael()
+{
+	bool res;
+
+	switch (m_blockCipher->Enumeral())
+	{
+		case BlockCiphers::AES:
+		case BlockCiphers::RHXH256:
+		case BlockCiphers::RHXH512:
+		case BlockCiphers::RHXS1024:
+		case BlockCiphers::RHXS256:
+		case BlockCiphers::RHXS512:
+		{
+			res = true;
+			break;
+		}
+		default:
+		{
+			res = false;
+		}
+	}
+
+	return res;
 }
 
 void ECB::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)

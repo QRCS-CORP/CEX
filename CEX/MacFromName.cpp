@@ -5,6 +5,7 @@
 #include "HMAC.h"
 #include "GMAC.h"
 #include "KMAC.h"
+#include "KPA.h"
 #include "Poly1305.h"
 #include "SHA2Digests.h"
 
@@ -16,6 +17,7 @@ using Exception::CryptoMacException;
 using Enumeration::ErrorCodes;
 using Enumeration::SHA2Digests;
 using Enumeration::KmacModes;
+using Enumeration::KpaModes;
 
 const std::string MacFromName::CLASS_NAME("MacFromName");
 
@@ -104,6 +106,21 @@ IMac* MacFromName::GetInstance(Macs MacType)
 			case Macs::KMAC1024:
 			{
 				mptr = new KMAC(KmacModes::KMAC1024);
+				break;
+			}
+			case Macs::KPA128:
+			{
+				mptr = new KPA(KpaModes::KPA128);
+				break;
+			}
+			case Macs::KPA256:
+			{
+				mptr = new KPA(KpaModes::KPA256);
+				break;
+			}
+			case Macs::KPA512:
+			{
+				mptr = new KPA(KpaModes::KPA512);
 				break;
 			}
 			case Macs::Poly1305:

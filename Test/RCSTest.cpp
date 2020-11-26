@@ -83,21 +83,22 @@ namespace Test
 			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 exception handling tests.."));
 
 			// test 2 succesive finalization calls against mac output and expected ciphertext
-			Finalization(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0], m_code[1]);
-			Finalization(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[2], m_code[2], m_code[3]);
-			Finalization(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[3], m_code[4], m_code[5]);
+			Finalization(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[0], m_code[1]);
+			Finalization(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[3], m_code[2], m_code[3]);
+			Finalization(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[4], m_code[4], m_code[5]);
 			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer finalization tests."));
 
 			// original known answer test vectors generated with this implementation
 			Kat(rcss, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
-			Kat(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[2]);
-			Kat(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[3]);
+			Kat(rcss, m_message[1], m_key[1], m_nonce[0], m_expected[1]);
+			Kat(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[2]);
+			Kat(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[3]);
+			Kat(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[4]);
 			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer cipher tests.."));
 
-			//Sequential(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[4], m_expected[5], m_expected[6]);
-			Sequential(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[7], m_expected[8], m_expected[9]);
-			Sequential(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[10], m_expected[11], m_expected[12]);
+			//Sequential(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[5], m_expected[6], m_expected[7]);
+			Sequential(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[8], m_expected[9], m_expected[10]);
+			Sequential(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[11], m_expected[12], m_expected[13]);
 			OnProgress(std::string("RCSTest: Passed RCS sequential transformation calls test.."));
 
 			// run the monte carlo equivalency tests and compare encryption to a vector
@@ -117,9 +118,9 @@ namespace Test
 			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 stress tests.."));
 
 			// verify ciphertext output, decryption, and mac code generation
-			Verification(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0]);
-			Verification(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[2], m_code[2]);
-			Verification(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[3], m_code[4]);
+			Verification(rcsa, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[0]);
+			Verification(rcsa, m_message[1], m_key[1], m_nonce[0], m_expected[3], m_code[2]);
+			Verification(rcsa, m_message[2], m_key[2], m_nonce[0], m_expected[4], m_code[4]);
 			OnProgress(std::string("RCSTest: Passed RCS-256/512/1024 known answer authentication tests.."));
 
 			delete rcss;
@@ -138,21 +139,22 @@ namespace Test
 				OnProgress(std::string("RCSTest: Passed ACS-256/512/1024 MAC authentication tests.."));
 
 				// test 2 succesive finalization calls against mac output and expected ciphertext
-				Finalization(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0], m_code[1]);
-				Finalization(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[2], m_code[2], m_code[3]);
-				Finalization(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[3], m_code[4], m_code[5]);
+				Finalization(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[0], m_code[1]);
+				Finalization(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[3], m_code[2], m_code[3]);
+				Finalization(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[4], m_code[4], m_code[5]);
 				OnProgress(std::string("RCSTest: Passed ACS-256/512/1024 known answer finalization tests."));
 
 				// original known answer test vectors generated with this implementation
 				Kat(acss, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-				Kat(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
-				Kat(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[2]);
-				Kat(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[3]);
+				Kat(acss, m_message[1], m_key[1], m_nonce[0], m_expected[1]);
+				Kat(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[2]);
+				Kat(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[3]);
+				Kat(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[4]);
 				OnProgress(std::string("RCSTest: Passed ACS-256/512/1024 known answer cipher tests.."));
 
-				Sequential(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[4], m_expected[5], m_expected[6]);
-				Sequential(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[7], m_expected[8], m_expected[9]);
-				Sequential(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[10], m_expected[11], m_expected[12]);
+				Sequential(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[5], m_expected[6], m_expected[7]);
+				Sequential(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[8], m_expected[9], m_expected[10]);
+				Sequential(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[11], m_expected[12], m_expected[13]);
 				OnProgress(std::string("RCSTest: Passed ACS sequential transformation calls test.."));
 
 				// run the monte carlo equivalency tests and compare encryption to a vector
@@ -168,9 +170,9 @@ namespace Test
 				OnProgress(std::string("RCSTest: Passed ACS-256/512/1024 stress tests.."));
 
 				// verify ciphertext output, decryption, and mac code generation
-				Verification(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[1], m_code[0]);
-				Verification(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[2], m_code[2]);
-				Verification(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[3], m_code[4]);
+				Verification(acsa, m_message[0], m_key[0], m_nonce[0], m_expected[2], m_code[0]);
+				Verification(acsa, m_message[1], m_key[1], m_nonce[0], m_expected[3], m_code[2]);
+				Verification(acsa, m_message[2], m_key[2], m_nonce[0], m_expected[4], m_code[4]);
 				OnProgress(std::string("RCSTest: Passed ACS-256/512/1024 known answer authentication tests.."));
 
 				delete acss;
@@ -778,6 +780,8 @@ namespace Test
 			// kat tests
 			// rcs256s
 			std::string("9EF7D04279C5277366D2DDD3FBB47F0DFCB3994D6F43D7F3A782778838C56DB3"),
+			// rcs512s
+			std::string("8643251F3880261010BF195886C0496CC2EB07BB68D9F13BCBD266890467F47F57FA98C08031903D6539AC94B4F17E3A45A741159FF929B0540436FFE7A77E01"),
 			// rcsc256k256
 			std::string("7940917E9219A31248946F71647B15421535941574F84F79F6110C1F2F776D03"),
 			// rcsc512k512
@@ -811,7 +815,7 @@ namespace Test
 				"4823A98B485F759D8DAC8347F15438A9F7926134DF90B25EC7B4D669CAA98DAC7D4C968093623CA8E56ADE0033CB49038DC9FF324B946BBBE5C852D942A24AF0"
 				"BA007D1507161331DB8CEE2859FF672C34F9DFFD7E52FC22E00DCE52CE93963A77537215F9BB3889183924790EE23AC4FF1A2B9AAAAC6771FB7F611112BC035A")
 		};
-		HexConverter::Decode(expected, 13, m_expected);
+		HexConverter::Decode(expected, 14, m_expected);
 
 		const std::vector<std::string> key =
 		{

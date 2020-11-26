@@ -220,7 +220,7 @@ public:
 	{
 		std::array<ulong, 8> tmp;
 
-		_mm512_storeu_si512(reinterpret_cast<__m256i*>(&tmp), zmm);
+		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmp), zmm);
 
 		X0 = tmp[0];
 		X1 = tmp[1];

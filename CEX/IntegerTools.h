@@ -1905,15 +1905,15 @@ public:
 	/// <param name="Input">The initial vector to clone</param>
 	/// <param name="Output">The incremented output vector</param>
 	/// <param name="Length">The number to increase by</param>
-	template <typename Array>
-	inline static void LeIncreaseW(const Array &Input, Array &Output, size_t Length)
+	template <typename ArrayA, typename ArrayB>
+	inline static void LeIncreaseW(const ArrayA &Input, ArrayB &Output, size_t Length)
 	{
-		CEXASSERT(!std::is_signed<Array::value_type>::value, "Input must be an unsigned integer vector");
+		CEXASSERT(!std::is_signed<ArrayA::value_type>::value, "Input must be an unsigned integer vector");
 		CEXASSERT(Input.size() != 0, "Input size can not be zero");
 		CEXASSERT(Output.size() >= Input.size(), "Output size is too small");
 
-		MemoryTools::Copy(Input, 0, Output, 0, Input.size() * sizeof(Array::value_type));
-		Output[0] += static_cast<typename Array::value_type>(Length);
+		MemoryTools::Copy(Input, 0, Output, 0, Input.size() * sizeof(ArrayA::value_type));
+		Output[0] += static_cast<typename ArrayA::value_type>(Length);
 
 		if (Output[0] < Input[0])
 		{

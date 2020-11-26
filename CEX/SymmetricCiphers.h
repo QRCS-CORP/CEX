@@ -84,7 +84,7 @@ enum class SymmetricCiphers : byte
 	/// A standard implementation of the ChaChaPoly20 stream-cipher, this variant uses 20 rounds and has no athentication.
 	/// <para>A standard ChaChaPoly20 stream-cipher implementation: uses a 512-bit block and a 256-bit key, and 8-byte nonce</para>
 	/// </summary>
-	CSX256 = 96,
+	ChaChaP20 = 96,
 	/// <summary>
 	/// The ChaChaPoly20 stream cipher authenticated with KMAC-256
 	/// <para>An extended ChaChaPoly20 stream-cipher implementation: uses a 512-bit block, a 256-bit key size, and 20 rounds</para>

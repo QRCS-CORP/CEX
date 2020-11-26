@@ -335,9 +335,8 @@ public:
 private:
 
 #if defined(CEX_EXTENDED_AESNI)
-	static __m256i Load128To256(__m128i &A, __m128i &B);
 #	if defined(CEX_HAS_AVX512)
-		static __m512i Load128To512(__m128i &A, __m128i &B, __m128i &C, __m128i &D);
+		static __m512i Load128To512(__m128i &V);
 #	endif
 #endif
 	static std::vector<SymmetricKeySize> CalculateKeySizes(BlockCipherExtensions Extension);

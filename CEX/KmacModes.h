@@ -7,8 +7,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// The type of KMAC KDF variant.
-/// <para>Must coincide with Macs/Kdfs enumeration.</para>
+/// The type of KMAC MAC variant.
 /// </summary>
 enum class KmacModes : byte
 {

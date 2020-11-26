@@ -114,9 +114,45 @@
 #		define CEX_OS_SUNUX
 #	endif
 #endif
+
 #if defined(__posix) || defined(_POSIX_VERSION)
 #	define CEX_OS_POSIX
 #	include <unistd.h>
+#endif
+
+#if !defined(__clang__) && !defined(__GNUC__)
+#	ifdef __attribute__
+#		undef __attribute__
+#	endif
+#	define __attribute__(a)
+#endif
+
+#if defined(_DLL)
+#	define CEX_DLL_API
+#endif
+
+#if defined(CEX_DLL_API)
+#	if defined(_MSC_VER)
+#		if defined(CEX_DLL_IMPORT)
+#			define CEX_EXPORT_API __declspec(dllimport)
+#		else
+#			define CEX_EXPORT_API __declspec(dllexport)
+#		endif
+#	else
+#		if defined(__SUNPRO_C)
+#			if !defined(__GNU_C__)
+#				define CEX_EXPORT_API __attribute__ (visibility(__global))
+#			else
+#				define CEX_EXPORT_API __attribute__ __global
+#			endif
+#		elif defined(_MSG_VER)
+#			define CEX_EXPORT_API extern __declspec(dllexport)
+#		else
+#			define CEX_EXPORT_API __attribute__ ((visibility ("default")))
+#		endif
+#	endif
+#else
+#	define CEX_EXPORT_API
 #endif
 
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_UNIX)
@@ -148,36 +184,6 @@
 #		define TYPE_OF_SOCKLEN_T int
 #	else
 #		define TYPE_OF_SOCKLEN_T ::socklen_t
-#	endif
-#endif
-
-#if defined(CEX_STATIC)
-#	define CEX_EXPORT
-#	define CEX_EXPORT_WEAK
-#else
-#	if defined(_MSC_VER)
-#		if defined(CEX_DLL_EXPORT)
-#			define CEX_EXPORT __declspec(dllexport)
-#		else
-#			define CEX_EXPORT __declspec(dllimport)
-#		endif
-#	else
-#		if defined(__SUNPRO_C)
-#			if defined(__GNU_C__)
-#				define CEX_EXPORT __attribute__ (visibility(__global))
-#			else
-#				define CEX_EXPORT __attribute__ __global
-#			endif
-#		elif defined(_MSG_VER)
-#			define CEX_EXPORT extern __declspec(dllexport)
-#		else
-#			define CEX_EXPORT __attribute__ ((visibility ("default")))
-#		endif
-#	endif
-#	if defined(__ELF__) && !defined(CEX_DISABLE_WEAK_FUNCTIONS)
-#		define CEX_EXPORT_WEAK CEX_EXPORT __attribute__((weak))
-#	else
-#		define CEX_EXPORT_WEAK CEX_EXPORT
 #	endif
 #endif
 

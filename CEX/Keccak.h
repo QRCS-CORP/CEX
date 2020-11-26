@@ -110,6 +110,11 @@ public:
 	static const byte KECCAK_KMAC_DOMAIN = 0x04;
 
 	/// <summary>
+	/// The Keccak Parallel Authentication domain identifier
+	/// </summary>
+	static const byte KECCAK_KPA_DOMAIN_ID = 0x41;
+
+	/// <summary>
 	/// The Keccak SHA3 digest domain identifier
 	/// </summary>
 	static const byte KECCAK_SHA3_DOMAIN = 0x06;
@@ -845,8 +850,9 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations uint64 state array</param>
+	/// <param name="Rounds">The number of permutations rounds; defaults at 24</param>
 	template<typename ArrayU64x25>
-	static void PermuteR24P1600C(ArrayU64x25 &State)
+	static void PermuteR24P1600C(ArrayU64x25 &State, size_t Rounds = 24)
 	{
 		std::array<ulong, 25> A;
 		std::array<ulong, 5> C;
@@ -856,7 +862,7 @@ public:
 
 		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
 
-		for (i = 0; i < 24; i += 2)
+		for (i = 0; i < Rounds; i += 2)
 		{
 			// round n
 			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
@@ -7758,8 +7764,9 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations ULong512 state array</param>
+	/// <param name="Rounds">The number of permutations rounds; defaults at 24</param>
 	template<typename ArrayU512>
-	static void PermuteR24P8x1600H(ArrayU512 &State)
+	static void PermuteR24P8x1600H(ArrayU512 &State, size_t Rounds = 24)
 	{
 		std::array<ULong512, 25> A;
 		std::array<ULong512, 5> C;
@@ -7769,7 +7776,7 @@ public:
 
 		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ULong512));
 
-		for (i = 0; i < 24; i += 2)
+		for (i = 0; i < Rounds; i += 2)
 		{
 			// round n
 			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
@@ -8156,8 +8163,9 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations ULong256 state array</param>
+	/// <param name="Rounds">The number of permutations rounds; defaults at 24</param>
 	template<typename ArrayU256>
-	static void PermuteR24P4x1600H(ArrayU256 &State)
+	static void PermuteR24P4x1600H(ArrayU256 &State, size_t Rounds = 24)
 	{
 		std::array<ULong256, 25> A;
 		std::array<ULong256, 5> C;
@@ -8167,7 +8175,7 @@ public:
 
 		MemoryTools::Copy(State, 0, A, 0, A.size() * sizeof(ULong256));
 
-		for (i = 0; i < 24; i += 2)
+		for (i = 0; i < Rounds; i += 2)
 		{
 			// round n
 			C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];

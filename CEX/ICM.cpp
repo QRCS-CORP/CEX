@@ -15,14 +15,14 @@ class ICM::IcmState
 {
 public:
 
-	std::vector<ulong> Nonce;
+	std::vector<byte> Nonce;
 	bool Destroyed;
 	bool Encryption;
 	bool Initialized;
 
 	IcmState(bool IsDestroyed)
 		:
-		Nonce(BLOCK_SIZE / sizeof(ulong), 0x0ULL),
+		Nonce(BLOCK_SIZE, 0x0ULL),
 		Destroyed(IsDestroyed),
 		Encryption(false),
 		Initialized(false)
@@ -36,7 +36,7 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(Nonce, 0, Nonce.size() * sizeof(ulong));
+		MemoryTools::Clear(Nonce, 0, Nonce.size());
 		Destroyed = false;
 		Encryption = false;
 		Initialized = false;
@@ -132,6 +132,11 @@ const std::string ICM::Name()
 	tmpn = CipherModeConvert::ToName(Enumeral()) + std::string("-") + BlockCipherConvert::ToName(m_blockCipher->Enumeral());
 
 	return tmpn;
+}
+
+const std::vector<byte> &ICM::Nonce()
+{
+	return m_icmState->Nonce;
 }
 
 const size_t ICM::ParallelBlockSize()
@@ -255,11 +260,11 @@ void ICM::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	std::vector<byte> tmpc(BLOCK_SIZE);
 	MemoryTools::COPY128(m_icmState->Nonce, 0, tmpc, 0);
 	m_blockCipher->EncryptBlock(tmpc, 0, Output, OutOffset);
-	IntegerTools::LeIncrementW(m_icmState->Nonce);
+	IntegerTools::LeIncrement(m_icmState->Nonce);
 	MemoryTools::XOR128(Input, InOffset, Output, OutOffset);
 }
 
-void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<ulong> &Counter)
+void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, std::vector<byte> &Counter)
 {
 	size_t bctr;
 
@@ -277,37 +282,37 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		{
 
 			MemoryTools::COPY128(Counter, 0, cblk, 0);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 16);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 32);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 48);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 64);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 80);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 96);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 112);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 128);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 144);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 160);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 176);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 192);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 208);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 224);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 240);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			m_blockCipher->Transform2048(cblk, 0, Output, OutOffset + bctr);
 			bctr += AVX512BLK;
 		}
@@ -323,21 +328,21 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		while (bctr != PBKALN)
 		{
 			MemoryTools::COPY128(Counter, 0, cblk, 0);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 16);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 32);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 48);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 64);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 80);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 96);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 112);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			m_blockCipher->Transform1024(cblk, 0, Output, OutOffset + bctr);
 			bctr += AVX2BLK;
 		}
@@ -353,13 +358,13 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		while (bctr != PBKALN)
 		{
 			MemoryTools::COPY128(Counter, 0, cblk, 0);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 16);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 32);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			MemoryTools::COPY128(Counter, 0, cblk, 48);
-			IntegerTools::LeIncrementW(Counter);
+			IntegerTools::LeIncrement(Counter);
 			m_blockCipher->Transform512(cblk, 0, Output, OutOffset + bctr);
 			bctr += AVXBLK;
 		}
@@ -373,7 +378,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 	{
 		MemoryTools::COPY128(Counter, 0, tmpc, 0);
 		m_blockCipher->EncryptBlock(tmpc, 0, Output, OutOffset + bctr);
-		IntegerTools::LeIncrementW(Counter);
+		IntegerTools::LeIncrement(Counter);
 		bctr += BLOCK_SIZE;
 	}
 
@@ -384,7 +389,7 @@ void ICM::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length, s
 		m_blockCipher->EncryptBlock(tmpc, 0, tmpr, 0);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
 		MemoryTools::Copy(tmpr, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
-		IntegerTools::LeIncrementW(Counter);
+		IntegerTools::LeIncrement(Counter);
 	}
 }
 
@@ -393,14 +398,14 @@ void ICM::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
-	std::vector<ulong> tmpc(m_icmState->Nonce.size());
+	std::vector<byte> tmpc(m_icmState->Nonce.size());
 
 	ParallelTools::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpc, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
-		std::vector<ulong> thdc(2, 0);
+		std::vector<byte> thdc(BLOCK_SIZE, 0);
 		// offset counter by chunk size / block size  
-		IntegerTools::LeIncreaseW(m_icmState->Nonce, thdc, CTRLEN * i);
+		IntegerTools::LeIncrease8(m_icmState->Nonce, thdc, CTRLEN * i);
 		const size_t STMPOS = i * CNKLEN;
 		// generate random at output array offset
 		this->Generate(Output, OutOffset + STMPOS, CNKLEN, thdc);

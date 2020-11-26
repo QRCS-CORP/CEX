@@ -63,25 +63,37 @@ enum class Macs : byte
 	/// </summary>
 	HMACSHA2512 = 12,
 	/// <summary>
-	/// The Keccak based Message Authentication Code generator using Keccak-256
+	/// The Keccak based Parallel Authentication Code generator using Keccak-256
 	/// </summary>
-	KMAC128 = 13,
+	KPA128 = 13,
+	/// <summary>
+	/// The Keccak based Parallel Authentication Code generator using Keccak-256
+	/// </summary>
+	KPA256 = 14,
+	/// <summary>
+	/// The Keccak based Parallel Authentication Code generator Keccak-512
+	/// </summary>
+	KPA512 = 15,
+	/// <summary>
+	/// The Keccak based Message Authentication Code generator using Keccak-128
+	/// </summary>
+	KMAC128 = 16,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator using Keccak-256
 	/// </summary>
-	KMAC256 = 14,
+	KMAC256 = 17,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator Keccak-512
 	/// </summary>
-	KMAC512 = 15,
+	KMAC512 = 18,
 	/// <summary>
 	/// The Keccak based Message Authentication Code generator Keccak-1024
 	/// </summary>
-	KMAC1024 = 16,
+	KMAC1024 = 19,
 	/// <summary>
 	/// The Poly1305 Message Authentication Code generator
 	/// </summary>
-	Poly1305 = 17
+	Poly1305 = 20
 };
 
 class MacConvert

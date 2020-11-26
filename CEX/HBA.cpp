@@ -85,7 +85,7 @@ HBA::HBA(BlockCiphers CipherType, StreamAuthenticators AuthenticatorType)
 	:
 	m_hbaState(new HbaState(true)),
 	m_cipherMode(CipherType != BlockCiphers::None ?
-		new CTR(CipherType) :
+		new ICM(CipherType) :
 		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The block cipher enumeration type can nor be none!"), ErrorCodes::InvalidParam)), //-V2571
 	m_macAuthenticator(AuthenticatorType != StreamAuthenticators::None ? 
 		Helper::MacFromName::GetInstance(AuthenticatorType) :
@@ -97,7 +97,7 @@ HBA::HBA(IBlockCipher* Cipher, StreamAuthenticators AuthenticatorType)
 	:
 	m_hbaState(new HbaState(false)),
 	m_cipherMode(Cipher != nullptr ? 
-		new CTR(Cipher) : 
+		new ICM(Cipher) :
 		throw CryptoCipherModeException(AeadModeConvert::ToName(AeadModes::HBA), std::string("Constructor"), std::string("The block cipher instance can not be null!"), ErrorCodes::IllegalOperation)), //-V2571
 	m_macAuthenticator(AuthenticatorType != StreamAuthenticators::None ?
 		Helper::MacFromName::GetInstance(AuthenticatorType) :

@@ -1,7 +1,7 @@
 #include "StreamCipherFromName.h"
 #include "ACS.h"
 #include "CpuDetect.h"
-#include "CSX256.h"
+#include "ChaChaP20.h"
 #include "CSX512.h"
 #include "CryptoSymmetricException.h"
 #include "RCS.h"
@@ -31,24 +31,24 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType)
 	{
 		switch (StreamCipherType)
 		{
-			case StreamCiphers::CSX256:
+			case StreamCiphers::ChaChaP20:
 			{
-				cptr = new CSX256(false);
+				cptr = new ChaChaP20(false);
 				break;
 			}
 			case StreamCiphers::CSXR20K256:
 			{
-				cptr = new CSX256(true);
+				cptr = new ChaChaP20(true);
 				break;
 			}
 			case StreamCiphers::CSX512:
 			{
-				cptr = new CSX256(false);
+				cptr = new ChaChaP20(false);
 				break;
 			}
 			case StreamCiphers::CSXR80K512:
 			{
-				cptr = new CSX256(true);
+				cptr = new ChaChaP20(true);
 				break;
 			}
 			case StreamCiphers::RCS:

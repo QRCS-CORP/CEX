@@ -53,11 +53,11 @@ namespace Test
 	{
 		try
 		{
-			//Ancillary();
-			//OnProgress(std::string("KMACTest: Passed the KMAC compact functions tests.."));
+			Ancillary();
+			OnProgress(std::string("KMACTest: Passed the KMAC compact functions tests.."));
 
-			//Exception();
-			//OnProgress(std::string("KMACTest: Passed KMAC exception handling tests.."));
+			Exception();
+			OnProgress(std::string("KMACTest: Passed KMAC exception handling tests.."));
 
 			KMAC* gen1 = new KMAC(KmacModes::KMAC128);
 			Kat(gen1, m_key[0], m_custom[0], m_message[0], m_expected[0]);
