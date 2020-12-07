@@ -57,7 +57,7 @@ public:
 	/// <param name="Host">The hosts qualified name</param>
 	/// <param name="Service">The service name</param>
 	/// 
-	/// <returns>The default interface ip address</returns>
+	/// <returns>The default interface ip info</returns>
 	static ipv4_info GetIPv4Info(const std::string &Host, const std::string &Service);
 
 	/// <summary>
@@ -67,7 +67,7 @@ public:
 	/// <param name="Host">The hosts qualified name</param>
 	/// <param name="Service">The service name</param>
 	/// 
-	/// <returns>The default interface ip address</returns>
+	/// <returns>The default interface ip info</returns>
 	static ipv6_info GetIPv6Info(const std::string &Host, const std::string &Service);
 
 	/// <summary>

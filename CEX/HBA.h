@@ -18,8 +18,10 @@
 //
 //
 // Implementation Details:
+// Version 1.1a
 // An implementation of an Encrypt and Authenticate AEAD cipher mode, block cipher counter-mode with Hash based Authentication (HBA).
 // Written by John G. Underhill, November 24, 2019
+// Updated December 4, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CHA_H

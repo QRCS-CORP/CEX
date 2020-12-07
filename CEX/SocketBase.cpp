@@ -126,11 +126,9 @@ void SocketBase::CloseSocket(Socket &Source)
 		}
 
 #else
-		if (res != SOCKET_RET_ERROR)
-		{
-			res = close(Source.Connection);
-		}
-		else
+		res = close(Source.Connection);
+
+		if (res == SOCKET_RET_ERROR)
 		{
 			throw CryptoSocketException(std::string("Socket"), std::string("CloseSocket"), std::string("The socket closed abnormally!"), ErrorCodes::SocketFailure);
 		}

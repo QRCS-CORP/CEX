@@ -40,7 +40,6 @@ public:
 #else
 	std::vector<__m128i> RoundKeys;
 #endif
-	SecureVector<byte> Associated;
 	SecureVector<byte> Custom;
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
@@ -58,7 +57,6 @@ public:
 	AcsState(bool Authenticate)
 		:
 		RoundKeys(0),
-		Associated(0),
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
@@ -81,7 +79,6 @@ public:
 	AcsState(SecureVector<byte> &State)
 		:
 		RoundKeys(0),
-		Associated(0),
 		Custom(0),
 		MacKey(0),
 		MacTag(0),
@@ -136,12 +133,6 @@ public:
 		soff += vlen;
 
 		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
-		Associated.resize(vlen);
-		soff += sizeof(ushort);
-		MemoryTools::Copy(SecureState, soff, Associated, 0, Associated.size());
-		soff += vlen;
-
-		MemoryTools::CopyToObject(SecureState, soff, &vlen, sizeof(ushort));
 		Custom.resize(vlen);
 		soff += sizeof(ushort);
 		MemoryTools::Copy(SecureState, soff, Custom, 0, Custom.size());
@@ -191,7 +182,6 @@ public:
 	void Reset()
 	{
 		MemoryTools::Clear(RoundKeys, 0, RoundKeys.size() * sizeof(RoundKeys[0]));
-		MemoryTools::Clear(Associated, 0, Associated.size());
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
@@ -205,7 +195,7 @@ public:
 
 	SecureVector<byte> Serialize()
 	{
-		const size_t STALEN = (RoundKeys.size() * sizeof(RoundKeys[0])) + Associated.size() + Custom.size() + MacKey.size() + MacTag.size() +
+		const size_t STALEN = (RoundKeys.size() * sizeof(RoundKeys[0])) + Custom.size() + MacKey.size() + MacTag.size() +
 			Name.size() + Nonce.size() + sizeof(ulong) + sizeof(ushort) + sizeof(KmacModes) + sizeof(ShakeModes) + (3 * sizeof(bool)) + (7 * sizeof(ushort));
 
 		size_t soff;
@@ -218,12 +208,6 @@ public:
 		soff += sizeof(ushort);
 		MemoryTools::Copy(RoundKeys, 0, state, soff, static_cast<size_t>(vlen));
 		soff += vlen;
-
-		vlen = static_cast<ushort>(Associated.size());
-		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
-		soff += sizeof(ushort);
-		MemoryTools::Copy(Associated, 0, state, soff, Associated.size());
-		soff += Associated.size();
 
 		vlen = static_cast<ushort>(Custom.size());
 		MemoryTools::CopyFromObject(&vlen, state, soff, sizeof(ushort));
@@ -559,10 +543,19 @@ void ACS::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 	{
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
+	if (Length == 0)
+	{
+		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The additional data array can not be zero sized!"), ErrorCodes::InvalidSize);
+	}
 
-	// store the associated data
-	m_acsState->Associated.resize(Length);
-	MemoryTools::Copy(Input, Offset, m_acsState->Associated, 0, Length);
+	if (IsAuthenticator() == true)
+	{
+		std::vector<byte> code(sizeof(uint));
+		// version 1.1a add AD and encoding to hash
+		m_macAuthenticator->Update(Input, Offset, Length);
+		IntegerTools::Le32ToBytes(static_cast<uint>(Length), code, 0);
+		m_macAuthenticator->Update(code, 0, code.size());
+	}
 }
 
 void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -599,7 +592,7 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 	}
 	else
 	{
-		if (IsAuthenticator())
+		if (IsAuthenticator() == true)
 		{
 			// add the starting position of the nonce
 			m_macAuthenticator->Update(m_acsState->Nonce, 0, BLOCK_SIZE);
@@ -610,7 +603,7 @@ void ACS::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 			// finalize the mac and verify
 			Finalize(m_acsState, m_macAuthenticator);
 
-			if (!IntegerTools::Compare(Input, InOffset + Length, m_acsState->MacTag, 0, m_acsState->MacTag.size()))
+			if (IntegerTools::Compare(Input, InOffset + Length, m_acsState->MacTag, 0, m_acsState->MacTag.size()) == false)
 			{
 				throw CryptoAuthenticationFailure(Name(), std::string("Transform"), std::string("The authentication tag does not match!"), ErrorCodes::AuthenticationFailure);
 			}
@@ -628,18 +621,9 @@ void ACS::Finalize(std::unique_ptr<AcsState> &State, std::unique_ptr<IMac> &Auth
 	std::vector<byte> mctr(sizeof(ulong));
 	ulong mlen;
 
-	// 1.0c: add the total number of bytes processed by the mac, including this terminating string
-	mlen = State->Counter + State->Nonce.size() + State->Associated.size() + mctr.size();
-	IntegerTools::LeIncrease8(mctr, mlen);
-
-	// 1.0c: add the associated data to the mac
-	if (State->Associated.size() != 0)
-	{
-		Authenticator->Update(SecureUnlock(State->Associated), 0, State->Associated.size());
-		// clear the associated data, reset for each transformation, 
-		// assignable with a call to SetAssociatedData before each transform call
-		SecureClear(State->Associated);
-	}
+	// 1.1a: add the number of bytes processed by the mac, including the nonce and this terminating string
+	mlen = State->Counter + State->Nonce.size() + mctr.size();
+	IntegerTools::Le64ToBytes(mlen, mctr, 0);
 
 	// add the termination string to the mac
 	Authenticator->Update(mctr, 0, mctr.size());

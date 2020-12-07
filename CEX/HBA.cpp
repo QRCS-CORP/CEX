@@ -24,7 +24,6 @@ class HBA::HbaState
 {
 public:
 
-	SecureVector<byte> Associated;
 	SecureVector<byte> Custom;
 	SecureVector<byte> MacKey;
 	SecureVector<byte> MacTag;
@@ -60,13 +59,11 @@ public:
 
 	void Reset()
 	{
-		MemoryTools::Clear(Associated, 0, Associated.size());
 		MemoryTools::Clear(Custom, 0, Custom.size());
 		MemoryTools::Clear(MacKey, 0, MacKey.size());
 		MemoryTools::Clear(MacTag, 0, MacTag.size());
 		MemoryTools::Clear(Name, 0, Name.size());
 
-		Associated.clear();
 		Custom.clear();
 		MacKey.clear();
 		MacTag.clear();
@@ -351,8 +348,21 @@ void HBA::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, size_
 		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 
-	m_hbaState->Associated.resize(Length);
-	MemoryTools::Copy(Input, Offset, m_hbaState->Associated, 0, Length);
+	if (Length - Offset > Input.size())
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The input array is too small!"), ErrorCodes::InvalidSize);
+	}
+
+	// add the additional data
+	if (Length != 0)
+	{
+		std::vector<byte> actr(sizeof(uint));
+		m_macAuthenticator->Update(Input, Offset, Length);
+		// seperate encoding for associated data v1.1a
+		IntegerTools::Le32ToBytes(static_cast<uint>(Length), actr, 0);
+		// the counter terminates the mac update stream
+		m_macAuthenticator->Update(actr, 0, actr.size());
+	}
 }
 
 void HBA::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size_t Length)
@@ -362,8 +372,21 @@ void HBA::SetAssociatedData(const SecureVector<byte> &Input, size_t Offset, size
 		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been initialized!"), ErrorCodes::NotInitialized);
 	}
 
-	m_hbaState->Associated.resize(Length);
-	SecureCopy(Input, Offset, m_hbaState->Associated, 0, Length);
+	if (Length - Offset > Input.size())
+	{
+		throw CryptoCipherModeException(Name(), std::string("SetAssociatedData"), std::string("The input array is too small!"), ErrorCodes::InvalidSize);
+	}
+
+	// add the additional data
+	if (Length != 0)
+	{
+		std::vector<byte> actr(sizeof(uint));
+		m_macAuthenticator->Update(SecureUnlock(Input), Offset, Length);
+		// seperate encoding for associated data v1.1a
+		IntegerTools::Le32ToBytes(static_cast<uint>(Length), actr, 0);
+		// the counter terminates the mac update stream
+		m_macAuthenticator->Update(actr, 0, actr.size());
+	}
 }
 
 void HBA::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -419,23 +442,16 @@ void HBA::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector
 
 void HBA::Finalize(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	std::vector<byte> mctr(sizeof(ulong));
+	std::vector<byte> pctr(sizeof(ulong));
 	SecureVector<byte> mack(0);
+	uint64_t mctr;
 
-	// 1.0b: add the total number of bytes processed by the mac, including this terminating string
-	IntegerTools::LeIncrease8(mctr, m_hbaState->Counter + m_hbaState->Associated.size() + m_cipherMode->Nonce().size() + mctr.size());
-
-	// add the additional data
-	if (m_hbaState->Associated.size() != 0)
-	{
-		m_macAuthenticator->Update(SecureUnlock(m_hbaState->Associated), 0, m_hbaState->Associated.size());
-		// clear the associated data, reset for each transformation, assignable with a call to SetAssociatedData
-		MemoryTools::Clear(m_hbaState->Associated, 0, m_hbaState->Associated.size());
-		m_hbaState->Associated.resize(0);
-	}
+	// 1.1a: add the number of message bytes processed by the mac, including counter and this encoding string
+	mctr = m_hbaState->Counter + m_cipherMode->Nonce().size() + pctr.size();
+	IntegerTools::Le64ToBytes(mctr, pctr, 0);
 
 	// the counter terminates the mac update stream
-	m_macAuthenticator->Update(mctr, 0, mctr.size());
+	m_macAuthenticator->Update(pctr, 0, pctr.size());
 
 	// generate the mac code to state tag
 	m_macAuthenticator->Finalize(m_hbaState->MacTag, 0);

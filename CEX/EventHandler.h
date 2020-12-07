@@ -83,6 +83,7 @@ public:
 	}
 
 private:
+
 	handler_func_type m_handlerFunc;
 	handler_id_type m_handlerId;
 	static std::atomic_uint m_handlerIdCounter;
@@ -158,8 +159,8 @@ public:
 
 		ret = false;
 		std::lock_guard<std::mutex> lock(m_handlersLocker);
-
 		auto it = std::find(m_handlers.begin(), m_handlers.end(), handler);
+
 		if (it != m_handlers.end())
 		{
 			m_handlers.erase(it);
@@ -220,6 +221,7 @@ public:
 	}
 
 protected:
+
 	typedef std::list<handler_type> handler_collection_type;
 
 	void call_impl(const handler_collection_type& handlers, Args... params) const
@@ -242,6 +244,7 @@ protected:
 	}
 
 private:
+
 	handler_collection_type m_handlers;
 	mutable std::mutex m_handlersLocker;
 };

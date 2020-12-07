@@ -19,11 +19,9 @@
 //
 // Implementation Details:
 // An implementation of an Rijndael-256 authenticated Cryptographic Streamcipher.
-// Version 1.0e
+// Version 1.1a
 // Written by John G. Underhill, March 8, 2019
-// Updated January 09, 2020
-// Updated July 18, 2020
-// Updated August 17, 2020
+// Updated December 12, 2020
 // Contact: develop@vtdev.com
 
 #ifndef CEX_RCS_H

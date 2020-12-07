@@ -424,9 +424,19 @@ void CSX512::SetAssociatedData(const std::vector<byte> &Input, size_t Offset, si
 	{
 		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The cipher has not been configured for authentication!"), ErrorCodes::IllegalOperation);
 	}
+	if (Length == 0)
+	{
+		throw CryptoSymmetricException(Name(), std::string("SetAssociatedData"), std::string("The additional data array can not be zero sized!"), ErrorCodes::InvalidSize);
+	}
 
-	// update the authenticator
-	m_macAuthenticator->Update(Input, Offset, Length);
+	if (IsAuthenticator() == true)
+	{
+		std::vector<byte> code(sizeof(uint));
+		// version 1.1a add AD and encoding to hash
+		m_macAuthenticator->Update(Input, Offset, Length);
+		IntegerTools::Le32ToBytes(static_cast<uint>(Length), code, 0);
+		m_macAuthenticator->Update(code, 0, code.size());
+	}
 }
 
 void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -461,7 +471,7 @@ void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 	}
 	else
 	{
-		if (IsAuthenticator())
+		if (IsAuthenticator() == true)
 		{
 			// add the starting position of the nonce
 			m_macAuthenticator->Update(IntegerTools::Le64ToBytes<std::vector<byte>>(m_csx512State->Nonce[0]), 0, sizeof(ulong));
@@ -473,7 +483,7 @@ void CSX512::Transform(const std::vector<byte> &Input, size_t InOffset, std::vec
 			// finalize the mac and verify
 			Finalize(m_csx512State, m_macAuthenticator);
 
-			if (!IntegerTools::Compare(Input, InOffset + Length, m_csx512State->MacTag, 0, m_csx512State->MacTag.size()))
+			if (IntegerTools::Compare(Input, InOffset + Length, m_csx512State->MacTag, 0, m_csx512State->MacTag.size()) == false)
 			{
 				throw CryptoAuthenticationFailure(Name(), std::string("Transform"), std::string("The authentication tag does not match!"), ErrorCodes::AuthenticationFailure);
 			}

@@ -92,7 +92,7 @@ ipv6_address NetworkTools::GetIPv6Address()
 
 ipv4_info NetworkTools::GetIPv4Info(const std::string &Host, const std::string &Service)
 {
-	ipv4_info info;
+	ipv4_info info = { 0 };
 	sockaddr_in sa;
 	std::string sai;
 	int res;
@@ -102,7 +102,7 @@ ipv4_info NetworkTools::GetIPv4Info(const std::string &Host, const std::string &
 
 #if defined(CEX_OS_WINDOWS)
 
-	addrinfo* result;
+	addrinfo* result = nullptr;
 	addrinfo hints;
 
 	sa.sin_family = AF_INET;
@@ -119,16 +119,18 @@ ipv4_info NetworkTools::GetIPv4Info(const std::string &Host, const std::string &
 	{
 		char ipstr[INET_ADDRSTRLEN] = { 0 };
 		sai.assign(ipstr);
-		inet_ntop(AF_INET, &sa.sin_addr, ipstr, INET_ADDRSTRLEN);
+		inet_ntop(AF_INET, &sa.sin_addr, ipstr, INET_ADDRSTRLEN); // fix and test this
 		ipv4_address ipa = ipv4_address::FromString(sai);
 		info.address = ipa;
-		info.port = static_cast<ushort>(ntohs(sa.sin_port));
+		info.port = (uint16_t)ntohs(((struct sockaddr_in*)result->ai_addr)->sin_port);
+
+		if (result != NULL)
+		{
+			freeaddrinfo(result);
+		}
 	}
 
-	if (result != NULL)
-	{
-		freeaddrinfo(result);
-	}
+
 
 #else
 
